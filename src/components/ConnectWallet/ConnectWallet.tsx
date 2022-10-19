@@ -31,24 +31,21 @@ export default function ConnectWallet(props: ConnectWalletProps) {
             {provider.name} {provider.isActive && "[active]"}
           </h4>
           <div>
-            {/* If the wallet provider isn't connected, render a "connect" button */}
-            {!provider.isConnected && (
-              <button onClick={provider.connect} className="button">
-                Connect
-              </button>
-            )}
-            {/* If the wallet provider is connected and active, render a "disconnect" button */}
-            {provider.isConnected && (
-              <button onClick={provider.disconnect} className="button">
-                Disonnect
-              </button>
-            )}
-            {/* If the wallet provider is connected but not active, render a "set active" button */}
-            {provider.isConnected && !provider.isActive && (
-              <button onClick={provider.setActive} className="button">
-                Set Active
-              </button>
-            )}
+            <button onClick={provider.connect} disabled={provider.isConnected}>
+              Connect
+            </button>
+            <button
+              onClick={provider.disconnect}
+              disabled={!provider.isConnected}
+            >
+              Disonnect
+            </button>
+            <button
+              onClick={provider.setActive}
+              disabled={!provider.isConnected || provider.isActive}
+            >
+              Set Active
+            </button>
           </div>
         </div>
       ))}
