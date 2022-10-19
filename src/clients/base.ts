@@ -180,8 +180,6 @@ abstract class BaseWallet implements BaseWalletInterface {
       sentTransaction.txId
     );
 
-    console.log("sent", confirmedTransaction);
-
     return {
       id: sentTransaction.txId,
       ...confirmedTransaction,
