@@ -36,13 +36,9 @@ Setup the wallet providers
 
 ```jsx
 import React from "react";
-import { useConnectWallet } from "../../index";
+import { useConnectWallet } from "@txnlab/use-wallet";
 
-type ConnectWalletProps = {
-  foo?: string;
-};
-
-export default function ConnectWallet(props: ConnectWalletProps) {
+function App() {
   const { providers, reconnectProviders, accounts, activeAccount } =
     useConnectWallet();
 
@@ -52,12 +48,13 @@ export default function ConnectWallet(props: ConnectWalletProps) {
   }, []);
 
   // Use these properties to display connected accounts to users.
+  // They are reactive and presisted to local storage.
   React.useEffect(() => {
     console.log("connected accounts", accounts);
     console.log("active account", activeAccount);
   });
 
-  // Map through the providers, and render "connect", "set active", and "disconnect" buttons
+  // Map through the providers, and render account information and "connect", "set active", and "disconnect" buttons
   return (
     <div>
       {providers.map((provider) => (
@@ -67,18 +64,15 @@ export default function ConnectWallet(props: ConnectWalletProps) {
             {provider.name} {provider.isActive && "[active]"}
           </h4>
           <div>
-            {/* If the wallet provider isn't connected, render a "connect" button */}
-            {!provider.isConnected && (
-              <button onClick={provider.connect}>Connect</button>
-            )}
-            {/* If the wallet provider is connected and active, render a "disconnect" button */}
-            {provider.isConnected && (
-              <button onClick={provider.disconnect}>Disonnect</button>
-            )}
-            {/* If the wallet provider is connected but not active, render a "set active" button */}
-            {provider.isConnected && !provider.isActive && (
-              <button onClick={provider.setActive}>Set Active</button>
-            )}
+            <button onClick={provider.connect} disabled={provider.isConnected}>
+              Connect
+            </button>
+            <button onClick={provider.disconnect} disabled={!provider.isConnected}>
+              Disonnect
+            </button>
+            <button onClick={provider.setActive} disabled={!provider.isConnected || provider.isActive}>
+              Set Active
+            </button>
           </div>
         </div>
       ))}
@@ -87,10 +81,16 @@ export default function ConnectWallet(props: ConnectWalletProps) {
 }
 ```
 
+Each provider has two connection states: `isConnected` and `isActive`.
+
+`isConnected` means that the user has authorized the provider to talk to the dApp. The connection flow does not need to be restarted when switching to this wallet from a different one.
+
+`isActive` indicates that the provider is currently active and will be used to sign and send transactions when using the `useWallet` hook.
+
 Sign and send transactions
 
 ```jsx
-const Wallet = (props: WalletProps) => {
+function Wallet() {
   const { activeAccount, signTransactions, sendTransactions } = useWallet();
 
   const sendTransaction = async (
@@ -104,6 +104,7 @@ const Wallet = (props: WalletProps) => {
 
     const params = await algodClient.getTransactionParams().do();
 
+  // Construct a transaction to be signed and sent. 
     const transaction = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
       from,
       to,
@@ -111,9 +112,13 @@ const Wallet = (props: WalletProps) => {
       suggestedParams: params,
     });
 
+    // Encode the transactions into a byte array.
     const encodedTransaction = algosdk.encodeUnsignedTransaction(transaction);
+
+    // Sign the transactions.
     const signedTransactions = await signTransactions([encodedTransaction]);
 
+    // Send the transactions.
     const { id } = await sendTransactions(signedTransactions);
 
     console.log("Successfully sent transaction. Transaction ID: ", id);
