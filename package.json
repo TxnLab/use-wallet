@@ -12,13 +12,12 @@
     "url": "https://github.com/txnlab/use-wallet/issues"
   },
   "homepage": "https://txnlab.github.io/use-wallet",
-  "version": "0.0.5",
+  "version": "0.0.7",
   "description": "React hooks for using Algorand compatible wallets in dApps.",
   "scripts": {
     "dev": "yarn storybook",
     "build": "rm -rf dist && rollup -c",
     "test": "jest",
-    "publish":"npm run build && npm publish",
     "storybook": "start-storybook -p 6006",
     "deploy-storybook": "build-storybook && gh-pages -d storybook-static",
     "build-storybook": "build-storybook",
