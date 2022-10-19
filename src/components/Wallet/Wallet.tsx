@@ -2,18 +2,15 @@ import React from "react";
 import "./Wallet.scss";
 import { useWallet } from "../../index";
 import algosdk from "algosdk";
+import { NODE_TOKEN, NODE_SERVER, NODE_PORT } from "../../constants";
 
-const algodClient = new algosdk.Algodv2(
-  "",
-  "https://node.algoexplorerapi.io",
-  ""
-);
+const algodClient = new algosdk.Algodv2(NODE_TOKEN, NODE_SERVER, NODE_PORT);
 
 export type WalletProps = {
   foo?: string;
 };
 
-const Wallet = (props: WalletProps) => {
+export default function Wallet(props: WalletProps) {
   const { activeAccount, signTransactions, sendTransactions } = useWallet();
 
   const sendTransaction = async (
@@ -64,6 +61,4 @@ const Wallet = (props: WalletProps) => {
       }
     </div>
   );
-};
-
-export default Wallet;
+}
