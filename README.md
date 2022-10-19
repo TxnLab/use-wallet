@@ -144,6 +144,25 @@ const Wallet = (props: WalletProps) => {
 };
 ```
 
+### Local Development
+
+Install dependencies.
+
+```bash
+yarn install
+```
+
+Demo the components in StoryBook.
+
+```bash
+yarn storybook
+
+```
+Build the library.
+
+```bash
+yarn build
+```
 ### Webpack 5 issues
 
 Install `react-app-rewired` and the missing polyfills.
