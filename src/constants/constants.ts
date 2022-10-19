@@ -6,6 +6,6 @@ export enum PROVIDER_ID {
   EXODUS = "Exodus",
 }
 
-export const NODE_SERVER = "https://node.algoexplorerapi.io";
+export const NODE_SERVER = "https://mainnet-api.algonode.cloud";
 export const NODE_TOKEN = "";
 export const NODE_PORT = "";
