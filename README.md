@@ -18,12 +18,12 @@ Install with NPM.
 npm install @txnlab/use-wallet
 ```
 
-Install the peer dependencies if you don't have them.
+Install peer dependencies if you don't have them.
 
 With Yarn.
 
 ```bash
-yarn add @blockshake/defly-connect @perawallet/connect @randlabs/myalgo-connect @walletconnect/client algosdk
+yarn add algosdk @blockshake/defly-connect @perawallet/connect @randlabs/myalgo-connect @walletconnect/client
 ```
 
 With NPM.
