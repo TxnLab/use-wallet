@@ -19,6 +19,8 @@
     "build": "rm -rf dist && rollup -c",
     "test": "jest",
     "storybook": "start-storybook -p 6006",
+    "predeploy": "npm run build-storybook",
+    "deploy-storybook": "gh-pages -d storybook-static",
     "build-storybook": "build-storybook",
     "check-types": "tsc --noEmit"
   },
@@ -51,6 +53,7 @@
     "babel-jest": "^29.1.2",
     "babel-loader": "^8.2.3",
     "css-loader": "^6.5.1",
+    "gh-pages": "^4.0.0",
     "html-webpack-plugin": "^5.5.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^29.1.2",
