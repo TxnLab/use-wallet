@@ -2,6 +2,8 @@
 
 React hooks for using Algorand compatible wallets with web applications.
 
+Demo `@txnlab/use-wallet` in [StoryBook](https://txnlab.github.io/use-wallet) or check out [this example](https://github.com/gabrielkuettel/use-wallet-example).
+
 ### Quick Start
 
 If you're using Webpack 5 (most newer React projects), you need to install polyfills. Follow [these directions.](#webpack-5-issues)
