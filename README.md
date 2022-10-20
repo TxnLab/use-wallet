@@ -1,40 +1,40 @@
-### @txnlab/use-wallet
+# @TxnLab/use-wallet
 
 React hooks for using Algorand compatible wallets with web applications.
 
-Demo `@txnlab/use-wallet` in [StoryBook](https://txnlab.github.io/use-wallet) or check out [this example](https://github.com/gabrielkuettel/use-wallet-example).
+## Demo
 
-### Quick Start
+Preview a basic implementation in [Storybook](https://txnlab.github.io/use-wallet) or check out [this example](https://github.com/gabrielkuettel/use-wallet-example).
 
-If you're using Webpack 5 (most newer React projects), you need to install polyfills. Follow [these directions.](#webpack-5-issues)
+## Quick Start
 
-Install with Yarn.
+⚠️ If you're using Webpack 5 (most newer React projects), you will need to install polyfills. Follow [these directions](#webpack-5).
+
+### Yarn
 
 ```bash
 yarn add @txnlab/use-wallet
 ```
 
-Install with NPM.
-
-```bash
-npm install @txnlab/use-wallet
-```
-
-Install peer dependencies if you don't have them.
-
-With Yarn.
+Install peer dependencies (if needed)
 
 ```bash
 yarn add algosdk @blockshake/defly-connect @perawallet/connect @randlabs/myalgo-connect @walletconnect/client
 ```
 
-With NPM.
+### NPM
+
+```bash
+npm install @txnlab/use-wallet
+```
+
+Install peer dependencies (if needed)
 
 ```bash
 npm install algosdk @blockshake/defly-connect @perawallet/connect @randlabs/myalgo-connect @walletconnect/client
 ```
 
-Setup the wallet providers
+### Set up the wallet providers
 
 ```jsx
 import React from "react";
@@ -89,7 +89,7 @@ Each provider has two connection states: `isConnected` and `isActive`.
 
 `isActive` indicates that the provider is currently active and will be used to sign and send transactions when using the `useWallet` hook.
 
-Sign and send transactions
+### Sign and send transactions
 
 ```jsx
 function Wallet() {
@@ -151,66 +151,73 @@ function Wallet() {
 };
 ```
 
-### Local Development
+## Webpack 5
 
-Install dependencies.
+1. Install `react-app-rewired` and the missing polyfills.
+
+    ```bash
+    yarn add --dev react-app-rewired crypto-browserify stream-browserify assert stream-http https-browserify os-browserify url buffer process
+    ```
+
+2. Create `config-overrides.js` in the root of your project and add the following:
+
+    ```js
+    const webpack = require("webpack");
+    
+    module.exports = function override(config) {
+      const fallback = config.resolve.fallback || {};
+      Object.assign(fallback, {
+        crypto: require.resolve("crypto-browserify"),
+        stream: require.resolve("stream-browserify"),
+        assert: require.resolve("assert"),
+        http: require.resolve("stream-http"),
+        https: require.resolve("https-browserify"),
+        os: require.resolve("os-browserify"),
+        url: require.resolve("url"),
+      });
+      config.resolve.fallback = fallback;
+      config.plugins = (config.plugins || []).concat([
+        new webpack.ProvidePlugin({
+          process: "process/browser",
+          Buffer: ["buffer", "Buffer"],
+        }),
+      ]);
+      return config;
+    };
+    ```
+
+3. Change your scripts in `package.json` to the following:
+
+    ```js
+    "scripts": {
+        "start": "react-app-rewired start",
+        "build": "react-app-rewired build",
+        "test": "react-app-rewired test",
+        "eject": "react-scripts eject"
+    },
+    ```
+
+## Local Development
+
+### Install dependencies
 
 ```bash
 yarn install
 ```
 
-Demo the components in StoryBook.
+### Demo in Storybook
 
 ```bash
 yarn storybook
 
 ```
-Build the library.
+
+### Build the library
 
 ```bash
 yarn build
 ```
-### Webpack 5 issues
 
-Install `react-app-rewired` and the missing polyfills.
+## License
 
-```bash
-yarn add --dev react-app-rewired crypto-browserify stream-browserify assert stream-http https-browserify os-browserify url buffer process
-```
-
-Create `config-overrides.js` in the root of your project and add the following:
-
-```js
-const webpack = require("webpack");
-
-module.exports = function override(config) {
-  const fallback = config.resolve.fallback || {};
-  Object.assign(fallback, {
-    crypto: require.resolve("crypto-browserify"),
-    stream: require.resolve("stream-browserify"),
-    assert: require.resolve("assert"),
-    http: require.resolve("stream-http"),
-    https: require.resolve("https-browserify"),
-    os: require.resolve("os-browserify"),
-    url: require.resolve("url"),
-  });
-  config.resolve.fallback = fallback;
-  config.plugins = (config.plugins || []).concat([
-    new webpack.ProvidePlugin({
-      process: "process/browser",
-      Buffer: ["buffer", "Buffer"],
-    }),
-  ]);
-  return config;
-};
-```
-
-Change your scripts in `package.json` to the following:
-```
-"scripts": {
-    "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
-    "test": "react-app-rewired test",
-    "eject": "react-scripts eject"
-},
-```
+See the [LICENSE](https://github.com/TxnLab/use-wallet/blob/main/LICENSE.md) file for license rights and limitations (MIT)
