@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useWalletStore, walletStoreSelector } from "../store/index";
-import type { PROVIDER_ID, WalletClient } from "../types";
+import type { PROVIDER_ID } from "../types";
 import { providers as walletProviders } from "../providers";
 import shallow from "zustand/shallow";
 import { getWalletClient } from "../utils";
@@ -65,40 +65,58 @@ export default function useConnectWallet() {
   };
 
   const connect = async (id: PROVIDER_ID) => {
-    await disconnectWCSessions(id);
+    try {
+      await disconnectWCSessions(id);
 
-    const walletClient = await getWalletClient(id);
-    const walletInfo = await walletClient.connect(() => disconnect(id));
+      const walletClient = await getWalletClient(id);
+      const walletInfo = await walletClient.connect(() => disconnect(id));
 
-    if (!walletInfo || !walletInfo.accounts.length) {
-      throw new Error("Failed to connect " + id);
+      if (!walletInfo || !walletInfo.accounts.length) {
+        throw new Error("Failed to connect " + id);
+      }
+
+      setActiveAccount(walletInfo.accounts[0]);
+      addAccounts(walletInfo.accounts);
+    } catch (e) {
+      console.error(e);
     }
-
-    setActiveAccount(walletInfo.accounts[0]);
-    addAccounts(walletInfo.accounts);
   };
 
   const setActive = async (id: PROVIDER_ID) => {
-    await disconnectWCSessions(id);
-    const accounts = getAccountsByProvider(id);
-    setActiveAccount(accounts[0]);
+    try {
+      await disconnectWCSessions(id);
+      const accounts = getAccountsByProvider(id);
+      setActiveAccount(accounts[0]);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const reconnect = async (id: PROVIDER_ID) => {
-    const walletClient = await getWalletClient(id);
-    const walletInfo = await walletClient?.reconnect(() => disconnect(id));
+    try {
+      const walletClient = await getWalletClient(id);
+      const walletInfo = await walletClient?.reconnect(() => disconnect(id));
 
-    if (walletInfo && walletInfo.accounts.length) {
-      addAccounts(walletInfo.accounts);
+      if (walletInfo && walletInfo.accounts.length) {
+        addAccounts(walletInfo.accounts);
+      }
+    } catch (e) {
+      console.error(e);
+      disconnect(id);
     }
   };
 
   const disconnect = async (id: PROVIDER_ID) => {
-    const walletClient = await getWalletClient(id);
+    try {
+      const walletClient = await getWalletClient(id);
 
-    walletClient?.disconnect();
-    clearActiveAccount(id);
-    removeAccounts(id);
+      walletClient?.disconnect();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      clearActiveAccount(id);
+      removeAccounts(id);
+    }
   };
 
   return {

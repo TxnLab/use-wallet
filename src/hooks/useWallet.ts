@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useWalletStore } from "../store/index";
 import { PROVIDER_ID } from "../types";
 import { getWalletClient } from "../utils";
-// import { TransactionsArray } from "../types";
+import { TransactionsArray } from "../types";
 
 export { PROVIDER_ID };
 
@@ -41,58 +41,58 @@ export default function useWallet() {
     return result;
   };
 
-  // const getAccountInfo = async () => {
-  //   if (!activeAccount) throw new Error("No selected account.");
+  const getAccountInfo = async () => {
+    if (!activeAccount) throw new Error("No selected account.");
 
-  //   const walletClient = await getWalletClient(activeAccount.providerId);
+    const walletClient = await getWalletClient(activeAccount.providerId);
 
-  //   const accountInfo = await walletClient?.getAccountInfo(
-  //     activeAccount.address
-  //   );
+    const accountInfo = await walletClient?.getAccountInfo(
+      activeAccount.address
+    );
 
-  //   return accountInfo;
-  // };
+    return accountInfo;
+  };
 
-  // const getAddress = () => {
-  //   return activeAccount?.address;
-  // };
+  const getAddress = () => {
+    return activeAccount?.address;
+  };
 
-  // const getAssets = async () => {
-  //   if (!activeAccount) throw new Error("No selected account.");
+  const getAssets = async () => {
+    if (!activeAccount) throw new Error("No selected account.");
 
-  //   const walletClient = await getWalletClient(activeAccount.providerId);
+    const walletClient = await getWalletClient(activeAccount.providerId);
 
-  //   return await walletClient?.getAssets(activeAccount.address);
-  // };
+    return await walletClient?.getAssets(activeAccount.address);
+  };
 
-  // const groupTransactionsBySender = async (transactions: TransactionsArray) => {
-  //   const walletClient = await getWalletClient(activeAccount?.providerId);
+  const groupTransactionsBySender = async (transactions: TransactionsArray) => {
+    const walletClient = await getWalletClient(activeAccount?.providerId);
 
-  //   return walletClient?.groupTransactionsBySender(transactions);
-  // };
+    return walletClient?.groupTransactionsBySender(transactions);
+  };
 
-  // const signEncodedTransactions = async (transactions: TransactionsArray) => {
-  //   const walletClient = await getWalletClient(activeAccount?.providerId);
+  const signEncodedTransactions = async (transactions: TransactionsArray) => {
+    const walletClient = await getWalletClient(activeAccount?.providerId);
 
-  //   return await walletClient?.signEncodedTransactions(transactions);
-  // };
+    return await walletClient?.signEncodedTransactions(transactions);
+  };
 
-  // const sendRawTransactions = async (transactions: Uint8Array[]) => {
-  //   const walletClient = await getWalletClient(activeAccount?.providerId);
+  const sendRawTransactions = async (transactions: Uint8Array[]) => {
+    const walletClient = await getWalletClient(activeAccount?.providerId);
 
-  //   return await walletClient?.sendRawTransactions(transactions);
-  // };
+    return await walletClient?.sendRawTransactions(transactions);
+  };
 
   return {
     accounts,
     activeAccount,
     signTransactions,
     sendTransactions,
-    // getAddress,
-    // groupTransactionsBySender,
-    // getAccountInfo,
-    // getAssets,
-    // signEncodedTransactions,
-    // sendRawTransactions,
+    getAddress,
+    groupTransactionsBySender,
+    getAccountInfo,
+    getAssets,
+    signEncodedTransactions,
+    sendRawTransactions,
   };
 }
