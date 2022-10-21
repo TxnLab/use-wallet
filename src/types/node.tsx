@@ -31,7 +31,7 @@ export type DecodedTransaction = {
   gen: string;
   gh: Uint8Array;
   grp: Uint8Array;
-  lv: 24909934;
+  lv: number;
   note: Uint8Array;
   rcv: Uint8Array;
   snd: Uint8Array;

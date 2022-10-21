@@ -21,7 +21,7 @@ type AlgoSignerTransaction = {
   multisig?: string; // address of a multisig wallet to sign with
 };
 
-type SupportedLedgers = "MainNet" | "TestNet" | "BetaNet" | "devmodenet";
+type SupportedLedgers = "MainNet" | "TestNet" | "BetaNet" | "SandNet" | "devmodenet";
 
 type AlgoSigner = {
   connect: () => Promise<Record<string, never>>;
@@ -92,18 +92,17 @@ class AlgoSignerClient extends BaseWallet {
 
     let ledger: SupportedLedgers = "MainNet";
 
-    /** @todo remove env vars */
-    // if (process.env.NEXT_PUBLIC_VERCEL_ENV === "betanet") {
-    //   ledger = "BetaNet";
-    // }
+    if (process.env.NEXT_PUBLIC_VERCEL_ENV === "betanet") {
+      ledger = "BetaNet";
+    }
 
-    // if (process.env.NEXT_PUBLIC_VERCEL_ENV === "testnet") {
-    //   ledger = "TestNet";
-    // }
+    if (process.env.NEXT_PUBLIC_VERCEL_ENV === "testnet") {
+      ledger = "TestNet";
+    }
 
-    // if (!process.env.NEXT_PUBLIC_VERCEL_ENV) {
-    //   ledger = "devmodenet";
-    // }
+    if (!process.env.NEXT_PUBLIC_VERCEL_ENV) {
+      ledger = "SandNet";
+    }
 
     const accounts = await this.#client.accounts({
       ledger,
