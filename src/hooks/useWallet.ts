@@ -1,3 +1,4 @@
+import algosdk from "algosdk";
 import { useMemo } from "react";
 import { useWalletStore } from "../store/index";
 import { PROVIDER_ID } from "../types";
@@ -40,6 +41,15 @@ export default function useWallet() {
 
     return result;
   };
+
+  const signer: algosdk.TransactionSigner = (txnGroup: algosdk.Transaction[], indexesToSign: number[]) => {
+      const txnBlobs: Array<Uint8Array> = txnGroup.map(algosdk.encodeUnsignedTransaction)
+      return Promise.resolve(signTransactions(txnBlobs)).then(
+        (txns: Uint8Array[]) => {
+          return txns.filter((_, index) => indexesToSign.includes(index));
+        },
+      );
+    };
 
   // const getAccountInfo = async () => {
   //   if (!activeAccount) throw new Error("No selected account.");
@@ -86,6 +96,7 @@ export default function useWallet() {
   return {
     accounts,
     activeAccount,
+    signer,
     signTransactions,
     sendTransactions,
     // getAddress,
