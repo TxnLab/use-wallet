@@ -7,7 +7,13 @@ import type { IWalletConnectOptions } from "@walletconnect/types";
 import type QRCodeModal from "algorand-walletconnect-qrcode-modal";
 import { providers } from "../providers";
 import type { WalletProvider, Wallet } from "../types/wallet";
-import { PROVIDER_ID, NODE_TOKEN, NODE_SERVER, NODE_PORT } from "../constants";
+import {
+  PROVIDER_ID,
+  NODE_NETWORK,
+  NODE_TOKEN,
+  NODE_SERVER,
+  NODE_PORT,
+} from "../constants";
 import BaseWallet from "./base";
 import type { InitAlgodClient } from "./base";
 import { formatJsonRpcRequest } from "@json-rpc-tools/utils";
@@ -76,8 +82,16 @@ class WalletConnectClient extends BaseWallet {
   }
 
   async connect(): Promise<Wallet> {
+    let chainId = 416001;
+
+    if (NODE_NETWORK === "betanet") {
+      chainId = 416003;
+    } else if (NODE_NETWORK === "testnet") {
+      chainId = 416002;
+    }
+
     if (!this.#client.connected) {
-      await this.#client.createSession();
+      await this.#client.createSession({ chainId });
     }
 
     return new Promise((resolve, reject) => {
