@@ -4,6 +4,7 @@ export enum PROVIDER_ID {
   ALGO_SIGNER = "Algo Signer",
   DEFLY = "Defly",
   EXODUS = "Exodus",
+  WALLET_CONNECT = "Wallet Connect",
 }
 
 export const NODE_SERVER =

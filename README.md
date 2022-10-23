@@ -19,7 +19,7 @@ yarn add @txnlab/use-wallet
 Install peer dependencies (if needed)
 
 ```bash
-yarn add algosdk @blockshake/defly-connect @perawallet/connect @randlabs/myalgo-connect @walletconnect/client
+yarn add algosdk @blockshake/defly-connect @perawallet/connect @randlabs/myalgo-connect @walletconnect/client algorand-walletconnect-qrcode-modal
 ```
 
 ### NPM
@@ -31,7 +31,7 @@ npm install @txnlab/use-wallet
 Install peer dependencies (if needed)
 
 ```bash
-npm install algosdk @blockshake/defly-connect @perawallet/connect @randlabs/myalgo-connect @walletconnect/client
+npm install algosdk @blockshake/defly-connect @perawallet/connect @randlabs/myalgo-connect @walletconnect/client algorand-walletconnect-qrcode-modal
 ```
 
 ### Set up the wallet providers
