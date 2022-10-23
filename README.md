@@ -151,6 +151,15 @@ function Wallet() {
 };
 ```
 
+## Setup Environments
+
+The wallets connect to Algorand [MainNet](https://developer.algorand.org/docs/get-details/algorand-networks/mainnet) by default.
+You can change this by overriding the `NODE_SERVER`, `NODE_TOKEN`, `NODE_PORT` and `NODE_NETWORK` environment variables.
+
+`NODE_NETWORK` defaults to `mainnet`, and can be set to `testnet`, `betanet`, or the name of a local network running in dev mode.
+
+Please note, for React and Next.js projects, you must prefix the environment variables with `REACT_APP_` or `NEXT_PUBLIC_` respectively.
+
 ## Webpack 5
 
 1. Install `react-app-rewired` and the missing polyfills.

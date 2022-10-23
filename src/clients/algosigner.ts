@@ -4,7 +4,13 @@
  */
 import BaseWallet from "./base";
 import type { InitAlgodClient } from "./base";
-import { PROVIDER_ID, NODE_TOKEN, NODE_SERVER, NODE_PORT } from "../constants";
+import {
+  PROVIDER_ID,
+  NODE_TOKEN,
+  NODE_SERVER,
+  NODE_PORT,
+  NODE_NETWORK,
+} from "../constants";
 import { providers } from "../providers";
 import type { WalletProvider } from "../types";
 import { TransactionsArray } from "../types";
@@ -21,7 +27,7 @@ type AlgoSignerTransaction = {
   multisig?: string; // address of a multisig wallet to sign with
 };
 
-type SupportedLedgers = "MainNet" | "TestNet" | "BetaNet" | "devmodenet";
+type SupportedLedgers = "MainNet" | "TestNet" | "BetaNet" | string;
 
 type AlgoSigner = {
   connect: () => Promise<Record<string, never>>;
@@ -92,18 +98,15 @@ class AlgoSignerClient extends BaseWallet {
 
     let ledger: SupportedLedgers = "MainNet";
 
-    /** @todo remove env vars */
-    // if (process.env.NEXT_PUBLIC_VERCEL_ENV === "betanet") {
-    //   ledger = "BetaNet";
-    // }
-
-    // if (process.env.NEXT_PUBLIC_VERCEL_ENV === "testnet") {
-    //   ledger = "TestNet";
-    // }
-
-    // if (!process.env.NEXT_PUBLIC_VERCEL_ENV) {
-    //   ledger = "devmodenet";
-    // }
+    if (NODE_NETWORK === "mainnet") {
+      ledger = "MainNet";
+    } else if (NODE_NETWORK === "betanet") {
+      ledger = "BetaNet";
+    } else if (NODE_NETWORK === "testnet") {
+      ledger = "TestNet";
+    } else if (!!NODE_NETWORK) {
+      ledger = NODE_NETWORK;
+    }
 
     const accounts = await this.#client.accounts({
       ledger,
