@@ -8,7 +8,7 @@ import { getWalletClient } from "../utils";
 export default function useConnectWallet() {
   const {
     accounts,
-    setActiveAccount,
+    setActiveAccount: setActiveAccount,
     activeAccount,
     clearActiveAccount,
     addAccounts,
@@ -92,6 +92,26 @@ export default function useConnectWallet() {
     }
   };
 
+  const selectActiveAccount = async (
+    providerId: PROVIDER_ID,
+    address: string
+  ) => {
+    try {
+      const account = accounts.find(
+        (acct) => acct.address === address && acct.providerId === providerId
+      );
+
+      if (!account) {
+        throw new Error(`No accounts with address ${address} found.`);
+      }
+
+      await disconnectWCSessions(account.providerId);
+      setActiveAccount(account);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const reconnect = async (id: PROVIDER_ID) => {
     try {
       const walletClient = await getWalletClient(id);
@@ -126,6 +146,7 @@ export default function useConnectWallet() {
     connect,
     reconnect,
     disconnect,
+    selectActiveAccount,
     setActive,
     reconnectProviders,
   };

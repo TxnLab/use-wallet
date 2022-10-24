@@ -88,6 +88,7 @@
   ],
   "types": "dist/index.d.ts",
   "dependencies": {
+    "algorand-walletconnect-qrcode-modal": "^1.8.0",
     "big.js": "^6.2.1",
     "immer": "^9.0.15",
     "react-device-detect": "^2.2.2",

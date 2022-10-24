@@ -19,7 +19,7 @@ yarn add @txnlab/use-wallet
 Install peer dependencies (if needed)
 
 ```bash
-yarn add algosdk @blockshake/defly-connect @perawallet/connect @randlabs/myalgo-connect @walletconnect/client
+yarn add algosdk @blockshake/defly-connect @perawallet/connect @randlabs/myalgo-connect @walletconnect/client algorand-walletconnect-qrcode-modal
 ```
 
 ### NPM
@@ -31,7 +31,7 @@ npm install @txnlab/use-wallet
 Install peer dependencies (if needed)
 
 ```bash
-npm install algosdk @blockshake/defly-connect @perawallet/connect @randlabs/myalgo-connect @walletconnect/client
+npm install algosdk @blockshake/defly-connect @perawallet/connect @randlabs/myalgo-connect @walletconnect/client algorand-walletconnect-qrcode-modal
 ```
 
 ### Set up the wallet providers
@@ -41,8 +41,13 @@ import React from "react";
 import { useConnectWallet } from "@txnlab/use-wallet";
 
 function App() {
-  const { providers, reconnectProviders, accounts, activeAccount } =
-    useConnectWallet();
+    const {
+    providers,
+    reconnectProviders,
+    accounts,
+    activeAccount,
+    selectActiveAccount,
+  } = useConnectWallet();
 
   // Reconnect the session when the user returns to the dApp
   React.useEffect(() => {
@@ -89,9 +94,30 @@ Each provider has two connection states: `isConnected` and `isActive`.
 
 `isActive` indicates that the provider is currently active and will be used to sign and send transactions when using the `useWallet` hook.
 
+To support wallets that allow users to connect multiple accounts, you can map through `accounts` and use `selectActiveAccount` to switch between them.
+
+```jsx
+<select
+  value={activeAccount.address}
+  onChange={(e) =>
+    selectActiveAccount(
+      activeAccount.providerId,
+      e.target.value
+    )
+  }
+>
+  {accounts.map((account) => (
+    <option value={account.address}>{account.address}</option>
+  ))}
+</select>
+```
+
 ### Sign and send transactions
 
 ```jsx
+import React from "react";
+import { useWallet } from "@txnlab/use-wallet";
+
 function Wallet() {
   const { activeAccount, signTransactions, sendTransactions } = useWallet();
 
@@ -150,6 +176,15 @@ function Wallet() {
   );
 };
 ```
+
+## Setup Environments
+
+The wallets connect to Algorand [MainNet](https://developer.algorand.org/docs/get-details/algorand-networks/mainnet) by default.
+You can change this by overriding the `NODE_SERVER`, `NODE_TOKEN`, `NODE_PORT` and `NODE_NETWORK` environment variables.
+
+`NODE_NETWORK` defaults to `mainnet`, and can be set to `testnet`, `betanet`, or the name of a local network running in dev mode.
+
+Please note, for React and Next.js projects, you must prefix the environment variables with `REACT_APP_` or `NEXT_PUBLIC_` respectively.
 
 ## Webpack 5
 

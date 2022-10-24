@@ -45,20 +45,14 @@ export default function Wallet(props: WalletProps) {
 
   return (
     <div>
-      {
-        <button
-          onClick={() =>
-            sendTransaction(
-              activeAccount?.address,
-              activeAccount?.address,
-              1000
-            )
-          }
-          className="button"
-        >
-          Sign and send transactions
-        </button>
-      }
+      <button
+        onClick={() =>
+          sendTransaction(activeAccount?.address, activeAccount?.address, 1000)
+        }
+        className="button"
+      >
+        Sign and send transactions
+      </button>
     </div>
   );
 }

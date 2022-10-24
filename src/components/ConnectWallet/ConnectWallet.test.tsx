@@ -2,8 +2,8 @@ import React from "react";
 import { render } from "@testing-library/react";
 import ConnectWallet from "./ConnectWallet";
 
-describe("Wallet", () => {
-  test("renders the Wallet component", () => {
+describe("ConnectWallet", () => {
+  test("renders the ConnectWallet component", () => {
     render(<ConnectWallet foo="bar" />);
   });
 });
