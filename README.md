@@ -41,8 +41,13 @@ import React from "react";
 import { useConnectWallet } from "@txnlab/use-wallet";
 
 function App() {
-  const { providers, reconnectProviders, accounts, activeAccount } =
-    useConnectWallet();
+    const {
+    providers,
+    reconnectProviders,
+    accounts,
+    activeAccount,
+    selectActiveAccount,
+  } = useConnectWallet();
 
   // Reconnect the session when the user returns to the dApp
   React.useEffect(() => {
@@ -89,9 +94,30 @@ Each provider has two connection states: `isConnected` and `isActive`.
 
 `isActive` indicates that the provider is currently active and will be used to sign and send transactions when using the `useWallet` hook.
 
+To support wallets that allow users to connect multiple accounts, you can map through `accounts` and use `selectActiveAccount` to switch between them.
+
+```jsx
+<select
+  value={activeAccount.address}
+  onChange={(e) =>
+    selectActiveAccount(
+      activeAccount.providerId,
+      e.target.value
+    )
+  }
+>
+  {accounts.map((account) => (
+    <option value={account.address}>{account.address}</option>
+  ))}
+</select>
+```
+
 ### Sign and send transactions
 
 ```jsx
+import React from "react";
+import { useWallet } from "@txnlab/use-wallet";
+
 function Wallet() {
   const { activeAccount, signTransactions, sendTransactions } = useWallet();
 

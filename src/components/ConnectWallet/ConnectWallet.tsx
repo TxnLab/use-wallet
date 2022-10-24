@@ -7,8 +7,13 @@ type ConnectWalletProps = {
 };
 
 export default function ConnectWallet(props: ConnectWalletProps) {
-  const { providers, reconnectProviders, accounts, activeAccount } =
-    useConnectWallet();
+  const {
+    providers,
+    reconnectProviders,
+    accounts,
+    activeAccount,
+    selectActiveAccount,
+  } = useConnectWallet();
 
   // Reconnect the session when the user returns to the dApp
   React.useEffect(() => {
@@ -46,6 +51,23 @@ export default function ConnectWallet(props: ConnectWalletProps) {
             >
               Set Active
             </button>
+            {activeAccount && activeAccount.providerId === provider.id && (
+              <div>
+                <select
+                  value={activeAccount.address}
+                  onChange={(e) =>
+                    selectActiveAccount(
+                      activeAccount.providerId,
+                      e.target.value
+                    )
+                  }
+                >
+                  {accounts.map((account) => (
+                    <option value={account.address}>{account.address}</option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
         </div>
       ))}
