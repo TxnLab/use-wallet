@@ -1,4 +1,4 @@
-import algosdk, {
+import type algosdk, {
   EncodedSignedTransaction,
   EncodedTransaction,
 } from "algosdk";
@@ -65,6 +65,7 @@ class KMDWallet extends BaseWallet {
   }
 
   static async init() {
+  const algosdk = (await import("algosdk")).default;
     const initAlgodClient: InitAlgodClient = {
       algosdk,
       token: NODE_TOKEN,
