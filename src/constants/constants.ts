@@ -6,9 +6,8 @@ export enum PROVIDER_ID {
   EXODUS = "Exodus",
 }
 
-
-
-export const NODE_SERVER = process.env.REACT_APP_NODE_URL ||
+export const NODE_SERVER =
+  process.env.REACT_APP_NODE_URL ||
   process.env.NEXT_PUBLIC_NODE_URL ||
   "https://mainnet-api.algonode.cloud";
 
