@@ -1,4 +1,5 @@
-import type algosdk, {
+import type {
+  Kmd,
   EncodedSignedTransaction,
   EncodedTransaction,
 } from "algosdk";
@@ -44,13 +45,13 @@ interface InitWalletHandle {
 }
 
 type InitWallet = {
-  client: algosdk.Kmd;
+  client: Kmd;
   id: PROVIDER_ID;
   providers: typeof providers;
 };
 
 class KMDWallet extends BaseWallet {
-  #client: algosdk.Kmd;
+  #client: Kmd;
   walletId: string;
   id: PROVIDER_ID;
   provider: WalletProvider;
@@ -65,7 +66,7 @@ class KMDWallet extends BaseWallet {
   }
 
   static async init() {
-  const algosdk = (await import("algosdk")).default;
+    const algosdk = (await import("algosdk")).default;
     const initAlgodClient: InitAlgodClient = {
       algosdk,
       token: NODE_TOKEN,
@@ -177,7 +178,7 @@ class KMDWallet extends BaseWallet {
   async signTransactions(activeAddress: string, transactions: Uint8Array[]) {
     // Decode the transactions to access their properties.
     const decodedTxns = transactions.map((txn) => {
-      return algosdk.decodeObj(txn);
+      return this.algosdk.decodeObj(txn);
     }) as Array<EncodedTransaction | EncodedSignedTransaction>;
 
     // Get a handle token
@@ -196,12 +197,12 @@ class KMDWallet extends BaseWallet {
       // Its already signed, skip it
       if (!("snd" in dtxn)) continue;
       // Not to be signed by our signer, skip it
-      if (!(algosdk.encodeAddress(dtxn.snd) === activeAddress)) continue;
+      if (!(this.algosdk.encodeAddress(dtxn.snd) === activeAddress)) continue;
 
       // overwrite with an empty blob
       signedTxns[idx] = new Uint8Array();
 
-      const txn = algosdk.Transaction.from_obj_for_encoding(dtxn);
+      const txn = this.algosdk.Transaction.from_obj_for_encoding(dtxn);
       signingPromises.push(this.#client.signTransaction(token, pw, txn));
     }
 
