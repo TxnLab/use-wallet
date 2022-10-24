@@ -1,11 +1,13 @@
-import algosdk, { decodeSignedTransaction, EncodedSignedTransaction, EncodedTransaction, SignedTransaction } from "algosdk";
+import algosdk, {
+  EncodedSignedTransaction,
+  EncodedTransaction,
+} from "algosdk";
 import BaseWallet from "./base";
 import type { InitAlgodClient } from "./base";
 import { PROVIDER_ID, NODE_TOKEN, NODE_SERVER, NODE_PORT } from "../constants";
 import { providers } from "../providers";
 import type { Account, Wallet, WalletProvider } from "../types";
 import { TransactionsArray } from "../types";
-import type { DecodedTransaction, DecodedSignedTransaction } from "../types";
 
 // Default config settings for dev sandbox kmd
 const DEFAULT_KMD_TOKEN = "a".repeat(64);
@@ -27,25 +29,19 @@ const DefaultKMDConfig = {
 } as KMDConfig;
 
 interface ListWalletResponse {
-    id: string,
-    name:	string,
-    driver_name?: 	string,
-    driver_version?: number,
-    mnemonic_ux?:	boolean,
-    supported_txs?: Array<any>,
-}
-interface SignTransactionResponse {
-  signed_transaction: Uint8Array 
-  error?:		boolean,
-  message?: 		string,
+  id: string;
+  name: string;
+  driver_name?: string;
+  driver_version?: number;
+  mnemonic_ux?: boolean;
+  supported_txs?: Array<any>;
 }
 
 interface InitWalletHandle {
-  wallet_handle_token: string,
-  message?: 	string,
-  error?:boolean,
+  wallet_handle_token: string;
+  message?: string;
+  error?: boolean;
 }
-
 
 type InitWallet = {
   client: algosdk.Kmd;
@@ -98,8 +94,11 @@ class KMDWallet extends BaseWallet {
     // TODO: prompt for wallet and password?
     return {
       ...this.provider,
-      accounts: await this.listAccounts(DEFAULT_KMD_WALLET, await this.requestPassword()),
-    }
+      accounts: await this.listAccounts(
+        DEFAULT_KMD_WALLET,
+        await this.requestPassword()
+      ),
+    };
   }
 
   async disconnect() {
@@ -109,18 +108,23 @@ class KMDWallet extends BaseWallet {
   async reconnect(): Promise<Wallet | null> {
     return {
       ...this.provider,
-      accounts: await this.listAccounts(DEFAULT_KMD_WALLET, await this.requestPassword()),
-    }
+      accounts: await this.listAccounts(
+        DEFAULT_KMD_WALLET,
+        await this.requestPassword()
+      ),
+    };
   }
 
   async requestPassword(): Promise<string> {
-    const pw = prompt("gib password")
-    return pw?pw:""
+    // TODO: store it locally?
+    const pw = prompt("gib password");
+    return pw ? pw : "";
   }
 
   async getWalletToken(walletId: string, password: string): Promise<string> {
     const handleResp: InitWalletHandle = await this.#client.initWalletHandle(
-      walletId, password
+      walletId,
+      password
     );
     return handleResp.wallet_handle_token;
   }
@@ -133,39 +137,41 @@ class KMDWallet extends BaseWallet {
     const walletResponse = await this.#client.listWallets();
     const walletList: Array<ListWalletResponse> = walletResponse["wallets"];
     const walletMap: Record<string, string> = {};
-    for(const w of walletList){
-      walletMap[w.name] = w.id
+    for (const w of walletList) {
+      walletMap[w.name] = w.id;
     }
     return walletMap;
   }
 
-  async listAccounts(wallet: string, password: string): Promise<Array<Account>> {
+  async listAccounts(
+    wallet: string,
+    password: string
+  ): Promise<Array<Account>> {
     const walletMap = await this.listWallets();
 
-    if(!(wallet in walletMap)) throw Error("No wallet named: " + wallet);
+    if (!(wallet in walletMap)) throw Error("No wallet named: " + wallet);
 
     this.walletId = walletMap[wallet];
 
     // Get a handle token
-    const token = await this.getWalletToken(this.walletId, password) ;
+    const token = await this.getWalletToken(this.walletId, password);
 
     // Fetch accounts and format them as lib expects
     const listResponse = await this.#client.listKeys(token);
     const addresses: Array<string> = listResponse["addresses"];
-    const mappedAccounts = addresses.map((address: string, index: number)=>{
+    const mappedAccounts = addresses.map((address: string, index: number) => {
       return {
-        name:`KMDWallet ${index + 1}`,
+        name: `KMDWallet ${index + 1}`,
         address,
         providerId: this.provider.id,
-      }
-    })
+      };
+    });
 
     // Release handle token
-    this.releaseToken(token)
+    this.releaseToken(token);
 
     return mappedAccounts;
   }
-
 
   async signTransactions(activeAddress: string, transactions: Uint8Array[]) {
     // Decode the transactions to access their properties.
@@ -174,22 +180,22 @@ class KMDWallet extends BaseWallet {
     }) as Array<EncodedTransaction | EncodedSignedTransaction>;
 
     // Get a handle token
-    const pw = await this.requestPassword()
+    const pw = await this.requestPassword();
     const token = await this.getWalletToken(this.walletId, pw);
 
     const signedTxns: Uint8Array[] = [];
     // Sign them with the client.
     const signingPromises: Promise<Uint8Array>[] = [];
-    for(const idx in decodedTxns){
+    for (const idx in decodedTxns) {
       const dtxn = decodedTxns[idx];
 
       // push the incoming txn into signed, we'll overwrite it later
-      signedTxns.push(transactions[idx])
+      signedTxns.push(transactions[idx]);
 
       // Its already signed, skip it
-      if(!('snd' in dtxn)) continue;
+      if (!("snd" in dtxn)) continue;
       // Not to be signed by our signer, skip it
-      if(!(algosdk.encodeAddress(dtxn.snd) === activeAddress)) continue;
+      if (!(algosdk.encodeAddress(dtxn.snd) === activeAddress)) continue;
 
       // overwrite with an empty blob
       signedTxns[idx] = new Uint8Array();
@@ -199,29 +205,27 @@ class KMDWallet extends BaseWallet {
     }
 
     const signingResults = await Promise.all(signingPromises);
-    console.log("Signing results: s")
-    console.log(signingResults.map((b)=>{return algosdk.decodeSignedTransaction(b)}))
 
     // Restore the newly signed txns in the correct order
     let signedIdx = 0;
-    for(const idx in signedTxns){
-      // Empty array, its one of the ones we wanted to have signed
-      if (signedTxns[idx].length === 0){
+    for (const idx in signedTxns) {
+      // If its an empty array, infer that it is one of the
+      // ones we wanted to have signed and overwrite the empty buff
+      if (signedTxns[idx].length === 0) {
         signedTxns[idx] = signingResults[signedIdx];
-        signedIdx += 1
+        signedIdx += 1;
       }
     }
-    console.log(signedTxns.map((b)=>{return algosdk.decodeSignedTransaction(b)}))
 
-    return signedTxns
+    return signedTxns;
   }
 
-  signEncodedTransactions(transactions: TransactionsArray): Promise<Uint8Array[]> {
+  signEncodedTransactions(
+    transactions: TransactionsArray
+  ): Promise<Uint8Array[]> {
     throw new Error("Method not implemented.");
   }
-
 }
-
 
 export default KMDWallet.init().catch((e) => {
   if (typeof window !== "undefined") {
