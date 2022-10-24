@@ -14,13 +14,13 @@ const DEFAULT_KMD_PORT = "4002";
 const DEFAULT_KMD_WALLET = "unencrypted-default-wallet";
 const DEFAULT_KMD_PASSWORD = "";
 
-export type KMDConfig = {
+type KMDConfig = {
   host: string;
   port: string;
   token: string;
 };
 
-export const DefaultKMDConfig = {
+const DefaultKMDConfig = {
   host: DEFAULT_KMD_HOST,
   token: DEFAULT_KMD_TOKEN,
   port: DEFAULT_KMD_PORT,
@@ -86,7 +86,7 @@ class KMDWallet extends BaseWallet {
     );
 
     const initWallet: InitWallet = {
-      id: PROVIDER_ID.KMD,
+      id: PROVIDER_ID.KMD_WALLET,
       client: kmdClient,
       providers: providers,
     };
@@ -107,7 +107,10 @@ class KMDWallet extends BaseWallet {
   }
 
   async reconnect(): Promise<Wallet | null> {
-    throw new Error("Method not implemented.");
+    return {
+      ...this.provider,
+      accounts: await this.listAccounts(DEFAULT_KMD_WALLET, await this.requestPassword()),
+    }
   }
 
   async requestPassword(): Promise<string> {
@@ -176,7 +179,7 @@ class KMDWallet extends BaseWallet {
 
     const signedTxns: Uint8Array[] = [];
     // Sign them with the client.
-    const signingPromises: Promise<SignTransactionResponse>[] = [];
+    const signingPromises: Promise<Uint8Array>[] = [];
     for(const idx in decodedTxns){
       const dtxn = decodedTxns[idx];
 
@@ -192,21 +195,23 @@ class KMDWallet extends BaseWallet {
       signedTxns[idx] = new Uint8Array();
 
       const txn = algosdk.Transaction.from_obj_for_encoding(dtxn);
-      signingPromises.push(this.#client.signTransactionWithSpecificPublicKey(token, pw, txn, activeAddress));
-
+      signingPromises.push(this.#client.signTransaction(token, pw, txn));
     }
 
     const signingResults = await Promise.all(signingPromises);
+    console.log("Signing results: s")
+    console.log(signingResults.map((b)=>{return algosdk.decodeSignedTransaction(b)}))
 
     // Restore the newly signed txns in the correct order
     let signedIdx = 0;
     for(const idx in signedTxns){
       // Empty array, its one of the ones we wanted to have signed
       if (signedTxns[idx].length === 0){
-        signedTxns[idx] = signingResults[signedIdx].signed_transaction;
+        signedTxns[idx] = signingResults[signedIdx];
         signedIdx += 1
       }
     }
+    console.log(signedTxns.map((b)=>{return algosdk.decodeSignedTransaction(b)}))
 
     return signedTxns
   }

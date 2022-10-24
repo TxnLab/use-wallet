@@ -7,10 +7,10 @@ import exodusClient from "./exodus";
 import kmdClient from "./kmd";
 
 export const clients = {
+  [PROVIDER_ID.KMD_WALLET]: kmdClient,
   [PROVIDER_ID.PERA_WALLET]: peraWalletClient,
   [PROVIDER_ID.MYALGO_WALLET]: myAlgoWalletClient,
   [PROVIDER_ID.ALGO_SIGNER]: algoSignerClient,
   [PROVIDER_ID.DEFLY]: deflyClient,
   [PROVIDER_ID.EXODUS]: exodusClient,
-  [PROVIDER_ID.KMD]: kmdClient,
 };
