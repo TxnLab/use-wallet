@@ -12,7 +12,7 @@
     "url": "https://github.com/txnlab/use-wallet/issues"
   },
   "homepage": "https://txnlab.github.io/use-wallet",
-  "version": "0.1.2",
+  "version": "0.1.14",
   "description": "React hooks for using Algorand compatible wallets in dApps.",
   "scripts": {
     "dev": "yarn storybook",
@@ -31,6 +31,7 @@
     "@babel/preset-react": "^7.16.0",
     "@babel/preset-typescript": "^7.16.0",
     "@blockshake/defly-connect": "^0.3.6",
+    "@json-rpc-tools/utils": "^1.7.6",
     "@mdx-js/react": "^2.1.2",
     "@perawallet/connect": "^0.2.3",
     "@randlabs/myalgo-connect": "^1.3.1",
@@ -48,6 +49,8 @@
     "@types/big.js": "^6.1.6",
     "@types/jest": "^29.1.2",
     "@types/react": "^18.0.15",
+    "@walletconnect/client": "^1.8.0",
+    "algorand-walletconnect-qrcode-modal": "^1.8.0",
     "algosdk": "^1.22.0",
     "babel-jest": "^29.1.2",
     "babel-loader": "^8.2.3",
@@ -75,9 +78,11 @@
   },
   "peerDependencies": {
     "@blockshake/defly-connect": "^0.3.6",
+    "@json-rpc-tools/utils": "^1.7.6",
     "@perawallet/connect": "^0.2.3",
     "@randlabs/myalgo-connect": "^1.3.1",
     "@walletconnect/client": "^1.8.0",
+    "algorand-walletconnect-qrcode-modal": "^1.8.0",
     "algosdk": "^1.22.0",
     "react": "^18.2.0"
   },
@@ -88,7 +93,6 @@
   ],
   "types": "dist/index.d.ts",
   "dependencies": {
-    "algorand-walletconnect-qrcode-modal": "^1.8.0",
     "big.js": "^6.2.1",
     "immer": "^9.0.15",
     "react-device-detect": "^2.2.2",
