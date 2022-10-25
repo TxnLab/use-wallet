@@ -171,14 +171,43 @@ function Wallet() {
 };
 ```
 
-## Setup Environments
+## Environment Variables
 
-The wallets connect to Algorand [MainNet](https://developer.algorand.org/docs/get-details/algorand-networks/mainnet) by default.
-You can change this by overriding the `NODE_SERVER`, `NODE_TOKEN`, `NODE_PORT` and `NODE_NETWORK` environment variables.
+By default, wallets will connect to Algorand [MainNet](https://developer.algorand.org/docs/get-details/algorand-networks/mainnet). You can change this behavior by setting the following environment variables:
 
-`NODE_NETWORK` defaults to `mainnet`, and can be set to `testnet`, `betanet`, or the name of a local network running in dev mode.
+* `NODE_NETWORK` (defaults to `mainnet`, and can be set to `testnet`, `betanet`, or the name of a local network running in dev mode)
+ 
+* `NODE_SERVER`
 
-Please note, for React and Next.js projects, you must prefix the environment variables with `REACT_APP_` or `NEXT_PUBLIC_` respectively.
+* `NODE_TOKEN` 
+
+* `NODE_PORT`
+
+Example `.env` file:
+
+```
+NODE_NETWORK=devmodenet
+NODE_SERVER=http://algod
+NODE_TOKEN=xxxxxxxxx
+NODE_PORT=8080
+```
+
+### Create React App and Next.js
+
+In Create React App and Next.js projects, you'll need to add a prefix to these environment variables to expose them to the browser.
+
+* `REACT_APP_` in [Create React App](https://create-react-app.dev/docs/adding-custom-environment-variables/)
+
+* `NEXT_PUBLIC_` in [Next.js](https://nextjs.org/docs/basic-features/environment-variables#exposing-environment-variables-to-the-browser)
+
+Example `.env` file in Create React App:
+
+```
+REACT_APP_NODE_NETWORK=devmodenet
+REACT_APP_NODE_SERVER=http://algod
+REACT_APP_NODE_TOKEN=xxxxxxxxx
+REACT_APP_NODE_PORT=8080
+```
 
 ## Webpack 5
 
