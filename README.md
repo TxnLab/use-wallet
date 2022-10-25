@@ -41,13 +41,7 @@ import React from "react";
 import { useConnectWallet } from "@txnlab/use-wallet";
 
 function App() {
-    const {
-    providers,
-    reconnectProviders,
-    accounts,
-    activeAccount,
-    selectActiveAccount,
-  } = useConnectWallet();
+  const { providers, reconnectProviders, accounts, activeAccount } = useConnectWallet();
 
   // Reconnect the session when the user returns to the dApp
   React.useEffect(() => {
