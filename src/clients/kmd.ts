@@ -9,13 +9,13 @@ import { PROVIDER_ID, NODE_TOKEN, NODE_SERVER, NODE_PORT } from "../constants";
 import { providers } from "../providers";
 import type { Account, Wallet, WalletProvider } from "../types";
 import { TransactionsArray } from "../types";
-
-// Default config settings for dev sandbox kmd
-const DEFAULT_KMD_TOKEN = "a".repeat(64);
-const DEFAULT_KMD_HOST = "http://localhost";
-const DEFAULT_KMD_PORT = "4002";
-const DEFAULT_KMD_WALLET = "unencrypted-default-wallet";
-const DEFAULT_KMD_PASSWORD = "";
+import {
+  KMD_HOST,
+  KMD_TOKEN,
+  KMD_PORT,
+  KMD_WALLET,
+  KMD_PASSWORD as _KMD_PASSWORD,
+} from "../constants";
 
 type KMDConfig = {
   host: string;
@@ -24,9 +24,9 @@ type KMDConfig = {
 };
 
 const DefaultKMDConfig = {
-  host: DEFAULT_KMD_HOST,
-  token: DEFAULT_KMD_TOKEN,
-  port: DEFAULT_KMD_PORT,
+  host: KMD_HOST,
+  token: KMD_TOKEN,
+  port: KMD_PORT,
 } as KMDConfig;
 
 interface ListWalletResponse {
@@ -97,7 +97,7 @@ class KMDWallet extends BaseWallet {
     return {
       ...this.provider,
       accounts: await this.listAccounts(
-        DEFAULT_KMD_WALLET,
+        KMD_WALLET,
         await this.requestPassword()
       ),
     };
@@ -111,7 +111,7 @@ class KMDWallet extends BaseWallet {
     return {
       ...this.provider,
       accounts: await this.listAccounts(
-        DEFAULT_KMD_WALLET,
+        KMD_WALLET,
         await this.requestPassword()
       ),
     };

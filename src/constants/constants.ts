@@ -35,3 +35,33 @@ export const NODE_NETWORK =
   /** @todo deprecate this env var */
   process.env.NEXT_PUBLIC_VERCEL_ENV ||
   "mainnet";
+
+export const KMD_HOST =
+  process.env.KMD_HOST ||
+  process.env.REACT_APP_KMD_HOST ||
+  process.env.NEXT_PUBLIC_KMD_HOST ||
+  "http://localhost";
+
+export const KMD_TOKEN =
+  process.env.KMD_TOKEN ||
+  process.env.REACT_APP_KMD_TOKEN ||
+  process.env.NEXT_PUBLIC_KMD_TOKEN ||
+  "a".repeat(64);
+
+export const KMD_PORT =
+  process.env.KMD_PORT ||
+  process.env.REACT_APP_KMD_PORT ||
+  process.env.NEXT_PUBLIC_KMD_PORT ||
+  "4002";
+
+export const KMD_WALLET =
+  process.env.KMD_WALLET ||
+  process.env.REACT_APP_KMD_WALLET ||
+  process.env.NEXT_PUBLIC_KMD_WALLET ||
+  "unencrypted-default-wallet";
+
+export const KMD_PASSWORD =
+  process.env.KMD_PASSWORD ||
+  process.env.REACT_APP_KMD_PASSWORD ||
+  process.env.NEXT_PUBLIC_KMD_PASSWORD ||
+  "";
