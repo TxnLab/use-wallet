@@ -30,7 +30,7 @@ yarn add @txnlab/use-wallet
 Install peer dependencies (if needed)
 
 ```bash
-yarn add algosdk @blockshake/defly-connect @perawallet/connect @randlabs/myalgo-connect @walletconnect/client algorand-walletconnect-qrcode-modal
+yarn add algosdk @blockshake/defly-connect @perawallet/connect @randlabs/myalgo-connect @walletconnect/client algorand-walletconnect-qrcode-modal @json-rpc-tools/utils
 ```
 
 ### NPM
@@ -42,7 +42,7 @@ npm install @txnlab/use-wallet
 Install peer dependencies (if needed)
 
 ```bash
-npm install algosdk @blockshake/defly-connect @perawallet/connect @randlabs/myalgo-connect @walletconnect/client algorand-walletconnect-qrcode-modal
+npm install algosdk @blockshake/defly-connect @perawallet/connect @randlabs/myalgo-connect @walletconnect/client algorand-walletconnect-qrcode-modal @json-rpc-tools/utils
 ```
 
 ### Set up the wallet providers
@@ -66,8 +66,8 @@ function App() {
     console.log("active account", activeAccount);
   });
 
-  // Map through the providers, 
-  // render account information and "connect", "set active", and "disconnect" buttons.
+  // Map through the providers.
+  // Render account information and "connect", "set active", and "disconnect" buttons.
   // Finally, map through the `accounts` property to render a dropdown for each connected account.
   return (
     <div>
