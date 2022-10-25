@@ -2,6 +2,17 @@
 
 React hooks for using Algorand compatible wallets with web applications.
 
+## Supported Providers
+
+- [Pera](https://perawallet.app/)
+- [MyAlgo](https://wallet.myalgo.com/home)
+- [Defly](https://defly.app)
+- [AlgoSigner](https://www.purestake.com/technology/algosigner)
+- [Exodus](https://www.exodus.com)
+- [WalletConnect](https://walletconnect.com)
+- [KMD](https://developer.algorand.org/docs/rest-apis/kmd)
+
+
 ## Demo
 
 Preview a basic implementation in [Storybook](https://txnlab.github.io/use-wallet) or check out [this example](https://github.com/gabrielkuettel/use-wallet-example).
@@ -99,6 +110,22 @@ Each provider has two connection states: `isConnected` and `isActive`.
 `isConnected` means that the user has authorized the provider to talk to the dApp. The connection flow does not need to be restarted when switching to this wallet from a different one.
 
 `isActive` indicates that the provider is currently active and will be used to sign and send transactions when using the `useWallet` hook.
+
+By default, all of the supported providers except for `KMD` are returned by `useConnectWallet`. A configuration object can be passed to determine which providers your dApp suports, as shown below.
+
+```jsx
+import { useConnectWallet, PROVIDER_ID } from "@txnlab/use-wallet";
+
+...
+
+const { providers } = useConnectWallet({
+  providers: [
+    PROVIDER_ID.MYALGO_WALLET,
+    PROVIDER_ID.PERA_WALLET,
+    PROVIDER_ID.KMD_WALLET,
+  ],
+});
+```
 
 ### Sign and send transactions
 
