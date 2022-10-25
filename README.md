@@ -61,7 +61,9 @@ function App() {
     console.log("active account", activeAccount);
   });
 
-  // Map through the providers, and render account information and "connect", "set active", and "disconnect" buttons
+  // Map through the providers, 
+  // render account information and "connect", "set active", and "disconnect" buttons.
+  // Finally, map through the `accounts` property to render a dropdown for each connected account.
   return (
     <div>
       {providers.map((provider) => (
@@ -80,6 +82,16 @@ function App() {
             <button onClick={provider.setActive} disabled={!provider.isConnected || provider.isActive}>
               Set Active
             </button>
+            {provider.isActive && provider.accounts.length && (
+              <select
+                value={provider.activeAccount?.address}
+                onChange={(e) => provider.selectAccount(e.target.value)}
+              >
+                {provider.accounts.map((account) => (
+                  <option value={account.address}>{account.address}</option>
+                ))}
+              </select>
+             )}
           </div>
         </div>
       ))}
@@ -93,24 +105,6 @@ Each provider has two connection states: `isConnected` and `isActive`.
 `isConnected` means that the user has authorized the provider to talk to the dApp. The connection flow does not need to be restarted when switching to this wallet from a different one.
 
 `isActive` indicates that the provider is currently active and will be used to sign and send transactions when using the `useWallet` hook.
-
-To support wallets that allow users to connect multiple accounts, you can map through `accounts` and use `selectActiveAccount` to switch between them.
-
-```jsx
-<select
-  value={activeAccount.address}
-  onChange={(e) =>
-    selectActiveAccount(
-      activeAccount.providerId,
-      e.target.value
-    )
-  }
->
-  {accounts.map((account) => (
-    <option value={account.address}>{account.address}</option>
-  ))}
-</select>
-```
 
 ### Sign and send transactions
 

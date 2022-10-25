@@ -51,23 +51,18 @@ export default function ConnectWallet(props: ConnectWalletProps) {
             >
               Set Active
             </button>
-            {activeAccount && activeAccount.providerId === provider.id && (
-              <div>
+            <div>
+              {provider.isActive && provider.accounts.length && (
                 <select
-                  value={activeAccount.address}
-                  onChange={(e) =>
-                    selectActiveAccount(
-                      activeAccount.providerId,
-                      e.target.value
-                    )
-                  }
+                  value={provider.activeAccount?.address}
+                  onChange={(e) => provider.selectAccount(e.target.value)}
                 >
-                  {accounts.map((account) => (
+                  {provider.accounts.map((account) => (
                     <option value={account.address}>{account.address}</option>
                   ))}
                 </select>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       ))}

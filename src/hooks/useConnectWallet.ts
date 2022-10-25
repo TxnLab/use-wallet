@@ -32,6 +32,9 @@ export default function useConnectWallet(options?: Options) {
             id,
             name,
             icon,
+            accounts: accounts.filter((account) => account.providerId === id),
+            activeAccount:
+              activeAccount?.providerId === id ? activeAccount : null,
             isActive: activeAccount?.providerId === id,
             isConnected: accounts.some(
               (accounts) => accounts.providerId === id
@@ -41,6 +44,8 @@ export default function useConnectWallet(options?: Options) {
             disconnect: () => disconnect(id),
             reconnect: () => reconnect(id),
             setActive: () => setActive(id),
+            selectAccount: (account: string) =>
+              selectActiveAccount(id, account),
           };
         }),
     [accounts, activeAccount]
