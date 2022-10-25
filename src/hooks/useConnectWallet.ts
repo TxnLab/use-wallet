@@ -1,11 +1,15 @@
 import { useMemo } from "react";
 import { useWalletStore, walletStoreSelector } from "../store/index";
-import type { PROVIDER_ID } from "../types";
+import { PROVIDER_ID } from "../types";
 import { providers as walletProviders } from "../providers";
 import shallow from "zustand/shallow";
 import { getWalletClient } from "../utils";
 
-export default function useConnectWallet() {
+type Options = Partial<{
+  providers: PROVIDER_ID[];
+}>;
+
+export default function useConnectWallet(options?: Options) {
   const {
     accounts,
     setActiveAccount: setActiveAccount,
@@ -17,8 +21,13 @@ export default function useConnectWallet() {
 
   const providers = useMemo(
     () =>
-      Object.values(walletProviders).map(
-        ({ id, name, icon, isWalletConnect }) => {
+      Object.values(walletProviders)
+        .filter(({ id }) =>
+          options?.providers
+            ? options.providers.includes(id)
+            : id !== PROVIDER_ID.KMD_WALLET
+        )
+        .map(({ id, name, icon, isWalletConnect }) => {
           return {
             id,
             name,
@@ -33,8 +42,7 @@ export default function useConnectWallet() {
             reconnect: () => reconnect(id),
             setActive: () => setActive(id),
           };
-        }
-      ),
+        }),
     [accounts, activeAccount]
   );
 
