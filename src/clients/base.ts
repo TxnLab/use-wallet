@@ -1,12 +1,19 @@
 import { algosdk, algodClient } from "../algod";
+import { getIsIOS } from "../utils";
 import { PROVIDER_ID } from "../constants";
-import type { WalletProvider, Asset, Wallet, AccountInfo } from "../types";
-import { ConfirmedTxn, TxnType } from "../types";
-import { TransactionsArray, TxnInfo } from "../types";
+import type {
+  WalletProvider,
+  Asset,
+  Wallet,
+  AccountInfo,
+  ConfirmedTxn,
+  TxnType,
+  TransactionsArray,
+  TxnInfo,
+} from "../types";
 import { audio } from "../media/audio";
 
-const isIOS =
-  /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+const isIOS = getIsIOS();
 
 export interface BaseWalletInterface {
   connect(onDisconnect: () => void): Promise<Wallet>;
