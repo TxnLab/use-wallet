@@ -93,7 +93,6 @@
   ],
   "types": "dist/index.d.ts",
   "dependencies": {
-    "big.js": "^6.2.1",
     "immer": "^9.0.15",
     "react-device-detect": "^2.2.2",
     "zustand": "^3.6.5"

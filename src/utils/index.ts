@@ -17,18 +17,3 @@ export const getWalletClient = async (
 
   return client;
 };
-
-export const formatPrice = (
-  price: number,
-  isAlgos?: boolean,
-  options?: Intl.NumberFormatOptions | undefined
-) => {
-  const algos = isAlgos ? price : convertMicroalgosToAlgos(price);
-  return new Intl.NumberFormat(undefined, options).format(algos);
-};
-
-// Formula: amount / (10 ^ decimals)
-export const convertMicroalgosToAlgos = (amount: number) => {
-  const divisor = new Big(10).pow(6);
-  return new Big(amount).div(divisor).round(6).toNumber();
-};
