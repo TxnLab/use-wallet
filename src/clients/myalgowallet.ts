@@ -11,8 +11,6 @@ import type { WalletProvider } from "../types";
 import { TransactionsArray } from "../types";
 import { DecodedTransaction, DecodedSignedTransaction } from "../types";
 
-const myAlgo = new MyAlgoConnect({ disableLedgerNano: false });
-
 type InitWallet = {
   id: PROVIDER_ID;
   client: MyAlgoConnect;
@@ -32,6 +30,8 @@ class MyAlgoWalletClient extends BaseWallet {
   }
 
   static async init() {
+    const myAlgo = new MyAlgoConnect({ disableLedgerNano: false });
+
     const initWallet: InitWallet = {
       id: PROVIDER_ID.MYALGO_WALLET,
       client: myAlgo,
