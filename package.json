@@ -94,7 +94,6 @@
   "types": "dist/index.d.ts",
   "dependencies": {
     "immer": "^9.0.15",
-    "react-device-detect": "^2.2.2",
     "zustand": "^3.6.5"
   }
 }

@@ -4,7 +4,9 @@ import type { WalletProvider, Asset, Wallet, AccountInfo } from "../types";
 import { ConfirmedTxn, TxnType } from "../types";
 import { TransactionsArray, TxnInfo } from "../types";
 import { audio } from "../media/audio";
-import { isIOS } from "react-device-detect";
+
+const isIOS =
+  /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
 
 export interface BaseWalletInterface {
   connect(onDisconnect: () => void): Promise<Wallet>;
