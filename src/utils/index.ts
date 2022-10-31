@@ -1,4 +1,3 @@
-import Big from "big.js";
 import { PROVIDER_ID, WalletClient } from "../types";
 import { clients } from "../clients";
 
@@ -21,15 +20,4 @@ export const getWalletClient = async (
   }
 
   return client;
-};
-
-export const getIsIOS = () => {
-  if (typeof window !== "undefined") {
-    return (
-      /iPad|iPhone|iPod/.test(navigator?.userAgent) &&
-      !(window as any)?.MSStream
-    );
-  } else {
-    return false;
-  }
 };

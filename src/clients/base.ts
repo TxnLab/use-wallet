@@ -1,5 +1,4 @@
 import { algosdk, algodClient } from "../algod";
-import { getIsIOS } from "../utils";
 import { PROVIDER_ID } from "../constants";
 import type {
   WalletProvider,
@@ -12,6 +11,17 @@ import type {
   TxnInfo,
 } from "../types";
 import { audio } from "../media/audio";
+
+const getIsIOS = () => {
+  if (typeof window !== "undefined") {
+    return (
+      /iPad|iPhone|iPod/.test(navigator?.userAgent) &&
+      !(window as any)?.MSStream
+    );
+  } else {
+    return false;
+  }
+};
 
 const isIOS = getIsIOS();
 
