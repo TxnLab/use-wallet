@@ -1,4 +1,4 @@
-import type _algosdk from "algosdk";
+import { algosdk, algodClient } from "../algod";
 import { PROVIDER_ID } from "../constants";
 import type { WalletProvider, Asset, Wallet, AccountInfo } from "../types";
 import { ConfirmedTxn, TxnType } from "../types";
@@ -6,21 +6,12 @@ import { TransactionsArray, TxnInfo } from "../types";
 import { audio } from "../media/audio";
 import { isIOS } from "react-device-detect";
 
-/** @todo implement audio hack */
-
-export type InitAlgodClient = {
-  algosdk: typeof _algosdk;
-  token: string;
-  server: string;
-  port: string;
-};
-
 export interface BaseWalletInterface {
   connect(onDisconnect: () => void): Promise<Wallet>;
   healthCheck(): Promise<Record<string, never>>;
   disconnect(): Promise<void>;
   reconnect(onDisconnect: () => void): Promise<Wallet | null>;
-  decodeTransaction(txn: string, isSigned: boolean): _algosdk.Transaction;
+  decodeTransaction(txn: string, isSigned: boolean): algosdk.Transaction;
   logEncodedTransaction(txn: string, isSigned: boolean): void;
   groupTransactionsBySender(
     transactions: TransactionsArray
@@ -42,8 +33,6 @@ export interface BaseWalletInterface {
 }
 
 abstract class BaseWallet implements BaseWalletInterface {
-  algodClient: _algosdk.Algodv2;
-  algosdk: typeof _algosdk;
   keepWCAlive: HTMLAudioElement;
 
   protected abstract id: PROVIDER_ID;
@@ -60,18 +49,16 @@ abstract class BaseWallet implements BaseWalletInterface {
     transactions: TransactionsArray
   ): Promise<Uint8Array[]>;
 
-  protected constructor({ algosdk, token, server, port }: InitAlgodClient) {
-    this.algodClient = new algosdk.Algodv2(token, server, port);
-    this.algosdk = algosdk;
+  protected constructor() {
     this.keepWCAlive = new Audio();
   }
 
   async healthCheck() {
-    return await this.algodClient.healthCheck().do();
+    return await algodClient.healthCheck().do();
   }
 
   async getAccountInfo(address: string) {
-    const accountInfo = await this.algodClient.accountInformation(address).do();
+    const accountInfo = await algodClient.accountInformation(address).do();
 
     if (!accountInfo) {
       throw new Error("Unable to get account information");
@@ -81,7 +68,7 @@ abstract class BaseWallet implements BaseWalletInterface {
   }
 
   async getAssets(address: string) {
-    const accountInfo = await this.algodClient.accountInformation(address).do();
+    const accountInfo = await algodClient.accountInformation(address).do();
 
     if (!accountInfo || accountInfo.assets === undefined) {
       throw new Error("Unable to get account assets");
@@ -91,8 +78,8 @@ abstract class BaseWallet implements BaseWalletInterface {
   }
 
   async waitForConfirmation(txId: string, timeout = 4) {
-    const confirmation = (await this.algosdk.waitForConfirmation(
-      this.algodClient,
+    const confirmation = (await algosdk.waitForConfirmation(
+      algodClient,
       txId,
       timeout
     )) as ConfirmedTxn;
@@ -102,10 +89,10 @@ abstract class BaseWallet implements BaseWalletInterface {
 
   decodeTransaction = (txn: string, isSigned: boolean) => {
     return isSigned
-      ? this.algosdk.decodeSignedTransaction(
+      ? algosdk.decodeSignedTransaction(
           new Uint8Array(Buffer.from(txn, "base64"))
         ).txn
-      : this.algosdk.decodeUnsignedTransaction(
+      : algosdk.decodeUnsignedTransaction(
           new Uint8Array(Buffer.from(txn, "base64"))
         );
   };
@@ -115,8 +102,8 @@ abstract class BaseWallet implements BaseWalletInterface {
 
     console.log("TRANSACTION", {
       isSigned,
-      from: txnObj.from && this.algosdk.encodeAddress(txnObj.from.publicKey),
-      to: txnObj.to && this.algosdk.encodeAddress(txnObj.to.publicKey),
+      from: txnObj.from && algosdk.encodeAddress(txnObj.from.publicKey),
+      to: txnObj.to && algosdk.encodeAddress(txnObj.to.publicKey),
       type: txnObj.type,
       txn: txnObj,
     });
@@ -140,10 +127,10 @@ abstract class BaseWallet implements BaseWalletInterface {
         if (type === "u") {
           const decodedTxn = this.decodeTransaction(txn, false);
           const from = decodedTxn.from
-            ? this.algosdk.encodeAddress(decodedTxn.from.publicKey)
+            ? algosdk.encodeAddress(decodedTxn.from.publicKey)
             : "";
           const to = decodedTxn.to
-            ? this.algosdk.encodeAddress(decodedTxn.to.publicKey)
+            ? algosdk.encodeAddress(decodedTxn.to.publicKey)
             : "";
           const type = (decodedTxn.type as TxnType) || "";
           const amount = Number(decodedTxn.amount) || 0; // convert from bigint to number
@@ -168,7 +155,7 @@ abstract class BaseWallet implements BaseWalletInterface {
   }
 
   async sendRawTransactions(transactions: Uint8Array[]) {
-    const sentTransaction = await this.algodClient
+    const sentTransaction = await algodClient
       .sendRawTransaction(transactions)
       .do();
 

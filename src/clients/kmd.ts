@@ -3,8 +3,8 @@ import type {
   EncodedSignedTransaction,
   EncodedTransaction,
 } from "algosdk";
+import { algosdk } from "../algod";
 import BaseWallet from "./base";
-import type { InitAlgodClient } from "./base";
 import { PROVIDER_ID, NODE_TOKEN, NODE_SERVER, NODE_PORT } from "../constants";
 import { providers } from "../providers";
 import type { Account, Wallet, WalletProvider } from "../types";
@@ -56,8 +56,8 @@ class KMDWallet extends BaseWallet {
   id: PROVIDER_ID;
   provider: WalletProvider;
 
-  constructor(initAlgodClient: InitAlgodClient, initWallet: InitWallet) {
-    super(initAlgodClient);
+  constructor(initWallet: InitWallet) {
+    super();
 
     this.#client = initWallet.client;
     this.id = initWallet.id;
@@ -66,14 +66,6 @@ class KMDWallet extends BaseWallet {
   }
 
   static async init() {
-    const algosdk = (await import("algosdk")).default;
-    const initAlgodClient: InitAlgodClient = {
-      algosdk,
-      token: NODE_TOKEN,
-      server: NODE_SERVER,
-      port: NODE_PORT,
-    };
-
     // TODO: allow diff config options?
     const kmdConfig: KMDConfig = DefaultKMDConfig;
 
@@ -89,7 +81,7 @@ class KMDWallet extends BaseWallet {
       providers: providers,
     };
 
-    return new KMDWallet(initAlgodClient, initWallet);
+    return new KMDWallet(initWallet);
   }
 
   async connect(): Promise<Wallet> {
@@ -178,7 +170,7 @@ class KMDWallet extends BaseWallet {
   async signTransactions(activeAddress: string, transactions: Uint8Array[]) {
     // Decode the transactions to access their properties.
     const decodedTxns = transactions.map((txn) => {
-      return this.algosdk.decodeObj(txn);
+      return algosdk.decodeObj(txn);
     }) as Array<EncodedTransaction | EncodedSignedTransaction>;
 
     // Get a handle token
@@ -197,12 +189,12 @@ class KMDWallet extends BaseWallet {
       // Its already signed, skip it
       if (!("snd" in dtxn)) continue;
       // Not to be signed by our signer, skip it
-      if (!(this.algosdk.encodeAddress(dtxn.snd) === activeAddress)) continue;
+      if (!(algosdk.encodeAddress(dtxn.snd) === activeAddress)) continue;
 
       // overwrite with an empty blob
       signedTxns[idx] = new Uint8Array();
 
-      const txn = this.algosdk.Transaction.from_obj_for_encoding(dtxn);
+      const txn = algosdk.Transaction.from_obj_for_encoding(dtxn);
       signingPromises.push(this.#client.signTransaction(token, pw, txn));
     }
 
@@ -229,9 +221,4 @@ class KMDWallet extends BaseWallet {
   }
 }
 
-export default KMDWallet.init().catch((e) => {
-  if (typeof window !== "undefined") {
-    console.info("error initializing kmd client", e);
-    return;
-  }
-});
+export default KMDWallet;

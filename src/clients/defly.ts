@@ -3,14 +3,18 @@
  * https://github.com/blockshake-io/defly-connect
  */
 import { providers } from "../providers";
+import { algosdk } from "../algod";
 import type { WalletProvider, Wallet } from "../types";
-import { PROVIDER_ID, NODE_TOKEN, NODE_SERVER, NODE_PORT } from "../constants";
-import type { Transaction, SignedTransaction } from "algosdk";
+import { PROVIDER_ID } from "../constants";
+import type { Transaction } from "algosdk";
 import BaseWallet from "./base";
-import type { InitAlgodClient } from "./base";
 import { TransactionsArray } from "../types";
-import type { DeflyWalletConnect } from "@blockshake/defly-connect";
+import { DeflyWalletConnect } from "@blockshake/defly-connect";
 import type { DecodedTransaction, DecodedSignedTransaction } from "../types";
+
+const deflyWallet = new DeflyWalletConnect({
+  shouldShowSignTxnToast: false,
+});
 
 export interface DeflyTransaction {
   txn: Transaction;
@@ -33,8 +37,8 @@ class DeflyWalletClient extends BaseWallet {
   id: PROVIDER_ID;
   provider: WalletProvider;
 
-  constructor(initAlgodClient: InitAlgodClient, initWallet: InitWallet) {
-    super(initAlgodClient);
+  constructor(initWallet: InitWallet) {
+    super();
 
     this.#client = initWallet.client;
     this.id = initWallet.id;
@@ -42,28 +46,13 @@ class DeflyWalletClient extends BaseWallet {
   }
 
   static async init() {
-    const algosdk = (await import("algosdk")).default;
-
-    const initAlgodClient: InitAlgodClient = {
-      algosdk,
-      token: NODE_TOKEN,
-      server: NODE_SERVER,
-      port: NODE_PORT,
-    };
-
-    const DeflyWalletConnect = (await import("@blockshake/defly-connect"))
-      .DeflyWalletConnect;
-    const deflyWallet = new DeflyWalletConnect({
-      shouldShowSignTxnToast: false,
-    });
-
     const initWallet: InitWallet = {
       id: PROVIDER_ID.DEFLY,
       client: deflyWallet,
       providers: providers,
     };
 
-    return new DeflyWalletClient(initAlgodClient, initWallet);
+    return new DeflyWalletClient(initWallet);
   }
 
   async connect(onDisconnect: () => void): Promise<Wallet> {
@@ -114,14 +103,14 @@ class DeflyWalletClient extends BaseWallet {
     for (const [type, txn] of transactions) {
       if (type === "s") {
         formattedTransactions.push({
-          ...this.algosdk.decodeSignedTransaction(
+          ...algosdk.decodeSignedTransaction(
             new Uint8Array(Buffer.from(txn, "base64"))
           ),
           signers: [],
         });
       } else {
         formattedTransactions.push({
-          txn: this.algosdk.decodeUnsignedTransaction(
+          txn: algosdk.decodeUnsignedTransaction(
             new Uint8Array(Buffer.from(txn, "base64"))
           ),
         });
@@ -134,7 +123,7 @@ class DeflyWalletClient extends BaseWallet {
   async signTransactions(activeAdress: string, transactions: Uint8Array[]) {
     // Decode the transactions to access their properties.
     const decodedTxns = transactions.map((txn) => {
-      return this.algosdk.decodeObj(txn);
+      return algosdk.decodeObj(txn);
     }) as Array<DecodedTransaction | DecodedSignedTransaction>;
 
     // Marshal the transactions,
@@ -142,14 +131,14 @@ class DeflyWalletClient extends BaseWallet {
     const txnsToSign = decodedTxns.reduce<DeflyTransaction[]>((acc, txn, i) => {
       if (
         !("txn" in txn) &&
-        this.algosdk.encodeAddress(txn["snd"]) === activeAdress
+        algosdk.encodeAddress(txn["snd"]) === activeAdress
       ) {
         acc.push({
-          txn: this.algosdk.decodeUnsignedTransaction(transactions[i]),
+          txn: algosdk.decodeUnsignedTransaction(transactions[i]),
         });
       } else {
         acc.push({
-          txn: this.algosdk.decodeSignedTransaction(transactions[i]).txn,
+          txn: algosdk.decodeSignedTransaction(transactions[i]).txn,
           signers: [],
         });
       }
@@ -198,9 +187,4 @@ class DeflyWalletClient extends BaseWallet {
   }
 }
 
-export default DeflyWalletClient.init().catch((e) => {
-  if (typeof window !== "undefined") {
-    console.error("error initializing DeflyWalletClient", e);
-    return;
-  }
-});
+export default DeflyWalletClient;

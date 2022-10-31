@@ -1,6 +1,6 @@
 import React from "react";
 import "./Wallet.scss";
-import { useWallet } from "../../index";
+import { useWallet, useConnectWallet } from "../../index";
 import algosdk from "algosdk";
 import { NODE_TOKEN, NODE_SERVER, NODE_PORT } from "../../constants";
 
@@ -11,7 +11,13 @@ export type WalletProps = {
 };
 
 export default function Wallet(props: WalletProps) {
+  const { reconnectProviders } = useConnectWallet();
   const { activeAccount, signTransactions, sendTransactions } = useWallet();
+
+  // Reconnect the session when the user returns to the dApp
+  React.useEffect(() => {
+    reconnectProviders();
+  }, []);
 
   const sendTransaction = async (
     from?: string,

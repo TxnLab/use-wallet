@@ -2,23 +2,21 @@
  * Helpful resources:
  * https://developer.algorand.org/docs/get-details/walletconnect/
  */
-import type WalletConnect from "@walletconnect/client";
-import type { IWalletConnectOptions } from "@walletconnect/types";
-import type QRCodeModal from "algorand-walletconnect-qrcode-modal";
+import { algosdk } from "../algod";
+import WalletConnect from "@walletconnect/client";
+import QRCodeModal from "algorand-walletconnect-qrcode-modal";
 import { providers } from "../providers";
 import type { WalletProvider, Wallet } from "../types/wallet";
-import {
-  PROVIDER_ID,
-  NODE_NETWORK,
-  NODE_TOKEN,
-  NODE_SERVER,
-  NODE_PORT,
-} from "../constants";
+import { PROVIDER_ID, NODE_NETWORK } from "../constants";
 import BaseWallet from "./base";
-import type { InitAlgodClient } from "./base";
 import { formatJsonRpcRequest } from "@json-rpc-tools/utils";
 import { TransactionsArray } from "../types/api";
 import type { DecodedTransaction, DecodedSignedTransaction } from "../types";
+
+const walletConnect = new WalletConnect({
+  bridge: "https://bridge.walletconnect.org",
+  qrcodeModal: QRCodeModal,
+});
 
 type WalletConnectTransaction = {
   txn: string;
@@ -31,11 +29,8 @@ type WalletConnectTransaction = {
 
 type InitWallet = {
   id: PROVIDER_ID;
-  walletConnect: typeof WalletConnect;
-  bridge: string;
-  qrcodeModal: typeof QRCodeModal;
-  WalletConnectOptions?: IWalletConnectOptions;
-  providers: typeof providers;
+  client: WalletConnect;
+  provider: WalletProvider;
 };
 
 class WalletConnectClient extends BaseWallet {
@@ -43,42 +38,22 @@ class WalletConnectClient extends BaseWallet {
   id: PROVIDER_ID;
   provider: WalletProvider;
 
-  constructor(initAlgodClient: InitAlgodClient, initWallet: InitWallet) {
-    super(initAlgodClient);
+  constructor(initWallet: InitWallet) {
+    super();
 
-    this.#client = new initWallet.walletConnect({
-      bridge: initWallet.bridge,
-      qrcodeModal: initWallet.qrcodeModal,
-      ...initWallet.WalletConnectOptions,
-    });
-
+    this.#client = initWallet.client;
     this.id = initWallet.id;
-    this.provider = initWallet.providers[this.id];
+    this.provider = initWallet.provider;
   }
 
   static async init() {
-    const algosdk = (await import("algosdk")).default;
-
-    const initAlgodClient: InitAlgodClient = {
-      algosdk,
-      token: NODE_TOKEN,
-      server: NODE_SERVER,
-      port: NODE_PORT,
-    };
-
-    const WalletConnect = (await import("@walletconnect/client")).default;
-    const QRCodeModal = (await import("algorand-walletconnect-qrcode-modal"))
-      .default;
-
     const initWallet: InitWallet = {
       id: PROVIDER_ID.WALLET_CONNECT,
-      walletConnect: WalletConnect,
-      bridge: "https://bridge.walletconnect.org",
-      qrcodeModal: QRCodeModal,
-      providers: providers,
+      client: walletConnect,
+      provider: providers[PROVIDER_ID.WALLET_CONNECT],
     };
 
-    return new WalletConnectClient(initAlgodClient, initWallet);
+    return new WalletConnectClient(initWallet);
   }
 
   async connect(): Promise<Wallet> {
@@ -171,12 +146,12 @@ class WalletConnectClient extends BaseWallet {
       };
 
       if (txn[0] === "s") {
-        const decodedTxn = this.algosdk.decodeSignedTransaction(
+        const decodedTxn = algosdk.decodeSignedTransaction(
           new Uint8Array(Buffer.from(txn[1], "base64"))
         );
 
         formattedTxn.txn = Buffer.from(
-          this.algosdk.encodeUnsignedTransaction(decodedTxn.txn)
+          algosdk.encodeUnsignedTransaction(decodedTxn.txn)
         ).toString("base64");
 
         formattedTxn.signers = [];
@@ -191,7 +166,7 @@ class WalletConnectClient extends BaseWallet {
   async signTransactions(activeAdress: string, transactions: Uint8Array[]) {
     // Decode the transactions to access their properties.
     const decodedTxns = transactions.map((txn) => {
-      return this.algosdk.decodeObj(txn);
+      return algosdk.decodeObj(txn);
     }) as Array<DecodedTransaction | DecodedSignedTransaction>;
 
     // Marshal the transactions,
@@ -200,7 +175,7 @@ class WalletConnectClient extends BaseWallet {
       (acc, txn, i) => {
         if (
           !("txn" in txn) &&
-          this.algosdk.encodeAddress(txn["snd"]) === activeAdress
+          algosdk.encodeAddress(txn["snd"]) === activeAdress
         ) {
           acc.push({
             txn: Buffer.from(transactions[i]).toString("base64"),
@@ -281,9 +256,4 @@ class WalletConnectClient extends BaseWallet {
   }
 }
 
-export default WalletConnectClient.init().catch((e) => {
-  if (typeof window !== "undefined") {
-    console.error("error initializing WalletConnectClient", e);
-    return;
-  }
-});
+export default WalletConnectClient;

@@ -3,14 +3,16 @@
  * https://github.com/perawallet/connect
  */
 import { providers } from "../providers";
-import type { PeraWalletConnect } from "@perawallet/connect";
+import { algosdk } from "../algod";
+import { PeraWalletConnect } from "@perawallet/connect";
 import type { WalletProvider, Wallet } from "../types";
 import { PROVIDER_ID, NODE_TOKEN, NODE_SERVER, NODE_PORT } from "../constants";
 import type { Transaction } from "algosdk";
 import BaseWallet from "./base";
-import type { InitAlgodClient } from "./base";
 import { TransactionsArray } from "../types";
 import type { DecodedTransaction, DecodedSignedTransaction } from "../types";
+
+const peraWallet = new PeraWalletConnect({ shouldShowSignTxnToast: false });
 
 export interface PeraTransaction {
   txn: Transaction;
@@ -33,8 +35,8 @@ class PeraWalletClient extends BaseWallet {
   id: PROVIDER_ID;
   provider: WalletProvider;
 
-  constructor(initAlgodClient: InitAlgodClient, initWallet: InitWallet) {
-    super(initAlgodClient);
+  constructor(initWallet: InitWallet) {
+    super();
 
     this.#client = initWallet.client;
     this.id = initWallet.id;
@@ -42,26 +44,13 @@ class PeraWalletClient extends BaseWallet {
   }
 
   static async init() {
-    const algosdk = (await import("algosdk")).default;
-
-    const initAlgodClient: InitAlgodClient = {
-      algosdk,
-      token: NODE_TOKEN,
-      server: NODE_SERVER,
-      port: NODE_PORT,
-    };
-
-    const PeraWalletConnect = (await import("@perawallet/connect"))
-      .PeraWalletConnect;
-    const peraWallet = new PeraWalletConnect({ shouldShowSignTxnToast: false });
-
     const initWallet: InitWallet = {
       id: PROVIDER_ID.PERA_WALLET,
       client: peraWallet,
       providers: providers,
     };
 
-    return new PeraWalletClient(initAlgodClient, initWallet);
+    return new PeraWalletClient(initWallet);
   }
 
   async connect(onDisconnect: () => void): Promise<Wallet> {
@@ -117,14 +106,14 @@ class PeraWalletClient extends BaseWallet {
     for (const [type, txn] of transactions) {
       if (type === "s") {
         formattedTransactions.push({
-          ...this.algosdk.decodeSignedTransaction(
+          ...algosdk.decodeSignedTransaction(
             new Uint8Array(Buffer.from(txn, "base64"))
           ),
           signers: [],
         });
       } else {
         formattedTransactions.push({
-          txn: this.algosdk.decodeUnsignedTransaction(
+          txn: algosdk.decodeUnsignedTransaction(
             new Uint8Array(Buffer.from(txn, "base64"))
           ),
         });
@@ -137,7 +126,7 @@ class PeraWalletClient extends BaseWallet {
   async signTransactions(activeAdress: string, transactions: Uint8Array[]) {
     // Decode the transactions to access their properties.
     const decodedTxns = transactions.map((txn) => {
-      return this.algosdk.decodeObj(txn);
+      return algosdk.decodeObj(txn);
     }) as Array<DecodedTransaction | DecodedSignedTransaction>;
 
     // Marshal the transactions,
@@ -145,14 +134,14 @@ class PeraWalletClient extends BaseWallet {
     const txnsToSign = decodedTxns.reduce<PeraTransaction[]>((acc, txn, i) => {
       if (
         !("txn" in txn) &&
-        this.algosdk.encodeAddress(txn["snd"]) === activeAdress
+        algosdk.encodeAddress(txn["snd"]) === activeAdress
       ) {
         acc.push({
-          txn: this.algosdk.decodeUnsignedTransaction(transactions[i]),
+          txn: algosdk.decodeUnsignedTransaction(transactions[i]),
         });
       } else {
         acc.push({
-          txn: this.algosdk.decodeSignedTransaction(transactions[i]).txn,
+          txn: algosdk.decodeSignedTransaction(transactions[i]).txn,
           signers: [],
         });
       }
@@ -211,9 +200,4 @@ class PeraWalletClient extends BaseWallet {
   }
 }
 
-export default PeraWalletClient.init().catch((e) => {
-  if (typeof window !== "undefined") {
-    console.error("error initializing PeraWalletClient", e);
-    return;
-  }
-});
+export default PeraWalletClient;

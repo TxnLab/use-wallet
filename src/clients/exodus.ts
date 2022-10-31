@@ -3,12 +3,11 @@
  * https://docs.exodus.com/api-reference/algorand-provider-api/
  */
 import BaseWallet from "./base";
-import type { InitAlgodClient } from "./base";
-import { PROVIDER_ID, NODE_TOKEN, NODE_SERVER, NODE_PORT } from "../constants";
+import { algosdk } from "../algod";
+import { PROVIDER_ID } from "../constants";
 import { providers } from "../providers";
 import type { WalletProvider } from "../types";
 import { TransactionsArray } from "../types";
-import type { SignedTransaction, Transaction } from "algosdk";
 import type { DecodedTransaction, DecodedSignedTransaction } from "../types";
 
 type WindowExtended = { exodus: { algorand: Exodus } } & Window &
@@ -40,8 +39,8 @@ class ExodusClient extends BaseWallet {
   id: PROVIDER_ID;
   provider: WalletProvider;
 
-  constructor(initAlgodClient: InitAlgodClient, initWallet: InitWallet) {
-    super(initAlgodClient);
+  constructor(initWallet: InitWallet) {
+    super();
 
     this.#client = initWallet.client;
     this.id = initWallet.id;
@@ -49,15 +48,6 @@ class ExodusClient extends BaseWallet {
   }
 
   static async init() {
-    const algosdk = (await import("algosdk")).default;
-
-    const initAlgodClient: InitAlgodClient = {
-      algosdk,
-      token: NODE_TOKEN,
-      server: NODE_SERVER,
-      port: NODE_PORT,
-    };
-
     if (
       typeof window == "undefined" ||
       (window as WindowExtended).exodus === undefined
@@ -73,7 +63,7 @@ class ExodusClient extends BaseWallet {
       providers: providers,
     };
 
-    return new ExodusClient(initAlgodClient, initWallet);
+    return new ExodusClient(initWallet);
   }
 
   async connect() {
@@ -119,7 +109,7 @@ class ExodusClient extends BaseWallet {
   ) {
     // Decode the transactions to access their properties.
     const decodedTxns = transactions.map((txn) => {
-      return this.algosdk.decodeObj(txn);
+      return algosdk.decodeObj(txn);
     }) as Array<DecodedTransaction | DecodedSignedTransaction>;
 
     // Get the unsigned transactions.
@@ -128,7 +118,7 @@ class ExodusClient extends BaseWallet {
       // add it to the arrays of transactions to be signed.
       if (
         !("txn" in txn) &&
-        this.algosdk.encodeAddress(txn["snd"]) === activeAdress
+        algosdk.encodeAddress(txn["snd"]) === activeAdress
       ) {
         acc.push(transactions[i]);
       }
@@ -160,7 +150,7 @@ class ExodusClient extends BaseWallet {
 
     for (const [type, txn] of transactions) {
       if (type === "u") {
-        const decoded = this.algosdk.decodeUnsignedTransaction(
+        const decoded = algosdk.decodeUnsignedTransaction(
           Buffer.from(txn, "base64")
         );
         transactionsToSign.push(decoded.toByte());
@@ -188,9 +178,4 @@ class ExodusClient extends BaseWallet {
   }
 }
 
-export default ExodusClient.init().catch((e) => {
-  if (typeof window !== "undefined") {
-    console.info("error initializing ExodusClient", e);
-    return;
-  }
-});
+export default ExodusClient;

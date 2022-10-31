@@ -3,13 +3,15 @@
  * https://github.com/randlabs/myalgo-connect
  */
 import BaseWallet from "./base";
-import type MyAlgoConnect from "@randlabs/myalgo-connect";
-import type { InitAlgodClient } from "./base";
-import { PROVIDER_ID, NODE_TOKEN, NODE_SERVER, NODE_PORT } from "../constants";
+import MyAlgoConnect from "@randlabs/myalgo-connect";
+import { algosdk } from "../algod";
+import { PROVIDER_ID } from "../constants";
 import { providers } from "../providers";
 import type { WalletProvider } from "../types";
 import { TransactionsArray } from "../types";
 import { DecodedTransaction, DecodedSignedTransaction } from "../types";
+
+const myAlgo = new MyAlgoConnect({ disableLedgerNano: false });
 
 type InitWallet = {
   id: PROVIDER_ID;
@@ -22,34 +24,21 @@ class MyAlgoWalletClient extends BaseWallet {
   id: PROVIDER_ID;
   provider: WalletProvider;
 
-  constructor(initAlgodClient: InitAlgodClient, initWallet: InitWallet) {
-    super(initAlgodClient);
-
+  constructor(initWallet: InitWallet) {
+    super();
     this.#client = initWallet.client;
     this.id = initWallet.id;
     this.provider = initWallet.providers[this.id];
   }
 
   static async init() {
-    const algosdk = (await import("algosdk")).default;
-
-    const initAlgodClient: InitAlgodClient = {
-      algosdk,
-      token: NODE_TOKEN,
-      server: NODE_SERVER,
-      port: NODE_PORT,
-    };
-
-    const MyAlgo = (await import("@randlabs/myalgo-connect")).default;
-    const myAlgo = new MyAlgo({ disableLedgerNano: false });
-
     const initWallet: InitWallet = {
       id: PROVIDER_ID.MYALGO_WALLET,
       client: myAlgo,
       providers: providers,
     };
 
-    return new MyAlgoWalletClient(initAlgodClient, initWallet);
+    return new MyAlgoWalletClient(initWallet);
   }
 
   async connect() {
@@ -81,7 +70,7 @@ class MyAlgoWalletClient extends BaseWallet {
   async signTransactions(activeAdress: string, transactions: Uint8Array[]) {
     // Decode the transactions to access their properties.
     const decodedTxns = transactions.map((txn) => {
-      return this.algosdk.decodeObj(txn);
+      return algosdk.decodeObj(txn);
     }) as Array<DecodedTransaction | DecodedSignedTransaction>;
 
     // Get the unsigned transactions.
@@ -90,7 +79,7 @@ class MyAlgoWalletClient extends BaseWallet {
       // add it to the arrays of transactions to be signed.
       if (
         !("txn" in txn) &&
-        this.algosdk.encodeAddress(txn["snd"]) === activeAdress
+        algosdk.encodeAddress(txn["snd"]) === activeAdress
       ) {
         acc.push(transactions[i]);
       }
@@ -147,9 +136,4 @@ class MyAlgoWalletClient extends BaseWallet {
   }
 }
 
-export default MyAlgoWalletClient.init().catch((e) => {
-  if (typeof window !== "undefined") {
-    console.error("error initializing MyAlgoWalletClient", e);
-    return;
-  }
-});
+export default MyAlgoWalletClient;
