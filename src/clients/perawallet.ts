@@ -6,7 +6,7 @@ import { providers } from "../providers";
 import { algosdk } from "../algod";
 import { PeraWalletConnect } from "@perawallet/connect";
 import type { WalletProvider, Wallet } from "../types";
-import { PROVIDER_ID, NODE_TOKEN, NODE_SERVER, NODE_PORT } from "../constants";
+import { PROVIDER_ID } from "../constants";
 import type { Transaction } from "algosdk";
 import BaseWallet from "./base";
 import { TransactionsArray } from "../types";

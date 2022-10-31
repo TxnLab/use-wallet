@@ -5,7 +5,7 @@ import type {
 } from "algosdk";
 import { algosdk } from "../algod";
 import BaseWallet from "./base";
-import { PROVIDER_ID, NODE_TOKEN, NODE_SERVER, NODE_PORT } from "../constants";
+import { PROVIDER_ID } from "../constants";
 import { providers } from "../providers";
 import type { Account, Wallet, WalletProvider } from "../types";
 import { TransactionsArray } from "../types";
