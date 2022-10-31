@@ -43,7 +43,7 @@ type AlgoSigner = {
 type InitWallet = {
   client: AlgoSigner;
   id: PROVIDER_ID;
-  providers: typeof providers;
+  provider: WalletProvider;
 };
 
 class AlgoSignerClient extends BaseWallet {
@@ -56,7 +56,7 @@ class AlgoSignerClient extends BaseWallet {
 
     this.#client = initWallet.client;
     this.id = initWallet.id;
-    this.provider = initWallet.providers[this.id];
+    this.provider = initWallet.provider;
   }
 
   static async init() {
@@ -72,7 +72,7 @@ class AlgoSignerClient extends BaseWallet {
     const initWallet: InitWallet = {
       id: PROVIDER_ID.ALGO_SIGNER,
       client: algoSigner,
-      providers: providers,
+      provider: providers[PROVIDER_ID.ALGO_SIGNER],
     };
 
     return new AlgoSignerClient(initWallet);

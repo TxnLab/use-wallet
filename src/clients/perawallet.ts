@@ -27,7 +27,7 @@ export interface PeraTransaction {
 type InitWallet = {
   id: PROVIDER_ID;
   client: PeraWalletConnect;
-  providers: typeof providers;
+  provider: WalletProvider;
 };
 
 class PeraWalletClient extends BaseWallet {
@@ -40,14 +40,14 @@ class PeraWalletClient extends BaseWallet {
 
     this.#client = initWallet.client;
     this.id = initWallet.id;
-    this.provider = initWallet.providers[this.id];
+    this.provider = initWallet.provider;
   }
 
   static async init() {
     const initWallet: InitWallet = {
       id: PROVIDER_ID.PERA_WALLET,
       client: peraWallet,
-      providers: providers,
+      provider: providers[PROVIDER_ID.PERA_WALLET],
     };
 
     return new PeraWalletClient(initWallet);

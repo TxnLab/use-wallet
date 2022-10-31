@@ -31,7 +31,7 @@ type Exodus = {
 type InitWallet = {
   client: Exodus;
   id: PROVIDER_ID;
-  providers: typeof providers;
+  provider: WalletProvider;
 };
 
 class ExodusClient extends BaseWallet {
@@ -44,7 +44,7 @@ class ExodusClient extends BaseWallet {
 
     this.#client = initWallet.client;
     this.id = initWallet.id;
-    this.provider = initWallet.providers[this.id];
+    this.provider = initWallet.provider;
   }
 
   static async init() {
@@ -60,7 +60,7 @@ class ExodusClient extends BaseWallet {
     const initWallet: InitWallet = {
       id: PROVIDER_ID.EXODUS,
       client: exodus,
-      providers: providers,
+      provider: providers[PROVIDER_ID.EXODUS],
     };
 
     return new ExodusClient(initWallet);

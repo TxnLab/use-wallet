@@ -47,7 +47,7 @@ interface InitWalletHandle {
 type InitWallet = {
   client: Kmd;
   id: PROVIDER_ID;
-  providers: typeof providers;
+  provider: WalletProvider;
 };
 
 class KMDWallet extends BaseWallet {
@@ -61,7 +61,7 @@ class KMDWallet extends BaseWallet {
 
     this.#client = initWallet.client;
     this.id = initWallet.id;
-    this.provider = initWallet.providers[this.id];
+    this.provider = initWallet.provider;
     this.walletId = "";
   }
 
@@ -78,7 +78,7 @@ class KMDWallet extends BaseWallet {
     const initWallet: InitWallet = {
       id: PROVIDER_ID.KMD_WALLET,
       client: kmdClient,
-      providers: providers,
+      provider: providers[PROVIDER_ID.KMD_WALLET],
     };
 
     return new KMDWallet(initWallet);

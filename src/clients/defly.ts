@@ -29,7 +29,7 @@ export interface DeflyTransaction {
 type InitWallet = {
   id: PROVIDER_ID;
   client: DeflyWalletConnect;
-  providers: typeof providers;
+  provider: WalletProvider;
 };
 
 class DeflyWalletClient extends BaseWallet {
@@ -42,14 +42,14 @@ class DeflyWalletClient extends BaseWallet {
 
     this.#client = initWallet.client;
     this.id = initWallet.id;
-    this.provider = initWallet.providers[this.id];
+    this.provider = initWallet.provider;
   }
 
   static async init() {
     const initWallet: InitWallet = {
       id: PROVIDER_ID.DEFLY,
       client: deflyWallet,
-      providers: providers,
+      provider: providers[PROVIDER_ID.DEFLY],
     };
 
     return new DeflyWalletClient(initWallet);

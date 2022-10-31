@@ -16,7 +16,7 @@ const myAlgo = new MyAlgoConnect({ disableLedgerNano: false });
 type InitWallet = {
   id: PROVIDER_ID;
   client: MyAlgoConnect;
-  providers: typeof providers;
+  provider: WalletProvider;
 };
 
 class MyAlgoWalletClient extends BaseWallet {
@@ -28,14 +28,14 @@ class MyAlgoWalletClient extends BaseWallet {
     super();
     this.#client = initWallet.client;
     this.id = initWallet.id;
-    this.provider = initWallet.providers[this.id];
+    this.provider = initWallet.provider;
   }
 
   static async init() {
     const initWallet: InitWallet = {
       id: PROVIDER_ID.MYALGO_WALLET,
       client: myAlgo,
-      providers: providers,
+      provider: providers[PROVIDER_ID.MYALGO_WALLET],
     };
 
     return new MyAlgoWalletClient(initWallet);
