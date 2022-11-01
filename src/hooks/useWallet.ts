@@ -1,5 +1,6 @@
-import algosdk from "algosdk";
 import { useMemo } from "react";
+import type algosdk from "algosdk";
+import { getAlgosdk } from "../algod";
 import { useWalletStore } from "../store/index";
 import { PROVIDER_ID } from "../types";
 import { getWalletClient } from "../utils";
@@ -42,18 +43,16 @@ export default function useWallet() {
     return result;
   };
 
-  const signer: algosdk.TransactionSigner = (
+  const signer: algosdk.TransactionSigner = async (
     txnGroup: algosdk.Transaction[],
     indexesToSign: number[]
   ) => {
+    const algosdk = await getAlgosdk();
     const txnBlobs: Array<Uint8Array> = txnGroup.map(
       algosdk.encodeUnsignedTransaction
     );
-    return Promise.resolve(signTransactions(txnBlobs)).then(
-      (txns: Uint8Array[]) => {
-        return txns.filter((_, index) => indexesToSign.includes(index));
-      }
-    );
+    const txns = await Promise.resolve(signTransactions(txnBlobs));
+    return txns.filter((_, index) => indexesToSign.includes(index));
   };
 
   const getAccountInfo = async () => {
