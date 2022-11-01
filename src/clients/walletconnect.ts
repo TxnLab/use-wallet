@@ -2,9 +2,9 @@
  * Helpful resources:
  * https://developer.algorand.org/docs/get-details/walletconnect/
  */
-import { algosdk } from "../algod";
-import WalletConnect from "@walletconnect/client";
-import QRCodeModal from "algorand-walletconnect-qrcode-modal";
+import type _algosdk from "algosdk";
+import Algod from "../algod";
+import type WalletConnect from "@walletconnect/client";
 import { providers } from "../providers";
 import type { WalletProvider, Wallet } from "../types/wallet";
 import { PROVIDER_ID, NODE_NETWORK } from "../constants";
@@ -12,11 +12,6 @@ import BaseWallet from "./base";
 import { formatJsonRpcRequest } from "@json-rpc-tools/utils";
 import { TransactionsArray } from "../types/api";
 import type { DecodedTransaction, DecodedSignedTransaction } from "../types";
-
-const walletConnect = new WalletConnect({
-  bridge: "https://bridge.walletconnect.org",
-  qrcodeModal: QRCodeModal,
-});
 
 type WalletConnectTransaction = {
   txn: string;
@@ -31,6 +26,8 @@ type InitWallet = {
   id: PROVIDER_ID;
   client: WalletConnect;
   provider: WalletProvider;
+  algosdk: typeof _algosdk;
+  algodClient: _algosdk.Algodv2;
 };
 
 class WalletConnectClient extends BaseWallet {
@@ -38,19 +35,31 @@ class WalletConnectClient extends BaseWallet {
   id: PROVIDER_ID;
   provider: WalletProvider;
 
-  constructor(initWallet: InitWallet) {
-    super();
+  constructor({ client, id, provider, algosdk, algodClient }: InitWallet) {
+    super(algosdk, algodClient);
 
-    this.#client = initWallet.client;
-    this.id = initWallet.id;
-    this.provider = initWallet.provider;
+    this.#client = client;
+    this.id = id;
+    this.provider = provider;
   }
 
   static async init() {
+    const { algosdk, algodClient } = await Algod.init();
+    const WalletConnect = (await import("@walletconnect/client")).default;
+    const QRCodeModal = (await import("algorand-walletconnect-qrcode-modal"))
+      .default;
+
+    const walletConnect = new WalletConnect({
+      bridge: "https://bridge.walletconnect.org",
+      qrcodeModal: QRCodeModal,
+    });
+
     const initWallet: InitWallet = {
       id: PROVIDER_ID.WALLET_CONNECT,
       client: walletConnect,
       provider: providers[PROVIDER_ID.WALLET_CONNECT],
+      algosdk: algosdk,
+      algodClient: algodClient,
     };
 
     return new WalletConnectClient(initWallet);
@@ -146,12 +155,12 @@ class WalletConnectClient extends BaseWallet {
       };
 
       if (txn[0] === "s") {
-        const decodedTxn = algosdk.decodeSignedTransaction(
+        const decodedTxn = this.algosdk.decodeSignedTransaction(
           new Uint8Array(Buffer.from(txn[1], "base64"))
         );
 
         formattedTxn.txn = Buffer.from(
-          algosdk.encodeUnsignedTransaction(decodedTxn.txn)
+          this.algosdk.encodeUnsignedTransaction(decodedTxn.txn)
         ).toString("base64");
 
         formattedTxn.signers = [];
@@ -166,7 +175,7 @@ class WalletConnectClient extends BaseWallet {
   async signTransactions(activeAdress: string, transactions: Uint8Array[]) {
     // Decode the transactions to access their properties.
     const decodedTxns = transactions.map((txn) => {
-      return algosdk.decodeObj(txn);
+      return this.algosdk.decodeObj(txn);
     }) as Array<DecodedTransaction | DecodedSignedTransaction>;
 
     // Marshal the transactions,
@@ -175,7 +184,7 @@ class WalletConnectClient extends BaseWallet {
       (acc, txn, i) => {
         if (
           !("txn" in txn) &&
-          algosdk.encodeAddress(txn["snd"]) === activeAdress
+          this.algosdk.encodeAddress(txn["snd"]) === activeAdress
         ) {
           acc.push({
             txn: Buffer.from(transactions[i]).toString("base64"),

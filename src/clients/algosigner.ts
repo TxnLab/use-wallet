@@ -2,8 +2,9 @@
  * Helpful resources:
  * https://github.com/PureStake/algosigner/blob/develop/docs/dApp-integration.md
  */
+import type _algosdk from "algosdk";
 import BaseWallet from "./base";
-import { algosdk } from "../algod";
+import Algod from "../algod";
 import { PROVIDER_ID, NODE_NETWORK } from "../constants";
 import { providers } from "../providers";
 import type { WalletProvider } from "../types";
@@ -44,6 +45,8 @@ type InitWallet = {
   client: AlgoSigner;
   id: PROVIDER_ID;
   provider: WalletProvider;
+  algosdk: typeof _algosdk;
+  algodClient: _algosdk.Algodv2;
 };
 
 class AlgoSignerClient extends BaseWallet {
@@ -51,12 +54,12 @@ class AlgoSignerClient extends BaseWallet {
   id: PROVIDER_ID;
   provider: WalletProvider;
 
-  constructor(initWallet: InitWallet) {
-    super();
+  constructor({ client, id, provider, algosdk, algodClient }: InitWallet) {
+    super(algosdk, algodClient);
 
-    this.#client = initWallet.client;
-    this.id = initWallet.id;
-    this.provider = initWallet.provider;
+    this.#client = client;
+    this.id = id;
+    this.provider = provider;
   }
 
   static async init() {
@@ -67,15 +70,16 @@ class AlgoSignerClient extends BaseWallet {
       throw new Error("AlgoSigner is not available.");
     }
 
+    const { algosdk, algodClient } = await Algod.init();
     const algoSigner = (window as WindowExtended).AlgoSigner as AlgoSigner;
 
-    const initWallet: InitWallet = {
+    return new AlgoSignerClient({
       id: PROVIDER_ID.ALGO_SIGNER,
       client: algoSigner,
       provider: providers[PROVIDER_ID.ALGO_SIGNER],
-    };
-
-    return new AlgoSignerClient(initWallet);
+      algosdk: algosdk,
+      algodClient: algodClient,
+    });
   }
 
   async connect() {
@@ -138,14 +142,14 @@ class AlgoSignerClient extends BaseWallet {
 
       if (type === "s") {
         formattedTxn.signers = [];
-        const decoded = algosdk.decodeSignedTransaction(
+        const decoded = this.algosdk.decodeSignedTransaction(
           new Uint8Array(Buffer.from(txn, "base64"))
         );
         formattedTxn.txn = this.#client.encoding.msgpackToBase64(
           decoded.txn.toByte()
         );
       } else {
-        const decoded = algosdk.decodeUnsignedTransaction(
+        const decoded = this.algosdk.decodeUnsignedTransaction(
           Buffer.from(txn, "base64")
         );
         formattedTxn.txn = this.#client.encoding.msgpackToBase64(
@@ -162,7 +166,7 @@ class AlgoSignerClient extends BaseWallet {
   async signTransactions(activeAdress: string, transactions: Uint8Array[]) {
     // Decode the transactions to access their properties.
     const decodedTxns = transactions.map((txn) => {
-      return algosdk.decodeObj(txn);
+      return this.algosdk.decodeObj(txn);
     }) as Array<DecodedTransaction | DecodedSignedTransaction>;
 
     // Marshal the transactions,
@@ -175,10 +179,10 @@ class AlgoSignerClient extends BaseWallet {
 
         if (
           "txn" in txn ||
-          algosdk.encodeAddress(txn["snd"]) !== activeAdress
+          this.algosdk.encodeAddress(txn["snd"]) !== activeAdress
         ) {
           txnObj.txn = this.#client.encoding.msgpackToBase64(
-            algosdk.decodeSignedTransaction(transactions[i]).txn.toByte()
+            this.algosdk.decodeSignedTransaction(transactions[i]).txn.toByte()
           );
           txnObj.signers = [];
         }

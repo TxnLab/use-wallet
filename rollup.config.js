@@ -6,20 +6,28 @@ import peerDepsExternal from "rollup-plugin-peer-deps-external";
 import analyze from "rollup-plugin-analyzer";
 import dts from "rollup-plugin-dts";
 
-const packageJson = require("./package.json");
-
 export default [
   {
-    input: "src/index.ts",
-    inlineDynamicImports: true,
+    input: {
+      index: "src/index.ts",
+      constants: "src/constants/index.ts",
+      providers: "src/providers/index.ts",
+      "clients/algosigner": "src/clients/algosigner.ts",
+      "clients/defly": "src/clients/defly.ts",
+      "clients/exodus": "src/clients/exodus.ts",
+      "clients/kmd": "src/clients/kmd.ts",
+      "clients/myalgowallet": "src/clients/myalgowallet.ts",
+      "clients/perawallet": "src/clients/perawallet.ts",
+      "clients/walletconnect": "src/clients/walletconnect.ts",
+    },
     output: [
       {
-        file: packageJson.main,
+        dir: "dist/cjs",
         format: "cjs",
         sourcemap: true,
       },
       {
-        file: packageJson.module,
+        dir: "dist/esm",
         format: "esm",
         sourcemap: true,
       },

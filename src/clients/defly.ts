@@ -2,19 +2,16 @@
  * Helpful resources:
  * https://github.com/blockshake-io/defly-connect
  */
+import type _algosdk from "algosdk";
 import { providers } from "../providers";
-import { algosdk } from "../algod";
+import Algod from "../algod";
 import type { WalletProvider, Wallet } from "../types";
 import { PROVIDER_ID } from "../constants";
 import type { Transaction } from "algosdk";
 import BaseWallet from "./base";
 import { TransactionsArray } from "../types";
-import { DeflyWalletConnect } from "@blockshake/defly-connect";
+import type { DeflyWalletConnect } from "@blockshake/defly-connect";
 import type { DecodedTransaction, DecodedSignedTransaction } from "../types";
-
-const deflyWallet = new DeflyWalletConnect({
-  shouldShowSignTxnToast: false,
-});
 
 export interface DeflyTransaction {
   txn: Transaction;
@@ -30,6 +27,8 @@ type InitWallet = {
   id: PROVIDER_ID;
   client: DeflyWalletConnect;
   provider: WalletProvider;
+  algosdk: typeof _algosdk;
+  algodClient: _algosdk.Algodv2;
 };
 
 class DeflyWalletClient extends BaseWallet {
@@ -37,22 +36,31 @@ class DeflyWalletClient extends BaseWallet {
   id: PROVIDER_ID;
   provider: WalletProvider;
 
-  constructor(initWallet: InitWallet) {
-    super();
+  constructor({ client, id, provider, algosdk, algodClient }: InitWallet) {
+    super(algosdk, algodClient);
 
-    this.#client = initWallet.client;
-    this.id = initWallet.id;
-    this.provider = initWallet.provider;
+    this.#client = client;
+    this.id = id;
+    this.provider = provider;
   }
 
   static async init() {
-    const initWallet: InitWallet = {
+    const { algosdk, algodClient } = await Algod.init();
+
+    const DeflyWalletConnect = (await import("@blockshake/defly-connect"))
+      .DeflyWalletConnect;
+
+    const deflyWallet = new DeflyWalletConnect({
+      shouldShowSignTxnToast: false,
+    });
+
+    return new DeflyWalletClient({
       id: PROVIDER_ID.DEFLY,
       client: deflyWallet,
       provider: providers[PROVIDER_ID.DEFLY],
-    };
-
-    return new DeflyWalletClient(initWallet);
+      algosdk,
+      algodClient,
+    });
   }
 
   async connect(onDisconnect: () => void): Promise<Wallet> {
@@ -103,14 +111,14 @@ class DeflyWalletClient extends BaseWallet {
     for (const [type, txn] of transactions) {
       if (type === "s") {
         formattedTransactions.push({
-          ...algosdk.decodeSignedTransaction(
+          ...this.algosdk.decodeSignedTransaction(
             new Uint8Array(Buffer.from(txn, "base64"))
           ),
           signers: [],
         });
       } else {
         formattedTransactions.push({
-          txn: algosdk.decodeUnsignedTransaction(
+          txn: this.algosdk.decodeUnsignedTransaction(
             new Uint8Array(Buffer.from(txn, "base64"))
           ),
         });
@@ -123,7 +131,7 @@ class DeflyWalletClient extends BaseWallet {
   async signTransactions(activeAdress: string, transactions: Uint8Array[]) {
     // Decode the transactions to access their properties.
     const decodedTxns = transactions.map((txn) => {
-      return algosdk.decodeObj(txn);
+      return this.algosdk.decodeObj(txn);
     }) as Array<DecodedTransaction | DecodedSignedTransaction>;
 
     // Marshal the transactions,
@@ -131,14 +139,14 @@ class DeflyWalletClient extends BaseWallet {
     const txnsToSign = decodedTxns.reduce<DeflyTransaction[]>((acc, txn, i) => {
       if (
         !("txn" in txn) &&
-        algosdk.encodeAddress(txn["snd"]) === activeAdress
+        this.algosdk.encodeAddress(txn["snd"]) === activeAdress
       ) {
         acc.push({
-          txn: algosdk.decodeUnsignedTransaction(transactions[i]),
+          txn: this.algosdk.decodeUnsignedTransaction(transactions[i]),
         });
       } else {
         acc.push({
-          txn: algosdk.decodeSignedTransaction(transactions[i]).txn,
+          txn: this.algosdk.decodeSignedTransaction(transactions[i]).txn,
           signers: [],
         });
       }

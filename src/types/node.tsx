@@ -1,5 +1,3 @@
-import type { TransactionType } from "algosdk";
-
 export type Txn = {
   apaa: Uint8Array;
   apas: number[];
@@ -24,6 +22,15 @@ export type ConfirmedTxn = {
   };
 };
 
+export type TxnType =
+  | "pay"
+  | "keyreg"
+  | "acfg"
+  | "axfer"
+  | "afrz"
+  | "appl"
+  | "stpf";
+
 export type DecodedTransaction = {
   amt: number;
   fee: number;
@@ -35,12 +42,10 @@ export type DecodedTransaction = {
   note: Uint8Array;
   rcv: Uint8Array;
   snd: Uint8Array;
-  type: TransactionType;
+  type: TxnType;
 };
 
 export type DecodedSignedTransaction = {
   sig: Uint8Array;
   txn: DecodedTransaction;
 };
-
-export type TxnType = TransactionType;
