@@ -12,6 +12,7 @@ export default [
       index: "src/index.ts",
       constants: "src/constants/index.ts",
       providers: "src/providers/index.ts",
+      utils: "src/utils/index.ts",
       "clients/algosigner": "src/clients/algosigner.ts",
       "clients/defly": "src/clients/defly.ts",
       "clients/exodus": "src/clients/exodus.ts",
