@@ -8,12 +8,7 @@ export const getWalletClient = async (
     throw new Error("No wallet provider id provided");
   }
 
-  const client = await clients[id].catch((e) => {
-    if (typeof window !== "undefined") {
-      console.error("error initializing client", id, e);
-      return;
-    }
-  });
+  const client = await clients[id];
 
   if (!client) {
     throw new Error(`No wallet client found for provider id: ${id}`);
