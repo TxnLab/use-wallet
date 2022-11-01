@@ -3,8 +3,9 @@
  * https://github.com/randlabs/myalgo-connect
  */
 import BaseWallet from "./base";
-import MyAlgoConnect from "@randlabs/myalgo-connect";
-import { algosdk } from "../algod";
+import type MyAlgoConnect from "@randlabs/myalgo-connect";
+import type _algosdk from "algosdk";
+import Algod from "../algod";
 import { PROVIDER_ID } from "../constants";
 import { providers } from "../providers";
 import type { WalletProvider } from "../types";
@@ -15,6 +16,8 @@ type InitWallet = {
   id: PROVIDER_ID;
   client: MyAlgoConnect;
   provider: WalletProvider;
+  algosdk: typeof _algosdk;
+  algodClient: _algosdk.Algodv2;
 };
 
 class MyAlgoWalletClient extends BaseWallet {
@@ -22,23 +25,26 @@ class MyAlgoWalletClient extends BaseWallet {
   id: PROVIDER_ID;
   provider: WalletProvider;
 
-  constructor(initWallet: InitWallet) {
-    super();
-    this.#client = initWallet.client;
-    this.id = initWallet.id;
-    this.provider = initWallet.provider;
+  constructor({ client, id, provider, algosdk, algodClient }: InitWallet) {
+    super(algosdk, algodClient);
+
+    this.#client = client;
+    this.id = id;
+    this.provider = provider;
   }
 
   static async init() {
+    const { algosdk, algodClient } = await Algod.init();
+    const MyAlgoConnect = (await import("@randlabs/myalgo-connect")).default;
     const myAlgo = new MyAlgoConnect({ disableLedgerNano: false });
 
-    const initWallet: InitWallet = {
+    return new MyAlgoWalletClient({
       id: PROVIDER_ID.MYALGO_WALLET,
       client: myAlgo,
       provider: providers[PROVIDER_ID.MYALGO_WALLET],
-    };
-
-    return new MyAlgoWalletClient(initWallet);
+      algosdk: algosdk,
+      algodClient: algodClient,
+    });
   }
 
   async connect() {
@@ -70,7 +76,7 @@ class MyAlgoWalletClient extends BaseWallet {
   async signTransactions(activeAdress: string, transactions: Uint8Array[]) {
     // Decode the transactions to access their properties.
     const decodedTxns = transactions.map((txn) => {
-      return algosdk.decodeObj(txn);
+      return this.algosdk.decodeObj(txn);
     }) as Array<DecodedTransaction | DecodedSignedTransaction>;
 
     // Get the unsigned transactions.
@@ -79,7 +85,7 @@ class MyAlgoWalletClient extends BaseWallet {
       // add it to the arrays of transactions to be signed.
       if (
         !("txn" in txn) &&
-        algosdk.encodeAddress(txn["snd"]) === activeAdress
+        this.algosdk.encodeAddress(txn["snd"]) === activeAdress
       ) {
         acc.push(transactions[i]);
       }

@@ -7,13 +7,12 @@ import exodusClient from "./exodus";
 import kmdClient from "./kmd";
 import walletconnectClient from "./walletconnect";
 
-
 export const clients = {
-  [PROVIDER_ID.KMD_WALLET]: kmdClient,
-  [PROVIDER_ID.PERA_WALLET]: peraWalletClient,
-  [PROVIDER_ID.MYALGO_WALLET]: myAlgoWalletClient,
-  [PROVIDER_ID.ALGO_SIGNER]: algoSignerClient,
-  [PROVIDER_ID.DEFLY]: deflyClient,
-  [PROVIDER_ID.EXODUS]: exodusClient,
-  [PROVIDER_ID.WALLET_CONNECT]: walletconnectClient,
+  [PROVIDER_ID.KMD_WALLET]: kmdClient.init(),
+  [PROVIDER_ID.PERA_WALLET]: peraWalletClient.init(),
+  [PROVIDER_ID.MYALGO_WALLET]: myAlgoWalletClient.init(),
+  [PROVIDER_ID.ALGO_SIGNER]: algoSignerClient.init(),
+  [PROVIDER_ID.DEFLY]: deflyClient.init(),
+  [PROVIDER_ID.EXODUS]: exodusClient.init(),
+  [PROVIDER_ID.WALLET_CONNECT]: walletconnectClient.init(),
 };
