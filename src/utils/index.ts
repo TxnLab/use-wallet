@@ -8,9 +8,9 @@ export const getWalletClient = async (
     throw new Error("No wallet provider id provided");
   }
 
-  const client = await clients[id].init().catch((e) => {
+  const client = await clients[id].catch((e) => {
     if (typeof window !== "undefined") {
-      console.error("error initializing WalletConnectClient", e);
+      console.error("error initializing client", id, e);
       return;
     }
   });
