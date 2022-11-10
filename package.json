@@ -94,6 +94,6 @@
   "types": "dist/index.d.ts",
   "dependencies": {
     "immer": "^9.0.15",
-    "zustand": "^3.6.5"
+    "zustand": "^4.1.4"
   }
 }
