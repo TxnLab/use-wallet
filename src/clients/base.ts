@@ -43,7 +43,8 @@ export interface BaseWalletInterface {
     transactions: TransactionsArray
   ): Promise<Uint8Array[]>;
   sendRawTransactions(
-    transactions: Uint8Array[]
+    transactions: Uint8Array[],
+    waitRoundsToConfirm?: number
   ): Promise<ConfirmedTxn & { id: string }>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getAccountInfo(address: string): Promise<AccountInfo>;
@@ -180,7 +181,10 @@ abstract class BaseWallet implements BaseWalletInterface {
     return groupBy(decodedGroup, "from");
   }
 
-  async sendRawTransactions(transactions: Uint8Array[]) {
+  async sendRawTransactions(
+    transactions: Uint8Array[],
+    waitRoundsToConfirm?: number
+  ) {
     const sentTransaction = await this.algodClient
       .sendRawTransaction(transactions)
       .do();
@@ -189,8 +193,14 @@ abstract class BaseWallet implements BaseWalletInterface {
       throw new Error("Transaction failed.");
     }
 
+    const decodedTxn = this.algosdk.decodeSignedTransaction(transactions[0]);
+    const waitRounds =
+      waitRoundsToConfirm ||
+      decodedTxn.txn.lastRound - decodedTxn.txn.firstRound;
+
     const confirmedTransaction = await this.waitForConfirmation(
-      sentTransaction.txId
+      sentTransaction.txId,
+      waitRounds
     );
 
     return {
