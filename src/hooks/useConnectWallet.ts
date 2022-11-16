@@ -56,11 +56,15 @@ export default function useConnectWallet(options?: Options) {
   };
 
   const reconnectProviders = async () => {
-    Object.values(providers).forEach(({ id, isActive, isConnected }) => {
-      if (isActive || isConnected) {
-        reconnect(id);
-      }
-    });
+    try {
+      Object.values(providers).forEach(({ id, isActive, isConnected }) => {
+        if (isActive || isConnected) {
+          reconnect(id);
+        }
+      });
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const disconnectWCSessions = async (id: PROVIDER_ID) => {
