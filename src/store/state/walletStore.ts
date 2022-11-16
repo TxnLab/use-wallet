@@ -1,4 +1,4 @@
-import { immer } from "../middelware/immer";
+import { immer } from "zustand/middleware/immer";
 import create from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import type { Account } from "../../types";
@@ -22,10 +22,10 @@ export type WalletStore = {
   removeAccounts: (providerId: PROVIDER_ID) => void;
 };
 
-export const useWalletStore = create<WalletStore>(
-  devtools(
+export const useWalletStore = create<WalletStore>()(
+  immer(
     persist(
-      immer((set, _get) => ({
+      devtools((set, _get) => ({
         accounts: [],
         activeAccount: null,
         setActiveAccount: (account: Account) => {
@@ -71,7 +71,6 @@ export const useWalletStore = create<WalletStore>(
         name: "txnlab-use-wallet", // key in local storage
         version: 0, // increment to deprecate stored data
       }
-    ),
-    { name: "local-storage" } // prefix in Redux DevTools
+    )
   )
 );
