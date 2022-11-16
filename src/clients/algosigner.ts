@@ -163,7 +163,10 @@ class AlgoSignerClient extends BaseWallet {
     return formattedTransactions;
   }
 
-  async signTransactions(activeAdress: string, transactions: Uint8Array[]) {
+  async signTransactions(
+    connectedAccounts: string[],
+    transactions: Uint8Array[]
+  ) {
     // Decode the transactions to access their properties.
     const decodedTxns = transactions.map((txn) => {
       return this.algosdk.decodeObj(txn);
@@ -179,7 +182,7 @@ class AlgoSignerClient extends BaseWallet {
 
         if (
           "txn" in txn ||
-          this.algosdk.encodeAddress(txn["snd"]) !== activeAdress
+          connectedAccounts.includes(this.algosdk.encodeAddress(txn["snd"]))
         ) {
           txnObj.txn = this.#client.encoding.msgpackToBase64(
             this.algosdk.decodeSignedTransaction(transactions[i]).txn.toByte()

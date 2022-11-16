@@ -108,7 +108,7 @@ class ExodusClient extends BaseWallet {
   }
 
   async signTransactions(
-    activeAdress: string,
+    connectedAccounts: string[],
     transactions: Array<Uint8Array>
   ) {
     // Decode the transactions to access their properties.
@@ -122,7 +122,7 @@ class ExodusClient extends BaseWallet {
       // add it to the arrays of transactions to be signed.
       if (
         !("txn" in txn) &&
-        this.algosdk.encodeAddress(txn["snd"]) === activeAdress
+        connectedAccounts.includes(this.algosdk.encodeAddress(txn["snd"]))
       ) {
         acc.push(transactions[i]);
       }

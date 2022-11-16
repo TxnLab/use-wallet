@@ -166,7 +166,10 @@ class KMDWallet extends BaseWallet {
     return mappedAccounts;
   }
 
-  async signTransactions(activeAddress: string, transactions: Uint8Array[]) {
+  async signTransactions(
+    connectedAccounts: string[],
+    transactions: Uint8Array[]
+  ) {
     // Decode the transactions to access their properties.
     const decodedTxns = transactions.map((txn) => {
       return this.algosdk.decodeObj(txn);
@@ -190,7 +193,8 @@ class KMDWallet extends BaseWallet {
       // Its already signed, skip it
       if (!("snd" in dtxn)) continue;
       // Not to be signed by our signer, skip it
-      if (!(this.algosdk.encodeAddress(dtxn.snd) === activeAddress)) continue;
+      if (!connectedAccounts.includes(this.algosdk.encodeAddress(dtxn.snd)))
+        continue;
 
       // overwrite with an empty blob
       signedTxns[idx] = new Uint8Array();

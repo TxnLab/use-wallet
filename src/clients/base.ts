@@ -36,7 +36,7 @@ export interface BaseWalletInterface {
     transactions: TransactionsArray
   ): Record<string, TxnInfo[]>;
   signTransactions(
-    activeAddress: string,
+    connectedAccounts: string[],
     transactions: Array<Uint8Array>
   ): Promise<Uint8Array[]>;
   signEncodedTransactions(
@@ -64,7 +64,7 @@ abstract class BaseWallet implements BaseWalletInterface {
   abstract disconnect(): Promise<void>;
   abstract reconnect(onDisconnect: () => void): Promise<Wallet | null>;
   abstract signTransactions(
-    activeAdress: string,
+    connectedAccounts: string[],
     transactions: Array<Uint8Array>
   ): Promise<Uint8Array[]>;
   abstract signEncodedTransactions(
