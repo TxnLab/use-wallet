@@ -1565,17 +1565,18 @@
   resolved "https://registry.yarnpkg.com/@pedrouid/environment/-/environment-1.0.1.tgz#858f0f8a057340e0b250398b75ead77d6f4342ec"
   integrity sha512-HaW78NszGzRZd9SeoI3JD11JqY+lubnaOx7Pewj5pfjqWXOEATpeKIFb9Z4t2WBUK2iryiXX3lzWwmYWgUL0Ug==
 
-"@perawallet/connect@^0.2.3":
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/@perawallet/connect/-/connect-0.2.3.tgz#777f98f0dc0d3c7b25aa5a41a70fd3497fee1b27"
-  integrity sha512-e8IOxjjOmBwHGV/F7JhF5kNDAJGJpq2+xJSvCBxvHynVX+Aw6upo1UyGIr28o2AzsuFEuG6yd4j6Ve1TeRUBDw==
+"@perawallet/connect@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@perawallet/connect/-/connect-1.0.3.tgz#12fb4338f0358fb5e2b5c2b6f6f21396186acefe"
+  integrity sha512-tKtFbAOl5tQYVRjCi2HJOE9Qdmqat+hPS0/8opwQue0xinggJODKN2ZxkgMx5kSHdmHDRCb4NnyzR84KJ4swfg==
   dependencies:
     "@json-rpc-tools/utils" "^1.7.6"
-    "@walletconnect/client" "^1.7.7"
+    "@walletconnect/client" "^1.8.0"
+    "@walletconnect/types" "^1.8.0"
     bowser "^2.11.0"
     buffer "^6.0.3"
-    lottie-react "^2.3.1"
-    react-qrcode-logo "^2.7.0"
+    lottie-web "^5.9.6"
+    qr-code-styling "^1.6.0-rc.1"
 
 "@pmmmwh/react-refresh-webpack-plugin@^0.5.3":
   version "0.5.8"
@@ -8098,7 +8099,7 @@ lottie-react@^2.3.1:
   dependencies:
     lottie-web "^5.9.4"
 
-lottie-web@^5.9.4:
+lottie-web@^5.9.4, lottie-web@^5.9.6:
   version "5.9.6"
   resolved "https://registry.yarnpkg.com/lottie-web/-/lottie-web-5.9.6.tgz#62ae68563355d3e04aa75d53dec3dd4bea0e57c9"
   integrity sha512-JFs7KsHwflugH5qIXBpB4905yC1Sub2MZWtl/elvO/QC6qj1ApqbUZJyjzJseJUtVpgiDaXQLjBlIJGS7UUUXA==
@@ -9786,7 +9787,14 @@ punycode@^2.1.0:
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
   integrity sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
 
-qrcode-generator@^1.4.1:
+qr-code-styling@^1.6.0-rc.1:
+  version "1.6.0-rc.1"
+  resolved "https://registry.yarnpkg.com/qr-code-styling/-/qr-code-styling-1.6.0-rc.1.tgz#6c89e185fa50cc9135101085c12ae95b06f1b290"
+  integrity sha512-ModRIiW6oUnsP18QzrRYZSc/CFKFKIdj7pUs57AEVH20ajlglRpN3HukjHk0UbNMTlKGuaYl7Gt6/O5Gg2NU2Q==
+  dependencies:
+    qrcode-generator "^1.4.3"
+
+qrcode-generator@^1.4.1, qrcode-generator@^1.4.3:
   version "1.4.4"
   resolved "https://registry.yarnpkg.com/qrcode-generator/-/qrcode-generator-1.4.4.tgz#63f771224854759329a99048806a53ed278740e7"
   integrity sha512-HM7yY8O2ilqhmULxGMpcHSF1EhJJ9yBj8gvDEuZ6M+KGJ0YY2hKpnXvRD+hZPLrDVck3ExIGhmPtSdcjC+guuw==
@@ -12208,11 +12216,6 @@ yargs@^17.3.1:
     string-width "^4.2.3"
     y18n "^5.0.5"
     yargs-parser "^21.0.0"
-
-yarn.lock@^0.0.1-security:
-  version "0.0.1-security"
-  resolved "https://registry.yarnpkg.com/yarn.lock/-/yarn.lock-0.0.1-security.tgz#8e7117924bfe916671b21f14212ba1bb49dfe0c7"
-  integrity sha512-ZRX6v5zGCJMI1T2aO+BQxJggy1vvorXEwonQhWXIC+brO7lkDB3zWelVNAti183ddH6FmJP8z4UDCJnJlioK4Q==
 
 yocto-queue@^0.1.0:
   version "0.1.0"
