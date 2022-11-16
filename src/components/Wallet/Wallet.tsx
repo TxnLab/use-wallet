@@ -40,7 +40,8 @@ export default function Wallet(props: WalletProps) {
     const encodedTransaction = algosdk.encodeUnsignedTransaction(transaction);
     const signedTransactions = await signTransactions([encodedTransaction]);
 
-    const { id } = await sendTransactions(signedTransactions);
+    const waitRoundsToConfirm = 4
+    const { id } = await sendTransactions(signedTransactions, waitRoundsToConfirm);
 
     console.log("Successfully sent transaction. Transaction ID: ", id);
   };

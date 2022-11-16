@@ -35,10 +35,16 @@ export default function useWallet() {
     return signedTransactions;
   };
 
-  const sendTransactions = async (transactions: Uint8Array[]) => {
+  const sendTransactions = async (
+    transactions: Uint8Array[],
+    waitRoundsToConfirm?: number
+  ) => {
     const walletClient = await getWalletClient(activeAccount?.providerId);
 
-    const result = await walletClient?.sendRawTransactions(transactions);
+    const result = await walletClient?.sendRawTransactions(
+      transactions,
+      waitRoundsToConfirm
+    );
 
     return result;
   };
@@ -91,10 +97,16 @@ export default function useWallet() {
     return await walletClient?.signEncodedTransactions(transactions);
   };
 
-  const sendRawTransactions = async (transactions: Uint8Array[]) => {
+  const sendRawTransactions = async (
+    transactions: Uint8Array[],
+    waitRoundsToConfirm?: number
+  ) => {
     const walletClient = await getWalletClient(activeAccount?.providerId);
 
-    return await walletClient?.sendRawTransactions(transactions);
+    return await walletClient?.sendRawTransactions(
+      transactions,
+      waitRoundsToConfirm
+    );
   };
 
   return {
