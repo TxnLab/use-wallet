@@ -61,11 +61,7 @@ class PeraWalletClient extends BaseWallet {
   }
 
   async connect(onDisconnect: () => void): Promise<Wallet> {
-    this.keepWCAliveStart();
-
     const accounts = await this.#client.connect();
-
-    this.keepWCAliveStop();
 
     this.#client.connector?.on("disconnect", onDisconnect);
 
@@ -159,14 +155,8 @@ class PeraWalletClient extends BaseWallet {
       return acc;
     }, []);
 
-    // Play an audio file to keep Wallet Connect's web socket open on iOS
-    // when the user goes into background mode.
-    this.keepWCAliveStart();
-
     // Sign them with the client.
     const result = await this.#client.signTransaction([txnsToSign]);
-
-    this.keepWCAliveStop();
 
     // Join the newly signed transactions with the original group of transactions.
     const signedTxns = decodedTxns.reduce<Uint8Array[]>((acc, txn, i) => {
@@ -186,13 +176,9 @@ class PeraWalletClient extends BaseWallet {
   async signEncodedTransactions(transactions: TransactionsArray) {
     const transactionsToSign = this.formatTransactionsArray(transactions);
 
-    this.keepWCAliveStart();
-
     const result = (await this.#client.signTransaction([
       transactionsToSign,
     ])) as Uint8Array[];
-
-    this.keepWCAliveStop();
 
     const signedTransactions: Uint8Array[] = [];
     let resultIndex = 0;
