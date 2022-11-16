@@ -28,7 +28,7 @@ export default function useWallet() {
     }
 
     const signedTransactions = await walletClient.signTransactions(
-      activeAccount.address,
+      accounts.map((acct) => acct.address),
       transactions
     );
 

@@ -73,7 +73,10 @@ class MyAlgoWalletClient extends BaseWallet {
     return;
   }
 
-  async signTransactions(activeAdress: string, transactions: Uint8Array[]) {
+  async signTransactions(
+    connectedAccounts: string[],
+    transactions: Uint8Array[]
+  ) {
     // Decode the transactions to access their properties.
     const decodedTxns = transactions.map((txn) => {
       return this.algosdk.decodeObj(txn);
@@ -83,9 +86,10 @@ class MyAlgoWalletClient extends BaseWallet {
     const txnsToSign = decodedTxns.reduce<Uint8Array[]>((acc, txn, i) => {
       // If the transaction isn't already signed and is to be sent from a connected account,
       // add it to the arrays of transactions to be signed.
+
       if (
         !("txn" in txn) &&
-        this.algosdk.encodeAddress(txn["snd"]) === activeAdress
+        connectedAccounts.includes(this.algosdk.encodeAddress(txn["snd"]))
       ) {
         acc.push(transactions[i]);
       }
