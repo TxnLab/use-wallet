@@ -182,7 +182,7 @@ class AlgoSignerClient extends BaseWallet {
 
         if (
           "txn" in txn ||
-          connectedAccounts.includes(this.algosdk.encodeAddress(txn["snd"]))
+          !connectedAccounts.includes(this.algosdk.encodeAddress(txn["snd"]))
         ) {
           txnObj.txn = this.#client.encoding.msgpackToBase64(
             this.algosdk.decodeSignedTransaction(transactions[i]).txn.toByte()
