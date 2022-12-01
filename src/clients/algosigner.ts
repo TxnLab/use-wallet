@@ -11,6 +11,10 @@ import type { WalletProvider } from "../types";
 import { TransactionsArray } from "../types";
 import type { DecodedTransaction, DecodedSignedTransaction } from "../types";
 
+type ClientOptions = {
+  network: "MainNet" | "BetaNet" | "TestNet" | string;
+};
+
 type WindowExtended = { AlgoSigner: AlgoSigner } & Window & typeof globalThis;
 
 type AlgoSignerTransaction = {

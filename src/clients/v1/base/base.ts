@@ -1,7 +1,6 @@
 import type _algosdk from "algosdk";
-import { PROVIDER_ID } from "../constants";
+import { PROVIDER_ID } from "../../../constants";
 import type {
-  WalletProvider,
   Asset,
   Wallet,
   AccountInfo,
@@ -9,8 +8,8 @@ import type {
   TxnType,
   TransactionsArray,
   TxnInfo,
-} from "../types";
-import { audio } from "../media/audio";
+} from "../../../types";
+import { audio } from "../../../media/audio";
 
 const getIsIOS = () => {
   if (typeof window !== "undefined") {
@@ -25,41 +24,17 @@ const getIsIOS = () => {
 
 const isIOS = getIsIOS();
 
-export interface BaseWalletInterface {
-  connect(onDisconnect: () => void): Promise<Wallet>;
-  healthCheck(): Promise<Record<string, never>>;
-  disconnect(): Promise<void>;
-  reconnect(onDisconnect: () => void): Promise<Wallet | null>;
-  decodeTransaction(txn: string, isSigned: boolean): _algosdk.Transaction;
-  logEncodedTransaction(txn: string, isSigned: boolean): void;
-  groupTransactionsBySender(
-    transactions: TransactionsArray
-  ): Record<string, TxnInfo[]>;
-  signTransactions(
-    connectedAccounts: string[],
-    transactions: Array<Uint8Array>
-  ): Promise<Uint8Array[]>;
-  signEncodedTransactions(
-    transactions: TransactionsArray
-  ): Promise<Uint8Array[]>;
-  sendRawTransactions(
-    transactions: Uint8Array[],
-    waitRoundsToConfirm?: number
-  ): Promise<ConfirmedTxn & { id: string }>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getAccountInfo(address: string): Promise<AccountInfo>;
-  getAssets(address: string): Promise<Asset[]>;
-  waitForConfirmation(txId: string, timeout?: number): Promise<ConfirmedTxn>;
-}
-
-abstract class BaseWallet implements BaseWalletInterface {
+abstract class BaseClient {
   algosdk: typeof _algosdk;
   algodClient: _algosdk.Algodv2;
   keepWCAlive: HTMLAudioElement;
 
-  abstract id: PROVIDER_ID;
-  abstract provider: WalletProvider;
-  abstract isWalletConnect: boolean;
+  static metadata: {
+    id: PROVIDER_ID;
+    name: string;
+    icon: string;
+    isWalletConnect: boolean;
+  };
 
   abstract connect(onDisconnect: () => void): Promise<Wallet>;
   abstract disconnect(): Promise<void>;
@@ -235,4 +210,4 @@ abstract class BaseWallet implements BaseWalletInterface {
   }
 }
 
-export default BaseWallet;
+export default BaseClient;

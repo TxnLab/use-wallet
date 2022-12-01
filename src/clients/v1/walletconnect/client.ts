@@ -3,17 +3,54 @@
  * https://developer.algorand.org/docs/get-details/walletconnect/
  */
 import type _algosdk from "algosdk";
-import Algod from "../algod";
+import Algod, { getAlgodClient } from "../../../algod";
 import type WalletConnect from "@walletconnect/client";
-import { providers } from "../providers";
-import type { WalletProvider, Wallet } from "../types/wallet";
-import { PROVIDER_ID, NODE_NETWORK } from "../constants";
-import BaseWallet from "./base";
+import type { Wallet, AlgodClientOptions } from "../../../types";
+import { PROVIDER_ID, NODE_NETWORK } from "../../../constants";
+import BaseWallet from "../base";
 import { formatJsonRpcRequest } from "@json-rpc-tools/utils";
-import { TransactionsArray } from "../types/api";
-import type { DecodedTransaction, DecodedSignedTransaction } from "../types";
+import {
+  TransactionsArray,
+  DecodedTransaction,
+  DecodedSignedTransaction,
+} from "../../../types";
+import { ICON } from "./constants";
 
-type WalletConnectTransaction = {
+export interface IClientMeta {
+  description: string;
+  url: string;
+  icons: string[];
+  name: string;
+}
+
+export interface IWalletConnectSession {
+  connected: boolean;
+  accounts: string[];
+  chainId: number;
+  bridge: string;
+  key: string;
+  clientId: string;
+  clientMeta: IClientMeta | null;
+  peerId: string;
+  peerMeta: IClientMeta | null;
+  handshakeId: number;
+  handshakeTopic: string;
+  qrcodeModal: {
+    open: (uri: string, cb: any, qrcodeModalOptions?: any) => void;
+    close: () => void;
+  };
+}
+
+export type ClientOptions = {
+  bridge?: string;
+  uri?: string;
+  storageId?: string;
+  signingMethods?: string[];
+  session?: IWalletConnectSession;
+  clientMeta?: IClientMeta;
+};
+
+export type WalletConnectTransaction = {
   txn: string;
   message?: string;
   // if the transaction does not need to be signed,
@@ -22,7 +59,16 @@ type WalletConnectTransaction = {
   signers?: string[] | [];
 };
 
-type InitWallet = {
+export type InitParams =
+  | {
+      clientOptions?: ClientOptions;
+      algodOptions?: AlgodClientOptions;
+      clientStatic?: typeof WalletConnect;
+      algosdkStatic?: typeof _algosdk;
+    }
+  | never;
+
+type WalletConnectClientConstructor = {
   client: WalletConnect;
   algosdk: typeof _algosdk;
   algodClient: _algosdk.Algodv2;
@@ -31,39 +77,57 @@ type InitWallet = {
 class WalletConnectClient extends BaseWallet {
   #client: WalletConnect;
 
-  constructor({ client, algosdk, algodClient }: InitWallet) {
+  constructor({
+    client,
+    algosdk,
+    algodClient,
+  }: WalletConnectClientConstructor) {
     super(algosdk, algodClient);
-
     this.#client = client;
   }
 
   static metadata = {
-    id: PROVIDER_ID.DEFLY,
-    name: "Defly",
+    id: PROVIDER_ID.WALLET_CONNECT,
+    name: "WalletConnect",
     icon: ICON,
     isWalletConnect: true,
   };
 
-  static async init() {
-    const { algosdk, algodClient } = await Algod.init();
-    const WalletConnect = (await import("@walletconnect/client")).default;
-    const QRCodeModal = (await import("algorand-walletconnect-qrcode-modal"))
-      .default;
+  static async init({
+    clientOptions,
+    algodOptions,
+    clientStatic,
+    algosdkStatic,
+  }: InitParams) {
+    try {
+      const WalletConnect =
+        clientStatic || (await import("@walletconnect/client")).default;
+      const QRCodeModal = (await import("algorand-walletconnect-qrcode-modal"))
+        .default;
 
-    const walletConnect = new WalletConnect({
-      bridge: "https://bridge.walletconnect.org",
-      qrcodeModal: QRCodeModal,
-    });
+      const walletConnect = new WalletConnect({
+        ...(clientOptions
+          ? clientOptions
+          : {
+              bridge: "https://bridge.walletconnect.org",
+              qrcodeModal: QRCodeModal,
+            }),
+      });
 
-    const initWallet: InitWallet = {
-      id: PROVIDER_ID.WALLET_CONNECT,
-      client: walletConnect,
-      provider: providers[PROVIDER_ID.WALLET_CONNECT],
-      algosdk: algosdk,
-      algodClient: algodClient,
-    };
+      const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk;
+      const algodClient = await getAlgodClient(algosdk, algodOptions);
 
-    return new WalletConnectClient(initWallet);
+      const initWallet: WalletConnectClientConstructor = {
+        client: walletConnect,
+        algosdk: algosdk,
+        algodClient: algodClient,
+      };
+
+      return new WalletConnectClient(initWallet);
+    } catch (e) {
+      console.error("Error initializing...", e);
+      return null;
+    }
   }
 
   async connect(): Promise<Wallet> {
@@ -88,11 +152,11 @@ class WalletConnectClient extends BaseWallet {
         const { accounts } = payload.params[0];
 
         resolve({
-          ...this.provider,
+          ...WalletConnectClient.metadata,
           accounts: accounts.map((address: string, index: number) => ({
             name: `Wallet Connect ${index + 1}`,
             address,
-            providerId: this.provider.id,
+            providerId: WalletConnectClient.metadata.id,
           })),
         });
       });
@@ -105,11 +169,11 @@ class WalletConnectClient extends BaseWallet {
         const { accounts } = payload.params[0];
 
         resolve({
-          ...this.provider,
+          ...WalletConnectClient.metadata,
           accounts: accounts.map((address: string, index: number) => ({
             name: `Wallet Connect ${index + 1}`,
             address,
-            providerId: this.provider.id,
+            providerId: WalletConnectClient.metadata.id,
           })),
         });
       });
@@ -117,8 +181,6 @@ class WalletConnectClient extends BaseWallet {
   }
 
   async reconnect() {
-    this.#client = (await WalletConnectClient.init()).#client;
-
     const accounts = this.#client.accounts;
 
     if (!accounts) {
@@ -126,11 +188,11 @@ class WalletConnectClient extends BaseWallet {
     }
 
     return {
-      ...this.provider,
+      ...WalletConnectClient.metadata,
       accounts: accounts.map((address: string, index: number) => ({
         name: `Wallet Connect ${index + 1}`,
         address,
-        providerId: this.provider.id,
+        providerId: WalletConnectClient.metadata.id,
       })),
     };
   }

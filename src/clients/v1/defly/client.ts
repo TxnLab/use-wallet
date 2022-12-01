@@ -3,80 +3,84 @@
  * https://github.com/blockshake-io/defly-connect
  */
 import type _algosdk from "algosdk";
-import { providers } from "../providers";
-import Algod from "../algod";
-import type { WalletProvider, Wallet } from "../types";
-import { PROVIDER_ID } from "../constants";
-import type { Transaction } from "algosdk";
-import BaseWallet from "./base";
-import { TransactionsArray } from "../types";
+import Algod, { getAlgodClient } from "../../../algod";
+import type { Wallet } from "../../../types";
+import { PROVIDER_ID } from "../../../constants";
+import BaseWallet from "../base";
+import { TransactionsArray } from "../../../types";
 import type { DeflyWalletConnect } from "@blockshake/defly-connect";
-import type { DecodedTransaction, DecodedSignedTransaction } from "../types";
-
-export interface DeflyTransaction {
-  txn: Transaction;
-  /**
-   * Optional list of addresses that must sign the transactions.
-   * Wallet skips to sign this txn if signers is empty array.
-   * If undefined, wallet tries to sign it.
-   */
-  signers?: string[];
-}
-
-type InitWallet = {
-  client: DeflyWalletConnect;
-  provider: WalletProvider;
-  algosdk: typeof _algosdk;
-  algodClient: _algosdk.Algodv2;
-};
+import type {
+  DecodedTransaction,
+  DecodedSignedTransaction,
+} from "../../../types";
+import { ICON } from "./constants";
+import {
+  DeflyTransaction,
+  InitParams,
+  DeflyWalletClientConstructor,
+} from "./types";
 
 class DeflyWalletClient extends BaseWallet {
   #client: DeflyWalletConnect;
-  id = PROVIDER_ID.DEFLY;
-  isWalletConnect = true;
-  provider: WalletProvider;
 
-  constructor({ client, provider, algosdk, algodClient }: InitWallet) {
+  constructor({ client, algosdk, algodClient }: DeflyWalletClientConstructor) {
     super(algosdk, algodClient);
-
     this.#client = client;
-    this.provider = provider;
   }
 
-  static async init() {
-    const { algosdk, algodClient } = await Algod.init();
+  static metadata = {
+    id: PROVIDER_ID.DEFLY,
+    name: "Defly",
+    icon: ICON,
+    isWalletConnect: true,
+  };
 
-    const DeflyWalletConnect = (await import("@blockshake/defly-connect"))
-      .DeflyWalletConnect;
+  static async init({
+    clientOptions,
+    algodOptions,
+    clientStatic,
+    algosdkStatic,
+  }: InitParams) {
+    try {
+      const DeflyWalletConnect =
+        clientStatic ||
+        (await import("@blockshake/defly-connect")).DeflyWalletConnect;
 
-    const deflyWallet = new DeflyWalletConnect({
-      shouldShowSignTxnToast: false,
-    });
+      const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk;
+      const algodClient = await getAlgodClient(algosdk, algodOptions);
 
-    return new DeflyWalletClient({
-      client: deflyWallet,
-      provider: providers[PROVIDER_ID.DEFLY],
-      algosdk,
-      algodClient,
-    });
+      const deflyWallet = new DeflyWalletConnect({
+        ...(clientOptions ? clientOptions : { shouldShowSignTxnToast: false }),
+      });
+
+      return new DeflyWalletClient({
+        client: deflyWallet,
+        algosdk,
+        algodClient,
+      });
+    } catch (e) {
+      console.error("Error initializing...", e);
+      return null;
+    }
   }
 
   async connect(onDisconnect: () => void): Promise<Wallet> {
-    const accounts = await this.#client.connect();
+    const accounts = await this.#client.connect().catch(console.error);
+
     this.#client.connector?.on("disconnect", onDisconnect);
 
-    if (accounts.length === 0) {
-      throw new Error(`No accounts found for ${this.provider}`);
+    if (!accounts || accounts.length === 0) {
+      throw new Error(`No accounts found for ${DeflyWalletClient.metadata.id}`);
     }
 
     const mappedAccounts = accounts.map((address: string, index: number) => ({
       name: `Defly Wallet ${index + 1}`,
       address,
-      providerId: this.provider.id,
+      providerId: DeflyWalletClient.metadata.id,
     }));
 
     return {
-      ...this.provider,
+      ...DeflyWalletClient.metadata,
       accounts: mappedAccounts,
     };
   }
@@ -90,40 +94,17 @@ class DeflyWalletClient extends BaseWallet {
     }
 
     return {
-      ...this.provider,
+      ...DeflyWalletClient.metadata,
       accounts: accounts.map((address: string, index: number) => ({
         name: `Defly Wallet ${index + 1}`,
         address,
-        providerId: this.provider.id,
+        providerId: DeflyWalletClient.metadata.id,
       })),
     };
   }
 
   async disconnect() {
     await this.#client.disconnect();
-  }
-
-  formatTransactionsArray(transactions: TransactionsArray) {
-    const formattedTransactions: DeflyTransaction[] = [];
-
-    for (const [type, txn] of transactions) {
-      if (type === "s") {
-        formattedTransactions.push({
-          ...this.algosdk.decodeSignedTransaction(
-            new Uint8Array(Buffer.from(txn, "base64"))
-          ),
-          signers: [],
-        });
-      } else {
-        formattedTransactions.push({
-          txn: this.algosdk.decodeUnsignedTransaction(
-            new Uint8Array(Buffer.from(txn, "base64"))
-          ),
-        });
-      }
-    }
-
-    return formattedTransactions;
   }
 
   async signTransactions(
@@ -173,6 +154,7 @@ class DeflyWalletClient extends BaseWallet {
     return signedTxns;
   }
 
+  /** @deprecated */
   async signEncodedTransactions(transactions: TransactionsArray) {
     const transactionsToSign = this.formatTransactionsArray(transactions);
     const result: Uint8Array[] = await this.#client.signTransaction([
@@ -193,6 +175,30 @@ class DeflyWalletClient extends BaseWallet {
     }
 
     return signedTransactions;
+  }
+
+  /** @deprecated */
+  formatTransactionsArray(transactions: TransactionsArray) {
+    const formattedTransactions: DeflyTransaction[] = [];
+
+    for (const [type, txn] of transactions) {
+      if (type === "s") {
+        formattedTransactions.push({
+          ...this.algosdk.decodeSignedTransaction(
+            new Uint8Array(Buffer.from(txn, "base64"))
+          ),
+          signers: [],
+        });
+      } else {
+        formattedTransactions.push({
+          txn: this.algosdk.decodeUnsignedTransaction(
+            new Uint8Array(Buffer.from(txn, "base64"))
+          ),
+        });
+      }
+    }
+
+    return formattedTransactions;
   }
 }
 

@@ -4,6 +4,6 @@ import ConnectWallet from "./ConnectWallet";
 
 describe("ConnectWallet", () => {
   test("renders the ConnectWallet component", () => {
-    render(<ConnectWallet foo="bar" />);
+    render(<ConnectWallet />);
   });
 });
