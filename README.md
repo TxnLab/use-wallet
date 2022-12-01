@@ -287,14 +287,42 @@ yarn install
 ### Demo in Storybook
 
 ```bash
-yarn storybook
+yarn dev
 
 ```
+
+To develop against a local version of `use-wallet` in your application, do the following:
 
 ### Build the library
 
 ```bash
 yarn build
+```
+
+### Symlink the library
+
+In the root of `use-wallet` directory, run:
+
+```bash
+yarn link
+```
+
+In the root of your application, run:
+```bash
+yarn link @txnlab/use-wallet
+```
+
+### Symlink React 
+
+In the root of your application, run:
+```bash
+cd node_modules/react
+yarn link
+```
+
+In the root of `use-wallet` directory, run:
+```bash
+yarn link react
 ```
 
 ## License
