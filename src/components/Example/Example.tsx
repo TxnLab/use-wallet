@@ -3,24 +3,21 @@ import {
   reconnectProviders,
   initializeProviders,
   PROVIDER_ID,
-} from "../../hooks/v1/useWallet";
+} from "../../hooks/useWallet";
 import WalletProvider from "../../store/state/clientStore";
-import { defly, myAlgo, algoSigner, exodus, pera } from "../../clients/v1";
+import { pera, myAlgo, defly, exodus } from "../../clients";
+import Account from "./Account";
 import Connect from "./Connect";
+import Transact from "./Transact";
 
-/**
- * @todo
- * Pass in object to init functions
- * Change PROVIDER_ID constants to lowercase
- */
+const walletProviders = initializeProviders();
 
-const walletProviders = {
-  [defly.metadata.id]: defly.init(),
-  [myAlgo.metadata.id]: myAlgo.init(),
-  [algoSigner.metadata.id]: algoSigner.init(),
-  [exodus.metadata.id]: exodus.init(),
-  [pera.metadata.id]: pera.init(),
-};
+// const walletProviders = {
+//   [pera.metadata.id]: pera.init({}),
+//   [defly.metadata.id]: defly.init({}),
+//   [myAlgo.metadata.id]: myAlgo.init({}),
+//   [exodus.metadata.id]: exodus.init({}),
+// };
 
 export default function ConnectWallet() {
   useEffect(() => {
@@ -29,7 +26,11 @@ export default function ConnectWallet() {
 
   return (
     <WalletProvider value={walletProviders}>
+      <Account />
+      <hr />
       <Connect />
+      <hr />
+      <Transact />
     </WalletProvider>
   );
 }

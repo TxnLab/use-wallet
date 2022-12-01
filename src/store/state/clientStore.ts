@@ -1,6 +1,6 @@
 import { createContext } from "react";
 import { PROVIDER_ID } from "src/constants";
-import BaseWallet from "../../clients/v1/base";
+import BaseWallet from "../../clients/base";
 
 type Context = Partial<{ [key in PROVIDER_ID]: Promise<BaseWallet> }>;
 

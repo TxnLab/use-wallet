@@ -1,5 +1,4 @@
 import type _algosdk from "algosdk";
-import { NODE_TOKEN, NODE_SERVER, NODE_PORT } from "../constants";
 import type { AlgodClientOptions } from "../types";
 
 export const getAlgosdk = async () => {
@@ -11,9 +10,9 @@ export const getAlgodClient = async (
   algodClientOptions?: AlgodClientOptions
 ) => {
   const [
-    tokenOrBaseClient = NODE_TOKEN,
-    baseServer = NODE_SERVER,
-    port = NODE_PORT,
+    tokenOrBaseClient = "",
+    baseServer = "https://mainnet-api.algonode.cloud",
+    port = "",
     headers,
   ] = algodClientOptions || [];
 
