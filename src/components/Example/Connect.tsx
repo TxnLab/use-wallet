@@ -2,13 +2,7 @@ import React from "react";
 import useWallet from "../../hooks/useWallet";
 
 export default function ConnectWallet() {
-  const { providers, /*reconnectProviders*/ accounts, activeAccount } =
-    useWallet();
-
-  // Reconnect the session when the user returns to the dApp
-  //   React.useEffect(() => {
-  //     reconnectProviders();
-  //   }, []);
+  const { providers, accounts, activeAccount } = useWallet();
 
   // Use these properties to display connected accounts to users.
   React.useEffect(() => {
@@ -21,7 +15,7 @@ export default function ConnectWallet() {
   // Finally, map through the `accounts` property to render a dropdown for each connected account.
   return (
     <div>
-      {providers.map((provider) => (
+      {providers?.map((provider) => (
         <div key={"provider-" + provider.metadata.id}>
           <h4>
             <img width={30} height={30} src={provider.metadata.icon} />

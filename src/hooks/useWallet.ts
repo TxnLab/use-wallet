@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useContext } from "react";
+import { useMemo, useContext } from "react";
 import type algosdk from "algosdk";
 import { getAlgosdk } from "../algod";
 import { useWalletStore, walletStoreSelector } from "../store/index";

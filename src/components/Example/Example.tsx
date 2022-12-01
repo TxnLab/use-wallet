@@ -15,12 +15,7 @@ import {
   DEFAULT_NODE_PORT,
 } from "../../constants";
 
-const walletProviders = initializeProviders(
-  [],
-  DEFAULT_NODE_BASEURL,
-  DEFAULT_NODE_TOKEN,
-  DEFAULT_NODE_PORT
-);
+const walletProviders = initializeProviders();
 
 // const walletProviders = {
 //   [pera.metadata.id]: pera.init({}),
