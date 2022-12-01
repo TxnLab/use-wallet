@@ -1,11 +1,16 @@
 import React from "react";
 import { useWallet } from "../../index";
 import algosdk from "algosdk";
+import {
+  DEFAULT_NODE_BASEURL,
+  DEFAULT_NODE_TOKEN,
+  DEFAULT_NODE_PORT,
+} from "../../constants";
 
 const algodClient = new algosdk.Algodv2(
-  "",
-  "https://mainnet-api.algonode.cloud",
-  ""
+  DEFAULT_NODE_TOKEN,
+  DEFAULT_NODE_BASEURL,
+  DEFAULT_NODE_PORT
 );
 
 export default function Transact() {

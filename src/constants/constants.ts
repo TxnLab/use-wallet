@@ -7,3 +7,11 @@ export enum PROVIDER_ID {
   EXODUS = "exodus",
   WALLET_CONNECT = "walletconnect",
 }
+
+export const DEFAULT_NETWORK = "mainnet";
+
+export const DEFAULT_NODE_BASEURL = "https://mainnet-api.algonode.cloud";
+
+export const DEFAULT_NODE_TOKEN = "";
+
+export const DEFAULT_NODE_PORT = "";

@@ -2,15 +2,25 @@ import React, { useEffect } from "react";
 import {
   reconnectProviders,
   initializeProviders,
-  PROVIDER_ID,
+  // PROVIDER_ID,
 } from "../../hooks/useWallet";
 import WalletProvider from "../../store/state/clientStore";
-import { pera, myAlgo, defly, exodus } from "../../clients";
+// import { pera, myAlgo, defly, exodus } from "../../clients";
 import Account from "./Account";
 import Connect from "./Connect";
 import Transact from "./Transact";
+import {
+  DEFAULT_NODE_BASEURL,
+  DEFAULT_NODE_TOKEN,
+  DEFAULT_NODE_PORT,
+} from "../../constants";
 
-const walletProviders = initializeProviders();
+const walletProviders = initializeProviders(
+  [],
+  DEFAULT_NODE_BASEURL,
+  DEFAULT_NODE_TOKEN,
+  DEFAULT_NODE_PORT
+);
 
 // const walletProviders = {
 //   [pera.metadata.id]: pera.init({}),

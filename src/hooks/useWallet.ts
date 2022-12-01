@@ -6,20 +6,19 @@ import { PROVIDER_ID, TransactionsArray, WalletClient } from "../types";
 import { ClientContext } from "../store/state/clientStore";
 import allClients from "../clients";
 import shallow from "zustand/shallow";
+import {
+  DEFAULT_NODE_BASEURL,
+  DEFAULT_NODE_TOKEN,
+  DEFAULT_NODE_PORT,
+} from "../constants";
 
 type SupportedProviders = { [x: string]: Promise<WalletClient | null> };
 
-export const NODE_SERVER = "https://mainnet-api.algonode.cloud";
-
-export const NODE_TOKEN = "";
-
-export const NODE_PORT = "";
-
 export const initializeProviders = (
   providers?: PROVIDER_ID[],
-  nodeServer = "https://mainnet-api.algonode.cloud",
-  nodeToken = "",
-  nodePort = ""
+  nodeServer = DEFAULT_NODE_BASEURL,
+  nodeToken = DEFAULT_NODE_TOKEN,
+  nodePort = DEFAULT_NODE_PORT
 ) => {
   const initializedProviders: SupportedProviders = {};
 
