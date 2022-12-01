@@ -11,7 +11,8 @@ import type {
   DecodedTransaction,
   DecodedSignedTransaction,
 } from "../../types";
-import { ICON, DEFAULT_NETWORK } from "./constants";
+import { DEFAULT_NETWORK } from "../../constants";
+import { ICON } from "./constants";
 import type {
   WindowExtended,
   AlgoSignerTransaction,
@@ -20,6 +21,22 @@ import type {
   AlgoSignerClientConstructor,
   InitParams,
 } from "./types";
+
+const getNetwork = (network: string) => {
+  if (network === "betanet") {
+    return "BetaNet";
+  }
+
+  if (network === "testnet") {
+    return "TestNet";
+  }
+
+  if (network === "mainnet") {
+    return "MainNet";
+  }
+
+  return network;
+};
 
 class AlgoSignerClient extends BaseWallet {
   #client: AlgoSigner;
@@ -65,7 +82,7 @@ class AlgoSignerClient extends BaseWallet {
         client: algoSigner,
         algosdk: algosdk,
         algodClient: algodClient,
-        network: clientOptions?.network || DEFAULT_NETWORK,
+        network: clientOptions?.network || getNetwork(DEFAULT_NETWORK),
       });
     } catch (e) {
       console.error("Error initializing...", e);
