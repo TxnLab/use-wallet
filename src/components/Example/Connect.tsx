@@ -2,12 +2,14 @@ import React from "react";
 import useWallet from "../../hooks/useWallet";
 
 export default function ConnectWallet() {
-  const { providers, accounts, activeAccount } = useWallet();
+  const { providers, connectedAccounts, activeAccounts, selectedAccount } =
+    useWallet();
 
   // Use these properties to display connected accounts to users.
   React.useEffect(() => {
-    console.log("connected accounts", accounts);
-    console.log("active account", activeAccount);
+    console.log("connected accounts", connectedAccounts);
+    console.log("active accounts", activeAccounts);
+    console.log("selected account", selectedAccount);
   });
 
   // Map through the providers.
@@ -15,43 +17,48 @@ export default function ConnectWallet() {
   // Finally, map through the `accounts` property to render a dropdown for each connected account.
   return (
     <div>
-      {providers?.map((provider) => (
-        <div key={"provider-" + provider.metadata.id}>
-          <h4>
-            <img width={30} height={30} src={provider.metadata.icon} />
-            {provider.metadata.id} {provider.isActive && "[active]"}
-          </h4>
-          <div>
-            <button onClick={provider.connect} disabled={provider.isConnected}>
-              Connect
-            </button>
-            <button
-              onClick={provider.disconnect}
-              disabled={!provider.isConnected}
-            >
-              Disonnect
-            </button>
-            <button
-              onClick={provider.setActive}
-              disabled={!provider.isConnected || provider.isActive}
-            >
-              Set Active
-            </button>
+      {providers?.map((provider) => {
+        return (
+          <div key={"provider-" + provider.metadata.id}>
+            <h4>
+              <img width={30} height={30} src={provider.metadata.icon} />
+              {provider.metadata.id} {provider.isActive && "[active]"}{" "}
+            </h4>
             <div>
-              {provider.isActive && provider.accounts.length && (
-                <select
-                  value={provider.activeAccount?.address}
-                  onChange={(e) => provider.selectAccount(e.target.value)}
-                >
-                  {provider.accounts.map((account) => (
-                    <option value={account.address}>{account.address}</option>
-                  ))}
-                </select>
-              )}
+              <button
+                onClick={provider.connect}
+                disabled={provider.isConnected}
+              >
+                Connect
+              </button>
+              <button
+                onClick={provider.disconnect}
+                disabled={!provider.isConnected}
+              >
+                Disonnect
+              </button>
+              <button
+                onClick={provider.setActive}
+                disabled={!provider.isConnected || provider.isActive}
+              >
+                Set Active
+              </button>
+              <div>
+                {provider.isActive && provider.accounts.length && (
+                  <select
+                    value={provider.selectedAccount?.address}
+                    onChange={(e) => provider.selectAccount(e.target.value)}
+                  >
+                    {provider.accounts.map((account) => (
+                      <option value={account.address}>{account.address}</option>
+                    ))}
+                  </select>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

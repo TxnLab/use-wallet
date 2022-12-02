@@ -52,7 +52,7 @@ import React from "react";
 import { useConnectWallet } from "@txnlab/use-wallet";
 
 function App() {
-  const { providers, reconnectProviders, accounts, activeAccount } = useConnectWallet();
+  const { providers, reconnectProviders, accounts, selectedAccount } = useConnectWallet();
 
   // Reconnect the session when the user returns to the dApp
   React.useEffect(() => {
@@ -63,7 +63,7 @@ function App() {
   // They are reactive and presisted to local storage.
   React.useEffect(() => {
     console.log("connected accounts", accounts);
-    console.log("active account", activeAccount);
+    console.log("active account", selectedAccount);
   });
 
   // Map through the providers.
@@ -89,7 +89,7 @@ function App() {
             </button>
             {provider.isActive && provider.accounts.length && (
               <select
-                value={provider.activeAccount?.address}
+                value={provider.selectedAccount?.address}
                 onChange={(e) => provider.selectAccount(e.target.value)}
               >
                 {provider.accounts.map((account) => (
@@ -134,7 +134,7 @@ import React from "react";
 import { useWallet } from "@txnlab/use-wallet";
 
 function Wallet() {
-  const { activeAccount, signTransactions, sendTransactions } = useWallet();
+  const { selectedAccount, signTransactions, sendTransactions } = useWallet();
 
   const sendTransaction = async (
     from?: string,
@@ -167,7 +167,7 @@ function Wallet() {
     console.log("Successfully sent transaction. Transaction ID: ", id);
   };
 
-  if (!activeAccount) {
+  if (!selectedAccount) {
     return <p>Connect an account first.</p>;
   }
 
@@ -177,8 +177,8 @@ function Wallet() {
         <button
           onClick={() =>
             sendTransaction(
-              activeAccount?.address,
-              activeAccount?.address,
+              selectedAccount?.address,
+              selectedAccount?.address,
               1000
             )
           }

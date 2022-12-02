@@ -59,22 +59,21 @@ export { PROVIDER_ID };
 export default function useWallet() {
   const clients = useContext(ClientContext);
 
-  console.log("clients", clients);
   const {
-    activeAccount,
-    accounts: allAccounts,
+    selectedAccount,
+    accounts: connectedAccounts,
     setActiveAccount: setActiveAccount,
     clearActiveAccount,
     addAccounts,
     removeAccounts,
   } = useWalletStore(walletStoreSelector, shallow);
 
-  const accounts = useMemo(
+  const activeAccounts = useMemo(
     () =>
-      allAccounts.filter(
-        (account) => account.providerId === activeAccount?.providerId
+      connectedAccounts.filter(
+        (account) => account.providerId === selectedAccount?.providerId
       ),
-    [allAccounts, activeAccount]
+    [connectedAccounts, selectedAccount]
   );
 
   const providers = useMemo(() => {
@@ -85,10 +84,12 @@ export default function useWallet() {
     return supportedClients.map((id) => {
       return {
         ...allClients[id],
-        accounts,
-        activeAccount,
-        isActive: activeAccount?.providerId === id,
-        isConnected: accounts.some((accounts) => accounts.providerId === id),
+        accounts: activeAccounts,
+        selectedAccount,
+        isActive: selectedAccount?.providerId === id,
+        isConnected: connectedAccounts.some(
+          (accounts) => accounts.providerId === id
+        ),
         connect: () => connect(id),
         disconnect: () => disconnect(id),
         reconnect: () => reconnect(id),
@@ -96,7 +97,7 @@ export default function useWallet() {
         selectAccount: (account: string) => selectActiveAccount(id, account),
       };
     });
-  }, [clients, accounts]);
+  }, [clients, connectedAccounts, activeAccounts, selectedAccount]);
 
   const getClient = async (id?: PROVIDER_ID) => {
     if (!id) throw new Error("Provier ID is missing.");
@@ -130,7 +131,7 @@ export default function useWallet() {
   };
 
   const getAccountsByProvider = (id: PROVIDER_ID) => {
-    return accounts.filter((account) => account.providerId === id);
+    return connectedAccounts.filter((account) => account.providerId === id);
   };
 
   const selectActiveAccount = async (
@@ -138,7 +139,7 @@ export default function useWallet() {
     address: string
   ) => {
     try {
-      const account = accounts.find(
+      const account = activeAccounts.find(
         (acct) => acct.address === address && acct.providerId === providerId
       );
 
@@ -209,14 +210,14 @@ export default function useWallet() {
   };
 
   const signTransactions = async (transactions: Array<Uint8Array>) => {
-    const walletClient = await getClient(activeAccount?.providerId);
+    const walletClient = await getClient(selectedAccount?.providerId);
 
-    if (!walletClient || !activeAccount?.address) {
+    if (!walletClient || !selectedAccount?.address) {
       throw new Error("No wallet found.");
     }
 
     const signedTransactions = await walletClient.signTransactions(
-      accounts.map((acct) => acct.address),
+      activeAccounts.map((acct) => acct.address),
       transactions
     );
 
@@ -227,7 +228,7 @@ export default function useWallet() {
     transactions: Uint8Array[],
     waitRoundsToConfirm?: number
   ) => {
-    const walletClient = await getClient(activeAccount?.providerId);
+    const walletClient = await getClient(selectedAccount?.providerId);
 
     const result = await walletClient?.sendRawTransactions(
       transactions,
@@ -250,37 +251,37 @@ export default function useWallet() {
   };
 
   const getAccountInfo = async () => {
-    if (!activeAccount) throw new Error("No selected account.");
+    if (!selectedAccount) throw new Error("No selected account.");
 
-    const walletClient = await getClient(activeAccount.providerId);
+    const walletClient = await getClient(selectedAccount.providerId);
 
     const accountInfo = await walletClient?.getAccountInfo(
-      activeAccount.address
+      selectedAccount.address
     );
 
     return accountInfo;
   };
 
   const getAddress = () => {
-    return activeAccount?.address;
+    return selectedAccount?.address;
   };
 
   const getAssets = async () => {
-    if (!activeAccount) throw new Error("No selected account.");
+    if (!selectedAccount) throw new Error("No selected account.");
 
-    const walletClient = await getClient(activeAccount.providerId);
+    const walletClient = await getClient(selectedAccount.providerId);
 
-    return await walletClient?.getAssets(activeAccount.address);
+    return await walletClient?.getAssets(selectedAccount.address);
   };
 
   const groupTransactionsBySender = async (transactions: TransactionsArray) => {
-    const walletClient = await getClient(activeAccount?.providerId);
+    const walletClient = await getClient(selectedAccount?.providerId);
 
     return walletClient?.groupTransactionsBySender(transactions);
   };
 
   const signEncodedTransactions = async (transactions: TransactionsArray) => {
-    const walletClient = await getClient(activeAccount?.providerId);
+    const walletClient = await getClient(selectedAccount?.providerId);
 
     return await walletClient?.signEncodedTransactions(transactions);
   };
@@ -289,7 +290,7 @@ export default function useWallet() {
     transactions: Uint8Array[],
     waitRoundsToConfirm?: number
   ) => {
-    const walletClient = await getClient(activeAccount?.providerId);
+    const walletClient = await getClient(selectedAccount?.providerId);
 
     return await walletClient?.sendRawTransactions(
       transactions,
@@ -300,8 +301,9 @@ export default function useWallet() {
   return {
     clients,
     providers,
-    accounts,
-    activeAccount,
+    connectedAccounts,
+    activeAccounts,
+    selectedAccount,
     signer,
     signTransactions,
     sendTransactions,
