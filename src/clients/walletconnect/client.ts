@@ -161,32 +161,6 @@ class WalletConnectClient extends BaseWallet {
     }
   }
 
-  formatTransactionsArray(
-    transactions: TransactionsArray
-  ): WalletConnectTransaction[] {
-    const formattedTransactions = transactions.map((txn) => {
-      const formattedTxn: WalletConnectTransaction = {
-        txn: txn[1],
-      };
-
-      if (txn[0] === "s") {
-        const decodedTxn = this.algosdk.decodeSignedTransaction(
-          new Uint8Array(Buffer.from(txn[1], "base64"))
-        );
-
-        formattedTxn.txn = Buffer.from(
-          this.algosdk.encodeUnsignedTransaction(decodedTxn.txn)
-        ).toString("base64");
-
-        formattedTxn.signers = [];
-      }
-
-      return formattedTxn;
-    });
-
-    return formattedTransactions;
-  }
-
   async signTransactions(
     connectedAccounts: string[],
     transactions: Uint8Array[]
@@ -249,6 +223,34 @@ class WalletConnectClient extends BaseWallet {
     return signedTxns;
   }
 
+  /** @deprecarted */
+  formatTransactionsArray(
+    transactions: TransactionsArray
+  ): WalletConnectTransaction[] {
+    const formattedTransactions = transactions.map((txn) => {
+      const formattedTxn: WalletConnectTransaction = {
+        txn: txn[1],
+      };
+
+      if (txn[0] === "s") {
+        const decodedTxn = this.algosdk.decodeSignedTransaction(
+          new Uint8Array(Buffer.from(txn[1], "base64"))
+        );
+
+        formattedTxn.txn = Buffer.from(
+          this.algosdk.encodeUnsignedTransaction(decodedTxn.txn)
+        ).toString("base64");
+
+        formattedTxn.signers = [];
+      }
+
+      return formattedTxn;
+    });
+
+    return formattedTransactions;
+  }
+
+  /** @deprecated */
   async signEncodedTransactions(transactions: TransactionsArray) {
     const transactionsToSign = this.formatTransactionsArray(transactions);
     const requestParams = [transactionsToSign];

@@ -151,6 +151,7 @@ class ExodusClient extends BaseWallet {
     return signedTxns;
   }
 
+  /** @deprecated */
   async signEncodedTransactions(transactions: TransactionsArray) {
     const transactionsToSign: Uint8Array[] = [];
     const signedRawTransactions: Uint8Array[] = [];

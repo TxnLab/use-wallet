@@ -163,6 +163,7 @@ class PeraWalletClient extends BaseWallet {
     return signedTxns;
   }
 
+  /** @deprecated */
   formatTransactionsArray(transactions: TransactionsArray): PeraTransaction[] {
     const formattedTransactions: PeraTransaction[] = [];
 
@@ -186,6 +187,7 @@ class PeraWalletClient extends BaseWallet {
     return formattedTransactions;
   }
 
+  /** @deprecated */
   async signEncodedTransactions(transactions: TransactionsArray) {
     const transactionsToSign = this.formatTransactionsArray(transactions);
 

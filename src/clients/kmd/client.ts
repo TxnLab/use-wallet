@@ -47,26 +47,31 @@ class KMDWalletClient extends BaseWallet {
     algodOptions,
     algosdkStatic,
   }: InitParams) {
-    const {
-      token = "a".repeat(64),
-      host = "http://localhost",
-      port = "4002",
-      wallet = "",
-      password = "",
-    } = clientOptions || {};
+    try {
+      const {
+        token = "a".repeat(64),
+        host = "http://localhost",
+        port = "4002",
+        wallet = "",
+        password = "",
+      } = clientOptions || {};
 
-    const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk;
-    const algodClient = await getAlgodClient(algosdk, algodOptions);
-    const kmdClient = new algosdk.Kmd(token, host, port);
+      const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk;
+      const algodClient = await getAlgodClient(algosdk, algodOptions);
+      const kmdClient = new algosdk.Kmd(token, host, port);
 
-    return new KMDWalletClient({
-      id: PROVIDER_ID.KMD_WALLET,
-      password,
-      wallet,
-      client: kmdClient,
-      algosdk: algosdk,
-      algodClient: algodClient,
-    });
+      return new KMDWalletClient({
+        id: PROVIDER_ID.KMD_WALLET,
+        password,
+        wallet,
+        client: kmdClient,
+        algosdk: algosdk,
+        algodClient: algodClient,
+      });
+    } catch (e) {
+      console.error("Error initializing...", e);
+      return null;
+    }
   }
 
   async connect(): Promise<Wallet> {
