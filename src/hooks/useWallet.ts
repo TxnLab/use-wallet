@@ -45,12 +45,15 @@ export const initializeProviders = (
 };
 
 export const reconnectProviders = async (providers: SupportedProviders) => {
-  const clients = Object.values(providers);
+  try {
+    const clients = Object.values(providers);
 
-  for (const client of clients) {
-    client.then((c) => {
+    for (const client of clients) {
+      const c = await client;
       c?.reconnect(c?.disconnect);
-    });
+    }
+  } catch (e) {
+    console.error(e);
   }
 };
 
