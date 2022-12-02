@@ -63,7 +63,7 @@ class ExodusClient extends BaseWallet {
         client: exodus,
         algosdk: algosdk,
         algodClient: algodClient,
-        onlyIfTrusted: clientOptions?.onlyIfTrusted || true,
+        onlyIfTrusted: clientOptions?.onlyIfTrusted || false,
       });
     } catch (e) {
       console.error("Error initializing...", e);
