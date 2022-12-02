@@ -6,7 +6,7 @@ import { PROVIDER_ID } from "../../constants";
 
 export const walletStoreSelector = (state: WalletStore) => ({
   accounts: state.accounts,
-  selectedAccount: state.selectedAccount,
+  activeAccount: state.activeAccount,
   setActiveAccount: state.setActiveAccount,
   clearActiveAccount: state.clearActiveAccount,
   addAccounts: state.addAccounts,
@@ -15,7 +15,7 @@ export const walletStoreSelector = (state: WalletStore) => ({
 
 export type WalletStore = {
   accounts: Account[];
-  selectedAccount: Account | null;
+  activeAccount: Account | null;
   setActiveAccount: (account: Account) => void;
   clearActiveAccount: (id: PROVIDER_ID) => void;
   addAccounts: (accounts: Account[]) => void;
@@ -27,16 +27,16 @@ export const useWalletStore = create<WalletStore>()(
     persist(
       devtools((set, _get) => ({
         accounts: [],
-        selectedAccount: null,
+        activeAccount: null,
         setActiveAccount: (account: Account) => {
           set((state) => {
-            state.selectedAccount = account;
+            state.activeAccount = account;
           });
         },
         clearActiveAccount: (id: PROVIDER_ID) => {
           set((state) => {
-            if (id === state.selectedAccount?.providerId)
-              state.selectedAccount = null;
+            if (id === state.activeAccount?.providerId)
+              state.activeAccount = null;
           });
         },
         addAccounts: (accounts: Account[]) => {

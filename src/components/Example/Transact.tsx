@@ -14,7 +14,7 @@ const algodClient = new algosdk.Algodv2(
 );
 
 export default function Transact() {
-  const { selectedAccount, signTransactions, sendTransactions } = useWallet();
+  const { activeAccount, signTransactions, sendTransactions } = useWallet();
 
   const sendTransaction = async (
     from?: string,
@@ -40,18 +40,14 @@ export default function Transact() {
     );
     console.log("Successfully sent transaction. Transaction ID: ", id);
   };
-  if (!selectedAccount) {
+  if (!activeAccount) {
     return <p>Connect an account first.</p>;
   }
   return (
     <div>
       <button
         onClick={() =>
-          sendTransaction(
-            selectedAccount?.address,
-            selectedAccount?.address,
-            1000
-          )
+          sendTransaction(activeAccount?.address, activeAccount?.address, 1000)
         }
         className="button"
       >

@@ -89,7 +89,7 @@ class PeraWalletClient extends BaseWallet {
   }
 
   async reconnect(onDisconnect: () => void) {
-    const accounts = await this.#client.reconnectSession().catch(console.error);
+    const accounts = await this.#client.reconnectSession().catch(console.info);
     this.#client.connector?.on("disconnect", onDisconnect);
 
     if (!accounts) {

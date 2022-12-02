@@ -2,9 +2,9 @@ import React from "react";
 import { useWallet } from "../../index";
 
 export default function Account() {
-  const { selectedAccount } = useWallet();
+  const { activeAccount } = useWallet();
 
-  if (!selectedAccount) {
+  if (!activeAccount) {
     return <p>Connect an account first.</p>;
   }
 
@@ -12,13 +12,13 @@ export default function Account() {
     <div>
       <h4>Active Account</h4>
       <p>
-        Name: <span>{selectedAccount.name}</span>
+        Name: <span>{activeAccount.name}</span>
       </p>
       <p>
-        Address: <span>{selectedAccount.address}</span>
+        Address: <span>{activeAccount.address}</span>
       </p>
       <p>
-        Provider: <span>{selectedAccount.providerId}</span>
+        Provider: <span>{activeAccount.providerId}</span>
       </p>
     </div>
   );

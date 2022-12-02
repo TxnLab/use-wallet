@@ -62,7 +62,7 @@ class DeflyWalletClient extends BaseWallet {
   }
 
   async connect(onDisconnect: () => void): Promise<Wallet> {
-    const accounts = await this.#client.connect().catch(console.error);
+    const accounts = await this.#client.connect().catch(console.info);
 
     this.#client.connector?.on("disconnect", onDisconnect);
 
