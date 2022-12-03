@@ -44,5 +44,5 @@ export type AlgoSignerClientConstructor = {
 export type InitParams = {
   algodOptions?: AlgodClientOptions;
   algosdkStatic?: typeof _algosdk;
-  network: Network;
+  network?: Network;
 };

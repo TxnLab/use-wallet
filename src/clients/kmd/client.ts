@@ -1,7 +1,7 @@
 import type _algosdk from "algosdk";
 import Algod, { getAlgodClient } from "../../algod";
 import BaseWallet from "../base";
-import { PROVIDER_ID } from "../../constants";
+import { DEFAULT_NETWORK, PROVIDER_ID } from "../../constants";
 import type { Account, Wallet, TransactionsArray, Network } from "../../types";
 import { ICON } from "./constants";
 import {
@@ -49,7 +49,7 @@ class KMDWalletClient extends BaseWallet {
     clientOptions,
     algodOptions,
     algosdkStatic,
-    network,
+    network = DEFAULT_NETWORK,
   }: InitParams) {
     try {
       const {

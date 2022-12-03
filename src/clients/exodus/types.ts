@@ -37,5 +37,5 @@ export type InitParams = {
   clientOptions?: ClientOptions;
   algodOptions?: AlgodClientOptions;
   algosdkStatic?: typeof _algosdk;
-  network: Network;
+  network?: Network;
 };

@@ -36,5 +36,5 @@ export type InitParams = {
   algodOptions?: AlgodClientOptions;
   clientStatic?: typeof PeraWalletConnect;
   algosdkStatic?: typeof _algosdk;
-  network: Network;
+  network?: Network;
 };

@@ -5,7 +5,7 @@
 import type _algosdk from "algosdk";
 import BaseWallet from "../base";
 import Algod, { getAlgodClient } from "../../algod";
-import { PROVIDER_ID } from "../../constants";
+import { DEFAULT_NETWORK, PROVIDER_ID } from "../../constants";
 import type {
   TransactionsArray,
   DecodedTransaction,
@@ -49,7 +49,7 @@ class ExodusClient extends BaseWallet {
     clientOptions,
     algodOptions,
     algosdkStatic,
-    network,
+    network = DEFAULT_NETWORK,
   }: InitParams) {
     try {
       if (

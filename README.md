@@ -260,6 +260,50 @@ export default function Account() {
 
 ## Provider Configuration
 
+The `initializeProviders` functon accepts a configuration object that can be used to configure the nodes that the providers use to send transactions, as shown below.
+
+```jsx
+const walletProviders = initializeProviders([], {
+  network: "devmodenet",
+  nodeServer: "http://algod",
+  nodeToken: "xxxxxxxxx",
+  nodePort: "8080",
+});
+```
+
+Passing an empty array as the first argument enables all of the default providers. The `network` property should be specified as `betanet`, `testnet`, `mainnet` or the name of your local development network.
+
+For more custom configuration options, the providers can be configured individually by creating an object and passing it to the `WalletProvider` where the key contains the provider ID, and the value calls the `init` function of the provider client. See below for an example:
+
+```jsx
+...
+
+import {
+  PROVIDER_ID,
+  pera,
+  myalgo,
+} from "@txnlab/use-wallet";
+
+const walletProviders = {
+  [PROVIDER_ID.PERA]: pera.init({
+    clientOptions: {
+      shouldShowSignTxnToast: true,
+    },
+  }),
+  [PROVIDER_ID.MYALGO]: myalgo.init({
+    network: "devmodenet",
+    algodOptions: ["xxxxxxxxx", "http://algod", "8080"],
+    clientOptions: { disableLedgerNano: true },
+  }),
+};
+
+... 
+
+<WalletProvider value={walletProviders}>
+  ...
+</WalletProvider>
+```
+
 ## Webpack 5
 
 1. Install `react-app-rewired` and the missing polyfills.

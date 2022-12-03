@@ -6,7 +6,7 @@ import BaseWallet from "../base";
 import type _MyAlgoConnect from "@randlabs/myalgo-connect";
 import type _algosdk from "algosdk";
 import Algod, { getAlgodClient } from "../../algod";
-import { PROVIDER_ID } from "../../constants";
+import { DEFAULT_NETWORK, PROVIDER_ID } from "../../constants";
 import {
   TransactionsArray,
   DecodedTransaction,
@@ -43,7 +43,7 @@ class MyAlgoWalletClient extends BaseWallet {
     algodOptions,
     clientStatic,
     algosdkStatic,
-    network,
+    network = DEFAULT_NETWORK,
   }: InitParams) {
     try {
       const MyAlgoConnect =

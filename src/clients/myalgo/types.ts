@@ -22,5 +22,5 @@ export type InitParams = {
   algodOptions?: AlgodClientOptions;
   clientStatic?: typeof _MyAlgoConnect;
   algosdkStatic?: typeof _algosdk;
-  network: Network;
+  network?: Network;
 };

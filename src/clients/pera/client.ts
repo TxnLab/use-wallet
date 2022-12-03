@@ -12,7 +12,7 @@ import type {
   DecodedSignedTransaction,
   Network,
 } from "../../types";
-import { PROVIDER_ID } from "../../constants";
+import { PROVIDER_ID, DEFAULT_NETWORK } from "../../constants";
 import BaseWallet from "../base";
 import { ICON } from "./constants";
 import {
@@ -48,7 +48,7 @@ class PeraWalletClient extends BaseWallet {
     algodOptions,
     clientStatic,
     algosdkStatic,
-    network,
+    network = DEFAULT_NETWORK,
   }: InitParams) {
     try {
       const PeraWalletConnect =

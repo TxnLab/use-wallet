@@ -5,7 +5,7 @@
 import type _algosdk from "algosdk";
 import Algod, { getAlgodClient } from "../../algod";
 import type { Wallet } from "../../types";
-import { PROVIDER_ID } from "../../constants";
+import { DEFAULT_NETWORK, PROVIDER_ID } from "../../constants";
 import BaseWallet from "../base";
 import { TransactionsArray } from "../../types";
 import type { DeflyWalletConnect } from "@blockshake/defly-connect";
@@ -48,7 +48,7 @@ class DeflyWalletClient extends BaseWallet {
     algodOptions,
     clientStatic,
     algosdkStatic,
-    network,
+    network = DEFAULT_NETWORK,
   }: InitParams) {
     try {
       const DeflyWalletConnect =

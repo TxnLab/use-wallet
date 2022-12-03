@@ -49,7 +49,7 @@ class WalletConnectClient extends BaseWallet {
     algodOptions,
     clientStatic,
     algosdkStatic,
-    network,
+    network = DEFAULT_NETWORK,
   }: InitParams) {
     try {
       const WalletConnect =
@@ -73,7 +73,7 @@ class WalletConnectClient extends BaseWallet {
         client: walletConnect,
         algosdk: algosdk,
         algodClient: algodClient,
-        network: network || DEFAULT_NETWORK,
+        network,
       };
 
       return new WalletConnectClient(initWallet);

@@ -50,7 +50,7 @@ export type InitParams = {
   algodOptions?: AlgodClientOptions;
   clientStatic?: typeof WalletConnect;
   algosdkStatic?: typeof _algosdk;
-  network: Network;
+  network?: Network;
 };
 
 export type WalletConnectClientConstructor = {

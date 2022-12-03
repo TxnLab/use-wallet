@@ -5,14 +5,13 @@
 import type _algosdk from "algosdk";
 import BaseWallet from "../base";
 import Algod, { getAlgodClient } from "../../algod";
-import { PROVIDER_ID } from "../../constants";
+import { PROVIDER_ID, DEFAULT_NETWORK } from "../../constants";
 import type {
   TransactionsArray,
   DecodedTransaction,
   DecodedSignedTransaction,
   Network,
 } from "../../types";
-import { DEFAULT_NETWORK } from "../../constants";
 import { ICON } from "./constants";
 import type {
   WindowExtended,
@@ -61,7 +60,11 @@ class AlgoSignerClient extends BaseWallet {
     isWalletConnect: false,
   };
 
-  static async init({ algodOptions, algosdkStatic, network }: InitParams) {
+  static async init({
+    algodOptions,
+    algosdkStatic,
+    network = DEFAULT_NETWORK,
+  }: InitParams) {
     try {
       if (
         typeof window == "undefined" ||
@@ -79,7 +82,7 @@ class AlgoSignerClient extends BaseWallet {
         client: algoSigner,
         algosdk: algosdk,
         algodClient: algodClient,
-        network: getNetwork(network || DEFAULT_NETWORK),
+        network: getNetwork(network),
       });
     } catch (e) {
       console.error("Error initializing...", e);

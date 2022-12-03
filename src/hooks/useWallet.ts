@@ -23,8 +23,8 @@ type SupportedProviders = { [x: string]: Promise<WalletClient | null> };
 type NodeConfig = {
   network: Network;
   nodeServer: string;
-  nodeToken: string;
-  nodePort: string;
+  nodeToken?: string;
+  nodePort?: string;
 };
 
 export const initializeProviders = (
@@ -181,7 +181,7 @@ export default function useWallet() {
       await disconnectWCSessions(id);
 
       const walletClient = await getClient(id);
-      const walletInfo = await walletClient.connect(() => disconnect(id));
+      const walletInfo = await walletClient?.connect(() => disconnect(id));
 
       if (!walletInfo || !walletInfo.accounts.length) {
         throw new Error("Failed to connect " + id);
