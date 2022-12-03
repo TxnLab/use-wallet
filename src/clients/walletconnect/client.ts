@@ -37,7 +37,7 @@ class WalletConnectClient extends BaseWallet {
   }
 
   static metadata = {
-    id: PROVIDER_ID.WALLET_CONNECT,
+    id: PROVIDER_ID.WALLETCONNECT,
     name: "WalletConnect",
     icon: ICON,
     isWalletConnect: true,

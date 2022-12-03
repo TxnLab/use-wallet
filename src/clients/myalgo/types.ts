@@ -12,7 +12,7 @@ export type MyAlgoWalletClientConstructor = {
 };
 
 export type ClientOptions = {
-  disableLedgerNano: false;
+  disableLedgerNano: boolean;
 };
 
 export type InitParams = {

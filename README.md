@@ -12,7 +12,6 @@ React hooks for using Algorand compatible wallets with web applications.
 - [WalletConnect](https://walletconnect.com)
 - [KMD](https://developer.algorand.org/docs/rest-apis/kmd)
 
-
 ## Demo
 
 Preview a basic implementation in [Storybook](https://txnlab.github.io/use-wallet) or check out [this example](https://github.com/gabrielkuettel/use-wallet-example).
@@ -45,64 +44,106 @@ Install peer dependencies (if needed)
 npm install algosdk @blockshake/defly-connect @perawallet/connect @randlabs/myalgo-connect @walletconnect/client algorand-walletconnect-qrcode-modal @json-rpc-tools/utils
 ```
 
-### Set up the wallet providers
+### Set up the Wallet Provider
+
+In `app.js`, initialize the Wallet Provider so that the `useWallet` hook can be used in the child components, and use the `reconnectProviders` function to restore sessions for users returning to the app. 
+
 
 ```jsx
 import React from "react";
-import { useConnectWallet } from "@txnlab/use-wallet";
+import {
+  reconnectProviders,
+  initializeProviders,
+  WalletProvider,
+} from "@txnlab/use-wallet";
 
-function App() {
-  const { providers, reconnectProviders, accounts, activeAccount } = useConnectWallet();
+const walletProviders = initializeProviders();
 
+export default function App() {
   // Reconnect the session when the user returns to the dApp
   React.useEffect(() => {
-    reconnectProviders();
+    reconnectProviders(walletProviders);
   }, []);
 
-  // Use these properties to display connected accounts to users.
-  // They are reactive and presisted to local storage.
-  React.useEffect(() => {
-    console.log("connected accounts", accounts);
-    console.log("active account", activeAccount);
-  });
+  return (
+    <WalletProvider value={walletProviders}>
+      ...
+    </WalletProvider>);
+}
+```
+
+The `reconnectProviders` function is used to restore session states of wallets that rely on the `WalletConnect` protocol.
+
+By default, all of the supported providers except for `KMD` are returned by `useConnectWallet`. An array can be passed to `initializeProviders` to determine which providers your dApp supports, as shown below.
+
+```jsx
+import { initializeProviders, PROVIDER_ID } from "@txnlab/use-wallet";
+
+const walletProviders = initializeProviders([
+  PROVIDER_ID.KMD_WALLET,
+  PROVIDER_ID.WALLET_CONNECT,
+]);
+```
+
+For more configuration options, see [Provider Configuration](#provider-configuration).
+
+### Connect
+
+Map through the `providers` object to list the providers and enable users to connect. 
+
+```jsx
+import React from "react";
+import { useWallet } from "@txnlab/use-wallet";
+
+export default function Connect() {
+  const { providers, activeAccount } = useWallet();
 
   // Map through the providers.
   // Render account information and "connect", "set active", and "disconnect" buttons.
   // Finally, map through the `accounts` property to render a dropdown for each connected account.
   return (
     <div>
-      {providers.map((provider) => (
-        <div key={"provider-" + provider.id}>
+      {providers?.map((provider) => (
+        <div key={"provider-" + provider.metadata.id}>
           <h4>
-            <img width={30} height={30} src={provider.icon} />
-            {provider.name} {provider.isActive && "[active]"}
+            <img width={30} height={30} alt="" src={provider.metadata.icon} />
+            {provider.metadata.name} {provider.isActive && "[active]"}
           </h4>
           <div>
             <button onClick={provider.connect} disabled={provider.isConnected}>
               Connect
             </button>
-            <button onClick={provider.disconnect} disabled={!provider.isConnected}>
+            <button
+              onClick={provider.disconnect}
+              disabled={!provider.isConnected}
+            >
               Disonnect
             </button>
-            <button onClick={provider.setActive} disabled={!provider.isConnected || provider.isActive}>
+            <button
+              onClick={provider.setActiveProvider}
+              disabled={!provider.isConnected || provider.isActive}
+            >
               Set Active
             </button>
-            {provider.isActive && provider.accounts.length && (
-              <select
-                value={provider.activeAccount?.address}
-                onChange={(e) => provider.selectAccount(e.target.value)}
-              >
-                {provider.accounts.map((account) => (
-                  <option value={account.address}>{account.address}</option>
-                ))}
-              </select>
-             )}
+            <div>
+              {provider.isActive && provider.accounts.length && (
+                <select
+                  value={activeAccount?.address}
+                  onChange={(e) => provider.setActiveAccount(e.target.value)}
+                >
+                  {provider.accounts.map((account) => (
+                    <option value={account.address}>{account.address}</option>
+                  ))}
+                </select>
+              )}
+            </div>
           </div>
         </div>
       ))}
     </div>
   );
 }
+
 ```
 
 Each provider has two connection states: `isConnected` and `isActive`.
@@ -111,30 +152,30 @@ Each provider has two connection states: `isConnected` and `isActive`.
 
 `isActive` indicates that the provider is currently active and will be used to sign and send transactions when using the `useWallet` hook.
 
-By default, all of the supported providers except for `KMD` are returned by `useConnectWallet`. A configuration object can be passed to determine which providers your dApp suports, as shown below.
-
-```jsx
-import { useConnectWallet, PROVIDER_ID } from "@txnlab/use-wallet";
-
-...
-
-const { providers } = useConnectWallet({
-  providers: [
-    PROVIDER_ID.MYALGO_WALLET,
-    PROVIDER_ID.PERA_WALLET,
-    PROVIDER_ID.KMD_WALLET,
-  ],
-});
-```
+The `activeAccount` is the primary account that is currently active and will be used to sign and send transactions.
 
 ### Sign and send transactions
 
+Construct a transaction using `algosdk`, and sign and send the transaction using the `signTransactions` and `sendTransactions` functions provided by the `useWallet` hook.
+
 ```jsx
 import React from "react";
-import { useWallet } from "@txnlab/use-wallet";
+import {
+  useWallet,
+  DEFAULT_NODE_BASEURL,
+  DEFAULT_NODE_TOKEN,
+  DEFAULT_NODE_PORT,
+} from "@txnlab/use-wallet";
+import algosdk from "algosdk";
 
-function Wallet() {
-  const { activeAccount, signTransactions, sendTransactions } = useWallet();
+const algodClient = new algosdk.Algodv2(
+  DEFAULT_NODE_TOKEN,
+  DEFAULT_NODE_BASEURL,
+  DEFAULT_NODE_PORT
+);
+
+export default function Transact() {
+  const { activeAddress, signTransactions, sendTransactions } = useWallet();
 
   const sendTransaction = async (
     from?: string,
@@ -147,7 +188,6 @@ function Wallet() {
 
     const params = await algodClient.getTransactionParams().do();
 
-  // Construct a transaction to be signed and sent. 
     const transaction = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
       from,
       to,
@@ -155,80 +195,70 @@ function Wallet() {
       suggestedParams: params,
     });
 
-    // Encode the transactions into a byte array.
     const encodedTransaction = algosdk.encodeUnsignedTransaction(transaction);
 
-    // Sign the transactions.
     const signedTransactions = await signTransactions([encodedTransaction]);
 
-    // Send the transactions.
-    const { id } = await sendTransactions(signedTransactions);
+    const waitRoundsToConfirm = 4;
+
+    const { id } = await sendTransactions(
+      signedTransactions,
+      waitRoundsToConfirm
+    );
 
     console.log("Successfully sent transaction. Transaction ID: ", id);
   };
 
-  if (!activeAccount) {
+  if (!activeAddress) {
     return <p>Connect an account first.</p>;
   }
 
   return (
     <div>
-      {
-        <button
-          onClick={() =>
-            sendTransaction(
-              activeAccount?.address,
-              activeAccount?.address,
-              1000
-            )
-          }
-          className="button"
-        >
-          Sign and send transactions
-        </button>
-      }
+      <button
+        onClick={() => sendTransaction(activeAddress, activeAddress, 1000)}
+        className="button"
+      >
+        Sign and send transactions
+      </button>
     </div>
   );
-};
+}
 ```
 
-## Environment Variables
+### Display account details
 
-By default, wallets will connect to Algorand [MainNet](https://developer.algorand.org/docs/get-details/algorand-networks/mainnet). You can change this behavior by setting the following environment variables:
+The `activeAccount` object can be used to display details for the currently active account. For convenience, the `activeAddress` property shows the currently active address.
 
-* `NODE_NETWORK` (defaults to `mainnet`, and can be set to `testnet`, `betanet`, or the name of a local network running in dev mode)
- 
-* `NODE_SERVER`
+```jsx
+import React from "react";
+import { useWallet } from "@txnlab/use-wallet";
 
-* `NODE_TOKEN` 
+export default function Account() {
+  const { activeAccount } = useWallet();
 
-* `NODE_PORT`
+  if (!activeAccount) {
+    return <p>No account active.</p>;
+  }
 
-Example `.env` file:
-
+  return (
+    <div>
+      <h4>Active Account</h4>
+      <p>
+        Name: <span>{activeAccount.name}</span>
+      </p>
+      <p>
+        Address: <span>{activeAccount.address}</span>
+      </p>
+      <p>
+        Provider: <span>{activeAccount.providerId}</span>
+      </p>
+    </div>
+  );
+}
 ```
-NODE_NETWORK=devmodenet
-NODE_SERVER=http://algod
-NODE_TOKEN=xxxxxxxxx
-NODE_PORT=8080
-```
 
-### Create React App and Next.js
-
-In Create React App and Next.js projects, you'll need to add a prefix to these environment variables to expose them to the browser.
-
-* `REACT_APP_` in [Create React App](https://create-react-app.dev/docs/adding-custom-environment-variables/)
-
-* `NEXT_PUBLIC_` in [Next.js](https://nextjs.org/docs/basic-features/environment-variables#exposing-environment-variables-to-the-browser)
-
-Example `.env` file in Create React App:
-
-```
-REACT_APP_NODE_NETWORK=devmodenet
-REACT_APP_NODE_SERVER=http://algod
-REACT_APP_NODE_TOKEN=xxxxxxxxx
-REACT_APP_NODE_PORT=8080
-```
+## Provider Configuration
 
 ## Webpack 5
 

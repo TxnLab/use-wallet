@@ -36,7 +36,7 @@ class KMDWalletClient extends BaseWallet {
   }
 
   static metadata = {
-    id: PROVIDER_ID.KMD_WALLET,
+    id: PROVIDER_ID.KMD,
     name: "KMD",
     icon: ICON,
     isWalletConnect: false,
@@ -61,7 +61,7 @@ class KMDWalletClient extends BaseWallet {
       const kmdClient = new algosdk.Kmd(token, host, port);
 
       return new KMDWalletClient({
-        id: PROVIDER_ID.KMD_WALLET,
+        id: PROVIDER_ID.KMD,
         password,
         wallet,
         client: kmdClient,

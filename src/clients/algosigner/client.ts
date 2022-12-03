@@ -54,7 +54,7 @@ class AlgoSignerClient extends BaseWallet {
   }
 
   static metadata = {
-    id: PROVIDER_ID.ALGO_SIGNER,
+    id: PROVIDER_ID.ALGOSIGNER,
     name: "AlgoSigner",
     icon: ICON,
     isWalletConnect: false,
@@ -78,7 +78,7 @@ class AlgoSignerClient extends BaseWallet {
       const algoSigner = (window as WindowExtended).AlgoSigner as AlgoSigner;
 
       return new AlgoSignerClient({
-        id: PROVIDER_ID.ALGO_SIGNER,
+        id: PROVIDER_ID.ALGOSIGNER,
         client: algoSigner,
         algosdk: algosdk,
         algodClient: algodClient,

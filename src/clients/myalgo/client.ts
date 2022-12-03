@@ -24,7 +24,7 @@ class MyAlgoWalletClient extends BaseWallet {
   }
 
   static metadata = {
-    id: PROVIDER_ID.MYALGO_WALLET,
+    id: PROVIDER_ID.MYALGO,
     name: "MyAlgo",
     icon: ICON,
     isWalletConnect: false,

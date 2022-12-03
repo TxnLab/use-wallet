@@ -1,11 +1,11 @@
 export enum PROVIDER_ID {
-  KMD_WALLET = "kmd",
-  PERA_WALLET = "pera",
-  MYALGO_WALLET = "myalgo",
-  ALGO_SIGNER = "algosigner",
+  KMD = "kmd",
+  PERA = "pera",
+  MYALGO = "myalgo",
+  ALGOSIGNER = "algosigner",
   DEFLY = "defly",
   EXODUS = "exodus",
-  WALLET_CONNECT = "walletconnect",
+  WALLETCONNECT = "walletconnect",
 }
 
 export const DEFAULT_NETWORK = "mainnet";

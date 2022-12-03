@@ -29,7 +29,7 @@ class PeraWalletClient extends BaseWallet {
   }
 
   static metadata = {
-    id: PROVIDER_ID.PERA_WALLET,
+    id: PROVIDER_ID.PERA,
     name: "Pera",
     icon: ICON,
     isWalletConnect: true,

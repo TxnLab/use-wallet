@@ -12,8 +12,8 @@ export default function ConnectWallet() {
   // Use these properties to display connected accounts to users.
   React.useEffect(() => {
     console.log("connected accounts", connectedAccounts);
-    console.log("active accounts", connectedActiveAccounts);
-    console.log("selected account", activeAccount);
+    console.log("connected and active accounts", connectedActiveAccounts);
+    console.log("active account", activeAccount);
   });
 
   // Map through the providers.
@@ -26,7 +26,7 @@ export default function ConnectWallet() {
           <div key={"provider-" + provider.metadata.id}>
             <h4>
               <img width={30} height={30} src={provider.metadata.icon} />
-              {provider.metadata.id} {provider.isActive && "[active]"}{" "}
+              {provider.metadata.name} {provider.isActive && "[active]"}{" "}
             </h4>
             <div>
               <button
