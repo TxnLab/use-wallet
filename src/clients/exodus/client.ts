@@ -10,6 +10,7 @@ import type {
   TransactionsArray,
   DecodedTransaction,
   DecodedSignedTransaction,
+  Network,
 } from "../../types";
 import { ICON } from "./constants";
 import {
@@ -22,16 +23,19 @@ import {
 class ExodusClient extends BaseWallet {
   #client: Exodus;
   #onlyIfTrusted: boolean;
+  network: Network;
 
   constructor({
     client,
     algosdk,
     algodClient,
     onlyIfTrusted,
+    network,
   }: ExodusClientConstructor) {
     super(algosdk, algodClient);
     this.#client = client;
     this.#onlyIfTrusted = onlyIfTrusted;
+    this.network = network;
   }
 
   static metadata = {
@@ -45,6 +49,7 @@ class ExodusClient extends BaseWallet {
     clientOptions,
     algodOptions,
     algosdkStatic,
+    network,
   }: InitParams) {
     try {
       if (
@@ -64,6 +69,7 @@ class ExodusClient extends BaseWallet {
         algosdk: algosdk,
         algodClient: algodClient,
         onlyIfTrusted: clientOptions?.onlyIfTrusted || false,
+        network,
       });
     } catch (e) {
       console.error("Error initializing...", e);

@@ -9,7 +9,11 @@ import { PROVIDER_ID } from "../../constants";
 import BaseWallet from "../base";
 import { TransactionsArray } from "../../types";
 import type { DeflyWalletConnect } from "@blockshake/defly-connect";
-import type { DecodedTransaction, DecodedSignedTransaction } from "../../types";
+import type {
+  DecodedTransaction,
+  DecodedSignedTransaction,
+  Network,
+} from "../../types";
 import { ICON } from "./constants";
 import {
   DeflyTransaction,
@@ -19,10 +23,17 @@ import {
 
 class DeflyWalletClient extends BaseWallet {
   #client: DeflyWalletConnect;
+  network: Network;
 
-  constructor({ client, algosdk, algodClient }: DeflyWalletClientConstructor) {
+  constructor({
+    client,
+    algosdk,
+    algodClient,
+    network,
+  }: DeflyWalletClientConstructor) {
     super(algosdk, algodClient);
     this.#client = client;
+    this.network = network;
   }
 
   static metadata = {
@@ -37,6 +48,7 @@ class DeflyWalletClient extends BaseWallet {
     algodOptions,
     clientStatic,
     algosdkStatic,
+    network,
   }: InitParams) {
     try {
       const DeflyWalletConnect =
@@ -54,6 +66,7 @@ class DeflyWalletClient extends BaseWallet {
         client: deflyWallet,
         algosdk,
         algodClient,
+        network,
       });
     } catch (e) {
       console.error("Error initializing...", e);

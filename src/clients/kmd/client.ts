@@ -2,7 +2,7 @@ import type _algosdk from "algosdk";
 import Algod, { getAlgodClient } from "../../algod";
 import BaseWallet from "../base";
 import { PROVIDER_ID } from "../../constants";
-import type { Account, Wallet, TransactionsArray } from "../../types";
+import type { Account, Wallet, TransactionsArray, Network } from "../../types";
 import { ICON } from "./constants";
 import {
   InitParams,
@@ -17,6 +17,7 @@ class KMDWalletClient extends BaseWallet {
   #password: string;
   walletId: string;
   id: PROVIDER_ID;
+  network: Network;
 
   constructor({
     client,
@@ -25,6 +26,7 @@ class KMDWalletClient extends BaseWallet {
     password,
     algosdk,
     algodClient,
+    network,
   }: KMDWalletClientConstructor) {
     super(algosdk, algodClient);
 
@@ -33,6 +35,7 @@ class KMDWalletClient extends BaseWallet {
     this.#password = password;
     this.id = id;
     this.walletId = "";
+    this.network = network;
   }
 
   static metadata = {
@@ -46,6 +49,7 @@ class KMDWalletClient extends BaseWallet {
     clientOptions,
     algodOptions,
     algosdkStatic,
+    network,
   }: InitParams) {
     try {
       const {
@@ -67,6 +71,7 @@ class KMDWalletClient extends BaseWallet {
         client: kmdClient,
         algosdk: algosdk,
         algodClient: algodClient,
+        network,
       });
     } catch (e) {
       console.error("Error initializing...", e);

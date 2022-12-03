@@ -1,6 +1,6 @@
 import type _algosdk from "algosdk";
 import type WalletConnect from "@walletconnect/client";
-import type { AlgodClientOptions } from "../../types";
+import type { AlgodClientOptions, Network } from "../../types";
 
 export interface IClientMeta {
   description: string;
@@ -50,12 +50,12 @@ export type InitParams = {
   algodOptions?: AlgodClientOptions;
   clientStatic?: typeof WalletConnect;
   algosdkStatic?: typeof _algosdk;
-  network?: "betanet" | "testnet" | "mainnet";
+  network: Network;
 };
 
 export type WalletConnectClientConstructor = {
   client: WalletConnect;
   algosdk: typeof _algosdk;
   algodClient: _algosdk.Algodv2;
-  network: "betanet" | "testnet" | "mainnet";
+  network: Network;
 };

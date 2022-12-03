@@ -11,16 +11,24 @@ import {
   TransactionsArray,
   DecodedTransaction,
   DecodedSignedTransaction,
+  Network,
 } from "../../types";
 import { MyAlgoWalletClientConstructor, InitParams } from "./types";
 import { ICON } from "./constants";
 
 class MyAlgoWalletClient extends BaseWallet {
   #client: _MyAlgoConnect;
+  network: Network;
 
-  constructor({ client, algosdk, algodClient }: MyAlgoWalletClientConstructor) {
+  constructor({
+    client,
+    algosdk,
+    algodClient,
+    network,
+  }: MyAlgoWalletClientConstructor) {
     super(algosdk, algodClient);
     this.#client = client;
+    this.network = network;
   }
 
   static metadata = {
@@ -35,6 +43,7 @@ class MyAlgoWalletClient extends BaseWallet {
     algodOptions,
     clientStatic,
     algosdkStatic,
+    network,
   }: InitParams) {
     try {
       const MyAlgoConnect =
@@ -51,6 +60,7 @@ class MyAlgoWalletClient extends BaseWallet {
         client: myAlgo,
         algosdk: algosdk,
         algodClient: algodClient,
+        network,
       });
     } catch (e) {
       console.error("Error initializing...", e);

@@ -13,6 +13,7 @@ import {
   TransactionsArray,
   DecodedTransaction,
   DecodedSignedTransaction,
+  Network,
 } from "../../types";
 import { DEFAULT_NETWORK, ICON } from "./constants";
 import {
@@ -23,7 +24,7 @@ import {
 
 class WalletConnectClient extends BaseWallet {
   #client: WalletConnect;
-  #network: "betanet" | "testnet" | "mainnet";
+  network: Network;
 
   constructor({
     client,
@@ -33,7 +34,7 @@ class WalletConnectClient extends BaseWallet {
   }: WalletConnectClientConstructor) {
     super(algosdk, algodClient);
     this.#client = client;
-    this.#network = network;
+    this.network = network;
   }
 
   static metadata = {
@@ -85,9 +86,9 @@ class WalletConnectClient extends BaseWallet {
   async connect(): Promise<Wallet> {
     let chainId = 416001;
 
-    if (this.#network === "betanet") {
+    if (this.network === "betanet") {
       chainId = 416003;
-    } else if (this.#network === "testnet") {
+    } else if (this.network === "testnet") {
       chainId = 416002;
     }
 

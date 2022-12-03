@@ -1,7 +1,7 @@
 import type _algosdk from "algosdk";
 import type { PeraWalletConnect } from "@perawallet/connect";
 import type { Transaction } from "algosdk";
-import type { AlgodClientOptions } from "../../types";
+import type { AlgodClientOptions, Network } from "../../types";
 
 export type ClientOptions = {
   bridge?: string;
@@ -28,6 +28,7 @@ export type PeraWalletClientConstructor = {
   client: PeraWalletConnect;
   algosdk: typeof _algosdk;
   algodClient: _algosdk.Algodv2;
+  network: Network;
 };
 
 export type InitParams = {
@@ -35,4 +36,5 @@ export type InitParams = {
   algodOptions?: AlgodClientOptions;
   clientStatic?: typeof PeraWalletConnect;
   algosdkStatic?: typeof _algosdk;
+  network: Network;
 };

@@ -10,6 +10,7 @@ import type {
   TransactionsArray,
   DecodedTransaction,
   DecodedSignedTransaction,
+  Network,
 } from "../../types";
 import { DEFAULT_NETWORK } from "../../constants";
 import { ICON } from "./constants";
@@ -22,7 +23,7 @@ import type {
   InitParams,
 } from "./types";
 
-const getNetwork = (network: string) => {
+const getNetwork = (network: string): SupportedLedgers => {
   if (network === "betanet") {
     return "BetaNet";
   }
@@ -40,7 +41,7 @@ const getNetwork = (network: string) => {
 
 class AlgoSignerClient extends BaseWallet {
   #client: AlgoSigner;
-  #network: SupportedLedgers;
+  network: Network;
 
   constructor({
     client,
@@ -50,7 +51,7 @@ class AlgoSignerClient extends BaseWallet {
   }: AlgoSignerClientConstructor) {
     super(algosdk, algodClient);
     this.#client = client;
-    this.#network = network;
+    this.network = network;
   }
 
   static metadata = {
@@ -60,11 +61,7 @@ class AlgoSignerClient extends BaseWallet {
     isWalletConnect: false,
   };
 
-  static async init({
-    clientOptions,
-    algodOptions,
-    algosdkStatic,
-  }: InitParams) {
+  static async init({ algodOptions, algosdkStatic, network }: InitParams) {
     try {
       if (
         typeof window == "undefined" ||
@@ -82,7 +79,7 @@ class AlgoSignerClient extends BaseWallet {
         client: algoSigner,
         algosdk: algosdk,
         algodClient: algodClient,
-        network: clientOptions?.network || getNetwork(DEFAULT_NETWORK),
+        network: getNetwork(network || DEFAULT_NETWORK),
       });
     } catch (e) {
       console.error("Error initializing...", e);
@@ -94,7 +91,7 @@ class AlgoSignerClient extends BaseWallet {
     await this.#client.connect();
 
     const accounts = await this.#client.accounts({
-      ledger: this.#network,
+      ledger: getNetwork(this.network),
     });
 
     if (accounts.length === 0) {

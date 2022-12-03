@@ -2,7 +2,12 @@ import { useMemo, useContext } from "react";
 import type algosdk from "algosdk";
 import { getAlgosdk } from "../algod";
 import { useWalletStore, walletStoreSelector } from "../store/index";
-import { PROVIDER_ID, TransactionsArray, WalletClient } from "../types";
+import {
+  PROVIDER_ID,
+  TransactionsArray,
+  WalletClient,
+  Network,
+} from "../types";
 import { ClientContext } from "../store/state/clientStore";
 import allClients from "../clients";
 import shallow from "zustand/shallow";
@@ -10,17 +15,30 @@ import {
   DEFAULT_NODE_BASEURL,
   DEFAULT_NODE_TOKEN,
   DEFAULT_NODE_PORT,
+  DEFAULT_NETWORK,
 } from "../constants";
 
 type SupportedProviders = { [x: string]: Promise<WalletClient | null> };
 
+type NodeConfig = {
+  network: Network;
+  nodeServer: string;
+  nodeToken: string;
+  nodePort: string;
+};
+
 export const initializeProviders = (
   providers?: PROVIDER_ID[],
-  nodeServer = DEFAULT_NODE_BASEURL,
-  nodeToken = DEFAULT_NODE_TOKEN,
-  nodePort = DEFAULT_NODE_PORT
+  nodeConfig?: NodeConfig
 ) => {
   const initializedProviders: SupportedProviders = {};
+
+  const {
+    network = DEFAULT_NETWORK,
+    nodeServer = DEFAULT_NODE_BASEURL,
+    nodePort = DEFAULT_NODE_PORT,
+    nodeToken = DEFAULT_NODE_TOKEN,
+  } = nodeConfig || {};
 
   if (!providers || providers.length === 0)
     for (const [id, client] of Object.entries(allClients)) {
@@ -29,6 +47,7 @@ export const initializeProviders = (
       }
 
       initializedProviders[id] = client.init({
+        network,
         algodOptions: [nodeToken, nodeServer, nodePort],
       });
     }
@@ -36,6 +55,7 @@ export const initializeProviders = (
   if (providers) {
     for (const id of providers) {
       initializedProviders[id] = allClients[id].init({
+        network,
         algodOptions: [nodeToken, nodeServer, nodePort],
       });
     }

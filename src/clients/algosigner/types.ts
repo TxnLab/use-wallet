@@ -1,10 +1,6 @@
 import type _algosdk from "algosdk";
 import { PROVIDER_ID } from "../../constants";
-import type { AlgodClientOptions } from "../../types";
-
-export type ClientOptions = {
-  network: "MainNet" | "BetaNet" | "TestNet" | string;
-};
+import type { AlgodClientOptions, Network } from "../../types";
 
 export type WindowExtended = { AlgoSigner: AlgoSigner } & Window &
   typeof globalThis;
@@ -46,7 +42,7 @@ export type AlgoSignerClientConstructor = {
 };
 
 export type InitParams = {
-  clientOptions?: ClientOptions;
   algodOptions?: AlgodClientOptions;
   algosdkStatic?: typeof _algosdk;
+  network: Network;
 };

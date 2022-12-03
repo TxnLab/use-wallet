@@ -10,6 +10,7 @@ import type {
   TransactionsArray,
   DecodedTransaction,
   DecodedSignedTransaction,
+  Network,
 } from "../../types";
 import { PROVIDER_ID } from "../../constants";
 import BaseWallet from "../base";
@@ -22,10 +23,17 @@ import {
 
 class PeraWalletClient extends BaseWallet {
   #client: PeraWalletConnect;
+  network: Network;
 
-  constructor({ client, algosdk, algodClient }: PeraWalletClientConstructor) {
+  constructor({
+    client,
+    algosdk,
+    algodClient,
+    network,
+  }: PeraWalletClientConstructor) {
     super(algosdk, algodClient);
     this.#client = client;
+    this.network = network;
   }
 
   static metadata = {
@@ -40,6 +48,7 @@ class PeraWalletClient extends BaseWallet {
     algodOptions,
     clientStatic,
     algosdkStatic,
+    network,
   }: InitParams) {
     try {
       const PeraWalletConnect =
@@ -56,6 +65,7 @@ class PeraWalletClient extends BaseWallet {
         client: peraWallet,
         algosdk,
         algodClient,
+        network,
       });
     } catch (e) {
       console.error("Error initializing...", e);
