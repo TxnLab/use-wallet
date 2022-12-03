@@ -125,10 +125,10 @@ export default function useWallet() {
     });
   }, [clients, connectedAccounts, connectedActiveAccounts, activeAccount]);
 
-  const getClient = async (id?: PROVIDER_ID) => {
+  const getClient = async (id?: PROVIDER_ID): Promise<WalletClient> => {
     if (!id) throw new Error("Provier ID is missing.");
 
-    const client = clients?.[id];
+    const client = await clients?.[id];
 
     if (!client) throw new Error("Client not found for ID");
 
