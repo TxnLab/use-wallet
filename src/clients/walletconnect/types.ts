@@ -1,5 +1,6 @@
 import type _algosdk from "algosdk";
 import type WalletConnect from "@walletconnect/client";
+import QRCodeModal from "algorand-walletconnect-qrcode-modal";
 import type { AlgodClientOptions, Network } from "../../types";
 
 export interface IClientMeta {
@@ -49,6 +50,7 @@ export type InitParams = {
   clientOptions?: ClientOptions;
   algodOptions?: AlgodClientOptions;
   clientStatic?: typeof WalletConnect;
+  modalStatic?: typeof QRCodeModal;
   algosdkStatic?: typeof _algosdk;
   network?: Network;
 };

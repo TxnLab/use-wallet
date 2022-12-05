@@ -29,7 +29,8 @@ type NodeConfig = {
 
 export const initializeProviders = (
   providers?: PROVIDER_ID[],
-  nodeConfig?: NodeConfig
+  nodeConfig?: NodeConfig,
+  algosdkStatic?: typeof algosdk
 ) => {
   const initializedProviders: SupportedProviders = {};
 
@@ -49,6 +50,7 @@ export const initializeProviders = (
       initializedProviders[id] = client.init({
         network,
         algodOptions: [nodeToken, nodeServer, nodePort],
+        algosdkStatic: algosdkStatic,
       });
     }
 
@@ -57,6 +59,7 @@ export const initializeProviders = (
       initializedProviders[id] = allClients[id].init({
         network,
         algodOptions: [nodeToken, nodeServer, nodePort],
+        algosdkStatic: algosdkStatic,
       });
     }
   }

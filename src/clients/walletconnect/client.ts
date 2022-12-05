@@ -48,14 +48,16 @@ class WalletConnectClient extends BaseWallet {
     clientOptions,
     algodOptions,
     clientStatic,
+    modalStatic,
     algosdkStatic,
     network = DEFAULT_NETWORK,
   }: InitParams) {
     try {
       const WalletConnect =
         clientStatic || (await import("@walletconnect/client")).default;
-      const QRCodeModal = (await import("algorand-walletconnect-qrcode-modal"))
-        .default;
+      const QRCodeModal =
+        modalStatic ||
+        (await import("algorand-walletconnect-qrcode-modal")).default;
 
       const walletConnect = new WalletConnect({
         ...(clientOptions

@@ -75,11 +75,11 @@ class AlgoSignerClient extends BaseWallet {
 
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk;
       const algodClient = await getAlgodClient(algosdk, algodOptions);
-      const algoSigner = (window as WindowExtended).AlgoSigner as AlgoSigner;
+      const algosigner = (window as WindowExtended).AlgoSigner as AlgoSigner;
 
       return new AlgoSignerClient({
         id: PROVIDER_ID.ALGOSIGNER,
-        client: algoSigner,
+        client: algosigner,
         algosdk: algosdk,
         algodClient: algodClient,
         network: getNetwork(network),

@@ -304,6 +304,62 @@ const walletProviders = {
 </WalletProvider>
 ```
 
+## Static Imports
+
+By default, `use-wallet` dynamically imports all of the dependencies for the providiers, as well as `algosdk`, to reduce bundle size. 
+
+Some React frameworks, like [Remix](https://remix.run/), do not support dynamic imports. To get around this, those dependencies can be imported in your application and passed to the `useWallet` provider. See below for an example. 
+
+```jsx
+...
+
+import algosdk from "algosdk";
+import MyAlgoConnect from "@randlabs/myalgo-connect";
+import { PeraWalletConnect } from "@perawallet/connect";
+import { DeflyWalletConnect } from "@blockshake/defly-connect";
+import WalletConnect from "@walletconnect/client";
+import QRCodeModal from "algorand-walletconnect-qrcode-modal";
+
+const walletProviders = {
+  [PROVIDER_ID.PERA]: pera.init({
+    algosdkStatic: algosdk,
+    clientStatic: PeraWalletConnect,
+  }),
+  [PROVIDER_ID.MYALGO]: myalgo.init({
+    algosdkStatic: algosdk,
+    clientStatic: MyAlgoConnect,
+  }),
+  [PROVIDER_ID.DEFLY]: defly.init({
+    algosdkStatic: algosdk,
+    clientStatic: DeflyWalletConnect,
+  }),
+  [PROVIDER_ID.EXODUS]: exodus.init({
+    algosdkStatic: algosdk,
+  }),
+  [PROVIDER_ID.ALGOSIGNER]: algosigner.init({
+    algosdkStatic: algosdk,
+  }),
+  [PROVIDER_ID.WALLETCONNECT]: walletconnect.init({
+    algosdkStatic: algosdk,
+    clientStatic: WalletConnect,
+    modalStatic: QRCodeModal,
+  }),
+};
+
+export default function App() {
+  ...
+
+  return (
+    <WalletProvider value={walletProviders}>
+      ...
+    </WalletProvider>
+  );
+}
+
+```
+
+Note that some of the providers do not require static imports to be provided. This is usually the case of providers that are browser extensions.
+
 ## Webpack 5
 
 1. Install `react-app-rewired` and the missing polyfills.
