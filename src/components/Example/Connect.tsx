@@ -39,7 +39,7 @@ export default function ConnectWallet() {
                 onClick={provider.disconnect}
                 disabled={!provider.isConnected}
               >
-                Disonnect
+                Disconnect
               </button>
               <button
                 onClick={provider.setActiveProvider}
