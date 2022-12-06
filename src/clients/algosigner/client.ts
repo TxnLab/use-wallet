@@ -82,7 +82,7 @@ class AlgoSignerClient extends BaseWallet {
         client: algosigner,
         algosdk: algosdk,
         algodClient: algodClient,
-        network: getNetwork(network),
+        network,
       });
     } catch (e) {
       console.error("Error initializing...", e);
