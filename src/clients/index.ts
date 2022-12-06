@@ -1,53 +1,19 @@
-import { PROVIDER_ID } from "../constants";
-import peraWalletClient from "./perawallet";
-import myAlgoWalletClient from "./myalgowallet";
-import algoSignerClient from "./algosigner";
-import deflyClient from "./defly";
-import exodusClient from "./exodus";
-import kmdClient from "./kmd";
-import walletconnectClient from "./walletconnect";
+import pera from "./pera";
+import myalgo from "./myalgo";
+import defly from "./defly";
+import exodus from "./exodus";
+import algosigner from "./algosigner";
+import walletconnect from "./walletconnect";
+import kmd from "./kmd";
 
-export const clients = {
-  [PROVIDER_ID.KMD_WALLET]: kmdClient.init().catch((e) => {
-    if (typeof window !== "undefined") {
-      console.info("error initializing client", e);
-      return;
-    }
-  }),
-  [PROVIDER_ID.PERA_WALLET]: peraWalletClient.init().catch((e) => {
-    if (typeof window !== "undefined") {
-      console.info("error initializing client", e);
-      return;
-    }
-  }),
-  [PROVIDER_ID.MYALGO_WALLET]: myAlgoWalletClient.init().catch((e) => {
-    if (typeof window !== "undefined") {
-      console.info("error initializing client", e);
-      return;
-    }
-  }),
-  [PROVIDER_ID.ALGO_SIGNER]: algoSignerClient.init().catch((e) => {
-    if (typeof window !== "undefined") {
-      console.info("error initializing client", e);
-      return;
-    }
-  }),
-  [PROVIDER_ID.DEFLY]: deflyClient.init().catch((e) => {
-    if (typeof window !== "undefined") {
-      console.info("error initializing client", e);
-      return;
-    }
-  }),
-  [PROVIDER_ID.EXODUS]: exodusClient.init().catch((e) => {
-    if (typeof window !== "undefined") {
-      console.info("error initializing client", e);
-      return;
-    }
-  }),
-  [PROVIDER_ID.WALLET_CONNECT]: walletconnectClient.init().catch((e) => {
-    if (typeof window !== "undefined") {
-      console.info("error initializing client", e);
-      return;
-    }
-  }),
+export { pera, myalgo, defly, exodus, algosigner, walletconnect, kmd };
+
+export default {
+  [pera.metadata.id]: pera,
+  [myalgo.metadata.id]: myalgo,
+  [defly.metadata.id]: defly,
+  [exodus.metadata.id]: exodus,
+  [algosigner.metadata.id]: algosigner,
+  [walletconnect.metadata.id]: walletconnect,
+  [kmd.metadata.id]: kmd,
 };

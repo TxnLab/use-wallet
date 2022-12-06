@@ -1,3 +1,7 @@
+import type algosdk from "algosdk";
+
+export type Network = "betanet" | "testnet" | "mainnet" | string;
+
 export type Txn = {
   apaa: Uint8Array;
   apas: number[];
@@ -49,3 +53,5 @@ export type DecodedSignedTransaction = {
   sig: Uint8Array;
   txn: DecodedTransaction;
 };
+
+export type AlgodClientOptions = ConstructorParameters<typeof algosdk.Algodv2>;

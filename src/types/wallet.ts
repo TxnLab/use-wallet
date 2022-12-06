@@ -1,5 +1,5 @@
 import { PROVIDER_ID } from "../constants";
-import type { BaseWalletInterface } from "../clients/base";
+import type BaseWallet from "../clients/base";
 
 export interface Account {
   providerId: PROVIDER_ID;
@@ -56,6 +56,6 @@ export type Wallet = ExtendValues<WalletProvider> & {
   accounts: Account[];
 };
 
-export type WalletClient = BaseWalletInterface;
+export type WalletClient = BaseWallet;
 
 export { PROVIDER_ID };

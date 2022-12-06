@@ -1,12 +1,27 @@
 import type _algosdk from "algosdk";
-import { NODE_TOKEN, NODE_SERVER, NODE_PORT } from "../constants";
+import type { AlgodClientOptions } from "../types";
+import {
+  DEFAULT_NODE_BASEURL,
+  DEFAULT_NODE_TOKEN,
+  DEFAULT_NODE_PORT,
+} from "../constants";
 
 export const getAlgosdk = async () => {
   return (await import("algosdk")).default;
 };
 
-export const getAlgodClient = async (algosdk: typeof _algosdk) => {
-  return new algosdk.Algodv2(NODE_TOKEN, NODE_SERVER, NODE_PORT);
+export const getAlgodClient = async (
+  algosdk: typeof _algosdk,
+  algodClientOptions?: AlgodClientOptions
+) => {
+  const [
+    tokenOrBaseClient = DEFAULT_NODE_TOKEN,
+    baseServer = DEFAULT_NODE_BASEURL,
+    port = DEFAULT_NODE_PORT,
+    headers,
+  ] = algodClientOptions || [];
+
+  return new algosdk.Algodv2(tokenOrBaseClient, baseServer, port, headers);
 };
 
 export default class Algod {
@@ -18,9 +33,9 @@ export default class Algod {
     this.algodClient = algodClient;
   }
 
-  static async init() {
+  static async init(algodOptions?: AlgodClientOptions) {
     const algosdk = await getAlgosdk();
-    const algodClient = await getAlgodClient(algosdk);
+    const algodClient = await getAlgodClient(algosdk, algodOptions);
 
     return new Algod(algosdk, algodClient);
   }
