@@ -132,7 +132,7 @@ export default function Connect() {
                   onChange={(e) => provider.setActiveAccount(e.target.value)}
                 >
                   {provider.accounts.map((account) => (
-                    <option value={account.address}>{account.address}</option>
+                    <option key={account.address} value={account.address}>{account.address}</option>
                   ))}
                 </select>
               )}
