@@ -186,13 +186,13 @@ export default function Transact() {
       throw new Error("Missing transaction params.");
     }
 
-    const params = await algodClient.getTransactionParams().do();
+    const suggestedParams = await algodClient.getTransactionParams().do();
 
     const transaction = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
       from,
       to,
       amount,
-      suggestedParams: params,
+      suggestedParams,
     });
 
     const encodedTransaction = algosdk.encodeUnsignedTransaction(transaction);
