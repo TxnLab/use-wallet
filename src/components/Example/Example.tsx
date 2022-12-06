@@ -1,6 +1,9 @@
 import React, { useEffect } from "react";
-import { reconnectProviders, initializeProviders } from "../../hooks/useWallet";
-import WalletProvider from "../../store/state/clientStore";
+import {
+  reconnectProviders,
+  initializeProviders,
+  WalletProvider,
+} from "../../index";
 import Account from "./Account";
 import Connect from "./Connect";
 import Transact from "./Transact";

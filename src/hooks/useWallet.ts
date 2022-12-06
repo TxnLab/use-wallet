@@ -2,83 +2,10 @@ import { useMemo, useContext } from "react";
 import type algosdk from "algosdk";
 import { getAlgosdk } from "../algod";
 import { useWalletStore, walletStoreSelector } from "../store/index";
-import {
-  PROVIDER_ID,
-  TransactionsArray,
-  WalletClient,
-  Network,
-} from "../types";
+import { PROVIDER_ID, TransactionsArray, WalletClient } from "../types";
 import { ClientContext } from "../store/state/clientStore";
 import allClients from "../clients";
 import shallow from "zustand/shallow";
-import {
-  DEFAULT_NODE_BASEURL,
-  DEFAULT_NODE_TOKEN,
-  DEFAULT_NODE_PORT,
-  DEFAULT_NETWORK,
-} from "../constants";
-
-type SupportedProviders = { [x: string]: Promise<WalletClient | null> };
-
-type NodeConfig = {
-  network: Network;
-  nodeServer: string;
-  nodeToken?: string;
-  nodePort?: string;
-};
-
-export const initializeProviders = (
-  providers?: PROVIDER_ID[],
-  nodeConfig?: NodeConfig,
-  algosdkStatic?: typeof algosdk
-) => {
-  const initializedProviders: SupportedProviders = {};
-
-  const {
-    network = DEFAULT_NETWORK,
-    nodeServer = DEFAULT_NODE_BASEURL,
-    nodePort = DEFAULT_NODE_PORT,
-    nodeToken = DEFAULT_NODE_TOKEN,
-  } = nodeConfig || {};
-
-  if (!providers || providers.length === 0)
-    for (const [id, client] of Object.entries(allClients)) {
-      if (id === "kmd") {
-        continue;
-      }
-
-      initializedProviders[id] = client.init({
-        network,
-        algodOptions: [nodeToken, nodeServer, nodePort],
-        algosdkStatic: algosdkStatic,
-      });
-    }
-
-  if (providers) {
-    for (const id of providers) {
-      initializedProviders[id] = allClients[id].init({
-        network,
-        algodOptions: [nodeToken, nodeServer, nodePort],
-        algosdkStatic: algosdkStatic,
-      });
-    }
-  }
-
-  return initializedProviders;
-};
-
-export const reconnectProviders = async (providers: SupportedProviders) => {
-  try {
-    const clients = Object.values(providers);
-
-    for (const client of clients) {
-      const c = await client;
-      c?.reconnect(c?.disconnect);
-    }
-  } catch (e) {
-    console.error(e);
-  }
-};
 
 export { PROVIDER_ID };
 

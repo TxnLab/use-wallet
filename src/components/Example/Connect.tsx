@@ -1,5 +1,5 @@
 import React from "react";
-import useWallet from "../../hooks/useWallet";
+import { useWallet } from "../../index";
 
 export default function ConnectWallet() {
   const {
@@ -48,16 +48,18 @@ export default function ConnectWallet() {
                 Set Active
               </button>
               <div>
-                {provider.isActive && provider.accounts.length && (
+                {provider.isActive && provider.accounts.length ? (
                   <select
                     value={activeAccount?.address}
                     onChange={(e) => provider.setActiveAccount(e.target.value)}
                   >
                     {provider.accounts.map((account) => (
-                      <option value={account.address}>{account.address}</option>
+                      <option key={account.address} value={account.address}>
+                        {account.address}
+                      </option>
                     ))}
                   </select>
-                )}
+                ) : null}
               </div>
             </div>
           </div>
