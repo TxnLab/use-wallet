@@ -26,14 +26,16 @@ class DeflyWalletClient extends BaseWallet {
   network: Network;
 
   constructor({
+    metadata,
     client,
     algosdk,
     algodClient,
     network,
   }: DeflyWalletClientConstructor) {
-    super(algosdk, algodClient);
+    super(metadata, algosdk, algodClient);
     this.#client = client;
     this.network = network;
+    this.metadata = DeflyWalletClient.metadata;
   }
 
   static metadata = {
@@ -63,6 +65,7 @@ class DeflyWalletClient extends BaseWallet {
       });
 
       return new DeflyWalletClient({
+        metadata: DeflyWalletClient.metadata,
         client: deflyWallet,
         algosdk,
         algodClient,

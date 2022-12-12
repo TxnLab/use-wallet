@@ -5,11 +5,11 @@
 import type _algosdk from "algosdk";
 import Algod, { getAlgodClient } from "../../algod";
 import type WalletConnect from "@walletconnect/client";
-import type { Wallet } from "../../types";
 import { PROVIDER_ID } from "../../constants";
 import BaseWallet from "../base";
 import { formatJsonRpcRequest } from "@json-rpc-tools/utils";
 import {
+  Wallet,
   TransactionsArray,
   DecodedTransaction,
   DecodedSignedTransaction,
@@ -27,14 +27,16 @@ class WalletConnectClient extends BaseWallet {
   network: Network;
 
   constructor({
+    metadata,
     client,
     algosdk,
     algodClient,
     network,
   }: WalletConnectClientConstructor) {
-    super(algosdk, algodClient);
+    super(metadata, algosdk, algodClient);
     this.#client = client;
     this.network = network;
+    this.metadata = WalletConnectClient.metadata;
   }
 
   static metadata = {
@@ -72,6 +74,7 @@ class WalletConnectClient extends BaseWallet {
       const algodClient = await getAlgodClient(algosdk, algodOptions);
 
       const initWallet: WalletConnectClientConstructor = {
+        metadata: WalletConnectClient.metadata,
         client: walletConnect,
         algosdk: algosdk,
         algodClient: algodClient,

@@ -26,14 +26,16 @@ class PeraWalletClient extends BaseWallet {
   network: Network;
 
   constructor({
+    metadata,
     client,
     algosdk,
     algodClient,
     network,
   }: PeraWalletClientConstructor) {
-    super(algosdk, algodClient);
+    super(metadata, algosdk, algodClient);
     this.#client = client;
     this.network = network;
+    this.metadata = PeraWalletClient.metadata;
   }
 
   static metadata = {
@@ -62,6 +64,7 @@ class PeraWalletClient extends BaseWallet {
       });
 
       return new PeraWalletClient({
+        metadata: PeraWalletClient.metadata,
         client: peraWallet,
         algosdk,
         algodClient,
@@ -96,9 +99,11 @@ class PeraWalletClient extends BaseWallet {
 
   async reconnect(onDisconnect: () => void) {
     const accounts = await this.#client.reconnectSession().catch(console.info);
+    console.log("accounts?", accounts);
     this.#client.connector?.on("disconnect", onDisconnect);
 
     if (!accounts) {
+      onDisconnect();
       return null;
     }
 

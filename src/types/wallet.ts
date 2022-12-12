@@ -56,6 +56,13 @@ export type Wallet = ExtendValues<WalletProvider> & {
   accounts: Account[];
 };
 
+export type Metadata = {
+  id: PROVIDER_ID;
+  name: string;
+  icon: string;
+  isWalletConnect: boolean;
+};
+
 export type WalletClient = BaseWallet;
 
 export { PROVIDER_ID };

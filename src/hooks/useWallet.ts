@@ -5,6 +5,7 @@ import { useWalletStore, walletStoreSelector } from "../store/index";
 import { PROVIDER_ID, TransactionsArray, WalletClient } from "../types";
 import { ClientContext } from "../store/state/clientStore";
 import allClients from "../clients";
+import { clearAccounts } from "../utils/clearAccounts";
 import shallow from "zustand/shallow";
 
 export { PROVIDER_ID };
@@ -111,7 +112,7 @@ export default function useWallet() {
       await disconnectWCSessions(id);
 
       const walletClient = await getClient(id);
-      const walletInfo = await walletClient?.connect(() => disconnect(id));
+      const walletInfo = await walletClient?.connect(() => clearAccounts(id));
 
       if (!walletInfo || !walletInfo.accounts.length) {
         throw new Error("Failed to connect " + id);
@@ -127,7 +128,7 @@ export default function useWallet() {
   const reconnect = async (id: PROVIDER_ID) => {
     try {
       const walletClient = await getClient(id);
-      const walletInfo = await walletClient?.reconnect(() => disconnect(id));
+      const walletInfo = await walletClient?.reconnect(() => clearAccounts(id));
 
       if (walletInfo && walletInfo.accounts.length) {
         addAccounts(walletInfo.accounts);
@@ -146,8 +147,7 @@ export default function useWallet() {
     } catch (e) {
       console.error(e);
     } finally {
-      clearActiveAccount(id);
-      removeAccounts(id);
+      clearAccounts(id);
     }
   };
 

@@ -1,5 +1,5 @@
 import type { Transaction } from "algosdk";
-import type { AlgodClientOptions, Network } from "../../types";
+import type { AlgodClientOptions, Network, Metadata } from "../../types";
 import type { DeflyWalletConnect } from "@blockshake/defly-connect";
 import type _algosdk from "algosdk";
 
@@ -25,6 +25,7 @@ export type DeflyTransaction = {
 };
 
 export type DeflyWalletClientConstructor = {
+  metadata: Metadata;
   client: DeflyWalletConnect;
   algosdk: typeof _algosdk;
   algodClient: _algosdk.Algodv2;

@@ -20,6 +20,7 @@ class KMDWalletClient extends BaseWallet {
   network: Network;
 
   constructor({
+    metadata,
     client,
     id,
     wallet,
@@ -28,7 +29,7 @@ class KMDWalletClient extends BaseWallet {
     algodClient,
     network,
   }: KMDWalletClientConstructor) {
-    super(algosdk, algodClient);
+    super(metadata, algosdk, algodClient);
 
     this.#client = client;
     this.#wallet = wallet;
@@ -36,6 +37,7 @@ class KMDWalletClient extends BaseWallet {
     this.id = id;
     this.walletId = "";
     this.network = network;
+    this.metadata = KMDWalletClient.metadata;
   }
 
   static metadata = {
@@ -65,6 +67,7 @@ class KMDWalletClient extends BaseWallet {
       const kmdClient = new algosdk.Kmd(token, host, port);
 
       return new KMDWalletClient({
+        metadata: KMDWalletClient.metadata,
         id: PROVIDER_ID.KMD,
         password,
         wallet,
