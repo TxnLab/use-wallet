@@ -95,13 +95,7 @@ class KMDWalletClient extends BaseWallet {
   }
 
   async reconnect(): Promise<Wallet | null> {
-    return {
-      ...KMDWalletClient.metadata,
-      accounts: await this.listAccounts(
-        this.#wallet,
-        this.#password || (await this.requestPassword())
-      ),
-    };
+    return null;
   }
 
   async requestPassword(): Promise<string> {
