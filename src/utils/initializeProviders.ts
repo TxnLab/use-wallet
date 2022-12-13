@@ -24,6 +24,11 @@ export const initializeProviders = (
 ) => {
   const initializedProviders: SupportedProviders = {};
 
+  if (typeof window === "undefined") {
+    console.warn("Window object is not available, skipping initialization.");
+    return initializedProviders;
+  }
+
   const {
     network = DEFAULT_NETWORK,
     nodeServer = DEFAULT_NODE_BASEURL,

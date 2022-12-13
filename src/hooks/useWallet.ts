@@ -1,4 +1,4 @@
-import { useMemo, useContext } from "react";
+import { useState, useMemo, useContext, useEffect } from "react";
 import type algosdk from "algosdk";
 import { getAlgosdk } from "../algod";
 import { useHydratedWalletStore, walletStoreSelector } from "../store/index";
@@ -16,6 +16,7 @@ import shallow from "zustand/shallow";
 export { PROVIDER_ID };
 
 export default function useWallet() {
+  const [providers, setProviders] = useState<Provider[] | null>(null);
   const clients = useContext(ClientContext);
 
   const {
@@ -37,26 +38,32 @@ export default function useWallet() {
     [connectedAccounts, activeAccount]
   );
 
-  const providers: Provider[] | null = useMemo(() => {
-    if (!clients) return null;
+  useEffect(() => {
+    if (!clients) {
+      setProviders(null);
+      return;
+    }
 
     const supportedClients = Object.keys(clients) as PROVIDER_ID[];
 
-    return supportedClients.map((id) => {
-      return {
-        ...allClients[id],
-        accounts: getAccountsByProvider(id),
-        isActive: activeAccount?.providerId === id,
-        isConnected: connectedAccounts.some(
-          (accounts) => accounts.providerId === id
-        ),
-        connect: () => connect(id),
-        disconnect: () => disconnect(id),
-        reconnect: () => reconnect(id),
-        setActiveProvider: () => setActive(id),
-        setActiveAccount: (account: string) => selectActiveAccount(id, account),
-      };
-    });
+    setProviders(
+      supportedClients.map((id) => {
+        return {
+          ...allClients[id],
+          accounts: getAccountsByProvider(id),
+          isActive: activeAccount?.providerId === id,
+          isConnected: connectedAccounts.some(
+            (accounts) => accounts.providerId === id
+          ),
+          connect: () => connect(id),
+          disconnect: () => disconnect(id),
+          reconnect: () => reconnect(id),
+          setActiveProvider: () => setActive(id),
+          setActiveAccount: (account: string) =>
+            selectActiveAccount(id, account),
+        };
+      })
+    );
   }, [clients, connectedAccounts, connectedActiveAccounts, activeAccount]);
 
   const getClient = async (id?: PROVIDER_ID): Promise<WalletClient> => {
