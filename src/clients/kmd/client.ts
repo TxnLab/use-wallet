@@ -58,7 +58,7 @@ class KMDWalletClient extends BaseWallet {
         token = "a".repeat(64),
         host = "http://localhost",
         port = "4002",
-        wallet = "",
+        wallet = "unencrypted-default-wallet",
         password = "",
       } = clientOptions || {};
 
