@@ -8,6 +8,7 @@ import type {
   TxnType,
   TransactionsArray,
   TxnInfo,
+  Metadata,
 } from "../../types";
 import { audio } from "../../media/audio";
 
@@ -28,13 +29,9 @@ abstract class BaseClient {
   algosdk: typeof _algosdk;
   algodClient: _algosdk.Algodv2;
   keepWCAlive: HTMLAudioElement;
+  metadata: Metadata;
 
-  static metadata: {
-    id: PROVIDER_ID;
-    name: string;
-    icon: string;
-    isWalletConnect: boolean;
-  };
+  static metadata: Metadata;
 
   abstract connect(onDisconnect: () => void): Promise<Wallet>;
   abstract disconnect(): Promise<void>;
@@ -48,12 +45,14 @@ abstract class BaseClient {
   ): Promise<Uint8Array[]>;
 
   protected constructor(
+    metadata: Metadata,
     algosdk: typeof _algosdk,
     algodClient: _algosdk.Algodv2
   ) {
     this.algosdk = algosdk;
     this.algodClient = algodClient;
     this.keepWCAlive = new Audio();
+    this.metadata = metadata;
   }
 
   async healthCheck() {

@@ -1,5 +1,5 @@
 import type _algosdk from "algosdk";
-import type { AlgodClientOptions, Network } from "../../types";
+import type { AlgodClientOptions, Network, Metadata } from "../../types";
 import { PROVIDER_ID } from "../../constants";
 
 export type ClientOptions = {
@@ -26,6 +26,7 @@ export interface InitWalletHandle {
 }
 
 export type KMDWalletClientConstructor = {
+  metadata: Metadata;
   client: _algosdk.Kmd;
   id: PROVIDER_ID;
   algosdk: typeof _algosdk;

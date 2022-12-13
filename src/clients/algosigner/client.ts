@@ -43,12 +43,13 @@ class AlgoSignerClient extends BaseWallet {
   network: Network;
 
   constructor({
+    metadata,
     client,
     algosdk,
     algodClient,
     network,
   }: AlgoSignerClientConstructor) {
-    super(algosdk, algodClient);
+    super(metadata, algosdk, algodClient);
     this.#client = client;
     this.network = network;
   }
@@ -78,6 +79,7 @@ class AlgoSignerClient extends BaseWallet {
       const algosigner = (window as WindowExtended).AlgoSigner as AlgoSigner;
 
       return new AlgoSignerClient({
+        metadata: AlgoSignerClient.metadata,
         id: PROVIDER_ID.ALGOSIGNER,
         client: algosigner,
         algosdk: algosdk,

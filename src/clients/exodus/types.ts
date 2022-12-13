@@ -1,6 +1,6 @@
 import { PROVIDER_ID } from "../../constants";
 import type _algosdk from "algosdk";
-import type { AlgodClientOptions, Network } from "../../types";
+import type { AlgodClientOptions, Network, Metadata } from "../../types";
 
 export type ClientOptions = {
   onlyIfTrusted: boolean;
@@ -25,6 +25,7 @@ export type Exodus = {
 };
 
 export type ExodusClientConstructor = {
+  metadata: Metadata;
   client: Exodus;
   id: PROVIDER_ID;
   algosdk: typeof _algosdk;

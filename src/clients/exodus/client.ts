@@ -26,16 +26,18 @@ class ExodusClient extends BaseWallet {
   network: Network;
 
   constructor({
+    metadata,
     client,
     algosdk,
     algodClient,
     onlyIfTrusted,
     network,
   }: ExodusClientConstructor) {
-    super(algosdk, algodClient);
+    super(metadata, algosdk, algodClient);
     this.#client = client;
     this.#onlyIfTrusted = onlyIfTrusted;
     this.network = network;
+    this.metadata = ExodusClient.metadata;
   }
 
   static metadata = {
@@ -64,6 +66,7 @@ class ExodusClient extends BaseWallet {
       const exodus = (window as WindowExtended).exodus.algorand as Exodus;
 
       return new ExodusClient({
+        metadata: ExodusClient.metadata,
         id: PROVIDER_ID.EXODUS,
         client: exodus,
         algosdk: algosdk,

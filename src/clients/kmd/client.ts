@@ -20,6 +20,7 @@ class KMDWalletClient extends BaseWallet {
   network: Network;
 
   constructor({
+    metadata,
     client,
     id,
     wallet,
@@ -28,7 +29,7 @@ class KMDWalletClient extends BaseWallet {
     algodClient,
     network,
   }: KMDWalletClientConstructor) {
-    super(algosdk, algodClient);
+    super(metadata, algosdk, algodClient);
 
     this.#client = client;
     this.#wallet = wallet;
@@ -36,6 +37,7 @@ class KMDWalletClient extends BaseWallet {
     this.id = id;
     this.walletId = "";
     this.network = network;
+    this.metadata = KMDWalletClient.metadata;
   }
 
   static metadata = {
@@ -56,7 +58,7 @@ class KMDWalletClient extends BaseWallet {
         token = "a".repeat(64),
         host = "http://localhost",
         port = "4002",
-        wallet = "",
+        wallet = "unencrypted-default-wallet",
         password = "",
       } = clientOptions || {};
 
@@ -65,6 +67,7 @@ class KMDWalletClient extends BaseWallet {
       const kmdClient = new algosdk.Kmd(token, host, port);
 
       return new KMDWalletClient({
+        metadata: KMDWalletClient.metadata,
         id: PROVIDER_ID.KMD,
         password,
         wallet,
@@ -95,13 +98,7 @@ class KMDWalletClient extends BaseWallet {
   }
 
   async reconnect(): Promise<Wallet | null> {
-    return {
-      ...KMDWalletClient.metadata,
-      accounts: await this.listAccounts(
-        this.#wallet,
-        this.#password || (await this.requestPassword())
-      ),
-    };
+    return null;
   }
 
   async requestPassword(): Promise<string> {

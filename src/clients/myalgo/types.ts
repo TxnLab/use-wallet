@@ -4,9 +4,10 @@
  */
 import type _MyAlgoConnect from "@randlabs/myalgo-connect";
 import type _algosdk from "algosdk";
-import { AlgodClientOptions, Network } from "../../types";
+import { AlgodClientOptions, Network, Metadata } from "../../types";
 
 export type MyAlgoWalletClientConstructor = {
+  metadata: Metadata;
   client: _MyAlgoConnect;
   algosdk: typeof _algosdk;
   algodClient: _algosdk.Algodv2;

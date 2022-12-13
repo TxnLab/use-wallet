@@ -21,14 +21,16 @@ class MyAlgoWalletClient extends BaseWallet {
   network: Network;
 
   constructor({
+    metadata,
     client,
     algosdk,
     algodClient,
     network,
   }: MyAlgoWalletClientConstructor) {
-    super(algosdk, algodClient);
+    super(metadata, algosdk, algodClient);
     this.#client = client;
     this.network = network;
+    this.metadata = MyAlgoWalletClient.metadata;
   }
 
   static metadata = {
@@ -57,6 +59,7 @@ class MyAlgoWalletClient extends BaseWallet {
       });
 
       return new MyAlgoWalletClient({
+        metadata: MyAlgoWalletClient.metadata,
         client: myAlgo,
         algosdk: algosdk,
         algodClient: algodClient,
