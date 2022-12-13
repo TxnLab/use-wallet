@@ -1,8 +1,13 @@
 import { useMemo, useContext } from "react";
 import type algosdk from "algosdk";
 import { getAlgosdk } from "../algod";
-import { useWalletStore, walletStoreSelector } from "../store/index";
-import { PROVIDER_ID, TransactionsArray, WalletClient } from "../types";
+import { useHydratedWalletStore, walletStoreSelector } from "../store/index";
+import {
+  PROVIDER_ID,
+  TransactionsArray,
+  WalletClient,
+  Provider,
+} from "../types";
 import { ClientContext } from "../store/state/clientStore";
 import allClients from "../clients";
 import { clearAccounts } from "../utils/clearAccounts";
@@ -18,7 +23,7 @@ export default function useWallet() {
     accounts: connectedAccounts,
     setActiveAccount: _setActiveAccount,
     addAccounts,
-  } = useWalletStore(walletStoreSelector, shallow);
+  } = useHydratedWalletStore(walletStoreSelector, shallow);
 
   const getAccountsByProvider = (id: PROVIDER_ID) => {
     return connectedAccounts.filter((account) => account.providerId === id);
@@ -32,7 +37,7 @@ export default function useWallet() {
     [connectedAccounts, activeAccount]
   );
 
-  const providers = useMemo(() => {
+  const providers: Provider[] | null = useMemo(() => {
     if (!clients) return null;
 
     const supportedClients = Object.keys(clients) as PROVIDER_ID[];
