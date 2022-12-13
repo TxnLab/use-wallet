@@ -17,9 +17,7 @@ export default function useWallet() {
     activeAccount,
     accounts: connectedAccounts,
     setActiveAccount: _setActiveAccount,
-    clearActiveAccount,
     addAccounts,
-    removeAccounts,
   } = useWalletStore(walletStoreSelector, shallow);
 
   const getAccountsByProvider = (id: PROVIDER_ID) => {
