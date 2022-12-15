@@ -1129,17 +1129,18 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@blockshake/defly-connect@^0.3.6":
-  version "0.3.6"
-  resolved "https://registry.yarnpkg.com/@blockshake/defly-connect/-/defly-connect-0.3.6.tgz#c5d25cb60a28cd8ccc16fdb328d222926a13d6e3"
-  integrity sha512-W3gD+GMw+y3zNPnkzU/LcWa6sMBE4tp8pM9hbTNP2vLtyjJUhMr+w6jus+dPxlJ9ZYykZH4M7VKkVxnQ3PWfIA==
+"@blockshake/defly-connect@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@blockshake/defly-connect/-/defly-connect-1.0.0.tgz#44f0b4954efdff421ba4ddf49a47958d9591159d"
+  integrity sha512-tXFb5Qtfn3keh4lfk/o/6eG6HG8mwQSfKb1HRyMTPsXcJM7chX+6zAaw6zVtxviathupN0MSZK5MmxB1WU2PkA==
   dependencies:
     "@json-rpc-tools/utils" "^1.7.6"
-    "@walletconnect/client" "^1.7.7"
+    "@walletconnect/client" "^1.8.0"
+    "@walletconnect/types" "^1.8.0"
     bowser "^2.11.0"
     buffer "^6.0.3"
-    lottie-react "^2.3.1"
-    react-qrcode-logo "^2.7.0"
+    lottie-web "^5.9.6"
+    qr-code-styling "^1.6.0-rc.1"
 
 "@cnakazawa/watch@^1.0.3":
   version "1.0.4"
@@ -2944,7 +2945,7 @@
     "@walletconnect/window-metadata" "1.0.0"
     detect-browser "5.2.0"
 
-"@walletconnect/client@^1.7.7", "@walletconnect/client@^1.8.0":
+"@walletconnect/client@^1.8.0":
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/@walletconnect/client/-/client-1.8.0.tgz#6f46b5499c7c861c651ff1ebe5da5b66225ca696"
   integrity sha512-svyBQ14NHx6Cs2j4TpkQaBI/2AF4+LXz64FojTjMtV4VMMhl81jSO1vNeg+yYhQzvjcGH/GpSwixjyCW0xFBOQ==
@@ -8079,11 +8080,6 @@ lodash.debounce@^4.0.8:
   resolved "https://registry.yarnpkg.com/lodash.debounce/-/lodash.debounce-4.0.8.tgz#82d79bff30a67c4005ffd5e2515300ad9ca4d7af"
   integrity sha512-FT1yDzDYEoYWhnSGnpE/4Kj1fLZkDFyqRb7fNt6FdYOSxlUWAtp42Eh6Wb0rGIv/m9Bgo7x4GhQbm5Ys4SG5ow==
 
-lodash.isequal@^4.5.0:
-  version "4.5.0"
-  resolved "https://registry.yarnpkg.com/lodash.isequal/-/lodash.isequal-4.5.0.tgz#415c4478f2bcc30120c22ce10ed3226f7d3e18e0"
-  integrity sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==
-
 lodash.memoize@^4.1.2:
   version "4.1.2"
   resolved "https://registry.yarnpkg.com/lodash.memoize/-/lodash.memoize-4.1.2.tgz#bcc6c49a42a2840ed997f323eada5ecd182e0bfe"
@@ -8106,14 +8102,7 @@ loose-envify@^1.1.0, loose-envify@^1.4.0:
   dependencies:
     js-tokens "^3.0.0 || ^4.0.0"
 
-lottie-react@^2.3.1:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/lottie-react/-/lottie-react-2.3.1.tgz#697060417bab027edb57ed45bda9d62e920d4040"
-  integrity sha512-8cxd6XZZtECT6LoAhCftRdYrEpHxiouvB5EPiYA+TtCG5LHNYAdMS9IVIHcxKtWnpo7x16QfCLj1XLXZpaN81A==
-  dependencies:
-    lottie-web "^5.9.4"
-
-lottie-web@^5.9.4, lottie-web@^5.9.6:
+lottie-web@^5.9.6:
   version "5.10.0"
   resolved "https://registry.yarnpkg.com/lottie-web/-/lottie-web-5.10.0.tgz#72563f22efdcf2b8f7e8359743514930ebaf5f8c"
   integrity sha512-q2hfqKrGXNkwjSSZjKxf3fWMi0e3ZBc03qBkVWoGbwUJ7BcG+9YXjMPtmmhitzk8Nc6VQ5PRnh9yInPdfq0PZg==
@@ -9808,7 +9797,7 @@ qr-code-styling@^1.6.0-rc.1:
   dependencies:
     qrcode-generator "^1.4.3"
 
-qrcode-generator@^1.4.1, qrcode-generator@^1.4.3:
+qrcode-generator@^1.4.3:
   version "1.4.4"
   resolved "https://registry.yarnpkg.com/qrcode-generator/-/qrcode-generator-1.4.4.tgz#63f771224854759329a99048806a53ed278740e7"
   integrity sha512-HM7yY8O2ilqhmULxGMpcHSF1EhJJ9yBj8gvDEuZ6M+KGJ0YY2hKpnXvRD+hZPLrDVck3ExIGhmPtSdcjC+guuw==
@@ -9961,14 +9950,6 @@ react-is@^18.0.0:
   version "18.2.0"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-18.2.0.tgz#199431eeaaa2e09f86427efbb4f1473edb47609b"
   integrity sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==
-
-react-qrcode-logo@^2.7.0:
-  version "2.8.0"
-  resolved "https://registry.yarnpkg.com/react-qrcode-logo/-/react-qrcode-logo-2.8.0.tgz#67b6febf59277f09e77417565ed9c7f84a6ff86f"
-  integrity sha512-dbEgjsg6C4tK6+oGmCRDlJ7urQAWqybaGBLJtp8Z6ZYvVUP302HBXk/F7VRk54yWTwzlHwig3VK6HMKCha2YFw==
-  dependencies:
-    lodash.isequal "^4.5.0"
-    qrcode-generator "^1.4.1"
 
 react-refresh@^0.11.0:
   version "0.11.0"

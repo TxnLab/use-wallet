@@ -62,12 +62,10 @@ class WalletConnectClient extends BaseWallet {
         (await import("algorand-walletconnect-qrcode-modal")).default;
 
       const walletConnect = new WalletConnect({
-        ...(clientOptions
-          ? clientOptions
-          : {
-              bridge: "https://bridge.walletconnect.org",
-              qrcodeModal: QRCodeModal,
-            }),
+        bridge: "https://bridge.walletconnect.org",
+        qrcodeModal: QRCodeModal,
+        storageId: 'walletconnect-generic',
+        ...(clientOptions || {})
       });
 
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk;

@@ -1,8 +1,13 @@
-import { useMemo, useContext } from "react";
+import { useState, useMemo, useContext, useEffect } from "react";
 import type algosdk from "algosdk";
 import { getAlgosdk } from "../algod";
-import { useWalletStore, walletStoreSelector } from "../store/index";
-import { PROVIDER_ID, TransactionsArray, WalletClient } from "../types";
+import { useHydratedWalletStore, walletStoreSelector } from "../store/index";
+import {
+  PROVIDER_ID,
+  TransactionsArray,
+  WalletClient,
+  Provider,
+} from "../types";
 import { ClientContext } from "../store/state/clientStore";
 import allClients from "../clients";
 import { clearAccounts } from "../utils/clearAccounts";
@@ -11,6 +16,7 @@ import shallow from "zustand/shallow";
 export { PROVIDER_ID };
 
 export default function useWallet() {
+  const [providers, setProviders] = useState<Provider[] | null>(null);
   const clients = useContext(ClientContext);
 
   const {
@@ -18,7 +24,7 @@ export default function useWallet() {
     accounts: connectedAccounts,
     setActiveAccount: _setActiveAccount,
     addAccounts,
-  } = useWalletStore(walletStoreSelector, shallow);
+  } = useHydratedWalletStore(walletStoreSelector, shallow);
 
   const getAccountsByProvider = (id: PROVIDER_ID) => {
     return connectedAccounts.filter((account) => account.providerId === id);
@@ -32,26 +38,32 @@ export default function useWallet() {
     [connectedAccounts, activeAccount]
   );
 
-  const providers = useMemo(() => {
-    if (!clients) return null;
+  useEffect(() => {
+    if (!clients) {
+      setProviders(null);
+      return;
+    }
 
     const supportedClients = Object.keys(clients) as PROVIDER_ID[];
 
-    return supportedClients.map((id) => {
-      return {
-        ...allClients[id],
-        accounts: getAccountsByProvider(id),
-        isActive: activeAccount?.providerId === id,
-        isConnected: connectedAccounts.some(
-          (accounts) => accounts.providerId === id
-        ),
-        connect: () => connect(id),
-        disconnect: () => disconnect(id),
-        reconnect: () => reconnect(id),
-        setActiveProvider: () => setActive(id),
-        setActiveAccount: (account: string) => selectActiveAccount(id, account),
-      };
-    });
+    setProviders(
+      supportedClients.map((id) => {
+        return {
+          ...allClients[id],
+          accounts: getAccountsByProvider(id),
+          isActive: activeAccount?.providerId === id,
+          isConnected: connectedAccounts.some(
+            (accounts) => accounts.providerId === id
+          ),
+          connect: () => connect(id),
+          disconnect: () => disconnect(id),
+          reconnect: () => reconnect(id),
+          setActiveProvider: () => setActive(id),
+          setActiveAccount: (account: string) =>
+            selectActiveAccount(id, account),
+        };
+      })
+    );
   }, [clients, connectedAccounts, connectedActiveAccounts, activeAccount]);
 
   const getClient = async (id?: PROVIDER_ID): Promise<WalletClient> => {
@@ -62,27 +74,6 @@ export default function useWallet() {
     if (!client) throw new Error("Client not found for ID");
 
     return client;
-  };
-
-  const disconnectWCSessions = async (id: PROVIDER_ID) => {
-    if (!allClients[id].metadata.isWalletConnect) {
-      return;
-    }
-
-    if (!providers) {
-      return;
-    }
-
-    const wcSessions = Object.values(providers).filter(
-      (p) =>
-        p.metadata.id !== id &&
-        p.metadata.isWalletConnect &&
-        (p.isConnected || p.isActive)
-    );
-
-    for (const session of wcSessions) {
-      await disconnect(session.metadata.id);
-    }
   };
 
   const selectActiveAccount = async (
@@ -98,7 +89,6 @@ export default function useWallet() {
         throw new Error(`No accounts with address ${address} found.`);
       }
 
-      await disconnectWCSessions(account.providerId);
       _setActiveAccount(account);
     } catch (e) {
       console.error(e);
@@ -107,8 +97,6 @@ export default function useWallet() {
 
   const connect = async (id: PROVIDER_ID) => {
     try {
-      await disconnectWCSessions(id);
-
       const walletClient = await getClient(id);
       const walletInfo = await walletClient?.connect(() => clearAccounts(id));
 
@@ -151,7 +139,6 @@ export default function useWallet() {
 
   const setActive = async (id: PROVIDER_ID) => {
     try {
-      await disconnectWCSessions(id);
       const accounts = getAccountsByProvider(id);
       _setActiveAccount(accounts[0]);
     } catch (e) {

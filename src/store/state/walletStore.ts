@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { immer } from "zustand/middleware/immer";
 import create from "zustand";
 import { devtools, persist } from "zustand/middleware";
@@ -20,6 +21,15 @@ export type WalletStore = {
   clearActiveAccount: (id: PROVIDER_ID) => void;
   addAccounts: (accounts: Account[]) => void;
   removeAccounts: (providerId: PROVIDER_ID) => void;
+};
+
+const emptyState: WalletStore = {
+  accounts: [],
+  activeAccount: null,
+  setActiveAccount: (account: Account) => {},
+  clearActiveAccount: (id: PROVIDER_ID) => {},
+  addAccounts: (accounts: Account[]) => {},
+  removeAccounts: (providerId: PROVIDER_ID) => {},
 };
 
 export const useWalletStore = create<WalletStore>()(
@@ -69,8 +79,20 @@ export const useWalletStore = create<WalletStore>()(
       })),
       {
         name: "txnlab-use-wallet", // key in local storage
-        version: 0, // increment to deprecate stored data
+        version: 1, // increment to deprecate stored data
       }
     )
   )
 );
+
+// This a fix to ensure zustand never hydrates the store before React hydrates the page
+// otherwise it causes a mismatch between SSR and client render
+// see: https://github.com/pmndrs/zustand/issues/1145
+export const useHydratedWalletStore = ((selector, compare) => {
+  const store = useWalletStore(selector, compare);
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => setHydrated(true), []);
+
+  return hydrated ? store : selector(emptyState);
+}) as typeof useWalletStore;

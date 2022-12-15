@@ -8,16 +8,15 @@ export interface Account {
 }
 
 export type Provider = {
-  id: PROVIDER_ID;
-  name: string;
-  icon: string;
+  accounts: Account[];
   isActive: boolean;
   isConnected: boolean;
-  isWalletConnect: boolean;
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
   reconnect: () => Promise<void>;
-  setActive: () => Promise<void>;
+  setActiveProvider: () => Promise<void>;
+  setActiveAccount: (account: string) => Promise<void>;
+  metadata: Metadata;
 };
 
 export type Asset = {
