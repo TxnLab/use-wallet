@@ -79,7 +79,7 @@ export const useWalletStore = create<WalletStore>()(
       })),
       {
         name: "txnlab-use-wallet", // key in local storage
-        version: 0, // increment to deprecate stored data
+        version: 1, // increment to deprecate stored data
       }
     )
   )
