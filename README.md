@@ -457,6 +457,12 @@ In the root of `use-wallet` directory, run:
 yarn link react
 ```
 
+## Used By
+
+Are you using `@txnlab/use-wallet`? We'd love to include you here. Let us know! [Twitter](https://twitter.com/NFDomains) | [Discord](https://discord.gg/7XcuMTfeZP) | [Email](mailto:admin@txnlab.dev)
+
+* [@algoscan/use-wallet-ui](https://github.com/algoscan/use-wallet-ui)
+
 ## License
 
 See the [LICENSE](https://github.com/TxnLab/use-wallet/blob/main/LICENSE.md) file for license rights and limitations (MIT)
