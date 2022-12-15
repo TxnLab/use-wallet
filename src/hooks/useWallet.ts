@@ -76,27 +76,6 @@ export default function useWallet() {
     return client;
   };
 
-  const disconnectWCSessions = async (id: PROVIDER_ID) => {
-    if (!allClients[id].metadata.isWalletConnect) {
-      return;
-    }
-
-    if (!providers) {
-      return;
-    }
-
-    const wcSessions = Object.values(providers).filter(
-      (p) =>
-        p.metadata.id !== id &&
-        p.metadata.isWalletConnect &&
-        (p.isConnected || p.isActive)
-    );
-
-    for (const session of wcSessions) {
-      await disconnect(session.metadata.id);
-    }
-  };
-
   const selectActiveAccount = async (
     providerId: PROVIDER_ID,
     address: string
@@ -110,7 +89,6 @@ export default function useWallet() {
         throw new Error(`No accounts with address ${address} found.`);
       }
 
-      await disconnectWCSessions(account.providerId);
       _setActiveAccount(account);
     } catch (e) {
       console.error(e);
@@ -119,8 +97,6 @@ export default function useWallet() {
 
   const connect = async (id: PROVIDER_ID) => {
     try {
-      await disconnectWCSessions(id);
-
       const walletClient = await getClient(id);
       const walletInfo = await walletClient?.connect(() => clearAccounts(id));
 
@@ -163,7 +139,6 @@ export default function useWallet() {
 
   const setActive = async (id: PROVIDER_ID) => {
     try {
-      await disconnectWCSessions(id);
       const accounts = getAccountsByProvider(id);
       _setActiveAccount(accounts[0]);
     } catch (e) {
