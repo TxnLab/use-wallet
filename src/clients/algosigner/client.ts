@@ -132,7 +132,9 @@ class AlgoSignerClient extends BaseWallet {
 
   async signTransactions(
     connectedAccounts: string[],
-    transactions: Uint8Array[]
+    transactions: Uint8Array[],
+    indexesToSign?: number[],
+    returnGroup = true
   ) {
     // Decode the transactions to access their properties.
     const decodedTxns = transactions.map((txn) => {
@@ -143,16 +145,36 @@ class AlgoSignerClient extends BaseWallet {
     // and add the signers property if they shouldn't be signed.
     const txnsToSign = decodedTxns.reduce<AlgoSignerTransaction[]>(
       (acc, txn, i) => {
+        const isSigned = "txn" in txn;
+
         const txnObj: AlgoSignerTransaction = {
           txn: this.#client.encoding.msgpackToBase64(transactions[i]),
         };
 
         if (
-          "txn" in txn ||
-          !connectedAccounts.includes(this.algosdk.encodeAddress(txn["snd"]))
+          indexesToSign &&
+          indexesToSign.length &&
+          !indexesToSign.includes(i)
         ) {
           txnObj.txn = this.#client.encoding.msgpackToBase64(
-            this.algosdk.decodeSignedTransaction(transactions[i]).txn.toByte()
+            isSigned
+              ? this.algosdk
+                  .decodeSignedTransaction(transactions[i])
+                  .txn.toByte()
+              : this.algosdk.decodeUnsignedTransaction(transactions[i]).toByte()
+          );
+          txnObj.signers = [];
+        } else if (
+          !connectedAccounts.includes(
+            this.algosdk.encodeAddress(isSigned ? txn.txn["snd"] : txn["snd"])
+          )
+        ) {
+          txnObj.txn = this.#client.encoding.msgpackToBase64(
+            isSigned
+              ? this.algosdk
+                  .decodeSignedTransaction(transactions[i])
+                  .txn.toByte()
+              : this.algosdk.decodeUnsignedTransaction(transactions[i]).toByte()
           );
           txnObj.signers = [];
         }
@@ -167,11 +189,12 @@ class AlgoSignerClient extends BaseWallet {
     // Sign them with the client.
     const result = await this.#client.signTxn(txnsToSign);
 
-    // Join the newly signed transactions with the original group of transactions.
+    // Join the newly signed transactions with the original group of transactions
+    // if 'returnGroup' param is specified
     const signedTxns = result.reduce<Uint8Array[]>((acc, txn, i) => {
       if (txn) {
         acc.push(new Uint8Array(Buffer.from(txn.blob, "base64")));
-      } else {
+      } else if (returnGroup) {
         acc.push(transactions[i]);
       }
 

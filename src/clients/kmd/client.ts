@@ -161,7 +161,9 @@ class KMDWalletClient extends BaseWallet {
 
   async signTransactions(
     connectedAccounts: string[],
-    transactions: Uint8Array[]
+    transactions: Uint8Array[],
+    indexesToSign?: number[],
+    returnGroup = true
   ) {
     // Decode the transactions to access their properties.
     const decodedTxns = transactions.map((txn) => {
@@ -174,20 +176,34 @@ class KMDWalletClient extends BaseWallet {
     const pw = await this.requestPassword();
     const token = await this.getWalletToken(this.walletId, pw);
 
-    const signedTxns: Uint8Array[] = [];
+    const signedTxns: Array<Uint8Array> = [];
     // Sign them with the client.
     const signingPromises: Promise<Uint8Array>[] = [];
+
     for (const idx in decodedTxns) {
       const dtxn = decodedTxns[idx];
+      const isSigned = "txn" in dtxn;
 
       // push the incoming txn into signed, we'll overwrite it later
       signedTxns.push(transactions[idx]);
 
       // Its already signed, skip it
-      if (!("snd" in dtxn)) continue;
-      // Not to be signed by our signer, skip it
-      if (!connectedAccounts.includes(this.algosdk.encodeAddress(dtxn.snd)))
+      if (isSigned) {
         continue;
+        // Not specified in indexes to sign, skip it
+      } else if (
+        indexesToSign &&
+        indexesToSign.length &&
+        !indexesToSign.includes(Number(idx))
+      ) {
+        continue;
+      }
+      // Not to be signed by our signer, skip it
+      else if (
+        !connectedAccounts.includes(this.algosdk.encodeAddress(dtxn.snd))
+      ) {
+        continue;
+      }
 
       // overwrite with an empty blob
       signedTxns[idx] = new Uint8Array();
@@ -200,16 +216,22 @@ class KMDWalletClient extends BaseWallet {
 
     // Restore the newly signed txns in the correct order
     let signedIdx = 0;
-    for (const idx in signedTxns) {
+
+    const formattedTxns = signedTxns.reduce<Uint8Array[]>((acc, txn, i) => {
       // If its an empty array, infer that it is one of the
       // ones we wanted to have signed and overwrite the empty buff
-      if (signedTxns[idx].length === 0) {
-        signedTxns[idx] = signingResults[signedIdx];
-        signedIdx += 1;
-      }
-    }
+      if (txn.length === 0) {
+        acc.push(signingResults[signedIdx]);
 
-    return signedTxns;
+        signedIdx += 1;
+      } else if (returnGroup) {
+        acc.push(txn);
+      }
+
+      return acc;
+    }, []);
+
+    return formattedTxns;
   }
 
   signEncodedTransactions(
