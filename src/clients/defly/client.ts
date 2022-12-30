@@ -122,26 +122,47 @@ class DeflyWalletClient extends BaseWallet {
 
   async signTransactions(
     connectedAccounts: string[],
-    transactions: Uint8Array[]
+    transactions: Uint8Array[],
+    indexesToSign?: number[],
+    returnGroup = true
   ) {
     // Decode the transactions to access their properties.
     const decodedTxns = transactions.map((txn) => {
       return this.algosdk.decodeObj(txn);
     }) as Array<DecodedTransaction | DecodedSignedTransaction>;
 
+    const signedIndexes: number[] = [];
+
     // Marshal the transactions,
     // and add the signers property if they shouldn't be signed.
     const txnsToSign = decodedTxns.reduce<DeflyTransaction[]>((acc, txn, i) => {
-      if (
-        !("txn" in txn) &&
-        connectedAccounts.includes(this.algosdk.encodeAddress(txn["snd"]))
-      ) {
+      const isSigned = "txn" in txn;
+
+      // If the indexes to be signed is specified, designate that it should be signed
+      if (indexesToSign && indexesToSign.length && indexesToSign.includes(i)) {
+        signedIndexes.push(i);
         acc.push({
           txn: this.algosdk.decodeUnsignedTransaction(transactions[i]),
         });
-      } else {
+        // If the transaction is unsigned and is to be sent from a connected account,
+        // designate that it should be signed
+      } else if (
+        !isSigned &&
+        connectedAccounts.includes(this.algosdk.encodeAddress(txn["snd"]))
+      ) {
+        signedIndexes.push(i);
+        acc.push({
+          txn: this.algosdk.decodeUnsignedTransaction(transactions[i]),
+        });
+        // Otherwise, designate that it should not be signed
+      } else if (isSigned) {
         acc.push({
           txn: this.algosdk.decodeSignedTransaction(transactions[i]).txn,
+          signers: [],
+        });
+      } else if (!isSigned) {
+        acc.push({
+          txn: this.algosdk.decodeUnsignedTransaction(transactions[i]),
           signers: [],
         });
       }
@@ -152,12 +173,13 @@ class DeflyWalletClient extends BaseWallet {
     // Sign them with the client.
     const result = await this.#client.signTransaction([txnsToSign]);
 
-    // Join the newly signed transactions with the original group of transactions.
-    const signedTxns = decodedTxns.reduce<Uint8Array[]>((acc, txn, i) => {
-      if (!("txn" in txn)) {
+    // Join the newly signed transactions with the original group of transactions
+    // if 'returnGroup' param is specified
+    const signedTxns = transactions.reduce<Uint8Array[]>((acc, txn, i) => {
+      if (signedIndexes.includes(i)) {
         const signedByUser = result.shift();
         signedByUser && acc.push(signedByUser);
-      } else {
+      } else if (returnGroup) {
         acc.push(transactions[i]);
       }
 

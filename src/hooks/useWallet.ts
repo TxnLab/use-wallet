@@ -146,7 +146,11 @@ export default function useWallet() {
     }
   };
 
-  const signTransactions = async (transactions: Array<Uint8Array>) => {
+  const signTransactions = async (
+    transactions: Array<Uint8Array>,
+    indexesToSign?: number[],
+    returnGroup = true
+  ) => {
     const walletClient = await getClient(activeAccount?.providerId);
 
     if (!walletClient || !activeAccount?.address) {
@@ -155,7 +159,9 @@ export default function useWallet() {
 
     const signedTransactions = await walletClient.signTransactions(
       connectedActiveAccounts.map((acct) => acct.address),
-      transactions
+      transactions,
+      indexesToSign,
+      returnGroup
     );
 
     return signedTransactions;
@@ -183,8 +189,10 @@ export default function useWallet() {
     const txnBlobs: Array<Uint8Array> = txnGroup.map(
       algosdk.encodeUnsignedTransaction
     );
-    const txns = await Promise.resolve(signTransactions(txnBlobs));
-    return txns.filter((_, index) => indexesToSign.includes(index));
+
+    return await Promise.resolve(
+      signTransactions(txnBlobs, indexesToSign, false)
+    );
   };
 
   const getAccountInfo = async () => {

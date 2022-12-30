@@ -101,22 +101,32 @@ class MyAlgoWalletClient extends BaseWallet {
 
   async signTransactions(
     connectedAccounts: string[],
-    transactions: Uint8Array[]
+    transactions: Uint8Array[],
+    indexesToSign?: number[],
+    returnGroup = true
   ) {
     // Decode the transactions to access their properties.
     const decodedTxns = transactions.map((txn) => {
       return this.algosdk.decodeObj(txn);
     }) as Array<DecodedTransaction | DecodedSignedTransaction>;
 
-    // Get the unsigned transactions.
-    const txnsToSign = decodedTxns.reduce<Uint8Array[]>((acc, txn, i) => {
-      // If the transaction isn't already signed and is to be sent from a connected account,
-      // add it to the arrays of transactions to be signed.
+    const signedIndexes: number[] = [];
 
-      if (
-        !("txn" in txn) &&
+    // Get the transactions to be signed
+    const txnsToSign = decodedTxns.reduce<Uint8Array[]>((acc, txn, i) => {
+      const isSigned = "txn" in txn;
+
+      // If the indexes to be signed is specified, add it to the transactions to be signed,
+      if (indexesToSign && indexesToSign.length && indexesToSign?.includes(i)) {
+        signedIndexes.push(i);
+        acc.push(transactions[i]);
+        // Otherwise, if the transaction is unsigned and is to be sent from a connected account,
+        // add it to the transactions to be signed
+      } else if (
+        !isSigned &&
         connectedAccounts.includes(this.algosdk.encodeAddress(txn["snd"]))
       ) {
+        signedIndexes.push(i);
         acc.push(transactions[i]);
       }
 
@@ -126,13 +136,12 @@ class MyAlgoWalletClient extends BaseWallet {
     // Sign them with the client.
     const result = await this.#client.signTransaction(txnsToSign);
 
-    // Join the newly signed transactions with the original group of transactions.
-    const signedTxns = decodedTxns.reduce<Uint8Array[]>((acc, txn, i) => {
-      if (!("txn" in txn)) {
+    const signedTxns = transactions.reduce<Uint8Array[]>((acc, txn, i) => {
+      if (signedIndexes.includes(i)) {
         const signedByUser = result.shift()?.blob;
         signedByUser && acc.push(signedByUser);
-      } else {
-        acc.push(transactions[i]);
+      } else if (returnGroup) {
+        acc.push(txn);
       }
 
       return acc;
