@@ -38,7 +38,7 @@ export const initializeProviders = (
 
   if (!providers || providers.length === 0)
     for (const [id, client] of Object.entries(allClients)) {
-      if (id === "kmd") {
+      if (id === "kmd" || id === "mnemonic") {
         continue;
       }
 
