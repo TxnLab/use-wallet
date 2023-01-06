@@ -1,6 +1,13 @@
-# @TxnLab/use-wallet
+<p align="center"><img  width=100%  src="https://ipfs.algonode.xyz/ipfs/bafkreiftentq6nc7ihtkfv7smiuenax74l2fo7yb734hb6rt7hovglvdty" /></p>
 
-React hooks for using Algorand compatible wallets with web applications.
+<p align="center">
+    <a href="https://www.txnlab.dev/"><img src="https://img.shields.io/badge/txnlab-about-orange.svg" /></a>
+    <a><img src="https://visitor-badge.glitch.me/badge?page_id=txnlab.use-wallet&right_color=orange" /></a>
+</p>
+
+## About
+
+React hooks for using Algorand compatible wallets with web applications. Flexible and extensible, `use-wallet` supports a variety of wallets and connection protocols. It also provides a simple interface for connecting, disconnecting, and switching between accounts.
 
 ## Supported Providers
 
@@ -46,7 +53,7 @@ npm install algosdk @blockshake/defly-connect @perawallet/connect @randlabs/myal
 
 ### Set up the Wallet Provider
 
-In `app.js`, initialize the Wallet Provider so that the `useWallet` hook can be used in the child components, and use the `reconnectProviders` function to restore sessions for users returning to the app. 
+In `app.js`, initialize the Wallet Provider so that the `useWallet` hook can be used in the child components, and use the `reconnectProviders` function to restore sessions for users returning to the app.
 
 
 ```jsx
@@ -89,7 +96,7 @@ For more configuration options, see [Provider Configuration](#provider-configura
 
 ### Connect
 
-Map through the `providers` object to list the providers and enable users to connect. 
+Map through the `providers` object to list the providers and enable users to connect.
 
 ```jsx
 import React from "react";
@@ -297,7 +304,7 @@ const walletProviders = {
   }),
 };
 
-... 
+...
 
 <WalletProvider value={walletProviders}>
   ...
@@ -306,9 +313,9 @@ const walletProviders = {
 
 ## Static Imports
 
-By default, `use-wallet` dynamically imports all of the dependencies for the providiers, as well as `algosdk`, to reduce bundle size. 
+By default, `use-wallet` dynamically imports all of the dependencies for the providiers, as well as `algosdk`, to reduce bundle size.
 
-Some React frameworks, like [Remix](https://remix.run/), do not support dynamic imports. To get around this, those dependencies can be imported in your application and passed to the `useWallet` provider. See below for an example. 
+Some React frameworks, like [Remix](https://remix.run/), do not support dynamic imports. To get around this, those dependencies can be imported in your application and passed to the `useWallet` provider. See below for an example.
 
 ```jsx
 ...
@@ -374,7 +381,7 @@ Note: Frameworks like `next.js` already include polyfills. This step is required
 
     ```js
     const webpack = require("webpack");
-    
+
     module.exports = function override(config) {
       const fallback = config.resolve.fallback || {};
       Object.assign(fallback, {
@@ -444,7 +451,7 @@ In the root of your application, run:
 yarn link @txnlab/use-wallet
 ```
 
-### Symlink React 
+### Symlink React
 
 In the root of your application, run:
 ```bash
@@ -463,6 +470,7 @@ Are you using `@txnlab/use-wallet`? We'd love to include you here. Let us know! 
 
 * [@algoscan/use-wallet-ui](https://github.com/algoscan/use-wallet-ui)
 * [@algoworldnft/algoworld-swapper](https://github.com/algoworldnft/algoworld-swapper)
+* [@algoworldnft/algoworld-explorer](https://github.com/algoworldnft/algoworld-explorer)
 
 ## License
 
