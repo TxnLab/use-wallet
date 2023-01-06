@@ -64,8 +64,8 @@ class WalletConnectClient extends BaseWallet {
       const walletConnect = new WalletConnect({
         bridge: "https://bridge.walletconnect.org",
         qrcodeModal: QRCodeModal,
-        storageId: 'walletconnect-generic',
-        ...(clientOptions || {})
+        storageId: "walletconnect-generic",
+        ...(clientOptions || {}),
       });
 
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk;
@@ -167,27 +167,49 @@ class WalletConnectClient extends BaseWallet {
 
   async signTransactions(
     connectedAccounts: string[],
-    transactions: Uint8Array[]
+    transactions: Uint8Array[],
+    indexesToSign?: number[],
+    returnGroup = true
   ) {
     // Decode the transactions to access their properties.
     const decodedTxns = transactions.map((txn) => {
       return this.algosdk.decodeObj(txn);
     }) as Array<DecodedTransaction | DecodedSignedTransaction>;
 
+    const signedIndexes: number[] = [];
+
     // Marshal the transactions,
     // and add the signers property if they shouldn't be signed.
     const txnsToSign = decodedTxns.reduce<WalletConnectTransaction[]>(
       (acc, txn, i) => {
+        const isSigned = "txn" in txn;
+
         if (
-          !("txn" in txn) &&
+          indexesToSign &&
+          indexesToSign.length &&
+          indexesToSign.includes(i)
+        ) {
+          signedIndexes.push(i);
+          acc.push({
+            txn: Buffer.from(transactions[i]).toString("base64"),
+          });
+        } else if (
+          !isSigned &&
           connectedAccounts.includes(this.algosdk.encodeAddress(txn["snd"]))
         ) {
+          signedIndexes.push(i);
           acc.push({
             txn: Buffer.from(transactions[i]).toString("base64"),
           });
         } else {
           acc.push({
-            txn: Buffer.from(transactions[i]).toString("base64"),
+            txn: isSigned
+              ? Buffer.from(
+                  this.algosdk.encodeUnsignedTransaction(
+                    this.algosdk.decodeSignedTransaction(transactions[i]).txn
+                  )
+                ).toString("base64")
+              : Buffer.from(transactions[i]).toString("base64"),
             signers: [],
           });
         }
@@ -217,7 +239,7 @@ class WalletConnectClient extends BaseWallet {
         signedTxns.push(new Uint8Array(Buffer.from(txn, "base64")));
       }
 
-      if (txn === null) {
+      if (returnGroup) {
         signedTxns.push(transactions[i]);
       }
 
