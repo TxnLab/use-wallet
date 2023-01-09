@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`clearAccounts.clearAccounts clears account for "algosigner" 1`] = `undefined`;
+
+exports[`clearAccounts.clearAccounts clears account for "exodus" 1`] = `undefined`;
+
+exports[`clearAccounts.clearAccounts clears account for "myalgo" 1`] = `undefined`;
+
+exports[`clearAccounts.clearAccounts clears account for "pera" 1`] = `undefined`;
