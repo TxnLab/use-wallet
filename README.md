@@ -1,4 +1,4 @@
-<p align="center"><img  width=100%  src="https://ipfs.algonode.xyz/ipfs/bafkreiftentq6nc7ihtkfv7smiuenax74l2fo7yb734hb6rt7hovglvdty" /></p>
+<p align="center"><img  width=100%  src="https://ipfs.algonode.xyz/ipfs/bafkreiexg66kttj75i6uv6khowp2ybvue4nwhvuhh24dobpniszqkbuxoq" /></p>
 
 <p align="center">
     <a href="https://www.txnlab.dev/"><img src="https://img.shields.io/badge/txnlab-about-orange.svg" /></a>
