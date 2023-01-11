@@ -76,6 +76,34 @@ export default function useWallet() {
     return client;
   };
 
+  const status = useMemo(() => {
+    if (activeAccount === undefined) {
+      return "initializing";
+    }
+
+    if (activeAccount === null && connectedAccounts.length) {
+      return "connected";
+    }
+
+    if (activeAccount === null && !connectedAccounts.length) {
+      return "disconnected";
+    }
+
+    if (activeAccount && activeAccount.address) {
+      return "active";
+    }
+
+    return "error";
+  }, [activeAccount]);
+
+  const isActive = useMemo(() => {
+    return status === "active";
+  }, [status]);
+
+  const isReady = useMemo(() => {
+    return status !== "initializing";
+  }, [status]);
+
   const selectActiveAccount = async (
     providerId: PROVIDER_ID,
     address: string
@@ -250,6 +278,9 @@ export default function useWallet() {
     connectedActiveAccounts,
     activeAccount,
     activeAddress: activeAccount?.address,
+    status,
+    isActive,
+    isReady,
     signer,
     signTransactions,
     sendTransactions,
