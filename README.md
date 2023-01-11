@@ -262,7 +262,7 @@ export default function Account() {
 
 The `isActive` and `isReady` properties can be used to check the status of the wallets. The `isActive` property determines whether or not an account is currently active. The `isReady` property shows if `use-wallet` has mounted and successfully read the connection status from the providers. These properties are useful when setting up client side access restrictions, for example, by redirecting a user if no wallet is active, as shown below.
 
-```
+```jsx
   const { isActive, isReady } = useWallet()
 
   useEffect(() => {
