@@ -258,6 +258,26 @@ export default function Account() {
 }
 ```
 
+### Check connection status
+
+The `isActive` and `isReady` properties can be used to check the status of the wallets. The `isActive` property determines whether or not an account is currently active. The `isReady` property shows if `use-wallet` has mounted and successfully read the connection status from the providers. These properties are useful when setting up client side access restrictions, for example, by redirecting a user if no wallet is active, as shown below.
+
+```
+  const { isActive, isReady } = useWallet()
+
+  useEffect(() => {
+    if (isReady && isActive) {
+      allowAccess()
+    }
+
+    if (isReady && !isActive) {
+      denyAccess()
+    }
+  })
+
+```
+
+
 ## Provider Configuration
 
 The `initializeProviders` functon accepts a configuration object that can be used to configure the nodes that the providers use to send transactions, as shown below.
