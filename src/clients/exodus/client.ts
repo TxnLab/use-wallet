@@ -75,7 +75,12 @@ class ExodusClient extends BaseWallet {
         network,
       });
     } catch (e) {
-      console.error("Error initializing...", e);
+      console.warn(e);
+      console.warn(
+        `Error initializing ${ExodusClient.metadata.name}.`,
+        "Do you have the extension installed?",
+        "https://www.exodus.com/web3-wallet"
+      );
       return null;
     }
   }

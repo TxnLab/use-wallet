@@ -87,7 +87,12 @@ class AlgoSignerClient extends BaseWallet {
         network,
       });
     } catch (e) {
-      console.error("Error initializing...", e);
+      console.warn(e);
+      console.warn(
+        `Error initializing ${AlgoSignerClient.metadata.name}.`,
+        "Do you have the extension installed?",
+        "https://www.purestake.com/technology/algosigner"
+      );
       return null;
     }
   }
