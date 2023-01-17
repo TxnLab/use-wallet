@@ -147,16 +147,21 @@ class MnemonicWalletClient extends BaseWallet {
 
     // Restore the newly signed txns in the correct order
     let signedIdx = 0;
-    for (const idx in signedTxns) {
+        const formattedTxns = signedTxns.reduce<Uint8Array[]>((acc, txn, i) => {
       // If its an empty array, infer that it is one of the
       // ones we wanted to have signed and overwrite the empty buff
-      if (signedTxns[idx].length === 0) {
-        signedTxns[idx] = signingResults[signedIdx];
-        signedIdx += 1;
-      }
-    }
+      if (txn.length === 0) {
+        acc.push(signingResults[signedIdx]);
 
-    return Promise.resolve(signedTxns);
+        signedIdx += 1;
+      } else if (returnGroup) {
+        acc.push(txn);
+      }
+
+      return acc;
+    }, []);
+
+    return Promise.resolve(formattedTxns);
   }
 
   signEncodedTransactions(
