@@ -112,17 +112,30 @@ class MnemonicWalletClient extends BaseWallet {
     const signedTxns: Uint8Array[] = [];
     // Sign them with the client.
     const signingResults: Uint8Array[] = [];
-    for (const idx in decodedTxns) {
+   for (const idx in decodedTxns) {
       const dtxn = decodedTxns[idx];
+      const isSigned = "txn" in dtxn;
 
       // push the incoming txn into signed, we'll overwrite it later
       signedTxns.push(transactions[idx]);
 
       // Its already signed, skip it
-      if (!("snd" in dtxn)) continue;
-      // Not to be signed by our signer, skip it
-      if (!connectedAccounts.includes(this.algosdk.encodeAddress(dtxn.snd)))
+      if (isSigned) {
         continue;
+        // Not specified in indexes to sign, skip it
+      } else if (
+        indexesToSign &&
+        indexesToSign.length &&
+        !indexesToSign.includes(Number(idx))
+      ) {
+        continue;
+      }
+      // Not to be signed by our signer, skip it
+      else if (
+        !connectedAccounts.includes(this.algosdk.encodeAddress(dtxn.snd))
+      ) {
+        continue;
+      }
 
       // overwrite with an empty blob
       signedTxns[idx] = new Uint8Array();
