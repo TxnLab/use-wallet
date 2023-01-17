@@ -94,7 +94,9 @@ class MnemonicWalletClient extends BaseWallet {
 
   signTransactions(
     connectedAccounts: string[],
-    transactions: Uint8Array[]
+    transactions: Uint8Array[],
+    indexesToSign?: number[],
+    returnGroup = true
   ): Promise<Uint8Array[]> {
     if (!this.#client) {
       throw new Error("Client not connected");
