@@ -5,13 +5,8 @@ import type { AlgodClientOptions, Network, Metadata } from "../../types";
 
 export type ClientOptions = {
   bridge?: string;
-  deep_link?: string;
-  app_meta?: {
-    logo: string;
-    name: string;
-    main_color: string;
-  };
   shouldShowSignTxnToast?: boolean;
+  chainId?: 416001 | 416002 | 416003 | 4160;
 };
 
 export interface PeraTransaction {
