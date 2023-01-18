@@ -233,12 +233,6 @@ class KMDWalletClient extends BaseWallet {
 
     return formattedTxns;
   }
-
-  signEncodedTransactions(
-    transactions: TransactionsArray
-  ): Promise<Uint8Array[]> {
-    throw new Error("Method not implemented.");
-  }
 }
 
 export default KMDWalletClient;

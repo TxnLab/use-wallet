@@ -253,24 +253,6 @@ export default function useWallet() {
     return walletClient?.groupTransactionsBySender(transactions);
   };
 
-  const signEncodedTransactions = async (transactions: TransactionsArray) => {
-    const walletClient = await getClient(activeAccount?.providerId);
-
-    return await walletClient?.signEncodedTransactions(transactions);
-  };
-
-  const sendRawTransactions = async (
-    transactions: Uint8Array[],
-    waitRoundsToConfirm?: number
-  ) => {
-    const walletClient = await getClient(activeAccount?.providerId);
-
-    return await walletClient?.sendRawTransactions(
-      transactions,
-      waitRoundsToConfirm
-    );
-  };
-
   return {
     clients,
     providers,
@@ -288,7 +270,5 @@ export default function useWallet() {
     groupTransactionsBySender,
     getAccountInfo,
     getAssets,
-    signEncodedTransactions,
-    sendRawTransactions,
   };
 }

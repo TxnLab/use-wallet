@@ -42,9 +42,6 @@ abstract class BaseClient {
     indexesToSign?: number[],
     returnGroup?: boolean
   ): Promise<Uint8Array[]>;
-  abstract signEncodedTransactions(
-    transactions: TransactionsArray
-  ): Promise<Uint8Array[]>;
 
   protected constructor(
     metadata: Metadata,

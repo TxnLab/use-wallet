@@ -176,40 +176,6 @@ class ExodusClient extends BaseWallet {
 
     return signedTxns;
   }
-
-  /** @deprecated */
-  async signEncodedTransactions(transactions: TransactionsArray) {
-    const transactionsToSign: Uint8Array[] = [];
-    const signedRawTransactions: Uint8Array[] = [];
-
-    for (const [type, txn] of transactions) {
-      if (type === "u") {
-        const decoded = this.algosdk.decodeUnsignedTransaction(
-          Buffer.from(txn, "base64")
-        );
-        transactionsToSign.push(decoded.toByte());
-      }
-    }
-
-    const result = await this.#client.signTransaction(transactionsToSign);
-
-    if (!result) {
-      throw new Error("Signing failed.");
-    }
-
-    let resultIndex = 0;
-
-    for (const [type, txn] of transactions) {
-      if (type === "u") {
-        signedRawTransactions.push(result[resultIndex]);
-        resultIndex++;
-      } else {
-        signedRawTransactions.push(new Uint8Array(Buffer.from(txn, "base64")));
-      }
-    }
-
-    return signedRawTransactions;
-  }
 }
 
 export default ExodusClient;
