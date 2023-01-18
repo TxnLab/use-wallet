@@ -103,7 +103,7 @@ class KMDWalletClient extends BaseWallet {
 
   async requestPassword(): Promise<string> {
     // TODO: store it locally?
-    const pw = prompt("gib password");
+    const pw = prompt("KMD password");
     return pw ? pw : "";
   }
 
@@ -133,14 +133,9 @@ class KMDWalletClient extends BaseWallet {
     wallet: string,
     password: string
   ): Promise<Array<Account>> {
-    const walletMap = await this.listWallets();
-
-    if (!(wallet in walletMap)) throw Error("No wallet named: " + wallet);
-
-    this.walletId = walletMap[wallet];
-
     // Get a handle token
-    const token = await this.getWalletToken(this.walletId, password);
+    const walletId = await this.getWalletId();
+    const token = await this.getWalletToken(walletId, password);
 
     // Fetch accounts and format them as lib expects
     const listResponse = await this.#client.listKeys(token);
@@ -159,6 +154,18 @@ class KMDWalletClient extends BaseWallet {
     return mappedAccounts;
   }
 
+  async getWalletId(): Promise<string> {
+    // Use cached if available
+    if(this.walletId !== "") return this.walletId
+
+    const walletMap = await this.listWallets();
+    if (!(this.#wallet in walletMap)) 
+      throw Error("No wallet named: " + this.#wallet);
+    this.walletId = walletMap[this.#wallet];
+
+    return this.walletId
+  }
+
   async signTransactions(
     connectedAccounts: string[],
     transactions: Uint8Array[],
@@ -173,8 +180,9 @@ class KMDWalletClient extends BaseWallet {
     >;
 
     // Get a handle token
+    const walletId = await this.getWalletId()
     const pw = await this.requestPassword();
-    const token = await this.getWalletToken(this.walletId, pw);
+    const token = await this.getWalletToken(walletId, pw);
 
     const signedTxns: Array<Uint8Array> = [];
     // Sign them with the client.
