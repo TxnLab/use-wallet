@@ -145,6 +145,19 @@ class PeraWalletClient extends BaseWallet {
         acc.push({
           txn: this.algosdk.decodeUnsignedTransaction(transactions[i]),
         });
+        // If the indexes to be signed is specified, but it's not included in it,
+        // designate that it should not be signed
+      } else if (
+        indexesToSign &&
+        indexesToSign.length &&
+        !indexesToSign.includes(i)
+      ) {
+        acc.push({
+          txn: isSigned
+            ? this.algosdk.decodeSignedTransaction(transactions[i]).txn
+            : this.algosdk.decodeUnsignedTransaction(transactions[i]),
+          signers: [],
+        });
         // If the transaction is unsigned and is to be sent from a connected account,
         // designate that it should be signed
       } else if (
