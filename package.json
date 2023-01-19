@@ -79,7 +79,7 @@
   "peerDependencies": {
     "@blockshake/defly-connect": "^1.0.0",
     "@json-rpc-tools/utils": "^1.7.6",
-    "@perawallet/connect": "^1.0.7",
+    "@perawallet/connect": "^1.1.0",
     "@randlabs/myalgo-connect": "^1.4.2",
     "@walletconnect/client": "^1.8.0",
     "algorand-walletconnect-qrcode-modal": "^1.8.0",
