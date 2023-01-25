@@ -248,67 +248,6 @@ class WalletConnectClient extends BaseWallet {
 
     return signedTxns;
   }
-
-  /** @deprecarted */
-  formatTransactionsArray(
-    transactions: TransactionsArray
-  ): WalletConnectTransaction[] {
-    const formattedTransactions = transactions.map((txn) => {
-      const formattedTxn: WalletConnectTransaction = {
-        txn: txn[1],
-      };
-
-      if (txn[0] === "s") {
-        const decodedTxn = this.algosdk.decodeSignedTransaction(
-          new Uint8Array(Buffer.from(txn[1], "base64"))
-        );
-
-        formattedTxn.txn = Buffer.from(
-          this.algosdk.encodeUnsignedTransaction(decodedTxn.txn)
-        ).toString("base64");
-
-        formattedTxn.signers = [];
-      }
-
-      return formattedTxn;
-    });
-
-    return formattedTransactions;
-  }
-
-  /** @deprecated */
-  async signEncodedTransactions(transactions: TransactionsArray) {
-    const transactionsToSign = this.formatTransactionsArray(transactions);
-    const requestParams = [transactionsToSign];
-    const request = formatJsonRpcRequest("algo_signTxn", requestParams);
-
-    this.keepWCAliveStart();
-
-    const result: Array<string | null> = await this.#client.sendCustomRequest(
-      request
-    );
-
-    this.keepWCAliveStop();
-
-    const signedRawTransactions = result.reduce(
-      (signedTxns: Uint8Array[], txn, currentIndex) => {
-        if (txn) {
-          signedTxns.push(new Uint8Array(Buffer.from(txn, "base64")));
-        }
-
-        if (txn === null) {
-          signedTxns.push(
-            new Uint8Array(Buffer.from(transactions[currentIndex][1], "base64"))
-          );
-        }
-
-        return signedTxns;
-      },
-      []
-    );
-
-    return signedRawTransactions;
-  }
 }
 
 export default WalletConnectClient;

@@ -145,6 +145,19 @@ class PeraWalletClient extends BaseWallet {
         acc.push({
           txn: this.algosdk.decodeUnsignedTransaction(transactions[i]),
         });
+        // If the indexes to be signed is specified, but it's not included in it,
+        // designate that it should not be signed
+      } else if (
+        indexesToSign &&
+        indexesToSign.length &&
+        !indexesToSign.includes(i)
+      ) {
+        acc.push({
+          txn: isSigned
+            ? this.algosdk.decodeSignedTransaction(transactions[i]).txn
+            : this.algosdk.decodeUnsignedTransaction(transactions[i]),
+          signers: [],
+        });
         // If the transaction is unsigned and is to be sent from a connected account,
         // designate that it should be signed
       } else if (
@@ -187,53 +200,6 @@ class PeraWalletClient extends BaseWallet {
     }, []);
 
     return signedTxns;
-  }
-
-  /** @deprecated */
-  formatTransactionsArray(transactions: TransactionsArray): PeraTransaction[] {
-    const formattedTransactions: PeraTransaction[] = [];
-
-    for (const [type, txn] of transactions) {
-      if (type === "s") {
-        formattedTransactions.push({
-          ...this.algosdk.decodeSignedTransaction(
-            new Uint8Array(Buffer.from(txn, "base64"))
-          ),
-          signers: [],
-        });
-      } else {
-        formattedTransactions.push({
-          txn: this.algosdk.decodeUnsignedTransaction(
-            new Uint8Array(Buffer.from(txn, "base64"))
-          ),
-        });
-      }
-    }
-
-    return formattedTransactions;
-  }
-
-  /** @deprecated */
-  async signEncodedTransactions(transactions: TransactionsArray) {
-    const transactionsToSign = this.formatTransactionsArray(transactions);
-
-    const result = (await this.#client.signTransaction([
-      transactionsToSign,
-    ])) as Uint8Array[];
-
-    const signedTransactions: Uint8Array[] = [];
-    let resultIndex = 0;
-
-    for (const [type, txn] of transactions) {
-      if (type === "u") {
-        signedTransactions.push(result[resultIndex]);
-        resultIndex++;
-      } else {
-        signedTransactions.push(new Uint8Array(Buffer.from(txn, "base64")));
-      }
-    }
-
-    return signedTransactions;
   }
 }
 

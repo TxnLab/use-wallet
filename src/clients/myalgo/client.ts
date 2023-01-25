@@ -149,37 +149,6 @@ class MyAlgoWalletClient extends BaseWallet {
 
     return signedTxns;
   }
-
-  /** @deprecated */
-  async signEncodedTransactions(transactions: TransactionsArray) {
-    const transactionsToSign: string[] = [];
-    const signedRawTransactions: Uint8Array[] = [];
-
-    for (const [type, txn] of transactions) {
-      if (type === "u") {
-        transactionsToSign.push(txn);
-      }
-    }
-
-    const result = await this.#client.signTransaction(transactionsToSign);
-
-    if (!result) {
-      throw new Error("Signing failed.");
-    }
-
-    let resultIndex = 0;
-
-    for (const [type, txn] of transactions) {
-      if (type === "u") {
-        signedRawTransactions.push(result[resultIndex].blob);
-        resultIndex++;
-      } else {
-        signedRawTransactions.push(new Uint8Array(Buffer.from(txn, "base64")));
-      }
-    }
-
-    return signedRawTransactions;
-  }
 }
 
 export default MyAlgoWalletClient;

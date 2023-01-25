@@ -188,53 +188,6 @@ class DeflyWalletClient extends BaseWallet {
 
     return signedTxns;
   }
-
-  /** @deprecated */
-  async signEncodedTransactions(transactions: TransactionsArray) {
-    const transactionsToSign = this.formatTransactionsArray(transactions);
-    const result: Uint8Array[] = await this.#client.signTransaction([
-      transactionsToSign,
-    ]);
-
-    const signedTransactions: Uint8Array[] = [];
-
-    let resultIndex = 0;
-
-    for (const [type, txn] of transactions) {
-      if (type === "u") {
-        signedTransactions.push(result[resultIndex]);
-        resultIndex++;
-      } else {
-        signedTransactions.push(new Uint8Array(Buffer.from(txn, "base64")));
-      }
-    }
-
-    return signedTransactions;
-  }
-
-  /** @deprecated */
-  formatTransactionsArray(transactions: TransactionsArray) {
-    const formattedTransactions: DeflyTransaction[] = [];
-
-    for (const [type, txn] of transactions) {
-      if (type === "s") {
-        formattedTransactions.push({
-          ...this.algosdk.decodeSignedTransaction(
-            new Uint8Array(Buffer.from(txn, "base64"))
-          ),
-          signers: [],
-        });
-      } else {
-        formattedTransactions.push({
-          txn: this.algosdk.decodeUnsignedTransaction(
-            new Uint8Array(Buffer.from(txn, "base64"))
-          ),
-        });
-      }
-    }
-
-    return formattedTransactions;
-  }
 }
 
 export default DeflyWalletClient;

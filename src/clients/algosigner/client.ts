@@ -208,67 +208,6 @@ class AlgoSignerClient extends BaseWallet {
 
     return signedTxns;
   }
-
-  /** @deprecated */
-  formatTransactionsArray(
-    transactions: TransactionsArray
-  ): AlgoSignerTransaction[] {
-    const formattedTransactions = transactions.map(([type, txn]) => {
-      const formattedTxn: AlgoSignerTransaction = {
-        txn: txn[1],
-      };
-
-      if (type === "s") {
-        formattedTxn.signers = [];
-        const decoded = this.algosdk.decodeSignedTransaction(
-          new Uint8Array(Buffer.from(txn, "base64"))
-        );
-        formattedTxn.txn = this.#client.encoding.msgpackToBase64(
-          decoded.txn.toByte()
-        );
-      } else {
-        const decoded = this.algosdk.decodeUnsignedTransaction(
-          Buffer.from(txn, "base64")
-        );
-        formattedTxn.txn = this.#client.encoding.msgpackToBase64(
-          decoded.toByte()
-        );
-      }
-
-      return formattedTxn;
-    });
-
-    return formattedTransactions;
-  }
-
-  /** @deprecated */
-  async signEncodedTransactions(transactions: TransactionsArray) {
-    const transactionsToSign = this.formatTransactionsArray(transactions);
-    const result = await this.#client.signTxn(transactionsToSign);
-
-    if (!result) {
-      throw new Error("Signing failed.");
-    }
-
-    const signedRawTransactions = result.reduce(
-      (signedTxns: Uint8Array[], txn, currentIndex) => {
-        if (txn) {
-          signedTxns.push(new Uint8Array(Buffer.from(txn.blob, "base64")));
-        }
-
-        if (txn === null) {
-          signedTxns.push(
-            new Uint8Array(Buffer.from(transactions[currentIndex][1], "base64"))
-          );
-        }
-
-        return signedTxns;
-      },
-      []
-    );
-
-    return signedRawTransactions;
-  }
 }
 
 export default AlgoSignerClient;
