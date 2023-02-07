@@ -380,54 +380,6 @@ export default function App() {
 
 Note that some of the providers do not require static imports to be provided. This is usually the case of providers that are browser extensions.
 
-## Webpack 5
-
-Note: Frameworks like `next.js` already include polyfills. This step is required if you're using `create-react-app` with `webpack 5`.
-
-1. Install `react-app-rewired` and the missing polyfills.
-
-    ```bash
-    yarn add --dev react-app-rewired crypto-browserify stream-browserify assert stream-http https-browserify os-browserify url buffer process
-    ```
-
-2. Create `config-overrides.js` in the root of your project and add the following:
-
-    ```js
-    const webpack = require("webpack");
-    
-    module.exports = function override(config) {
-      const fallback = config.resolve.fallback || {};
-      Object.assign(fallback, {
-        crypto: require.resolve("crypto-browserify"),
-        stream: require.resolve("stream-browserify"),
-        assert: require.resolve("assert"),
-        http: require.resolve("stream-http"),
-        https: require.resolve("https-browserify"),
-        os: require.resolve("os-browserify"),
-        url: require.resolve("url"),
-      });
-      config.resolve.fallback = fallback;
-      config.plugins = (config.plugins || []).concat([
-        new webpack.ProvidePlugin({
-          process: "process/browser",
-          Buffer: ["buffer", "Buffer"],
-        }),
-      ]);
-      return config;
-    };
-    ```
-
-3. Change your scripts in `package.json` to the following:
-
-    ```js
-    "scripts": {
-        "start": "react-app-rewired start",
-        "build": "react-app-rewired build",
-        "test": "react-app-rewired test",
-        "eject": "react-scripts eject"
-    },
-    ```
-
 ## Local Development
 
 ### Install dependencies

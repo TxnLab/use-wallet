@@ -51,7 +51,7 @@
     "@types/react": "^18.0.15",
     "@walletconnect/client": "^1.8.0",
     "algorand-walletconnect-qrcode-modal": "^1.8.0",
-    "algosdk": "^1.22.0",
+    "algosdk": "^2.1.0",
     "babel-jest": "^29.1.2",
     "babel-loader": "^8.2.3",
     "css-loader": "^6.5.1",
@@ -83,7 +83,7 @@
     "@randlabs/myalgo-connect": "^1.4.2",
     "@walletconnect/client": "^1.8.0",
     "algorand-walletconnect-qrcode-modal": "^1.8.0",
-    "algosdk": "^1.24.0",
+    "algosdk": "^2.1.0",
     "react": "^18.2.0"
   },
   "main": "dist/cjs/index.js",
