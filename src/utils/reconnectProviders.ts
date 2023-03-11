@@ -1,5 +1,6 @@
 import { WalletClient } from "../types";
 import { clearAccounts } from "./clearAccounts";
+import { isActiveProvider } from "./providers";
 
 type SupportedProviders = { [x: string]: Promise<WalletClient | null> };
 
@@ -9,7 +10,12 @@ export const reconnectProviders = async (providers: SupportedProviders) => {
 
     for (const client of clients) {
       const c = await client;
-      c?.reconnect(() => clearAccounts(c?.metadata.id));
+      const id = c?.metadata.id;
+
+      // Only reconnect to active providers
+      if (id && isActiveProvider(id)) {
+        c.reconnect(() => clearAccounts(id));
+      }
     }
   } catch (e) {
     console.error(e);
