@@ -234,17 +234,16 @@ class WalletConnectClient extends BaseWallet {
     this.keepWCAliveStop();
 
     // Join the newly signed transactions with the original group of transactions.
-    const signedTxns = result.reduce((signedTxns: Uint8Array[], txn, i) => {
-      if (txn) {
-        signedTxns.push(new Uint8Array(Buffer.from(txn, "base64")));
+    const signedTxns = transactions.reduce<Uint8Array[]>((acc, txn, i) => {
+      if (signedIndexes.includes(i)) {
+        const signedByUser = result[i]
+        signedByUser && acc.push(new Uint8Array(Buffer.from(signedByUser, 'base64')))
+      } else if (returnGroup) {
+        acc.push(txn)
       }
 
-      if (returnGroup) {
-        signedTxns.push(transactions[i]);
-      }
-
-      return signedTxns;
-    }, []);
+      return acc
+    }, [])
 
     return signedTxns;
   }
