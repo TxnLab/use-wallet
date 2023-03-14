@@ -233,10 +233,13 @@ class WalletConnectClient extends BaseWallet {
 
     this.keepWCAliveStop();
 
+    // Check if the result is the same length as the transactions
+    const lengthsMatch = result.length === transactions.length
+
     // Join the newly signed transactions with the original group of transactions.
     const signedTxns = transactions.reduce<Uint8Array[]>((acc, txn, i) => {
       if (signedIndexes.includes(i)) {
-        const signedByUser = result[i]
+        const signedByUser = lengthsMatch ? result[i] : result.shift()
         signedByUser && acc.push(new Uint8Array(Buffer.from(signedByUser, 'base64')))
       } else if (returnGroup) {
         acc.push(txn)
