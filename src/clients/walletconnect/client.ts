@@ -8,13 +8,7 @@ import type WalletConnect from '@walletconnect/client'
 import { PROVIDER_ID } from '../../constants'
 import BaseWallet from '../base'
 import { formatJsonRpcRequest } from '@json-rpc-tools/utils'
-import {
-  Wallet,
-  TransactionsArray,
-  DecodedTransaction,
-  DecodedSignedTransaction,
-  Network
-} from '../../types'
+import { Wallet, DecodedTransaction, DecodedSignedTransaction, Network } from '../../types'
 import { DEFAULT_NETWORK, ICON } from './constants'
 import { WalletConnectClientConstructor, InitParams, WalletConnectTransaction } from './types'
 
@@ -57,7 +51,7 @@ class WalletConnectClient extends BaseWallet {
       })
 
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
-      const algodClient = await getAlgodClient(algosdk, algodOptions)
+      const algodClient = getAlgodClient(algosdk, algodOptions)
 
       const initWallet: WalletConnectClientConstructor = {
         metadata: WalletConnectClient.metadata,
@@ -74,7 +68,7 @@ class WalletConnectClient extends BaseWallet {
     }
   }
 
-  async connect(): Promise<Wallet> {
+  async connect() {
     let chainId = 416001
 
     if (this.network === 'betanet') {
@@ -87,7 +81,7 @@ class WalletConnectClient extends BaseWallet {
       await this.#client.createSession({ chainId })
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise<Wallet>((resolve, reject) => {
       this.#client.on('connect', (error, payload) => {
         if (error) {
           reject(error)
@@ -124,6 +118,7 @@ class WalletConnectClient extends BaseWallet {
     })
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async reconnect() {
     const accounts = this.#client.accounts
 
@@ -202,7 +197,7 @@ class WalletConnectClient extends BaseWallet {
 
     // Play an audio file to keep Wallet Connect's web socket open on iOS
     // when the user goes into background mode.
-    this.keepWCAliveStart()
+    await this.keepWCAliveStart()
 
     // Sign them with the client.
     const result: Array<string | null> = await this.#client.sendCustomRequest(request)

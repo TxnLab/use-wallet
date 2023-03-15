@@ -2,7 +2,7 @@ import type _algosdk from 'algosdk'
 import Algod, { getAlgodClient } from '../../algod'
 import BaseWallet from '../base'
 import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
-import type { Wallet, TransactionsArray, Network } from '../../types'
+import type { TransactionsArray, Network } from '../../types'
 import { ICON } from './constants'
 import { InitParams, MnemonicWalletClientConstructor } from './types'
 import algosdk from 'algosdk'
@@ -30,7 +30,7 @@ class MnemonicWalletClient extends BaseWallet {
   static async init({ algodOptions, algosdkStatic, network = DEFAULT_NETWORK }: InitParams) {
     try {
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
-      const algodClient = await getAlgodClient(algosdk, algodOptions)
+      const algodClient = getAlgodClient(algosdk, algodOptions)
       console.log(network, algodClient)
       return new MnemonicWalletClient({
         metadata: MnemonicWalletClient.metadata,
@@ -45,8 +45,9 @@ class MnemonicWalletClient extends BaseWallet {
     }
   }
 
-  async connect(): Promise<Wallet> {
-    const password = await this.requestPassword()
+  // eslint-disable-next-line @typescript-eslint/require-await
+  async connect() {
+    const password = this.requestPassword()
 
     if (!password) {
       this.#client = undefined
@@ -67,16 +68,18 @@ class MnemonicWalletClient extends BaseWallet {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async disconnect() {
     this.#client = undefined
     return
   }
 
-  async reconnect(): Promise<Wallet | null> {
+  // eslint-disable-next-line @typescript-eslint/require-await
+  async reconnect() {
     return null
   }
 
-  async requestPassword(): Promise<string> {
+  requestPassword() {
     // TODO: store it locally?
     const pass = prompt('enter mnemonic passphrase, 25 words')
     return pass ? pass : ''
@@ -100,8 +103,8 @@ class MnemonicWalletClient extends BaseWallet {
     const signedTxns: Uint8Array[] = []
     // Sign them with the client.
     const signingResults: Uint8Array[] = []
-    for (const idx in decodedTxns) {
-      const dtxn = decodedTxns[idx]
+
+    decodedTxns.forEach((dtxn, idx) => {
       const isSigned = 'txn' in dtxn
 
       // push the incoming txn into signed, we'll overwrite it later
@@ -109,27 +112,27 @@ class MnemonicWalletClient extends BaseWallet {
 
       // Its already signed, skip it
       if (isSigned) {
-        continue
+        return
         // Not specified in indexes to sign, skip it
       } else if (indexesToSign && indexesToSign.length && !indexesToSign.includes(Number(idx))) {
-        continue
+        return
       }
       // Not to be signed by our signer, skip it
       else if (!connectedAccounts.includes(this.algosdk.encodeAddress(dtxn.snd))) {
-        continue
+        return
       }
 
       // overwrite with an empty blob
       signedTxns[idx] = new Uint8Array()
 
       const txn = this.algosdk.Transaction.from_obj_for_encoding(dtxn)
-      const signedTxn = txn.signTxn(this.#client.sk)
+      const signedTxn = txn.signTxn(this.#client?.sk as Uint8Array)
       signingResults.push(signedTxn)
-    }
+    })
 
     // Restore the newly signed txns in the correct order
     let signedIdx = 0
-    const formattedTxns = signedTxns.reduce<Uint8Array[]>((acc, txn, i) => {
+    const formattedTxns = signedTxns.reduce<Uint8Array[]>((acc, txn) => {
       // If its an empty array, infer that it is one of the
       // ones we wanted to have signed and overwrite the empty buff
       if (txn.length === 0) {
@@ -146,7 +149,7 @@ class MnemonicWalletClient extends BaseWallet {
     return Promise.resolve(formattedTxns)
   }
 
-  signEncodedTransactions(transactions: TransactionsArray): Promise<Uint8Array[]> {
+  signEncodedTransactions(_transactions: TransactionsArray): Promise<Uint8Array[]> {
     throw new Error('Method not implemented.')
   }
 }

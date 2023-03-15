@@ -16,6 +16,7 @@ export interface ListWalletResponse {
   driver_name?: string
   driver_version?: number
   mnemonic_ux?: boolean
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supported_txs?: Array<any>
 }
 

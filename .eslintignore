@@ -7,10 +7,6 @@
 # production
 /dist
 
-# config
-.eslintrc.js
-rollup.config.js
-
 # misc
 .DS_Store
 

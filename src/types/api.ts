@@ -11,3 +11,7 @@ export type TxnInfo = {
   txn: string
   signedTxn?: Uint8Array
 }
+
+export type RawTxnResponse = {
+  txId: string
+}

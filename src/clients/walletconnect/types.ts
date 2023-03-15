@@ -23,6 +23,7 @@ export interface IWalletConnectSession {
   handshakeId: number
   handshakeTopic: string
   qrcodeModal: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     open: (uri: string, cb: any, qrcodeModalOptions?: any) => void
     close: () => void
   }

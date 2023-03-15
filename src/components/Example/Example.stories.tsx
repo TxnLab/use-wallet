@@ -7,7 +7,7 @@ export default {
   component: Example
 } as ComponentMeta<typeof Example>
 
-const Template: ComponentStory<typeof Example> = (args) => <Example />
+const Template: ComponentStory<typeof Example> = () => <Example />
 
 export const ExampleStory = Template.bind({})
 

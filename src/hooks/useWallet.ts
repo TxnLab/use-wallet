@@ -53,6 +53,7 @@ export default function useWallet() {
         }
       })
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clients, connectedAccounts, connectedActiveAccounts, activeAccount])
 
   const getClient = async (id?: PROVIDER_ID): Promise<WalletClient> => {
@@ -83,7 +84,7 @@ export default function useWallet() {
     }
 
     return 'error'
-  }, [activeAccount])
+  }, [activeAccount, connectedAccounts.length])
 
   const isActive = useMemo(() => {
     return status === 'active'
@@ -93,7 +94,7 @@ export default function useWallet() {
     return status !== 'initializing'
   }, [status])
 
-  const selectActiveAccount = async (providerId: PROVIDER_ID, address: string) => {
+  const selectActiveAccount = (providerId: PROVIDER_ID, address: string) => {
     try {
       const account = connectedActiveAccounts.find(
         (acct) => acct.address === address && acct.providerId === providerId
@@ -135,7 +136,7 @@ export default function useWallet() {
       }
     } catch (e) {
       console.error(e)
-      disconnect(id)
+      await disconnect(id)
     }
   }
 
@@ -143,7 +144,7 @@ export default function useWallet() {
     try {
       const walletClient = await getClient(id)
 
-      walletClient?.disconnect()
+      await walletClient?.disconnect()
     } catch (e) {
       console.error(e)
     } finally {
@@ -151,7 +152,7 @@ export default function useWallet() {
     }
   }
 
-  const setActive = async (id: PROVIDER_ID) => {
+  const setActive = (id: PROVIDER_ID) => {
     try {
       const accounts = getAccountsByProvider(id)
       _setActiveAccount(accounts[0])

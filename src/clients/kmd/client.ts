@@ -2,7 +2,7 @@ import type _algosdk from 'algosdk'
 import Algod, { getAlgodClient } from '../../algod'
 import BaseWallet from '../base'
 import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
-import type { Account, Wallet, TransactionsArray, Network } from '../../types'
+import type { Account, Wallet, Network } from '../../types'
 import { ICON } from './constants'
 import {
   InitParams,
@@ -63,7 +63,7 @@ class KMDWalletClient extends BaseWallet {
       } = clientOptions || {}
 
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
-      const algodClient = await getAlgodClient(algosdk, algodOptions)
+      const algodClient = getAlgodClient(algosdk, algodOptions)
       const kmdClient = new algosdk.Kmd(token, host, port)
 
       return new KMDWalletClient({
@@ -86,19 +86,21 @@ class KMDWalletClient extends BaseWallet {
     // TODO: prompt for wallet and password?
     return {
       ...KMDWalletClient.metadata,
-      accounts: await this.listAccounts(this.#wallet, await this.requestPassword())
+      accounts: await this.listAccounts(this.#wallet, this.requestPassword())
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async disconnect() {
     return
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async reconnect(): Promise<Wallet | null> {
     return null
   }
 
-  async requestPassword(): Promise<string> {
+  requestPassword() {
     // TODO: store it locally?
     const pw = prompt('KMD password')
     return pw ? pw : ''
@@ -140,7 +142,7 @@ class KMDWalletClient extends BaseWallet {
     })
 
     // Release handle token
-    this.releaseToken(token)
+    await this.releaseToken(token)
 
     return mappedAccounts
   }
@@ -169,15 +171,14 @@ class KMDWalletClient extends BaseWallet {
 
     // Get a handle token
     const walletId = await this.getWalletId()
-    const pw = await this.requestPassword()
+    const pw = this.requestPassword()
     const token = await this.getWalletToken(walletId, pw)
 
     const signedTxns: Array<Uint8Array> = []
     // Sign them with the client.
     const signingPromises: Promise<Uint8Array>[] = []
 
-    for (const idx in decodedTxns) {
-      const dtxn = decodedTxns[idx]
+    decodedTxns.forEach((dtxn, idx) => {
       const isSigned = 'txn' in dtxn
 
       // push the incoming txn into signed, we'll overwrite it later
@@ -185,29 +186,29 @@ class KMDWalletClient extends BaseWallet {
 
       // Its already signed, skip it
       if (isSigned) {
-        continue
+        return
         // Not specified in indexes to sign, skip it
       } else if (indexesToSign && indexesToSign.length && !indexesToSign.includes(Number(idx))) {
-        continue
+        return
       }
       // Not to be signed by our signer, skip it
       else if (!connectedAccounts.includes(this.algosdk.encodeAddress(dtxn.snd))) {
-        continue
+        return
       }
 
       // overwrite with an empty blob
       signedTxns[idx] = new Uint8Array()
 
       const txn = this.algosdk.Transaction.from_obj_for_encoding(dtxn)
-      signingPromises.push(this.#client.signTransaction(token, pw, txn))
-    }
+      signingPromises.push(this.#client.signTransaction(token, pw, txn) as Promise<Uint8Array>)
+    })
 
     const signingResults = await Promise.all(signingPromises)
 
     // Restore the newly signed txns in the correct order
     let signedIdx = 0
 
-    const formattedTxns = signedTxns.reduce<Uint8Array[]>((acc, txn, i) => {
+    const formattedTxns = signedTxns.reduce<Uint8Array[]>((acc, txn) => {
       // If its an empty array, infer that it is one of the
       // ones we wanted to have signed and overwrite the empty buff
       if (txn.length === 0) {

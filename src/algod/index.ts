@@ -6,7 +6,7 @@ export const getAlgosdk = async () => {
   return (await import('algosdk')).default
 }
 
-export const getAlgodClient = async (
+export const getAlgodClient = (
   algosdk: typeof _algosdk,
   algodClientOptions?: AlgodClientOptions
 ) => {
@@ -31,7 +31,7 @@ export default class Algod {
 
   static async init(algodOptions?: AlgodClientOptions) {
     const algosdk = await getAlgosdk()
-    const algodClient = await getAlgodClient(algosdk, algodOptions)
+    const algodClient = getAlgodClient(algosdk, algodOptions)
 
     return new Algod(algosdk, algodClient)
   }

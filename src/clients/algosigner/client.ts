@@ -6,12 +6,7 @@ import type _algosdk from 'algosdk'
 import BaseWallet from '../base'
 import Algod, { getAlgodClient } from '../../algod'
 import { PROVIDER_ID, DEFAULT_NETWORK } from '../../constants'
-import type {
-  TransactionsArray,
-  DecodedTransaction,
-  DecodedSignedTransaction,
-  Network
-} from '../../types'
+import type { DecodedTransaction, DecodedSignedTransaction, Network } from '../../types'
 import { ICON } from './constants'
 import type {
   WindowExtended,
@@ -62,8 +57,8 @@ class AlgoSignerClient extends BaseWallet {
       }
 
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
-      const algodClient = await getAlgodClient(algosdk, algodOptions)
-      const algosigner = (window as WindowExtended).AlgoSigner as AlgoSigner
+      const algodClient = getAlgodClient(algosdk, algodOptions)
+      const algosigner = (window as WindowExtended).AlgoSigner
 
       return new AlgoSignerClient({
         metadata: AlgoSignerClient.metadata,
@@ -107,6 +102,7 @@ class AlgoSignerClient extends BaseWallet {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async reconnect(onDisconnect: () => void) {
     if (window === undefined || (window as WindowExtended).AlgoSigner === undefined) {
       onDisconnect()
@@ -115,6 +111,7 @@ class AlgoSignerClient extends BaseWallet {
     return null
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async disconnect() {
     return
   }

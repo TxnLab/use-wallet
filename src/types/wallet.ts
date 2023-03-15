@@ -14,8 +14,8 @@ export type Provider = {
   connect: () => Promise<void>
   disconnect: () => Promise<void>
   reconnect: () => Promise<void>
-  setActiveProvider: () => Promise<void>
-  setActiveAccount: (account: string) => Promise<void>
+  setActiveProvider: () => void
+  setActiveAccount: (account: string) => void
   metadata: Metadata
 }
 

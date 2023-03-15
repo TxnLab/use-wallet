@@ -6,12 +6,7 @@ import type _algosdk from 'algosdk'
 import BaseWallet from '../base'
 import Algod, { getAlgodClient } from '../../algod'
 import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
-import type {
-  TransactionsArray,
-  DecodedTransaction,
-  DecodedSignedTransaction,
-  Network
-} from '../../types'
+import type { DecodedTransaction, DecodedSignedTransaction, Network } from '../../types'
 import { ICON } from './constants'
 import { InitParams, WindowExtended, Exodus, ExodusClientConstructor } from './types'
 
@@ -54,8 +49,8 @@ class ExodusClient extends BaseWallet {
       }
 
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
-      const algodClient = await getAlgodClient(algosdk, algodOptions)
-      const exodus = (window as WindowExtended).exodus.algorand as Exodus
+      const algodClient = getAlgodClient(algosdk, algodOptions)
+      const exodus = (window as WindowExtended).exodus.algorand
 
       return new ExodusClient({
         metadata: ExodusClient.metadata,
@@ -100,6 +95,7 @@ class ExodusClient extends BaseWallet {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async reconnect(onDisconnect: () => void) {
     if (
       window === undefined ||
@@ -112,6 +108,7 @@ class ExodusClient extends BaseWallet {
     return null
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async disconnect() {
     return
   }

@@ -7,12 +7,7 @@ import type _MyAlgoConnect from '@randlabs/myalgo-connect'
 import type _algosdk from 'algosdk'
 import Algod, { getAlgodClient } from '../../algod'
 import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
-import {
-  TransactionsArray,
-  DecodedTransaction,
-  DecodedSignedTransaction,
-  Network
-} from '../../types'
+import { DecodedTransaction, DecodedSignedTransaction, Network } from '../../types'
 import { MyAlgoWalletClientConstructor, InitParams } from './types'
 import { ICON } from './constants'
 
@@ -45,7 +40,7 @@ class MyAlgoWalletClient extends BaseWallet {
       const MyAlgoConnect = clientStatic || (await import('@randlabs/myalgo-connect')).default
 
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
-      const algodClient = await getAlgodClient(algosdk, algodOptions)
+      const algodClient = getAlgodClient(algosdk, algodOptions)
 
       const myAlgo = new MyAlgoConnect({
         ...(clientOptions ? clientOptions : { disableLedgerNano: false })
@@ -82,10 +77,12 @@ class MyAlgoWalletClient extends BaseWallet {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async reconnect() {
     return null
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async disconnect() {
     return
   }

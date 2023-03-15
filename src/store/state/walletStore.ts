@@ -26,10 +26,18 @@ export type WalletStore = {
 const emptyState: WalletStore = {
   accounts: [],
   activeAccount: undefined,
-  setActiveAccount: (account: Account) => {},
-  clearActiveAccount: (id: PROVIDER_ID) => {},
-  addAccounts: (accounts: Account[]) => {},
-  removeAccounts: (providerId: PROVIDER_ID) => {}
+  setActiveAccount: () => {
+    return
+  },
+  clearActiveAccount: () => {
+    return
+  },
+  addAccounts: () => {
+    return
+  },
+  removeAccounts: () => {
+    return
+  }
 }
 
 export const useWalletStore = create<WalletStore>()(

@@ -1,21 +1,58 @@
 module.exports = {
   root: true,
-  extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:@typescript-eslint/recommended-requiring-type-checking',
-    'plugin:react/recommended',
-    'plugin:react-hooks/recommended',
-    'plugin:prettier/recommended'
-  ],
   parser: '@typescript-eslint/parser',
-  parserOptions: {
-    project: './tsconfig.json'
-  },
-  plugins: ['@typescript-eslint'],
-  env: {
-    browser: true,
-    node: true,
-    es6: true
+  extends: ['eslint:recommended', 'prettier'],
+  overrides: [
+    {
+      files: ['*.ts'],
+      plugins: ['@typescript-eslint'],
+      extends: [
+        'plugin:@typescript-eslint/eslint-recommended',
+        'plugin:@typescript-eslint/recommended',
+        'plugin:@typescript-eslint/recommended-requiring-type-checking',
+        'plugin:react/recommended',
+        'plugin:react-hooks/recommended'
+      ],
+      parserOptions: {
+        project: true
+      },
+      rules: {
+        '@typescript-eslint/no-unused-vars': [
+          'warn',
+          {
+            argsIgnorePattern: '^_',
+            varsIgnorePattern: '^_',
+            caughtErrorsIgnorePattern: '^_'
+          }
+        ],
+        '@typescript-eslint/no-unsafe-member-access': 'off',
+        '@typescript-eslint/no-unsafe-assignment': 'off',
+        '@typescript-eslint/no-unsafe-call': 'off'
+      }
+    },
+    {
+      files: ['*.tsx'],
+      plugins: ['@typescript-eslint'],
+      extends: [
+        'plugin:@typescript-eslint/eslint-recommended',
+        'plugin:@typescript-eslint/recommended',
+        'plugin:react/recommended',
+        'plugin:react-hooks/recommended'
+      ],
+      parserOptions: {
+        project: true
+      }
+    },
+    {
+      files: ['.eslintrc.js', '*.config.js'],
+      env: {
+        node: true
+      }
+    }
+  ],
+  settings: {
+    react: {
+      version: 'detect'
+    }
   }
 }

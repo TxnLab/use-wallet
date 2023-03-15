@@ -14,7 +14,7 @@ export const reconnectProviders = async (providers: SupportedProviders) => {
 
       // Only reconnect to active providers
       if (id && isActiveProvider(id)) {
-        c.reconnect(() => clearAccounts(id))
+        await c.reconnect(() => clearAccounts(id))
       }
     }
   } catch (e) {

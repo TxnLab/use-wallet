@@ -7,7 +7,6 @@ import Algod, { getAlgodClient } from '../../algod'
 import type { Wallet } from '../../types'
 import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
 import BaseWallet from '../base'
-import { TransactionsArray } from '../../types'
 import type { DeflyWalletConnect } from '@blockshake/defly-connect'
 import type { DecodedTransaction, DecodedSignedTransaction, Network } from '../../types'
 import { ICON } from './constants'
@@ -43,7 +42,7 @@ class DeflyWalletClient extends BaseWallet {
         clientStatic || (await import('@blockshake/defly-connect')).DeflyWalletConnect
 
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
-      const algodClient = await getAlgodClient(algosdk, algodOptions)
+      const algodClient = getAlgodClient(algosdk, algodOptions)
 
       const deflyWallet = new DeflyWalletConnect({
         ...(clientOptions ? clientOptions : { shouldShowSignTxnToast: false })

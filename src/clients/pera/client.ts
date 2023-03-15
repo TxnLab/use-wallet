@@ -5,13 +5,7 @@
 import type _algosdk from 'algosdk'
 import Algod, { getAlgodClient } from '../../algod'
 import type { PeraWalletConnect } from '@perawallet/connect'
-import type {
-  Wallet,
-  TransactionsArray,
-  DecodedTransaction,
-  DecodedSignedTransaction,
-  Network
-} from '../../types'
+import type { Wallet, DecodedTransaction, DecodedSignedTransaction, Network } from '../../types'
 import { PROVIDER_ID, DEFAULT_NETWORK } from '../../constants'
 import BaseWallet from '../base'
 import { ICON } from './constants'
@@ -47,7 +41,7 @@ class PeraWalletClient extends BaseWallet {
         clientStatic || (await import('@perawallet/connect')).PeraWalletConnect
 
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
-      const algodClient = await getAlgodClient(algosdk, algodOptions)
+      const algodClient = getAlgodClient(algosdk, algodOptions)
 
       const peraWallet = new PeraWalletConnect({
         ...(clientOptions ? clientOptions : { shouldShowSignTxnToast: false })

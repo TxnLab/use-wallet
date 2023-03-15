@@ -1,5 +1,4 @@
 import type _algosdk from 'algosdk'
-import { PROVIDER_ID } from '../../constants'
 import type {
   Asset,
   Wallet,
@@ -8,12 +7,14 @@ import type {
   TxnType,
   TransactionsArray,
   TxnInfo,
-  Metadata
+  Metadata,
+  RawTxnResponse
 } from '../../types'
 import { audio } from '../../media/audio'
 
 const getIsIOS = () => {
   if (typeof window !== 'undefined') {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return /iPad|iPhone|iPod/.test(navigator?.userAgent) && !(window as any)?.MSStream
   } else {
     return false
@@ -104,16 +105,15 @@ abstract class BaseClient {
   }
 
   groupTransactionsBySender(transactions: TransactionsArray) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    function groupBy(objectArray: Record<string, any>[], property: string) {
+    function groupBySender(objectArray: TxnInfo[]) {
       return objectArray.reduce(function (acc, obj) {
-        const key = obj[property]
-        if (!acc[key]) {
-          acc[key] = []
+        const sender = obj.from
+        if (!acc[sender]) {
+          acc[sender] = []
         }
-        acc[key].push(obj)
+        acc[sender].push(obj)
         return acc
-      }, {})
+      }, {} as { [sender: string]: TxnInfo[] })
     }
 
     const decodedGroup = transactions.reduce((acc: TxnInfo[], [type, txn], index) => {
@@ -138,11 +138,14 @@ abstract class BaseClient {
 
       return acc
     }, [])
-    return groupBy(decodedGroup, 'from')
+
+    return groupBySender(decodedGroup)
   }
 
   async sendRawTransactions(transactions: Uint8Array[], waitRoundsToConfirm?: number) {
-    const sentTransaction = await this.algodClient.sendRawTransaction(transactions).do()
+    const sentTransaction = (await this.algodClient
+      .sendRawTransaction(transactions)
+      .do()) as RawTxnResponse
 
     if (!sentTransaction) {
       throw new Error('Transaction failed.')
@@ -159,7 +162,7 @@ abstract class BaseClient {
     }
   }
 
-  keepWCAliveStart() {
+  async keepWCAliveStart() {
     // Playing an audio file prevents Wallet Connect's
     // web socket connection from being dropped when
     // iOS goes into background mode
@@ -172,7 +175,7 @@ abstract class BaseClient {
     this.keepWCAlive.autoplay = true
     this.keepWCAlive.volume = 0
     this.keepWCAlive.loop = true
-    this.keepWCAlive.play()
+    await this.keepWCAlive.play()
   }
 
   keepWCAliveStop() {
