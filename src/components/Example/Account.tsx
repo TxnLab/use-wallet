@@ -1,11 +1,11 @@
-import React from "react";
-import { useWallet } from "../../index";
+import React from 'react'
+import { useWallet } from '../../index'
 
 export default function Account() {
-  const { activeAccount } = useWallet();
+  const { activeAccount } = useWallet()
 
   if (!activeAccount) {
-    return <p>Connect an account first.</p>;
+    return <p>Connect an account first.</p>
   }
 
   return (
@@ -21,5 +21,5 @@ export default function Account() {
         Provider: <span>{activeAccount.providerId}</span>
       </p>
     </div>
-  );
+  )
 }

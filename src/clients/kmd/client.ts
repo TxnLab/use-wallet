@@ -1,23 +1,23 @@
-import type _algosdk from "algosdk";
-import Algod, { getAlgodClient } from "../../algod";
-import BaseWallet from "../base";
-import { DEFAULT_NETWORK, PROVIDER_ID } from "../../constants";
-import type { Account, Wallet, TransactionsArray, Network } from "../../types";
-import { ICON } from "./constants";
+import type _algosdk from 'algosdk'
+import Algod, { getAlgodClient } from '../../algod'
+import BaseWallet from '../base'
+import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
+import type { Account, Wallet, TransactionsArray, Network } from '../../types'
+import { ICON } from './constants'
 import {
   InitParams,
   ListWalletResponse,
   InitWalletHandle,
-  KMDWalletClientConstructor,
-} from "./types";
+  KMDWalletClientConstructor
+} from './types'
 
 class KMDWalletClient extends BaseWallet {
-  #client: _algosdk.Kmd;
-  #wallet: string;
-  #password: string;
-  walletId: string;
-  id: PROVIDER_ID;
-  network: Network;
+  #client: _algosdk.Kmd
+  #wallet: string
+  #password: string
+  walletId: string
+  id: PROVIDER_ID
+  network: Network
 
   constructor({
     metadata,
@@ -27,44 +27,44 @@ class KMDWalletClient extends BaseWallet {
     password,
     algosdk,
     algodClient,
-    network,
+    network
   }: KMDWalletClientConstructor) {
-    super(metadata, algosdk, algodClient);
+    super(metadata, algosdk, algodClient)
 
-    this.#client = client;
-    this.#wallet = wallet;
-    this.#password = password;
-    this.id = id;
-    this.walletId = "";
-    this.network = network;
-    this.metadata = KMDWalletClient.metadata;
+    this.#client = client
+    this.#wallet = wallet
+    this.#password = password
+    this.id = id
+    this.walletId = ''
+    this.network = network
+    this.metadata = KMDWalletClient.metadata
   }
 
   static metadata = {
     id: PROVIDER_ID.KMD,
-    name: "KMD",
+    name: 'KMD',
     icon: ICON,
-    isWalletConnect: false,
-  };
+    isWalletConnect: false
+  }
 
   static async init({
     clientOptions,
     algodOptions,
     algosdkStatic,
-    network = DEFAULT_NETWORK,
+    network = DEFAULT_NETWORK
   }: InitParams) {
     try {
       const {
-        token = "a".repeat(64),
-        host = "http://localhost",
-        port = "4002",
-        wallet = "unencrypted-default-wallet",
-        password = "",
-      } = clientOptions || {};
+        token = 'a'.repeat(64),
+        host = 'http://localhost',
+        port = '4002',
+        wallet = 'unencrypted-default-wallet',
+        password = ''
+      } = clientOptions || {}
 
-      const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk;
-      const algodClient = await getAlgodClient(algosdk, algodOptions);
-      const kmdClient = new algosdk.Kmd(token, host, port);
+      const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
+      const algodClient = await getAlgodClient(algosdk, algodOptions)
+      const kmdClient = new algosdk.Kmd(token, host, port)
 
       return new KMDWalletClient({
         metadata: KMDWalletClient.metadata,
@@ -74,11 +74,11 @@ class KMDWalletClient extends BaseWallet {
         client: kmdClient,
         algosdk: algosdk,
         algodClient: algodClient,
-        network,
-      });
+        network
+      })
     } catch (e) {
-      console.error("Error initializing...", e);
-      return null;
+      console.error('Error initializing...', e)
+      return null
     }
   }
 
@@ -86,82 +86,72 @@ class KMDWalletClient extends BaseWallet {
     // TODO: prompt for wallet and password?
     return {
       ...KMDWalletClient.metadata,
-      accounts: await this.listAccounts(
-        this.#wallet,
-        await this.requestPassword()
-      ),
-    };
+      accounts: await this.listAccounts(this.#wallet, await this.requestPassword())
+    }
   }
 
   async disconnect() {
-    return;
+    return
   }
 
   async reconnect(): Promise<Wallet | null> {
-    return null;
+    return null
   }
 
   async requestPassword(): Promise<string> {
     // TODO: store it locally?
-    const pw = prompt("KMD password");
-    return pw ? pw : "";
+    const pw = prompt('KMD password')
+    return pw ? pw : ''
   }
 
   async getWalletToken(walletId: string, password: string): Promise<string> {
-    const handleResp: InitWalletHandle = await this.#client.initWalletHandle(
-      walletId,
-      password
-    );
-    return handleResp.wallet_handle_token;
+    const handleResp: InitWalletHandle = await this.#client.initWalletHandle(walletId, password)
+    return handleResp.wallet_handle_token
   }
 
   async releaseToken(token: string): Promise<void> {
-    await this.#client.releaseWalletHandle(token);
+    await this.#client.releaseWalletHandle(token)
   }
 
   async listWallets(): Promise<Record<string, string>> {
-    const walletResponse = await this.#client.listWallets();
-    const walletList: Array<ListWalletResponse> = walletResponse["wallets"];
-    const walletMap: Record<string, string> = {};
+    const walletResponse = await this.#client.listWallets()
+    const walletList: Array<ListWalletResponse> = walletResponse['wallets']
+    const walletMap: Record<string, string> = {}
     for (const w of walletList) {
-      walletMap[w.name] = w.id;
+      walletMap[w.name] = w.id
     }
-    return walletMap;
+    return walletMap
   }
 
-  async listAccounts(
-    wallet: string,
-    password: string
-  ): Promise<Array<Account>> {
+  async listAccounts(wallet: string, password: string): Promise<Array<Account>> {
     // Get a handle token
-    const walletId = await this.getWalletId();
-    const token = await this.getWalletToken(walletId, password);
+    const walletId = await this.getWalletId()
+    const token = await this.getWalletToken(walletId, password)
 
     // Fetch accounts and format them as lib expects
-    const listResponse = await this.#client.listKeys(token);
-    const addresses: Array<string> = listResponse["addresses"];
+    const listResponse = await this.#client.listKeys(token)
+    const addresses: Array<string> = listResponse['addresses']
     const mappedAccounts = addresses.map((address: string, index: number) => {
       return {
         name: `KMDWallet ${index + 1}`,
         address,
-        providerId: KMDWalletClient.metadata.id,
-      };
-    });
+        providerId: KMDWalletClient.metadata.id
+      }
+    })
 
     // Release handle token
-    this.releaseToken(token);
+    this.releaseToken(token)
 
-    return mappedAccounts;
+    return mappedAccounts
   }
 
   async getWalletId(): Promise<string> {
     // Use cached if available
-    if(this.walletId !== "") return this.walletId
+    if (this.walletId !== '') return this.walletId
 
-    const walletMap = await this.listWallets();
-    if (!(this.#wallet in walletMap)) 
-      throw Error("No wallet named: " + this.#wallet);
-    this.walletId = walletMap[this.#wallet];
+    const walletMap = await this.listWallets()
+    if (!(this.#wallet in walletMap)) throw Error('No wallet named: ' + this.#wallet)
+    this.walletId = walletMap[this.#wallet]
 
     return this.walletId
   }
@@ -174,73 +164,65 @@ class KMDWalletClient extends BaseWallet {
   ) {
     // Decode the transactions to access their properties.
     const decodedTxns = transactions.map((txn) => {
-      return this.algosdk.decodeObj(txn);
-    }) as Array<
-      _algosdk.EncodedTransaction | _algosdk.EncodedSignedTransaction
-    >;
+      return this.algosdk.decodeObj(txn)
+    }) as Array<_algosdk.EncodedTransaction | _algosdk.EncodedSignedTransaction>
 
     // Get a handle token
     const walletId = await this.getWalletId()
-    const pw = await this.requestPassword();
-    const token = await this.getWalletToken(walletId, pw);
+    const pw = await this.requestPassword()
+    const token = await this.getWalletToken(walletId, pw)
 
-    const signedTxns: Array<Uint8Array> = [];
+    const signedTxns: Array<Uint8Array> = []
     // Sign them with the client.
-    const signingPromises: Promise<Uint8Array>[] = [];
+    const signingPromises: Promise<Uint8Array>[] = []
 
     for (const idx in decodedTxns) {
-      const dtxn = decodedTxns[idx];
-      const isSigned = "txn" in dtxn;
+      const dtxn = decodedTxns[idx]
+      const isSigned = 'txn' in dtxn
 
       // push the incoming txn into signed, we'll overwrite it later
-      signedTxns.push(transactions[idx]);
+      signedTxns.push(transactions[idx])
 
       // Its already signed, skip it
       if (isSigned) {
-        continue;
+        continue
         // Not specified in indexes to sign, skip it
-      } else if (
-        indexesToSign &&
-        indexesToSign.length &&
-        !indexesToSign.includes(Number(idx))
-      ) {
-        continue;
+      } else if (indexesToSign && indexesToSign.length && !indexesToSign.includes(Number(idx))) {
+        continue
       }
       // Not to be signed by our signer, skip it
-      else if (
-        !connectedAccounts.includes(this.algosdk.encodeAddress(dtxn.snd))
-      ) {
-        continue;
+      else if (!connectedAccounts.includes(this.algosdk.encodeAddress(dtxn.snd))) {
+        continue
       }
 
       // overwrite with an empty blob
-      signedTxns[idx] = new Uint8Array();
+      signedTxns[idx] = new Uint8Array()
 
-      const txn = this.algosdk.Transaction.from_obj_for_encoding(dtxn);
-      signingPromises.push(this.#client.signTransaction(token, pw, txn));
+      const txn = this.algosdk.Transaction.from_obj_for_encoding(dtxn)
+      signingPromises.push(this.#client.signTransaction(token, pw, txn))
     }
 
-    const signingResults = await Promise.all(signingPromises);
+    const signingResults = await Promise.all(signingPromises)
 
     // Restore the newly signed txns in the correct order
-    let signedIdx = 0;
+    let signedIdx = 0
 
     const formattedTxns = signedTxns.reduce<Uint8Array[]>((acc, txn, i) => {
       // If its an empty array, infer that it is one of the
       // ones we wanted to have signed and overwrite the empty buff
       if (txn.length === 0) {
-        acc.push(signingResults[signedIdx]);
+        acc.push(signingResults[signedIdx])
 
-        signedIdx += 1;
+        signedIdx += 1
       } else if (returnGroup) {
-        acc.push(txn);
+        acc.push(txn)
       }
 
-      return acc;
-    }, []);
+      return acc
+    }, [])
 
-    return formattedTxns;
+    return formattedTxns
   }
 }
 
-export default KMDWalletClient;
+export default KMDWalletClient

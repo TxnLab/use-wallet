@@ -1,52 +1,52 @@
-import type algosdk from "algosdk";
-import { PROVIDER_ID, WalletClient, Network } from "../types";
-import allClients from "../clients";
+import type algosdk from 'algosdk'
+import { PROVIDER_ID, WalletClient, Network } from '../types'
+import allClients from '../clients'
 import {
   DEFAULT_NODE_BASEURL,
   DEFAULT_NODE_TOKEN,
   DEFAULT_NODE_PORT,
-  DEFAULT_NETWORK,
-} from "../constants";
+  DEFAULT_NETWORK
+} from '../constants'
 
-type SupportedProviders = { [x: string]: Promise<WalletClient | null> };
+type SupportedProviders = { [x: string]: Promise<WalletClient | null> }
 
 type NodeConfig = {
-  network: Network;
-  nodeServer: string;
-  nodeToken?: string;
-  nodePort?: string;
-};
+  network: Network
+  nodeServer: string
+  nodeToken?: string
+  nodePort?: string
+}
 
 export const initializeProviders = (
   providers?: PROVIDER_ID[],
   nodeConfig?: NodeConfig,
   algosdkStatic?: typeof algosdk
 ) => {
-  const initializedProviders: SupportedProviders = {};
+  const initializedProviders: SupportedProviders = {}
 
-  if (typeof window === "undefined") {
-    console.warn("Window object is not available, skipping initialization.");
-    return initializedProviders;
+  if (typeof window === 'undefined') {
+    console.warn('Window object is not available, skipping initialization.')
+    return initializedProviders
   }
 
   const {
     network = DEFAULT_NETWORK,
     nodeServer = DEFAULT_NODE_BASEURL,
     nodePort = DEFAULT_NODE_PORT,
-    nodeToken = DEFAULT_NODE_TOKEN,
-  } = nodeConfig || {};
+    nodeToken = DEFAULT_NODE_TOKEN
+  } = nodeConfig || {}
 
   if (!providers || providers.length === 0)
     for (const [id, client] of Object.entries(allClients)) {
-      if (id === "kmd" || id === "mnemonic") {
-        continue;
+      if (id === 'kmd' || id === 'mnemonic') {
+        continue
       }
 
       initializedProviders[id] = client.init({
         network,
         algodOptions: [nodeToken, nodeServer, nodePort],
-        algosdkStatic: algosdkStatic,
-      });
+        algosdkStatic: algosdkStatic
+      })
     }
 
   if (providers) {
@@ -54,10 +54,10 @@ export const initializeProviders = (
       initializedProviders[id] = allClients[id].init({
         network,
         algodOptions: [nodeToken, nodeServer, nodePort],
-        algosdkStatic: algosdkStatic,
-      });
+        algosdkStatic: algosdkStatic
+      })
     }
   }
 
-  return initializedProviders;
-};
+  return initializedProviders
+}

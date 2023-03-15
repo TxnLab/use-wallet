@@ -1,3 +1,3 @@
-import mnemonic from "./client";
+import mnemonic from './client'
 
-export default mnemonic;
+export default mnemonic

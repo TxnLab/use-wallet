@@ -2,109 +2,99 @@
  * Helpful resources:
  * https://github.com/perawallet/connect
  */
-import type _algosdk from "algosdk";
-import Algod, { getAlgodClient } from "../../algod";
-import type { PeraWalletConnect } from "@perawallet/connect";
+import type _algosdk from 'algosdk'
+import Algod, { getAlgodClient } from '../../algod'
+import type { PeraWalletConnect } from '@perawallet/connect'
 import type {
   Wallet,
   TransactionsArray,
   DecodedTransaction,
   DecodedSignedTransaction,
-  Network,
-} from "../../types";
-import { PROVIDER_ID, DEFAULT_NETWORK } from "../../constants";
-import BaseWallet from "../base";
-import { ICON } from "./constants";
-import {
-  PeraTransaction,
-  PeraWalletClientConstructor,
-  InitParams,
-} from "./types";
+  Network
+} from '../../types'
+import { PROVIDER_ID, DEFAULT_NETWORK } from '../../constants'
+import BaseWallet from '../base'
+import { ICON } from './constants'
+import { PeraTransaction, PeraWalletClientConstructor, InitParams } from './types'
 
 class PeraWalletClient extends BaseWallet {
-  #client: PeraWalletConnect;
-  network: Network;
+  #client: PeraWalletConnect
+  network: Network
 
-  constructor({
-    metadata,
-    client,
-    algosdk,
-    algodClient,
-    network,
-  }: PeraWalletClientConstructor) {
-    super(metadata, algosdk, algodClient);
-    this.#client = client;
-    this.network = network;
-    this.metadata = PeraWalletClient.metadata;
+  constructor({ metadata, client, algosdk, algodClient, network }: PeraWalletClientConstructor) {
+    super(metadata, algosdk, algodClient)
+    this.#client = client
+    this.network = network
+    this.metadata = PeraWalletClient.metadata
   }
 
   static metadata = {
     id: PROVIDER_ID.PERA,
-    name: "Pera",
+    name: 'Pera',
     icon: ICON,
-    isWalletConnect: true,
-  };
+    isWalletConnect: true
+  }
 
   static async init({
     clientOptions,
     algodOptions,
     clientStatic,
     algosdkStatic,
-    network = DEFAULT_NETWORK,
+    network = DEFAULT_NETWORK
   }: InitParams) {
     try {
       const PeraWalletConnect =
-        clientStatic || (await import("@perawallet/connect")).PeraWalletConnect;
+        clientStatic || (await import('@perawallet/connect')).PeraWalletConnect
 
-      const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk;
-      const algodClient = await getAlgodClient(algosdk, algodOptions);
+      const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
+      const algodClient = await getAlgodClient(algosdk, algodOptions)
 
       const peraWallet = new PeraWalletConnect({
-        ...(clientOptions ? clientOptions : { shouldShowSignTxnToast: false }),
-      });
+        ...(clientOptions ? clientOptions : { shouldShowSignTxnToast: false })
+      })
 
       return new PeraWalletClient({
         metadata: PeraWalletClient.metadata,
         client: peraWallet,
         algosdk,
         algodClient,
-        network,
-      });
+        network
+      })
     } catch (e) {
-      console.error("Error initializing...", e);
-      return null;
+      console.error('Error initializing...', e)
+      return null
     }
   }
 
   async connect(onDisconnect: () => void): Promise<Wallet> {
-    const accounts = await this.#client.connect();
+    const accounts = await this.#client.connect()
 
-    this.#client.connector?.on("disconnect", onDisconnect);
+    this.#client.connector?.on('disconnect', onDisconnect)
 
     if (accounts.length === 0) {
-      throw new Error(`No accounts found for ${PeraWalletClient.metadata.id}`);
+      throw new Error(`No accounts found for ${PeraWalletClient.metadata.id}`)
     }
 
     const mappedAccounts = accounts.map((address: string, index: number) => ({
       name: `Pera Wallet ${index + 1}`,
       address,
-      providerId: PeraWalletClient.metadata.id,
-    }));
+      providerId: PeraWalletClient.metadata.id
+    }))
 
     return {
       ...PeraWalletClient.metadata,
-      accounts: mappedAccounts,
-    };
+      accounts: mappedAccounts
+    }
   }
 
   async reconnect(onDisconnect: () => void) {
-    const accounts = await this.#client.reconnectSession().catch(console.info);
+    const accounts = await this.#client.reconnectSession().catch(console.info)
 
-    this.#client.connector?.on("disconnect", onDisconnect);
+    this.#client.connector?.on('disconnect', onDisconnect)
 
     if (!accounts) {
-      onDisconnect();
-      return null;
+      onDisconnect()
+      return null
     }
 
     return {
@@ -112,13 +102,13 @@ class PeraWalletClient extends BaseWallet {
       accounts: accounts.map((address: string, index: number) => ({
         name: `Pera Wallet ${index + 1}`,
         address,
-        providerId: PeraWalletClient.metadata.id,
-      })),
-    };
+        providerId: PeraWalletClient.metadata.id
+      }))
+    }
   }
 
   async disconnect() {
-    await this.#client.disconnect();
+    await this.#client.disconnect()
   }
 
   async signTransactions(
@@ -129,78 +119,71 @@ class PeraWalletClient extends BaseWallet {
   ) {
     // Decode the transactions to access their properties.
     const decodedTxns = transactions.map((txn) => {
-      return this.algosdk.decodeObj(txn);
-    }) as Array<DecodedTransaction | DecodedSignedTransaction>;
+      return this.algosdk.decodeObj(txn)
+    }) as Array<DecodedTransaction | DecodedSignedTransaction>
 
-    const signedIndexes: number[] = [];
+    const signedIndexes: number[] = []
 
     // Marshal the transactions,
     // and add the signers property if they shouldn't be signed.
     const txnsToSign = decodedTxns.reduce<PeraTransaction[]>((acc, txn, i) => {
-      const isSigned = "txn" in txn;
+      const isSigned = 'txn' in txn
 
       // If the indexes to be signed is specified, designate that it should be signed
       if (indexesToSign && indexesToSign.length && indexesToSign.includes(i)) {
-        signedIndexes.push(i);
+        signedIndexes.push(i)
         acc.push({
-          txn: this.algosdk.decodeUnsignedTransaction(transactions[i]),
-        });
+          txn: this.algosdk.decodeUnsignedTransaction(transactions[i])
+        })
         // If the indexes to be signed is specified, but it's not included in it,
         // designate that it should not be signed
-      } else if (
-        indexesToSign &&
-        indexesToSign.length &&
-        !indexesToSign.includes(i)
-      ) {
+      } else if (indexesToSign && indexesToSign.length && !indexesToSign.includes(i)) {
         acc.push({
           txn: isSigned
             ? this.algosdk.decodeSignedTransaction(transactions[i]).txn
             : this.algosdk.decodeUnsignedTransaction(transactions[i]),
-          signers: [],
-        });
+          signers: []
+        })
         // If the transaction is unsigned and is to be sent from a connected account,
         // designate that it should be signed
-      } else if (
-        !isSigned &&
-        connectedAccounts.includes(this.algosdk.encodeAddress(txn["snd"]))
-      ) {
-        signedIndexes.push(i);
+      } else if (!isSigned && connectedAccounts.includes(this.algosdk.encodeAddress(txn['snd']))) {
+        signedIndexes.push(i)
         acc.push({
-          txn: this.algosdk.decodeUnsignedTransaction(transactions[i]),
-        });
+          txn: this.algosdk.decodeUnsignedTransaction(transactions[i])
+        })
         // Otherwise, designate that it should not be signed
       } else if (isSigned) {
         acc.push({
           txn: this.algosdk.decodeSignedTransaction(transactions[i]).txn,
-          signers: [],
-        });
+          signers: []
+        })
       } else if (!isSigned) {
         acc.push({
           txn: this.algosdk.decodeUnsignedTransaction(transactions[i]),
-          signers: [],
-        });
+          signers: []
+        })
       }
 
-      return acc;
-    }, []);
+      return acc
+    }, [])
 
     // Sign them with the client.
-    const result = await this.#client.signTransaction([txnsToSign]);
+    const result = await this.#client.signTransaction([txnsToSign])
 
     // Join the newly signed transactions with the original group of transactions.
     const signedTxns = transactions.reduce<Uint8Array[]>((acc, txn, i) => {
       if (signedIndexes.includes(i)) {
-        const signedByUser = result.shift();
-        signedByUser && acc.push(signedByUser);
+        const signedByUser = result.shift()
+        signedByUser && acc.push(signedByUser)
       } else if (returnGroup) {
-        acc.push(transactions[i]);
+        acc.push(transactions[i])
       }
 
-      return acc;
-    }, []);
+      return acc
+    }, [])
 
-    return signedTxns;
+    return signedTxns
   }
 }
 
-export default PeraWalletClient;
+export default PeraWalletClient
