@@ -27,7 +27,8 @@ module.exports = {
         ],
         '@typescript-eslint/no-unsafe-member-access': 'off',
         '@typescript-eslint/no-unsafe-assignment': 'off',
-        '@typescript-eslint/no-unsafe-call': 'off'
+        '@typescript-eslint/no-unsafe-call': 'off',
+        '@typescript-eslint/no-extra-semi': 'off'
       }
     },
     {
@@ -41,6 +42,9 @@ module.exports = {
       ],
       parserOptions: {
         project: true
+      },
+      rules: {
+        '@typescript-eslint/no-extra-semi': 'off'
       }
     },
     {
