@@ -5,6 +5,7 @@ export interface Account {
   providerId: PROVIDER_ID
   name: string
   address: string
+  authAddr?: string
 }
 
 export type Provider = {
@@ -34,8 +35,9 @@ export type Asset = {
 export type AccountInfo = {
   address: string
   amount: number
-  assets: Asset[]
   'min-balance': number
+  'auth-addr'?: string
+  assets?: Asset[]
 }
 
 export type WalletProvider = {
