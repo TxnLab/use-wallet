@@ -1,57 +1,50 @@
-import type algosdk from "algosdk";
+import type algosdk from 'algosdk'
 
-export type Network = "betanet" | "testnet" | "mainnet" | string;
+export type Network = 'betanet' | 'testnet' | 'mainnet' | string
 
 export type Txn = {
-  apaa: Uint8Array;
-  apas: number[];
-  apid: number;
-  fee: number;
-  fv: number;
-  gen: string;
-  gh: Uint8Array;
-  grp: Uint8Array;
-  lv: number;
-  snd: Uint8Array;
-  type: string;
-};
+  apaa: Uint8Array
+  apas: number[]
+  apid: number
+  fee: number
+  fv: number
+  gen: string
+  gh: Uint8Array
+  grp: Uint8Array
+  lv: number
+  snd: Uint8Array
+  type: string
+}
 
 export type ConfirmedTxn = {
-  "confirmed-round": number;
-  "global-state-delta": Record<string, unknown>[];
-  "pool-error": string;
+  'confirmed-round': number
+  'global-state-delta': Record<string, unknown>[]
+  'pool-error': string
   txn: {
-    sig: Uint8Array;
-    txn: Txn;
-  };
-};
+    sig: Uint8Array
+    txn: Txn
+  }
+}
 
-export type TxnType =
-  | "pay"
-  | "keyreg"
-  | "acfg"
-  | "axfer"
-  | "afrz"
-  | "appl"
-  | "stpf";
+export type TxnType = 'pay' | 'keyreg' | 'acfg' | 'axfer' | 'afrz' | 'appl' | 'stpf'
 
 export type DecodedTransaction = {
-  amt: number;
-  fee: number;
-  fv: number;
-  gen: string;
-  gh: Uint8Array;
-  grp: Uint8Array;
-  lv: number;
-  note: Uint8Array;
-  rcv: Uint8Array;
-  snd: Uint8Array;
-  type: TxnType;
-};
+  amt: number
+  fee: number
+  fv: number
+  gen: string
+  gh: Uint8Array
+  grp: Uint8Array
+  lv: number
+  note: Uint8Array
+  rcv: Uint8Array
+  snd: Uint8Array
+  type: TxnType
+}
 
 export type DecodedSignedTransaction = {
-  sig: Uint8Array;
-  txn: DecodedTransaction;
-};
+  sig: Uint8Array
+  txn: DecodedTransaction
+}
 
-export type AlgodClientOptions = ConstructorParameters<typeof algosdk.Algodv2>;
+export type AlgodClientOptions = ConstructorParameters<typeof algosdk.Algodv2>

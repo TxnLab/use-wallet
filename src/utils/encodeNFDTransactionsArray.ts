@@ -1,9 +1,7 @@
-export type NFDTransactionsArray = ["u" | "s", string][];
+export type NFDTransactionsArray = ['u' | 's', string][]
 
-export function encodeNFDTransactionsArray(
-  transactionsArray: NFDTransactionsArray
-) {
-  return transactionsArray.map(([type, txn]) => {
-    return new Uint8Array(Buffer.from(txn, "base64"));
-  });
+export function encodeNFDTransactionsArray(transactionsArray: NFDTransactionsArray) {
+  return transactionsArray.map(([_type, txn]) => {
+    return new Uint8Array(Buffer.from(txn, 'base64'))
+  })
 }

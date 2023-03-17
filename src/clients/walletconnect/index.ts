@@ -1,3 +1,3 @@
-import walletconnect from "./client";
+import walletconnect from './client'
 
-export default walletconnect;
+export default walletconnect

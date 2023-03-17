@@ -1,42 +1,41 @@
-import { PROVIDER_ID } from "../../constants";
-import type _algosdk from "algosdk";
-import type { AlgodClientOptions, Network, Metadata } from "../../types";
+import { PROVIDER_ID } from '../../constants'
+import type _algosdk from 'algosdk'
+import type { AlgodClientOptions, Network, Metadata } from '../../types'
 
 export type ClientOptions = {
-  onlyIfTrusted: boolean;
-};
+  onlyIfTrusted: boolean
+}
 
-export type WindowExtended = { exodus: { algorand: Exodus } } & Window &
-  typeof globalThis;
+export type WindowExtended = { exodus: { algorand: Exodus } } & Window & typeof globalThis
 
-export type Bytes = Readonly<Uint8Array>;
+export type Bytes = Readonly<Uint8Array>
 
 export type Exodus = {
-  isConnected: boolean;
-  address: string | null;
+  isConnected: boolean
+  address: string | null
   connect: ({ onlyIfTrusted }: { onlyIfTrusted: boolean }) => Promise<{
-    address: string;
-  }>;
-  disconnect: () => void;
+    address: string
+  }>
+  disconnect: () => void
   signAndSendTransaction(transactions: Bytes[]): Promise<{
-    txId: string;
-  }>;
-  signTransaction(transactions: Bytes[]): Promise<Bytes[]>;
-};
+    txId: string
+  }>
+  signTransaction(transactions: Bytes[]): Promise<Bytes[]>
+}
 
 export type ExodusClientConstructor = {
-  metadata: Metadata;
-  client: Exodus;
-  id: PROVIDER_ID;
-  algosdk: typeof _algosdk;
-  algodClient: _algosdk.Algodv2;
-  onlyIfTrusted: boolean;
-  network: Network;
-};
+  metadata: Metadata
+  client: Exodus
+  id: PROVIDER_ID
+  algosdk: typeof _algosdk
+  algodClient: _algosdk.Algodv2
+  onlyIfTrusted: boolean
+  network: Network
+}
 
 export type InitParams = {
-  clientOptions?: ClientOptions;
-  algodOptions?: AlgodClientOptions;
-  algosdkStatic?: typeof _algosdk;
-  network?: Network;
-};
+  clientOptions?: ClientOptions
+  algodOptions?: AlgodClientOptions
+  algosdkStatic?: typeof _algosdk
+  network?: Network
+}

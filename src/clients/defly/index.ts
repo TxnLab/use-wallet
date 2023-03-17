@@ -1,3 +1,3 @@
-import defly from "./client";
+import defly from './client'
 
-export default defly;
+export default defly

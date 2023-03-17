@@ -1,20 +1,15 @@
-import React from "react";
-import { useWallet } from "../../index";
+import React from 'react'
+import { useWallet } from '../../index'
 
 export default function ConnectWallet() {
-  const {
-    providers,
-    connectedAccounts,
-    connectedActiveAccounts,
-    activeAccount,
-  } = useWallet();
+  const { providers, connectedAccounts, connectedActiveAccounts, activeAccount } = useWallet()
 
   // Use these properties to display connected accounts to users.
   React.useEffect(() => {
-    console.log("connected accounts", connectedAccounts);
-    console.log("connected and active accounts", connectedActiveAccounts);
-    console.log("active account", activeAccount);
-  });
+    console.log('connected accounts', connectedAccounts)
+    console.log('connected and active accounts', connectedActiveAccounts)
+    console.log('active account', activeAccount)
+  })
 
   // Map through the providers.
   // Render account information and "connect", "set active", and "disconnect" buttons.
@@ -23,22 +18,16 @@ export default function ConnectWallet() {
     <div>
       {providers?.map((provider) => {
         return (
-          <div key={"provider-" + provider.metadata.id}>
+          <div key={'provider-' + provider.metadata.id}>
             <h4>
               <img width={30} height={30} src={provider.metadata.icon} />
-              {provider.metadata.name} {provider.isActive && "[active]"}{" "}
+              {provider.metadata.name} {provider.isActive && '[active]'}{' '}
             </h4>
             <div>
-              <button
-                onClick={provider.connect}
-                disabled={provider.isConnected}
-              >
+              <button onClick={provider.connect} disabled={provider.isConnected}>
                 Connect
               </button>
-              <button
-                onClick={provider.disconnect}
-                disabled={!provider.isConnected}
-              >
+              <button onClick={provider.disconnect} disabled={!provider.isConnected}>
                 Disconnect
               </button>
               <button
@@ -63,8 +52,8 @@ export default function ConnectWallet() {
               </div>
             </div>
           </div>
-        );
+        )
       })}
     </div>
-  );
+  )
 }

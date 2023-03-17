@@ -13,6 +13,7 @@
     "sourceMap": true,
     "outDir": "dist",
     "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
-  }
+    "allowSyntheticDefaultImports": true
+  },
+  "exclude": ["node_modules"]
 }

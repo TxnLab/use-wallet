@@ -46,29 +46,21 @@ npm install algosdk @blockshake/defly-connect @perawallet/connect @randlabs/myal
 
 ### Set up the Wallet Provider
 
-In `app.js`, initialize the Wallet Provider so that the `useWallet` hook can be used in the child components, and use the `reconnectProviders` function to restore sessions for users returning to the app. 
-
+In `app.js`, initialize the Wallet Provider so that the `useWallet` hook can be used in the child components, and use the `reconnectProviders` function to restore sessions for users returning to the app.
 
 ```jsx
-import React from "react";
-import {
-  reconnectProviders,
-  initializeProviders,
-  WalletProvider,
-} from "@txnlab/use-wallet";
+import React from 'react'
+import { reconnectProviders, initializeProviders, WalletProvider } from '@txnlab/use-wallet'
 
-const walletProviders = initializeProviders();
+const walletProviders = initializeProviders()
 
 export default function App() {
   // Reconnect the session when the user returns to the dApp
   React.useEffect(() => {
-    reconnectProviders(walletProviders);
-  }, []);
+    reconnectProviders(walletProviders)
+  }, [])
 
-  return (
-    <WalletProvider value={walletProviders}>
-      ...
-    </WalletProvider>);
+  return <WalletProvider value={walletProviders}>...</WalletProvider>
 }
 ```
 
@@ -77,26 +69,23 @@ The `reconnectProviders` function is used to restore session states of wallets t
 By default, all of the supported providers except for `KMD` are returned by `useConnectWallet`. An array can be passed to `initializeProviders` to determine which providers your dApp supports, as shown below.
 
 ```jsx
-import { initializeProviders, PROVIDER_ID } from "@txnlab/use-wallet";
+import { initializeProviders, PROVIDER_ID } from '@txnlab/use-wallet'
 
-const walletProviders = initializeProviders([
-  PROVIDER_ID.KMD_WALLET,
-  PROVIDER_ID.WALLET_CONNECT,
-]);
+const walletProviders = initializeProviders([PROVIDER_ID.KMD_WALLET, PROVIDER_ID.WALLET_CONNECT])
 ```
 
 For more configuration options, see [Provider Configuration](#provider-configuration).
 
 ### Connect
 
-Map through the `providers` object to list the providers and enable users to connect. 
+Map through the `providers` object to list the providers and enable users to connect.
 
 ```jsx
-import React from "react";
-import { useWallet } from "@txnlab/use-wallet";
+import React from 'react'
+import { useWallet } from '@txnlab/use-wallet'
 
 export default function Connect() {
-  const { providers, activeAccount } = useWallet();
+  const { providers, activeAccount } = useWallet()
 
   // Map through the providers.
   // Render account information and "connect", "set active", and "disconnect" buttons.
@@ -104,19 +93,16 @@ export default function Connect() {
   return (
     <div>
       {providers?.map((provider) => (
-        <div key={"provider-" + provider.metadata.id}>
+        <div key={'provider-' + provider.metadata.id}>
           <h4>
             <img width={30} height={30} alt="" src={provider.metadata.icon} />
-            {provider.metadata.name} {provider.isActive && "[active]"}
+            {provider.metadata.name} {provider.isActive && '[active]'}
           </h4>
           <div>
             <button onClick={provider.connect} disabled={provider.isConnected}>
               Connect
             </button>
-            <button
-              onClick={provider.disconnect}
-              disabled={!provider.isConnected}
-            >
+            <button onClick={provider.disconnect} disabled={!provider.isConnected}>
               Disconnect
             </button>
             <button
@@ -132,7 +118,9 @@ export default function Connect() {
                   onChange={(e) => provider.setActiveAccount(e.target.value)}
                 >
                   {provider.accounts.map((account) => (
-                    <option key={account.address} value={account.address}>{account.address}</option>
+                    <option key={account.address} value={account.address}>
+                      {account.address}
+                    </option>
                   ))}
                 </select>
               )}
@@ -141,9 +129,8 @@ export default function Connect() {
         </div>
       ))}
     </div>
-  );
+  )
 }
-
 ```
 
 Each provider has two connection states: `isConnected` and `isActive`.
@@ -159,58 +146,47 @@ The `activeAccount` is the primary account that is currently active and will be 
 Construct a transaction using `algosdk`, and sign and send the transaction using the `signTransactions` and `sendTransactions` functions provided by the `useWallet` hook.
 
 ```jsx
-import React from "react";
+import React from 'react'
 import {
   useWallet,
   DEFAULT_NODE_BASEURL,
   DEFAULT_NODE_TOKEN,
-  DEFAULT_NODE_PORT,
-} from "@txnlab/use-wallet";
-import algosdk from "algosdk";
-
-const algodClient = new algosdk.Algodv2(
-  DEFAULT_NODE_TOKEN,
-  DEFAULT_NODE_BASEURL,
   DEFAULT_NODE_PORT
-);
+} from '@txnlab/use-wallet'
+import algosdk from 'algosdk'
+
+const algodClient = new algosdk.Algodv2(DEFAULT_NODE_TOKEN, DEFAULT_NODE_BASEURL, DEFAULT_NODE_PORT)
 
 export default function Transact() {
-  const { activeAddress, signTransactions, sendTransactions } = useWallet();
+  const { activeAddress, signTransactions, sendTransactions } = useWallet()
 
-  const sendTransaction = async (
-    from?: string,
-    to?: string,
-    amount?: number
-  ) => {
+  const sendTransaction = async (from?: string, to?: string, amount?: number) => {
     if (!from || !to || !amount) {
-      throw new Error("Missing transaction params.");
+      throw new Error('Missing transaction params.')
     }
 
-    const suggestedParams = await algodClient.getTransactionParams().do();
+    const suggestedParams = await algodClient.getTransactionParams().do()
 
     const transaction = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
       from,
       to,
       amount,
-      suggestedParams,
-    });
+      suggestedParams
+    })
 
-    const encodedTransaction = algosdk.encodeUnsignedTransaction(transaction);
+    const encodedTransaction = algosdk.encodeUnsignedTransaction(transaction)
 
-    const signedTransactions = await signTransactions([encodedTransaction]);
+    const signedTransactions = await signTransactions([encodedTransaction])
 
-    const waitRoundsToConfirm = 4;
+    const waitRoundsToConfirm = 4
 
-    const { id } = await sendTransactions(
-      signedTransactions,
-      waitRoundsToConfirm
-    );
+    const { id } = await sendTransactions(signedTransactions, waitRoundsToConfirm)
 
-    console.log("Successfully sent transaction. Transaction ID: ", id);
-  };
+    console.log('Successfully sent transaction. Transaction ID: ', id)
+  }
 
   if (!activeAddress) {
-    return <p>Connect an account first.</p>;
+    return <p>Connect an account first.</p>
   }
 
   return (
@@ -222,7 +198,7 @@ export default function Transact() {
         Sign and send transactions
       </button>
     </div>
-  );
+  )
 }
 ```
 
@@ -231,14 +207,14 @@ export default function Transact() {
 The `activeAccount` object can be used to display details for the currently active account. For convenience, the `activeAddress` property shows the currently active address.
 
 ```jsx
-import React from "react";
-import { useWallet } from "@txnlab/use-wallet";
+import React from 'react'
+import { useWallet } from '@txnlab/use-wallet'
 
 export default function Account() {
-  const { activeAccount } = useWallet();
+  const { activeAccount } = useWallet()
 
   if (!activeAccount) {
-    return <p>No account active.</p>;
+    return <p>No account active.</p>
   }
 
   return (
@@ -254,7 +230,7 @@ export default function Account() {
         Provider: <span>{activeAccount.providerId}</span>
       </p>
     </div>
-  );
+  )
 }
 ```
 
@@ -263,20 +239,18 @@ export default function Account() {
 The `isActive` and `isReady` properties can be used to check the status of the wallets. The `isActive` property determines whether or not an account is currently active. The `isReady` property shows if `use-wallet` has mounted and successfully read the connection status from the providers. These properties are useful when setting up client side access restrictions, for example, by redirecting a user if no wallet is active, as shown below.
 
 ```jsx
-  const { isActive, isReady } = useWallet()
+const { isActive, isReady } = useWallet()
 
-  useEffect(() => {
-    if (isReady && isActive) {
-      allowAccess()
-    }
+useEffect(() => {
+  if (isReady && isActive) {
+    allowAccess()
+  }
 
-    if (isReady && !isActive) {
-      denyAccess()
-    }
-  })
-
+  if (isReady && !isActive) {
+    denyAccess()
+  }
+})
 ```
-
 
 ## Provider Configuration
 
@@ -284,11 +258,11 @@ The `initializeProviders` functon accepts a configuration object that can be use
 
 ```jsx
 const walletProviders = initializeProviders([], {
-  network: "devmodenet",
-  nodeServer: "http://algod",
-  nodeToken: "xxxxxxxxx",
-  nodePort: "8080",
-});
+  network: 'devmodenet',
+  nodeServer: 'http://algod',
+  nodeToken: 'xxxxxxxxx',
+  nodePort: '8080'
+})
 ```
 
 Passing an empty array as the first argument enables all of the default providers. The `network` property should be specified as `betanet`, `testnet`, `mainnet` or the name of your local development network.
@@ -317,7 +291,7 @@ const walletProviders = {
   }),
 };
 
-... 
+...
 
 <WalletProvider value={walletProviders}>
   ...
@@ -326,9 +300,9 @@ const walletProviders = {
 
 ## Static Imports
 
-By default, `use-wallet` dynamically imports all of the dependencies for the providiers, as well as `algosdk`, to reduce bundle size. 
+By default, `use-wallet` dynamically imports all of the dependencies for the providiers, as well as `algosdk`, to reduce bundle size.
 
-Some React frameworks, like [Remix](https://remix.run/), do not support dynamic imports. To get around this, those dependencies can be imported in your application and passed to the `useWallet` provider. See below for an example. 
+Some React frameworks, like [Remix](https://remix.run/), do not support dynamic imports. To get around this, those dependencies can be imported in your application and passed to the `useWallet` provider. See below for an example.
 
 ```jsx
 ...
@@ -412,19 +386,22 @@ yarn link
 ```
 
 In the root of your application, run:
+
 ```bash
 yarn link @txnlab/use-wallet
 ```
 
-### Symlink React 
+### Symlink React
 
 In the root of your application, run:
+
 ```bash
 cd node_modules/react
 yarn link
 ```
 
 In the root of `use-wallet` directory, run:
+
 ```bash
 yarn link react
 ```
@@ -433,8 +410,8 @@ yarn link react
 
 Are you using `@txnlab/use-wallet`? We'd love to include you here. Let us know! [Twitter](https://twitter.com/NFDomains) | [Discord](https://discord.gg/7XcuMTfeZP) | [Email](mailto:admin@txnlab.dev)
 
-* [@algoscan/use-wallet-ui](https://github.com/algoscan/use-wallet-ui)
-* [@algoworldnft/algoworld-swapper](https://github.com/algoworldnft/algoworld-swapper)
+- [@algoscan/use-wallet-ui](https://github.com/algoscan/use-wallet-ui)
+- [@algoworldnft/algoworld-swapper](https://github.com/algoworldnft/algoworld-swapper)
 
 ## License
 

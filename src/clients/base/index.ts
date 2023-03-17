@@ -1,3 +1,3 @@
-import baseClient from "./base";
+import baseClient from './base'
 
-export default baseClient;
+export default baseClient

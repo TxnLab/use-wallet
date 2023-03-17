@@ -1,3 +1,3 @@
-import myalgo from "./client";
+import myalgo from './client'
 
-export default myalgo;
+export default myalgo
