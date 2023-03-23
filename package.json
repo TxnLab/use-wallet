@@ -12,7 +12,7 @@
     "url": "https://github.com/txnlab/use-wallet/issues"
   },
   "homepage": "https://txnlab.github.io/use-wallet",
-  "version": "1.2.7",
+  "version": "1.2.8",
   "description": "React hooks for using Algorand compatible wallets in dApps.",
   "scripts": {
     "dev": "yarn storybook",
@@ -33,7 +33,7 @@
     "@blockshake/defly-connect": "^1.0.0",
     "@json-rpc-tools/utils": "^1.7.6",
     "@mdx-js/react": "^2.1.2",
-    "@perawallet/connect": "^1.1.1",
+    "@perawallet/connect": "^1.2.1",
     "@randlabs/myalgo-connect": "^1.4.2",
     "@rollup/plugin-commonjs": "^23.0.2",
     "@rollup/plugin-json": "^5.0.1",
