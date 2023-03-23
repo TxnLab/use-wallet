@@ -413,6 +413,8 @@ Are you using `@txnlab/use-wallet`? We'd love to include you here. Let us know! 
 - [@algoscan/use-wallet-ui](https://github.com/algoscan/use-wallet-ui)
 - [@algoworldnft/algoworld-swapper](https://github.com/algoworldnft/algoworld-swapper)
 
+Full list of [Dependents](https://github.com/TxnLab/use-wallet/network/dependents)
+
 ## License
 
 See the [LICENSE](https://github.com/TxnLab/use-wallet/blob/main/LICENSE.md) file for license rights and limitations (MIT)
