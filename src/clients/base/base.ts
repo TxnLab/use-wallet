@@ -113,7 +113,7 @@ abstract class BaseClient {
         }
         acc[sender].push(obj)
         return acc
-      }, {} as { [sender: string]: TxnInfo[] })
+      }, {} as Record<string, Array<TxnInfo>>)
     }
 
     const decodedGroup = transactions.reduce((acc: TxnInfo[], [type, txn], index) => {
