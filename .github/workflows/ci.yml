@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - '*'
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  run-ci:
+    name: Run Type Check & Linters
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install dependencies (with cache)
+        uses: bahmutov/npm-install@v1
+
+      - name: Run TypeScript type check
+        run: yarn check-types
+
+      - name: Run unit tests
+        run: yarn test
+
+      - name: Run build
+        run: yarn build

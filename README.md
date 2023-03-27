@@ -1,6 +1,13 @@
-# @TxnLab/use-wallet
+<p align="center"><img  width=100%  src="https://ipfs.algonode.xyz/ipfs/bafkreiexg66kttj75i6uv6khowp2ybvue4nwhvuhh24dobpniszqkbuxoq" /></p>
 
-React hooks for using Algorand compatible wallets with web applications.
+<p align="center">
+    <a href="https://www.txnlab.dev/"><img src="https://img.shields.io/badge/txnlab-about-orange.svg" /></a>
+    <a><img src="https://visitor-badge.glitch.me/badge?page_id=txnlab.use-wallet&right_color=orange" /></a>
+</p>
+
+## About
+
+React hooks for using Algorand compatible wallets with web applications. Flexible and extensible, `use-wallet` supports a variety of wallets and connection protocols. It also provides a simple interface for connecting, disconnecting, switching between accounts and signing transactions.
 
 ## Supported Providers
 
