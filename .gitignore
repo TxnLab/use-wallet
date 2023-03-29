@@ -162,3 +162,8 @@ sketch
 storybook-static/
 
 # End of https://www.toptal.com/developers/gitignore/api/storybookjs,react,node
+
+# ===== CUSTOM NFD ignore rules =====
+
+# VS Code
+*.code-workspace

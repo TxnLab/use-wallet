@@ -1,6 +1,9 @@
-<p align="center"><img  width=100%  src="https://ipfs.algonode.xyz/ipfs/bafkreiexg66kttj75i6uv6khowp2ybvue4nwhvuhh24dobpniszqkbuxoq" /></p>
-
 <p align="center">
+    <span style="font-size: 25px; font-weight: bold;">use-wȺllet</span>
+    <br>
+    <span style="font-size: 15px; font-style: italic;">React hooks for quick, simple and easy integration of any Algorand wallet provider</span>
+    <br>
+    <br>
     <a href="https://www.txnlab.dev/"><img src="https://img.shields.io/badge/txnlab-about-orange.svg" /></a>
     <a><img src="https://visitor-badge.glitch.me/badge?page_id=txnlab.use-wallet&right_color=orange" /></a>
 </p>
