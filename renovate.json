@@ -3,7 +3,7 @@
   "semanticCommits": true,
   "ignoreDeps": [],
   "schedule": "before 3am on the first day of the month",
-  "assignees": ["gabrielkuettel"],
+  "assignees": ["drichar"],
   "baseBranches": ["main"],
   "separateMajorMinor": true,
   "rebaseStalePrs": true,
