@@ -1,5 +1,5 @@
-import { PROVIDER_ID } from 'src/constants'
-import { useWalletStore } from 'src/store'
+import { PROVIDER_ID } from '../constants'
+import { useWalletStore } from '../store'
 
 export const getActiveProviders = () => {
   const accounts = useWalletStore.getState().accounts

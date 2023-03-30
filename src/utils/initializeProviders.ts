@@ -1,14 +1,12 @@
 import type algosdk from 'algosdk'
-import { PROVIDER_ID, WalletClient, Network } from '../types'
 import allClients from '../clients'
+import { PROVIDER_ID, Network, SupportedProviders } from '../types'
 import {
   DEFAULT_NODE_BASEURL,
   DEFAULT_NODE_TOKEN,
   DEFAULT_NODE_PORT,
   DEFAULT_NETWORK
 } from '../constants'
-
-type SupportedProviders = { [x: string]: Promise<WalletClient | null> }
 
 type NodeConfig = {
   network: Network
@@ -21,7 +19,7 @@ export const initializeProviders = (
   providers?: PROVIDER_ID[],
   nodeConfig?: NodeConfig,
   algosdkStatic?: typeof algosdk
-) => {
+): SupportedProviders => {
   const initializedProviders: SupportedProviders = {}
 
   if (typeof window === 'undefined') {
@@ -45,7 +43,7 @@ export const initializeProviders = (
       initializedProviders[id] = client.init({
         network,
         algodOptions: [nodeToken, nodeServer, nodePort],
-        algosdkStatic: algosdkStatic
+        algosdkStatic
       })
     }
 
@@ -54,7 +52,7 @@ export const initializeProviders = (
       initializedProviders[id] = allClients[id].init({
         network,
         algodOptions: [nodeToken, nodeServer, nodePort],
-        algosdkStatic: algosdkStatic
+        algosdkStatic
       })
     }
   }
