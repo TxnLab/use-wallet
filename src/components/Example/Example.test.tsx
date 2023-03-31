@@ -6,7 +6,6 @@ import React from 'react'
 import { render, cleanup, act, RenderResult } from '@testing-library/react'
 import ConnectWallet from './Example'
 
-jest.mock('lottie-web')
 jest.mock('../../index', () => ({
   initializeProviders: jest.fn(),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
