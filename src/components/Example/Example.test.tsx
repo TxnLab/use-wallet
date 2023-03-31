@@ -6,9 +6,9 @@ import React from 'react'
 import { render, cleanup, act, RenderResult } from '@testing-library/react'
 import ConnectWallet from './Example'
 
-jest.mock('lottie-web')
 jest.mock('../../index', () => ({
   initializeProviders: jest.fn(),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   WalletProvider: ({ children }: { children: any }) => <div>{children}</div>,
   reconnectProviders: jest.fn(),
   useWallet: jest.fn().mockImplementation(() => ({
@@ -21,17 +21,30 @@ jest.mock('../../index', () => ({
 }))
 
 describe('ConnectWallet', () => {
-  afterEach(cleanup)
+  beforeEach(() => {
+    // Mock console.log to avoid polluting the test output
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    jest.spyOn(console, 'log').mockImplementation(() => {})
+  })
+
+  afterEach(() => {
+    cleanup()
+    jest.clearAllMocks()
+  })
 
   it('should render the Account, Connect, and Transact components', async () => {
-    let component: RenderResult
+    let component: RenderResult | undefined
 
-    await act(() => {
+    await act(async () => {
       component = render(<ConnectWallet />)
     })
 
-    expect(component!.getByText(/mock account name/i)).toBeTruthy()
-    expect(component!.getByText(/mock account address/i)).toBeTruthy()
-    expect(component!.getByText(/mock provider id/i)).toBeTruthy()
+    if (component) {
+      expect(component.getByText(/mock account name/i)).toBeTruthy()
+      expect(component.getByText(/mock account address/i)).toBeTruthy()
+      expect(component.getByText(/mock provider id/i)).toBeTruthy()
+    } else {
+      throw new Error('Component not rendered')
+    }
   })
 })

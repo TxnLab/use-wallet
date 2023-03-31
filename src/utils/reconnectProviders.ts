@@ -1,8 +1,6 @@
-import { WalletClient } from '../types'
 import { clearAccounts } from './clearAccounts'
 import { isActiveProvider } from './providers'
-
-type SupportedProviders = { [x: string]: Promise<WalletClient | null> }
+import type { SupportedProviders } from '../types'
 
 export const reconnectProviders = async (providers: SupportedProviders) => {
   try {

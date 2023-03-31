@@ -66,4 +66,6 @@ export type Metadata = {
 
 export type WalletClient = BaseWallet
 
+export type SupportedProviders = Record<string, Promise<WalletClient | null>>
+
 export { PROVIDER_ID }
