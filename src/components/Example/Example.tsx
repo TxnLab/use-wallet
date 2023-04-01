@@ -1,14 +1,25 @@
-import React, { useEffect } from 'react'
-import { reconnectProviders, initializeProviders, WalletProvider } from '../../index'
+import React, { useState, useEffect } from 'react'
+import {
+  reconnectProviders,
+  initializeProviders,
+  WalletProvider,
+  SupportedProviders
+} from '../../index'
 import Account from './Account'
 import Connect from './Connect'
 import Transact from './Transact'
 
-const walletProviders = initializeProviders()
-
 export default function ConnectWallet() {
+  const [walletProviders, setWalletProviders] = useState<SupportedProviders | null>(null)
+
   useEffect(() => {
-    reconnectProviders(walletProviders)
+    async function initializeAndConnect() {
+      const providers = await initializeProviders()
+      setWalletProviders(providers)
+      reconnectProviders(providers)
+    }
+
+    initializeAndConnect()
   }, [])
 
   return (

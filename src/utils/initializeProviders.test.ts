@@ -29,7 +29,7 @@ describe('initializeProviders', () => {
     jest.restoreAllMocks()
   })
 
-  it('should return an empty object if window is undefined', () => {
+  it('should return an empty object if window is undefined', async () => {
     const originalWindow = global.window
 
     Object.defineProperty(global, 'window', {
@@ -39,7 +39,7 @@ describe('initializeProviders', () => {
       configurable: true
     })
 
-    const result = initializeProviders()
+    const result = await initializeProviders()
     expect(result).toEqual({})
 
     Object.defineProperty(global, 'window', {
@@ -48,7 +48,7 @@ describe('initializeProviders', () => {
     })
   })
 
-  it('should initialize default wallets with default node configuration', () => {
+  it('should initialize default wallets with default node configuration', async () => {
     const defaultProviders = [
       PROVIDER_ID.PERA,
       PROVIDER_ID.DEFLY,
@@ -64,7 +64,7 @@ describe('initializeProviders', () => {
       algosdkStatic: undefined
     }
 
-    const result = initializeProviders()
+    const result = await initializeProviders()
     const initializedIds = Object.keys(result)
 
     defaultProviders.forEach((id) => {
@@ -78,10 +78,10 @@ describe('initializeProviders', () => {
     expect(initializedIds).not.toContain(PROVIDER_ID.MNEMONIC)
   })
 
-  it('should initialize specified wallets only', () => {
+  it('should initialize specified wallets only', async () => {
     const providers = [PROVIDER_ID.PERA, PROVIDER_ID.DEFLY]
 
-    const result = initializeProviders(providers)
+    const result = await initializeProviders(providers)
     const initializedIds = Object.keys(result)
 
     expect(initializedIds).toMatchSnapshot()
@@ -97,7 +97,7 @@ describe('initializeProviders', () => {
     })
   })
 
-  it('should initialize using custom node configuration', () => {
+  it('should initialize using custom node configuration', async () => {
     const nodeConfig = {
       network: 'testnet',
       nodeServer: 'http://localhost',
@@ -107,7 +107,7 @@ describe('initializeProviders', () => {
 
     const providers = [PROVIDER_ID.WALLETCONNECT, PROVIDER_ID.ALGOSIGNER]
 
-    const result = initializeProviders(providers, nodeConfig)
+    const result = await initializeProviders(providers, nodeConfig)
     const initializedIds = Object.keys(result)
 
     providers.forEach((id) => {
@@ -120,10 +120,10 @@ describe('initializeProviders', () => {
     })
   })
 
-  it('should initialize using provided algosdk instance', () => {
+  it('should initialize using provided algosdk instance', async () => {
     const providers = [PROVIDER_ID.PERA, PROVIDER_ID.DEFLY]
 
-    const result = initializeProviders(providers, undefined, algosdk)
+    const result = await initializeProviders(providers, undefined, algosdk)
     const initializedIds = Object.keys(result)
 
     providers.forEach((id) => {
