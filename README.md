@@ -46,21 +46,33 @@ npm install algosdk @blockshake/defly-connect @perawallet/connect @randlabs/myal
 
 ### Set up the Wallet Provider
 
-In `app.js`, initialize the Wallet Provider so that the `useWallet` hook can be used in the child components, and use the `reconnectProviders` function to restore sessions for users returning to the app.
+In `app.js`, initialize the `WalletProvider` so that the `useWallet` hook can be used anywhere in your app, and use the `reconnectProviders` function to restore sessions for returning users.
 
 ```jsx
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { reconnectProviders, initializeProviders, WalletProvider } from '@txnlab/use-wallet'
 
-const walletProviders = initializeProviders()
-
 export default function App() {
-  // Reconnect the session when the user returns to the dApp
-  React.useEffect(() => {
-    reconnectProviders(walletProviders)
+  const [walletProviders, setWalletProviders] = useState(null)
+
+  useEffect(() => {
+    async function initializeAndConnect() {
+      // Initialize with default configuration
+      const providers = await initializeProviders()
+      setWalletProviders(providers)
+
+      // Reconnect the session when the user returns to the app
+      reconnectProviders(providers)
+    }
+
+    initializeAndConnect()
   }, [])
 
-  return <WalletProvider value={walletProviders}>...</WalletProvider>
+  return (
+    <WalletProvider value={walletProviders}>
+      <div className="App">{/* ... */}</div>
+    </WalletProvider>
+  )
 }
 ```
 
@@ -71,7 +83,7 @@ By default, all of the supported providers except for `KMD` are returned by `use
 ```jsx
 import { initializeProviders, PROVIDER_ID } from '@txnlab/use-wallet'
 
-const walletProviders = initializeProviders([PROVIDER_ID.KMD_WALLET, PROVIDER_ID.WALLET_CONNECT])
+const providers = await initializeProviders([PROVIDER_ID.KMD, PROVIDER_ID.WALLETCONNECT])
 ```
 
 For more configuration options, see [Provider Configuration](#provider-configuration).
@@ -254,10 +266,10 @@ useEffect(() => {
 
 ## Provider Configuration
 
-The `initializeProviders` functon accepts a configuration object that can be used to configure the nodes that the providers use to send transactions, as shown below.
+The `initializeProviders` function accepts a configuration object that can be used to configure the nodes that the providers use to send transactions, as shown below.
 
 ```jsx
-const walletProviders = initializeProviders([], {
+const providers = await initializeProviders([], {
   network: 'devmodenet',
   nodeServer: 'http://algod',
   nodeToken: 'xxxxxxxxx',

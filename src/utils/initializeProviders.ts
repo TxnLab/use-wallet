@@ -15,11 +15,11 @@ type NodeConfig = {
   nodePort?: string
 }
 
-export const initializeProviders = (
+export const initializeProviders = async (
   providers?: PROVIDER_ID[],
   nodeConfig?: NodeConfig,
   algosdkStatic?: typeof algosdk
-): SupportedProviders => {
+): Promise<SupportedProviders> => {
   const initializedProviders: SupportedProviders = {}
 
   if (typeof window === 'undefined') {
@@ -34,27 +34,25 @@ export const initializeProviders = (
     nodeToken = DEFAULT_NODE_TOKEN
   } = nodeConfig || {}
 
-  if (!providers || providers.length === 0)
-    for (const [id, client] of Object.entries(allClients)) {
-      if (id === 'kmd' || id === 'mnemonic') {
-        continue
-      }
-
-      initializedProviders[id] = client.init({
+  const initClient = async (id: string): Promise<void> => {
+    initializedProviders[id] = Promise.resolve(
+      await allClients[id].init({
         network,
         algodOptions: [nodeToken, nodeServer, nodePort],
         algosdkStatic
       })
-    }
+    )
+  }
 
-  if (providers) {
-    for (const id of providers) {
-      initializedProviders[id] = allClients[id].init({
-        network,
-        algodOptions: [nodeToken, nodeServer, nodePort],
-        algosdkStatic
-      })
-    }
+  if (!providers || providers.length === 0) {
+    const initPromises = Object.entries(allClients)
+      .filter(([id]) => id !== 'kmd' && id !== 'mnemonic')
+      .map(([id]) => initClient(id))
+
+    await Promise.all(initPromises)
+  } else {
+    const initPromises = providers.map((id) => initClient(id))
+    await Promise.all(initPromises)
   }
 
   return initializedProviders
