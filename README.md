@@ -1,4 +1,4 @@
-# @TxnLab/use-wallet
+# @txnlab/use-wallet
 
 React hooks for using Algorand compatible wallets with web applications. Flexible and extensible, `use-wallet` supports a variety of wallets and connection protocols. It also provides a simple interface for connecting, disconnecting, switching between accounts and signing transactions.
 
@@ -18,30 +18,16 @@ Preview a basic implementation in [Storybook](https://txnlab.github.io/use-walle
 
 ## Quick Start
 
-⚠️ If you're using `create-react-app` and `webpack 5` (most newer React projects), you will need to install polyfills. Follow [these directions](#webpack-5).
-
 ### Yarn
 
 ```bash
 yarn add @txnlab/use-wallet
 ```
 
-Install peer dependencies (if needed)
-
-```bash
-yarn add algosdk @blockshake/defly-connect @perawallet/connect @randlabs/myalgo-connect @walletconnect/client algorand-walletconnect-qrcode-modal @json-rpc-tools/utils
-```
-
 ### NPM
 
 ```bash
 npm install @txnlab/use-wallet
-```
-
-Install peer dependencies (if needed)
-
-```bash
-npm install algosdk @blockshake/defly-connect @perawallet/connect @randlabs/myalgo-connect @walletconnect/client algorand-walletconnect-qrcode-modal @json-rpc-tools/utils
 ```
 
 ### Set up the Wallet Provider
@@ -78,7 +64,7 @@ export default function App() {
 
 The `reconnectProviders` function is used to restore session states of wallets that rely on the `WalletConnect` protocol.
 
-By default, all of the supported providers except for `KMD` are returned by `useConnectWallet`. An array can be passed to `initializeProviders` to determine which providers your dApp supports, as shown below.
+By default, all of the supported providers except for `KMD` and `MNEMONIC` are initialized. You can choose which providers to support by passing an array of provider IDs to `initializeProviders` as shown here:
 
 ```jsx
 import { initializeProviders, PROVIDER_ID } from '@txnlab/use-wallet'
@@ -99,9 +85,10 @@ import { useWallet } from '@txnlab/use-wallet'
 export default function Connect() {
   const { providers, activeAccount } = useWallet()
 
-  // Map through the providers.
-  // Render account information and "connect", "set active", and "disconnect" buttons.
-  // Finally, map through the `accounts` property to render a dropdown for each connected account.
+  // 1. Map the `providers`
+  // 2. Render account information and "Connect", "Set Active", and "Disconnect" buttons
+  // 3. Finally, map the `provider.accounts` property to render a dropdown for each connected account
+
   return (
     <div>
       {providers?.map((provider) => (
@@ -147,7 +134,7 @@ export default function Connect() {
 
 Each provider has two connection states: `isConnected` and `isActive`.
 
-`isConnected` means that the user has authorized the provider to talk to the dApp. The connection flow does not need to be restarted when switching to this wallet from a different one.
+`isConnected` means that the user has authorized the provider to talk to the app. The connection flow does not need to be restarted when switching to this wallet from a different one.
 
 `isActive` indicates that the provider is currently active and will be used to sign and send transactions when using the `useWallet` hook.
 
@@ -159,13 +146,13 @@ Construct a transaction using `algosdk`, and sign and send the transaction using
 
 ```jsx
 import React from 'react'
+import algosdk from 'algosdk'
 import {
   useWallet,
   DEFAULT_NODE_BASEURL,
   DEFAULT_NODE_TOKEN,
   DEFAULT_NODE_PORT
 } from '@txnlab/use-wallet'
-import algosdk from 'algosdk'
 
 const algodClient = new algosdk.Algodv2(DEFAULT_NODE_TOKEN, DEFAULT_NODE_BASEURL, DEFAULT_NODE_PORT)
 
@@ -187,11 +174,8 @@ export default function Transact() {
     })
 
     const encodedTransaction = algosdk.encodeUnsignedTransaction(transaction)
-
     const signedTransactions = await signTransactions([encodedTransaction])
-
     const waitRoundsToConfirm = 4
-
     const { id } = await sendTransactions(signedTransactions, waitRoundsToConfirm)
 
     console.log('Successfully sent transaction. Transaction ID: ', id)
@@ -204,6 +188,7 @@ export default function Transact() {
   return (
     <div>
       <button
+        type="button"
         onClick={() => sendTransaction(activeAddress, activeAddress, 1000)}
         className="button"
       >
@@ -248,7 +233,7 @@ export default function Account() {
 
 ### Check connection status
 
-The `isActive` and `isReady` properties can be used to check the status of the wallets. The `isActive` property determines whether or not an account is currently active. The `isReady` property shows if `use-wallet` has mounted and successfully read the connection status from the providers. These properties are useful when setting up client side access restrictions, for example, by redirecting a user if no wallet is active, as shown below.
+The `isActive` and `isReady` properties can be used to check the status of the wallets. The `isActive` property determines whether or not an account is currently active. The `isReady` property indicates whether `use-wallet` has mounted and successfully read the connection status from the providers. These properties are useful when setting up client side access restrictions, for example, by redirecting a user if no wallet is active, as shown below.
 
 ```jsx
 const { isActive, isReady } = useWallet()
@@ -282,8 +267,6 @@ Passing an empty array as the first argument enables all of the default provider
 For more custom configuration options, the providers can be configured individually by creating an object and passing it to the `WalletProvider` where the key contains the provider ID, and the value calls the `init` function of the provider client. See below for an example:
 
 ```jsx
-...
-
 import {
   PROVIDER_ID,
   pera,
@@ -303,11 +286,13 @@ const walletProviders = {
   }),
 };
 
-...
-
-<WalletProvider value={walletProviders}>
-  ...
-</WalletProvider>
+export default functon App() {
+  return (
+    <WalletProvider value={walletProviders}>
+      <div className="App">{/* ... */}</div>
+    </WalletProvider>
+  )
+}
 ```
 
 ## Static Imports
@@ -317,52 +302,49 @@ By default, `use-wallet` dynamically imports all of the dependencies for the pro
 Some React frameworks, like [Remix](https://remix.run/), do not support dynamic imports. To get around this, those dependencies can be imported in your application and passed to the `useWallet` provider. See below for an example.
 
 ```jsx
-...
-
-import algosdk from "algosdk";
-import MyAlgoConnect from "@randlabs/myalgo-connect";
-import { PeraWalletConnect } from "@perawallet/connect";
-import { DeflyWalletConnect } from "@blockshake/defly-connect";
-import WalletConnect from "@walletconnect/client";
-import QRCodeModal from "algorand-walletconnect-qrcode-modal";
+import algosdk from 'algosdk'
+import MyAlgoConnect from '@randlabs/myalgo-connect'
+import { PeraWalletConnect } from '@perawallet/connect'
+import { DeflyWalletConnect } from '@blockshake/defly-connect'
+import WalletConnect from '@walletconnect/client'
+import QRCodeModal from 'algorand-walletconnect-qrcode-modal'
 
 const walletProviders = {
   [PROVIDER_ID.PERA]: pera.init({
     algosdkStatic: algosdk,
-    clientStatic: PeraWalletConnect,
+    clientStatic: PeraWalletConnect
   }),
   [PROVIDER_ID.MYALGO]: myalgo.init({
     algosdkStatic: algosdk,
-    clientStatic: MyAlgoConnect,
+    clientStatic: MyAlgoConnect
   }),
   [PROVIDER_ID.DEFLY]: defly.init({
     algosdkStatic: algosdk,
-    clientStatic: DeflyWalletConnect,
+    clientStatic: DeflyWalletConnect
   }),
   [PROVIDER_ID.EXODUS]: exodus.init({
-    algosdkStatic: algosdk,
+    algosdkStatic: algosdk
   }),
   [PROVIDER_ID.ALGOSIGNER]: algosigner.init({
-    algosdkStatic: algosdk,
+    algosdkStatic: algosdk
   }),
   [PROVIDER_ID.WALLETCONNECT]: walletconnect.init({
     algosdkStatic: algosdk,
     clientStatic: WalletConnect,
-    modalStatic: QRCodeModal,
-  }),
-};
-
-export default function App() {
-  ...
-
-  return (
-    <WalletProvider value={walletProviders}>
-      ...
-    </WalletProvider>
-  );
+    modalStatic: QRCodeModal
+  })
 }
 
+export default function App() {
+  return (
+    <WalletProvider value={walletProviders}>
+      <div className="App">{/* ... */}</div>
+    </WalletProvider>
+  )
+}
 ```
+
+You will need to install these dependencies, depending on which wallet(s) you want to support.
 
 Note that some of the providers do not require static imports to be provided. This is usually the case of providers that are browser extensions.
 
@@ -410,12 +392,14 @@ In the root of your application, run:
 ```bash
 cd node_modules/react
 yarn link
+cd ../react-dom
+yarn link
 ```
 
 In the root of `use-wallet` directory, run:
 
 ```bash
-yarn link react
+yarn link react react-dom
 ```
 
 ## Used By
