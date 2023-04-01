@@ -1,6 +1,6 @@
 import type _algosdk from 'algosdk'
 import { PROVIDER_ID } from '../../constants'
-import type { AlgodClientOptions, Network, Metadata } from '../../types'
+import type { Network, Metadata, CommonInitParams } from '../../types'
 
 export type WindowExtended = { algorand: AlgoSigner } & Window & typeof globalThis
 
@@ -57,8 +57,4 @@ export type AlgoSignerClientConstructor = {
   network: Network
 }
 
-export type InitParams = {
-  algodOptions?: AlgodClientOptions
-  algosdkStatic?: typeof _algosdk
-  network?: Network
-}
+export type InitParams = CommonInitParams

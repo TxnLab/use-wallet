@@ -45,7 +45,7 @@ class DeflyWalletClient extends BaseWallet {
       const algodClient = getAlgodClient(algosdk, algodOptions)
 
       const deflyWallet = new DeflyWalletConnect({
-        ...(clientOptions ? clientOptions : { shouldShowSignTxnToast: false })
+        ...(clientOptions && clientOptions)
       })
 
       return new DeflyWalletClient({

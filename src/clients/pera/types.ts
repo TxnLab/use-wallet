@@ -1,7 +1,7 @@
 import type _algosdk from 'algosdk'
 import type { PeraWalletConnect } from '@perawallet/connect'
 import type { Transaction } from 'algosdk'
-import type { AlgodClientOptions, Network, Metadata } from '../../types'
+import type { Network, Metadata, CommonInitParams } from '../../types'
 
 export type ClientOptions = {
   bridge?: string
@@ -27,10 +27,7 @@ export type PeraWalletClientConstructor = {
   network: Network
 }
 
-export type InitParams = {
-  clientOptions?: ClientOptions
-  algodOptions?: AlgodClientOptions
+export type InitParams<TClientOptions = ClientOptions> = CommonInitParams & {
+  clientOptions?: TClientOptions
   clientStatic?: typeof PeraWalletConnect
-  algosdkStatic?: typeof _algosdk
-  network?: Network
 }

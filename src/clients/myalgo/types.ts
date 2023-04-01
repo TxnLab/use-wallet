@@ -4,7 +4,7 @@
  */
 import type _MyAlgoConnect from '@randlabs/myalgo-connect'
 import type _algosdk from 'algosdk'
-import { AlgodClientOptions, Network, Metadata } from '../../types'
+import { Network, Metadata, CommonInitParams } from '../../types'
 
 export type MyAlgoWalletClientConstructor = {
   metadata: Metadata
@@ -18,10 +18,7 @@ export type ClientOptions = {
   disableLedgerNano: boolean
 }
 
-export type InitParams = {
-  clientOptions?: ClientOptions
-  algodOptions?: AlgodClientOptions
+export type InitParams<TClientOptions = ClientOptions> = CommonInitParams & {
+  clientOptions?: TClientOptions
   clientStatic?: typeof _MyAlgoConnect
-  algosdkStatic?: typeof _algosdk
-  network?: Network
 }

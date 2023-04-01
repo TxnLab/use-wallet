@@ -1,5 +1,5 @@
 import type _algosdk from 'algosdk'
-import type { AlgodClientOptions, Network, Metadata } from '../../types'
+import type { Network, Metadata, CommonInitParams } from '../../types'
 import { PROVIDER_ID } from '../../constants'
 
 export type ClientOptions = {
@@ -37,9 +37,6 @@ export type KMDWalletClientConstructor = {
   network: Network
 }
 
-export type InitParams = {
-  clientOptions?: ClientOptions
-  algodOptions?: AlgodClientOptions
-  algosdkStatic?: typeof _algosdk
-  network?: Network
+export type InitParams<TClientOptions = ClientOptions> = CommonInitParams & {
+  clientOptions?: TClientOptions
 }

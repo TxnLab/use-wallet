@@ -1,6 +1,12 @@
 import type algosdk from 'algosdk'
 import allClients from '../clients'
-import { PROVIDER_ID, Network, SupportedProviders } from '../types'
+import {
+  CommonInitParams,
+  NodeConfig,
+  ProviderConfig,
+  ProviderConfigMapping,
+  SupportedProviders
+} from '../types'
 import {
   DEFAULT_NODE_BASEURL,
   DEFAULT_NODE_TOKEN,
@@ -8,15 +14,8 @@ import {
   DEFAULT_NETWORK
 } from '../constants'
 
-type NodeConfig = {
-  network: Network
-  nodeServer: string
-  nodeToken?: string
-  nodePort?: string
-}
-
-export const initializeProviders = async (
-  providers?: PROVIDER_ID[],
+export const initializeProviders = async <T extends keyof ProviderConfigMapping>(
+  providers?: Array<T | ProviderConfig<T>>,
   nodeConfig?: NodeConfig,
   algosdkStatic?: typeof algosdk
 ): Promise<SupportedProviders> => {
@@ -34,24 +33,28 @@ export const initializeProviders = async (
     nodeToken = DEFAULT_NODE_TOKEN
   } = nodeConfig || {}
 
-  const initClient = async (id: string): Promise<void> => {
-    initializedProviders[id] = Promise.resolve(
-      await allClients[id].init({
-        network,
-        algodOptions: [nodeToken, nodeServer, nodePort],
-        algosdkStatic
-      })
-    )
+  const initClient = async (provider: T | ProviderConfig<T>): Promise<void> => {
+    const id = typeof provider === 'string' ? provider : provider.id
+    const config = typeof provider === 'object' ? provider.config : undefined
+
+    const initParams: CommonInitParams = {
+      network,
+      algodOptions: [nodeToken, nodeServer, nodePort],
+      algosdkStatic,
+      ...(config || {})
+    }
+
+    initializedProviders[id] = Promise.resolve(await allClients[id].init(initParams))
   }
 
   if (!providers || providers.length === 0) {
     const initPromises = Object.entries(allClients)
       .filter(([id]) => id !== 'kmd' && id !== 'mnemonic')
-      .map(([id]) => initClient(id))
+      .map(([id]) => initClient(id as T))
 
     await Promise.all(initPromises)
   } else {
-    const initPromises = providers.map((id) => initClient(id))
+    const initPromises = providers.map((provider) => initClient(provider))
     await Promise.all(initPromises)
   }
 

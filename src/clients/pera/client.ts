@@ -44,7 +44,7 @@ class PeraWalletClient extends BaseWallet {
       const algodClient = getAlgodClient(algosdk, algodOptions)
 
       const peraWallet = new PeraWalletConnect({
-        ...(clientOptions ? clientOptions : { shouldShowSignTxnToast: false })
+        ...(clientOptions && clientOptions)
       })
 
       return new PeraWalletClient({
