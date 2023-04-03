@@ -3,7 +3,7 @@ import type { PeraWalletConnect } from '@perawallet/connect'
 import type { Transaction } from 'algosdk'
 import type { Network, Metadata, CommonInitParams } from '../../types'
 
-export type ClientOptions = {
+export type PeraWalletConnectOptions = {
   bridge?: string
   shouldShowSignTxnToast?: boolean
   chainId?: 416001 | 416002 | 416003 | 4160
@@ -22,12 +22,13 @@ export interface PeraTransaction {
 export type PeraWalletClientConstructor = {
   metadata: Metadata
   client: PeraWalletConnect
+  clientOptions?: PeraWalletConnectOptions
   algosdk: typeof _algosdk
   algodClient: _algosdk.Algodv2
   network: Network
 }
 
-export type InitParams<TClientOptions = ClientOptions> = CommonInitParams & {
-  clientOptions?: TClientOptions
+export type InitParams = CommonInitParams & {
+  clientOptions?: PeraWalletConnectOptions
   clientStatic?: typeof PeraWalletConnect
 }

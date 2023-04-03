@@ -1,8 +1,7 @@
-import { PROVIDER_ID } from '../../constants'
 import type _algosdk from 'algosdk'
 import type { Network, Metadata, CommonInitParams } from '../../types'
 
-export type ClientOptions = {
+export type ExodusOptions = {
   onlyIfTrusted: boolean
 }
 
@@ -26,13 +25,12 @@ export type Exodus = {
 export type ExodusClientConstructor = {
   metadata: Metadata
   client: Exodus
-  id: PROVIDER_ID
+  clientOptions: ExodusOptions
   algosdk: typeof _algosdk
   algodClient: _algosdk.Algodv2
-  onlyIfTrusted: boolean
   network: Network
 }
 
-export type InitParams<TClientOptions = ClientOptions> = CommonInitParams & {
-  clientOptions?: TClientOptions
+export type InitParams = CommonInitParams & {
+  clientOptions?: ExodusOptions
 }

@@ -1,3 +1,3 @@
-import baseClient from './base'
+import BaseClient from './base'
 
-export default baseClient
+export default BaseClient

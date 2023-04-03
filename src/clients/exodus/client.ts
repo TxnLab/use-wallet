@@ -3,29 +3,29 @@
  * https://docs.exodus.com/api-reference/algorand-provider-api/
  */
 import type _algosdk from 'algosdk'
-import BaseWallet from '../base'
+import BaseClient from '../base'
 import Algod, { getAlgodClient } from '../../algod'
 import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
 import type { DecodedTransaction, DecodedSignedTransaction, Network } from '../../types'
 import { ICON } from './constants'
-import { InitParams, WindowExtended, Exodus, ExodusClientConstructor } from './types'
+import { InitParams, WindowExtended, Exodus, ExodusClientConstructor, ExodusOptions } from './types'
 
-class ExodusClient extends BaseWallet {
+class ExodusClient extends BaseClient {
   #client: Exodus
-  #onlyIfTrusted: boolean
+  clientOptions: ExodusOptions
   network: Network
 
   constructor({
     metadata,
     client,
+    clientOptions,
     algosdk,
     algodClient,
-    onlyIfTrusted,
     network
   }: ExodusClientConstructor) {
     super(metadata, algosdk, algodClient)
     this.#client = client
-    this.#onlyIfTrusted = onlyIfTrusted
+    this.clientOptions = clientOptions
     this.network = network
     this.metadata = ExodusClient.metadata
   }
@@ -42,7 +42,7 @@ class ExodusClient extends BaseWallet {
     algodOptions,
     algosdkStatic,
     network = DEFAULT_NETWORK
-  }: InitParams) {
+  }: InitParams): Promise<BaseClient | null> {
     try {
       if (typeof window == 'undefined' || (window as WindowExtended).exodus === undefined) {
         throw new Error('Exodus is not available.')
@@ -54,11 +54,10 @@ class ExodusClient extends BaseWallet {
 
       return new ExodusClient({
         metadata: ExodusClient.metadata,
-        id: PROVIDER_ID.EXODUS,
         client: exodus,
         algosdk: algosdk,
         algodClient: algodClient,
-        onlyIfTrusted: clientOptions?.onlyIfTrusted || false,
+        clientOptions: clientOptions || { onlyIfTrusted: false },
         network
       })
     } catch (e) {
@@ -74,7 +73,7 @@ class ExodusClient extends BaseWallet {
 
   async connect() {
     const { address } = await this.#client.connect({
-      onlyIfTrusted: this.#onlyIfTrusted
+      onlyIfTrusted: this.clientOptions.onlyIfTrusted
     })
 
     if (!address) {

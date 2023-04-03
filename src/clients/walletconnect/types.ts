@@ -29,7 +29,7 @@ export interface IWalletConnectSession {
   }
 }
 
-export type ClientOptions = {
+export type WalletConnectOptions = {
   bridge?: string
   uri?: string
   storageId?: string
@@ -47,8 +47,8 @@ export type WalletConnectTransaction = {
   signers?: string[] | []
 }
 
-export type InitParams<TClientOptions = ClientOptions> = CommonInitParams & {
-  clientOptions?: TClientOptions
+export type InitParams = CommonInitParams & {
+  clientOptions?: WalletConnectOptions
   clientStatic?: typeof WalletConnect
   modalStatic?: typeof QRCodeModal
 }
@@ -56,6 +56,7 @@ export type InitParams<TClientOptions = ClientOptions> = CommonInitParams & {
 export type WalletConnectClientConstructor = {
   metadata: Metadata
   client: WalletConnect
+  clientOptions?: WalletConnectOptions
   algosdk: typeof _algosdk
   algodClient: _algosdk.Algodv2
   network: Network

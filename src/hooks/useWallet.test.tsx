@@ -10,20 +10,13 @@ import PeraWalletClient from '../clients/pera'
 import { default as ClientProvider } from '../store/state/clientStore'
 import { useHydratedWalletStore } from '../store/state/walletStore'
 import { createWrapper } from '../testUtils/createWrapper'
+import { mockAccounts } from '../testUtils/mockAccounts'
 import { createDeflyMockInstance, createPeraMockInstance } from '../testUtils/mockClients'
 import { clearAccounts } from '../utils/clearAccounts'
 import type { WalletClient } from '../types'
 
-// Used by `createPeraMockInstance`
-export const peraAccounts = [
-  { address: 'addrPera1', providerId: PROVIDER_ID.PERA, name: 'Pera Account 1' },
-  { address: 'addrPera2', providerId: PROVIDER_ID.PERA, name: 'Pera Account 2' }
-]
-
-// Used by `createDeflyMockInstance`
-export const deflyAccounts = [
-  { address: 'addrDefly1', providerId: PROVIDER_ID.DEFLY, name: 'Defly Account 1' }
-]
+const peraAccounts = mockAccounts(PROVIDER_ID.PERA, 2)
+const deflyAccounts = mockAccounts(PROVIDER_ID.DEFLY, 1)
 
 const setActiveAccountSpy = jest.fn()
 
@@ -50,15 +43,15 @@ jest.mock('../utils/clearAccounts')
 describe('useWallet', () => {
   let peraMockInstance: PeraWalletClient
   let deflyMockInstance: DeflyWalletClient
-  let mockClientProviders: Record<string, Promise<WalletClient | null>>
+  let mockClientProviders: Record<string, WalletClient | null>
 
   beforeEach(() => {
     // Mock `useHydratedWalletStore`
     ;(useHydratedWalletStore as unknown as jest.Mock).mockImplementation(() => mockedState)
 
     // Mock clients
-    peraMockInstance = createPeraMockInstance()
-    deflyMockInstance = createDeflyMockInstance()
+    peraMockInstance = createPeraMockInstance(undefined, peraAccounts)
+    deflyMockInstance = createDeflyMockInstance(undefined, deflyAccounts)
 
     // Pera client methods
     jest.spyOn(peraMockInstance, 'connect')
@@ -67,8 +60,8 @@ describe('useWallet', () => {
 
     // Passed to `ClientProvider` in renderHook wrapper
     mockClientProviders = {
-      pera: Promise.resolve(peraMockInstance),
-      defly: Promise.resolve(deflyMockInstance)
+      pera: peraMockInstance,
+      defly: deflyMockInstance
     }
   })
 
@@ -114,17 +107,22 @@ describe('useWallet', () => {
     expect(deflyProvider?.isActive).toBe(false)
     expect(deflyProvider?.isConnected).toBe(true)
 
+    // Connect Pera
+    await act(async () => await peraProvider?.connect())
+    expect(peraMockInstance.connect).toHaveBeenCalled()
+    expect(setActiveAccountSpy).toBeCalledWith(peraAccounts[0])
+
     // Set active account
     peraProvider?.setActiveAccount(peraAccounts[1].address)
     expect(setActiveAccountSpy).toBeCalledWith(peraAccounts[1])
 
-    // Set active provider
-    deflyProvider?.setActiveProvider()
+    // Connect Defly
+    await act(async () => await deflyProvider?.connect())
+    expect(peraMockInstance.connect).toHaveBeenCalled()
     expect(setActiveAccountSpy).toBeCalledWith(deflyAccounts[0])
 
-    // Connect
-    await act(async () => await peraProvider?.connect())
-    expect(peraMockInstance.connect).toHaveBeenCalled()
+    // Set active provider
+    peraProvider?.setActiveProvider()
     expect(setActiveAccountSpy).toBeCalledWith(peraAccounts[0])
 
     // Disconnect

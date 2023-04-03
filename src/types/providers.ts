@@ -6,26 +6,12 @@ import type MyAlgoConnect from '@randlabs/myalgo-connect'
 import QRCodeModal from 'algorand-walletconnect-qrcode-modal'
 import { AlgodClientOptions, Network } from './node'
 import algosdk from 'algosdk'
-
-type PeraWalletConnectOptions = ConstructorParameters<typeof PeraWalletConnect>[0]
-
-type DeflyWalletConnectOptions = ConstructorParameters<typeof DeflyWalletConnect>[0]
-
-type WalletConnectOptions = ConstructorParameters<typeof WalletConnect>[0]
-
-type MyAlgoConnectOptions = ConstructorParameters<typeof MyAlgoConnect>[0]
-
-type ExodusOptions = {
-  onlyIfTrusted: boolean
-}
-
-type KmdOptions = {
-  token?: string
-  host?: string
-  port?: string
-  wallet?: string
-  password?: string
-}
+import type { PeraWalletConnectOptions } from '../clients/pera/types'
+import { DeflyWalletConnectOptions } from '../clients/defly/types'
+import { ExodusOptions } from '../clients/exodus/types'
+import { KmdOptions } from '../clients/kmd/types'
+import { MyAlgoConnectOptions } from '../clients/myalgo/types'
+import { WalletConnectOptions } from '../clients/walletconnect/types'
 
 export type ProviderConfigMapping = {
   [PROVIDER_ID.PERA]: {
@@ -55,10 +41,24 @@ export type ProviderConfigMapping = {
   [PROVIDER_ID.MNEMONIC]: Record<string, never>
 }
 
-export interface ProviderConfig<T extends keyof ProviderConfigMapping> {
+/*
+export type ProviderConfig<T extends keyof ProviderConfigMapping> = {
   id: T
-  config?: ProviderConfigMapping[T]
-}
+} & ProviderConfigMapping[T]
+*/
+
+/**
+ * Enforces correct configuration given for each provider. For example,
+ * if `id` is `PROVIDER_ID.PERA`, then `clientOptions` must be of type
+ * `PeraWalletConnectOptions`.
+ *
+ * @todo install `tsd` to test TypeScript type definitions in CI
+ */
+export type ProviderConfig<T extends keyof ProviderConfigMapping> = {
+  [K in T]: {
+    id: K
+  } & ProviderConfigMapping[K]
+}[T]
 
 export type CommonInitParams = {
   network?: Network

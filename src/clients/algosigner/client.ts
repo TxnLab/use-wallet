@@ -3,7 +3,7 @@
  * https://github.com/PureStake/algosigner/blob/develop/docs/dApp-integration.md
  */
 import type _algosdk from 'algosdk'
-import BaseWallet from '../base'
+import BaseClient from '../base'
 import Algod, { getAlgodClient } from '../../algod'
 import { PROVIDER_ID, DEFAULT_NETWORK } from '../../constants'
 import type { DecodedTransaction, DecodedSignedTransaction, Network } from '../../types'
@@ -17,7 +17,7 @@ import type {
 } from './types'
 import { useWalletStore } from '../../store'
 
-class AlgoSignerClient extends BaseWallet {
+class AlgoSignerClient extends BaseClient {
   #client: AlgoSigner
   network: Network
   walletStore: typeof useWalletStore
@@ -36,7 +36,11 @@ class AlgoSignerClient extends BaseWallet {
     isWalletConnect: false
   }
 
-  static async init({ algodOptions, algosdkStatic, network = DEFAULT_NETWORK }: InitParams) {
+  static async init({
+    algodOptions,
+    algosdkStatic,
+    network = DEFAULT_NETWORK
+  }: InitParams): Promise<BaseClient | null> {
     try {
       if (typeof window == 'undefined' || (window as WindowExtended).algorand === undefined) {
         throw new Error('AlgoSigner is not available.')
@@ -48,7 +52,6 @@ class AlgoSignerClient extends BaseWallet {
 
       return new AlgoSignerClient({
         metadata: AlgoSignerClient.metadata,
-        id: PROVIDER_ID.ALGOSIGNER,
         client: algosigner,
         algosdk: algosdk,
         algodClient: algodClient,

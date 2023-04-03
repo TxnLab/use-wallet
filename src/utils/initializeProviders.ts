@@ -5,6 +5,7 @@ import {
   NodeConfig,
   ProviderConfig,
   ProviderConfigMapping,
+  PROVIDER_ID,
   SupportedProviders
 } from '../types'
 import {
@@ -22,6 +23,7 @@ export const initializeProviders = async <T extends keyof ProviderConfigMapping>
   const initializedProviders: SupportedProviders = {}
 
   if (typeof window === 'undefined') {
+    // @todo add `debug: Boolean` option to enable/disable console logs
     console.warn('Window object is not available, skipping initialization.')
     return initializedProviders
   }
@@ -34,23 +36,24 @@ export const initializeProviders = async <T extends keyof ProviderConfigMapping>
   } = nodeConfig || {}
 
   const initClient = async (provider: T | ProviderConfig<T>): Promise<void> => {
-    const id = typeof provider === 'string' ? provider : provider.id
-    const config = typeof provider === 'object' ? provider.config : undefined
+    const { id, ...providerConfig } = typeof provider === 'string' ? { id: provider } : provider
 
     const initParams: CommonInitParams = {
       network,
       algodOptions: [nodeToken, nodeServer, nodePort],
       algosdkStatic,
-      ...(config || {})
+      ...providerConfig
     }
 
-    initializedProviders[id] = Promise.resolve(await allClients[id].init(initParams))
+    const client = await allClients[id].init(initParams)
+    initializedProviders[id] = client
   }
 
+  // Initialize default providers if `providers` is undefined or empty
   if (!providers || providers.length === 0) {
-    const initPromises = Object.entries(allClients)
-      .filter(([id]) => id !== 'kmd' && id !== 'mnemonic')
-      .map(([id]) => initClient(id as T))
+    const initPromises = Object.keys(allClients)
+      .filter((id) => id !== PROVIDER_ID.KMD && id !== PROVIDER_ID.MNEMONIC)
+      .map((id) => initClient(id as T))
 
     await Promise.all(initPromises)
   } else {

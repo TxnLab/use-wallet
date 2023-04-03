@@ -1,6 +1,5 @@
 import type _algosdk from 'algosdk'
 import type { Network, Metadata, CommonInitParams } from '../../types'
-import { PROVIDER_ID } from '../../constants'
 
 export type ClientOptions = {
   wallet: string
@@ -18,7 +17,6 @@ export interface InitWalletHandle {
 
 export type MnemonicWalletClientConstructor = {
   metadata: Metadata
-  id: PROVIDER_ID
   algosdk: typeof _algosdk
   algodClient: _algosdk.Algodv2
   network: Network

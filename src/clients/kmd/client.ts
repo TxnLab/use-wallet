@@ -1,6 +1,6 @@
 import type _algosdk from 'algosdk'
 import Algod, { getAlgodClient } from '../../algod'
-import BaseWallet from '../base'
+import BaseClient from '../base'
 import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
 import type { Account, Wallet, Network } from '../../types'
 import { ICON } from './constants'
@@ -11,18 +11,16 @@ import {
   KMDWalletClientConstructor
 } from './types'
 
-class KMDWalletClient extends BaseWallet {
+class KMDWalletClient extends BaseClient {
   #client: _algosdk.Kmd
   #wallet: string
   #password: string
   walletId: string
-  id: PROVIDER_ID
   network: Network
 
   constructor({
     metadata,
     client,
-    id,
     wallet,
     password,
     algosdk,
@@ -34,7 +32,6 @@ class KMDWalletClient extends BaseWallet {
     this.#client = client
     this.#wallet = wallet
     this.#password = password
-    this.id = id
     this.walletId = ''
     this.network = network
     this.metadata = KMDWalletClient.metadata
@@ -52,7 +49,7 @@ class KMDWalletClient extends BaseWallet {
     algodOptions,
     algosdkStatic,
     network = DEFAULT_NETWORK
-  }: InitParams) {
+  }: InitParams): Promise<BaseClient | null> {
     try {
       const {
         token = 'a'.repeat(64),
@@ -68,7 +65,6 @@ class KMDWalletClient extends BaseWallet {
 
       return new KMDWalletClient({
         metadata: KMDWalletClient.metadata,
-        id: PROVIDER_ID.KMD,
         password,
         wallet,
         client: kmdClient,
