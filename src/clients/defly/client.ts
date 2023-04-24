@@ -128,6 +128,15 @@ class DeflyWalletClient extends BaseWallet {
         acc.push({
           txn: this.algosdk.decodeUnsignedTransaction(transactions[i])
         })
+        // If the indexes to be signed is specified, but it's not included in it,
+        // designate that it should not be signed
+      } else if (indexesToSign && indexesToSign.length && !indexesToSign.includes(i)) {
+        acc.push({
+          txn: isSigned
+            ? this.algosdk.decodeSignedTransaction(transactions[i]).txn
+            : this.algosdk.decodeUnsignedTransaction(transactions[i]),
+          signers: []
+        })
         // If the transaction is unsigned and is to be sent from a connected account,
         // designate that it should be signed
       } else if (!isSigned && connectedAccounts.includes(this.algosdk.encodeAddress(txn['snd']))) {
@@ -154,8 +163,7 @@ class DeflyWalletClient extends BaseWallet {
     // Sign them with the client.
     const result = await this.#client.signTransaction([txnsToSign])
 
-    // Join the newly signed transactions with the original group of transactions
-    // if 'returnGroup' param is specified
+    // Join the newly signed transactions with the original group of transactions.
     const signedTxns = transactions.reduce<Uint8Array[]>((acc, txn, i) => {
       if (signedIndexes.includes(i)) {
         const signedByUser = result.shift()
