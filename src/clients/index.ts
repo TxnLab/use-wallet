@@ -1,4 +1,5 @@
 import pera from './pera'
+import daffi from './daffi'
 import myalgo from './myalgo'
 import defly from './defly'
 import exodus from './exodus'
@@ -11,6 +12,7 @@ export { pera, myalgo, defly, exodus, algosigner, walletconnect, kmd, mnemonic }
 
 export default {
   [pera.metadata.id]: pera,
+  [daffi.metadata.id]: daffi,
   [myalgo.metadata.id]: myalgo,
   [defly.metadata.id]: defly,
   [exodus.metadata.id]: exodus,
