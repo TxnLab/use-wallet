@@ -32,10 +32,10 @@
     "@babel/preset-react": "^7.16.0",
     "@babel/preset-typescript": "^7.16.0",
     "@blockshake/defly-connect": "^1.1.2",
+    "@daffiwallet/connect": "^1.0.3",
     "@json-rpc-tools/utils": "^1.7.6",
     "@mdx-js/react": "^2.1.2",
     "@perawallet/connect": "^1.2.1",
-    "@daffiwallet/connect": "^1.0.3",
     "@randlabs/myalgo-connect": "^1.4.2",
     "@rollup/plugin-commonjs": "^23.0.2",
     "@rollup/plugin-json": "^5.0.1",
@@ -58,7 +58,11 @@
     "algosdk": "^2.1.0",
     "babel-jest": "^29.1.2",
     "babel-loader": "^8.2.3",
+    "bufferutil": "^4.0.7",
+    "commitizen": "4.2.6",
     "css-loader": "^6.5.1",
+    "cz-conventional-changelog": "3.3.0",
+    "encoding": "^0.1.13",
     "eslint": "^8.36.0",
     "eslint-config-prettier": "^8.7.0",
     "eslint-plugin-prettier": "^4.2.1",
@@ -68,6 +72,7 @@
     "html-webpack-plugin": "^5.5.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^29.1.2",
+    "jest-environment-jsdom": "^29.3.1",
     "postcss": "^8.4.17",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -81,23 +86,45 @@
     "sass": "^1.43.5",
     "sass-loader": "^13.1.0",
     "style-loader": "^3.3.1",
+    "ts-node": "^10.9.1",
     "tslib": "^2.4.0",
     "typescript": "^4.8.4",
-    "ts-node": "^10.9.1",
-    "commitizen": "4.2.6",
-    "jest-environment-jsdom": "^29.3.1",
-    "cz-conventional-changelog": "3.3.0"
+    "utf-8-validate": "^6.0.3"
   },
   "peerDependencies": {
     "@blockshake/defly-connect": "^1.1.2",
+    "@daffiwallet/connect": "^1.0.3",
     "@json-rpc-tools/utils": "^1.7.6",
     "@perawallet/connect": "^1.2.1",
-    "@daffiwallet/connect": "^1.0.3",
     "@randlabs/myalgo-connect": "^1.4.2",
     "@walletconnect/client": "^1.8.0",
     "algorand-walletconnect-qrcode-modal": "^1.8.0",
     "algosdk": "^2.1.0",
-    "react": "^18.2.0"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "peerDependenciesMeta": {
+    "@blockshake/defly-connect": {
+      "optional": true
+    },
+    "@daffiwallet/connect": {
+      "optional": true
+    },
+    "@json-rpc-tools/utils": {
+      "optional": true
+    },
+    "@perawallet/connect": {
+      "optional": true
+    },
+    "@randlabs/myalgo-connect": {
+      "optional": true
+    },
+    "@walletconnect/client": {
+      "optional": true
+    },
+    "algorand-walletconnect-qrcode-modal": {
+      "optional": true
+    }
   },
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
