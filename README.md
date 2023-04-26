@@ -10,6 +10,7 @@ React hooks for using Algorand compatible wallets with web applications. Flexibl
 - [AlgoSigner](https://www.purestake.com/technology/algosigner)
 - [Exodus](https://www.exodus.com)
 - [WalletConnect](https://walletconnect.com)
+- [Daffi](https://www.daffi.me/)
 - [KMD](https://developer.algorand.org/docs/rest-apis/kmd)
 
 ## Demo
@@ -29,7 +30,7 @@ yarn add @txnlab/use-wallet
 Install peer dependencies (if needed)
 
 ```bash
-yarn add algosdk @blockshake/defly-connect @perawallet/connect @randlabs/myalgo-connect @walletconnect/client algorand-walletconnect-qrcode-modal @json-rpc-tools/utils
+yarn add algosdk @blockshake/defly-connect @perawallet/connect @randlabs/myalgo-connect @walletconnect/client algorand-walletconnect-qrcode-modal @json-rpc-tools/utils @daffiwallet/connect
 ```
 
 ### NPM
@@ -41,7 +42,7 @@ npm install @txnlab/use-wallet
 Install peer dependencies (if needed)
 
 ```bash
-npm install algosdk @blockshake/defly-connect @perawallet/connect @randlabs/myalgo-connect @walletconnect/client algorand-walletconnect-qrcode-modal @json-rpc-tools/utils
+npm install algosdk @blockshake/defly-connect @perawallet/connect @randlabs/myalgo-connect @walletconnect/client algorand-walletconnect-qrcode-modal @json-rpc-tools/utils @daffiwallet/connect
 ```
 
 ### Set up the Wallet Provider

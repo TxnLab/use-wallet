@@ -1,6 +1,6 @@
 /**
  * Helpful resources:
- * https://github.com/RDinitiativ/DaffiWallet-Connect
+ * https://github.com/RDinitiativ/daffiwallet_connect
  */
 import type _algosdk from 'algosdk'
 import Algod, { getAlgodClient } from '../../algod'
