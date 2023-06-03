@@ -19,8 +19,6 @@ Preview a basic implementation in [Storybook](https://txnlab.github.io/use-walle
 
 ## Quick Start
 
-⚠️ If you're using `create-react-app` and `webpack 5` (most newer React projects), you will need to install polyfills. Follow [these directions](#webpack-5).
-
 ### Yarn
 
 ```bash
