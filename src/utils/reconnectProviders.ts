@@ -7,12 +7,11 @@ export const reconnectProviders = async (providers: SupportedProviders) => {
     const clients = Object.values(providers)
 
     for (const client of clients) {
-      const c = await client
-      const id = c?.metadata.id
+      const id = client?.metadata.id
 
       // Only reconnect to active providers
       if (id && isActiveProvider(id)) {
-        await c.reconnect(() => clearAccounts(id))
+        await client.reconnect(() => clearAccounts(id))
       }
     }
   } catch (e) {

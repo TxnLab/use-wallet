@@ -39,9 +39,9 @@ describe('reconnectProviders', () => {
     const reconnectKmdSpy = jest.fn()
 
     const providers = {
-      pera: Promise.resolve(createMockClient(PROVIDER_ID.PERA, reconnectPeraSpy)),
-      defly: Promise.resolve(createMockClient(PROVIDER_ID.DEFLY, reconnectDeflySpy)),
-      kmd: Promise.resolve(createMockClient(PROVIDER_ID.KMD, reconnectKmdSpy))
+      pera: createMockClient(PROVIDER_ID.PERA, reconnectPeraSpy),
+      defly: createMockClient(PROVIDER_ID.DEFLY, reconnectDeflySpy),
+      kmd: createMockClient(PROVIDER_ID.KMD, reconnectKmdSpy)
     }
 
     // Mock `isActiveProvider` to return true for Pera and Defly only
@@ -63,7 +63,7 @@ describe('reconnectProviders', () => {
     })
 
     const providers = {
-      pera: Promise.resolve(createMockClient(PROVIDER_ID.PERA, reconnectSpy))
+      pera: createMockClient(PROVIDER_ID.PERA, reconnectSpy)
     }
 
     isActiveProviderSpy.mockImplementation((id) => id === PROVIDER_ID.PERA)

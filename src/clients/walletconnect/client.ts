@@ -6,19 +6,33 @@ import type _algosdk from 'algosdk'
 import Algod, { getAlgodClient } from '../../algod'
 import type WalletConnect from '@walletconnect/client'
 import { PROVIDER_ID } from '../../constants'
-import BaseWallet from '../base'
+import BaseClient from '../base'
 import { formatJsonRpcRequest } from '@json-rpc-tools/utils'
 import { Wallet, DecodedTransaction, DecodedSignedTransaction, Network } from '../../types'
 import { DEFAULT_NETWORK, ICON } from './constants'
-import { WalletConnectClientConstructor, InitParams, WalletConnectTransaction } from './types'
+import {
+  WalletConnectClientConstructor,
+  InitParams,
+  WalletConnectTransaction,
+  WalletConnectOptions
+} from './types'
 
-class WalletConnectClient extends BaseWallet {
+class WalletConnectClient extends BaseClient {
   #client: WalletConnect
+  clientOptions?: WalletConnectOptions
   network: Network
 
-  constructor({ metadata, client, algosdk, algodClient, network }: WalletConnectClientConstructor) {
+  constructor({
+    metadata,
+    client,
+    clientOptions,
+    algosdk,
+    algodClient,
+    network
+  }: WalletConnectClientConstructor) {
     super(metadata, algosdk, algodClient)
     this.#client = client
+    this.clientOptions = clientOptions
     this.network = network
     this.metadata = WalletConnectClient.metadata
   }
@@ -37,7 +51,7 @@ class WalletConnectClient extends BaseWallet {
     modalStatic,
     algosdkStatic,
     network = DEFAULT_NETWORK
-  }: InitParams) {
+  }: InitParams): Promise<BaseClient | null> {
     try {
       const WalletConnect = clientStatic || (await import('@walletconnect/client')).default
       const QRCodeModal =
@@ -47,7 +61,7 @@ class WalletConnectClient extends BaseWallet {
         bridge: 'https://bridge.walletconnect.org',
         qrcodeModal: QRCodeModal,
         storageId: 'walletconnect-generic',
-        ...(clientOptions || {})
+        ...clientOptions
       })
 
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
@@ -56,6 +70,7 @@ class WalletConnectClient extends BaseWallet {
       const initWallet: WalletConnectClientConstructor = {
         metadata: WalletConnectClient.metadata,
         client: walletConnect,
+        clientOptions,
         algosdk: algosdk,
         algodClient: algodClient,
         network

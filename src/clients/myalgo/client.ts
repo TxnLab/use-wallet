@@ -2,22 +2,31 @@
  * Helpful resources:
  * https://github.com/randlabs/myalgo-connect
  */
-import BaseWallet from '../base'
-import type _MyAlgoConnect from '@randlabs/myalgo-connect'
+import BaseClient from '../base'
+import type MyAlgoConnect from '@randlabs/myalgo-connect'
 import type _algosdk from 'algosdk'
 import Algod, { getAlgodClient } from '../../algod'
 import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
 import { DecodedTransaction, DecodedSignedTransaction, Network } from '../../types'
-import { MyAlgoWalletClientConstructor, InitParams } from './types'
+import { MyAlgoWalletClientConstructor, InitParams, MyAlgoConnectOptions } from './types'
 import { ICON } from './constants'
 
-class MyAlgoWalletClient extends BaseWallet {
-  #client: _MyAlgoConnect
+class MyAlgoWalletClient extends BaseClient {
+  #client: MyAlgoConnect
+  clientOptions?: MyAlgoConnectOptions
   network: Network
 
-  constructor({ metadata, client, algosdk, algodClient, network }: MyAlgoWalletClientConstructor) {
+  constructor({
+    metadata,
+    client,
+    clientOptions,
+    algosdk,
+    algodClient,
+    network
+  }: MyAlgoWalletClientConstructor) {
     super(metadata, algosdk, algodClient)
     this.#client = client
+    this.clientOptions = clientOptions
     this.network = network
     this.metadata = MyAlgoWalletClient.metadata
   }
@@ -35,7 +44,7 @@ class MyAlgoWalletClient extends BaseWallet {
     clientStatic,
     algosdkStatic,
     network = DEFAULT_NETWORK
-  }: InitParams) {
+  }: InitParams): Promise<BaseClient | null> {
     try {
       const MyAlgoConnect = clientStatic || (await import('@randlabs/myalgo-connect')).default
 
@@ -49,6 +58,7 @@ class MyAlgoWalletClient extends BaseWallet {
       return new MyAlgoWalletClient({
         metadata: MyAlgoWalletClient.metadata,
         client: myAlgo,
+        clientOptions,
         algosdk: algosdk,
         algodClient: algodClient,
         network

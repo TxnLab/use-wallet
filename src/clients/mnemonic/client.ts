@@ -1,21 +1,19 @@
 import type _algosdk from 'algosdk'
 import Algod, { getAlgodClient } from '../../algod'
-import BaseWallet from '../base'
+import BaseClient from '../base'
 import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
 import type { TransactionsArray, Network } from '../../types'
 import { ICON } from './constants'
 import { InitParams, MnemonicWalletClientConstructor } from './types'
 import algosdk from 'algosdk'
 
-class MnemonicWalletClient extends BaseWallet {
+class MnemonicWalletClient extends BaseClient {
   #client?: _algosdk.Account
-  id: PROVIDER_ID
   network: Network
 
-  constructor({ metadata, id, algosdk, algodClient, network }: MnemonicWalletClientConstructor) {
+  constructor({ metadata, algosdk, algodClient, network }: MnemonicWalletClientConstructor) {
     super(metadata, algosdk, algodClient)
 
-    this.id = id
     this.network = network
     this.metadata = MnemonicWalletClient.metadata
   }
@@ -27,14 +25,17 @@ class MnemonicWalletClient extends BaseWallet {
     isWalletConnect: false
   }
 
-  static async init({ algodOptions, algosdkStatic, network = DEFAULT_NETWORK }: InitParams) {
+  static async init({
+    algodOptions,
+    algosdkStatic,
+    network = DEFAULT_NETWORK
+  }: InitParams): Promise<BaseClient | null> {
     try {
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
       const algodClient = getAlgodClient(algosdk, algodOptions)
-      console.log(network, algodClient)
+
       return new MnemonicWalletClient({
         metadata: MnemonicWalletClient.metadata,
-        id: PROVIDER_ID.MNEMONIC,
         algosdk: algosdk,
         algodClient: algodClient,
         network

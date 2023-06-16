@@ -7,17 +7,31 @@ import Algod, { getAlgodClient } from '../../algod'
 import type { PeraWalletConnect } from '@perawallet/connect'
 import type { Wallet, DecodedTransaction, DecodedSignedTransaction, Network } from '../../types'
 import { PROVIDER_ID, DEFAULT_NETWORK } from '../../constants'
-import BaseWallet from '../base'
+import BaseClient from '../base'
 import { ICON } from './constants'
-import { PeraTransaction, PeraWalletClientConstructor, InitParams } from './types'
+import {
+  PeraTransaction,
+  PeraWalletClientConstructor,
+  InitParams,
+  PeraWalletConnectOptions
+} from './types'
 
-class PeraWalletClient extends BaseWallet {
+class PeraWalletClient extends BaseClient {
   #client: PeraWalletConnect
+  clientOptions?: PeraWalletConnectOptions
   network: Network
 
-  constructor({ metadata, client, algosdk, algodClient, network }: PeraWalletClientConstructor) {
+  constructor({
+    metadata,
+    client,
+    clientOptions,
+    algosdk,
+    algodClient,
+    network
+  }: PeraWalletClientConstructor) {
     super(metadata, algosdk, algodClient)
     this.#client = client
+    this.clientOptions = clientOptions
     this.network = network
     this.metadata = PeraWalletClient.metadata
   }
@@ -35,7 +49,7 @@ class PeraWalletClient extends BaseWallet {
     clientStatic,
     algosdkStatic,
     network = DEFAULT_NETWORK
-  }: InitParams) {
+  }: InitParams): Promise<BaseClient | null> {
     try {
       const PeraWalletConnect =
         clientStatic || (await import('@perawallet/connect')).PeraWalletConnect
@@ -44,12 +58,13 @@ class PeraWalletClient extends BaseWallet {
       const algodClient = getAlgodClient(algosdk, algodOptions)
 
       const peraWallet = new PeraWalletConnect({
-        ...(clientOptions ? clientOptions : { shouldShowSignTxnToast: false })
+        ...(clientOptions && clientOptions)
       })
 
       return new PeraWalletClient({
         metadata: PeraWalletClient.metadata,
         client: peraWallet,
+        clientOptions,
         algosdk,
         algodClient,
         network

@@ -2,26 +2,24 @@
  * Helpful resources:
  * https://github.com/randlabs/myalgo-connect
  */
-import type _MyAlgoConnect from '@randlabs/myalgo-connect'
+import type MyAlgoConnect from '@randlabs/myalgo-connect'
 import type _algosdk from 'algosdk'
-import { AlgodClientOptions, Network, Metadata } from '../../types'
+import { Network, Metadata, CommonInitParams } from '../../types'
+
+export type MyAlgoConnectOptions = {
+  disableLedgerNano: boolean
+}
 
 export type MyAlgoWalletClientConstructor = {
   metadata: Metadata
-  client: _MyAlgoConnect
+  client: MyAlgoConnect
+  clientOptions?: MyAlgoConnectOptions
   algosdk: typeof _algosdk
   algodClient: _algosdk.Algodv2
   network: Network
 }
 
-export type ClientOptions = {
-  disableLedgerNano: boolean
-}
-
-export type InitParams = {
-  clientOptions?: ClientOptions
-  algodOptions?: AlgodClientOptions
-  clientStatic?: typeof _MyAlgoConnect
-  algosdkStatic?: typeof _algosdk
-  network?: Network
+export type InitParams = CommonInitParams & {
+  clientOptions?: MyAlgoConnectOptions
+  clientStatic?: typeof MyAlgoConnect
 }

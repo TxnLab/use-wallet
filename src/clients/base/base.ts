@@ -8,7 +8,8 @@ import type {
   TransactionsArray,
   TxnInfo,
   Metadata,
-  RawTxnResponse
+  RawTxnResponse,
+  ClientOptions
 } from '../../types'
 import { audio } from '../../media/audio'
 
@@ -26,6 +27,7 @@ const isIOS = getIsIOS()
 abstract class BaseClient {
   algosdk: typeof _algosdk
   algodClient: _algosdk.Algodv2
+  clientOptions?: ClientOptions
   keepWCAlive: HTMLAudioElement
   metadata: Metadata
 
@@ -44,10 +46,12 @@ abstract class BaseClient {
   protected constructor(
     metadata: Metadata,
     algosdk: typeof _algosdk,
-    algodClient: _algosdk.Algodv2
+    algodClient: _algosdk.Algodv2,
+    clientOptions?: ClientOptions
   ) {
     this.algosdk = algosdk
     this.algodClient = algodClient
+    this.clientOptions = clientOptions
     this.keepWCAlive = new Audio()
     this.metadata = metadata
   }

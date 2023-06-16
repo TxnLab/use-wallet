@@ -6,19 +6,33 @@ import type _algosdk from 'algosdk'
 import Algod, { getAlgodClient } from '../../algod'
 import type { Wallet } from '../../types'
 import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
-import BaseWallet from '../base'
+import BaseClient from '../base'
 import type { DeflyWalletConnect } from '@blockshake/defly-connect'
 import type { DecodedTransaction, DecodedSignedTransaction, Network } from '../../types'
 import { ICON } from './constants'
-import { DeflyTransaction, InitParams, DeflyWalletClientConstructor } from './types'
+import {
+  DeflyTransaction,
+  InitParams,
+  DeflyWalletClientConstructor,
+  DeflyWalletConnectOptions
+} from './types'
 
-class DeflyWalletClient extends BaseWallet {
+class DeflyWalletClient extends BaseClient {
   #client: DeflyWalletConnect
+  clientOptions?: DeflyWalletConnectOptions
   network: Network
 
-  constructor({ metadata, client, algosdk, algodClient, network }: DeflyWalletClientConstructor) {
+  constructor({
+    metadata,
+    client,
+    clientOptions,
+    algosdk,
+    algodClient,
+    network
+  }: DeflyWalletClientConstructor) {
     super(metadata, algosdk, algodClient)
     this.#client = client
+    this.clientOptions = clientOptions
     this.network = network
     this.metadata = DeflyWalletClient.metadata
   }
@@ -36,7 +50,7 @@ class DeflyWalletClient extends BaseWallet {
     clientStatic,
     algosdkStatic,
     network = DEFAULT_NETWORK
-  }: InitParams) {
+  }: InitParams): Promise<BaseClient | null> {
     try {
       const DeflyWalletConnect =
         clientStatic || (await import('@blockshake/defly-connect')).DeflyWalletConnect
@@ -45,7 +59,7 @@ class DeflyWalletClient extends BaseWallet {
       const algodClient = getAlgodClient(algosdk, algodOptions)
 
       const deflyWallet = new DeflyWalletConnect({
-        ...(clientOptions ? clientOptions : { shouldShowSignTxnToast: false })
+        ...(clientOptions && clientOptions)
       })
 
       return new DeflyWalletClient({
