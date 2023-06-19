@@ -3,6 +3,7 @@ import { Network } from '../types'
 export enum PROVIDER_ID {
   KMD = 'kmd',
   PERA = 'pera',
+  DAFFI = 'daffi',
   MYALGO = 'myalgo',
   ALGOSIGNER = 'algosigner',
   DEFLY = 'defly',

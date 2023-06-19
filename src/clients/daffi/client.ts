@@ -1,25 +1,24 @@
 /**
  * Helpful resources:
- * https://github.com/blockshake-io/defly-connect
+ * https://github.com/RDinitiativ/daffiwallet_connect
  */
 import type _algosdk from 'algosdk'
 import Algod, { getAlgodClient } from '../../algod'
-import type { Wallet } from '../../types'
-import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
+import type { DaffiWalletConnect } from '@daffiwallet/connect'
+import type { Wallet, DecodedTransaction, DecodedSignedTransaction, Network } from '../../types'
+import { PROVIDER_ID, DEFAULT_NETWORK } from '../../constants'
 import BaseClient from '../base'
-import type { DeflyWalletConnect } from '@blockshake/defly-connect'
-import type { DecodedTransaction, DecodedSignedTransaction, Network } from '../../types'
 import { ICON } from './constants'
 import {
-  DeflyTransaction,
-  InitParams,
-  DeflyWalletClientConstructor,
-  DeflyWalletConnectOptions
+  DaffiTransaction,
+  DaffiWalletClientConstructor,
+  DaffiWalletConnectOptions,
+  InitParams
 } from './types'
 
-class DeflyWalletClient extends BaseClient {
-  #client: DeflyWalletConnect
-  clientOptions?: DeflyWalletConnectOptions
+class DaffiWalletClient extends BaseClient {
+  #client: DaffiWalletConnect
+  clientOptions?: DaffiWalletConnectOptions
   network: Network
 
   constructor({
@@ -29,17 +28,17 @@ class DeflyWalletClient extends BaseClient {
     algosdk,
     algodClient,
     network
-  }: DeflyWalletClientConstructor) {
+  }: DaffiWalletClientConstructor) {
     super(metadata, algosdk, algodClient)
     this.#client = client
     this.clientOptions = clientOptions
     this.network = network
-    this.metadata = DeflyWalletClient.metadata
+    this.metadata = DaffiWalletClient.metadata
   }
 
   static metadata = {
-    id: PROVIDER_ID.DEFLY,
-    name: 'Defly',
+    id: PROVIDER_ID.DAFFI,
+    name: 'Daffi',
     icon: ICON,
     isWalletConnect: true
   }
@@ -50,21 +49,22 @@ class DeflyWalletClient extends BaseClient {
     clientStatic,
     algosdkStatic,
     network = DEFAULT_NETWORK
-  }: InitParams): Promise<BaseClient | null> {
+  }: InitParams) {
     try {
-      const DeflyWalletConnect =
-        clientStatic || (await import('@blockshake/defly-connect')).DeflyWalletConnect
+      const DaffiWalletConnect =
+        clientStatic || (await import('@daffiwallet/connect')).DaffiWalletConnect
 
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
       const algodClient = getAlgodClient(algosdk, algodOptions)
 
-      const deflyWallet = new DeflyWalletConnect({
-        ...(clientOptions && clientOptions)
+      const daffiWallet = new DaffiWalletConnect({
+        ...(clientOptions ? clientOptions : { shouldShowSignTxnToast: false })
       })
 
-      return new DeflyWalletClient({
-        metadata: DeflyWalletClient.metadata,
-        client: deflyWallet,
+      return new DaffiWalletClient({
+        metadata: DaffiWalletClient.metadata,
+        client: daffiWallet,
+        clientOptions,
         algosdk,
         algodClient,
         network
@@ -76,40 +76,42 @@ class DeflyWalletClient extends BaseClient {
   }
 
   async connect(onDisconnect: () => void): Promise<Wallet> {
-    const accounts = await this.#client.connect().catch(console.info)
+    const accounts = await this.#client.connect()
 
     this.#client.connector?.on('disconnect', onDisconnect)
 
-    if (!accounts || accounts.length === 0) {
-      throw new Error(`No accounts found for ${DeflyWalletClient.metadata.id}`)
+    if (accounts.length === 0) {
+      throw new Error(`No accounts found for ${DaffiWalletClient.metadata.id}`)
     }
 
     const mappedAccounts = accounts.map((address: string, index: number) => ({
-      name: `Defly Wallet ${index + 1}`,
+      name: `Daffi Wallet ${index + 1}`,
       address,
-      providerId: DeflyWalletClient.metadata.id
+      providerId: DaffiWalletClient.metadata.id
     }))
 
     return {
-      ...DeflyWalletClient.metadata,
+      ...DaffiWalletClient.metadata,
       accounts: mappedAccounts
     }
   }
 
   async reconnect(onDisconnect: () => void) {
     const accounts = await this.#client.reconnectSession().catch(console.info)
+
     this.#client.connector?.on('disconnect', onDisconnect)
 
     if (!accounts) {
+      onDisconnect()
       return null
     }
 
     return {
-      ...DeflyWalletClient.metadata,
+      ...DaffiWalletClient.metadata,
       accounts: accounts.map((address: string, index: number) => ({
-        name: `Defly Wallet ${index + 1}`,
+        name: `Daffi Wallet ${index + 1}`,
         address,
-        providerId: DeflyWalletClient.metadata.id
+        providerId: DaffiWalletClient.metadata.id
       }))
     }
   }
@@ -133,7 +135,7 @@ class DeflyWalletClient extends BaseClient {
 
     // Marshal the transactions,
     // and add the signers property if they shouldn't be signed.
-    const txnsToSign = decodedTxns.reduce<DeflyTransaction[]>((acc, txn, i) => {
+    const txnsToSign = decodedTxns.reduce<DaffiTransaction[]>((acc, txn, i) => {
       const isSigned = 'txn' in txn
 
       // If the indexes to be signed is specified, designate that it should be signed
@@ -193,4 +195,4 @@ class DeflyWalletClient extends BaseClient {
   }
 }
 
-export default DeflyWalletClient
+export default DaffiWalletClient

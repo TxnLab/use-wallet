@@ -7,7 +7,7 @@ import Algod, { getAlgodClient } from '../../algod'
 import type WalletConnect from '@walletconnect/client'
 import { PROVIDER_ID } from '../../constants'
 import BaseClient from '../base'
-import { formatJsonRpcRequest } from '@json-rpc-tools/utils'
+import type { JsonRpcRequest } from '@json-rpc-tools/types'
 import { Wallet, DecodedTransaction, DecodedSignedTransaction, Network } from '../../types'
 import { DEFAULT_NETWORK, ICON } from './constants'
 import {
@@ -207,8 +207,10 @@ class WalletConnectClient extends BaseClient {
       return acc
     }, [])
 
+    const { formatJsonRpcRequest } = await import('@json-rpc-tools/utils')
+
     const requestParams = [txnsToSign]
-    const request = formatJsonRpcRequest('algo_signTxn', requestParams)
+    const request: JsonRpcRequest = formatJsonRpcRequest('algo_signTxn', requestParams)
 
     // Play an audio file to keep Wallet Connect's web socket open on iOS
     // when the user goes into background mode.
