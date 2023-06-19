@@ -1,9 +1,9 @@
 import type _algosdk from 'algosdk'
 import type { DaffiWalletConnect } from '@daffiwallet/connect'
 import type { Transaction } from 'algosdk'
-import type { AlgodClientOptions, Network, Metadata } from '../../types'
+import type { Network, Metadata, CommonInitParams } from '../../types'
 
-export type ClientOptions = {
+export type DaffiWalletConnectOptions = {
   bridge?: string
   shouldShowSignTxnToast?: boolean
   chainId?: 416001 | 416002 | 416003 | 4160
@@ -22,15 +22,13 @@ export interface DaffiTransaction {
 export type DaffiWalletClientConstructor = {
   metadata: Metadata
   client: DaffiWalletConnect
+  clientOptions?: DaffiWalletConnectOptions
   algosdk: typeof _algosdk
   algodClient: _algosdk.Algodv2
   network: Network
 }
 
-export type InitParams = {
-  clientOptions?: ClientOptions
-  algodOptions?: AlgodClientOptions
+export type InitParams = CommonInitParams & {
+  clientOptions?: DaffiWalletConnectOptions
   clientStatic?: typeof DaffiWalletConnect
-  algosdkStatic?: typeof _algosdk
-  network?: Network
 }

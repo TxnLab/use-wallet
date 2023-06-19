@@ -7,17 +7,31 @@ import Algod, { getAlgodClient } from '../../algod'
 import type { DaffiWalletConnect } from '@daffiwallet/connect'
 import type { Wallet, DecodedTransaction, DecodedSignedTransaction, Network } from '../../types'
 import { PROVIDER_ID, DEFAULT_NETWORK } from '../../constants'
-import BaseWallet from '../base'
+import BaseClient from '../base'
 import { ICON } from './constants'
-import { DaffiTransaction, DaffiWalletClientConstructor, InitParams } from './types'
+import {
+  DaffiTransaction,
+  DaffiWalletClientConstructor,
+  DaffiWalletConnectOptions,
+  InitParams
+} from './types'
 
-class DaffiWalletClient extends BaseWallet {
+class DaffiWalletClient extends BaseClient {
   #client: DaffiWalletConnect
+  clientOptions?: DaffiWalletConnectOptions
   network: Network
 
-  constructor({ metadata, client, algosdk, algodClient, network }: DaffiWalletClientConstructor) {
+  constructor({
+    metadata,
+    client,
+    clientOptions,
+    algosdk,
+    algodClient,
+    network
+  }: DaffiWalletClientConstructor) {
     super(metadata, algosdk, algodClient)
     this.#client = client
+    this.clientOptions = clientOptions
     this.network = network
     this.metadata = DaffiWalletClient.metadata
   }
@@ -50,6 +64,7 @@ class DaffiWalletClient extends BaseWallet {
       return new DaffiWalletClient({
         metadata: DaffiWalletClient.metadata,
         client: daffiWallet,
+        clientOptions,
         algosdk,
         algodClient,
         network

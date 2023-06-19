@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DeflyWalletConnect } from '@blockshake/defly-connect'
+import { DaffiWalletConnect } from '@daffiwallet/connect'
 import { PeraWalletConnect } from '@perawallet/connect'
 import MyAlgoConnect from '@randlabs/myalgo-connect'
 import WalletConnect from '@walletconnect/client'
 import algosdk from 'algosdk'
 import AlgoSignerClient from '../clients/algosigner/client'
+import DaffiWalletClient from '../clients/daffi/client'
 import DeflyWalletClient from '../clients/defly/client'
 import ExodusClient from '../clients/exodus/client'
 import KMDWalletClient from '../clients/kmd/client'
@@ -19,6 +21,7 @@ import type { Account, ClientOptions } from '../types'
 
 type ClientTypeMap = {
   [PROVIDER_ID.ALGOSIGNER]: AlgoSignerClient
+  [PROVIDER_ID.DAFFI]: DaffiWalletClient
   [PROVIDER_ID.DEFLY]: DeflyWalletClient
   [PROVIDER_ID.EXODUS]: ExodusClient
   [PROVIDER_ID.KMD]: KMDWalletClient
@@ -40,6 +43,7 @@ export const createMockClient = <T extends PROVIDER_ID>(
     ) => ClientTypeMap[K]
   } = {
     [PROVIDER_ID.ALGOSIGNER]: createAlgoSignerMockInstance,
+    [PROVIDER_ID.DAFFI]: createDaffiMockInstance,
     [PROVIDER_ID.DEFLY]: createDeflyMockInstance,
     [PROVIDER_ID.EXODUS]: createExodusMockInstance,
     [PROVIDER_ID.KMD]: createKmdMockInstance,
@@ -96,6 +100,42 @@ export const createAlgoSignerMockInstance = (
   mockAlgoSignerClient.disconnect = jest.fn().mockImplementation(() => Promise.resolve())
 
   return mockAlgoSignerClient
+}
+
+// DAFFI
+export const createDaffiMockInstance = (
+  clientOptions?: ClientOptions,
+  accounts: Array<Account> = []
+): DaffiWalletClient => {
+  const mockDaffiWalletClient = new DaffiWalletClient({
+    metadata: {
+      id: PROVIDER_ID.DAFFI,
+      name: 'Daffi',
+      icon: 'daffi-icon-b64',
+      isWalletConnect: true
+    },
+    client: new DaffiWalletConnect(),
+    algosdk,
+    algodClient: {
+      accountInformation: () => ({
+        do: () => Promise.resolve({})
+      })
+    } as any,
+    network: 'test-network'
+  })
+
+  // Mock the connect method
+  mockDaffiWalletClient.connect = jest.fn().mockImplementation(() =>
+    Promise.resolve({
+      ...mockDaffiWalletClient.metadata,
+      accounts
+    })
+  )
+
+  // Mock the disconnect method
+  mockDaffiWalletClient.disconnect = jest.fn().mockImplementation(() => Promise.resolve())
+
+  return mockDaffiWalletClient
 }
 
 // DEFLY

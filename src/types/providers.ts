@@ -1,6 +1,7 @@
 import { PROVIDER_ID } from './wallet'
 import type { PeraWalletConnect } from '@perawallet/connect'
 import type { DeflyWalletConnect } from '@blockshake/defly-connect'
+import type { DaffiWalletConnect } from '@daffiwallet/connect'
 import type WalletConnect from '@walletconnect/client'
 import type MyAlgoConnect from '@randlabs/myalgo-connect'
 import QRCodeModal from 'algorand-walletconnect-qrcode-modal'
@@ -12,11 +13,16 @@ import { ExodusOptions } from '../clients/exodus/types'
 import { KmdOptions } from '../clients/kmd/types'
 import { MyAlgoConnectOptions } from '../clients/myalgo/types'
 import { WalletConnectOptions } from '../clients/walletconnect/types'
+import { DaffiWalletConnectOptions } from '../clients/daffi/types'
 
 export type ProviderConfigMapping = {
   [PROVIDER_ID.PERA]: {
     clientOptions?: PeraWalletConnectOptions
     clientStatic?: typeof PeraWalletConnect
+  }
+  [PROVIDER_ID.DAFFI]: {
+    clientOptions?: DaffiWalletConnectOptions
+    clientStatic?: typeof DaffiWalletConnect
   }
   [PROVIDER_ID.DEFLY]: {
     clientOptions?: DeflyWalletConnectOptions
