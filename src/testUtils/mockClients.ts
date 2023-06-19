@@ -85,7 +85,8 @@ export const createAlgoSignerMockInstance = (
         do: () => Promise.resolve({})
       })
     } as any,
-    network: 'test-network'
+    network: 'test-network',
+    ...(clientOptions && clientOptions)
   })
 
   // Mock the connect method
@@ -121,7 +122,8 @@ export const createDaffiMockInstance = (
         do: () => Promise.resolve({})
       })
     } as any,
-    network: 'test-network'
+    network: 'test-network',
+    ...(clientOptions && clientOptions)
   })
 
   // Mock the connect method
@@ -157,7 +159,8 @@ export const createDeflyMockInstance = (
         do: () => Promise.resolve({})
       })
     } as any,
-    network: 'test-network'
+    network: 'test-network',
+    ...(clientOptions && clientOptions)
   })
 
   // Mock the connect method
@@ -207,7 +210,8 @@ export const createExodusMockInstance = (
     } as any,
     network: 'test-network',
     clientOptions: {
-      onlyIfTrusted: false
+      onlyIfTrusted: false,
+      ...clientOptions
     }
   })
 
@@ -246,7 +250,8 @@ export const createKmdMockInstance = (
     } as any,
     network: 'test-network',
     wallet: 'mock-wallet',
-    password: 'mock-password'
+    password: 'mock-password',
+    ...(clientOptions && clientOptions)
   })
 
   // Mock the connect method
@@ -281,7 +286,8 @@ export const createMnemonicMockInstance = (
         do: () => Promise.resolve({})
       })
     } as any,
-    network: 'test-network'
+    network: 'test-network',
+    ...(clientOptions && clientOptions)
   })
 
   // Mock the connect method
@@ -317,7 +323,8 @@ export const createMyAlgoMockInstance = (
         do: () => Promise.resolve({})
       })
     } as any,
-    network: 'test-network'
+    network: 'test-network',
+    ...(clientOptions && clientOptions)
   })
 
   // Mock the connect method
@@ -390,7 +397,8 @@ export const createWalletConnectMockInstance = (
         do: () => Promise.resolve({})
       })
     } as any,
-    network: 'test-network'
+    network: 'test-network',
+    ...(clientOptions && clientOptions)
   })
 
   // Mock the connect method
