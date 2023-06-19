@@ -47,12 +47,6 @@ export type ProviderConfigMapping = {
   [PROVIDER_ID.MNEMONIC]: Record<string, never>
 }
 
-/*
-export type ProviderConfig<T extends keyof ProviderConfigMapping> = {
-  id: T
-} & ProviderConfigMapping[T]
-*/
-
 /**
  * Enforces correct configuration given for each provider. For example,
  * if `id` is `PROVIDER_ID.PERA`, then `clientOptions` must be of type
