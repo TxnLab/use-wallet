@@ -1,6 +1,6 @@
 import type _algosdk from 'algosdk'
 import type WalletConnect from '@walletconnect/client'
-import QRCodeModal from 'algorand-walletconnect-qrcode-modal'
+import type QRCodeModal from 'algorand-walletconnect-qrcode-modal'
 import type { Network, Metadata, CommonInitParams } from '../../types'
 
 export interface IClientMeta {

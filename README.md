@@ -10,6 +10,7 @@ React hooks for using Algorand compatible wallets with web applications. Flexibl
 - [AlgoSigner](https://www.purestake.com/technology/algosigner)
 - [Exodus](https://www.exodus.com)
 - [WalletConnect](https://walletconnect.com)
+- [Daffi](https://www.daffi.me/)
 - [KMD](https://developer.algorand.org/docs/rest-apis/kmd)
 
 ## Demo
