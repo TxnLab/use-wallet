@@ -1,4 +1,4 @@
-import { PROVIDER_ID } from './wallet'
+import { PROVIDER_ID } from '../constants'
 import type { PeraWalletConnect } from '@perawallet/connect'
 import type { DeflyWalletConnect } from '@blockshake/defly-connect'
 import type { DaffiWalletConnect } from '@daffiwallet/connect'

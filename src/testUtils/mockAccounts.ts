@@ -1,4 +1,5 @@
-import { Account, PROVIDER_ID } from 'src/types'
+import { Account } from 'src/types'
+import { PROVIDER_ID } from 'src/constants'
 
 export const mockAccounts = (providerId: PROVIDER_ID, qty = 1): Account[] => {
   const accounts = []

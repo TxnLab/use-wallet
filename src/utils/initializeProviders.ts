@@ -5,14 +5,14 @@ import {
   NodeConfig,
   ProviderConfig,
   ProviderConfigMapping,
-  PROVIDER_ID,
   SupportedProviders
 } from '../types'
 import {
   DEFAULT_NODE_BASEURL,
   DEFAULT_NODE_TOKEN,
   DEFAULT_NODE_PORT,
-  DEFAULT_NETWORK
+  DEFAULT_NETWORK,
+  PROVIDER_ID
 } from '../constants'
 
 export const initializeProviders = async <T extends keyof ProviderConfigMapping>(
