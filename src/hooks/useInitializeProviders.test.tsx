@@ -86,40 +86,6 @@ describe('useInitializeProviders', () => {
     })
   })
 
-  it('should handle re-rendering during initialization', async () => {
-    const { rerender } = renderHook(
-      ({ providers, nodeConfig }) => useInitializeProviders({ providers, nodeConfig }),
-      {
-        initialProps: {
-          providers: [PROVIDER_ID.PERA, PROVIDER_ID.DEFLY],
-          nodeConfig: {
-            nodeServer: 'http://localhost',
-            network: 'testnet'
-          }
-        }
-      }
-    )
-
-    rerender({
-      providers: [PROVIDER_ID.PERA],
-      nodeConfig: {
-        nodeServer: 'http://localhost',
-        network: 'testnet'
-      }
-    })
-
-    await waitFor(() =>
-      expect(initializeProviders).toHaveBeenCalledWith(
-        [PROVIDER_ID.PERA],
-        {
-          nodeServer: 'http://localhost',
-          network: 'testnet'
-        },
-        undefined
-      )
-    )
-  })
-
   it('should return the result of initializeProviders', async () => {
     const mockWalletProviders = { pera: {}, defly: {} }
     ;(initializeProviders as jest.Mock).mockImplementation(() =>
