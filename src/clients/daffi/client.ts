@@ -122,10 +122,15 @@ class DaffiWalletClient extends BaseClient {
 
   async signTransactions(
     connectedAccounts: string[],
-    transactions: Uint8Array[],
+    txnGroups: Uint8Array[] | Uint8Array[][],
     indexesToSign?: number[],
     returnGroup = true
   ) {
+    // If txnGroups is a nested array, flatten it
+    const transactions: Uint8Array[] = Array.isArray(txnGroups[0])
+      ? (txnGroups as Uint8Array[][]).flatMap((txn) => txn)
+      : (txnGroups as Uint8Array[])
+
     // Decode the transactions to access their properties.
     const decodedTxns = transactions.map((txn) => {
       return this.algosdk.decodeObj(txn)
