@@ -33,7 +33,6 @@
     "@babel/preset-typescript": "^7.16.0",
     "@blockshake/defly-connect": "^1.1.2",
     "@daffiwallet/connect": "^1.0.3",
-    "@json-rpc-tools/utils": "^1.7.6",
     "@mdx-js/react": "^2.1.2",
     "@perawallet/connect": "^1.2.1",
     "@randlabs/myalgo-connect": "^1.4.2",
@@ -53,12 +52,10 @@
     "@types/react": "^18.0.15",
     "@typescript-eslint/eslint-plugin": "^5.55.0",
     "@typescript-eslint/parser": "^5.55.0",
-    "@walletconnect/client": "^1.8.0",
     "@walletconnect/modal": "^2.4.7",
     "@walletconnect/sign-client": "^2.8.1",
     "@walletconnect/types": "^2.8.1",
     "@walletconnect/utils": "^2.8.1",
-    "algorand-walletconnect-qrcode-modal": "^1.8.0",
     "algosdk": "^2.1.0",
     "babel-jest": "^29.1.2",
     "babel-loader": "^8.2.3",
@@ -100,11 +97,10 @@
   "peerDependencies": {
     "@blockshake/defly-connect": "^1.1.2",
     "@daffiwallet/connect": "^1.0.3",
-    "@json-rpc-tools/utils": "^1.7.6",
     "@perawallet/connect": "^1.2.1",
     "@randlabs/myalgo-connect": "^1.4.2",
-    "@walletconnect/client": "^1.8.0",
-    "algorand-walletconnect-qrcode-modal": "^1.8.0",
+    "@walletconnect/modal": "^2.4.7",
+    "@walletconnect/sign-client": "^2.8.1",
     "algosdk": "^2.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
@@ -116,19 +112,16 @@
     "@daffiwallet/connect": {
       "optional": true
     },
-    "@json-rpc-tools/utils": {
-      "optional": true
-    },
     "@perawallet/connect": {
       "optional": true
     },
     "@randlabs/myalgo-connect": {
       "optional": true
     },
-    "@walletconnect/client": {
+    "@walletconnect/sign-client": {
       "optional": true
     },
-    "algorand-walletconnect-qrcode-modal": {
+    "@walletconnect/modal": {
       "optional": true
     }
   },
