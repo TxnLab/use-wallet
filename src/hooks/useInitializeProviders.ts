@@ -22,14 +22,10 @@ export default function useInitializeProviders<
   const [walletProviders, setWalletProviders] = useState<SupportedProviders | null>(null)
 
   useEffect(() => {
-    let active = true
     async function initializeAndConnect() {
       try {
         // Initialize with provided or default configuration
         const initializedProviders = await initializeProviders(providers, nodeConfig, algosdkStatic)
-
-        // Bail out if the dependencies changed while initializing
-        if (!active) return
 
         setWalletProviders(initializedProviders)
 
@@ -41,11 +37,8 @@ export default function useInitializeProviders<
     }
 
     void initializeAndConnect()
-
-    return () => {
-      active = false
-    }
-  }, [algosdkStatic, nodeConfig, providers])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return walletProviders
 }
