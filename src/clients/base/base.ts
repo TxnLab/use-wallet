@@ -38,7 +38,7 @@ abstract class BaseClient {
   abstract reconnect(onDisconnect: () => void): Promise<Wallet | null>
   abstract signTransactions(
     connectedAccounts: string[],
-    transactions: Array<Uint8Array>,
+    txnGroups: Uint8Array[] | Uint8Array[][],
     indexesToSign?: number[],
     returnGroup?: boolean
   ): Promise<Uint8Array[]>
