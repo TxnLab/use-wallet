@@ -1,59 +1,96 @@
 # @txnlab/use-wallet
 
-React hooks for using Algorand compatible wallets with web applications. Flexible and extensible, `use-wallet` supports a variety of wallets and connection protocols. It also provides a simple interface for connecting, disconnecting, switching between accounts and signing transactions.
+`@txnlab/use-wallet` is a React library that provides a simplified, consistent interface for integrating multiple Algorand wallets into your decentralized applications (dApps).
 
-## Supported Providers
+## Overview
 
-- [Pera](https://perawallet.app/)
-- [MyAlgo](https://wallet.myalgo.com/home)
-- [Defly](https://defly.app)
-- [AlgoSigner](https://www.purestake.com/technology/algosigner)
-- [Exodus](https://www.exodus.com)
-- [WalletConnect](https://walletconnect.com)
-- [Daffi](https://www.daffi.me/)
-- [KMD](https://developer.algorand.org/docs/rest-apis/kmd)
+With the `useWallet` hook and utility functions, you can:
 
-## Demo
+- Easily add or remove wallet support with a few lines of code
+- Configure each wallet provider as needed for your application
+- Allow users to easily switch between active accounts and wallet providers
+- Sign and send transactions
+- Restore sessions for returning users
 
-Preview a basic implementation in [Storybook](https://txnlab.github.io/use-wallet) or check out [this example](https://github.com/gabrielkuettel/use-wallet-example).
+This library supports most Algorand wallet providers, including Defly, Pera, Daffi, and Exodus (see [Supported Wallet Providers](#supported-wallet-providers) for the full list).
 
-## Quick Start
+<!-- It provides an abstraction layer that handles the initialization, connection, and transaction signing logic, eliminating the need to interact with each wallet's individual API. -->
 
-### Yarn
+As of version 2.x it includes [WalletConnect 2.0 support](#walletconnect-20-support).
 
-```bash
-yarn add @txnlab/use-wallet
-```
+## Table of Contents
 
-### NPM
+- [Live Examples](#live-examples)
+- [Installation](#installation)
+- [Initializing Providers](#initializing-providers)
+- [The `useWallet` Hook](#the-usewallet-hook)
+- [Type Definitions](#type-definitions)
+- [Connect Menu](#connect-menu)
+- [Displaying Account Details](#displaying-account-details)
+- [Signing and Sending Transactions](#signing-and-sending-transactions)
+- [Checking Connection Status](#checking-connection-status)
+- [Supported Wallet Providers](#supported-wallet-providers)
+- [Legacy Wallet Support](#legacy-wallet-support)
+- [Provider Configuration](#provider-configuration)
+  - [Default configuration](#default-configuration)
+  - [Node configuration](#node-configuration)
+  - [Customize provider support](#customize-provider-support)
+  - [Provider objects](#provider-objects)
+  - [Static imports](#static-imports)
+- [WalletConnect 2.0 Support](#walletconnect-20-support)
+- [Migration Guide](#migration-guide)
+- [Local Development](#local-development)
+- [Used By](#used-by)
+- [License](#license)
+
+## Live Examples
+
+**Storybook demo** - https://txnlab.github.io/use-wallet
+
+**Next.js example**
+
+- Demo - https://next-use-wallet.vercel.app/
+- Code - https://github.com/TxnLab/next-use-wallet
+
+**NFDomains** - https://app.nf.domains/
+
+## Installation
+
+Since this library uses React Hooks, your app will need to be using React 16.8 or higher.
+
+First, install the library
 
 ```bash
 npm install @txnlab/use-wallet
 ```
 
-### Set up the Wallet Provider
+If you haven't already, install the Algorand JS SDK
 
-In `app.js`, initialize the `WalletProvider` so that the `useWallet` hook can be used anywhere in your app, and use the `reconnectProviders` function to restore sessions for returning users.
+```bash
+npm install algosdk
+```
+
+Finally, install the peer dependencies for the wallets you wish to support. To use the default configuration:
+
+```bash
+npm install @perawallet/connect @blockshake/defly-connect @daffiwallet/connect @walletconnect/sign-client @walletconnect/utils @web3modal/standalone
+```
+
+Replace `npm install` with `yarn add` or `pnpm add` in the commands above, depending on your preferred package manager.
+
+## Initializing Providers
+
+In the root of your app, initialize the `WalletProvider` with the `useInitializeProviders` hook.
+
+This example initializes `useWallet` with the default configuration options. See [Provider Configuration](#provider-configuration) for more options.
 
 ```jsx
-import React, { useState, useEffect } from 'react'
-import { reconnectProviders, initializeProviders, WalletProvider } from '@txnlab/use-wallet'
+import React from 'react'
+import { WalletProvider, useInitializeProviders } from '@txnlab/use-wallet'
 
 export default function App() {
-  const [walletProviders, setWalletProviders] = useState(null)
-
-  useEffect(() => {
-    async function initializeAndConnect() {
-      // Initialize with default configuration
-      const providers = await initializeProviders()
-      setWalletProviders(providers)
-
-      // Reconnect the session when the user returns to the app
-      reconnectProviders(providers)
-    }
-
-    initializeAndConnect()
-  }, [])
+  // default configuration
+  const walletProviders = useInitializeProviders()
 
   return (
     <WalletProvider value={walletProviders}>
@@ -63,54 +100,109 @@ export default function App() {
 }
 ```
 
-The `reconnectProviders` function is used to restore session states of wallets that rely on the `WalletConnect` protocol.
+## The `useWallet` Hook
 
-By default, all of the supported providers except for `KMD` and `MNEMONIC` are initialized. You can choose which providers to support by passing an array of provider IDs to `initializeProviders` as shown here:
+The `useWallet` hook is used to access wallet provider and account state, send unsigned transactions to be signed, and send signed transactions to the node from anywhere in your app. It returns an object with the following properties:
 
-```jsx
-import { initializeProviders, PROVIDER_ID } from '@txnlab/use-wallet'
+- `providers` - Array of wallet providers that have been initialized (see `Provider` in [Type Definitions](#type-definitions))
+- `activeAccount` - The currently active account in the active provider (see `Account` in [Type Definitions](#type-definitions))
+- `connectedAccounts` - Array of accounts from all connected wallet providers
+- `connectedActiveAccounts` - Array of accounts from the active wallet provider
+- `activeAddress` - The address of `activeAccount`
+- `status`, `isReady`, `isActive` - The current connection status, see [Check connection status](#check-connection-status)
+- `signTransactions` - Function that sends unsigned transactions to active wallet provider for signature
+- `sendTransactions` - Function that sends signed transactions to the node
+- `groupTransactionsBySender` - Utility function that groups transactions by sender address
+- `getAddress` - Utility function that returns the address of the `activeAccount`
+- `getAccountInfo` - Utility function that fetches `activeAccount` account information from the node
+- `getAssets` - Utility function that fetches `activeAccount` asset info/balances from the node
+- `signer` - Function used by the [KMD](#kmd-algorand-key-management-daemon) provider to sign transactions
 
-const providers = await initializeProviders([PROVIDER_ID.KMD, PROVIDER_ID.WALLETCONNECT])
+## Type Definitions
+
+### `Provider`
+
+```ts
+type Provider = {
+  accounts: Account[]
+  isActive: boolean
+  isConnected: boolean
+  connect: () => Promise<void>
+  disconnect: () => Promise<void>
+  reconnect: () => Promise<void>
+  setActiveProvider: () => void
+  setActiveAccount: (account: string) => void
+  metadata: Metadata
+}
 ```
 
-For more configuration options, see [Provider Configuration](#provider-configuration).
+Each provider has two connection states: `isConnected` and `isActive`.
 
-### Connect
+`isConnected` means that the user has authorized the provider in the app. Multiple providers can be connected at the same time.
 
-Map through the `providers` object to list the providers and enable users to connect.
+`isActive` means that the provider is currently active and will be used to sign and send transactions.
+
+### `Account`
+
+```ts
+interface Account {
+  providerId: PROVIDER_ID
+  name: string
+  address: string
+  authAddr?: string
+}
+```
+
+The `activeAccount` is the account that will be used to sign and send transactions.
+
+To get the currently active wallet provider, read the `providerId` property of `activeAccount`.
+
+## Connect Menu
+
+In your app's UI you will need a menu for the user to `connect` or `disconnect` wallet providers, `setActiveProvider`, and `setActiveAccount`.
+
+This is a bare-bones example for demonstration purposes. For a styled example, see https://app.nf.domains/
 
 ```jsx
 import React from 'react'
 import { useWallet } from '@txnlab/use-wallet'
 
-export default function Connect() {
+export default function ConnectMenu() {
   const { providers, activeAccount } = useWallet()
 
-  // 1. Map the `providers`
-  // 2. Render account information and "Connect", "Set Active", and "Disconnect" buttons
-  // 3. Finally, map the `provider.accounts` property to render a dropdown for each connected account
+  // 1. Map over `providers` array
+  // 2. Show the provider name/icon and "Connect", "Set Active", and "Disconnect" buttons
+  // 3. If active, map `provider.accounts` to render a select menu of connected accounts
 
   return (
     <div>
       {providers?.map((provider) => (
-        <div key={'provider-' + provider.metadata.id}>
+        <div key={provider.metadata.id}>
           <h4>
-            <img width={30} height={30} alt="" src={provider.metadata.icon} />
+            <img
+              width={30}
+              height={30}
+              alt={`${provider.metadata.name} icon`}
+              src={provider.metadata.icon}
+            />
             {provider.metadata.name} {provider.isActive && '[active]'}
           </h4>
+
           <div>
-            <button onClick={provider.connect} disabled={provider.isConnected}>
+            <button type="button" onClick={provider.connect} disabled={provider.isConnected}>
               Connect
             </button>
-            <button onClick={provider.disconnect} disabled={!provider.isConnected}>
+            <button type="button" onClick={provider.disconnect} disabled={!provider.isConnected}>
               Disconnect
             </button>
             <button
+              type="button"
               onClick={provider.setActiveProvider}
               disabled={!provider.isConnected || provider.isActive}
             >
               Set Active
             </button>
+
             <div>
               {provider.isActive && provider.accounts.length && (
                 <select
@@ -133,76 +225,9 @@ export default function Connect() {
 }
 ```
 
-Each provider has two connection states: `isConnected` and `isActive`.
+## Displaying Account Details
 
-`isConnected` means that the user has authorized the provider to talk to the app. The connection flow does not need to be restarted when switching to this wallet from a different one.
-
-`isActive` indicates that the provider is currently active and will be used to sign and send transactions when using the `useWallet` hook.
-
-The `activeAccount` is the primary account that is currently active and will be used to sign and send transactions.
-
-### Sign and send transactions
-
-Construct a transaction using `algosdk`, and sign and send the transaction using the `signTransactions` and `sendTransactions` functions provided by the `useWallet` hook.
-
-```jsx
-import React from 'react'
-import algosdk from 'algosdk'
-import {
-  useWallet,
-  DEFAULT_NODE_BASEURL,
-  DEFAULT_NODE_TOKEN,
-  DEFAULT_NODE_PORT
-} from '@txnlab/use-wallet'
-
-const algodClient = new algosdk.Algodv2(DEFAULT_NODE_TOKEN, DEFAULT_NODE_BASEURL, DEFAULT_NODE_PORT)
-
-export default function Transact() {
-  const { activeAddress, signTransactions, sendTransactions } = useWallet()
-
-  const sendTransaction = async (from?: string, to?: string, amount?: number) => {
-    if (!from || !to || !amount) {
-      throw new Error('Missing transaction params.')
-    }
-
-    const suggestedParams = await algodClient.getTransactionParams().do()
-
-    const transaction = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
-      from,
-      to,
-      amount,
-      suggestedParams
-    })
-
-    const encodedTransaction = algosdk.encodeUnsignedTransaction(transaction)
-    const signedTransactions = await signTransactions([encodedTransaction])
-    const waitRoundsToConfirm = 4
-    const { id } = await sendTransactions(signedTransactions, waitRoundsToConfirm)
-
-    console.log('Successfully sent transaction. Transaction ID: ', id)
-  }
-
-  if (!activeAddress) {
-    return <p>Connect an account first.</p>
-  }
-
-  return (
-    <div>
-      <button
-        type="button"
-        onClick={() => sendTransaction(activeAddress, activeAddress, 1000)}
-        className="button"
-      >
-        Sign and send transactions
-      </button>
-    </div>
-  )
-}
-```
-
-### Display account details
-
-The `activeAccount` object can be used to display details for the currently active account. For convenience, the `activeAddress` property shows the currently active address.
+The `activeAccount` object can be used to display details for the currently active account.
 
 ```jsx
 import React from 'react'
@@ -232,9 +257,101 @@ export default function Account() {
 }
 ```
 
-### Check connection status
+## Signing and Sending Transactions
 
-The `isActive` and `isReady` properties can be used to check the status of the wallets. The `isActive` property determines whether or not an account is currently active. The `isReady` property indicates whether `use-wallet` has mounted and successfully read the connection status from the providers. These properties are useful when setting up client side access restrictions, for example, by redirecting a user if no wallet is active, as shown below.
+Here is an example of a signing and sending simple pay transaction using `signTransactions` and `sendTransactions`.
+
+```jsx
+import React from 'react'
+import algosdk from 'algosdk'
+import {
+  useWallet,
+  DEFAULT_NODE_BASEURL,
+  DEFAULT_NODE_TOKEN,
+  DEFAULT_NODE_PORT
+} from '@txnlab/use-wallet'
+
+const algodClient = new algosdk.Algodv2(DEFAULT_NODE_TOKEN, DEFAULT_NODE_BASEURL, DEFAULT_NODE_PORT)
+
+export default function Transact() {
+  const { activeAddress, signTransactions, sendTransactions } = useWallet()
+
+  const sendTransaction = async (from?: string, to?: string, amount?: number) => {
+    try {
+      if (!from || !to || !amount) {
+        throw new Error('Missing transaction params.')
+      }
+
+      const suggestedParams = await algodClient.getTransactionParams().do()
+
+      const transaction = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+        from,
+        to,
+        amount,
+        suggestedParams
+      })
+
+      const encodedTransaction = algosdk.encodeUnsignedTransaction(transaction)
+      const signedTransactions = await signTransactions([encodedTransaction])
+      const waitRoundsToConfirm = 4
+      const { id } = await sendTransactions(signedTransactions, waitRoundsToConfirm)
+
+      console.log('Successfully sent transaction. Transaction ID: ', id)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  if (!activeAddress) {
+    return <p>Connect an account first.</p>
+  }
+
+  return (
+    <div>
+      <button type="button" onClick={() => sendTransaction(activeAddress, activeAddress, 1000)}>
+        Sign and send transactions
+      </button>
+    </div>
+  )
+}
+```
+
+### signTransactions
+
+```jsx
+const signTransactions: (
+  transactions: Uint8Array[] | Uint8Array[][],
+  indexesToSign?: number[],
+  returnGroup?: boolean // defaults to true
+) => Promise<Uint8Array[]>
+```
+
+The `signTransactions` function will accept an array of transactions or an array of transaction groups.
+
+You can optionally specify which transactions should be signed by providing an array of indexes as the second argument, `indexesToSign`.
+
+By setting `returnGroup` to `false`, the returned promise will resolve to an array of signed transactions only. Otherwise it will return flat array of all transactions by default.
+
+### sendTransactions
+
+```jsx
+const sendTransactions: (
+  signedTransactions: Uint8Array[],
+  waitRoundsToConfirm?: number
+) => Promise<PendingTransactionResponse & { id: string }>
+```
+
+If `signTransactions` is successful, the returned array of transactions can be passed to `sendTransactions` to be sent to the network.
+
+It will wait for confirmation before resolving the promise. Use the optional argument `waitRoundsToConfirm` to indicate how many rounds to wait for confirmation.
+
+The promise will resolve to an object containing the transaction `id` and the [`PendingTransactionResponse`](https://developer.algorand.org/docs/rest-apis/algod/#pendingtransactionresponse) from the Algorand REST API.
+
+## Checking Connection Status
+
+The `isActive` and `isReady` properties can be used to check the status of the wallet providers. The `isActive` property determines whether or not an account is currently active. The `isReady` property indicates whether `use-wallet` has mounted and successfully read the connection status from the providers.
+
+These properties are useful when setting up client side access restrictions, for example, by redirecting a user if no wallet provider `isActive`, as shown below.
 
 ```jsx
 const { isActive, isReady } = useWallet()
@@ -250,93 +367,169 @@ useEffect(() => {
 })
 ```
 
+## Supported Wallet Providers
+
+### Pera Wallet
+
+- Website - https://perawallet.app/
+- Download Pera Mobile - [iOS](https://apps.apple.com/us/app/algorand-wallet/id1459898525) / [Android](https://play.google.com/store/apps/details?id=com.algorand.android)
+- Pera Web Wallet - https://web.perawallet.app/
+- Pera Connect - https://github.com/perawallet/connect
+
+### Defly Wallet
+
+- Website - https://defly.app/
+- Download Defly Wallet - [iOS](https://apps.apple.com/us/app/defly/id1602672723) / [Android](https://play.google.com/store/apps/details?id=io.blockshake.defly.app)
+- Defly Connect - https://github.com/blockshake-io/defly-connect
+
+### Daffi Wallet
+
+- Website - https://www.daffi.me/
+- Download Daffi Wallet - [iOS](https://apps.apple.com/kn/app/daffiwallet/id1659597876) / [Android](https://play.google.com/store/apps/details?id=me.daffi.daffi_wallet)
+- Daffi Connect - https://github.com/RDinitiativ/daffiwallet_connect
+
+### WalletConnect
+
+- Website - https://walletconnect.com/
+- Documentation - https://docs.walletconnect.com/
+- WalletConnect Cloud - https://cloud.walletconnect.com/
+- Web3Modal - https://web3modal.com/
+
+### Exodus Wallet
+
+- Website - https://www.exodus.com/
+- Download - https://www.exodus.com/download/
+
+### KMD (Algorand Key Management Daemon)
+
+- Documentation - https://developer.algorand.org/docs/rest-apis/kmd
+
+## Legacy Wallet Support
+
+Support for these wallets will be removed in a future release.
+
+### AlgoSigner
+
+- GitHub - https://github.com/PureStake/algosigner
+- EOL Press Release - https://www.algorand.foundation/news/algosigner-support-ending
+
+### MyAlgo
+
+- Website - https://wallet.myalgo.com/home
+- FAQ - https://wallet.myalgo.com/home#faq
+
 ## Provider Configuration
 
-The `initializeProviders` function accepts a configuration object that can be used to configure the nodes that the providers use to send transactions, as shown below.
+### Default Configuration
+
+Calling `useInitializeProviders` with no arguments initializes the default supported wallet providers with the default node configuration:
+
+| Key                   | Default Value                                                                  |
+| --------------------- | ------------------------------------------------------------------------------ |
+| providers             | `[PROVIDER_ID.PERA, PROVIDER_ID.DEFLY, PROVIDER_ID.DAFFI, PROVIDER_ID.EXODUS]` |
+| nodeConfig.network    | `'mainnet'`                                                                    |
+| nodeConfig.nodeServer | `'https://mainnet-api.algonode.cloud'`                                         |
+| nodeConfig.nodeToken  | `''`                                                                           |
+| nodeConfig.nodePort   | `443`                                                                          |
+| algosdkStatic         | `undefined`                                                                    |
 
 ```jsx
-const providers = await initializeProviders([], {
-  network: 'devmodenet',
-  nodeServer: 'http://algod',
-  nodeToken: 'xxxxxxxxx',
-  nodePort: '8080'
+import React from 'react'
+import { WalletProvider, useInitializeProviders } from '@txnlab/use-wallet'
+
+export default function App() {
+  const providers = useInitializeProviders()
+
+  return (
+    <WalletProvider value={walletProviders}>
+      <div className="App">{/* ... */}</div>
+    </WalletProvider>
+  )
+}
+```
+
+### Node configuration
+
+To configure the Algorand node that providers will use to send transactions, you can set the `nodeConfig` property. The `network` property should be specified as `mainnet`, `testnet`, `betanet` or the name of your local development network.
+
+Refer to your wallet providers' documentation to see which networks they support.
+
+```jsx
+const providers = await initializeProviders({
+  nodeConfig: {
+    network: 'testnet',
+    nodeServer: 'https://testnet-api.algonode.cloud',
+    nodeToken: '',
+    nodePort: '443'
+  }
 })
 ```
 
-Passing an empty array as the first argument enables all of the default providers. The `network` property should be specified as `betanet`, `testnet`, `mainnet` or the name of your local development network.
+### Customize provider support
 
-For more custom configuration options, the providers can be configured individually by creating an object and passing it to the `WalletProvider` where the key contains the provider ID, and the value calls the `init` function of the provider client. See below for an example:
+You can choose which wallet providers to support by setting the `providers` property to an array of provider IDs or [provider objects](#provider-objects). The example below shows provider IDs being used.
 
 ```jsx
-import {
-  PROVIDER_ID,
-  pera,
-  myalgo,
-} from "@txnlab/use-wallet";
-
-const walletProviders = {
-  [PROVIDER_ID.PERA]: pera.init({
-    clientOptions: {
-      shouldShowSignTxnToast: true,
-    },
-  }),
-  [PROVIDER_ID.MYALGO]: myalgo.init({
-    network: "devmodenet",
-    algodOptions: ["xxxxxxxxx", "http://algod", "8080"],
-    clientOptions: { disableLedgerNano: true },
-  }),
-};
-
-export default functon App() {
-  return (
-    <WalletProvider value={walletProviders}>
-      <div className="App">{/* ... */}</div>
-    </WalletProvider>
-  )
-}
+// Only initialize Pera and Defly providers
+const providers = useInitializeProviders({
+  providers: [PROVIDER_ID.PERA, PROVIDER_ID.DEFLY]
+})
 ```
 
-## Static Imports
+### Provider objects
 
-By default, `use-wallet` dynamically imports all of the dependencies for the providiers, as well as `algosdk`, to reduce bundle size.
-
-Some React frameworks, like [Remix](https://remix.run/), do not support dynamic imports. To get around this, those dependencies can be imported in your application and passed to the `useWallet` provider. See below for an example.
+Some wallet providers have accompanying client libraries that can be configured. You can pass an object to the providers array to set `clientOptions`, as shown below.
 
 ```jsx
-import algosdk from 'algosdk'
-import MyAlgoConnect from '@randlabs/myalgo-connect'
-import { PeraWalletConnect } from '@perawallet/connect'
-import { DeflyWalletConnect } from '@blockshake/defly-connect'
-import WalletConnect from '@walletconnect/client'
-import QRCodeModal from 'algorand-walletconnect-qrcode-modal'
+const providers = useInitializeProviders({
+  providers: [
+    PROVIDER_ID.DEFLY, // use default options for Defly Connect
+    { id: PROVIDER_ID.PERA, clientOptions: { shouldShowSignTxnToast: false } },
+    { id: PROVIDER_ID.MYALGO, clientOptions: { disableLedgerNano: false } },
+    PROVIDER_ID.EXODUS // Exodus has no client library
+  ]
+})
+```
 
-const walletProviders = {
-  [PROVIDER_ID.PERA]: pera.init({
-    algosdkStatic: algosdk,
-    clientStatic: PeraWalletConnect
-  }),
-  [PROVIDER_ID.MYALGO]: myalgo.init({
-    algosdkStatic: algosdk,
-    clientStatic: MyAlgoConnect
-  }),
-  [PROVIDER_ID.DEFLY]: defly.init({
-    algosdkStatic: algosdk,
-    clientStatic: DeflyWalletConnect
-  }),
-  [PROVIDER_ID.EXODUS]: exodus.init({
-    algosdkStatic: algosdk
-  }),
-  [PROVIDER_ID.ALGOSIGNER]: algosigner.init({
-    algosdkStatic: algosdk
-  }),
-  [PROVIDER_ID.WALLETCONNECT]: walletconnect.init({
-    algosdkStatic: algosdk,
-    clientStatic: WalletConnect,
-    modalStatic: QRCodeModal
-  })
-}
+See each provider's documentation for the available client options.
+
+You will need to use provider objects for [static imports](#static-imports), and for [WalletConnect 2.0](#walletconnect-20) support.
+
+**TypeScript:** The provider objects are type-safe, so your IDE should be able to provide autocomplete suggestions for the client's available options based on the `id` that is set.
+
+### Static Imports
+
+By default, `use-wallet` dynamically imports all of the dependencies for the providers, as well as `algosdk`, to reduce bundle size.
+
+Some React frameworks, like [Remix](https://remix.run/), do not support dynamic imports. To get around this, provider clients can be imported in your application and passed to the provider objects `clientStatic` property.
+
+Set the imported `algosdk` to the `algosdkStatic` root property.
+
+```jsx
+import React from 'react'
+import algosdk from 'algosdk'
+import { PROVIDER_ID, WalletProvider, useInitializeProviders } from '@txnlab/use-wallet'
+import { DeflyWalletConnect } from '@blockshake/defly-connect'
+import { PeraWalletConnect } from '@perawallet/connect'
+import SignClient from '@walletconnect/sign-client'
+import { Web3Modal } from '@web3modal/standalone'
 
 export default function App() {
+  const providers = useInitializeProviders({
+    providers: [
+      { id: PROVIDER_ID.PERA, clientStatic: PeraWalletConnect },
+      { id: PROVIDER_ID.DEFLY, clientStatic: DeflyWalletConnect },
+      {
+        id: PROVIDER_ID.WALLETCONNECT,
+        clientStatic: SignClient,
+        web3Modal: Web3Modal,
+        projectId: '<YOUR_PROJECT_ID>'
+      },
+      PROVIDER_ID.EXODUS
+    ],
+    algosdkStatic: algosdk
+  })
+
   return (
     <WalletProvider value={walletProviders}>
       <div className="App">{/* ... */}</div>
@@ -345,9 +538,102 @@ export default function App() {
 }
 ```
 
-You will need to install these dependencies, depending on which wallet(s) you want to support.
+## WalletConnect 2.0 Support
 
-Note that some of the providers do not require static imports to be provided. This is usually the case of providers that are browser extensions.
+`use-wallet` v2 introduces support for WalletConnect 2.0. This is a major upgrade to the WalletConnect protocol, and introduces a number of breaking changes for app developers to contend with.
+
+However, Algorand apps with `use-wallet` will be able to support the new protocol with minimal effort:
+
+1. **Obtain a project ID** - You will need to obtain a project ID from [WalletConnect Cloud](https://cloud.walletconnect.com/). This is a simple process, and there is no waiting period. Every app will need its own unique project ID.
+
+2. **Install peer dependencies** - Install `@walletconnect/sign-client` and `@web3modal/standalone`.
+
+3. **Update provider configuration** - You will need to use a provider object to initialize WalletConnect, and pass your `projectId` as shown below
+
+```jsx
+const providers = useInitializeProviders({
+  providers: [
+    { id: PROVIDER_ID.WALLETCONNECT, projectId: '<YOUR_PROJECT_ID>' }
+    // other providers...
+  ]
+})
+```
+
+Since it requires the unique `projectId`, the WalletConnect provider is not initialized by default. This is a change from v1. If you want to support WalletConnect, it must be added to the `providers` array.
+
+See [Migrating to WalletConnect 2.0](#migrating-to-walletconnect-20) below for more information.
+
+## Migration Guide
+
+Version 2.x is a major version bump, and includes some breaking changes from 1.x.
+
+### initializeProviders
+
+`initializeProviders` is now asynchronous, and must be called from inside a `useEffect` hook.
+
+To simplify this, the `useInitializeProviders` hook is now provided, which calls `initializeProviders` internally. It accepts a single object as an argument.
+
+The providers array should be set as the `providers` property.
+
+```diff
+- const providers = initializeProviders([PROVIDER_ID.PERA, PROVIDER_ID.DEFLY])
++ const providers = useInitializeProviders({
++   providers: [PROVIDER_ID.PERA, PROVIDER_ID.DEFLY]
++ })
+```
+
+Node configuration should be set as the `nodeConfig` property.
+
+```diff
+- const providers = initializeProviders([], {
+-   network: 'testnet',
+-   nodeServer: 'https://testnet-api.algonode.cloud',
+-   nodeToken: '',
+-   nodePort: '443'
+- })
++ const providers = useInitializeProviders({
++   nodeConfig: {
++     network: 'testnet',
++     nodeServer: 'https://testnet-api.algonode.cloud',
++     nodeToken: '',
++     nodePort: '443'
++   }
++ })
+```
+
+See [Provider Configuration](#provider-configuration) for more details.
+
+### shouldShowSignTxnToast
+
+Pera Connect and Defly Connect both have a `shouldShowSignTxnToast` option that is set to `true` by default. `use-wallet` v1 set this to `false` by default, and required setting the option back to `true` to achieve the libraries' default behavior.
+
+In v2 this option is set to `true` by default. If your app has this option explicitly set you can remove it from your configuration. If you wish to disable the toast(s), you must now explicitly set the option to `false`.
+
+```jsx
+const providers = useInitializeProviders({
+  providers: [
+    { id: PROVIDER_ID.DEFLY, clientOptions: { shouldShowSignTxnToast: false } },
+    { id: PROVIDER_ID.PERA, clientOptions: { shouldShowSignTxnToast: false } }
+    // other providers...
+  ]
+})
+```
+
+### WalletConnect provider
+
+The WalletConnect provider now supports WalletConnect 2.0. To continue supporting this default provider, or to add support to your application, you must install the `@walletconnect/sign-client` and `@web3modal/standalone` packages.
+
+```bash
+npm install @walletconnect/sign-client @web3modal/standalone
+```
+
+The peer dependencies for WalletConnect 1.x should be uninstalled.
+
+```bash
+npm uninstall @walletconnect/client @json-rpc-tools/utils algorand-walletconnect-qrcode-modal
+```
+
+WalletConnect is no longer initialized by default. To add support for WalletConnect, you must add it to the `providers` array, and pass your `projectId` as described in [WalletConnect 2.0 Support](#walletconnect-20-support) above.
 
 ## Local Development
 
@@ -361,7 +647,6 @@ yarn install
 
 ```bash
 yarn dev
-
 ```
 
 To develop against a local version of `use-wallet` in your application, do the following:
@@ -397,7 +682,7 @@ cd ../react-dom
 yarn link
 ```
 
-In the root of `use-wallet` directory, run:
+In the root of the `use-wallet` directory, run:
 
 ```bash
 yarn link react react-dom
@@ -405,7 +690,7 @@ yarn link react react-dom
 
 ## Used By
 
-Are you using `@txnlab/use-wallet`? We'd love to include you here. Let us know! [Twitter](https://twitter.com/NFDomains) | [Discord](https://discord.gg/7XcuMTfeZP) | [Email](mailto:admin@txnlab.dev)
+Are you using `@txnlab/use-wallet`? We'd love to include your project here. Let us know! [Twitter](https://twitter.com/NFDomains) | [Discord](https://discord.gg/7XcuMTfeZP) | [Email](mailto:admin@txnlab.dev)
 
 - [@algoscan/use-wallet-ui](https://github.com/algoscan/use-wallet-ui)
 - [@algoworldnft/algoworld-swapper](https://github.com/algoworldnft/algoworld-swapper)

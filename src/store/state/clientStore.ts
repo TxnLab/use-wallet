@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import { SupportedProviders } from 'src/types'
+import { SupportedProviders } from '../../types'
 
 const ClientContext = createContext<SupportedProviders | null>(null)
 
