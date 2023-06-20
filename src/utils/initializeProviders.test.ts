@@ -70,7 +70,6 @@ describe('initializeProviders', () => {
     const defaultProviders = [
       PROVIDER_ID.PERA,
       PROVIDER_ID.DEFLY,
-      PROVIDER_ID.WALLETCONNECT,
       PROVIDER_ID.EXODUS,
       PROVIDER_ID.ALGOSIGNER,
       PROVIDER_ID.MYALGO
@@ -95,11 +94,15 @@ describe('initializeProviders', () => {
   })
 
   it('should return an object with the expected shape', async () => {
-    // Initialize all providers
-    const result = await initializeProviders(Object.values(PROVIDER_ID))
+    const providers = Object.values(PROVIDER_ID).filter(
+      (providerId) => providerId !== PROVIDER_ID.WALLETCONNECT
+    )
+
+    // Initialize providers
+    const result = await initializeProviders(providers)
 
     // Check if the returned object has the correct keys
-    expect(Object.keys(result)).toEqual(expect.arrayContaining(Object.values(PROVIDER_ID)))
+    expect(Object.keys(result)).toEqual(expect.arrayContaining(providers))
 
     // Check if the returned clients are instances of BaseClient
     for (const clientInstance of Object.values(result)) {

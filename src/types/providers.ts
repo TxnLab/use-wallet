@@ -2,17 +2,17 @@ import { PROVIDER_ID } from '../constants'
 import type { PeraWalletConnect } from '@perawallet/connect'
 import type { DeflyWalletConnect } from '@blockshake/defly-connect'
 import type { DaffiWalletConnect } from '@daffiwallet/connect'
-import type WalletConnect from '@walletconnect/client'
+import type SignClient from '@walletconnect/sign-client'
 import type MyAlgoConnect from '@randlabs/myalgo-connect'
-import QRCodeModal from 'algorand-walletconnect-qrcode-modal'
+import type { WalletConnectModal } from '@walletconnect/modal'
 import { AlgodClientOptions, Network } from './node'
-import algosdk from 'algosdk'
+import type algosdk from 'algosdk'
 import type { PeraWalletConnectOptions } from '../clients/pera/types'
 import { DeflyWalletConnectOptions } from '../clients/defly/types'
 import { ExodusOptions } from '../clients/exodus/types'
 import { KmdOptions } from '../clients/kmd/types'
 import { MyAlgoConnectOptions } from '../clients/myalgo/types'
-import { WalletConnectOptions } from '../clients/walletconnect/types'
+import { WalletConnectModalOptions, WalletConnectOptions } from '../clients/walletconnect2/types'
 import { DaffiWalletConnectOptions } from '../clients/daffi/types'
 
 export type ProviderConfigMapping = {
@@ -30,8 +30,9 @@ export type ProviderConfigMapping = {
   }
   [PROVIDER_ID.WALLETCONNECT]: {
     clientOptions?: WalletConnectOptions
-    clientStatic?: typeof WalletConnect
-    modalStatic?: typeof QRCodeModal
+    clientStatic?: typeof SignClient
+    modalStatic?: typeof WalletConnectModal
+    modalOptions?: WalletConnectModalOptions
   }
   [PROVIDER_ID.MYALGO]: {
     clientOptions?: MyAlgoConnectOptions

@@ -88,7 +88,12 @@ export default {
   // ],
 
   // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
-  // moduleNameMapper: {},
+  moduleNameMapper: {
+    '@walletconnect/utils': '<rootDir>/__mocks__/walletconnect-utils.js',
+    '@walletconnect/sign-client': '<rootDir>/__mocks__/walletconnect-sign-client.js',
+    '@walletconnect/modal': '<rootDir>/__mocks__/walletconnect-modal.js',
+    '@walletconnect/client': '<rootDir>/__mocks__/walletconnect-client.js'
+  },
 
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
   // modulePathIgnorePatterns: [],

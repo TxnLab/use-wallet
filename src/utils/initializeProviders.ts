@@ -52,7 +52,10 @@ export const initializeProviders = async <T extends keyof ProviderConfigMapping>
   // Initialize default providers if `providers` is undefined or empty
   if (!providers || providers.length === 0) {
     const initPromises = Object.keys(allClients)
-      .filter((id) => id !== PROVIDER_ID.KMD && id !== PROVIDER_ID.MNEMONIC)
+      .filter(
+        (id) =>
+          id !== PROVIDER_ID.KMD && id !== PROVIDER_ID.MNEMONIC && id !== PROVIDER_ID.WALLETCONNECT
+      )
       .map((id) => initClient(id as T))
 
     await Promise.all(initPromises)
