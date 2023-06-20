@@ -162,7 +162,7 @@ export default function useWallet() {
   }
 
   const signTransactions = async (
-    transactions: Array<Uint8Array>,
+    transactions: Uint8Array[] | Uint8Array[][],
     indexesToSign?: number[],
     returnGroup = true
   ) => {
