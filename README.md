@@ -73,7 +73,7 @@ npm install algosdk
 Finally, install the peer dependencies for the wallets you wish to support. To use the default configuration:
 
 ```bash
-npm install @perawallet/connect @blockshake/defly-connect @daffiwallet/connect @walletconnect/sign-client @walletconnect/utils @web3modal/standalone
+npm install @perawallet/connect @blockshake/defly-connect @daffiwallet/connect
 ```
 
 Replace `npm install` with `yarn add` or `pnpm add` in the commands above, depending on your preferred package manager.
@@ -90,10 +90,10 @@ import { WalletProvider, useInitializeProviders } from '@txnlab/use-wallet'
 
 export default function App() {
   // default configuration
-  const walletProviders = useInitializeProviders()
+  const providers = useInitializeProviders()
 
   return (
-    <WalletProvider value={walletProviders}>
+    <WalletProvider value={providers}>
       <div className="App">{/* ... */}</div>
     </WalletProvider>
   )
@@ -441,7 +441,7 @@ export default function App() {
   const providers = useInitializeProviders()
 
   return (
-    <WalletProvider value={walletProviders}>
+    <WalletProvider value={providers}>
       <div className="App">{/* ... */}</div>
     </WalletProvider>
   )
@@ -512,7 +512,7 @@ import { PROVIDER_ID, WalletProvider, useInitializeProviders } from '@txnlab/use
 import { DeflyWalletConnect } from '@blockshake/defly-connect'
 import { PeraWalletConnect } from '@perawallet/connect'
 import SignClient from '@walletconnect/sign-client'
-import { Web3Modal } from '@web3modal/standalone'
+import { WalletConnectModal } from '@walletconnect/modal'
 
 export default function App() {
   const providers = useInitializeProviders({
@@ -522,8 +522,16 @@ export default function App() {
       {
         id: PROVIDER_ID.WALLETCONNECT,
         clientStatic: SignClient,
-        web3Modal: Web3Modal,
-        projectId: '<YOUR_PROJECT_ID>'
+        modalStatic: WalletConnectModal,
+        clientOptions: {
+          projectId: '<YOUR_PROJECT_ID>',
+          metadata: {
+            name: 'Example Dapp',
+            description: 'Example Dapp',
+            url: '#',
+            icons: ['https://walletconnect.com/walletconnect-logo.png']
+          }
+        }
       },
       PROVIDER_ID.EXODUS
     ],
@@ -531,7 +539,7 @@ export default function App() {
   })
 
   return (
-    <WalletProvider value={walletProviders}>
+    <WalletProvider value={providers}>
       <div className="App">{/* ... */}</div>
     </WalletProvider>
   )
@@ -546,14 +554,25 @@ However, Algorand apps with `use-wallet` will be able to support the new protoco
 
 1. **Obtain a project ID** - You will need to obtain a project ID from [WalletConnect Cloud](https://cloud.walletconnect.com/). This is a simple process, and there is no waiting period. Every app will need its own unique project ID.
 
-2. **Install peer dependencies** - Install `@walletconnect/sign-client` and `@web3modal/standalone`.
+2. **Install peer dependencies** - Install `@walletconnect/sign-client` and `@walletconnect/modal`.
 
-3. **Update provider configuration** - You will need to use a provider object to initialize WalletConnect, and pass your `projectId` as shown below
+3. **Update provider configuration** - You will need to use a provider object to initialize WalletConnect, and pass your `clientOptions` as shown below
 
 ```jsx
 const providers = useInitializeProviders({
   providers: [
-    { id: PROVIDER_ID.WALLETCONNECT, projectId: '<YOUR_PROJECT_ID>' }
+    {
+      id: PROVIDER_ID.WALLETCONNECT,
+      clientOptions: {
+        projectId: '<YOUR_PROJECT_ID>',
+        metadata: {
+          name: 'Example Dapp',
+          description: 'Example Dapp',
+          url: '#',
+          icons: ['https://walletconnect.com/walletconnect-logo.png']
+        }
+      }
+    }
     // other providers...
   ]
 })
@@ -621,10 +640,10 @@ const providers = useInitializeProviders({
 
 ### WalletConnect provider
 
-The WalletConnect provider now supports WalletConnect 2.0. To continue supporting this default provider, or to add support to your application, you must install the `@walletconnect/sign-client` and `@web3modal/standalone` packages.
+The WalletConnect provider now supports WalletConnect 2.0. To continue supporting this provider, or to add support to your application, you must install the `@walletconnect/sign-client` and `@walletconnect/modal` packages.
 
 ```bash
-npm install @walletconnect/sign-client @web3modal/standalone
+npm install @walletconnect/sign-client @walletconnect/modal
 ```
 
 The peer dependencies for WalletConnect 1.x should be uninstalled.
@@ -633,7 +652,7 @@ The peer dependencies for WalletConnect 1.x should be uninstalled.
 npm uninstall @walletconnect/client @json-rpc-tools/utils algorand-walletconnect-qrcode-modal
 ```
 
-WalletConnect is no longer initialized by default. To add support for WalletConnect, you must add it to the `providers` array, and pass your `projectId` as described in [WalletConnect 2.0 Support](#walletconnect-20-support) above.
+WalletConnect is no longer initialized by default. To add support for WalletConnect, you must add it to the `providers` array, and pass your `clientOptions` as described in [WalletConnect 2.0 Support](#walletconnect-20-support) above.
 
 ## Local Development
 

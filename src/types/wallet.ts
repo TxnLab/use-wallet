@@ -70,5 +70,3 @@ export type ClientOptions = Record<string, any>
 export type WalletClient = BaseClient
 
 export type SupportedProviders = Partial<Record<PROVIDER_ID, WalletClient | null>>
-
-export { PROVIDER_ID }

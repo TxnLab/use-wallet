@@ -3,7 +3,8 @@ import { DeflyWalletConnect } from '@blockshake/defly-connect'
 import { DaffiWalletConnect } from '@daffiwallet/connect'
 import { PeraWalletConnect } from '@perawallet/connect'
 import MyAlgoConnect from '@randlabs/myalgo-connect'
-import WalletConnect from '@walletconnect/client'
+import { WalletConnectModal } from '@walletconnect/modal'
+import { SignClient } from '@walletconnect/sign-client'
 import algosdk from 'algosdk'
 import AlgoSignerClient from '../clients/algosigner/client'
 import DaffiWalletClient from '../clients/daffi/client'
@@ -13,7 +14,7 @@ import KMDWalletClient from '../clients/kmd/client'
 import MnemonicWalletClient from '../clients/mnemonic/client'
 import MyAlgoWalletClient from '../clients/myalgo/client'
 import PeraWalletClient from '../clients/pera/client'
-import WalletConnectClient from '../clients/walletconnect/client'
+import WalletConnectClient from '../clients/walletconnect2/client'
 import { PROVIDER_ID } from '../constants'
 import type { AlgoSigner } from '../clients/algosigner/types'
 import type { Exodus } from '../clients/exodus/types'
@@ -390,7 +391,8 @@ export const createWalletConnectMockInstance = (
       icon: 'walletconnect-icon-b64',
       isWalletConnect: true
     },
-    client: new WalletConnect({ bridge: 'http://mock-bridge' }),
+    client: new SignClient(),
+    modal: new WalletConnectModal({ projectId: 'project-id', walletConnectVersion: 2 }),
     algosdk,
     algodClient: {
       accountInformation: () => ({
@@ -398,6 +400,7 @@ export const createWalletConnectMockInstance = (
       })
     } as any,
     network: 'test-network',
+    chain: 'algorand:testnet',
     ...(clientOptions && clientOptions)
   })
 
