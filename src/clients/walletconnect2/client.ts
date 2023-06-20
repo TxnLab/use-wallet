@@ -111,13 +111,6 @@ class WalletConnectClient extends BaseClient {
   }
 
   async connect(): Promise<Wallet> {
-    const unsubscribeModal = this.#modal.subscribeModal((state) => {
-      if (!state.open) {
-        unsubscribeModal()
-        throw new Error('Modal closed')
-      }
-    })
-
     const requiredNamespaces = {
       algorand: {
         chains: [this.chain],
@@ -132,25 +125,35 @@ class WalletConnectClient extends BaseClient {
       await this.#modal.openModal({ uri, standaloneChains: [this.chain] })
     }
 
-    try {
-      const session = await approval()
-      const { accounts } = session.namespaces.algorand
+    return new Promise<Wallet>((resolve, reject) => {
+      const unsubscribeModal = this.#modal.subscribeModal((state) => {
+        if (!state.open) {
+          unsubscribeModal()
+          reject(new Error('Modal closed'))
+        }
+      })
 
-      return {
-        ...WalletConnectClient.metadata,
-        accounts: accounts.map((accountStr, index) => ({
-          name: `WalletConnect ${index + 1}`,
-          address: accountStr.split(':').pop() as string,
-          providerId: WalletConnectClient.metadata.id
-        }))
-      }
-    } catch (error) {
-      console.error('Error connecting', error)
-      throw error
-    } finally {
-      unsubscribeModal()
-      this.#modal.closeModal()
-    }
+      approval()
+        .then((session) => {
+          const { accounts } = session.namespaces.algorand
+
+          resolve({
+            ...WalletConnectClient.metadata,
+            accounts: accounts.map((accountStr, index) => ({
+              name: `WalletConnect ${index + 1}`,
+              address: accountStr.split(':').pop() as string,
+              providerId: WalletConnectClient.metadata.id
+            }))
+          })
+        })
+        .catch((error) => {
+          reject(error)
+        })
+        .finally(() => {
+          unsubscribeModal()
+          this.#modal.closeModal()
+        })
+    })
   }
 
   // eslint-disable-next-line @typescript-eslint/require-await
