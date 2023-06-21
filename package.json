@@ -54,8 +54,6 @@
     "@typescript-eslint/parser": "^5.55.0",
     "@walletconnect/modal": "^2.4.7",
     "@walletconnect/sign-client": "^2.8.1",
-    "@walletconnect/types": "^2.8.1",
-    "@walletconnect/utils": "^2.8.1",
     "algosdk": "^2.1.0",
     "babel-jest": "^29.1.2",
     "babel-loader": "^8.2.3",
