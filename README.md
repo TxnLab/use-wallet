@@ -582,6 +582,25 @@ Since it requires the unique `projectId`, the WalletConnect provider is not init
 
 See [Migrating to WalletConnect 2.0](#migrating-to-walletconnect-20) below for more information.
 
+### "Module not found" errors in Next.js 13
+
+With the WalletConnect provider initialized in your Next.js 13 app, you may see the error `Module not found: Can't resolve 'lokijs' in...` or similar in local development. To resolve this, add the following to your `next.config.js` file:
+
+```js
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  webpack: (config) => {
+    config.externals.push('pino-pretty', 'lokijs', 'encoding') // list modules in error messages
+    return config
+  }
+  // ...other config
+}
+
+module.exports = nextConfig
+```
+
+See https://github.com/WalletConnect/walletconnect-monorepo/issues/1908#issuecomment-1487801131
+
 ## Migration Guide
 
 Version 2.x is a major version bump, and includes some breaking changes from 1.x.
