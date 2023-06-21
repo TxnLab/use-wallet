@@ -1,10 +1,9 @@
 import type algosdk from 'algosdk'
 import type SignClient from '@walletconnect/sign-client'
 import type { CommonInitParams, Metadata, Network } from '../../types'
-import type { SignClientTypes } from '@walletconnect/types'
 import type { WalletConnectModal, WalletConnectModalConfig } from '@walletconnect/modal'
 
-export type WalletConnectOptions = SignClientTypes.Options
+export type WalletConnectOptions = SignClient['opts']
 
 export type WalletConnectModalOptions = Omit<
   WalletConnectModalConfig,

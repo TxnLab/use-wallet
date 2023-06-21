@@ -1,4 +1,3 @@
-import { getSdkError } from '@walletconnect/utils'
 import type SignClient from '@walletconnect/sign-client'
 import type { WalletConnectModal } from '@walletconnect/modal'
 import BaseClient from '../base'
@@ -186,7 +185,11 @@ class WalletConnectClient extends BaseClient {
       }
       await this.#client.disconnect({
         topic: session.topic,
-        reason: getSdkError('USER_DISCONNECTED')
+        // replicates getSdkError('USER_DISCONNECTED') from @walletconnect/utils
+        reason: {
+          message: 'User disconnected.',
+          code: 6000
+        }
       })
     } catch (error) {
       console.error('Error disconnecting', error)
