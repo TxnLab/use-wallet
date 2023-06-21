@@ -12,7 +12,7 @@ import {
   DEFAULT_NODE_TOKEN,
   DEFAULT_NODE_PORT,
   DEFAULT_NETWORK,
-  PROVIDER_ID
+  DEFAULT_PROVIDERS
 } from '../constants'
 
 export const initializeProviders = async <T extends keyof ProviderConfigMapping>(
@@ -52,10 +52,7 @@ export const initializeProviders = async <T extends keyof ProviderConfigMapping>
   // Initialize default providers if `providers` is undefined or empty
   if (!providers || providers.length === 0) {
     const initPromises = Object.keys(allClients)
-      .filter(
-        (id) =>
-          id !== PROVIDER_ID.KMD && id !== PROVIDER_ID.MNEMONIC && id !== PROVIDER_ID.WALLETCONNECT
-      )
+      .filter((id) => DEFAULT_PROVIDERS.includes(id as T))
       .map((id) => initClient(id as T))
 
     await Promise.all(initPromises)

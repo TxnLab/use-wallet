@@ -11,6 +11,7 @@ import {
   DEFAULT_NODE_BASEURL,
   DEFAULT_NODE_PORT,
   DEFAULT_NODE_TOKEN,
+  DEFAULT_PROVIDERS,
   PROVIDER_ID
 } from '../constants'
 import { createMockClient } from '../testUtils/mockClients'
@@ -67,21 +68,16 @@ describe('initializeProviders', () => {
   })
 
   it('should initialize default providers with default node configuration', async () => {
-    const defaultProviders = [
-      PROVIDER_ID.PERA,
-      PROVIDER_ID.DEFLY,
-      PROVIDER_ID.EXODUS,
-      PROVIDER_ID.ALGOSIGNER,
-      PROVIDER_ID.MYALGO
-    ]
-
     // Initialize default providers
     const result = await initializeProviders()
 
     // Check if the returned object has the correct keys
-    expect(Object.keys(result)).toEqual(expect.arrayContaining(defaultProviders))
+    expect(Object.keys(result)).toEqual(expect.arrayContaining(DEFAULT_PROVIDERS))
     expect(Object.keys(result)).not.toContain(PROVIDER_ID.KMD)
     expect(Object.keys(result)).not.toContain(PROVIDER_ID.MNEMONIC)
+    expect(Object.keys(result)).not.toContain(PROVIDER_ID.WALLETCONNECT)
+    expect(Object.keys(result)).not.toContain(PROVIDER_ID.ALGOSIGNER)
+    expect(Object.keys(result)).not.toContain(PROVIDER_ID.MYALGO)
 
     // Check if the clients were initialized with the default node configuration
     for (const providerId of Object.keys(result)) {

@@ -12,6 +12,13 @@ export enum PROVIDER_ID {
   MNEMONIC = 'mnemonic'
 }
 
+export const DEFAULT_PROVIDERS = [
+  PROVIDER_ID.PERA,
+  PROVIDER_ID.DEFLY,
+  PROVIDER_ID.DAFFI,
+  PROVIDER_ID.EXODUS
+]
+
 export const DEFAULT_NETWORK: Network = 'mainnet'
 
 export const DEFAULT_NODE_BASEURL = 'https://mainnet-api.algonode.cloud'
