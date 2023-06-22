@@ -511,7 +511,7 @@ import algosdk from 'algosdk'
 import { PROVIDER_ID, WalletProvider, useInitializeProviders } from '@txnlab/use-wallet'
 import { DeflyWalletConnect } from '@blockshake/defly-connect'
 import { PeraWalletConnect } from '@perawallet/connect'
-import { Web3ModalSign } from '@web3modal/sign-html'
+import { Web3ModalSign } from '@walletconnect/modal-sign-html'
 
 export default function App() {
   const providers = useInitializeProviders({
@@ -552,7 +552,7 @@ However, Algorand apps with `use-wallet` will be able to support the new protoco
 
 1. **Obtain a project ID** - You will need to obtain a project ID from [WalletConnect Cloud](https://cloud.walletconnect.com/). This is a simple process, and there is no waiting period. Every app will need its own unique project ID.
 
-2. **Install peer dependency** - Install `@web3modal/sign-html`.
+2. **Install peer dependency** - Install `@walletconnect/modal-sign-html`.
 
 3. **Update provider configuration** - You will need to use a provider object to initialize WalletConnect, and pass your `clientOptions` as shown below
 
@@ -657,10 +657,10 @@ const providers = useInitializeProviders({
 
 ### WalletConnect provider
 
-The WalletConnect provider now supports WalletConnect 2.0. To continue supporting this provider, or to add support to your application, you must install the `@web3modal/sign-html` package.
+The WalletConnect provider now supports WalletConnect 2.0. To continue supporting this provider, or to add support to your application, you must install the `@walletconnect/modal-sign-html` package.
 
 ```bash
-npm install @web3modal/sign-html
+npm install @walletconnect/modal-sign-html
 ```
 
 The peer dependencies for WalletConnect 1.x should be uninstalled.

@@ -3631,13 +3631,39 @@
     pino "7.11.0"
     tslib "1.14.1"
 
-"@walletconnect/modal@2.4.7":
-  version "2.4.7"
-  resolved "https://registry.yarnpkg.com/@walletconnect/modal/-/modal-2.4.7.tgz#fd84d6f1ac767865d63153e32150f790739a189a"
-  integrity sha512-kFpvDTT44CgNGcwQVC0jHrYed4xorghKX1DOGo8ZfBSJ5TJx3p6d6SzLxkH1cZupWbljWkYS6SqvZcUBs8vWpg==
+"@walletconnect/modal-core@2.5.2":
+  version "2.5.2"
+  resolved "https://registry.yarnpkg.com/@walletconnect/modal-core/-/modal-core-2.5.2.tgz#b847191d36274e947aa805b5ca9fe2cae273cc63"
+  integrity sha512-meYjouZxAik0peyhxDUTRY77uu/r4tLe1QoJp/Ra3brHD0i93uwX5U8RlBNDLGQhLGIraZl6xNANcxHGRHFSuQ==
   dependencies:
-    "@web3modal/core" "2.4.7"
-    "@web3modal/ui" "2.4.7"
+    buffer "6.0.3"
+    valtio "1.10.5"
+
+"@walletconnect/modal-sign-html@^2.5.2":
+  version "2.5.2"
+  resolved "https://registry.yarnpkg.com/@walletconnect/modal-sign-html/-/modal-sign-html-2.5.2.tgz#244f5baa8574be8949c90ebe6ddd667c3840ef18"
+  integrity sha512-ULery8TISHBkSoaBjEl5f3JypQLM0YUqbLmI1rjjwmSRTFxfwRK9Vlv4ElEaTeC3c00klsqYOj2sqG3lksaV4A==
+  dependencies:
+    "@walletconnect/modal" "2.5.2"
+    "@walletconnect/sign-client" "2.8.1"
+
+"@walletconnect/modal-ui@2.5.2":
+  version "2.5.2"
+  resolved "https://registry.yarnpkg.com/@walletconnect/modal-ui/-/modal-ui-2.5.2.tgz#cb6184bd4c0e207fcfc566b13046938fe03e1cfd"
+  integrity sha512-ZbHsFP+LWvyJ3wwJf3nJKkwqMOHpJ5ECnAZgopMX+hp/bS+4JEeCzUy1StmzyriT6RImLFRQkI6Zas/NetaUnw==
+  dependencies:
+    "@walletconnect/modal-core" "2.5.2"
+    lit "2.7.5"
+    motion "10.16.2"
+    qrcode "1.5.3"
+
+"@walletconnect/modal@2.5.2":
+  version "2.5.2"
+  resolved "https://registry.yarnpkg.com/@walletconnect/modal/-/modal-2.5.2.tgz#402e5904e2a39fddc63a6a99bd9c621a0c315d6f"
+  integrity sha512-vMLAQFjbMeXZ3+ojb+0OmMRpXCg92vCWJS2t3pF6XyxZrp/qxB9W87HwP7q6ecJtePM1Snil5QlpXipprqzr9g==
+  dependencies:
+    "@walletconnect/modal-core" "2.5.2"
+    "@walletconnect/modal-ui" "2.5.2"
 
 "@walletconnect/randombytes@^1.0.3":
   version "1.0.3"
@@ -3788,32 +3814,6 @@
   dependencies:
     "@walletconnect/window-getters" "^1.0.1"
     tslib "1.14.1"
-
-"@web3modal/core@2.4.7":
-  version "2.4.7"
-  resolved "https://registry.yarnpkg.com/@web3modal/core/-/core-2.4.7.tgz#e128be449bc5f6f23f6fb32f12021c096b5e7a07"
-  integrity sha512-FZMmI4JnEZovRDdN+PZBMe2ot8ly+UftVkZ6lmtfgiRZ2Gy3k/4IYE8/KwOSmN63Lf2Oj2077buLR17i0xoKZA==
-  dependencies:
-    buffer "6.0.3"
-    valtio "1.10.5"
-
-"@web3modal/sign-html@^2.4.7":
-  version "2.4.7"
-  resolved "https://registry.yarnpkg.com/@web3modal/sign-html/-/sign-html-2.4.7.tgz#8280ad68b8c61f1389b712344a758e5f7cf15fe6"
-  integrity sha512-HsnhpJJfdyB9X5nrPV6gCXGSDju9oT4lZ53Vmaw5G4ZuGHC/X2zzoo1OhJSTFYP5IJ60gsj70SZpSWbSw3WAwg==
-  dependencies:
-    "@walletconnect/modal" "2.4.7"
-    "@walletconnect/sign-client" "2.8.1"
-
-"@web3modal/ui@2.4.7":
-  version "2.4.7"
-  resolved "https://registry.yarnpkg.com/@web3modal/ui/-/ui-2.4.7.tgz#94d70e60386eb6fae422c56386019e761f80a50a"
-  integrity sha512-5tU9u5CVYueZ9y+1x1A1Q0bFUfk3gOIKy3MT6Vx+aI0RDxVu7OYQDw6wbNPlgz/wd9JPYXG6uSv8WTBpdyit8Q==
-  dependencies:
-    "@web3modal/core" "2.4.7"
-    lit "2.7.5"
-    motion "10.16.2"
-    qrcode "1.5.3"
 
 "@webassemblyjs/ast@1.11.1":
   version "1.11.1"

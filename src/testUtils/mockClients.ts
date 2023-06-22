@@ -3,7 +3,7 @@ import { DeflyWalletConnect } from '@blockshake/defly-connect'
 import { DaffiWalletConnect } from '@daffiwallet/connect'
 import { PeraWalletConnect } from '@perawallet/connect'
 import MyAlgoConnect from '@randlabs/myalgo-connect'
-import { Web3ModalSign } from '@web3modal/sign-html'
+import { WalletConnectModalSign } from '@walletconnect/modal-sign-html'
 import algosdk from 'algosdk'
 import AlgoSignerClient from '../clients/algosigner/client'
 import DaffiWalletClient from '../clients/daffi/client'
@@ -401,7 +401,7 @@ export const createWalletConnectMockInstance = (
       icon: 'walletconnect-icon-b64',
       isWalletConnect: true
     },
-    client: new Web3ModalSign(options),
+    client: new WalletConnectModalSign(options),
     clientOptions: {
       ...options
     },

@@ -1,8 +1,8 @@
 import type {
-  Web3ModalSign,
-  Web3ModalSignOptions,
-  Web3ModalSignSession
-} from '@web3modal/sign-html'
+  WalletConnectModalSign,
+  WalletConnectModalSignOptions,
+  WalletConnectModalSignSession
+} from '@walletconnect/modal-sign-html'
 import BaseClient from '../base'
 import { DecodedSignedTransaction, DecodedTransaction, Network, Wallet } from '../../types'
 import { PROVIDER_ID } from '../../constants'
@@ -13,8 +13,8 @@ import Algod, { getAlgodClient } from '../../algod'
 import { formatJsonRpcRequest } from './utils'
 
 class WalletConnectClient extends BaseClient {
-  #client: Web3ModalSign
-  clientOptions?: Web3ModalSignOptions
+  #client: WalletConnectModalSign
+  clientOptions?: WalletConnectModalSignOptions
   network: Network
   chain: string
 
@@ -63,10 +63,10 @@ class WalletConnectClient extends BaseClient {
       const chain = ALGORAND_CHAINS[network]
 
       const clientModule = clientStatic
-        ? { Web3ModalSign: clientStatic }
-        : await import('@web3modal/sign-html')
+        ? { WalletConnectModalSign: clientStatic }
+        : await import('@walletconnect/modal-sign-html')
 
-      const Client = clientModule.Web3ModalSign
+      const Client = clientModule.WalletConnectModalSign
 
       // Initialize client
       const client = new Client({
@@ -107,7 +107,7 @@ class WalletConnectClient extends BaseClient {
     }
 
     try {
-      const session: Web3ModalSignSession = await this.#client.connect({
+      const session: WalletConnectModalSignSession = await this.#client.connect({
         requiredNamespaces
       })
 
@@ -124,7 +124,7 @@ class WalletConnectClient extends BaseClient {
   }
 
   public async reconnect() {
-    const session: Web3ModalSignSession | undefined = await this.#client.getSession()
+    const session: WalletConnectModalSignSession | undefined = await this.#client.getSession()
     if (typeof session === 'undefined') {
       return null
     }
@@ -248,7 +248,7 @@ class WalletConnectClient extends BaseClient {
   }
 
   async #getSession() {
-    const session: Web3ModalSignSession | undefined = await this.#client.getSession()
+    const session: WalletConnectModalSignSession | undefined = await this.#client.getSession()
     if (typeof session === 'undefined') {
       throw new Error('Session is not connected')
     }

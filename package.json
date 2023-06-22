@@ -52,7 +52,7 @@
     "@types/react": "^18.0.15",
     "@typescript-eslint/eslint-plugin": "^5.55.0",
     "@typescript-eslint/parser": "^5.55.0",
-    "@web3modal/sign-html": "^2.4.7",
+    "@walletconnect/modal-sign-html": "^2.5.2",
     "algosdk": "^2.1.0",
     "babel-jest": "^29.1.2",
     "babel-loader": "^8.2.3",
@@ -96,7 +96,7 @@
     "@daffiwallet/connect": "^1.0.3",
     "@perawallet/connect": "^1.2.1",
     "@randlabs/myalgo-connect": "^1.4.2",
-    "@web3modal/sign-html": "^2.4.7",
+    "@walletconnect/modal-sign-html": "^2.5.2",
     "algosdk": "^2.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
@@ -114,7 +114,7 @@
     "@randlabs/myalgo-connect": {
       "optional": true
     },
-    "@web3modal/sign-html": {
+    "@walletconnect/modal-sign-html": {
       "optional": true
     }
   },
