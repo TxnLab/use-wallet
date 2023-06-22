@@ -2,18 +2,16 @@ import { PROVIDER_ID } from '../constants'
 import type { PeraWalletConnect } from '@perawallet/connect'
 import type { DeflyWalletConnect } from '@blockshake/defly-connect'
 import type { DaffiWalletConnect } from '@daffiwallet/connect'
-import type SignClient from '@walletconnect/sign-client'
 import type MyAlgoConnect from '@randlabs/myalgo-connect'
-import type { WalletConnectModal } from '@walletconnect/modal'
-import { AlgodClientOptions, Network } from './node'
+import type { Web3ModalSign, Web3ModalSignOptions } from '@web3modal/sign-html'
 import type algosdk from 'algosdk'
+import type { AlgodClientOptions, Network } from './node'
 import type { PeraWalletConnectOptions } from '../clients/pera/types'
-import { DeflyWalletConnectOptions } from '../clients/defly/types'
-import { ExodusOptions } from '../clients/exodus/types'
-import { KmdOptions } from '../clients/kmd/types'
-import { MyAlgoConnectOptions } from '../clients/myalgo/types'
-import { WalletConnectModalOptions, WalletConnectOptions } from '../clients/walletconnect2/types'
-import { DaffiWalletConnectOptions } from '../clients/daffi/types'
+import type { DeflyWalletConnectOptions } from '../clients/defly/types'
+import type { ExodusOptions } from '../clients/exodus/types'
+import type { KmdOptions } from '../clients/kmd/types'
+import type { MyAlgoConnectOptions } from '../clients/myalgo/types'
+import type { DaffiWalletConnectOptions } from '../clients/daffi/types'
 
 export type ProviderConfigMapping = {
   [PROVIDER_ID.PERA]: {
@@ -29,10 +27,8 @@ export type ProviderConfigMapping = {
     clientStatic?: typeof DeflyWalletConnect
   }
   [PROVIDER_ID.WALLETCONNECT]: {
-    clientOptions?: WalletConnectOptions
-    clientStatic?: typeof SignClient
-    modalStatic?: typeof WalletConnectModal
-    modalOptions?: WalletConnectModalOptions
+    clientOptions?: Web3ModalSignOptions
+    clientStatic?: typeof Web3ModalSign
   }
   [PROVIDER_ID.MYALGO]: {
     clientOptions?: MyAlgoConnectOptions

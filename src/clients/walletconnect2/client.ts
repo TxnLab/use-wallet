@@ -14,7 +14,7 @@ import { formatJsonRpcRequest } from './utils'
 
 class WalletConnectClient extends BaseClient {
   #client: Web3ModalSign
-  clientOptions: Web3ModalSignOptions
+  clientOptions?: Web3ModalSignOptions
   network: Network
   chain: string
 
@@ -54,6 +54,10 @@ class WalletConnectClient extends BaseClient {
         throw new Error(
           `WalletConnect only supports Algorand mainnet, testnet, and betanet. "${network}" is not supported.`
         )
+      }
+
+      if (!clientOptions) {
+        throw new Error('WalletConnect clientOptions must be provided')
       }
 
       const chain = ALGORAND_CHAINS[network]

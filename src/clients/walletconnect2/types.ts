@@ -13,8 +13,8 @@ export type WalletConnectClientConstructor = {
 }
 
 export type InitParams = CommonInitParams & {
-  clientOptions: Web3ModalSignOptions
-  clientStatic: typeof Web3ModalSign
+  clientOptions?: Web3ModalSignOptions
+  clientStatic?: typeof Web3ModalSign
 }
 
 export type WalletConnectTransaction = {
