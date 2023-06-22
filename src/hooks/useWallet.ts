@@ -9,8 +9,6 @@ import allClients from '../clients'
 import { clearAccounts } from '../utils/clearAccounts'
 import shallow from 'zustand/shallow'
 
-export { PROVIDER_ID }
-
 export default function useWallet() {
   const [providers, setProviders] = useState<Provider[] | null>(null)
   const clients = useContext(ClientContext)
