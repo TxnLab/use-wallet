@@ -18,7 +18,7 @@ interface InitializeProvidersOptions<
 
 export default function useInitializeProviders<
   T extends keyof ProviderConfigMapping = keyof ProviderConfigMapping
->({ providers, nodeConfig, algosdkStatic }: InitializeProvidersOptions<T> = {}) {
+>({ providers = [], nodeConfig, algosdkStatic }: InitializeProvidersOptions<T> = {}) {
   const [walletProviders, setWalletProviders] = useState<SupportedProviders | null>(null)
 
   useEffect(() => {
