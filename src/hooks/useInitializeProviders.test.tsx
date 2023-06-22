@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { renderHook, waitFor } from '@testing-library/react'
 import useInitializeProviders from './useInitializeProviders'
-import { PROVIDER_ID } from './useWallet'
+import { PROVIDER_ID } from '../constants'
 import { initializeProviders, reconnectProviders } from '../utils'
 
 jest.mock('../utils')

@@ -1,23 +1,20 @@
-import type SignClient from '@walletconnect/sign-client'
-import type { WalletConnectModal } from '@walletconnect/modal'
+import type {
+  Web3ModalSign,
+  Web3ModalSignOptions,
+  Web3ModalSignSession
+} from '@web3modal/sign-html'
 import BaseClient from '../base'
-import Algod, { getAlgodClient } from '../../algod'
-import { formatJsonRpcRequest } from './utils'
-import { isPublicNetwork } from '../../utils/types'
+import { DecodedSignedTransaction, DecodedTransaction, Network, Wallet } from '../../types'
 import { PROVIDER_ID } from '../../constants'
 import { ALGORAND_CHAINS, DEFAULT_NETWORK, ICON } from './constants'
-import type { Network, Wallet, DecodedTransaction, DecodedSignedTransaction } from '../../types'
-import type {
-  InitParams,
-  WalletConnectClientConstructor,
-  WalletConnectOptions,
-  WalletConnectTransaction
-} from './types'
+import { InitParams, WalletConnectClientConstructor, WalletConnectTransaction } from './types'
+import { isPublicNetwork } from '../../utils/types'
+import Algod, { getAlgodClient } from '../../algod'
+import { formatJsonRpcRequest } from './utils'
 
 class WalletConnectClient extends BaseClient {
-  #client: SignClient
-  clientOptions?: WalletConnectOptions
-  #modal: WalletConnectModal
+  #client: Web3ModalSign
+  clientOptions?: Web3ModalSignOptions
   network: Network
   chain: string
 
@@ -25,7 +22,6 @@ class WalletConnectClient extends BaseClient {
     metadata,
     client,
     clientOptions,
-    modal,
     algosdk,
     algodClient,
     network,
@@ -34,7 +30,6 @@ class WalletConnectClient extends BaseClient {
     super(metadata, algosdk, algodClient)
     this.#client = client
     this.clientOptions = clientOptions
-    this.#modal = modal
     this.network = network
     this.chain = chain
     this.metadata = WalletConnectClient.metadata
@@ -51,8 +46,6 @@ class WalletConnectClient extends BaseClient {
     clientOptions,
     algodOptions,
     clientStatic,
-    modalStatic,
-    modalOptions,
     algosdkStatic,
     network = DEFAULT_NETWORK
   }: InitParams): Promise<BaseClient | null> {
@@ -63,25 +56,25 @@ class WalletConnectClient extends BaseClient {
         )
       }
 
+      if (!clientOptions) {
+        throw new Error('WalletConnect clientOptions must be provided')
+      }
+
       const chain = ALGORAND_CHAINS[network]
 
-      // Initialize sign client
-      const Client = clientStatic || (await import('@walletconnect/sign-client')).default
+      const clientModule = clientStatic
+        ? { Web3ModalSign: clientStatic }
+        : await import('@web3modal/sign-html')
 
-      const client = await Client.init(clientOptions)
+      const Client = clientModule.Web3ModalSign
 
-      // Initialize web3modal
-      const modalModule = modalStatic
-        ? { WalletConnectModal: modalStatic }
-        : await import('@walletconnect/modal')
-
-      const Web3Modal = modalModule.WalletConnectModal
-
-      const modal = new Web3Modal({
-        explorerExcludedWalletIds: 'ALL',
-        ...modalOptions,
-        projectId: clientOptions?.projectId || '',
-        walletConnectVersion: 2
+      // Initialize client
+      const client = new Client({
+        ...clientOptions,
+        modalOptions: {
+          explorerExcludedWalletIds: 'ALL',
+          ...clientOptions.modalOptions
+        }
       })
 
       // Initialize algod client
@@ -89,27 +82,22 @@ class WalletConnectClient extends BaseClient {
       const algodClient = getAlgodClient(algosdk, algodOptions)
 
       // Initialize wallet client
-      const walletClient = new WalletConnectClient({
+      return new WalletConnectClient({
         metadata: WalletConnectClient.metadata,
         client,
         clientOptions,
-        modal,
         algosdk,
         algodClient,
         network,
         chain
       })
-
-      walletClient.#subscribeToEvents()
-
-      return walletClient
     } catch (error) {
-      console.error('Error initializing', error)
+      console.error('Error initializing WalletConnect client', error)
       return null
     }
   }
 
-  async connect(): Promise<Wallet> {
+  public async connect(): Promise<Wallet> {
     const requiredNamespaces = {
       algorand: {
         chains: [this.chain],
@@ -118,46 +106,25 @@ class WalletConnectClient extends BaseClient {
       }
     }
 
-    const { uri, approval } = await this.#client.connect({ requiredNamespaces })
-
-    if (uri) {
-      await this.#modal.openModal({ uri, standaloneChains: [this.chain] })
-    }
-
-    return new Promise<Wallet>((resolve, reject) => {
-      const unsubscribeModal = this.#modal.subscribeModal((state) => {
-        if (!state.open) {
-          unsubscribeModal()
-          reject(new Error('Modal closed'))
-        }
+    try {
+      const session: Web3ModalSignSession = await this.#client.connect({
+        requiredNamespaces
       })
 
-      approval()
-        .then((session) => {
-          const { accounts } = session.namespaces.algorand
+      const { accounts } = session.namespaces.algorand
 
-          resolve({
-            ...WalletConnectClient.metadata,
-            accounts: accounts.map((accountStr, index) => ({
-              name: `WalletConnect ${index + 1}`,
-              address: accountStr.split(':').pop() as string,
-              providerId: WalletConnectClient.metadata.id
-            }))
-          })
-        })
-        .catch((error) => {
-          reject(error)
-        })
-        .finally(() => {
-          unsubscribeModal()
-          this.#modal.closeModal()
-        })
-    })
+      return {
+        ...WalletConnectClient.metadata,
+        accounts: this.#mapAccounts(accounts)
+      }
+    } catch (error) {
+      console.error('Error connecting to WalletConnect', error)
+      throw error
+    }
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
-  async reconnect() {
-    const session = this.#getSession()
+  public async reconnect() {
+    const session: Web3ModalSignSession | undefined = await this.#client.getSession()
     if (typeof session === 'undefined') {
       return null
     }
@@ -166,23 +133,14 @@ class WalletConnectClient extends BaseClient {
 
     return {
       ...WalletConnectClient.metadata,
-      accounts: accounts.map((accountStr, index) => ({
-        name: `WalletConnect ${index + 1}`,
-        address: accountStr.split(':').pop() as string,
-        providerId: WalletConnectClient.metadata.id
-      }))
+      accounts: this.#mapAccounts(accounts)
     }
   }
 
-  async disconnect() {
+  public async disconnect() {
     try {
-      if (typeof this.#client === 'undefined') {
-        throw new Error('WalletConnect is not initialized')
-      }
-      const session = this.#getSession()
-      if (typeof session === 'undefined') {
-        throw new Error('Session is not connected')
-      }
+      const session = await this.#getSession()
+
       await this.#client.disconnect({
         topic: session.topic,
         // replicates getSdkError('USER_DISCONNECTED') from @walletconnect/utils
@@ -196,35 +154,76 @@ class WalletConnectClient extends BaseClient {
     }
   }
 
-  async signTransactions(
+  public async signTransactions(
     connectedAccounts: string[],
     txnGroups: Uint8Array[] | Uint8Array[][],
-    indexesToSign?: number[],
+    indexesToSign: number[] = [],
     returnGroup = true
   ) {
-    // If txnGroups is a nested array, flatten it
+    // Flatten transactions array if nested
     const transactions: Uint8Array[] = Array.isArray(txnGroups[0])
       ? (txnGroups as Uint8Array[][]).flatMap((txn) => txn)
       : (txnGroups as Uint8Array[])
 
-    // Decode the transactions to access their properties.
+    const { txnsToSign, signedIndexes } = this.#composeTransactions(
+      transactions,
+      connectedAccounts,
+      indexesToSign
+    )
+
+    const request = formatJsonRpcRequest('algo_signTxn', [txnsToSign])
+
+    const session = await this.#getSession()
+
+    const response = await this.#client.request<Array<string | null>>({
+      chainId: this.chain,
+      topic: session.topic,
+      request
+    })
+
+    // Check if the result is the same length as the transactions
+    const lengthsMatch = response.length === transactions.length
+
+    // Join the signed transactions with the original group of transactions
+    const signedTxns = transactions.reduce<Uint8Array[]>((acc, txn, i) => {
+      if (signedIndexes.includes(i)) {
+        const signedTxn = lengthsMatch ? response[i] : response.shift()
+        signedTxn && acc.push(new Uint8Array(Buffer.from(signedTxn, 'base64')))
+      } else if (returnGroup) {
+        acc.push(txn)
+      }
+
+      return acc
+    }, [])
+
+    return signedTxns
+  }
+
+  #composeTransactions(
+    transactions: Uint8Array[],
+    connectedAccounts: string[],
+    indexesToSign: number[]
+  ) {
+    // Decode the transactions
     const decodedTxns = transactions.map((txn) => {
       return this.algosdk.decodeObj(txn)
     }) as Array<DecodedTransaction | DecodedSignedTransaction>
 
+    // Track signed transactions
     const signedIndexes: number[] = []
 
-    // Marshal the transactions,
-    // and add the signers property if they shouldn't be signed.
+    // Marshal the transactions into WalletConnect format
     const txnsToSign = decodedTxns.reduce<WalletConnectTransaction[]>((acc, txn, i) => {
       const isSigned = 'txn' in txn
 
-      if (indexesToSign && indexesToSign.length && indexesToSign.includes(i)) {
-        signedIndexes.push(i)
-        acc.push({
-          txn: Buffer.from(transactions[i]).toString('base64')
-        })
-      } else if (!isSigned && connectedAccounts.includes(this.algosdk.encodeAddress(txn['snd']))) {
+      const senderAccount = !isSigned
+        ? this.algosdk.encodeAddress(txn['snd'])
+        : this.algosdk.encodeAddress(txn.txn['snd'])
+
+      const shouldSign =
+        indexesToSign.includes(i) || (!isSigned && connectedAccounts.includes(senderAccount))
+
+      if (shouldSign) {
         signedIndexes.push(i)
         acc.push({
           txn: Buffer.from(transactions[i]).toString('base64')
@@ -245,63 +244,23 @@ class WalletConnectClient extends BaseClient {
       return acc
     }, [])
 
-    const session = this.#getSession()
+    return { txnsToSign, signedIndexes }
+  }
+
+  async #getSession() {
+    const session: Web3ModalSignSession | undefined = await this.#client.getSession()
     if (typeof session === 'undefined') {
       throw new Error('Session is not connected')
     }
-
-    const request = formatJsonRpcRequest('algo_signTxn', [txnsToSign])
-
-    // Play an audio file to keep Wallet Connect's web socket open on iOS
-    // when the user goes into background mode.
-    // await this.keepWCAliveStart()
-
-    const response = await this.#client.request<Array<string | null>>({
-      chainId: this.chain,
-      topic: session.topic,
-      request
-    })
-
-    // this.keepWCAliveStop()
-
-    // Check if the result is the same length as the transactions
-    const lengthsMatch = response.length === transactions.length
-
-    // Join the newly signed transactions with the original group of transactions.
-    const signedTxns = transactions.reduce<Uint8Array[]>((acc, txn, i) => {
-      if (signedIndexes.includes(i)) {
-        const signedByUser = lengthsMatch ? response[i] : response.shift()
-        signedByUser && acc.push(new Uint8Array(Buffer.from(signedByUser, 'base64')))
-      } else if (returnGroup) {
-        acc.push(txn)
-      }
-
-      return acc
-    }, [])
-
-    return signedTxns
+    return session
   }
 
-  #subscribeToEvents() {
-    if (typeof this.#client === 'undefined') {
-      throw new Error('WalletConnect is not initialized')
-    }
-
-    this.#client.on('session_event', (args) => {
-      console.log('EVENT', 'session_event', args)
-    })
-
-    this.#client.on('session_update', ({ topic, params }) => {
-      console.log('EVENT', 'session_update', { topic, params })
-    })
-
-    this.#client.on('session_delete', () => {
-      console.log('EVENT', 'session_delete')
-    })
-  }
-
-  #getSession() {
-    return this.#client.session.getAll().at(-1)
+  #mapAccounts(accounts: string[]) {
+    return accounts.map((accountStr, index) => ({
+      name: `WalletConnect ${index + 1}`,
+      address: accountStr.split(':').pop() as string,
+      providerId: WalletConnectClient.metadata.id
+    }))
   }
 }
 

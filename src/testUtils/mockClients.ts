@@ -3,8 +3,7 @@ import { DeflyWalletConnect } from '@blockshake/defly-connect'
 import { DaffiWalletConnect } from '@daffiwallet/connect'
 import { PeraWalletConnect } from '@perawallet/connect'
 import MyAlgoConnect from '@randlabs/myalgo-connect'
-import { WalletConnectModal } from '@walletconnect/modal'
-import { SignClient } from '@walletconnect/sign-client'
+import { Web3ModalSign } from '@web3modal/sign-html'
 import algosdk from 'algosdk'
 import AlgoSignerClient from '../clients/algosigner/client'
 import DaffiWalletClient from '../clients/daffi/client'
@@ -384,6 +383,17 @@ export const createWalletConnectMockInstance = (
   clientOptions?: ClientOptions,
   accounts: Array<Account> = []
 ): WalletConnectClient => {
+  const options = {
+    projectId: 'project-id',
+    metadata: {
+      name: 'Example Dapp',
+      description: 'Example Dapp',
+      url: '#',
+      icons: ['https://walletconnect.com/walletconnect-logo.png']
+    },
+    ...(clientOptions && clientOptions)
+  }
+
   const mockWalletConnectClient = new WalletConnectClient({
     metadata: {
       id: PROVIDER_ID.WALLETCONNECT,
@@ -391,8 +401,10 @@ export const createWalletConnectMockInstance = (
       icon: 'walletconnect-icon-b64',
       isWalletConnect: true
     },
-    client: new SignClient(),
-    modal: new WalletConnectModal({ projectId: 'project-id', walletConnectVersion: 2 }),
+    client: new Web3ModalSign(options),
+    clientOptions: {
+      ...options
+    },
     algosdk,
     algodClient: {
       accountInformation: () => ({
@@ -400,8 +412,7 @@ export const createWalletConnectMockInstance = (
       })
     } as any,
     network: 'test-network',
-    chain: 'algorand:testnet',
-    ...(clientOptions && clientOptions)
+    chain: 'algorand:testnet'
   })
 
   // Mock the connect method
