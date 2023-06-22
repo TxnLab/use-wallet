@@ -4,7 +4,7 @@
 
 import { act, renderHook } from '@testing-library/react'
 import React from 'react'
-import useWallet, { PROVIDER_ID } from './useWallet'
+import useWallet from './useWallet'
 import DeflyWalletClient from '../clients/defly'
 import PeraWalletClient from '../clients/pera'
 import { default as ClientProvider } from '../store/state/clientStore'
@@ -14,6 +14,7 @@ import { mockAccounts } from '../testUtils/mockAccounts'
 import { createDeflyMockInstance, createPeraMockInstance } from '../testUtils/mockClients'
 import { clearAccounts } from '../utils/clearAccounts'
 import type { WalletClient } from '../types'
+import { PROVIDER_ID } from '../constants'
 
 const peraAccounts = mockAccounts(PROVIDER_ID.PERA, 2)
 const deflyAccounts = mockAccounts(PROVIDER_ID.DEFLY, 1)
