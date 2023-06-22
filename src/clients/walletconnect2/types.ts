@@ -1,31 +1,20 @@
+import type { Web3ModalSign, Web3ModalSignOptions } from '@web3modal/sign-html'
 import type algosdk from 'algosdk'
-import type SignClient from '@walletconnect/sign-client'
-import type { CommonInitParams, Metadata, Network } from '../../types'
-import type { WalletConnectModal, WalletConnectModalConfig } from '@walletconnect/modal'
-
-export type WalletConnectOptions = SignClient['opts']
-
-export type WalletConnectModalOptions = Omit<
-  WalletConnectModalConfig,
-  'projectId' | 'walletConnectVersion'
->
-
-export type InitParams = CommonInitParams & {
-  clientOptions?: WalletConnectOptions
-  clientStatic?: typeof SignClient
-  modalStatic?: typeof WalletConnectModal
-  modalOptions?: WalletConnectModalOptions
-}
+import { CommonInitParams, Metadata, Network } from 'src/types'
 
 export type WalletConnectClientConstructor = {
   metadata: Metadata
-  client: SignClient
-  clientOptions?: WalletConnectOptions
-  modal: WalletConnectModal
+  client: Web3ModalSign
+  clientOptions: Web3ModalSignOptions
   algosdk: typeof algosdk
   algodClient: algosdk.Algodv2
   network: Network
   chain: string
+}
+
+export type InitParams = CommonInitParams & {
+  clientOptions: Web3ModalSignOptions
+  clientStatic: typeof Web3ModalSign
 }
 
 export type WalletConnectTransaction = {
