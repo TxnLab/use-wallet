@@ -16,6 +16,7 @@ import {
   DeflyWalletClientConstructor,
   DeflyWalletConnectOptions
 } from './types'
+import { debugLog } from '../../utils/debugLog'
 
 class DeflyWalletClient extends BaseClient {
   #client: DeflyWalletConnect
@@ -52,6 +53,8 @@ class DeflyWalletClient extends BaseClient {
     network = DEFAULT_NETWORK
   }: InitParams): Promise<BaseClient | null> {
     try {
+      debugLog(`${PROVIDER_ID.DEFLY.toUpperCase()} initializing...`)
+
       const DeflyWalletConnect =
         clientStatic || (await import('@blockshake/defly-connect')).DeflyWalletConnect
 
@@ -62,13 +65,17 @@ class DeflyWalletClient extends BaseClient {
         ...(clientOptions && clientOptions)
       })
 
-      return new DeflyWalletClient({
+      const provider = new DeflyWalletClient({
         metadata: DeflyWalletClient.metadata,
         client: deflyWallet,
         algosdk,
         algodClient,
         network
       })
+
+      debugLog(`${PROVIDER_ID.DEFLY.toUpperCase()} initialized`, '✅')
+
+      return provider
     } catch (e) {
       console.error('Error initializing...', e)
       return null

@@ -15,6 +15,7 @@ import {
   InitParams,
   PeraWalletConnectOptions
 } from './types'
+import { debugLog } from '../../utils/debugLog'
 
 class PeraWalletClient extends BaseClient {
   #client: PeraWalletConnect
@@ -51,6 +52,8 @@ class PeraWalletClient extends BaseClient {
     network = DEFAULT_NETWORK
   }: InitParams): Promise<BaseClient | null> {
     try {
+      debugLog(`${PROVIDER_ID.PERA.toUpperCase()} initializing...`)
+
       const PeraWalletConnect =
         clientStatic || (await import('@perawallet/connect')).PeraWalletConnect
 
@@ -61,7 +64,7 @@ class PeraWalletClient extends BaseClient {
         ...(clientOptions && clientOptions)
       })
 
-      return new PeraWalletClient({
+      const provider = new PeraWalletClient({
         metadata: PeraWalletClient.metadata,
         client: peraWallet,
         clientOptions,
@@ -69,6 +72,10 @@ class PeraWalletClient extends BaseClient {
         algodClient,
         network
       })
+
+      debugLog(`${PROVIDER_ID.PERA.toUpperCase()} initialized`, '✅')
+
+      return provider
     } catch (e) {
       console.error('Error initializing...', e)
       return null

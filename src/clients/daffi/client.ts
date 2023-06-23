@@ -15,6 +15,7 @@ import {
   DaffiWalletConnectOptions,
   InitParams
 } from './types'
+import { debugLog } from '../../utils/debugLog'
 
 class DaffiWalletClient extends BaseClient {
   #client: DaffiWalletConnect
@@ -51,6 +52,8 @@ class DaffiWalletClient extends BaseClient {
     network = DEFAULT_NETWORK
   }: InitParams) {
     try {
+      debugLog(`${PROVIDER_ID.DAFFI.toUpperCase()} initializing...`)
+
       const DaffiWalletConnect =
         clientStatic || (await import('@daffiwallet/connect')).DaffiWalletConnect
 
@@ -61,7 +64,7 @@ class DaffiWalletClient extends BaseClient {
         ...(clientOptions ? clientOptions : { shouldShowSignTxnToast: false })
       })
 
-      return new DaffiWalletClient({
+      const provider = new DaffiWalletClient({
         metadata: DaffiWalletClient.metadata,
         client: daffiWallet,
         clientOptions,
@@ -69,6 +72,10 @@ class DaffiWalletClient extends BaseClient {
         algodClient,
         network
       })
+
+      debugLog(`${PROVIDER_ID.DAFFI.toUpperCase()} initialized`, '✅')
+
+      return provider
     } catch (e) {
       console.error('Error initializing...', e)
       return null

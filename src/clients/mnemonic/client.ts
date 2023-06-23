@@ -6,6 +6,7 @@ import type { TransactionsArray, Network } from '../../types'
 import { ICON } from './constants'
 import { InitParams, MnemonicWalletClientConstructor } from './types'
 import algosdk from 'algosdk'
+import { debugLog } from '../../utils/debugLog'
 
 class MnemonicWalletClient extends BaseClient {
   #client?: _algosdk.Account
@@ -30,16 +31,22 @@ class MnemonicWalletClient extends BaseClient {
     algosdkStatic,
     network = DEFAULT_NETWORK
   }: InitParams): Promise<BaseClient | null> {
+    debugLog(`${PROVIDER_ID.MNEMONIC.toUpperCase()} initializing...`)
+
     try {
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
       const algodClient = getAlgodClient(algosdk, algodOptions)
 
-      return new MnemonicWalletClient({
+      const provider = new MnemonicWalletClient({
         metadata: MnemonicWalletClient.metadata,
         algosdk: algosdk,
         algodClient: algodClient,
         network
       })
+
+      debugLog(`${PROVIDER_ID.MNEMONIC.toUpperCase()} initialized`)
+
+      return provider
     } catch (e) {
       console.error('Error initializing...', e)
       return null

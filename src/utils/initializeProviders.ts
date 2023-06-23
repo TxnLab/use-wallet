@@ -14,6 +14,7 @@ import {
   DEFAULT_NETWORK,
   DEFAULT_PROVIDERS
 } from '../constants'
+import { debugLog, getProviderList } from './debugLog'
 
 export const initializeProviders = async <T extends keyof ProviderConfigMapping>(
   providers?: Array<T | ProviderConfig<T>>,
@@ -23,8 +24,7 @@ export const initializeProviders = async <T extends keyof ProviderConfigMapping>
   const initializedProviders: SupportedProviders = {}
 
   if (typeof window === 'undefined') {
-    // @todo add `debug: Boolean` option to enable/disable console logs
-    console.warn('Window object is not available, skipping initialization.')
+    debugLog('Window object is not available, skipping initialization')
     return initializedProviders
   }
 
@@ -49,14 +49,17 @@ export const initializeProviders = async <T extends keyof ProviderConfigMapping>
     initializedProviders[id] = client
   }
 
-  // Initialize default providers if `providers` is undefined or empty
   if (!providers || providers.length === 0) {
+    debugLog('Initializing default providers:', getProviderList(DEFAULT_PROVIDERS))
+
     const initPromises = Object.keys(allClients)
       .filter((id) => DEFAULT_PROVIDERS.includes(id as T))
       .map((id) => initClient(id as T))
 
     await Promise.all(initPromises)
   } else {
+    debugLog('Initializing custom providers:', getProviderList(providers))
+
     const initPromises = providers.map((provider) => initClient(provider))
     await Promise.all(initPromises)
   }

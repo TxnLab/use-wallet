@@ -10,6 +10,7 @@ import {
   InitWalletHandle,
   KMDWalletClientConstructor
 } from './types'
+import { debugLog } from '../../utils/debugLog'
 
 class KMDWalletClient extends BaseClient {
   #client: _algosdk.Kmd
@@ -51,6 +52,8 @@ class KMDWalletClient extends BaseClient {
     network = DEFAULT_NETWORK
   }: InitParams): Promise<BaseClient | null> {
     try {
+      debugLog(`${PROVIDER_ID.KMD.toUpperCase()} initializing...`)
+
       const {
         token = 'a'.repeat(64),
         host = 'http://localhost',
@@ -63,7 +66,7 @@ class KMDWalletClient extends BaseClient {
       const algodClient = getAlgodClient(algosdk, algodOptions)
       const kmdClient = new algosdk.Kmd(token, host, port)
 
-      return new KMDWalletClient({
+      const provider = new KMDWalletClient({
         metadata: KMDWalletClient.metadata,
         password,
         wallet,
@@ -72,6 +75,10 @@ class KMDWalletClient extends BaseClient {
         algodClient: algodClient,
         network
       })
+
+      debugLog(`${PROVIDER_ID.KMD.toUpperCase()} initialized`, '✅')
+
+      return provider
     } catch (e) {
       console.error('Error initializing...', e)
       return null
