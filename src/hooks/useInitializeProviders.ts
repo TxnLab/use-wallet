@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { initializeProviders, reconnectProviders } from '../utils'
+import { useDebugStore } from '../store'
 import type algosdk from 'algosdk'
 import type {
   NodeConfig,
@@ -14,11 +15,21 @@ interface InitializeProvidersOptions<
   providers?: Array<T | ProviderConfig<T>>
   nodeConfig?: NodeConfig
   algosdkStatic?: typeof algosdk
+  debug?: boolean
 }
 
 export default function useInitializeProviders<
   T extends keyof ProviderConfigMapping = keyof ProviderConfigMapping
->({ providers = [], nodeConfig, algosdkStatic }: InitializeProvidersOptions<T> = {}) {
+>({
+  providers = [],
+  nodeConfig,
+  algosdkStatic,
+  debug = false
+}: InitializeProvidersOptions<T> = {}) {
+  // Enable debug mode
+  const { setDebug } = useDebugStore()
+  useEffect(() => setDebug(debug), [debug, setDebug])
+
   const [walletProviders, setWalletProviders] = useState<SupportedProviders | null>(null)
 
   useEffect(() => {

@@ -10,6 +10,7 @@ import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
 import { DecodedTransaction, DecodedSignedTransaction, Network } from '../../types'
 import { MyAlgoWalletClientConstructor, InitParams, MyAlgoConnectOptions } from './types'
 import { ICON } from './constants'
+import { debugLog } from '../../utils/debugLog'
 
 class MyAlgoWalletClient extends BaseClient {
   #client: MyAlgoConnect
@@ -46,6 +47,8 @@ class MyAlgoWalletClient extends BaseClient {
     network = DEFAULT_NETWORK
   }: InitParams): Promise<BaseClient | null> {
     try {
+      debugLog(`${PROVIDER_ID.MYALGO.toUpperCase()} initializing...`)
+
       const MyAlgoConnect = clientStatic || (await import('@randlabs/myalgo-connect')).default
 
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
@@ -55,7 +58,7 @@ class MyAlgoWalletClient extends BaseClient {
         ...(clientOptions ? clientOptions : { disableLedgerNano: false })
       })
 
-      return new MyAlgoWalletClient({
+      const provider = new MyAlgoWalletClient({
         metadata: MyAlgoWalletClient.metadata,
         client: myAlgo,
         clientOptions,
@@ -63,6 +66,10 @@ class MyAlgoWalletClient extends BaseClient {
         algodClient: algodClient,
         network
       })
+
+      debugLog(`${PROVIDER_ID.MYALGO.toUpperCase()} initialized`, '✅')
+
+      return provider
     } catch (e) {
       console.error('Error initializing...', e)
       return null

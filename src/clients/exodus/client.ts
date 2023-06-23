@@ -9,6 +9,7 @@ import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
 import type { DecodedTransaction, DecodedSignedTransaction, Network } from '../../types'
 import { ICON } from './constants'
 import { InitParams, WindowExtended, Exodus, ExodusClientConstructor, ExodusOptions } from './types'
+import { debugLog } from '../../utils/debugLog'
 
 class ExodusClient extends BaseClient {
   #client: Exodus
@@ -44,6 +45,8 @@ class ExodusClient extends BaseClient {
     network = DEFAULT_NETWORK
   }: InitParams): Promise<BaseClient | null> {
     try {
+      debugLog(`${PROVIDER_ID.EXODUS.toUpperCase()} initializing...`)
+
       if (typeof window == 'undefined' || (window as WindowExtended).exodus === undefined) {
         throw new Error('Exodus is not available.')
       }
@@ -52,7 +55,7 @@ class ExodusClient extends BaseClient {
       const algodClient = getAlgodClient(algosdk, algodOptions)
       const exodus = (window as WindowExtended).exodus.algorand
 
-      return new ExodusClient({
+      const provider = new ExodusClient({
         metadata: ExodusClient.metadata,
         client: exodus,
         algosdk: algosdk,
@@ -60,6 +63,10 @@ class ExodusClient extends BaseClient {
         clientOptions: clientOptions || { onlyIfTrusted: false },
         network
       })
+
+      debugLog(`${PROVIDER_ID.EXODUS.toUpperCase()} initialized`, '✅')
+
+      return provider
     } catch (e) {
       console.warn(e)
       console.warn(

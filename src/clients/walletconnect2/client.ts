@@ -11,6 +11,7 @@ import { InitParams, WalletConnectClientConstructor, WalletConnectTransaction } 
 import { isPublicNetwork } from '../../utils/types'
 import Algod, { getAlgodClient } from '../../algod'
 import { formatJsonRpcRequest } from './utils'
+import { debugLog } from '../../utils/debugLog'
 
 class WalletConnectClient extends BaseClient {
   #client: Web3ModalSign
@@ -50,6 +51,8 @@ class WalletConnectClient extends BaseClient {
     network = DEFAULT_NETWORK
   }: InitParams): Promise<BaseClient | null> {
     try {
+      debugLog(`${PROVIDER_ID.WALLETCONNECT.toUpperCase()} initializing...`)
+
       if (!isPublicNetwork(network)) {
         throw new Error(
           `WalletConnect only supports Algorand mainnet, testnet, and betanet. "${network}" is not supported.`
@@ -81,8 +84,8 @@ class WalletConnectClient extends BaseClient {
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
       const algodClient = getAlgodClient(algosdk, algodOptions)
 
-      // Initialize wallet client
-      return new WalletConnectClient({
+      // Initialize provider client
+      const provider = new WalletConnectClient({
         metadata: WalletConnectClient.metadata,
         client,
         clientOptions,
@@ -91,6 +94,10 @@ class WalletConnectClient extends BaseClient {
         network,
         chain
       })
+
+      debugLog(`${PROVIDER_ID.WALLETCONNECT.toUpperCase()} initialized`, '✅')
+
+      return provider
     } catch (error) {
       console.error('Error initializing WalletConnect client', error)
       return null

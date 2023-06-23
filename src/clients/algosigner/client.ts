@@ -16,6 +16,7 @@ import type {
   InitParams
 } from './types'
 import { useWalletStore } from '../../store'
+import { debugLog } from '../../utils/debugLog'
 
 class AlgoSignerClient extends BaseClient {
   #client: AlgoSigner
@@ -42,6 +43,8 @@ class AlgoSignerClient extends BaseClient {
     network = DEFAULT_NETWORK
   }: InitParams): Promise<BaseClient | null> {
     try {
+      debugLog(`${PROVIDER_ID.ALGOSIGNER.toUpperCase()} initializing...`)
+
       if (typeof window == 'undefined' || (window as WindowExtended).algorand === undefined) {
         throw new Error('AlgoSigner is not available.')
       }
@@ -50,13 +53,17 @@ class AlgoSignerClient extends BaseClient {
       const algodClient = getAlgodClient(algosdk, algodOptions)
       const algosigner = (window as WindowExtended).algorand
 
-      return new AlgoSignerClient({
+      const provider = new AlgoSignerClient({
         metadata: AlgoSignerClient.metadata,
         client: algosigner,
         algosdk: algosdk,
         algodClient: algodClient,
         network
       })
+
+      debugLog(`${PROVIDER_ID.ALGOSIGNER.toUpperCase()} initialized`, '✅')
+
+      return provider
     } catch (e) {
       console.warn(e)
       console.warn(
