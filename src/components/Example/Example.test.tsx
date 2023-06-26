@@ -17,7 +17,14 @@ jest.mock('../../index', () => ({
       address: 'mock account address',
       providerId: 'mock provider id'
     }
-  }))
+  })),
+  PROVIDER_ID: {
+    DEFLY: 'mock_defly_id',
+    PERA: 'mock_pera_id',
+    DAFFI: 'mock_daffi_id',
+    EXODUS: 'mock_exodus_id'
+  },
+  useInitializeProviders: jest.fn()
 }))
 
 describe('ConnectWallet', () => {
