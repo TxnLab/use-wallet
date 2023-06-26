@@ -54,8 +54,11 @@ class DaffiWalletClient extends BaseClient {
     try {
       debugLog(`${PROVIDER_ID.DAFFI.toUpperCase()} initializing...`)
 
-      const DaffiWalletConnect =
-        clientStatic || (await import('@daffiwallet/connect')).DaffiWalletConnect
+      if (!clientStatic) {
+        throw new Error('Daffi Wallet provider missing required property: clientStatic')
+      }
+
+      const DaffiWalletConnect = clientStatic
 
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
       const algodClient = getAlgodClient(algosdk, algodOptions)

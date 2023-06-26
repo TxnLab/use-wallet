@@ -55,8 +55,11 @@ class DeflyWalletClient extends BaseClient {
     try {
       debugLog(`${PROVIDER_ID.DEFLY.toUpperCase()} initializing...`)
 
-      const DeflyWalletConnect =
-        clientStatic || (await import('@blockshake/defly-connect')).DeflyWalletConnect
+      if (!clientStatic) {
+        throw new Error('Defly Wallet provider missing required property: clientStatic')
+      }
+
+      const DeflyWalletConnect = clientStatic
 
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
       const algodClient = getAlgodClient(algosdk, algodOptions)

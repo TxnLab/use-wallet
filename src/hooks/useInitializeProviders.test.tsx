@@ -3,6 +3,8 @@
  */
 
 /* eslint-disable @typescript-eslint/no-empty-function */
+import { DeflyWalletConnect } from '@blockshake/defly-connect'
+import { PeraWalletConnect } from '@perawallet/connect'
 import { renderHook, waitFor } from '@testing-library/react'
 import useInitializeProviders from './useInitializeProviders'
 import { PROVIDER_ID } from '../constants'
@@ -30,7 +32,10 @@ describe('useInitializeProviders', () => {
   it('should call initializeProviders and reconnectProviders correctly', async () => {
     renderHook(() =>
       useInitializeProviders({
-        providers: [PROVIDER_ID.PERA, PROVIDER_ID.DEFLY],
+        providers: [
+          { id: PROVIDER_ID.PERA, clientStatic: PeraWalletConnect },
+          { id: PROVIDER_ID.DEFLY, clientStatic: DeflyWalletConnect }
+        ],
         nodeConfig: {
           nodeServer: 'http://localhost',
           network: 'testnet'
@@ -40,7 +45,10 @@ describe('useInitializeProviders', () => {
 
     await waitFor(() =>
       expect(initializeProviders).toHaveBeenCalledWith(
-        [PROVIDER_ID.PERA, PROVIDER_ID.DEFLY],
+        [
+          { id: PROVIDER_ID.PERA, clientStatic: PeraWalletConnect },
+          { id: PROVIDER_ID.DEFLY, clientStatic: DeflyWalletConnect }
+        ],
         {
           nodeServer: 'http://localhost',
           network: 'testnet'
@@ -57,7 +65,7 @@ describe('useInitializeProviders', () => {
       throw new Error('Initialization Error')
     })
 
-    renderHook(() => useInitializeProviders())
+    renderHook(() => useInitializeProviders({ providers: [PROVIDER_ID.EXODUS] }))
 
     await waitFor(() =>
       expect(consoleErrorSpy).toHaveBeenCalledWith(
@@ -71,7 +79,7 @@ describe('useInitializeProviders', () => {
   it('should not throw an error if unmounted during initialization', async () => {
     const { unmount } = renderHook(() =>
       useInitializeProviders({
-        providers: [PROVIDER_ID.PERA, PROVIDER_ID.DEFLY],
+        providers: [PROVIDER_ID.EXODUS],
         nodeConfig: {
           nodeServer: 'http://localhost',
           network: 'testnet'
@@ -87,12 +95,20 @@ describe('useInitializeProviders', () => {
   })
 
   it('should return the result of initializeProviders', async () => {
-    const mockWalletProviders = { pera: {}, defly: {} }
+    const mockWalletProviders = { pera: {}, defly: {}, exodus: {} }
     ;(initializeProviders as jest.Mock).mockImplementation(() =>
       Promise.resolve(mockWalletProviders)
     )
 
-    const { result } = renderHook(() => useInitializeProviders())
+    const { result } = renderHook(() =>
+      useInitializeProviders({
+        providers: [
+          { id: PROVIDER_ID.PERA, clientStatic: PeraWalletConnect },
+          { id: PROVIDER_ID.DEFLY, clientStatic: DeflyWalletConnect },
+          PROVIDER_ID.EXODUS
+        ]
+      })
+    )
 
     await waitFor(() => expect(result.current).toEqual(mockWalletProviders))
   })
