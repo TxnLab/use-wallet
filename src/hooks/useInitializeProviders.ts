@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react'
 import { initializeProviders, reconnectProviders } from '../utils'
 import { useDebugStore } from '../store'
 import type algosdk from 'algosdk'
-import type { NodeConfig, ProviderArray, SupportedProviders } from '../types'
+import type { NodeConfig, ProvidersArray, SupportedProviders } from '../types'
 
 interface InitializeProvidersOptions {
-  providers: ProviderArray
+  providers: ProvidersArray
   nodeConfig?: NodeConfig
   algosdkStatic?: typeof algosdk
   debug?: boolean

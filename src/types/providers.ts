@@ -88,4 +88,4 @@ type ProviderDef =
   | PROVIDER_ID.ALGOSIGNER
   | PROVIDER_ID.MNEMONIC
 
-export type ProviderArray = NonEmptyArray<ProviderDef>
+export type ProvidersArray = NonEmptyArray<ProviderDef>
