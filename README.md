@@ -553,7 +553,7 @@ export default function App() {
             icons: ['https://walletconnect.com/walletconnect-logo.png']
           },
           modalOptions: {
-            theme: 'dark'
+            themeMode: 'dark'
           }
         }
       },
