@@ -4,7 +4,7 @@
 
 ## Overview
 
-With the `useWallet` hook and utility functions, you can:
+With the `use-wallet`'s hooks and utility functions, you can:
 
 - Easily add or remove wallet support with a few lines of code
 - Configure each wallet provider as needed for your application
@@ -12,15 +12,16 @@ With the `useWallet` hook and utility functions, you can:
 - Sign and send transactions
 - Restore sessions for returning users
 
+It provides an abstraction layer that unifies the initialization, connection, and transaction signing logic, eliminating the need to interact with each wallet's individual API.
+
 This library supports most Algorand wallet providers, including Defly, Pera, Daffi, and Exodus (see [Supported Wallet Providers](#supported-wallet-providers) for the full list).
 
-<!-- It provides an abstraction layer that handles the initialization, connection, and transaction signing logic, eliminating the need to interact with each wallet's individual API. -->
-
-As of version 2.x it includes [WalletConnect 2.0 support](#walletconnect-20-support).
+Version 2.x introduces [WalletConnect 2.0 support](#walletconnect-20-support).
 
 ## Table of Contents
 
 - [Live Examples](#live-examples)
+- [Requirements](#requirements)
 - [Installation](#installation)
 - [Initializing Providers](#initializing-providers)
 - [The `useWallet` Hook](#the-usewallet-hook)
@@ -32,11 +33,10 @@ As of version 2.x it includes [WalletConnect 2.0 support](#walletconnect-20-supp
 - [Supported Wallet Providers](#supported-wallet-providers)
 - [Legacy Wallet Support](#legacy-wallet-support)
 - [Provider Configuration](#provider-configuration)
-  - [Default configuration](#default-configuration)
-  - [Node configuration](#node-configuration)
-  - [Customize provider support](#customize-provider-support)
-  - [Provider objects](#provider-objects)
-  - [Static imports](#static-imports)
+  - [Provider Definitions](#provider-definitions)
+  - [Node Configuration](#node-configuration)
+  - [Algosdk Static Import](#algosdk-static-import)
+  - [Full Configuration Example](#full-configuration-example)
 - [WalletConnect 2.0 Support](#walletconnect-20-support)
 - [Migration Guide](#migration-guide)
 - [Local Development](#local-development)
@@ -54,9 +54,13 @@ As of version 2.x it includes [WalletConnect 2.0 support](#walletconnect-20-supp
 
 **NFDomains** - https://app.nf.domains/
 
+## Requirements
+
+Since this library uses [React Hooks](https://react.dev/reference/react), your app will need to be using React 16.8 or higher.
+
 ## Installation
 
-Since this library uses React Hooks, your app will need to be using React 16.8 or higher.
+Commands shown below use `npm install` but you can use `yarn add` or `pnpm add` instead.
 
 First, install the library
 
@@ -70,27 +74,35 @@ If you haven't already, install the Algorand JS SDK
 npm install algosdk
 ```
 
-Finally, install the peer dependencies for the wallets you wish to support. To use the default configuration:
+Finally, install any peer dependencies for the wallets you wish to support. For example, to support Defly, Pera, and Daffi wallets:
 
 ```bash
-npm install @perawallet/connect @blockshake/defly-connect @daffiwallet/connect
+npm install @blockshake/defly-connect @perawallet/connect @daffiwallet/connect
 ```
-
-Replace `npm install` with `yarn add` or `pnpm add` in the commands above, depending on your preferred package manager.
 
 ## Initializing Providers
 
 In the root of your app, initialize the `WalletProvider` with the `useInitializeProviders` hook.
 
-This example initializes `useWallet` with the default configuration options. See [Provider Configuration](#provider-configuration) for more options.
+This example initializes `useWallet` with Defly, Pera, Daffi and Exodus wallet providers. The default node configuration (mainnet via [AlgoNode](https://algonode.io/api/)) is used. See [Provider Configuration](#provider-configuration) for more options.
 
 ```jsx
 import React from 'react'
-import { WalletProvider, useInitializeProviders } from '@txnlab/use-wallet'
+import { WalletProvider, useInitializeProviders, PROVIDER_ID } from '@txnlab/use-wallet'
+import { DeflyWalletConnect } from '@blockshake/defly-connect'
+import { PeraWalletConnect } from '@perawallet/connect'
+import { DaffiWalletConnect } from '@daffiwallet/connect'
 
 export default function App() {
-  // default configuration
-  const providers = useInitializeProviders()
+  const providers = useInitializeProviders([
+    {
+      providers: [
+        { id: PROVIDER_ID.DEFLY, clientStatic: DeflyWalletConnect },
+        { id: PROVIDER_ID.PERA, clientStatic: PeraWalletConnect },
+        { id: PROVIDER_ID.DAFFI, clientStatic: DaffiWalletConnect }
+      ]
+    }
+  ])
 
   return (
     <WalletProvider value={providers}>
@@ -326,11 +338,13 @@ const signTransactions: (
 ) => Promise<Uint8Array[]>
 ```
 
-The `signTransactions` function will accept an array of transactions or an array of transaction groups.
+The `signTransactions` function will accept an array of transactions (encoded) or an array of transaction groups.
+
+#### Advanced Usage
 
 You can optionally specify which transactions should be signed by providing an array of indexes as the second argument, `indexesToSign`.
 
-By setting `returnGroup` to `false`, the returned promise will resolve to an array of signed transactions only. Otherwise it will return flat array of all transactions by default.
+By setting `returnGroup` to `false`, the returned promise will resolve to an array of signed transactions only. Otherwise it will return a flat array of all transactions by default.
 
 ### sendTransactions
 
@@ -369,24 +383,27 @@ useEffect(() => {
 
 ## Supported Wallet Providers
 
+### Defly Wallet
+
+- Website - https://defly.app/
+- Download Defly Wallet - [iOS](https://apps.apple.com/us/app/defly/id1602672723) / [Android](https://play.google.com/store/apps/details?id=io.blockshake.defly.app)
+- Defly Connect - https://github.com/blockshake-io/defly-connect
+- Install dependency - `npm install @blockshake/defly-connect`
+
 ### Pera Wallet
 
 - Website - https://perawallet.app/
 - Download Pera Mobile - [iOS](https://apps.apple.com/us/app/algorand-wallet/id1459898525) / [Android](https://play.google.com/store/apps/details?id=com.algorand.android)
 - Pera Web Wallet - https://web.perawallet.app/
 - Pera Connect - https://github.com/perawallet/connect
-
-### Defly Wallet
-
-- Website - https://defly.app/
-- Download Defly Wallet - [iOS](https://apps.apple.com/us/app/defly/id1602672723) / [Android](https://play.google.com/store/apps/details?id=io.blockshake.defly.app)
-- Defly Connect - https://github.com/blockshake-io/defly-connect
+- Install dependency - `npm install @perawallet/connect`
 
 ### Daffi Wallet
 
 - Website - https://www.daffi.me/
 - Download Daffi Wallet - [iOS](https://apps.apple.com/kn/app/daffiwallet/id1659597876) / [Android](https://play.google.com/store/apps/details?id=me.daffi.daffi_wallet)
 - Daffi Connect - https://github.com/RDinitiativ/daffiwallet_connect
+- Install dependency - `npm install @daffiwallet/connect`
 
 ### WalletConnect
 
@@ -394,6 +411,7 @@ useEffect(() => {
 - Documentation - https://docs.walletconnect.com/
 - WalletConnect Cloud - https://cloud.walletconnect.com/
 - Web3Modal - https://web3modal.com/
+- Install dependency - `npm install @web3modal/sign-html`
 
 ### Exodus Wallet
 
@@ -408,7 +426,7 @@ useEffect(() => {
 
 Support for these wallets will be removed in a future release.
 
-### AlgoSigner
+### AlgoSigner (deprecated)
 
 - GitHub - https://github.com/PureStake/algosigner
 - EOL Press Release - https://www.algorand.foundation/news/algosigner-support-ending
@@ -417,28 +435,37 @@ Support for these wallets will be removed in a future release.
 
 - Website - https://wallet.myalgo.com/home
 - FAQ - https://wallet.myalgo.com/home#faq
+- Install dependency - `npm install @randlabs/myalgo-connect`
 
 ## Provider Configuration
 
-### Default Configuration
+The `useInitializeProviders` hook accepts a configuration object with the following properties:
 
-Calling `useInitializeProviders` with no arguments initializes the default supported wallet providers with the default node configuration:
+| Key                    | Type                                  | Default Value                          |
+| ---------------------- | ------------------------------------- | -------------------------------------- |
+| providers              | `Array<ProviderDef>`                  | _required_                             |
+| nodeConfig.network     | `string \| undefined`                 | `'mainnet'`                            |
+| nodeConfig.nodeServer  | `string \| undefined`                 | `'https://mainnet-api.algonode.cloud'` |
+| nodeConfig.nodeToken   | `string \| undefined`                 | `''`                                   |
+| nodeConfig.nodePort    | `string \| number \| undefined`       | `443`                                  |
+| nodeConfig.nodeHeaders | `Record<string, string> \| undefined` |                                        |
+| algosdkStatic          | `typeof algosdk \| undefined`         |                                        |
 
-| Key                   | Default Value                                                                  |
-| --------------------- | ------------------------------------------------------------------------------ |
-| providers             | `[PROVIDER_ID.PERA, PROVIDER_ID.DEFLY, PROVIDER_ID.DAFFI, PROVIDER_ID.EXODUS]` |
-| nodeConfig.network    | `'mainnet'`                                                                    |
-| nodeConfig.nodeServer | `'https://mainnet-api.algonode.cloud'`                                         |
-| nodeConfig.nodeToken  | `''`                                                                           |
-| nodeConfig.nodePort   | `443`                                                                          |
-| algosdkStatic         | `undefined`                                                                    |
+### Provider Definitions
+
+The `providers` property is required, and must include at least one provider definition object. This is how you specify which wallet providers you wish to support in your app.
+
+If a wallet provider has an SDK library dependency, make sure you have installed the package. Then set the provider definition's `clientStatic` property to the dependency's exported module. For example, to use the Defly Wallet provider, you must install the `@blockshake/defly-connect` package and set its `clientStatic` property to `DeflyWalletConnect`.
 
 ```jsx
 import React from 'react'
-import { WalletProvider, useInitializeProviders } from '@txnlab/use-wallet'
+import { WalletProvider, useInitializeProviders, PROVIDER_ID } from '@txnlab/use-wallet'
+import { DeflyWalletConnect } from '@blockshake/defly-connect'
 
 export default function App() {
-  const providers = useInitializeProviders()
+  const providers = useInitializeProviders({
+    providers: [{ id: PROVIDER_ID.DEFLY, clientStatic: DeflyWalletConnect }]
+  })
 
   return (
     <WalletProvider value={providers}>
@@ -448,11 +475,17 @@ export default function App() {
 }
 ```
 
+If a provider has options that can be configured, you can set them in the `clientOptions` property. In most cases these would be the options that are passed to the provider's SDK library when it is initialized. See each [supported provider](#supported-wallet-providers)'s documentation for more details.
+
+While most client options are optional, the WalletConnect provider has required `clientOptions` that must be set. See the [WalletConnect 2.0](#walletconnect-20-support) section below for more details.
+
+**TypeScript:** The provider definitions are type-safe, so your IDE should be able to provide autocomplete suggestions for the client's available options based on the `id` that is set.
+
 ### Node configuration
 
-To configure the Algorand node that providers will use to send transactions, you can set the `nodeConfig` property. The `network` property should be specified as `mainnet`, `testnet`, `betanet` or the name of your local development network.
+To configure the Algorand node that providers will use to send transactions, you can set the `nodeConfig` property. The `network` property should be specified as `mainnet`, `testnet`, `betanet` or the name of your local development network\*.
 
-Refer to your wallet providers' documentation to see which networks they support.
+\* _Refer to each wallet providers' documentation to see which networks they support._
 
 ```jsx
 const providers = await initializeProviders({
@@ -465,45 +498,33 @@ const providers = await initializeProviders({
 })
 ```
 
-### Customize provider support
+### Algosdk Static Import
 
-You can choose which wallet providers to support by setting the `providers` property to an array of provider IDs or [provider objects](#provider-objects). The example below shows provider IDs being used.
+By default, `use-wallet` dynamically imports the `algosdk` peer dependency installed in your app, to reduce bundle size.
 
-```jsx
-// Only initialize Pera and Defly providers
-const providers = useInitializeProviders({
-  providers: [PROVIDER_ID.PERA, PROVIDER_ID.DEFLY]
-})
-```
-
-### Provider objects
-
-Some wallet providers have accompanying client libraries that can be configured. You can pass an object to the providers array to set `clientOptions`, as shown below.
+Some React frameworks, like [Remix](https://remix.run/), do not support dynamic imports. To get around this, you can set the optional `algosdkStatic` root property to the imported `algosdk` module.
 
 ```jsx
-const providers = useInitializeProviders({
-  providers: [
-    PROVIDER_ID.DEFLY, // use default options for Defly Connect
-    { id: PROVIDER_ID.PERA, clientOptions: { shouldShowSignTxnToast: false } },
-    { id: PROVIDER_ID.MYALGO, clientOptions: { disableLedgerNano: false } },
-    PROVIDER_ID.EXODUS // Exodus has no client library
-  ]
-})
+import React from 'react'
+import algosdk from 'algosdk'
+import { PROVIDER_ID, WalletProvider, useInitializeProviders } from '@txnlab/use-wallet'
+import { DeflyWalletConnect } from '@blockshake/defly-connect'
+
+export default function App() {
+  const providers = useInitializeProviders({
+    providers: [{ id: PROVIDER_ID.DEFLY, clientStatic: DeflyWalletConnect }],
+    algosdkStatic: algosdk
+  })
+
+  return (
+    <WalletProvider value={providers}>
+      <div className="App">{/* ... */}</div>
+    </WalletProvider>
+  )
+}
 ```
 
-See each provider's documentation for the available client options.
-
-You will need to use provider objects for [static imports](#static-imports), and for [WalletConnect 2.0](#walletconnect-20) support.
-
-**TypeScript:** The provider objects are type-safe, so your IDE should be able to provide autocomplete suggestions for the client's available options based on the `id` that is set.
-
-### Static Imports
-
-By default, `use-wallet` dynamically imports all of the dependencies for the providers, as well as `algosdk`, to reduce bundle size.
-
-Some React frameworks, like [Remix](https://remix.run/), do not support dynamic imports. To get around this, provider clients can be imported in your application and passed to the provider objects `clientStatic` property.
-
-Set the imported `algosdk` to the `algosdkStatic` root property.
+### Full Configuration Example
 
 ```jsx
 import React from 'react'
@@ -511,13 +532,15 @@ import algosdk from 'algosdk'
 import { PROVIDER_ID, WalletProvider, useInitializeProviders } from '@txnlab/use-wallet'
 import { DeflyWalletConnect } from '@blockshake/defly-connect'
 import { PeraWalletConnect } from '@perawallet/connect'
+import { DaffiWalletConnect } from '@daffiwallet/connect'
 import { Web3ModalSign } from '@web3modal/sign-html'
 
 export default function App() {
   const providers = useInitializeProviders({
     providers: [
-      { id: PROVIDER_ID.PERA, clientStatic: PeraWalletConnect },
       { id: PROVIDER_ID.DEFLY, clientStatic: DeflyWalletConnect },
+      { id: PROVIDER_ID.PERA, clientStatic: PeraWalletConnect },
+      { id: PROVIDER_ID.DAFFI, clientStatic: DaffiWalletConnect },
       {
         id: PROVIDER_ID.WALLETCONNECT,
         clientStatic: Web3ModalSign,
@@ -528,11 +551,20 @@ export default function App() {
             description: 'Example Dapp',
             url: '#',
             icons: ['https://walletconnect.com/walletconnect-logo.png']
+          },
+          modalOptions: {
+            theme: 'dark'
           }
         }
       },
-      PROVIDER_ID.EXODUS
+      { id: PROVIDER_ID.EXODUS }
     ],
+    nodeConfig: {
+      network: 'mainnet',
+      nodeServer: 'https://mainnet-api.algonode.cloud',
+      nodeToken: '',
+      nodePort: '443'
+    }
     algosdkStatic: algosdk
   })
 
@@ -546,21 +578,22 @@ export default function App() {
 
 ## WalletConnect 2.0 Support
 
-`use-wallet` v2 introduces support for WalletConnect 2.0. This is a major upgrade to the WalletConnect protocol, and introduces a number of breaking changes for app developers to contend with.
+`use-wallet` v2 introduces support for WalletConnect 2.0. This is a major upgrade to the WalletConnect protocol, and introduces a number of breaking changes for app developers.
 
 However, Algorand apps with `use-wallet` will be able to support the new protocol with minimal effort:
 
 1. **Obtain a project ID** - You will need to obtain a project ID from [WalletConnect Cloud](https://cloud.walletconnect.com/). This is a simple process, and there is no waiting period. Every app will need its own unique project ID.
 
-2. **Install peer dependency** - Install `@web3modal/sign-html`.
+2. **Install client library** - Install `@web3modal/sign-html` and set `clientStatic` to the imported `Web3ModalSign` module.
 
-3. **Update provider configuration** - You will need to use a provider object to initialize WalletConnect, and pass your `clientOptions` as shown below
+3. **Required options** - Set the required `clientOptions` as shown below
 
 ```jsx
 const providers = useInitializeProviders({
   providers: [
     {
       id: PROVIDER_ID.WALLETCONNECT,
+      clientStatic: Web3ModalSign,
       clientOptions: {
         projectId: '<YOUR_PROJECT_ID>',
         metadata: {
@@ -576,9 +609,7 @@ const providers = useInitializeProviders({
 })
 ```
 
-Since it requires the unique `projectId`, the WalletConnect provider is not initialized by default. This is a change from v1. If you want to support WalletConnect, it must be added to the `providers` array.
-
-See [Migrating to WalletConnect 2.0](#migrating-to-walletconnect-20) below for more information.
+**IMPORTANT:** Only wallets that have been upgraded to support WalletConnect 2.0 will be able to connect to your app with this provider.
 
 ### "Module not found" errors in Next.js 13
 
@@ -603,31 +634,38 @@ See https://github.com/WalletConnect/walletconnect-monorepo/issues/1908#issuecom
 
 Version 2.x is a major version bump, and includes some breaking changes from 1.x.
 
-### initializeProviders
+### useInitializeProviders
 
-`initializeProviders` is now asynchronous, and must be called from inside a `useEffect` hook.
+The most significant change is how wallet providers are initialized.
 
-To simplify this, the `useInitializeProviders` hook is now provided, which calls `initializeProviders` internally. It accepts a single object as an argument.
+`initializeProviders` has been replaced by the `useInitializeProviders` hook. It accepts a single configuration object as an argument. Its properties correspond to the three arguments passed to its predecessor.
 
-The providers array should be set as the `providers` property.
+The `providers` property is an array of provider definition objects, with an `id` set to a `PROVIDER_ID` constant. Wallet provider SDKs are no longer dynamically imported by their client classes. They must be statically imported and set as the `clientStatic` property.
 
 ```diff
-- const providers = initializeProviders([PROVIDER_ID.PERA, PROVIDER_ID.DEFLY])
+- const providers = initializeProviders([PROVIDER_ID.PERA, PROVIDER_ID.DEFLY, PROVIDER_ID.EXODUS])
 + const providers = useInitializeProviders({
-+   providers: [PROVIDER_ID.PERA, PROVIDER_ID.DEFLY]
++   providers: [
++     { id: PROVIDER_ID.PERA, clientStatic: PeraWalletConnect },
++     { id: PROVIDER_ID.DEFLY, clientStatic: DeflyWalletConnect },
++     { id: PROVIDER_ID.EXODUS }
++   ]
 + })
 ```
+
+We've also done away with the concept of "default" providers. Each provider you wish to support in your app must be explicitly defined in the `providers` array.
 
 Node configuration should be set as the `nodeConfig` property.
 
 ```diff
-- const providers = initializeProviders([], {
+- const providers = initializeProviders([...], {
 -   network: 'testnet',
 -   nodeServer: 'https://testnet-api.algonode.cloud',
 -   nodeToken: '',
 -   nodePort: '443'
 - })
 + const providers = useInitializeProviders({
++   providers: [...],
 +   nodeConfig: {
 +     network: 'testnet',
 +     nodeServer: 'https://testnet-api.algonode.cloud',
@@ -655,7 +693,7 @@ const providers = useInitializeProviders({
 })
 ```
 
-### WalletConnect provider
+### WalletConnect peer dependencies
 
 The WalletConnect provider now supports WalletConnect 2.0. To continue supporting this provider, or to add support to your application, you must install the `@web3modal/sign-html` package.
 
@@ -669,7 +707,7 @@ The peer dependencies for WalletConnect 1.x should be uninstalled.
 npm uninstall @walletconnect/client @json-rpc-tools/utils algorand-walletconnect-qrcode-modal
 ```
 
-WalletConnect is no longer initialized by default. To add support for WalletConnect, you must add it to the `providers` array, and pass your `clientOptions` as described in [WalletConnect 2.0 Support](#walletconnect-20-support) above.
+See [WalletConnect 2.0 Support](#walletconnect-20-support) for more details.
 
 ## Local Development
 
