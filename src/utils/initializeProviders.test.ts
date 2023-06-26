@@ -11,7 +11,6 @@ import {
   DEFAULT_NODE_BASEURL,
   DEFAULT_NODE_PORT,
   DEFAULT_NODE_TOKEN,
-  DEFAULT_PROVIDERS,
   PROVIDER_ID
 } from '../constants'
 import { createMockClient } from '../testUtils/mockClients'
@@ -58,7 +57,7 @@ describe('initializeProviders', () => {
       configurable: true
     })
 
-    const result = await initializeProviders()
+    const result = await initializeProviders([PROVIDER_ID.EXODUS])
     expect(result).toEqual({})
 
     Object.defineProperty(global, 'window', {
@@ -67,12 +66,12 @@ describe('initializeProviders', () => {
     })
   })
 
-  it('should initialize default providers with default node configuration', async () => {
+  it('should initialize providers with default node configuration', async () => {
     // Initialize default providers
-    const result = await initializeProviders()
+    const result = await initializeProviders([PROVIDER_ID.EXODUS])
 
     // Check if the returned object has the correct keys
-    expect(Object.keys(result)).toEqual(expect.arrayContaining(DEFAULT_PROVIDERS))
+    expect(Object.keys(result)).toEqual(expect.arrayContaining([PROVIDER_ID.EXODUS]))
     expect(Object.keys(result)).not.toContain(PROVIDER_ID.KMD)
     expect(Object.keys(result)).not.toContain(PROVIDER_ID.MNEMONIC)
     expect(Object.keys(result)).not.toContain(PROVIDER_ID.WALLETCONNECT)
@@ -83,7 +82,7 @@ describe('initializeProviders', () => {
     for (const providerId of Object.keys(result)) {
       expect(allClients[providerId].init).toHaveBeenCalledWith({
         network: DEFAULT_NETWORK,
-        algodOptions: [DEFAULT_NODE_TOKEN, DEFAULT_NODE_BASEURL, DEFAULT_NODE_PORT],
+        algodOptions: [DEFAULT_NODE_TOKEN, DEFAULT_NODE_BASEURL, DEFAULT_NODE_PORT, undefined],
         algosdkStatic: undefined
       })
     }

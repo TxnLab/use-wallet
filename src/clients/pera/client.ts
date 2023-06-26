@@ -15,6 +15,7 @@ import {
   InitParams,
   PeraWalletConnectOptions
 } from './types'
+import { debugLog } from '../../utils/debugLog'
 
 class PeraWalletClient extends BaseClient {
   #client: PeraWalletConnect
@@ -51,8 +52,13 @@ class PeraWalletClient extends BaseClient {
     network = DEFAULT_NETWORK
   }: InitParams): Promise<BaseClient | null> {
     try {
-      const PeraWalletConnect =
-        clientStatic || (await import('@perawallet/connect')).PeraWalletConnect
+      debugLog(`${PROVIDER_ID.PERA.toUpperCase()} initializing...`)
+
+      if (!clientStatic) {
+        throw new Error('Pera Wallet provider missing required property: clientStatic')
+      }
+
+      const PeraWalletConnect = clientStatic
 
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
       const algodClient = getAlgodClient(algosdk, algodOptions)
@@ -61,7 +67,7 @@ class PeraWalletClient extends BaseClient {
         ...(clientOptions && clientOptions)
       })
 
-      return new PeraWalletClient({
+      const provider = new PeraWalletClient({
         metadata: PeraWalletClient.metadata,
         client: peraWallet,
         clientOptions,
@@ -69,6 +75,10 @@ class PeraWalletClient extends BaseClient {
         algodClient,
         network
       })
+
+      debugLog(`${PROVIDER_ID.PERA.toUpperCase()} initialized`, '✅')
+
+      return provider
     } catch (e) {
       console.error('Error initializing...', e)
       return null

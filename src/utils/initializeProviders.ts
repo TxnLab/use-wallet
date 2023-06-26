@@ -11,20 +11,19 @@ import {
   DEFAULT_NODE_BASEURL,
   DEFAULT_NODE_TOKEN,
   DEFAULT_NODE_PORT,
-  DEFAULT_NETWORK,
-  DEFAULT_PROVIDERS
+  DEFAULT_NETWORK
 } from '../constants'
+import { debugLog, getProviderList } from './debugLog'
 
 export const initializeProviders = async <T extends keyof ProviderConfigMapping>(
-  providers?: Array<T | ProviderConfig<T>>,
+  providers: Array<T | ProviderConfig<T>>,
   nodeConfig?: NodeConfig,
   algosdkStatic?: typeof algosdk
 ): Promise<SupportedProviders> => {
   const initializedProviders: SupportedProviders = {}
 
   if (typeof window === 'undefined') {
-    // @todo add `debug: Boolean` option to enable/disable console logs
-    console.warn('Window object is not available, skipping initialization.')
+    debugLog('Window object is not available, skipping initialization')
     return initializedProviders
   }
 
@@ -49,17 +48,10 @@ export const initializeProviders = async <T extends keyof ProviderConfigMapping>
     initializedProviders[id] = client
   }
 
-  // Initialize default providers if `providers` is undefined or empty
-  if (!providers || providers.length === 0) {
-    const initPromises = Object.keys(allClients)
-      .filter((id) => DEFAULT_PROVIDERS.includes(id as T))
-      .map((id) => initClient(id as T))
+  debugLog('Initializing providers:', getProviderList(providers))
 
-    await Promise.all(initPromises)
-  } else {
-    const initPromises = providers.map((provider) => initClient(provider))
-    await Promise.all(initPromises)
-  }
+  const initPromises = providers.map((provider) => initClient(provider))
+  await Promise.all(initPromises)
 
   return initializedProviders
 }
