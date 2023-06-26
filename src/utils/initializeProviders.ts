@@ -11,13 +11,12 @@ import {
   DEFAULT_NODE_BASEURL,
   DEFAULT_NODE_TOKEN,
   DEFAULT_NODE_PORT,
-  DEFAULT_NETWORK,
-  DEFAULT_PROVIDERS
+  DEFAULT_NETWORK
 } from '../constants'
 import { debugLog, getProviderList } from './debugLog'
 
 export const initializeProviders = async <T extends keyof ProviderConfigMapping>(
-  providers?: Array<T | ProviderConfig<T>>,
+  providers: Array<T | ProviderConfig<T>>,
   nodeConfig?: NodeConfig,
   algosdkStatic?: typeof algosdk
 ): Promise<SupportedProviders> => {
@@ -49,20 +48,10 @@ export const initializeProviders = async <T extends keyof ProviderConfigMapping>
     initializedProviders[id] = client
   }
 
-  if (!providers || providers.length === 0) {
-    debugLog('Initializing default providers:', getProviderList(DEFAULT_PROVIDERS))
+  debugLog('Initializing providers:', getProviderList(providers))
 
-    const initPromises = Object.keys(allClients)
-      .filter((id) => DEFAULT_PROVIDERS.includes(id as T))
-      .map((id) => initClient(id as T))
-
-    await Promise.all(initPromises)
-  } else {
-    debugLog('Initializing custom providers:', getProviderList(providers))
-
-    const initPromises = providers.map((provider) => initClient(provider))
-    await Promise.all(initPromises)
-  }
+  const initPromises = providers.map((provider) => initClient(provider))
+  await Promise.all(initPromises)
 
   return initializedProviders
 }

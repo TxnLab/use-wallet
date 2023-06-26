@@ -12,6 +12,7 @@ import type { ExodusOptions } from '../clients/exodus/types'
 import type { KmdOptions } from '../clients/kmd/types'
 import type { MyAlgoConnectOptions } from '../clients/myalgo/types'
 import type { DaffiWalletConnectOptions } from '../clients/daffi/types'
+import type { NonEmptyArray } from './utilities'
 
 export type ProviderConfigMapping = {
   [PROVIDER_ID.PERA]: {
@@ -67,5 +68,24 @@ export type NodeConfig = {
   network: Network
   nodeServer: string
   nodeToken?: string
-  nodePort?: string
+  nodePort?: string | number
+  nodeHeaders?: Record<string, string>
 }
+
+type ProviderDef =
+  | (ProviderConfig<PROVIDER_ID.PERA> & { clientStatic: typeof PeraWalletConnect })
+  | (ProviderConfig<PROVIDER_ID.DEFLY> & { clientStatic: typeof DeflyWalletConnect })
+  | (ProviderConfig<PROVIDER_ID.DAFFI> & { clientStatic: typeof DaffiWalletConnect })
+  | (ProviderConfig<PROVIDER_ID.WALLETCONNECT> & {
+      clientStatic: typeof Web3ModalSign
+      clientOptions: Web3ModalSignOptions
+    })
+  | (ProviderConfig<PROVIDER_ID.MYALGO> & { clientStatic: typeof MyAlgoConnect })
+  | ProviderConfig<PROVIDER_ID.EXODUS>
+  | ProviderConfig<PROVIDER_ID.KMD>
+  | PROVIDER_ID.EXODUS
+  | PROVIDER_ID.KMD
+  | PROVIDER_ID.ALGOSIGNER
+  | PROVIDER_ID.MNEMONIC
+
+export type ProvidersArray = NonEmptyArray<ProviderDef>

@@ -49,7 +49,11 @@ class MyAlgoWalletClient extends BaseClient {
     try {
       debugLog(`${PROVIDER_ID.MYALGO.toUpperCase()} initializing...`)
 
-      const MyAlgoConnect = clientStatic || (await import('@randlabs/myalgo-connect')).default
+      if (!clientStatic) {
+        throw new Error('MyAlgo Wallet provider missing required property: clientStatic')
+      }
+
+      const MyAlgoConnect = clientStatic
 
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
       const algodClient = getAlgodClient(algosdk, algodOptions)

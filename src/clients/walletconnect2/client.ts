@@ -53,23 +53,23 @@ class WalletConnectClient extends BaseClient {
     try {
       debugLog(`${PROVIDER_ID.WALLETCONNECT.toUpperCase()} initializing...`)
 
+      if (!clientStatic) {
+        throw new Error('WalletConnect provider missing required property: clientStatic')
+      }
+
+      if (!clientOptions) {
+        throw new Error('WalletConnect provider missing required property: clientOptions')
+      }
+
       if (!isPublicNetwork(network)) {
         throw new Error(
           `WalletConnect only supports Algorand mainnet, testnet, and betanet. "${network}" is not supported.`
         )
       }
 
-      if (!clientOptions) {
-        throw new Error('WalletConnect clientOptions must be provided')
-      }
-
       const chain = ALGORAND_CHAINS[network]
 
-      const clientModule = clientStatic
-        ? { Web3ModalSign: clientStatic }
-        : await import('@web3modal/sign-html')
-
-      const Client = clientModule.Web3ModalSign
+      const Client = clientStatic
 
       // Initialize client
       const client = new Client({

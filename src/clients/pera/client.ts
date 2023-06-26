@@ -54,8 +54,11 @@ class PeraWalletClient extends BaseClient {
     try {
       debugLog(`${PROVIDER_ID.PERA.toUpperCase()} initializing...`)
 
-      const PeraWalletConnect =
-        clientStatic || (await import('@perawallet/connect')).PeraWalletConnect
+      if (!clientStatic) {
+        throw new Error('Pera Wallet provider missing required property: clientStatic')
+      }
+
+      const PeraWalletConnect = clientStatic
 
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
       const algodClient = getAlgodClient(algosdk, algodOptions)
