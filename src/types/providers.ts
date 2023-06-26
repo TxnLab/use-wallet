@@ -68,7 +68,8 @@ export type NodeConfig = {
   network: Network
   nodeServer: string
   nodeToken?: string
-  nodePort?: string
+  nodePort?: string | number
+  nodeHeaders?: Record<string, string>
 }
 
 type ProviderDef =
