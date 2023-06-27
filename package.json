@@ -54,7 +54,7 @@
     "@web3modal/sign-html": "^2.4.7",
     "algosdk": "^2.1.0",
     "babel-jest": "^29.1.2",
-    "babel-loader": "^8.2.3",
+    "babel-loader": "^9.0.0",
     "commitizen": "4.3.0",
     "css-loader": "^6.5.1",
     "cz-conventional-changelog": "3.3.0",
