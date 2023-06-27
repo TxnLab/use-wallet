@@ -1,3 +1,5 @@
+![](use-wallet-banner.png)
+
 # UseWallet v2
 
 `@txnlab/use-wallet` is a React library that provides a simplified, consistent interface for integrating multiple Algorand wallets into your decentralized applications (dApps).
