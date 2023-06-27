@@ -1,5 +1,6 @@
-import type _algosdk from 'algosdk'
-import type { Network, Metadata, CommonInitParams } from '../../types'
+import type algosdk from 'algosdk'
+import type { Network } from '../../types/node'
+import type { Metadata } from '../../types/wallet'
 
 export type ExodusOptions = {
   onlyIfTrusted: boolean
@@ -26,11 +27,7 @@ export type ExodusClientConstructor = {
   metadata: Metadata
   client: Exodus
   clientOptions: ExodusOptions
-  algosdk: typeof _algosdk
-  algodClient: _algosdk.Algodv2
+  algosdk: typeof algosdk
+  algodClient: algosdk.Algodv2
   network: Network
-}
-
-export type InitParams = CommonInitParams & {
-  clientOptions?: ExodusOptions
 }

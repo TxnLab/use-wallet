@@ -1,15 +1,15 @@
 /**
- * Helpful resources:
+ * Documentation:
  * https://docs.exodus.com/api-reference/algorand-provider-api/
  */
-import type _algosdk from 'algosdk'
-import BaseClient from '../base'
 import Algod, { getAlgodClient } from '../../algod'
+import BaseClient from '../base'
 import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
-import type { DecodedTransaction, DecodedSignedTransaction, Network } from '../../types'
-import { ICON } from './constants'
-import { InitParams, WindowExtended, Exodus, ExodusClientConstructor, ExodusOptions } from './types'
 import { debugLog } from '../../utils/debugLog'
+import { ICON } from './constants'
+import type { DecodedSignedTransaction, DecodedTransaction, Network } from '../../types/node'
+import type { InitParams } from '../../types/providers'
+import type { Exodus, ExodusClientConstructor, ExodusOptions, WindowExtended } from './types'
 
 class ExodusClient extends BaseClient {
   #client: Exodus
@@ -43,7 +43,7 @@ class ExodusClient extends BaseClient {
     algodOptions,
     algosdkStatic,
     network = DEFAULT_NETWORK
-  }: InitParams): Promise<BaseClient | null> {
+  }: InitParams<PROVIDER_ID.EXODUS>): Promise<BaseClient | null> {
     try {
       debugLog(`${PROVIDER_ID.EXODUS.toUpperCase()} initializing...`)
 

@@ -1,6 +1,7 @@
 import type { Web3ModalSign, Web3ModalSignOptions } from '@web3modal/sign-html'
 import type algosdk from 'algosdk'
-import { CommonInitParams, Metadata, Network } from '../../types'
+import type { Network } from '../../types/node'
+import type { Metadata } from '../../types/wallet'
 
 export type WalletConnectClientConstructor = {
   metadata: Metadata
@@ -10,11 +11,6 @@ export type WalletConnectClientConstructor = {
   algodClient: algosdk.Algodv2
   network: Network
   chain: string
-}
-
-export type InitParams = CommonInitParams & {
-  clientOptions?: Web3ModalSignOptions
-  clientStatic?: typeof Web3ModalSign
 }
 
 export type WalletConnectTransaction = {

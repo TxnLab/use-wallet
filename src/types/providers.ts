@@ -1,4 +1,4 @@
-import { PROVIDER_ID } from '../constants'
+import type { PROVIDER_ID } from '../constants'
 import type { PeraWalletConnect } from '@perawallet/connect'
 import type { DeflyWalletConnect } from '@blockshake/defly-connect'
 import type { DaffiWalletConnect } from '@daffiwallet/connect'
@@ -13,6 +13,7 @@ import type { KmdOptions } from '../clients/kmd/types'
 import type { MyAlgoConnectOptions } from '../clients/myalgo/types'
 import type { DaffiWalletConnectOptions } from '../clients/daffi/types'
 import type { NonEmptyArray } from './utilities'
+import type BaseClient from '../clients/base'
 
 export type ProviderConfigMapping = {
   [PROVIDER_ID.PERA]: {
@@ -37,12 +38,20 @@ export type ProviderConfigMapping = {
   }
   [PROVIDER_ID.EXODUS]: {
     clientOptions?: ExodusOptions
+    clientStatic?: undefined
   }
   [PROVIDER_ID.KMD]: {
     clientOptions?: KmdOptions
+    clientStatic?: undefined
   }
-  [PROVIDER_ID.ALGOSIGNER]: Record<string, never>
-  [PROVIDER_ID.MNEMONIC]: Record<string, never>
+  [PROVIDER_ID.ALGOSIGNER]: {
+    clientOptions?: undefined
+    clientStatic?: undefined
+  }
+  [PROVIDER_ID.MNEMONIC]: {
+    clientOptions?: undefined
+    clientStatic?: undefined
+  }
 }
 
 /**
@@ -63,6 +72,9 @@ export type CommonInitParams = {
   algodOptions?: AlgodClientOptions
   algosdkStatic?: typeof algosdk
 }
+
+export type InitParams<T extends keyof ProviderConfigMapping> = CommonInitParams &
+  ProviderConfigMapping[T]
 
 export type NodeConfig = {
   network: Network
@@ -89,3 +101,7 @@ type ProviderDef =
   | PROVIDER_ID.MNEMONIC
 
 export type ProvidersArray = NonEmptyArray<ProviderDef>
+
+export type WalletClient = BaseClient
+
+export type SupportedProviders = Partial<Record<PROVIDER_ID, WalletClient | null>>

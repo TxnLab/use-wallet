@@ -1,22 +1,21 @@
 /**
- * Helpful resources:
+ * Documentation:
  * https://github.com/PureStake/algosigner/blob/develop/docs/dApp-integration.md
  */
-import type _algosdk from 'algosdk'
-import BaseClient from '../base'
 import Algod, { getAlgodClient } from '../../algod'
-import { PROVIDER_ID, DEFAULT_NETWORK } from '../../constants'
-import type { DecodedTransaction, DecodedSignedTransaction, Network } from '../../types'
-import { ICON } from './constants'
-import type {
-  WindowExtended,
-  AlgoSignerTransaction,
-  AlgoSigner,
-  AlgoSignerClientConstructor,
-  InitParams
-} from './types'
+import BaseClient from '../base'
+import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
 import { useWalletStore } from '../../store'
 import { debugLog } from '../../utils/debugLog'
+import { ICON } from './constants'
+import type { DecodedSignedTransaction, DecodedTransaction, Network } from '../../types/node'
+import type { InitParams } from '../../types/providers'
+import type {
+  AlgoSigner,
+  AlgoSignerClientConstructor,
+  AlgoSignerTransaction,
+  WindowExtended
+} from './types'
 
 class AlgoSignerClient extends BaseClient {
   #client: AlgoSigner
@@ -41,7 +40,7 @@ class AlgoSignerClient extends BaseClient {
     algodOptions,
     algosdkStatic,
     network = DEFAULT_NETWORK
-  }: InitParams): Promise<BaseClient | null> {
+  }: InitParams<PROVIDER_ID.ALGOSIGNER>): Promise<BaseClient | null> {
     try {
       debugLog(`${PROVIDER_ID.ALGOSIGNER.toUpperCase()} initializing...`)
 

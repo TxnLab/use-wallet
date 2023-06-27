@@ -1,17 +1,23 @@
+/**
+ * Documentation:
+ * https://docs.walletconnect.com/2.0/
+ */
+import Algod, { getAlgodClient } from '../../algod'
+import BaseClient from '../base'
+import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
+import { debugLog } from '../../utils/debugLog'
+import { isPublicNetwork } from '../../utils/types'
+import { ALGORAND_CHAINS, ICON } from './constants'
+import { formatJsonRpcRequest } from './utils'
 import type {
   Web3ModalSign,
   Web3ModalSignOptions,
   Web3ModalSignSession
 } from '@web3modal/sign-html'
-import BaseClient from '../base'
-import { DecodedSignedTransaction, DecodedTransaction, Network, Wallet } from '../../types'
-import { PROVIDER_ID } from '../../constants'
-import { ALGORAND_CHAINS, DEFAULT_NETWORK, ICON } from './constants'
-import { InitParams, WalletConnectClientConstructor, WalletConnectTransaction } from './types'
-import { isPublicNetwork } from '../../utils/types'
-import Algod, { getAlgodClient } from '../../algod'
-import { formatJsonRpcRequest } from './utils'
-import { debugLog } from '../../utils/debugLog'
+import type { DecodedSignedTransaction, DecodedTransaction, Network } from '../../types/node'
+import type { InitParams } from '../../types/providers'
+import type { Wallet } from '../../types/wallet'
+import type { WalletConnectClientConstructor, WalletConnectTransaction } from './types'
 
 class WalletConnectClient extends BaseClient {
   #client: Web3ModalSign
@@ -49,7 +55,7 @@ class WalletConnectClient extends BaseClient {
     clientStatic,
     algosdkStatic,
     network = DEFAULT_NETWORK
-  }: InitParams): Promise<BaseClient | null> {
+  }: InitParams<PROVIDER_ID.WALLETCONNECT>): Promise<BaseClient | null> {
     try {
       debugLog(`${PROVIDER_ID.WALLETCONNECT.toUpperCase()} initializing...`)
 

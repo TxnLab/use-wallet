@@ -1,16 +1,16 @@
 /**
- * Helpful resources:
+ * Documentation:
  * https://github.com/randlabs/myalgo-connect
  */
-import BaseClient from '../base'
-import type MyAlgoConnect from '@randlabs/myalgo-connect'
-import type _algosdk from 'algosdk'
 import Algod, { getAlgodClient } from '../../algod'
+import BaseClient from '../base'
 import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
-import { DecodedTransaction, DecodedSignedTransaction, Network } from '../../types'
-import { MyAlgoWalletClientConstructor, InitParams, MyAlgoConnectOptions } from './types'
-import { ICON } from './constants'
 import { debugLog } from '../../utils/debugLog'
+import { ICON } from './constants'
+import type MyAlgoConnect from '@randlabs/myalgo-connect'
+import type { DecodedSignedTransaction, DecodedTransaction, Network } from '../../types/node'
+import type { InitParams } from '../../types/providers'
+import type { MyAlgoConnectOptions, MyAlgoWalletClientConstructor } from './types'
 
 class MyAlgoWalletClient extends BaseClient {
   #client: MyAlgoConnect
@@ -45,7 +45,7 @@ class MyAlgoWalletClient extends BaseClient {
     clientStatic,
     algosdkStatic,
     network = DEFAULT_NETWORK
-  }: InitParams): Promise<BaseClient | null> {
+  }: InitParams<PROVIDER_ID.MYALGO>): Promise<BaseClient | null> {
     try {
       debugLog(`${PROVIDER_ID.MYALGO.toUpperCase()} initializing...`)
 
