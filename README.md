@@ -679,15 +679,16 @@ See [Provider Configuration](#provider-configuration) for more details.
 
 ### shouldShowSignTxnToast
 
-Pera Connect and Defly Connect both have a `shouldShowSignTxnToast` option that is set to `true` by default. `use-wallet` v1 set this to `false` by default, and required setting the option back to `true` to achieve the libraries' default behavior.
+Pera Connect, Defly Connect and Daffi Connect share a `shouldShowSignTxnToast` option that is set to `true` by default. `use-wallet` v1 set these to `false` by default, and required setting the option back to `true` to achieve the libraries' default behavior.
 
-In v2 this option is set to `true` by default. If your app has this option explicitly set you can remove it from your configuration. If you wish to disable the toast(s), you must now explicitly set the option to `false`.
+In v2 this option is set to `true` by default. If your app has this option set to `true` you can remove it from your configuration. If you wish to disable the toast(s), you must now explicitly set the option to `false`.
 
 ```jsx
 const providers = useInitializeProviders({
   providers: [
     { id: PROVIDER_ID.DEFLY, clientOptions: { shouldShowSignTxnToast: false } },
-    { id: PROVIDER_ID.PERA, clientOptions: { shouldShowSignTxnToast: false } }
+    { id: PROVIDER_ID.PERA, clientOptions: { shouldShowSignTxnToast: false } },
+    { id: PROVIDER_ID.DAFFI, clientOptions: { shouldShowSignTxnToast: false } }
     // other providers...
   ]
 })

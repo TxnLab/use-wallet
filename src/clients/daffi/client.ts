@@ -64,7 +64,7 @@ class DaffiWalletClient extends BaseClient {
       const algodClient = getAlgodClient(algosdk, algodOptions)
 
       const daffiWallet = new DaffiWalletConnect({
-        ...(clientOptions ? clientOptions : { shouldShowSignTxnToast: false })
+        ...(clientOptions && clientOptions)
       })
 
       const provider = new DaffiWalletClient({
