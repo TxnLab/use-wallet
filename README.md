@@ -1,10 +1,13 @@
-# @txnlab/use-wallet
+# UseWallet v2
 
 `@txnlab/use-wallet` is a React library that provides a simplified, consistent interface for integrating multiple Algorand wallets into your decentralized applications (dApps).
 
+[![npm version](https://badge.fury.io/js/%40txnlab%2Fuse-wallet.svg)](https://badge.fury.io/js/%40txnlab%2Fuse-wallet)
+![License](https://img.shields.io/github/license/TxnLab/use-wallet)
+
 ## Overview
 
-With the `use-wallet`'s hooks and utility functions, you can:
+With UseWallet's hooks and utility functions, you can:
 
 - Easily add or remove wallet support with a few lines of code
 - Configure each wallet provider as needed for your application
@@ -14,7 +17,7 @@ With the `use-wallet`'s hooks and utility functions, you can:
 
 It provides an abstraction layer that unifies the initialization, connection, and transaction signing logic, eliminating the need to interact with each wallet's individual API.
 
-This library supports most Algorand wallet providers, including Defly, Pera, Daffi, and Exodus (see [Supported Wallet Providers](#supported-wallet-providers) for the full list).
+UseWallet supports most Algorand wallet providers, including Defly, Pera, Daffi, and Exodus (see [Supported Wallet Providers](#supported-wallet-providers) for the full list).
 
 Version 2.x introduces [WalletConnect 2.0 support](#walletconnect-20-support).
 
@@ -84,7 +87,7 @@ npm install @blockshake/defly-connect @perawallet/connect @daffiwallet/connect
 
 In the root of your app, initialize the `WalletProvider` with the `useInitializeProviders` hook.
 
-This example initializes `useWallet` with Defly, Pera, Daffi and Exodus wallet providers. The default node configuration (mainnet via [AlgoNode](https://algonode.io/api/)) is used. See [Provider Configuration](#provider-configuration) for more options.
+This example initializes Defly, Pera, Daffi and Exodus wallet providers. The default node configuration (mainnet via [AlgoNode](https://algonode.io/api/)) is used. See [Provider Configuration](#provider-configuration) for more options.
 
 ```jsx
 import React from 'react'
@@ -363,7 +366,7 @@ The promise will resolve to an object containing the transaction `id` and the [`
 
 ## Checking Connection Status
 
-The `isActive` and `isReady` properties can be used to check the status of the wallet providers. The `isActive` property determines whether or not an account is currently active. The `isReady` property indicates whether `use-wallet` has mounted and successfully read the connection status from the providers.
+The `isActive` and `isReady` properties can be used to check the status of the wallet providers. The `isActive` property determines whether or not an account is currently active. The `isReady` property indicates whether client has mounted and successfully read the connection status from the wallet providers.
 
 These properties are useful when setting up client side access restrictions, for example, by redirecting a user if no wallet provider `isActive`, as shown below.
 
@@ -500,7 +503,7 @@ const providers = await initializeProviders({
 
 ### Algosdk Static Import
 
-By default, `use-wallet` dynamically imports the `algosdk` peer dependency installed in your app, to reduce bundle size.
+By default, the providers dynamically import the `algosdk` peer dependency installed in your app, to reduce bundle size.
 
 Some React frameworks, like [Remix](https://remix.run/), do not support dynamic imports. To get around this, you can set the optional `algosdkStatic` root property to the imported `algosdk` module.
 
@@ -578,9 +581,9 @@ export default function App() {
 
 ## WalletConnect 2.0 Support
 
-`use-wallet` v2 introduces support for WalletConnect 2.0. This is a major upgrade to the WalletConnect protocol, and introduces a number of breaking changes for app developers.
+UseWallet v2 introduces support for WalletConnect 2.0. This is a major upgrade to the WalletConnect protocol, and introduces a number of breaking changes for app developers.
 
-However, Algorand apps with `use-wallet` will be able to support the new protocol with minimal effort:
+However, Algorand apps with UseWallet will be able to support the new protocol with minimal effort:
 
 1. **Obtain a project ID** - You will need to obtain a project ID from [WalletConnect Cloud](https://cloud.walletconnect.com/). This is a simple process, and there is no waiting period. Every app will need its own unique project ID.
 
@@ -679,7 +682,7 @@ See [Provider Configuration](#provider-configuration) for more details.
 
 ### shouldShowSignTxnToast
 
-Pera Connect, Defly Connect and Daffi Connect share a `shouldShowSignTxnToast` option that is set to `true` by default. `use-wallet` v1 set these to `false` by default, and required setting the option back to `true` to achieve the libraries' default behavior.
+Pera Connect, Defly Connect and Daffi Connect share a `shouldShowSignTxnToast` option that is set to `true` by default. UseWallet v1 set these to `false` by default, and required setting the option back to `true` to achieve the libraries' default behavior.
 
 In v2 this option is set to `true` by default. If your app has this option set to `true` you can remove it from your configuration. If you wish to disable the toast(s), you must now explicitly set the option to `false`.
 
@@ -724,7 +727,7 @@ yarn install
 yarn dev
 ```
 
-To develop against a local version of `use-wallet` in your application, do the following:
+To develop against a local version of `@txnlab/use-wallet` in your application, do the following:
 
 ### Build the library
 
