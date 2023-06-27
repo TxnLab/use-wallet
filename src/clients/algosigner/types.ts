@@ -1,5 +1,6 @@
-import type _algosdk from 'algosdk'
-import type { Network, Metadata, CommonInitParams } from '../../types'
+import type algosdk from 'algosdk'
+import type { Network } from '../../types/node'
+import type { Metadata } from '../../types/wallet'
 
 export type WindowExtended = { algorand: AlgoSigner } & Window & typeof globalThis
 
@@ -50,9 +51,7 @@ export type AlgoSigner = {
 export type AlgoSignerClientConstructor = {
   metadata: Metadata
   client: AlgoSigner
-  algosdk: typeof _algosdk
-  algodClient: _algosdk.Algodv2
+  algosdk: typeof algosdk
+  algodClient: algosdk.Algodv2
   network: Network
 }
-
-export type InitParams = CommonInitParams

@@ -1,6 +1,6 @@
 import { clearAccounts } from './clearAccounts'
 import { isActiveProvider } from './providers'
-import type { SupportedProviders } from '../types'
+import type { SupportedProviders } from '../types/providers'
 
 export const reconnectProviders = async (providers: SupportedProviders) => {
   try {

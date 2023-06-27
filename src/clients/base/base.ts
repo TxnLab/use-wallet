@@ -1,17 +1,8 @@
 import type _algosdk from 'algosdk'
-import type {
-  Asset,
-  Wallet,
-  AccountInfo,
-  ConfirmedTxn,
-  TxnType,
-  TransactionsArray,
-  TxnInfo,
-  Metadata,
-  RawTxnResponse,
-  ClientOptions
-} from '../../types'
 import { audio } from '../../media/audio'
+import type { AccountInfo, Asset, ClientOptions, Metadata, Wallet } from '../../types/wallet'
+import type { ConfirmedTxn, TxnType } from '../../types/node'
+import type { RawTxnResponse, TransactionsArray, TxnInfo } from '../../types/api'
 
 const getIsIOS = () => {
   if (typeof window !== 'undefined') {

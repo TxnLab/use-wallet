@@ -1,21 +1,21 @@
 /**
- * Helpful resources:
+ * Documentation:
  * https://github.com/perawallet/connect
  */
-import type _algosdk from 'algosdk'
 import Algod, { getAlgodClient } from '../../algod'
-import type { PeraWalletConnect } from '@perawallet/connect'
-import type { Wallet, DecodedTransaction, DecodedSignedTransaction, Network } from '../../types'
-import { PROVIDER_ID, DEFAULT_NETWORK } from '../../constants'
 import BaseClient from '../base'
+import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
+import { debugLog } from '../../utils/debugLog'
 import { ICON } from './constants'
-import {
+import type { PeraWalletConnect } from '@perawallet/connect'
+import type { DecodedSignedTransaction, DecodedTransaction, Network } from '../../types/node'
+import type { InitParams } from '../../types/providers'
+import type { Wallet } from '../../types/wallet'
+import type {
   PeraTransaction,
   PeraWalletClientConstructor,
-  InitParams,
   PeraWalletConnectOptions
 } from './types'
-import { debugLog } from '../../utils/debugLog'
 
 class PeraWalletClient extends BaseClient {
   #client: PeraWalletConnect
@@ -50,7 +50,7 @@ class PeraWalletClient extends BaseClient {
     clientStatic,
     algosdkStatic,
     network = DEFAULT_NETWORK
-  }: InitParams): Promise<BaseClient | null> {
+  }: InitParams<PROVIDER_ID.PERA>): Promise<BaseClient | null> {
     try {
       debugLog(`${PROVIDER_ID.PERA.toUpperCase()} initializing...`)
 

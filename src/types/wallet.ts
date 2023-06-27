@@ -1,5 +1,4 @@
-import { PROVIDER_ID } from '../constants'
-import type BaseClient from '../clients/base'
+import type { PROVIDER_ID } from '../constants'
 
 export interface Account {
   providerId: PROVIDER_ID
@@ -66,7 +65,3 @@ export type Metadata = {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ClientOptions = Record<string, any>
-
-export type WalletClient = BaseClient
-
-export type SupportedProviders = Partial<Record<PROVIDER_ID, WalletClient | null>>

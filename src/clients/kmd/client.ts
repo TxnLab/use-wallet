@@ -1,16 +1,13 @@
-import type _algosdk from 'algosdk'
 import Algod, { getAlgodClient } from '../../algod'
 import BaseClient from '../base'
 import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
-import type { Account, Wallet, Network } from '../../types'
-import { ICON } from './constants'
-import {
-  InitParams,
-  ListWalletResponse,
-  InitWalletHandle,
-  KMDWalletClientConstructor
-} from './types'
 import { debugLog } from '../../utils/debugLog'
+import { ICON } from './constants'
+import type _algosdk from 'algosdk'
+import type { Network } from '../../types/node'
+import type { InitParams } from '../../types/providers'
+import type { Account, Wallet } from '../../types/wallet'
+import type { InitWalletHandle, KMDWalletClientConstructor, ListWalletResponse } from './types'
 
 class KMDWalletClient extends BaseClient {
   #client: _algosdk.Kmd
@@ -50,7 +47,7 @@ class KMDWalletClient extends BaseClient {
     algodOptions,
     algosdkStatic,
     network = DEFAULT_NETWORK
-  }: InitParams): Promise<BaseClient | null> {
+  }: InitParams<PROVIDER_ID.KMD>): Promise<BaseClient | null> {
     try {
       debugLog(`${PROVIDER_ID.KMD.toUpperCase()} initializing...`)
 

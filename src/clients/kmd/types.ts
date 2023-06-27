@@ -1,5 +1,6 @@
-import type _algosdk from 'algosdk'
-import type { Network, Metadata, CommonInitParams } from '../../types'
+import type algosdk from 'algosdk'
+import type { Network } from '../../types/node'
+import type { Metadata } from '../../types/wallet'
 
 export type KmdOptions = {
   wallet: string
@@ -27,14 +28,10 @@ export interface InitWalletHandle {
 
 export type KMDWalletClientConstructor = {
   metadata: Metadata
-  client: _algosdk.Kmd
-  algosdk: typeof _algosdk
-  algodClient: _algosdk.Algodv2
+  client: algosdk.Kmd
+  algosdk: typeof algosdk
+  algodClient: algosdk.Algodv2
   wallet: string
   password: string
   network: Network
-}
-
-export type InitParams = CommonInitParams & {
-  clientOptions?: KmdOptions
 }
