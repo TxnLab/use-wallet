@@ -31,7 +31,7 @@
     "@babel/preset-env": "^7.16.4",
     "@babel/preset-react": "^7.16.0",
     "@babel/preset-typescript": "^7.16.0",
-    "@blockshake/defly-connect": "^1.1.3",
+    "@blockshake/defly-connect": "^1.1.5",
     "@daffiwallet/connect": "^1.0.3",
     "@mdx-js/react": "^2.3.0",
     "@perawallet/connect": "^1.2.1",
@@ -89,7 +89,7 @@
     "typescript": "^4.8.4"
   },
   "peerDependencies": {
-    "@blockshake/defly-connect": "^1.1.3",
+    "@blockshake/defly-connect": "^1.1.5",
     "@daffiwallet/connect": "^1.0.3",
     "@perawallet/connect": "^1.2.1",
     "@randlabs/myalgo-connect": "^1.4.2",
