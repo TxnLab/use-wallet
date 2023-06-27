@@ -441,15 +441,15 @@ Support for these wallets will be removed in a future release.
 
 The `useInitializeProviders` hook accepts a configuration object with the following properties:
 
-| Key                    | Type                                  | Default Value                          |
-| ---------------------- | ------------------------------------- | -------------------------------------- |
-| providers              | `Array<ProviderDef>`                  | _required_                             |
-| nodeConfig.network     | `string \| undefined`                 | `'mainnet'`                            |
-| nodeConfig.nodeServer  | `string \| undefined`                 | `'https://mainnet-api.algonode.cloud'` |
-| nodeConfig.nodeToken   | `string \| undefined`                 | `''`                                   |
-| nodeConfig.nodePort    | `string \| number \| undefined`       | `443`                                  |
-| nodeConfig.nodeHeaders | `Record<string, string> \| undefined` |                                        |
-| algosdkStatic          | `typeof algosdk \| undefined`         |                                        |
+| Key                    | Type                                                                                                     | Default Value                          |
+| ---------------------- | -------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| providers              | `Array<ProviderDef>`                                                                                     | _required_                             |
+| nodeConfig.network     | `string \| undefined`                                                                                    | `'mainnet'`                            |
+| nodeConfig.nodeServer  | `string \| undefined`                                                                                    | `'https://mainnet-api.algonode.cloud'` |
+| nodeConfig.nodeToken   | `string \| algosdk.AlgodTokenHeader \| algosdk.CustomTokenHeader \| algosdk.BaseHTTPClient \| undefined` | `''`                                   |
+| nodeConfig.nodePort    | `string \| number \| undefined`                                                                          | `443`                                  |
+| nodeConfig.nodeHeaders | `Record<string, string> \| undefined`                                                                    |                                        |
+| algosdkStatic          | `typeof algosdk \| undefined`                                                                            |                                        |
 
 ### Provider Definitions
 

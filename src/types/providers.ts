@@ -79,7 +79,7 @@ export type InitParams<T extends keyof ProviderConfigMapping> = CommonInitParams
 export type NodeConfig = {
   network: Network
   nodeServer: string
-  nodeToken?: string
+  nodeToken?: string | algosdk.AlgodTokenHeader | algosdk.CustomTokenHeader | algosdk.BaseHTTPClient
   nodePort?: string | number
   nodeHeaders?: Record<string, string>
 }
