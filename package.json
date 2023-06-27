@@ -45,7 +45,7 @@
     "@storybook/manager-webpack5": "^6.5.16",
     "@storybook/preset-scss": "^1.0.3",
     "@storybook/react": "^6.5.16",
-    "@testing-library/react": "^13.3.0",
+    "@testing-library/react": "^14.0.0",
     "@types/jest": "^29.1.2",
     "@types/node": "^20.3.2",
     "@types/react": "^18.0.15",
