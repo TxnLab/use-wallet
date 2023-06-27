@@ -10,18 +10,18 @@ import { isPublicNetwork } from '../../utils/types'
 import { ALGORAND_CHAINS, ICON } from './constants'
 import { formatJsonRpcRequest } from './utils'
 import type {
-  Web3ModalSign,
-  Web3ModalSignOptions,
-  Web3ModalSignSession
-} from '@web3modal/sign-html'
+  WalletConnectModalSign,
+  WalletConnectModalSignOptions,
+  WalletConnectModalSignSession
+} from '@walletconnect/modal-sign-html'
 import type { DecodedSignedTransaction, DecodedTransaction, Network } from '../../types/node'
 import type { InitParams } from '../../types/providers'
 import type { Wallet } from '../../types/wallet'
 import type { WalletConnectClientConstructor, WalletConnectTransaction } from './types'
 
 class WalletConnectClient extends BaseClient {
-  #client: Web3ModalSign
-  clientOptions?: Web3ModalSignOptions
+  #client: WalletConnectModalSign
+  clientOptions?: WalletConnectModalSignOptions
   network: Network
   chain: string
 
@@ -120,7 +120,7 @@ class WalletConnectClient extends BaseClient {
     }
 
     try {
-      const session: Web3ModalSignSession = await this.#client.connect({
+      const session: WalletConnectModalSignSession = await this.#client.connect({
         requiredNamespaces
       })
 
@@ -137,7 +137,7 @@ class WalletConnectClient extends BaseClient {
   }
 
   public async reconnect() {
-    const session: Web3ModalSignSession | undefined = await this.#client.getSession()
+    const session: WalletConnectModalSignSession | undefined = await this.#client.getSession()
     if (typeof session === 'undefined') {
       return null
     }
@@ -261,7 +261,7 @@ class WalletConnectClient extends BaseClient {
   }
 
   async #getSession() {
-    const session: Web3ModalSignSession | undefined = await this.#client.getSession()
+    const session: WalletConnectModalSignSession | undefined = await this.#client.getSession()
     if (typeof session === 'undefined') {
       throw new Error('Session is not connected')
     }

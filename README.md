@@ -411,7 +411,7 @@ useEffect(() => {
 - Documentation - https://docs.walletconnect.com/
 - WalletConnect Cloud - https://cloud.walletconnect.com/
 - Web3Modal - https://web3modal.com/
-- Install dependency - `npm install @web3modal/sign-html`
+- Install dependency - `npm install @walletconnect/modal-sign-html`
 
 ### Exodus Wallet
 
@@ -533,7 +533,7 @@ import { PROVIDER_ID, WalletProvider, useInitializeProviders } from '@txnlab/use
 import { DeflyWalletConnect } from '@blockshake/defly-connect'
 import { PeraWalletConnect } from '@perawallet/connect'
 import { DaffiWalletConnect } from '@daffiwallet/connect'
-import { Web3ModalSign } from '@web3modal/sign-html'
+import { WalletConnectModalSign } from '@walletconnect/modal-sign-html'
 
 export default function App() {
   const providers = useInitializeProviders({
@@ -543,7 +543,7 @@ export default function App() {
       { id: PROVIDER_ID.DAFFI, clientStatic: DaffiWalletConnect },
       {
         id: PROVIDER_ID.WALLETCONNECT,
-        clientStatic: Web3ModalSign,
+        clientStatic: WalletConnectModalSign,
         clientOptions: {
           projectId: '<YOUR_PROJECT_ID>',
           metadata: {
@@ -584,7 +584,7 @@ However, Algorand apps with `use-wallet` will be able to support the new protoco
 
 1. **Obtain a project ID** - You will need to obtain a project ID from [WalletConnect Cloud](https://cloud.walletconnect.com/). This is a simple process, and there is no waiting period. Every app will need its own unique project ID.
 
-2. **Install client library** - Install `@web3modal/sign-html` and set `clientStatic` to the imported `Web3ModalSign` module.
+2. **Install client library** - Install `@walletconnect/modal-sign-html` and set `clientStatic` to the imported `WalletConnectModalSign` module.
 
 3. **Required options** - Set the required `clientOptions` as shown below
 
@@ -593,7 +593,7 @@ const providers = useInitializeProviders({
   providers: [
     {
       id: PROVIDER_ID.WALLETCONNECT,
-      clientStatic: Web3ModalSign,
+      clientStatic: WalletConnectModalSign,
       clientOptions: {
         projectId: '<YOUR_PROJECT_ID>',
         metadata: {
@@ -696,10 +696,10 @@ const providers = useInitializeProviders({
 
 ### WalletConnect peer dependencies
 
-The WalletConnect provider now supports WalletConnect 2.0. To continue supporting this provider, or to add support to your application, you must install the `@web3modal/sign-html` package.
+The WalletConnect provider now supports WalletConnect 2.0. To continue supporting this provider, or to add support to your application, you must install the `@walletconnect/modal-sign-html` package.
 
 ```bash
-npm install @web3modal/sign-html
+npm install @walletconnect/modal-sign-html
 ```
 
 The peer dependencies for WalletConnect 1.x should be uninstalled.

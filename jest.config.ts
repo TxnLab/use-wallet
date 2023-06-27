@@ -89,7 +89,7 @@ export default {
 
   // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
   moduleNameMapper: {
-    '@web3modal/sign-html': '<rootDir>/__mocks__/web3modal-sign-html.js'
+    '@walletconnect/modal-sign-html': '<rootDir>/__mocks__/walletconnect-modal-sign-html.js'
   },
 
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
