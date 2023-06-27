@@ -3,7 +3,10 @@ import type { PeraWalletConnect } from '@perawallet/connect'
 import type { DeflyWalletConnect } from '@blockshake/defly-connect'
 import type { DaffiWalletConnect } from '@daffiwallet/connect'
 import type MyAlgoConnect from '@randlabs/myalgo-connect'
-import type { Web3ModalSign, Web3ModalSignOptions } from '@web3modal/sign-html'
+import type {
+  WalletConnectModalSign,
+  WalletConnectModalSignOptions
+} from '@walletconnect/modal-sign-html'
 import type algosdk from 'algosdk'
 import type { AlgodClientOptions, Network } from './node'
 import type { PeraWalletConnectOptions } from '../clients/pera/types'
@@ -29,8 +32,8 @@ export type ProviderConfigMapping = {
     clientStatic?: typeof DeflyWalletConnect
   }
   [PROVIDER_ID.WALLETCONNECT]: {
-    clientOptions?: Web3ModalSignOptions
-    clientStatic?: typeof Web3ModalSign
+    clientOptions?: WalletConnectModalSignOptions
+    clientStatic?: typeof WalletConnectModalSign
   }
   [PROVIDER_ID.MYALGO]: {
     clientOptions?: MyAlgoConnectOptions
@@ -89,8 +92,8 @@ type ProviderDef =
   | (ProviderConfig<PROVIDER_ID.DEFLY> & { clientStatic: typeof DeflyWalletConnect })
   | (ProviderConfig<PROVIDER_ID.DAFFI> & { clientStatic: typeof DaffiWalletConnect })
   | (ProviderConfig<PROVIDER_ID.WALLETCONNECT> & {
-      clientStatic: typeof Web3ModalSign
-      clientOptions: Web3ModalSignOptions
+      clientStatic: typeof WalletConnectModalSign
+      clientOptions: WalletConnectModalSignOptions
     })
   | (ProviderConfig<PROVIDER_ID.MYALGO> & { clientStatic: typeof MyAlgoConnect })
   | ProviderConfig<PROVIDER_ID.EXODUS>
