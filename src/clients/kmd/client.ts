@@ -1,28 +1,24 @@
-import type _algosdk from 'algosdk'
 import Algod, { getAlgodClient } from '../../algod'
-import BaseWallet from '../base'
+import BaseClient from '../base'
 import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
-import type { Account, Wallet, Network } from '../../types'
+import { debugLog } from '../../utils/debugLog'
 import { ICON } from './constants'
-import {
-  InitParams,
-  ListWalletResponse,
-  InitWalletHandle,
-  KMDWalletClientConstructor
-} from './types'
+import type _algosdk from 'algosdk'
+import type { Network } from '../../types/node'
+import type { InitParams } from '../../types/providers'
+import type { Account, Wallet } from '../../types/wallet'
+import type { InitWalletHandle, KMDWalletClientConstructor, ListWalletResponse } from './types'
 
-class KMDWalletClient extends BaseWallet {
+class KMDWalletClient extends BaseClient {
   #client: _algosdk.Kmd
   #wallet: string
   #password: string
   walletId: string
-  id: PROVIDER_ID
   network: Network
 
   constructor({
     metadata,
     client,
-    id,
     wallet,
     password,
     algosdk,
@@ -34,7 +30,6 @@ class KMDWalletClient extends BaseWallet {
     this.#client = client
     this.#wallet = wallet
     this.#password = password
-    this.id = id
     this.walletId = ''
     this.network = network
     this.metadata = KMDWalletClient.metadata
@@ -52,8 +47,10 @@ class KMDWalletClient extends BaseWallet {
     algodOptions,
     algosdkStatic,
     network = DEFAULT_NETWORK
-  }: InitParams) {
+  }: InitParams<PROVIDER_ID.KMD>): Promise<BaseClient | null> {
     try {
+      debugLog(`${PROVIDER_ID.KMD.toUpperCase()} initializing...`)
+
       const {
         token = 'a'.repeat(64),
         host = 'http://localhost',
@@ -66,9 +63,8 @@ class KMDWalletClient extends BaseWallet {
       const algodClient = getAlgodClient(algosdk, algodOptions)
       const kmdClient = new algosdk.Kmd(token, host, port)
 
-      return new KMDWalletClient({
+      const provider = new KMDWalletClient({
         metadata: KMDWalletClient.metadata,
-        id: PROVIDER_ID.KMD,
         password,
         wallet,
         client: kmdClient,
@@ -76,6 +72,10 @@ class KMDWalletClient extends BaseWallet {
         algodClient: algodClient,
         network
       })
+
+      debugLog(`${PROVIDER_ID.KMD.toUpperCase()} initialized`, '✅')
+
+      return provider
     } catch (e) {
       console.error('Error initializing...', e)
       return null

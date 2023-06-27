@@ -1,6 +1,8 @@
 import type algosdk from 'algosdk'
 
-export type Network = 'betanet' | 'testnet' | 'mainnet' | string
+export type PublicNetwork = 'betanet' | 'testnet' | 'mainnet'
+
+export type Network = PublicNetwork | string
 
 export type Txn = {
   apaa: Uint8Array

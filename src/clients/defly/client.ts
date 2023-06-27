@@ -2,23 +2,37 @@
  * Helpful resources:
  * https://github.com/blockshake-io/defly-connect
  */
-import type _algosdk from 'algosdk'
 import Algod, { getAlgodClient } from '../../algod'
-import type { Wallet } from '../../types'
+import BaseClient from '../base'
 import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
-import BaseWallet from '../base'
-import type { DeflyWalletConnect } from '@blockshake/defly-connect'
-import type { DecodedTransaction, DecodedSignedTransaction, Network } from '../../types'
+import { debugLog } from '../../utils/debugLog'
 import { ICON } from './constants'
-import { DeflyTransaction, InitParams, DeflyWalletClientConstructor } from './types'
+import type { DeflyWalletConnect } from '@blockshake/defly-connect'
+import type { DecodedSignedTransaction, DecodedTransaction, Network } from '../../types/node'
+import type { InitParams } from '../../types/providers'
+import type { Wallet } from '../../types/wallet'
+import type {
+  DeflyTransaction,
+  DeflyWalletClientConstructor,
+  DeflyWalletConnectOptions
+} from './types'
 
-class DeflyWalletClient extends BaseWallet {
+class DeflyWalletClient extends BaseClient {
   #client: DeflyWalletConnect
+  clientOptions?: DeflyWalletConnectOptions
   network: Network
 
-  constructor({ metadata, client, algosdk, algodClient, network }: DeflyWalletClientConstructor) {
+  constructor({
+    metadata,
+    client,
+    clientOptions,
+    algosdk,
+    algodClient,
+    network
+  }: DeflyWalletClientConstructor) {
     super(metadata, algosdk, algodClient)
     this.#client = client
+    this.clientOptions = clientOptions
     this.network = network
     this.metadata = DeflyWalletClient.metadata
   }
@@ -36,25 +50,34 @@ class DeflyWalletClient extends BaseWallet {
     clientStatic,
     algosdkStatic,
     network = DEFAULT_NETWORK
-  }: InitParams) {
+  }: InitParams<PROVIDER_ID.DEFLY>): Promise<BaseClient | null> {
     try {
-      const DeflyWalletConnect =
-        clientStatic || (await import('@blockshake/defly-connect')).DeflyWalletConnect
+      debugLog(`${PROVIDER_ID.DEFLY.toUpperCase()} initializing...`)
+
+      if (!clientStatic) {
+        throw new Error('Defly Wallet provider missing required property: clientStatic')
+      }
+
+      const DeflyWalletConnect = clientStatic
 
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
       const algodClient = getAlgodClient(algosdk, algodOptions)
 
       const deflyWallet = new DeflyWalletConnect({
-        ...(clientOptions ? clientOptions : { shouldShowSignTxnToast: false })
+        ...(clientOptions && clientOptions)
       })
 
-      return new DeflyWalletClient({
+      const provider = new DeflyWalletClient({
         metadata: DeflyWalletClient.metadata,
         client: deflyWallet,
         algosdk,
         algodClient,
         network
       })
+
+      debugLog(`${PROVIDER_ID.DEFLY.toUpperCase()} initialized`, '✅')
+
+      return provider
     } catch (e) {
       console.error('Error initializing...', e)
       return null

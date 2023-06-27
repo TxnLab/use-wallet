@@ -1,21 +1,21 @@
-import type _algosdk from 'algosdk'
 import Algod, { getAlgodClient } from '../../algod'
-import BaseWallet from '../base'
+import BaseClient from '../base'
 import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
-import type { TransactionsArray, Network } from '../../types'
+import { debugLog } from '../../utils/debugLog'
 import { ICON } from './constants'
-import { InitParams, MnemonicWalletClientConstructor } from './types'
-import algosdk from 'algosdk'
+import type _algosdk from 'algosdk'
+import type { TransactionsArray } from '../../types/api'
+import type { Network } from '../../types/node'
+import type { InitParams } from '../../types/providers'
+import type { MnemonicWalletClientConstructor } from './types'
 
-class MnemonicWalletClient extends BaseWallet {
+class MnemonicWalletClient extends BaseClient {
   #client?: _algosdk.Account
-  id: PROVIDER_ID
   network: Network
 
-  constructor({ metadata, id, algosdk, algodClient, network }: MnemonicWalletClientConstructor) {
+  constructor({ metadata, algosdk, algodClient, network }: MnemonicWalletClientConstructor) {
     super(metadata, algosdk, algodClient)
 
-    this.id = id
     this.network = network
     this.metadata = MnemonicWalletClient.metadata
   }
@@ -27,18 +27,27 @@ class MnemonicWalletClient extends BaseWallet {
     isWalletConnect: false
   }
 
-  static async init({ algodOptions, algosdkStatic, network = DEFAULT_NETWORK }: InitParams) {
+  static async init({
+    algodOptions,
+    algosdkStatic,
+    network = DEFAULT_NETWORK
+  }: InitParams<PROVIDER_ID.MNEMONIC>): Promise<BaseClient | null> {
     try {
+      debugLog(`${PROVIDER_ID.MNEMONIC.toUpperCase()} initializing...`)
+
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
       const algodClient = getAlgodClient(algosdk, algodOptions)
-      console.log(network, algodClient)
-      return new MnemonicWalletClient({
+
+      const provider = new MnemonicWalletClient({
         metadata: MnemonicWalletClient.metadata,
-        id: PROVIDER_ID.MNEMONIC,
         algosdk: algosdk,
         algodClient: algodClient,
         network
       })
+
+      debugLog(`${PROVIDER_ID.MNEMONIC.toUpperCase()} initialized`)
+
+      return provider
     } catch (e) {
       console.error('Error initializing...', e)
       return null
@@ -54,7 +63,7 @@ class MnemonicWalletClient extends BaseWallet {
       throw new Error('Mnemonic passphrase is required')
     }
 
-    this.#client = algosdk.mnemonicToSecretKey(password)
+    this.#client = this.algosdk.mnemonicToSecretKey(password)
 
     return {
       ...MnemonicWalletClient.metadata,

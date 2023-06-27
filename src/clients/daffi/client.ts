@@ -1,23 +1,38 @@
 /**
- * Helpful resources:
+ * Documentation:
  * https://github.com/RDinitiativ/daffiwallet_connect
  */
-import type _algosdk from 'algosdk'
 import Algod, { getAlgodClient } from '../../algod'
-import type { DaffiWalletConnect } from '@daffiwallet/connect'
-import type { Wallet, DecodedTransaction, DecodedSignedTransaction, Network } from '../../types'
-import { PROVIDER_ID, DEFAULT_NETWORK } from '../../constants'
-import BaseWallet from '../base'
+import BaseClient from '../base'
+import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
+import { debugLog } from '../../utils/debugLog'
 import { ICON } from './constants'
-import { DaffiTransaction, DaffiWalletClientConstructor, InitParams } from './types'
+import type { DaffiWalletConnect } from '@daffiwallet/connect'
+import type { DecodedSignedTransaction, DecodedTransaction, Network } from '../../types/node'
+import type { InitParams } from '../../types/providers'
+import type { Wallet } from '../../types/wallet'
+import type {
+  DaffiTransaction,
+  DaffiWalletClientConstructor,
+  DaffiWalletConnectOptions
+} from './types'
 
-class DaffiWalletClient extends BaseWallet {
+class DaffiWalletClient extends BaseClient {
   #client: DaffiWalletConnect
+  clientOptions?: DaffiWalletConnectOptions
   network: Network
 
-  constructor({ metadata, client, algosdk, algodClient, network }: DaffiWalletClientConstructor) {
+  constructor({
+    metadata,
+    client,
+    clientOptions,
+    algosdk,
+    algodClient,
+    network
+  }: DaffiWalletClientConstructor) {
     super(metadata, algosdk, algodClient)
     this.#client = client
+    this.clientOptions = clientOptions
     this.network = network
     this.metadata = DaffiWalletClient.metadata
   }
@@ -35,25 +50,35 @@ class DaffiWalletClient extends BaseWallet {
     clientStatic,
     algosdkStatic,
     network = DEFAULT_NETWORK
-  }: InitParams) {
+  }: InitParams<PROVIDER_ID.DAFFI>) {
     try {
-      const DaffiWalletConnect =
-        clientStatic || (await import('@daffiwallet/connect')).DaffiWalletConnect
+      debugLog(`${PROVIDER_ID.DAFFI.toUpperCase()} initializing...`)
+
+      if (!clientStatic) {
+        throw new Error('Daffi Wallet provider missing required property: clientStatic')
+      }
+
+      const DaffiWalletConnect = clientStatic
 
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
       const algodClient = getAlgodClient(algosdk, algodOptions)
 
       const daffiWallet = new DaffiWalletConnect({
-        ...(clientOptions ? clientOptions : { shouldShowSignTxnToast: false })
+        ...(clientOptions && clientOptions)
       })
 
-      return new DaffiWalletClient({
+      const provider = new DaffiWalletClient({
         metadata: DaffiWalletClient.metadata,
         client: daffiWallet,
+        clientOptions,
         algosdk,
         algodClient,
         network
       })
+
+      debugLog(`${PROVIDER_ID.DAFFI.toUpperCase()} initialized`, '✅')
+
+      return provider
     } catch (e) {
       console.error('Error initializing...', e)
       return null

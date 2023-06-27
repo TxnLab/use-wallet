@@ -1,31 +1,29 @@
 import type algosdk from 'algosdk'
-import { PROVIDER_ID, WalletClient, Network } from '../types'
 import allClients from '../clients'
+import {
+  CommonInitParams,
+  NodeConfig,
+  ProviderConfig,
+  ProviderConfigMapping,
+  SupportedProviders
+} from '../types'
 import {
   DEFAULT_NODE_BASEURL,
   DEFAULT_NODE_TOKEN,
   DEFAULT_NODE_PORT,
   DEFAULT_NETWORK
 } from '../constants'
+import { debugLog, getProviderList } from './debugLog'
 
-type SupportedProviders = { [x: string]: Promise<WalletClient | null> }
-
-type NodeConfig = {
-  network: Network
-  nodeServer: string
-  nodeToken?: string
-  nodePort?: string
-}
-
-export const initializeProviders = (
-  providers?: PROVIDER_ID[],
+export const initializeProviders = async <T extends keyof ProviderConfigMapping>(
+  providers: Array<T | ProviderConfig<T>>,
   nodeConfig?: NodeConfig,
   algosdkStatic?: typeof algosdk
-) => {
+): Promise<SupportedProviders> => {
   const initializedProviders: SupportedProviders = {}
 
   if (typeof window === 'undefined') {
-    console.warn('Window object is not available, skipping initialization.')
+    debugLog('Window object is not available, skipping initialization')
     return initializedProviders
   }
 
@@ -36,28 +34,24 @@ export const initializeProviders = (
     nodeToken = DEFAULT_NODE_TOKEN
   } = nodeConfig || {}
 
-  if (!providers || providers.length === 0)
-    for (const [id, client] of Object.entries(allClients)) {
-      if (id === 'kmd' || id === 'mnemonic') {
-        continue
-      }
+  const initClient = async (provider: T | ProviderConfig<T>): Promise<void> => {
+    const { id, ...providerConfig } = typeof provider === 'string' ? { id: provider } : provider
 
-      initializedProviders[id] = client.init({
-        network,
-        algodOptions: [nodeToken, nodeServer, nodePort],
-        algosdkStatic: algosdkStatic
-      })
+    const initParams: CommonInitParams = {
+      network,
+      algodOptions: [nodeToken, nodeServer, nodePort],
+      algosdkStatic,
+      ...providerConfig
     }
 
-  if (providers) {
-    for (const id of providers) {
-      initializedProviders[id] = allClients[id].init({
-        network,
-        algodOptions: [nodeToken, nodeServer, nodePort],
-        algosdkStatic: algosdkStatic
-      })
-    }
+    const client = await allClients[id].init(initParams)
+    initializedProviders[id] = client
   }
+
+  debugLog('Initializing providers:', getProviderList(providers))
+
+  const initPromises = providers.map((provider) => initClient(provider))
+  await Promise.all(initPromises)
 
   return initializedProviders
 }

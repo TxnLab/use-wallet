@@ -1,10 +1,9 @@
-import { PROVIDER_ID } from '../types'
+import { PROVIDER_ID } from '../constants'
 import { useWalletStore } from '../store/index'
 
-const clearActiveAccount = useWalletStore.getState().clearActiveAccount
-const removeAccounts = useWalletStore.getState().removeAccounts
-
 export const clearAccounts = (id: PROVIDER_ID) => {
+  const { clearActiveAccount, removeAccounts } = useWalletStore.getState()
+
   clearActiveAccount(id)
   removeAccounts(id)
 }

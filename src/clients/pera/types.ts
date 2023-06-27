@@ -1,9 +1,10 @@
-import type _algosdk from 'algosdk'
+import type algosdk from 'algosdk'
 import type { PeraWalletConnect } from '@perawallet/connect'
 import type { Transaction } from 'algosdk'
-import type { AlgodClientOptions, Network, Metadata } from '../../types'
+import type { Network } from '../../types/node'
+import type { Metadata } from '../../types/wallet'
 
-export type ClientOptions = {
+export type PeraWalletConnectOptions = {
   bridge?: string
   shouldShowSignTxnToast?: boolean
   chainId?: 416001 | 416002 | 416003 | 4160
@@ -22,15 +23,8 @@ export interface PeraTransaction {
 export type PeraWalletClientConstructor = {
   metadata: Metadata
   client: PeraWalletConnect
-  algosdk: typeof _algosdk
-  algodClient: _algosdk.Algodv2
+  clientOptions?: PeraWalletConnectOptions
+  algosdk: typeof algosdk
+  algodClient: algosdk.Algodv2
   network: Network
-}
-
-export type InitParams = {
-  clientOptions?: ClientOptions
-  algodOptions?: AlgodClientOptions
-  clientStatic?: typeof PeraWalletConnect
-  algosdkStatic?: typeof _algosdk
-  network?: Network
 }

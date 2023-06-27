@@ -1,5 +1,4 @@
-import { PROVIDER_ID } from '../constants'
-import type BaseWallet from '../clients/base'
+import type { PROVIDER_ID } from '../constants'
 
 export interface Account {
   providerId: PROVIDER_ID
@@ -64,6 +63,5 @@ export type Metadata = {
   isWalletConnect: boolean
 }
 
-export type WalletClient = BaseWallet
-
-export { PROVIDER_ID }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ClientOptions = Record<string, any>
