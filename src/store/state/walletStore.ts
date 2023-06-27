@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { immer } from 'zustand/middleware/immer'
-import create from 'zustand'
+import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
 import type { Account } from '../../types'
 import { PROVIDER_ID } from '../../constants'
