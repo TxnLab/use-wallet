@@ -4,7 +4,7 @@
   "ignoreDeps": [],
   "schedule": "before 3am on the first day of the month",
   "assignees": ["drichar"],
-  "baseBranches": ["release-2.0.0"],
+  "baseBranches": ["next"],
   "separateMajorMinor": true,
   "rebaseStalePrs": true,
   "lockFileMaintenance": {
