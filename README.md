@@ -493,7 +493,8 @@ To configure the Algorand node that providers will use to send transactions, you
 \* _Refer to each wallet providers' documentation to see which networks they support._
 
 ```jsx
-const providers = await initializeProviders({
+const providers = useInitializeProviders({
+  providers: [...],
   nodeConfig: {
     network: 'testnet',
     nodeServer: 'https://testnet-api.algonode.cloud',
