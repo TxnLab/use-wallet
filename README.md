@@ -99,15 +99,13 @@ import { PeraWalletConnect } from '@perawallet/connect'
 import { DaffiWalletConnect } from '@daffiwallet/connect'
 
 export default function App() {
-  const providers = useInitializeProviders([
-    {
-      providers: [
-        { id: PROVIDER_ID.DEFLY, clientStatic: DeflyWalletConnect },
-        { id: PROVIDER_ID.PERA, clientStatic: PeraWalletConnect },
-        { id: PROVIDER_ID.DAFFI, clientStatic: DaffiWalletConnect }
-      ]
-    }
-  ])
+  const providers = useInitializeProviders({
+    providers: [
+      { id: PROVIDER_ID.DEFLY, clientStatic: DeflyWalletConnect },
+      { id: PROVIDER_ID.PERA, clientStatic: PeraWalletConnect },
+      { id: PROVIDER_ID.DAFFI, clientStatic: DaffiWalletConnect }
+    ]
+  })
 
   return (
     <WalletProvider value={providers}>
