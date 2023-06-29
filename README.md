@@ -4,7 +4,7 @@
 
 `@txnlab/use-wallet` is a React library that provides a simplified, consistent interface for integrating multiple Algorand wallets into your decentralized applications (dApps).
 
-[![npm version](https://badge.fury.io/js/%40txnlab%2Fuse-wallet.svg)](https://badge.fury.io/js/%40txnlab%2Fuse-wallet)
+[![npm version](https://badge.fury.io/js/@txnlab%2Fuse-wallet.svg)](https://badge.fury.io/js/@txnlab%2Fuse-wallet)
 ![License](https://img.shields.io/github/license/TxnLab/use-wallet)
 
 ## Overview
