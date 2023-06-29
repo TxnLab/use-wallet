@@ -613,7 +613,11 @@ const providers = useInitializeProviders({
 })
 ```
 
-**IMPORTANT:** Only wallets that have been upgraded to support WalletConnect 2.0 will be able to connect to your app with this provider.
+**IMPORTANT:** Wallets must migrate to WalletConnect v2 or they will NOT work with this provider. **The latest versions of Pera Wallet, Defly Wallet, and Daffi Wallet still support WalletConnect v1 ONLY.**
+
+### Defly beta (iOS)
+
+iOS users can join the Defly Wallet beta program for WalletConnect v2 support: https://testflight.apple.com/join/S66wwJpq
 
 ### "Module not found" errors in Next.js 13
 
