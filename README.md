@@ -778,6 +778,8 @@ Are you using `@txnlab/use-wallet`? We'd love to include your project here. Let 
 
 - [@algoscan/use-wallet-ui](https://github.com/algoscan/use-wallet-ui)
 - [@algoworldnft/algoworld-swapper](https://github.com/algoworldnft/algoworld-swapper)
+- [Algogator](https://algogator.finance/)
+- [Notiboy](https://notiboy.com/)
 
 Full list of [Dependents](https://github.com/TxnLab/use-wallet/network/dependents)
 
