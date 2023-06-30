@@ -45,6 +45,7 @@ Version 2.x introduces [WalletConnect 2.0 support](#walletconnect-20-support).
 - [WalletConnect 2.0 Support](#walletconnect-20-support)
 - [Migration Guide](#migration-guide)
 - [Local Development](#local-development)
+- [Support](#support)
 - [Used By](#used-by)
 - [License](#license)
 
@@ -772,9 +773,18 @@ In the root of the `use-wallet` directory, run:
 yarn link react react-dom
 ```
 
+## Support
+
+For questions or technical support, you can reach us in the #use-wallet channel on NFD's Discord: https://discord.gg/w6vSwG5bFK
+
+To report bugs/issues or make a feature request here on GitHub:
+
+- [Create an issue](https://github.com/TxnLab/use-wallet/issues/new)
+- [Create a discussion](https://github.com/TxnLab/use-wallet/discussions/new/choose)
+
 ## Used By
 
-Are you using `@txnlab/use-wallet`? We'd love to include your project here. Let us know! [Twitter](https://twitter.com/NFDomains) | [Discord](https://discord.gg/7XcuMTfeZP) | [Email](mailto:admin@txnlab.dev)
+Are you using `@txnlab/use-wallet`? We'd love to include your project here. Let us know! [Twitter](https://twitter.com/NFDomains) | [Discord](https://discord.gg/w6vSwG5bFK) | [Email](mailto:admin@txnlab.dev)
 
 - [@algoscan/use-wallet-ui](https://github.com/algoscan/use-wallet-ui)
 - [@algoworldnft/algoworld-swapper](https://github.com/algoworldnft/algoworld-swapper)
