@@ -43,6 +43,8 @@ Version 2.x introduces [WalletConnect 2.0 support](#walletconnect-20-support).
   - [Algosdk Static Import](#algosdk-static-import)
   - [Full Configuration Example](#full-configuration-example)
 - [WalletConnect 2.0 Support](#walletconnect-20-support)
+  - [Defly Wallet (iOS) beta](#defly-wallet-ios-beta)
+  - [Pera Wallet (Android) beta](#pera-wallet-android-beta)
 - [Migration Guide](#migration-guide)
 - [Local Development](#local-development)
 - [Support](#support)
@@ -615,11 +617,15 @@ const providers = useInitializeProviders({
 })
 ```
 
-**IMPORTANT:** Wallets must migrate to WalletConnect v2 or they will NOT work with this provider. **The latest versions of Pera Wallet, Defly Wallet, and Daffi Wallet still support WalletConnect v1 ONLY.**
+**IMPORTANT:** Wallets must migrate to WalletConnect v2 or they will NOT work with this provider. **The latest versions of Pera Wallet, Defly Wallet, and Daffi Wallet still support WalletConnect v1 ONLY.** Beta versions of these wallets with WalletConnect v2 support are available now:
 
-### Defly beta (iOS)
+### Defly Wallet (iOS) beta
 
-iOS users can join the Defly Wallet beta program for WalletConnect v2 support: https://testflight.apple.com/join/S66wwJpq
+iOS users can join the [Defly Wallet (iOS) beta program](https://testflight.apple.com/join/S66wwJpq) for testing WalletConnect v2 support. Android beta coming soon.
+
+### Pera Wallet (Android) beta
+
+Android users can join the [Pera Wallet (Android) beta program](https://forms.gle/m5TJueyJD9f74ieL8) for testing WalletConnect v2 support. Fill out the form and wait for an email with instructions. Form submissions will be checked periodically and added in bulk.
 
 ### "Module not found" errors in Next.js 13
 
@@ -790,6 +796,7 @@ Are you using `@txnlab/use-wallet`? We'd love to include your project here. Let 
 - [@algoworldnft/algoworld-swapper](https://github.com/algoworldnft/algoworld-swapper)
 - [Algogator](https://algogator.finance/)
 - [Notiboy](https://notiboy.com/)
+- [Rand Drops](https://drops.randgallery.com/drops)
 
 Full list of [Dependents](https://github.com/TxnLab/use-wallet/network/dependents)
 
