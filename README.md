@@ -617,6 +617,8 @@ const providers = useInitializeProviders({
 })
 ```
 
+While `projectId` and `metadata` are required, you can also set optional `modalOptions` to customize the appearance of the WalletConnect modal. See the [WalletConnect docs](https://docs.walletconnect.com/2.0/web/walletConnectModal/sign/html/options) for more details.
+
 **IMPORTANT:** Wallets must migrate to WalletConnect v2 or they will NOT work with this provider. **The latest versions of Pera Wallet, Defly Wallet, and Daffi Wallet still support WalletConnect v1 ONLY.** Beta versions of these wallets with WalletConnect v2 support are available now:
 
 ### Defly Wallet (iOS) beta
@@ -797,6 +799,7 @@ Are you using `@txnlab/use-wallet`? We'd love to include your project here. Let 
 - [Algogator](https://algogator.finance/)
 - [Notiboy](https://notiboy.com/)
 - [Rand Drops](https://drops.randgallery.com/drops)
+- [Vestige](https://vestige.fi/)
 
 Full list of [Dependents](https://github.com/TxnLab/use-wallet/network/dependents)
 
