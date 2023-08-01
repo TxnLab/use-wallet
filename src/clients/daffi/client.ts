@@ -48,17 +48,23 @@ class DaffiWalletClient extends BaseClient {
     clientOptions,
     algodOptions,
     clientStatic,
+    getDynamicClient,
     algosdkStatic,
     network = DEFAULT_NETWORK
   }: InitParams<PROVIDER_ID.DAFFI>) {
     try {
       debugLog(`${PROVIDER_ID.DAFFI.toUpperCase()} initializing...`)
 
-      if (!clientStatic) {
-        throw new Error('Daffi Wallet provider missing required property: clientStatic')
+      let DaffiWalletConnect
+      if (clientStatic) {
+        DaffiWalletConnect = clientStatic
+      } else if (getDynamicClient) {
+        DaffiWalletConnect = await getDynamicClient()
+      } else {
+        throw new Error(
+          'Daffi Wallet provider missing required property: clientStatic or getDynamicClient'
+        )
       }
-
-      const DaffiWalletConnect = clientStatic
 
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
       const algodClient = getAlgodClient(algosdk, algodOptions)

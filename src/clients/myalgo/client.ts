@@ -43,17 +43,23 @@ class MyAlgoWalletClient extends BaseClient {
     clientOptions,
     algodOptions,
     clientStatic,
+    getDynamicClient,
     algosdkStatic,
     network = DEFAULT_NETWORK
   }: InitParams<PROVIDER_ID.MYALGO>): Promise<BaseClient | null> {
     try {
       debugLog(`${PROVIDER_ID.MYALGO.toUpperCase()} initializing...`)
 
-      if (!clientStatic) {
-        throw new Error('MyAlgo Wallet provider missing required property: clientStatic')
+      let MyAlgoConnect
+      if (clientStatic) {
+        MyAlgoConnect = clientStatic
+      } else if (getDynamicClient) {
+        MyAlgoConnect = await getDynamicClient()
+      } else {
+        throw new Error(
+          'MyAlgo Wallet provider missing required property: clientStatic or getDynamicClient'
+        )
       }
-
-      const MyAlgoConnect = clientStatic
 
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
       const algodClient = getAlgodClient(algosdk, algodOptions)

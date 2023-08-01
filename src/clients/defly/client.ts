@@ -48,17 +48,23 @@ class DeflyWalletClient extends BaseClient {
     clientOptions,
     algodOptions,
     clientStatic,
+    getDynamicClient,
     algosdkStatic,
     network = DEFAULT_NETWORK
   }: InitParams<PROVIDER_ID.DEFLY>): Promise<BaseClient | null> {
     try {
       debugLog(`${PROVIDER_ID.DEFLY.toUpperCase()} initializing...`)
 
-      if (!clientStatic) {
-        throw new Error('Defly Wallet provider missing required property: clientStatic')
+      let DeflyWalletConnect
+      if (clientStatic) {
+        DeflyWalletConnect = clientStatic
+      } else if (getDynamicClient) {
+        DeflyWalletConnect = await getDynamicClient()
+      } else {
+        throw new Error(
+          'Defly Wallet provider missing required property: clientStatic or getDynamicClient'
+        )
       }
-
-      const DeflyWalletConnect = clientStatic
 
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
       const algodClient = getAlgodClient(algosdk, algodOptions)
