@@ -66,7 +66,9 @@ class WalletConnectClient extends BaseClient {
       } else if (getDynamicClient) {
         Client = await getDynamicClient()
       } else {
-        throw new Error('WalletConnect provider missing required property: clientStatic')
+        throw new Error(
+          'WalletConnect provider missing required property: clientStatic or getDynamicClient'
+        )
       }
 
       if (!clientOptions) {
