@@ -94,6 +94,18 @@ In the root of your app, initialize the `WalletProvider` with the `useInitialize
 
 This example initializes Defly, Pera, Daffi and Exodus wallet providers. The default node configuration (mainnet via [AlgoNode](https://algonode.io/api/)) is used. See [Provider Configuration](#provider-configuration) for more options.
 
+You can initialize your providers in two ways:
+
+1. **Static Import** - This is the standard way of importing modules in JavaScript. In this method, the import statement is at the top of the file and the modules are imported when the file loads. This is done by passing the clientStatic property.
+
+2. **Dynamic Import** - With the dynamic import() syntax, you can load modules on demand by calling a function. This can greatly reduce the initial load time of your app by only loading modules when they are needed. This is done by passing the getDynamicClient property which must be a function that returns a promise that resolves to the client.
+
+Note: For each provider, either clientStatic or getDynamicClient must be passed, not both.
+
+Here is an example of both:
+
+### Static Import Example
+
 ```jsx
 import React from 'react'
 import { WalletProvider, useInitializeProviders, PROVIDER_ID } from '@txnlab/use-wallet'
@@ -118,6 +130,46 @@ export default function App() {
   )
 }
 ```
+
+### Dynamic Import Example
+
+```jsx
+import React from 'react'
+import { WalletProvider, useInitializeProviders, PROVIDER_ID } from '@txnlab/use-wallet'
+
+const getDynamicDeflyWalletConnect = async () => {
+  const DeflyWalletConnect = (await import("@blockshake/defly-connect")).DeflyWalletConnect;
+  return DeflyWalletConnect;
+};
+
+const getDynamicPeraWalletConnect = async () => {
+  const PeraWalletConnect = (await import("@perawallet/connect")).PeraWalletConnect;
+  return PeraWalletConnect;
+};
+
+const getDynamicDaffiWalletConnect = async () => {
+  const DaffiWalletConnect = (await import("@daffiwallet/connect")).DaffiWalletConnect;
+  return DaffiWalletConnect;
+};
+
+export default function App() {
+  const providers = useInitializeProviders({
+    providers: [
+      { id: PROVIDER_ID.DEFLY, getDynamicClient: getDynamicDeflyWalletConnect },
+      { id: PROVIDER_ID.PERA, getDynamicClient: getDynamicPeraWalletConnect },
+      { id: PROVIDER_ID.DAFFI, getDynamicClient: getDynamicDaffiWalletConnect },
+      { id: PROVIDER_ID.EXODUS }
+    ]
+  })
+
+  return (
+    <WalletProvider value={providers}>
+      <div className="App">{/* ... */}</div>
+    </WalletProvider>
+  )
+}
+```
+
 
 ## The `useWallet` Hook
 
