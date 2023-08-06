@@ -53,14 +53,22 @@ class WalletConnectClient extends BaseClient {
     clientOptions,
     algodOptions,
     clientStatic,
+    getDynamicClient,
     algosdkStatic,
     network = DEFAULT_NETWORK
   }: InitParams<PROVIDER_ID.WALLETCONNECT>): Promise<BaseClient | null> {
     try {
       debugLog(`${PROVIDER_ID.WALLETCONNECT.toUpperCase()} initializing...`)
 
-      if (!clientStatic) {
-        throw new Error('WalletConnect provider missing required property: clientStatic')
+      let Client
+      if (clientStatic) {
+        Client = clientStatic
+      } else if (getDynamicClient) {
+        Client = await getDynamicClient()
+      } else {
+        throw new Error(
+          'WalletConnect provider missing required property: clientStatic or getDynamicClient'
+        )
       }
 
       if (!clientOptions) {
@@ -74,8 +82,6 @@ class WalletConnectClient extends BaseClient {
       }
 
       const chain = ALGORAND_CHAINS[network]
-
-      const Client = clientStatic
 
       // Initialize client
       const client = new Client({
