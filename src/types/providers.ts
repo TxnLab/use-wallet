@@ -22,38 +22,47 @@ export type ProviderConfigMapping = {
   [PROVIDER_ID.PERA]: {
     clientOptions?: PeraWalletConnectOptions
     clientStatic?: typeof PeraWalletConnect
+    getDynamicClient?: () => Promise<typeof PeraWalletConnect>
   }
   [PROVIDER_ID.DAFFI]: {
     clientOptions?: DaffiWalletConnectOptions
     clientStatic?: typeof DaffiWalletConnect
+    getDynamicClient?: () => Promise<typeof DaffiWalletConnect>
   }
   [PROVIDER_ID.DEFLY]: {
     clientOptions?: DeflyWalletConnectOptions
     clientStatic?: typeof DeflyWalletConnect
+    getDynamicClient?: () => Promise<typeof DeflyWalletConnect>
   }
   [PROVIDER_ID.WALLETCONNECT]: {
     clientOptions?: WalletConnectModalSignOptions
     clientStatic?: typeof WalletConnectModalSign
+    getDynamicClient?: () => Promise<typeof WalletConnectModalSign>
   }
   [PROVIDER_ID.MYALGO]: {
     clientOptions?: MyAlgoConnectOptions
     clientStatic?: typeof MyAlgoConnect
+    getDynamicClient?: () => Promise<typeof MyAlgoConnect>
   }
   [PROVIDER_ID.EXODUS]: {
     clientOptions?: ExodusOptions
     clientStatic?: undefined
+    getDynamicClient?: undefined
   }
   [PROVIDER_ID.KMD]: {
     clientOptions?: KmdOptions
     clientStatic?: undefined
+    getDynamicClient?: undefined
   }
   [PROVIDER_ID.ALGOSIGNER]: {
     clientOptions?: undefined
     clientStatic?: undefined
+    getDynamicClient?: undefined
   }
   [PROVIDER_ID.MNEMONIC]: {
     clientOptions?: undefined
     clientStatic?: undefined
+    getDynamicClient?: undefined
   }
 }
 
@@ -87,15 +96,27 @@ export type NodeConfig = {
   nodeHeaders?: Record<string, string>
 }
 
+type StaticClient<T> = {
+  clientStatic: T
+  getDynamicClient?: undefined
+}
+
+type DynamicClient<T> = {
+  clientStatic?: undefined
+  getDynamicClient: () => Promise<T>
+}
+
+type OneOfStaticOrDynamicClient<T> = StaticClient<T> | DynamicClient<T>
+
 type ProviderDef =
-  | (ProviderConfig<PROVIDER_ID.PERA> & { clientStatic: typeof PeraWalletConnect })
-  | (ProviderConfig<PROVIDER_ID.DEFLY> & { clientStatic: typeof DeflyWalletConnect })
-  | (ProviderConfig<PROVIDER_ID.DAFFI> & { clientStatic: typeof DaffiWalletConnect })
-  | (ProviderConfig<PROVIDER_ID.WALLETCONNECT> & {
-      clientStatic: typeof WalletConnectModalSign
-      clientOptions: WalletConnectModalSignOptions
-    })
-  | (ProviderConfig<PROVIDER_ID.MYALGO> & { clientStatic: typeof MyAlgoConnect })
+  | (ProviderConfig<PROVIDER_ID.PERA> & OneOfStaticOrDynamicClient<typeof PeraWalletConnect>)
+  | (ProviderConfig<PROVIDER_ID.DEFLY> & OneOfStaticOrDynamicClient<typeof DeflyWalletConnect>)
+  | (ProviderConfig<PROVIDER_ID.DAFFI> & OneOfStaticOrDynamicClient<typeof DaffiWalletConnect>)
+  | (ProviderConfig<PROVIDER_ID.WALLETCONNECT> &
+      OneOfStaticOrDynamicClient<typeof WalletConnectModalSign> & {
+        clientOptions: WalletConnectModalSignOptions
+      })
+  | (ProviderConfig<PROVIDER_ID.MYALGO> & OneOfStaticOrDynamicClient<typeof MyAlgoConnect>)
   | ProviderConfig<PROVIDER_ID.EXODUS>
   | ProviderConfig<PROVIDER_ID.KMD>
   | PROVIDER_ID.EXODUS
