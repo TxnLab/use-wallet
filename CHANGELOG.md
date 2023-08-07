@@ -1,3 +1,9 @@
+# [2.1.0](https://github.com/txnlab/use-wallet/compare/v2.0.0...v2.1.0) (2023-08-07)
+
+### Features
+
+- enable dynamic import of wallet libraries ([#100](https://github.com/txnlab/use-wallet/pull/100)) ([57f38f3](https://github.com/txnlab/use-wallet/commit/57f38f3a748fd2f126b87f5fd0368ce175490c7e))
+
 # [2.0.0](https://github.com/TxnLab/use-wallet/compare/v1.3.1...v2.0.0) (2023-06-27)
 
 ### Features
