@@ -25,6 +25,7 @@
     "build-storybook": "build-storybook",
     "check-types": "tsc --noEmit",
     "commit": "cz",
+    "pre-release": "yarn lint && yarn format && yarn check-types && yarn test && yarn build",
     "release": "release-it"
   },
   "author": "txnlab",

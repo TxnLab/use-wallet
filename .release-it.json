@@ -5,7 +5,7 @@
     "tagName": "v${version}"
   },
   "hooks": {
-    "before:init": ["git pull", "yarn lint", "yarn format", "yarn test"]
+    "before:init": ["git pull", "yarn pre-release"]
   },
   "npm": {
     "publish": true
