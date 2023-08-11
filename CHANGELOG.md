@@ -1,3 +1,9 @@
+# [2.1.1](https://github.com/txnlab/use-wallet/compare/v2.1.0...v2.1.1) (2023-08-11)
+
+### Bug Fixes
+
+- Deduplicate dependencies ([#105](https://github.com/TxnLab/use-wallet/pull/105)) ([de17bbe](https://github.com/TxnLab/use-wallet/commit/de17bbec85c3fc6dc16225f9eb276a5536252cd3))
+
 # [2.1.0](https://github.com/txnlab/use-wallet/compare/v2.0.0...v2.1.0) (2023-08-07)
 
 ### Features
