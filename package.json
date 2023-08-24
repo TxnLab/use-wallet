@@ -60,6 +60,7 @@
     "algosdk": "^2.1.0",
     "babel-jest": "^29.1.2",
     "babel-loader": "^9.0.0",
+    "buffer": "^6.0.3",
     "commitizen": "4.3.0",
     "css-loader": "^6.5.1",
     "cz-conventional-changelog": "3.3.0",

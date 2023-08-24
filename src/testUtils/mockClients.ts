@@ -18,9 +18,11 @@ import { PROVIDER_ID } from '../constants'
 import type { AlgoSigner } from '../clients/algosigner/types'
 import type { Exodus } from '../clients/exodus/types'
 import type { Account, ClientOptions } from '../types'
+import CustomWalletClient from '../clients/custom/client'
 
 type ClientTypeMap = {
   [PROVIDER_ID.ALGOSIGNER]: AlgoSignerClient
+  [PROVIDER_ID.CUSTOM]: CustomWalletClient
   [PROVIDER_ID.DAFFI]: DaffiWalletClient
   [PROVIDER_ID.DEFLY]: DeflyWalletClient
   [PROVIDER_ID.EXODUS]: ExodusClient
@@ -47,6 +49,7 @@ export const createMockClient = <T extends PROVIDER_ID>(
     [PROVIDER_ID.DEFLY]: createDeflyMockInstance,
     [PROVIDER_ID.EXODUS]: createExodusMockInstance,
     [PROVIDER_ID.KMD]: createKmdMockInstance,
+    [PROVIDER_ID.CUSTOM]: createCustomMockInstance,
     [PROVIDER_ID.MNEMONIC]: createMnemonicMockInstance,
     [PROVIDER_ID.MYALGO]: createMyAlgoMockInstance,
     [PROVIDER_ID.PERA]: createPeraMockInstance,
@@ -266,6 +269,43 @@ export const createKmdMockInstance = (
   mockKmdWalletClient.disconnect = jest.fn().mockImplementation(() => Promise.resolve())
 
   return mockKmdWalletClient
+}
+
+// CUSTOM
+export const createCustomMockInstance = (
+  clientOptions?: ClientOptions,
+  accounts: Array<Account> = []
+): CustomWalletClient => {
+  const mockCustomWalletClient = new CustomWalletClient({
+    metadata: {
+      id: PROVIDER_ID.CUSTOM,
+      name: 'CUSTOM',
+      icon: 'custom-icon-b64',
+      isWalletConnect: false
+    },
+    providerProxy: undefined as any,
+    algosdk,
+    algodClient: {
+      accountInformation: () => ({
+        do: () => Promise.resolve({})
+      })
+    } as any,
+    network: 'test-network',
+    ...(clientOptions && clientOptions)
+  })
+
+  // Mock the connect method
+  mockCustomWalletClient.connect = jest.fn().mockImplementation(() =>
+    Promise.resolve({
+      ...mockCustomWalletClient.metadata,
+      accounts
+    })
+  )
+
+  // Mock the disconnect method
+  mockCustomWalletClient.disconnect = jest.fn().mockImplementation(() => Promise.resolve())
+
+  return mockCustomWalletClient
 }
 
 // MNEMONIC

@@ -17,6 +17,7 @@ import type { MyAlgoConnectOptions } from '../clients/myalgo/types'
 import type { DaffiWalletConnectOptions } from '../clients/daffi/types'
 import type { NonEmptyArray } from './utilities'
 import type BaseClient from '../clients/base'
+import type { CustomOptions } from 'src/clients/custom/types'
 
 export type ProviderConfigMapping = {
   [PROVIDER_ID.PERA]: {
@@ -51,6 +52,11 @@ export type ProviderConfigMapping = {
   }
   [PROVIDER_ID.KMD]: {
     clientOptions?: KmdOptions
+    clientStatic?: undefined
+    getDynamicClient?: undefined
+  }
+  [PROVIDER_ID.CUSTOM]: {
+    clientOptions?: CustomOptions
     clientStatic?: undefined
     getDynamicClient?: undefined
   }
@@ -119,10 +125,12 @@ type ProviderDef =
   | (ProviderConfig<PROVIDER_ID.MYALGO> & OneOfStaticOrDynamicClient<typeof MyAlgoConnect>)
   | ProviderConfig<PROVIDER_ID.EXODUS>
   | ProviderConfig<PROVIDER_ID.KMD>
+  | ProviderConfig<PROVIDER_ID.CUSTOM>
   | PROVIDER_ID.EXODUS
   | PROVIDER_ID.KMD
   | PROVIDER_ID.ALGOSIGNER
   | PROVIDER_ID.MNEMONIC
+  | PROVIDER_ID.CUSTOM
 
 export type ProvidersArray = NonEmptyArray<ProviderDef>
 

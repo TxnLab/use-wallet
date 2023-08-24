@@ -2,6 +2,7 @@ import { Network } from '../types/node'
 
 export enum PROVIDER_ID {
   KMD = 'kmd',
+  CUSTOM = 'custom',
   PERA = 'pera',
   DAFFI = 'daffi',
   MYALGO = 'myalgo',
@@ -9,7 +10,7 @@ export enum PROVIDER_ID {
   DEFLY = 'defly',
   EXODUS = 'exodus',
   WALLETCONNECT = 'walletconnect',
-  MNEMONIC = 'mnemonic'
+  MNEMONIC = 'mnemonic',
 }
 
 export const DEFAULT_NETWORK: Network = 'mainnet'
