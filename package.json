@@ -16,7 +16,7 @@
   "description": "React hooks for using Algorand compatible wallets in dApps.",
   "scripts": {
     "dev": "yarn storybook",
-    "build": "rm -rf dist && rollup -c",
+    "build": "rimraf dist && rollup -c",
     "test": "jest",
     "lint": "eslint '**/*.{js,ts,tsx}'",
     "format": "prettier --check '**/*.{js,ts,tsx}'",
@@ -81,6 +81,7 @@
     "react-dom": "^18.2.0",
     "release-it": "^16.1.0",
     "require-from-string": "^2.0.2",
+    "rimraf": "^5.0.1",
     "rollup": "^3.3.0",
     "rollup-plugin-analyzer": "^4.0.0",
     "rollup-plugin-dts": "^5.0.0",
