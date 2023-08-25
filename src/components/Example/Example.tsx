@@ -110,9 +110,11 @@ class TestManualProvider implements CustomProvider {
       // Make async to avoid permission issue
       await new Promise<void>((resolve) =>
         setTimeout(() => {
-          navigator.clipboard.writeText(forSigning)
-          resolve(), 1
-        }),
+          navigator.clipboard
+            .writeText(forSigning)
+            .catch(() => alert('Copy failed; try copying from developer console'))
+          resolve()
+        }, 1)
       )
 
       alert(`### Signing instructions ###
