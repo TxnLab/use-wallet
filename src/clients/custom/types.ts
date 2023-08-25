@@ -13,9 +13,9 @@ export type CustomOptions = {
 }
 
 export type CustomProvider = {
-  connect(): Promise<Wallet>
+  connect(metadata: Metadata): Promise<Wallet>
   disconnect(): Promise<void>
-  reconnect(): Promise<Wallet | null>
+  reconnect(metadata: Metadata): Promise<Wallet | null>
   signTransactions(
     connectedAccounts: string[],
     txnGroups: Uint8Array[] | Uint8Array[][],

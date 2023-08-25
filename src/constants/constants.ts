@@ -10,7 +10,7 @@ export enum PROVIDER_ID {
   DEFLY = 'defly',
   EXODUS = 'exodus',
   WALLETCONNECT = 'walletconnect',
-  MNEMONIC = 'mnemonic',
+  MNEMONIC = 'mnemonic'
 }
 
 export const DEFAULT_NETWORK: Network = 'mainnet'

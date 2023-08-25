@@ -1,62 +1,50 @@
 import React from 'react'
 import { DeflyWalletConnect } from '@blockshake/defly-connect'
 import { DaffiWalletConnect } from '@daffiwallet/connect'
-import {
-  WalletProvider,
-  PROVIDER_ID,
-  useInitializeProviders,
-  Wallet,
-  Metadata,
-  Network
-} from '../../index'
+import { WalletProvider, PROVIDER_ID, useInitializeProviders, Metadata, Network } from '../../index'
 import Account from './Account'
 import Connect from './Connect'
 import Transact from './Transact'
 import { CustomProvider } from '../../clients/custom/types'
-import { ICON } from '../../clients/custom/constants'
 import algosdk from 'algosdk'
 import type _algosdk from 'algosdk'
 import { Buffer } from 'buffer'
+import { ICON as KMDICON } from '../../clients/kmd/constants'
 
 const getDynamicPeraWalletConnect = async () => {
   const PeraWalletConnect = (await import('@perawallet/connect')).PeraWalletConnect
   return PeraWalletConnect
 }
 
-class TestProvider implements CustomProvider {
-  metadata: Metadata
+class TestManualProvider implements CustomProvider {
   algosdk: typeof _algosdk
 
   constructor(algosdkStatic: typeof _algosdk) {
     this.algosdk = algosdkStatic
-    this.metadata = {
-      name: 'Offline account',
-      icon: ICON,
-      id: PROVIDER_ID.CUSTOM,
-      isWalletConnect: false,
-    }
   }
 
-  async connect() {
+  async connect(metadata: Metadata) {
     let address = prompt('Enter address of your account')
     if (address && !this.algosdk.isValidAddress(address)) {
       alert('Invalid address; please try again')
       address = null
     }
-    const authAddress = address ? prompt("Enter address of the signing account; leave blank if account hasn't been rekeyed") : undefined
+    const authAddress = address
+      ? prompt("Enter address of the signing account; leave blank if account hasn't been rekeyed")
+      : undefined
 
     return {
-      ...this.metadata,
+      ...metadata,
       accounts: address
         ? [
             {
               address,
               name: address,
               providerId: PROVIDER_ID.CUSTOM,
-              authAddr: authAddress === null || authAddress === address ? undefined : authAddress,
-            },
+              authAddr: authAddress === null || authAddress === address ? undefined : authAddress
+            }
           ]
-        : [],
+        : []
     }
   }
 
@@ -64,7 +52,7 @@ class TestProvider implements CustomProvider {
     //
   }
 
-  async reconnect() {
+  async reconnect(_metadata: Metadata) {
     return null
   }
 
@@ -73,7 +61,7 @@ class TestProvider implements CustomProvider {
     txnGroups: Uint8Array[] | Uint8Array[][],
     indexesToSign?: number[] | undefined,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _returnGroup?: boolean | undefined,
+    _returnGroup?: boolean | undefined
   ): Promise<Uint8Array[]> {
     // If txnGroups is a nested array, flatten it
     const transactions: Uint8Array[] = Array.isArray(txnGroups[0])
@@ -111,10 +99,12 @@ class TestProvider implements CustomProvider {
 
       const forSigning = Buffer.from(
         this.algosdk.encodeObj({
-          txn: unsignedTxn.get_obj_for_encoding(),
-        }),
+          txn: unsignedTxn.get_obj_for_encoding()
+        })
       ).toString('base64')
-      alert(`Here is the unsigned transaction bytes that needs signing in base64, press OK to copy to clipboard for signing: ${forSigning}`)
+      alert(
+        `Here is the unsigned transaction bytes that needs signing in base64, press OK to copy to clipboard for signing: ${forSigning}`
+      )
 
       console.log(forSigning)
       // Make async to avoid permission issue
@@ -162,13 +152,14 @@ export default function ConnectWallet() {
       {
         id: PROVIDER_ID.CUSTOM,
         clientOptions: {
-          name: 'Test',
+          name: 'Manual with KMD icon',
+          icon: KMDICON,
           getProvider: (params: {
             network?: Network
             algod?: algosdk.Algodv2
             algosdkStatic?: typeof algosdk
           }) => {
-            return new TestProvider(params.algosdkStatic ?? algosdk)
+            return new TestManualProvider(params.algosdkStatic ?? algosdk)
           }
         }
       }

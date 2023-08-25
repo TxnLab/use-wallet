@@ -57,10 +57,9 @@ class CustomWalletClient extends BaseClient {
             network
           }),
           metadata: {
-            id: PROVIDER_ID.CUSTOM,
-            isWalletConnect: false,
+            ...CustomWalletClient.metadata,
             name: clientOptions.name,
-            icon: clientOptions.icon ?? ICON
+            icon: clientOptions.icon ?? CustomWalletClient.metadata.icon
           },
           algodClient,
           algosdk,
@@ -76,7 +75,7 @@ class CustomWalletClient extends BaseClient {
   }
 
   async connect(): Promise<Wallet> {
-    return await this.providerProxy.connect()
+    return await this.providerProxy.connect(this.metadata)
   }
 
   async disconnect() {
@@ -84,7 +83,7 @@ class CustomWalletClient extends BaseClient {
   }
 
   async reconnect(): Promise<Wallet | null> {
-    return await this.providerProxy.reconnect()
+    return await this.providerProxy.reconnect(this.metadata)
   }
 
   async signTransactions(
