@@ -138,19 +138,19 @@ import React from 'react'
 import { WalletProvider, useInitializeProviders, PROVIDER_ID } from '@txnlab/use-wallet'
 
 const getDynamicDeflyWalletConnect = async () => {
-  const DeflyWalletConnect = (await import("@blockshake/defly-connect")).DeflyWalletConnect;
-  return DeflyWalletConnect;
-};
+  const DeflyWalletConnect = (await import('@blockshake/defly-connect')).DeflyWalletConnect
+  return DeflyWalletConnect
+}
 
 const getDynamicPeraWalletConnect = async () => {
-  const PeraWalletConnect = (await import("@perawallet/connect")).PeraWalletConnect;
-  return PeraWalletConnect;
-};
+  const PeraWalletConnect = (await import('@perawallet/connect')).PeraWalletConnect
+  return PeraWalletConnect
+}
 
 const getDynamicDaffiWalletConnect = async () => {
-  const DaffiWalletConnect = (await import("@daffiwallet/connect")).DaffiWalletConnect;
-  return DaffiWalletConnect;
-};
+  const DaffiWalletConnect = (await import('@daffiwallet/connect')).DaffiWalletConnect
+  return DaffiWalletConnect
+}
 
 export default function App() {
   const providers = useInitializeProviders({
@@ -169,7 +169,6 @@ export default function App() {
   )
 }
 ```
-
 
 ## The `useWallet` Hook
 
@@ -335,14 +334,10 @@ Here is an example of a signing and sending simple pay transaction using `signTr
 ```jsx
 import React from 'react'
 import algosdk from 'algosdk'
-import {
-  useWallet,
-  DEFAULT_NODE_BASEURL,
-  DEFAULT_NODE_TOKEN,
-  DEFAULT_NODE_PORT
-} from '@txnlab/use-wallet'
+import { useWallet } from '@txnlab/use-wallet'
+import { NODE_BASEURL, NODE_TOKEN, NODE_PORT } from '@/constants'
 
-const algodClient = new algosdk.Algodv2(DEFAULT_NODE_TOKEN, DEFAULT_NODE_BASEURL, DEFAULT_NODE_PORT)
+const algodClient = new algosdk.Algodv2(NODE_TOKEN, NODE_BASEURL, NODE_PORT)
 
 export default function Transact() {
   const { activeAddress, signTransactions, sendTransactions } = useWallet()
@@ -554,6 +549,25 @@ const providers = useInitializeProviders({
     nodeServer: 'https://testnet-api.algonode.cloud',
     nodeToken: '',
     nodePort: '443'
+  }
+})
+```
+
+The node configuration must match the network your app's algod client is connected to. The recommended approach is to define the node configuration variables as constants and pass them to both the `useInitializeProviders` hook and the `algosdk.Algodv2` constructor.
+
+```jsx
+import algosdk from 'algosdk'
+import { NODE_BASEURL, NODE_TOKEN, NODE_PORT } from '@/constants'
+
+const algodClient = new algosdk.Algodv2(NODE_TOKEN, NODE_BASEURL, NODE_PORT)
+
+const providers = useInitializeProviders({
+  providers: [...],
+  nodeConfig: {
+    network: 'testnet',
+    nodeServer: NODE_BASEURL,
+    nodeToken: NODE_TOKEN,
+    nodePort: NODE_PORT
   }
 })
 ```
