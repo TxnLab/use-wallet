@@ -50,7 +50,11 @@ export const initializeProviders = async <T extends keyof ProviderConfigMapping>
 
   debugLog('Initializing providers:', getProviderList(providers))
 
-  const initPromises = providers.map((provider) => initClient(provider))
+  const initPromises = providers.map((provider) => {
+    const providerId = typeof provider === 'string'? provider : provider.id
+    initializedProviders[providerId] = null // Set to null to preserve order of providers
+    initClient(provider)
+  })
   await Promise.all(initPromises)
 
   return initializedProviders
