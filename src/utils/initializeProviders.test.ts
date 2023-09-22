@@ -97,7 +97,7 @@ describe('initializeProviders', () => {
     const result = await initializeProviders(providers)
 
     // Check if the returned object has the correct keys
-    expect(Object.keys(result)).toEqual(expect.arrayContaining(providers))
+    expect(Object.keys(result)).toEqual(providers)
 
     // Check if the returned clients are instances of BaseClient
     for (const clientInstance of Object.values(result)) {
