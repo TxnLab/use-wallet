@@ -16,7 +16,7 @@
   "description": "React hooks for using Algorand compatible wallets in dApps.",
   "scripts": {
     "dev": "yarn storybook",
-    "build": "rm -rf dist && rollup -c",
+    "build": "del -f dist && rollup -c",
     "test": "jest",
     "storybook": "start-storybook -p 6006",
     "deploy-storybook": "build-storybook && gh-pages -d storybook-static",
@@ -134,6 +134,7 @@
   "types": "dist/index.d.ts",
   "dependencies": {
     "immer": "^9.0.15",
+    "snapalgo-sdk": "^1.1.6",
     "zustand": "^4.1.4"
   },
   "config": {
