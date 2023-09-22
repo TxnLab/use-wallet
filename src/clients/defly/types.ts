@@ -1,9 +1,10 @@
 import type { Transaction } from 'algosdk'
-import type { AlgodClientOptions, Network, Metadata } from '../../types'
 import type { DeflyWalletConnect } from '@blockshake/defly-connect'
-import type _algosdk from 'algosdk'
+import type algosdk from 'algosdk'
+import type { Network } from '../../types/node'
+import type { Metadata } from '../../types/wallet'
 
-export type ClientOptions = {
+export type DeflyWalletConnectOptions = {
   bridge?: string
   deep_link?: string
   app_meta?: {
@@ -27,15 +28,8 @@ export type DeflyTransaction = {
 export type DeflyWalletClientConstructor = {
   metadata: Metadata
   client: DeflyWalletConnect
-  algosdk: typeof _algosdk
-  algodClient: _algosdk.Algodv2
+  clientOptions?: DeflyWalletConnectOptions
+  algosdk: typeof algosdk
+  algodClient: algosdk.Algodv2
   network: Network
-}
-
-export type InitParams = {
-  clientOptions?: ClientOptions
-  algodOptions?: AlgodClientOptions
-  clientStatic?: typeof DeflyWalletConnect
-  algosdkStatic?: typeof _algosdk
-  network?: Network
 }

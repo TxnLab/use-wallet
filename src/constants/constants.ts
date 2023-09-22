@@ -1,4 +1,4 @@
-import { Network } from '../types'
+import { Network } from '../types/node'
 
 export enum PROVIDER_ID {
   KMD = 'kmd',

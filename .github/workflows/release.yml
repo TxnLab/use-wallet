@@ -1,0 +1,25 @@
+name: Release & Publish to NPM
+on: workflow_dispatch
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Initialize Git user
+        run: |
+          git config --global user.email "drichar@gmail.com"
+          git config --global user.name "GitHub Actions"
+      - name: Initialize NPM config
+        run: npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Run release
+        run: yarn release --ci
+        env:
+          GITHUB_TOKEN: ${{ secrets.USE_WALLET_RELEASE }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

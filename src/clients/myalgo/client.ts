@@ -1,23 +1,33 @@
 /**
- * Helpful resources:
+ * Documentation:
  * https://github.com/randlabs/myalgo-connect
  */
-import BaseWallet from '../base'
-import type _MyAlgoConnect from '@randlabs/myalgo-connect'
-import type _algosdk from 'algosdk'
 import Algod, { getAlgodClient } from '../../algod'
+import BaseClient from '../base'
 import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
-import { DecodedTransaction, DecodedSignedTransaction, Network } from '../../types'
-import { MyAlgoWalletClientConstructor, InitParams } from './types'
+import { debugLog } from '../../utils/debugLog'
 import { ICON } from './constants'
+import type MyAlgoConnect from '@randlabs/myalgo-connect'
+import type { DecodedSignedTransaction, DecodedTransaction, Network } from '../../types/node'
+import type { InitParams } from '../../types/providers'
+import type { MyAlgoConnectOptions, MyAlgoWalletClientConstructor } from './types'
 
-class MyAlgoWalletClient extends BaseWallet {
-  #client: _MyAlgoConnect
+class MyAlgoWalletClient extends BaseClient {
+  #client: MyAlgoConnect
+  clientOptions?: MyAlgoConnectOptions
   network: Network
 
-  constructor({ metadata, client, algosdk, algodClient, network }: MyAlgoWalletClientConstructor) {
+  constructor({
+    metadata,
+    client,
+    clientOptions,
+    algosdk,
+    algodClient,
+    network
+  }: MyAlgoWalletClientConstructor) {
     super(metadata, algosdk, algodClient)
     this.#client = client
+    this.clientOptions = clientOptions
     this.network = network
     this.metadata = MyAlgoWalletClient.metadata
   }
@@ -33,11 +43,23 @@ class MyAlgoWalletClient extends BaseWallet {
     clientOptions,
     algodOptions,
     clientStatic,
+    getDynamicClient,
     algosdkStatic,
     network = DEFAULT_NETWORK
-  }: InitParams) {
+  }: InitParams<PROVIDER_ID.MYALGO>): Promise<BaseClient | null> {
     try {
-      const MyAlgoConnect = clientStatic || (await import('@randlabs/myalgo-connect')).default
+      debugLog(`${PROVIDER_ID.MYALGO.toUpperCase()} initializing...`)
+
+      let MyAlgoConnect
+      if (clientStatic) {
+        MyAlgoConnect = clientStatic
+      } else if (getDynamicClient) {
+        MyAlgoConnect = await getDynamicClient()
+      } else {
+        throw new Error(
+          'MyAlgo Wallet provider missing required property: clientStatic or getDynamicClient'
+        )
+      }
 
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
       const algodClient = getAlgodClient(algosdk, algodOptions)
@@ -46,13 +68,18 @@ class MyAlgoWalletClient extends BaseWallet {
         ...(clientOptions ? clientOptions : { disableLedgerNano: false })
       })
 
-      return new MyAlgoWalletClient({
+      const provider = new MyAlgoWalletClient({
         metadata: MyAlgoWalletClient.metadata,
         client: myAlgo,
+        clientOptions,
         algosdk: algosdk,
         algodClient: algodClient,
         network
       })
+
+      debugLog(`${PROVIDER_ID.MYALGO.toUpperCase()} initialized`, '✅')
+
+      return provider
     } catch (e) {
       console.error('Error initializing...', e)
       return null

@@ -1,16 +1,8 @@
 import type _algosdk from 'algosdk'
-import type {
-  Asset,
-  Wallet,
-  AccountInfo,
-  ConfirmedTxn,
-  TxnType,
-  TransactionsArray,
-  TxnInfo,
-  Metadata,
-  RawTxnResponse
-} from '../../types'
 import { audio } from '../../media/audio'
+import type { AccountInfo, Asset, ClientOptions, Metadata, Wallet } from '../../types/wallet'
+import type { ConfirmedTxn, TxnType } from '../../types/node'
+import type { RawTxnResponse, TransactionsArray, TxnInfo } from '../../types/api'
 
 const getIsIOS = () => {
   if (typeof window !== 'undefined') {
@@ -26,6 +18,7 @@ const isIOS = getIsIOS()
 abstract class BaseClient {
   algosdk: typeof _algosdk
   algodClient: _algosdk.Algodv2
+  clientOptions?: ClientOptions
   keepWCAlive: HTMLAudioElement
   metadata: Metadata
 
@@ -36,7 +29,7 @@ abstract class BaseClient {
   abstract reconnect(onDisconnect: () => void): Promise<Wallet | null>
   abstract signTransactions(
     connectedAccounts: string[],
-    transactions: Array<Uint8Array>,
+    txnGroups: Uint8Array[] | Uint8Array[][],
     indexesToSign?: number[],
     returnGroup?: boolean
   ): Promise<Uint8Array[]>
@@ -44,10 +37,12 @@ abstract class BaseClient {
   protected constructor(
     metadata: Metadata,
     algosdk: typeof _algosdk,
-    algodClient: _algosdk.Algodv2
+    algodClient: _algosdk.Algodv2,
+    clientOptions?: ClientOptions
   ) {
     this.algosdk = algosdk
     this.algodClient = algodClient
+    this.clientOptions = clientOptions
     this.keepWCAlive = new Audio()
     this.metadata = metadata
   }

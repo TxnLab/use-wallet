@@ -1,23 +1,38 @@
 /**
- * Helpful resources:
+ * Documentation:
  * https://github.com/perawallet/connect
  */
-import type _algosdk from 'algosdk'
 import Algod, { getAlgodClient } from '../../algod'
-import type { PeraWalletConnect } from '@perawallet/connect'
-import type { Wallet, DecodedTransaction, DecodedSignedTransaction, Network } from '../../types'
-import { PROVIDER_ID, DEFAULT_NETWORK } from '../../constants'
-import BaseWallet from '../base'
+import BaseClient from '../base'
+import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
+import { debugLog } from '../../utils/debugLog'
 import { ICON } from './constants'
-import { PeraTransaction, PeraWalletClientConstructor, InitParams } from './types'
+import type { PeraWalletConnect } from '@perawallet/connect'
+import type { DecodedSignedTransaction, DecodedTransaction, Network } from '../../types/node'
+import type { InitParams } from '../../types/providers'
+import type { Wallet } from '../../types/wallet'
+import type {
+  PeraTransaction,
+  PeraWalletClientConstructor,
+  PeraWalletConnectOptions
+} from './types'
 
-class PeraWalletClient extends BaseWallet {
+class PeraWalletClient extends BaseClient {
   #client: PeraWalletConnect
+  clientOptions?: PeraWalletConnectOptions
   network: Network
 
-  constructor({ metadata, client, algosdk, algodClient, network }: PeraWalletClientConstructor) {
+  constructor({
+    metadata,
+    client,
+    clientOptions,
+    algosdk,
+    algodClient,
+    network
+  }: PeraWalletClientConstructor) {
     super(metadata, algosdk, algodClient)
     this.#client = client
+    this.clientOptions = clientOptions
     this.network = network
     this.metadata = PeraWalletClient.metadata
   }
@@ -33,27 +48,43 @@ class PeraWalletClient extends BaseWallet {
     clientOptions,
     algodOptions,
     clientStatic,
+    getDynamicClient,
     algosdkStatic,
     network = DEFAULT_NETWORK
-  }: InitParams) {
+  }: InitParams<PROVIDER_ID.PERA>): Promise<BaseClient | null> {
     try {
-      const PeraWalletConnect =
-        clientStatic || (await import('@perawallet/connect')).PeraWalletConnect
+      debugLog(`${PROVIDER_ID.PERA.toUpperCase()} initializing...`)
+
+      let PeraWalletConnect
+      if (clientStatic) {
+        PeraWalletConnect = clientStatic
+      } else if (getDynamicClient) {
+        PeraWalletConnect = await getDynamicClient()
+      } else {
+        throw new Error(
+          'Pera Wallet provider missing required property: clientStatic or getDynamicClient'
+        )
+      }
 
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
       const algodClient = getAlgodClient(algosdk, algodOptions)
 
       const peraWallet = new PeraWalletConnect({
-        ...(clientOptions ? clientOptions : { shouldShowSignTxnToast: false })
+        ...(clientOptions && clientOptions)
       })
 
-      return new PeraWalletClient({
+      const provider = new PeraWalletClient({
         metadata: PeraWalletClient.metadata,
         client: peraWallet,
+        clientOptions,
         algosdk,
         algodClient,
         network
       })
+
+      debugLog(`${PROVIDER_ID.PERA.toUpperCase()} initialized`, '✅')
+
+      return provider
     } catch (e) {
       console.error('Error initializing...', e)
       return null
@@ -107,10 +138,15 @@ class PeraWalletClient extends BaseWallet {
 
   async signTransactions(
     connectedAccounts: string[],
-    transactions: Uint8Array[],
+    txnGroups: Uint8Array[] | Uint8Array[][],
     indexesToSign?: number[],
     returnGroup = true
   ) {
+    // If txnGroups is a nested array, flatten it
+    const transactions: Uint8Array[] = Array.isArray(txnGroups[0])
+      ? (txnGroups as Uint8Array[][]).flatMap((txn) => txn)
+      : (txnGroups as Uint8Array[])
+
     // Decode the transactions to access their properties.
     const decodedTxns = transactions.map((txn) => {
       return this.algosdk.decodeObj(txn)

@@ -1,23 +1,23 @@
 /**
- * Helpful resources:
+ * Documentation:
  * https://github.com/PureStake/algosigner/blob/develop/docs/dApp-integration.md
  */
-import type _algosdk from 'algosdk'
-import BaseWallet from '../base'
 import Algod, { getAlgodClient } from '../../algod'
-import { PROVIDER_ID, DEFAULT_NETWORK } from '../../constants'
-import type { DecodedTransaction, DecodedSignedTransaction, Network } from '../../types'
+import BaseClient from '../base'
+import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
+import { useWalletStore } from '../../store'
+import { debugLog } from '../../utils/debugLog'
 import { ICON } from './constants'
+import type { DecodedSignedTransaction, DecodedTransaction, Network } from '../../types/node'
+import type { InitParams } from '../../types/providers'
 import type {
-  WindowExtended,
-  AlgoSignerTransaction,
   AlgoSigner,
   AlgoSignerClientConstructor,
-  InitParams
+  AlgoSignerTransaction,
+  WindowExtended
 } from './types'
-import { useWalletStore } from '../../store'
 
-class AlgoSignerClient extends BaseWallet {
+class AlgoSignerClient extends BaseClient {
   #client: AlgoSigner
   network: Network
   walletStore: typeof useWalletStore
@@ -36,8 +36,14 @@ class AlgoSignerClient extends BaseWallet {
     isWalletConnect: false
   }
 
-  static async init({ algodOptions, algosdkStatic, network = DEFAULT_NETWORK }: InitParams) {
+  static async init({
+    algodOptions,
+    algosdkStatic,
+    network = DEFAULT_NETWORK
+  }: InitParams<PROVIDER_ID.ALGOSIGNER>): Promise<BaseClient | null> {
     try {
+      debugLog(`${PROVIDER_ID.ALGOSIGNER.toUpperCase()} initializing...`)
+
       if (typeof window == 'undefined' || (window as WindowExtended).algorand === undefined) {
         throw new Error('AlgoSigner is not available.')
       }
@@ -46,14 +52,17 @@ class AlgoSignerClient extends BaseWallet {
       const algodClient = getAlgodClient(algosdk, algodOptions)
       const algosigner = (window as WindowExtended).algorand
 
-      return new AlgoSignerClient({
+      const provider = new AlgoSignerClient({
         metadata: AlgoSignerClient.metadata,
-        id: PROVIDER_ID.ALGOSIGNER,
         client: algosigner,
         algosdk: algosdk,
         algodClient: algodClient,
         network
       })
+
+      debugLog(`${PROVIDER_ID.ALGOSIGNER.toUpperCase()} initialized`, '✅')
+
+      return provider
     } catch (e) {
       console.warn(e)
       console.warn(

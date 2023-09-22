@@ -167,3 +167,6 @@ storybook-static/
 
 # VS Code
 *.code-workspace
+
+# NPM config
+.npmrc
