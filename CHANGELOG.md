@@ -1,3 +1,9 @@
+## [2.1.3](https://github.com/txnlab/use-wallet/compare/v2.1.2...v2.1.3) (2023-09-22)
+
+### Bug Fixes
+
+- preserve order of providers as passed into `useInitializeProviders` ([#111](https://github.com/txnlab/use-wallet/pull/111)) ([35a6333](https://github.com/txnlab/use-wallet/commit/35a6333d53877d62609a90212f0948289b1a2cfc)), closes [#104](https://github.com/txnlab/use-wallet/issues/104)
+
 ## [2.1.2](https://github.com/txnlab/use-wallet/compare/v2.1.1...v2.1.2) (2023-09-12)
 
 ### Changes
