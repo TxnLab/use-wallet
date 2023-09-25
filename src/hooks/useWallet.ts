@@ -38,7 +38,7 @@ export default function useWallet() {
     const supportedClients = Object.keys(clients) as PROVIDER_ID[]
     setProviders(
       supportedClients
-        // Femove any clients that didn't initialise
+        // Remove any clients that didn't initialise
         .filter((id) => !!clients?.[id])
         .map((id) => {
           return {
