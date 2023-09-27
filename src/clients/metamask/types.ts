@@ -1,8 +1,7 @@
 import type _algosdk from 'algosdk'
 import { PROVIDER_ID } from '../../constants'
 import type { AlgodClientOptions, Network, Metadata } from '../../types'
-
-export type WindowExtended = { algorand: AlgoSigner } & Window & typeof globalThis
+export type WindowExtended = { algorand: AlgoSigner, ethereum: any } & Window & typeof globalThis
 
 export type GenesisId = 'betanet-v1.0' | 'testnet-v1.0' | 'mainnet-v1.0' | string
 
@@ -48,10 +47,9 @@ export type AlgoSigner = {
   }
 }
 
-export type AlgoSignerClientConstructor = {
+export type MetamaskClientConstructor = {
   metadata: Metadata
-  client: AlgoSigner
-  id: PROVIDER_ID
+  client: any
   algosdk: typeof _algosdk
   algodClient: _algosdk.Algodv2
   network: Network

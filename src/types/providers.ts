@@ -59,6 +59,11 @@ export type ProviderConfigMapping = {
     clientStatic?: undefined
     getDynamicClient?: undefined
   }
+  [PROVIDER_ID.METAMASK]:{
+    clientOptrions?:undefined
+    clientStatic?:undefined
+    getDynamicClient?:undefined
+  }
   [PROVIDER_ID.MNEMONIC]: {
     clientOptions?: undefined
     clientStatic?: undefined

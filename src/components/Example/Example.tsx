@@ -17,7 +17,8 @@ export default function ConnectWallet() {
       { id: PROVIDER_ID.DEFLY, clientStatic: DeflyWalletConnect },
       { id: PROVIDER_ID.PERA, getDynamicClient: getDynamicPeraWalletConnect },
       { id: PROVIDER_ID.DAFFI, clientStatic: DaffiWalletConnect },
-      { id: PROVIDER_ID.EXODUS }
+      { id: PROVIDER_ID.EXODUS },
+      { id: PROVIDER_ID.METAMASK}
     ]
   })
 

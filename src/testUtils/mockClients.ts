@@ -2,6 +2,7 @@
 import { DeflyWalletConnect } from '@blockshake/defly-connect'
 import { DaffiWalletConnect } from '@daffiwallet/connect'
 import { PeraWalletConnect } from '@perawallet/connect'
+import { Wallet as metamaskConnect } from 'snapalgo-sdk'
 import MyAlgoConnect from '@randlabs/myalgo-connect'
 import { WalletConnectModalSign } from '@walletconnect/modal-sign-html'
 import algosdk from 'algosdk'
@@ -14,6 +15,7 @@ import MnemonicWalletClient from '../clients/mnemonic/client'
 import MyAlgoWalletClient from '../clients/myalgo/client'
 import PeraWalletClient from '../clients/pera/client'
 import WalletConnectClient from '../clients/walletconnect2/client'
+import MetamaskClient from 'src/clients/metamask/client'
 import { PROVIDER_ID } from '../constants'
 import type { AlgoSigner } from '../clients/algosigner/types'
 import type { Exodus } from '../clients/exodus/types'
@@ -29,6 +31,7 @@ type ClientTypeMap = {
   [PROVIDER_ID.MYALGO]: MyAlgoWalletClient
   [PROVIDER_ID.PERA]: PeraWalletClient
   [PROVIDER_ID.WALLETCONNECT]: WalletConnectClient
+  [PROVIDER_ID.METAMASK]: MetamaskClient
 }
 
 export const createMockClient = <T extends PROVIDER_ID>(
@@ -50,7 +53,8 @@ export const createMockClient = <T extends PROVIDER_ID>(
     [PROVIDER_ID.MNEMONIC]: createMnemonicMockInstance,
     [PROVIDER_ID.MYALGO]: createMyAlgoMockInstance,
     [PROVIDER_ID.PERA]: createPeraMockInstance,
-    [PROVIDER_ID.WALLETCONNECT]: createWalletConnectMockInstance
+    [PROVIDER_ID.WALLETCONNECT]: createWalletConnectMockInstance,
+    [PROVIDER_ID.METAMASK]: createMetamaskMockInstance
   }
 
   return mockClientFactoryMap[providerId](clientOptions, accounts)
@@ -101,6 +105,33 @@ export const createAlgoSignerMockInstance = (
   mockAlgoSignerClient.disconnect = jest.fn().mockImplementation(() => Promise.resolve())
 
   return mockAlgoSignerClient
+}
+
+//METAMASK
+export const createMetamaskMockInstance = (
+  clientOptions?:ClientOptions, 
+  accounts:Array<Account> = []
+):MetamaskClient =>{
+  const mockMetamaskClient = new MetamaskClient({
+    metadata: MetamaskClient.metadata,
+    client: new metamaskConnect(),
+    algodClient:{
+      accountInformation: () => ({
+        do: () => Promise.resolve({})
+      })
+    } as any,
+    algosdk,
+    network:'test-network',
+    ...(clientOptions && clientOptions)
+  })
+  mockMetamaskClient.connect = jest.fn().mockImplementation(() =>
+  Promise.resolve({
+    ...mockMetamaskClient.metadata,
+    accounts
+  }));
+  mockMetamaskClient.disconnect = jest.fn().mockImplementation(() => Promise.resolve());
+
+  return mockMetamaskClient;
 }
 
 // DAFFI

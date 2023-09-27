@@ -12,19 +12,20 @@ import type {
   WindowExtended,
   AlgoSignerTransaction,
   AlgoSigner,
-  AlgoSignerClientConstructor,
+  MetamaskClientConstructor,
   InitParams
 } from './types'
 import { useWalletStore } from '../../store'
 import {Wallet} from 'snapalgo-sdk';
 
+
 class MetamaskClient extends BaseWallet {
-  #client: AlgoSigner
+  #client: any
   network: Network
   walletStore: typeof useWalletStore
   init: boolean
 
-  constructor({ metadata, client, algosdk, algodClient, network }: AlgoSignerClientConstructor) {
+  constructor({ metadata, client, algosdk, algodClient, network }: MetamaskClientConstructor) {
     super(metadata, algosdk, algodClient)
     this.#client = client
     this.network = network
@@ -45,12 +46,11 @@ class MetamaskClient extends BaseWallet {
 
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
       const algodClient = getAlgodClient(algosdk, algodOptions)
-      const algosigner = (window as WindowExtended).algorand
+      const client = Wallet;
 
       return new MetamaskClient({
         metadata: MetamaskClient.metadata,
-        id: PROVIDER_ID.ALGOSIGNER,
-        client: algosigner,
+        client: client,
         algosdk: algosdk,
         algodClient: algodClient,
         network
@@ -59,27 +59,37 @@ class MetamaskClient extends BaseWallet {
   }
 
   async connect() {
-    const testId = `local:http://localhost:8081`;
     
     if(this.init === false){
-      console.log(testId);
-      new Wallet();
+      this.#client = new Wallet();
     }
-    console.log(window.algorand);
     console.log(this.getGenesisID());
-    const { accounts } = await window.algorand.enable({ genesisID: this.getGenesisID() })
+    const { accounts } = await this.#client.enable({ genesisID: this.getGenesisID() })
+    console.log("accounts is")
+    console.log(accounts);
 
     if (accounts.length === 0) {
       throw new Error(`No accounts found for ${MetamaskClient.metadata.id}`)
     }
 
     const mappedAccounts = await Promise.all(
-      accounts.map(async (address, index) => {
+      accounts.map(async (address:string, index:any) => {
         // check to see if this is a rekeyed account
         const { 'auth-addr': authAddr } = await this.getAccountInfo(address)
+        
+        const currentAccountInfo:any = await (window as WindowExtended)?.ethereum.request({  
+            method: 'wallet_invokeSnap',
+            params:{        
+              snapId:'npm:@algorandfoundation/algorand-metamask-snap',
+              request:{
+                method: 'getCurrentAccount',
+              }
+            }
+        })
+      
 
         return {
-          name: `AlgoSigner ${index + 1}`,
+          name: currentAccountInfo.name,
           address,
           providerId: MetamaskClient.metadata.id,
           ...(authAddr && { authAddr })
@@ -107,6 +117,7 @@ class MetamaskClient extends BaseWallet {
 
   // eslint-disable-next-line @typescript-eslint/require-await
   async disconnect() {
+    //disconnect not supported by metamask
     return
   }
 
@@ -135,18 +146,18 @@ class MetamaskClient extends BaseWallet {
       if (indexesToSign && indexesToSign.length && indexesToSign.includes(i)) {
         signedIndexes.push(i)
         acc.push({
-          txn: window.algorand.base64Encode(transactions[i]),
+          txn: this.#client.base64Encode(transactions[i]),
           ...(authAddress && { authAddr: authAddress })
         })
       } else if (!isSigned && connectedAccounts.includes(sender)) {
         signedIndexes.push(i)
         acc.push({
-          txn: window.algorand.base64Encode(transactions[i]),
+          txn: this.#client.base64Encode(transactions[i]),
           ...(authAddress && { authAddr: authAddress })
         })
       } else {
         acc.push({
-          txn: window.algorand.base64Encode(
+          txn: this.#client.base64Encode(
             isSigned
               ? this.algosdk.decodeSignedTransaction(transactions[i]).txn.toByte()
               : this.algosdk.decodeUnsignedTransaction(transactions[i]).toByte()
@@ -159,7 +170,7 @@ class MetamaskClient extends BaseWallet {
     }, [])
 
     // Sign them with the client.
-    const result = await window.algorand.signTxns(txnsToSign)
+    const result = await this.#client.signTxns(txnsToSign)
 
     // Join the newly signed transactions with the original group of transactions
     // if `returnGroup` is true
