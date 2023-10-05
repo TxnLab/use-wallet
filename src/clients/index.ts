@@ -7,8 +7,21 @@ import algosigner from './algosigner'
 import walletconnect from './walletconnect2'
 import kmd from './kmd'
 import mnemonic from './mnemonic'
+import { CustomProvider } from './custom/types'
+import custom from './custom'
 
-export { pera, myalgo, defly, exodus, algosigner, walletconnect, kmd, mnemonic }
+export {
+  pera,
+  myalgo,
+  defly,
+  exodus,
+  algosigner,
+  walletconnect,
+  kmd,
+  mnemonic,
+  custom,
+  CustomProvider
+}
 
 export default {
   [pera.metadata.id]: pera,
@@ -19,5 +32,6 @@ export default {
   [algosigner.metadata.id]: algosigner,
   [walletconnect.metadata.id]: walletconnect,
   [kmd.metadata.id]: kmd,
-  [mnemonic.metadata.id]: mnemonic
+  [mnemonic.metadata.id]: mnemonic,
+  [custom.metadata.id]: custom
 }

@@ -36,31 +36,35 @@ export default function useWallet() {
     }
 
     const supportedClients = Object.keys(clients) as PROVIDER_ID[]
-
     setProviders(
-      supportedClients.map((id) => {
-        return {
-          ...allClients[id],
-          accounts: getAccountsByProvider(id),
-          isActive: activeAccount?.providerId === id,
-          isConnected: connectedAccounts.some((accounts) => accounts.providerId === id),
-          connect: () => connect(id),
-          disconnect: () => disconnect(id),
-          reconnect: () => reconnect(id),
-          setActiveProvider: () => setActive(id),
-          setActiveAccount: (account: string) => selectActiveAccount(id, account)
-        }
-      })
+      supportedClients
+        // Remove any clients that didn't initialise
+        .filter((id) => !!clients?.[id])
+        .map((id) => {
+          return {
+            ...allClients[id],
+            // Override static details with any instance details
+            ...clients[id],
+            accounts: getAccountsByProvider(id),
+            isActive: activeAccount?.providerId === id,
+            isConnected: connectedAccounts.some((accounts) => accounts.providerId === id),
+            connect: () => connect(id),
+            disconnect: () => disconnect(id),
+            reconnect: () => reconnect(id),
+            setActiveProvider: () => setActive(id),
+            setActiveAccount: (account: string) => selectActiveAccount(id, account)
+          }
+        })
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clients, connectedAccounts, connectedActiveAccounts, activeAccount])
 
   const getClient = (id?: PROVIDER_ID): WalletClient => {
-    if (!id) throw new Error('Provier ID is missing.')
+    if (!id) throw new Error('Provider ID is missing.')
 
     const walletClient = clients?.[id]
 
-    if (!walletClient) throw new Error('Client not found for ID')
+    if (!walletClient) throw new Error(`Client not found for ID: ${id}`)
 
     return walletClient
   }

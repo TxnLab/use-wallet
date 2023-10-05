@@ -2,6 +2,7 @@ import { Network } from '../types/node'
 
 export enum PROVIDER_ID {
   KMD = 'kmd',
+  CUSTOM = 'custom',
   PERA = 'pera',
   DAFFI = 'daffi',
   MYALGO = 'myalgo',
