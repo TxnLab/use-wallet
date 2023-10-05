@@ -17,7 +17,7 @@ import type { MyAlgoConnectOptions } from '../clients/myalgo/types'
 import type { DaffiWalletConnectOptions } from '../clients/daffi/types'
 import type { NonEmptyArray } from './utilities'
 import type BaseClient from '../clients/base'
-import type { CustomOptions } from 'src/clients/custom/types'
+import type { CustomOptions } from '../clients/custom/types'
 
 export type ProviderConfigMapping = {
   [PROVIDER_ID.PERA]: {
