@@ -4,7 +4,7 @@ import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
 import { debugLog } from '../../utils/debugLog'
 import { ICON } from './constants'
 import type _algosdk from 'algosdk'
-import type { Network } from '../../types/node'
+import type { AlgodClientOptions, Network } from '../../types/node'
 import type { InitParams } from '../../types/providers'
 import type { Metadata, Wallet } from '../../types/wallet'
 import type { CustomProvider, CustomWalletClientConstructor } from './types'
@@ -40,14 +40,15 @@ class CustomWalletClient extends BaseClient {
     network = DEFAULT_NETWORK
   }: InitParams<PROVIDER_ID.CUSTOM>): Promise<BaseClient | null> {
     try {
-      debugLog(`${PROVIDER_ID.CUSTOM.toUpperCase()} initializing...`)
+      debugLog(`${PROVIDER_ID.CUSTOM.toUpperCase() as string} initializing...`)
 
       if (!clientOptions) {
         throw new Error(`Attempt to create custom wallet with no provider specified.`)
       }
 
-      const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
-      const algodClient = getAlgodClient(algosdk, algodOptions)
+      const algosdk: typeof _algosdk =
+        algosdkStatic || (await Algod.init(algodOptions as AlgodClientOptions)).algosdk
+      const algodClient = getAlgodClient(algosdk, algodOptions as AlgodClientOptions)
 
       try {
         return new CustomWalletClient({
@@ -66,7 +67,7 @@ class CustomWalletClient extends BaseClient {
           network
         })
       } finally {
-        debugLog(`${PROVIDER_ID.CUSTOM.toUpperCase()} initialized`, '✅')
+        debugLog(`${PROVIDER_ID.CUSTOM.toUpperCase() as string} initialized`, '✅')
       }
     } catch (e) {
       console.error('Error initializing...', e)
