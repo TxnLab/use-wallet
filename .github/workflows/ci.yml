@@ -22,10 +22,16 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
 
       - name: Install dependencies (with cache)
         uses: bahmutov/npm-install@v1
+
+      - name: Run ESLint
+        run: yarn lint
+
+      - name: Run Prettier check
+        run: yarn prettier
 
       - name: Run TypeScript type check
         run: yarn check-types
