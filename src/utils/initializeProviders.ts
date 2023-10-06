@@ -20,7 +20,6 @@ export const initializeProviders = async <T extends keyof ProviderConfigMapping>
   nodeConfig?: NodeConfig,
   algosdkStatic?: typeof algosdk
 ): Promise<SupportedProviders> => {
-
   if (typeof window === 'undefined') {
     debugLog('Window object is not available, skipping initialization')
     return {} as SupportedProviders
@@ -28,7 +27,7 @@ export const initializeProviders = async <T extends keyof ProviderConfigMapping>
 
   // Set all providers to null to preserve order
   const initializedProviders = providers.reduce((acc, provider) => {
-    const providerId = typeof provider === 'string'? provider : provider.id
+    const providerId = typeof provider === 'string' ? provider : provider.id
     acc[providerId] = null
     return acc
   }, {} as SupportedProviders)
