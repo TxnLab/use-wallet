@@ -31,7 +31,7 @@ jobs:
         run: yarn lint
 
       - name: Run Prettier check
-        run: yarn prettier
+        run: yarn format
 
       - name: Run TypeScript type check
         run: yarn check-types
