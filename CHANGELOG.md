@@ -16,7 +16,7 @@
 
 - Update documentation to show recommended approach for node configuration ([#110](https://github.com/TxnLab/use-wallet/pull/110)) ([b50c564](https://github.com/TxnLab/use-wallet/commit/b50c564d8ef6e6fb8c207848737851b4f3b8d64d))
 
-# [2.1.1](https://github.com/txnlab/use-wallet/compare/v2.1.0...v2.1.1) (2023-08-11)
+## [2.1.1](https://github.com/txnlab/use-wallet/compare/v2.1.0...v2.1.1) (2023-08-11)
 
 ### Bug Fixes
 
