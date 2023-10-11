@@ -40,7 +40,7 @@ class CustomWalletClient extends BaseClient {
     network = DEFAULT_NETWORK
   }: InitParams<PROVIDER_ID.CUSTOM>): Promise<BaseClient | null> {
     try {
-      debugLog(`${PROVIDER_ID.CUSTOM.toUpperCase() as string} initializing...`)
+      debugLog(`${PROVIDER_ID.CUSTOM.toUpperCase()} initializing...`)
 
       if (!clientOptions) {
         throw new Error(`Attempt to create custom wallet with no provider specified.`)
@@ -67,7 +67,7 @@ class CustomWalletClient extends BaseClient {
           network
         })
       } finally {
-        debugLog(`${PROVIDER_ID.CUSTOM.toUpperCase() as string} initialized`, '✅')
+        debugLog(`${PROVIDER_ID.CUSTOM.toUpperCase()} initialized`, '✅')
       }
     } catch (e) {
       console.error('Error initializing...', e)
