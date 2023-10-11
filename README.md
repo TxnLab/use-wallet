@@ -45,6 +45,11 @@ Version 2.x introduces [WalletConnect 2.0 support](#walletconnect-20-support).
 - [WalletConnect 2.0 Support](#walletconnect-20-support)
   - [Defly Wallet (iOS) beta](#defly-wallet-ios-beta)
   - [Pera Wallet (Android) beta](#pera-wallet-android-beta)
+  - ["Module not found" errors in Next.js 13](#module-not-found-errors-in-nextjs-13)
+- [Custom Provider](#custom-provider)
+  - [Custom Provider example](#custom-provider-example)
+  - [Initializing Custom Provider](#initializing-custom-provider)
+  - [Manual Provider (example implementation)](#manual-provider-example-implementation)
 - [Migration Guide](#migration-guide)
 - [Local Development](#local-development)
 - [Support](#support)
@@ -476,6 +481,10 @@ useEffect(() => {
 
 - Documentation - https://developer.algorand.org/docs/rest-apis/kmd
 
+### Custom Provider
+
+- Documentation - [Custom Provider](#custom-provider)
+
 ## Legacy Wallet Support
 
 Support for these wallets will be removed in a future release.
@@ -713,6 +722,79 @@ module.exports = nextConfig
 ```
 
 See https://github.com/WalletConnect/walletconnect-monorepo/issues/1908#issuecomment-1487801131
+
+## Custom Provider
+
+As of v2.2.0, you can now add support for a **custom provider** that delegates wallet actions to your application. This is useful if you want to support a wallet that is not yet integrated with UseWallet, or if your application requires any additional, custom interactions.
+
+### Custom Provider example
+
+```jsx
+import { PROVIDER_ID, Metadata, CustomProvider } from '@txnlab/use-wallet'
+import type _algosdk from 'algosdk'
+
+export class MyCustomProvider implements CustomProvider {
+  algosdk: typeof _algosdk
+
+  constructor(algosdk: typeof _algosdk, ...) {
+    this.algosdk = algosdk
+    // ...
+  }
+
+  async connect(metadata: Metadata): Promise<Wallet> {
+    // connect to wallet
+  }
+
+  async disconnect(): Promise<void> {
+    // disconnect from wallet
+  }
+
+  async reconnect(metadata: Metadata): Promise<Wallet | null> {
+    // reconnect to wallet
+  }
+
+  async signTransactions(
+    connectedAccounts: string[],
+    txnGroups: Uint8Array[] | Uint8Array[][],
+    indexesToSign?: number[] | undefined,
+    returnGroup?: boolean | undefined
+  ): Promise<Uint8Array[]> {
+    // sign transactions
+  }
+}
+```
+
+### Initializing Custom Provider
+
+```jsx
+const providers = useInitializeProviders({
+  providers: [
+    {
+      id: PROVIDER_ID.CUSTOM,
+      clientOptions: {
+        name: 'My Custom Provider',
+        icon: 'data:image/png;base64...',
+        getProvider: (params: {
+          network?: Network
+          algod?: algosdk.Algodv2
+          algosdkStatic?: typeof algosdk
+        }) => {
+          return new MyCustomProvider(params.algosdkStatic ?? algosdk)
+        }
+      }
+    }
+    // other providers...
+  ]
+})
+```
+
+### Manual Provider (example implementation)
+
+See [TestManualProvider.ts](https://github.com/TxnLab/use-wallet/blob/main/src/components/Example/TestManualProvider.tsx) for a full example implementation of a custom provider. You can try it by running
+
+```bash
+yarn storybook
+```
 
 ## Migration Guide
 
