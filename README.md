@@ -481,7 +481,7 @@ useEffect(() => {
 
 - Documentation - https://developer.algorand.org/docs/rest-apis/kmd
 
-### Custom Provider
+### Custom
 
 - Documentation - [Custom Provider](#custom-provider)
 
