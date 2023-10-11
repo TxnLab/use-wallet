@@ -1,3 +1,9 @@
+# [2.2.0](https://github.com/txnlab/use-wallet/compare/v2.1.3...v2.2.0) (2023-10-11)
+
+### Features
+
+- Custom wallet ([#106](https://github.com/txnlab/use-wallet/pull/106)) ([f1bb0f1](https://github.com/txnlab/use-wallet/commit/f1bb0f15177e7f719a9ec454ea847899837ee614))
+
 ## [2.1.3](https://github.com/txnlab/use-wallet/compare/v2.1.2...v2.1.3) (2023-09-22)
 
 ### Bug Fixes
