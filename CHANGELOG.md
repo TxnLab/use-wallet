@@ -1,3 +1,9 @@
+# [2.3.0](https://github.com/txnlab/use-wallet/compare/v2.2.0...v2.3.0) (2023-11-29)
+
+### Features
+
+- Support rekeyed signing with kmd ([#121](https://github.com/txnlab/use-wallet/pull/121)) ([e09b7b5](https://github.com/txnlab/use-wallet/commit/e09b7b545616f889df1a6276b5ede1d255d0b47b))
+
 # [2.2.0](https://github.com/txnlab/use-wallet/compare/v2.1.3...v2.2.0) (2023-10-11)
 
 ### Features
