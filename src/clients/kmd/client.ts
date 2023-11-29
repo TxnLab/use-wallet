@@ -197,15 +197,29 @@ class KMDWalletClient extends BaseClient {
         return
       }
       // Not to be signed by our signer, skip it
-      else if (!connectedAccounts.includes(this.algosdk.encodeAddress(dtxn.snd))) {
-        return
+      else {
+        const senderAddress = this.algosdk.encodeAddress(dtxn.snd)
+        const rekeyAddress = dtxn.rekey ? this.algosdk.encodeAddress(dtxn.rekey) : null
+
+        const isSignerConnected = rekeyAddress
+          ? connectedAccounts.includes(rekeyAddress) && connectedAccounts.includes(senderAddress)
+          : connectedAccounts.includes(senderAddress)
+
+        if (!isSignerConnected) {
+          return
+        }
       }
 
       // overwrite with an empty blob
       signedTxns[idx] = new Uint8Array()
 
       const txn = this.algosdk.Transaction.from_obj_for_encoding(dtxn)
-      signingPromises.push(this.#client.signTransaction(token, pw, txn) as Promise<Uint8Array>)
+
+      const promise = txn.reKeyTo
+        ? this.#client.signTransactionWithSpecificPublicKey(token, pw, txn, txn.reKeyTo.publicKey)
+        : this.#client.signTransaction(token, pw, txn)
+
+      signingPromises.push(promise as Promise<Uint8Array>)
     })
 
     const signingResults = await Promise.all(signingPromises)
