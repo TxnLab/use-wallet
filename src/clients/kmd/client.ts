@@ -215,8 +215,6 @@ class KMDWalletClient extends BaseClient {
 
       const txn = this.algosdk.Transaction.from_obj_for_encoding(dtxn)
 
-      console.log('signing txn', txn)
-
       const promise = txn.reKeyTo
         ? this.#client.signTransactionWithSpecificPublicKey(token, pw, txn, txn.reKeyTo.publicKey)
         : this.#client.signTransaction(token, pw, txn)
