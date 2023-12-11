@@ -5,6 +5,7 @@ import defly from './defly'
 import exodus from './exodus'
 import algosigner from './algosigner'
 import walletconnect from './walletconnect2'
+import magic from './magic'
 import kmd from './kmd'
 import mnemonic from './mnemonic'
 import { CustomProvider } from './custom/types'
@@ -20,6 +21,7 @@ export {
   kmd,
   mnemonic,
   custom,
+  magic,
   CustomProvider
 }
 
@@ -33,5 +35,6 @@ export default {
   [walletconnect.metadata.id]: walletconnect,
   [kmd.metadata.id]: kmd,
   [mnemonic.metadata.id]: mnemonic,
+  [magic.metadata.id]: magic,
   [custom.metadata.id]: custom
 }

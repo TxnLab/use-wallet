@@ -2,7 +2,12 @@ import { useState, useEffect } from 'react'
 import { initializeProviders, reconnectProviders } from '../utils'
 import { useDebugStore } from '../store'
 import type algosdk from 'algosdk'
-import type { NodeConfig, ProvidersArray, SupportedProviders } from '../types/providers'
+import type {
+  NodeConfig,
+  ProviderConfigMapping,
+  ProvidersArray,
+  SupportedProviders
+} from '../types/providers'
 
 interface InitializeProvidersOptions {
   providers: ProvidersArray
@@ -28,7 +33,11 @@ export default function useInitializeProviders({
     async function initializeAndConnect() {
       try {
         // Initialize with provided configuration
-        const initializedProviders = await initializeProviders(providers, nodeConfig, algosdkStatic)
+        const initializedProviders = await initializeProviders<keyof ProviderConfigMapping>(
+          providers,
+          nodeConfig,
+          algosdkStatic
+        )
 
         setWalletProviders(initializedProviders)
 

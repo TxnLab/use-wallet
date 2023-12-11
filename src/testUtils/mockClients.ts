@@ -19,6 +19,9 @@ import type { AlgoSigner } from '../clients/algosigner/types'
 import type { Exodus } from '../clients/exodus/types'
 import type { Account, ClientOptions } from '../types'
 import CustomWalletClient from '../clients/custom/client'
+import MagicAuthClient from '../clients/magic/client'
+import { AlgorandExtension } from '@magic-ext/algorand'
+import { Magic } from 'magic-sdk'
 
 type ClientTypeMap = {
   [PROVIDER_ID.ALGOSIGNER]: AlgoSignerClient
@@ -31,6 +34,7 @@ type ClientTypeMap = {
   [PROVIDER_ID.MYALGO]: MyAlgoWalletClient
   [PROVIDER_ID.PERA]: PeraWalletClient
   [PROVIDER_ID.WALLETCONNECT]: WalletConnectClient
+  [PROVIDER_ID.MAGIC]: MagicAuthClient
 }
 
 export const createMockClient = <T extends PROVIDER_ID>(
@@ -53,7 +57,8 @@ export const createMockClient = <T extends PROVIDER_ID>(
     [PROVIDER_ID.MNEMONIC]: createMnemonicMockInstance,
     [PROVIDER_ID.MYALGO]: createMyAlgoMockInstance,
     [PROVIDER_ID.PERA]: createPeraMockInstance,
-    [PROVIDER_ID.WALLETCONNECT]: createWalletConnectMockInstance
+    [PROVIDER_ID.WALLETCONNECT]: createWalletConnectMockInstance,
+    [PROVIDER_ID.MAGIC]: createMagicMockInstance
   }
 
   return mockClientFactoryMap[providerId](clientOptions, accounts)
@@ -467,4 +472,49 @@ export const createWalletConnectMockInstance = (
   mockWalletConnectClient.disconnect = jest.fn().mockImplementation(() => Promise.resolve())
 
   return mockWalletConnectClient
+}
+
+// MAGIC
+export const createMagicMockInstance = (
+  clientOptions?: ClientOptions,
+  accounts: Array<Account> = []
+): MagicAuthClient => {
+  const mockMagicAuthClient = new MagicAuthClient({
+    metadata: {
+      id: PROVIDER_ID.MAGIC,
+      name: 'Magic',
+      icon: 'magic-icon-b64',
+      isWalletConnect: false
+    },
+    client: new Magic('mock-api-key', {
+      extensions: {
+        algorand: new AlgorandExtension({
+          rpcUrl: ''
+        })
+      }
+    }),
+    clientOptions: {
+      apiKey: 'mock-api-key'
+    },
+    algosdk,
+    algodClient: {
+      accountInformation: () => ({
+        do: () => Promise.resolve({})
+      })
+    } as any,
+    network: 'test-network'
+  })
+
+  // Mock the connect method
+  mockMagicAuthClient.connect = jest.fn().mockImplementation(() =>
+    Promise.resolve({
+      ...mockMagicAuthClient.metadata,
+      accounts
+    })
+  )
+
+  // Mock the disconnect method
+  mockMagicAuthClient.disconnect = jest.fn().mockImplementation(() => Promise.resolve())
+
+  return mockMagicAuthClient
 }

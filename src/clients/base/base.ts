@@ -24,7 +24,7 @@ abstract class BaseClient {
 
   static metadata: Metadata
 
-  abstract connect(onDisconnect: () => void): Promise<Wallet>
+  abstract connect(onDisconnect: () => void, email?: string): Promise<Wallet>
   abstract disconnect(): Promise<void>
   abstract reconnect(onDisconnect: () => void): Promise<Wallet | null>
   abstract signTransactions(

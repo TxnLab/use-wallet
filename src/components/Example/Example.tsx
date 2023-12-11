@@ -8,9 +8,15 @@ import Transact from './Transact'
 import algosdk from 'algosdk'
 import { ManualGoalSigningAlertPromptProvider } from './TestManualProvider'
 
+const DUMMY_MAGIC_PK = 'pk_live_D17FD8D89621B5F3'
 const getDynamicPeraWalletConnect = async () => {
   const PeraWalletConnect = (await import('@perawallet/connect')).PeraWalletConnect
   return PeraWalletConnect
+}
+
+const getDynamigMagic = async () => {
+  const Magic = (await import('magic-sdk')).Magic
+  return Magic
 }
 
 export default function ConnectWallet() {
@@ -20,6 +26,11 @@ export default function ConnectWallet() {
       { id: PROVIDER_ID.PERA, getDynamicClient: getDynamicPeraWalletConnect },
       { id: PROVIDER_ID.DAFFI, clientStatic: DaffiWalletConnect },
       { id: PROVIDER_ID.EXODUS },
+      {
+        id: PROVIDER_ID.MAGIC,
+        getDynamicClient: getDynamigMagic,
+        clientOptions: { apiKey: DUMMY_MAGIC_PK }
+      },
       {
         id: PROVIDER_ID.CUSTOM,
         clientOptions: {

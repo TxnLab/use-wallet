@@ -1,8 +1,9 @@
-import React from 'react'
-import { useWallet } from '../../index'
+import React, { useState } from 'react'
+import { PROVIDER_ID, useWallet } from '../../index'
 
 export default function ConnectWallet() {
   const { providers, connectedAccounts, connectedActiveAccounts, activeAccount } = useWallet()
+  const [email, setEmail] = useState('')
 
   // Use these properties to display connected accounts to users.
   React.useEffect(() => {
@@ -24,7 +25,23 @@ export default function ConnectWallet() {
               {provider.metadata.name} {provider.isActive && '[active]'}{' '}
             </h4>
             <div>
-              <button onClick={provider.connect} disabled={provider.isConnected}>
+              {provider.metadata.id === PROVIDER_ID.MAGIC && (
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter email"
+                />
+              )}
+              <button
+                onClick={() => {
+                  provider.connect(
+                    undefined,
+                    provider.metadata.id === PROVIDER_ID.MAGIC ? email : undefined
+                  )
+                }}
+                disabled={provider.isConnected}
+              >
                 Connect
               </button>
               <button onClick={provider.disconnect} disabled={!provider.isConnected}>

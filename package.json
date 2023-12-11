@@ -94,7 +94,9 @@
     "ts-node": "^10.9.1",
     "tsconfig-paths-webpack-plugin": "^4.0.1",
     "tslib": "^2.4.0",
-    "typescript": "^4.8.4"
+    "typescript": "^4.8.4",
+    "@magic-ext/algorand": "^16.3.2",
+    "magic-sdk": "^21.3.1"
   },
   "peerDependencies": {
     "@blockshake/defly-connect": "^1.1.5",
@@ -103,9 +105,17 @@
     "@randlabs/myalgo-connect": "^1.4.2",
     "algosdk": "^2.1.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "@magic-ext/algorand": "^16.3.2",
+    "magic-sdk": "^21.3.1"
   },
   "peerDependenciesMeta": {
+    "@magic-ext/algorand": {
+      "optional": true
+    },
+    "@magic-sdk": {
+      "optional": true
+    },
     "@blockshake/defly-connect": {
       "optional": true
     },
