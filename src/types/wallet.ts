@@ -5,6 +5,7 @@ export interface Account {
   name: string
   address: string
   authAddr?: string
+  email?: string
 }
 
 export type Provider = {
