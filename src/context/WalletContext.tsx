@@ -1,5 +1,5 @@
 import React, { createContext, useContext } from 'react'
-import type { SupportedProviders } from 'src/types/providers'
+import type { SupportedProviders } from '../types/providers'
 
 const WalletContext = createContext<SupportedProviders | null>(null)
 
