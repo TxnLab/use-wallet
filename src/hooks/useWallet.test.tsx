@@ -7,9 +7,8 @@ import React from 'react'
 import useWallet from './useWallet'
 import DeflyWalletClient from '../clients/defly'
 import PeraWalletClient from '../clients/pera'
-import { default as ClientProvider } from '../store/state/clientStore'
+import { WalletProvider, type WalletProviderProps } from '../context/WalletContext'
 import { useHydratedWalletStore } from '../store/state/walletStore'
-import { createWrapper } from '../testUtils/createWrapper'
 import { mockAccounts } from '../testUtils/mockAccounts'
 import { createDeflyMockInstance, createPeraMockInstance } from '../testUtils/mockClients'
 import { clearAccounts } from '../utils/clearAccounts'
@@ -36,7 +35,7 @@ jest.mock('../store/state/walletStore', () => ({
 }))
 
 jest.mock('../', () => ({
-  ClientProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>
+  WalletProvider: ({ children }: WalletProviderProps) => <div>{children}</div>
 }))
 
 jest.mock('../utils/clearAccounts')
@@ -59,7 +58,7 @@ describe('useWallet', () => {
     jest.spyOn(peraMockInstance, 'disconnect')
     jest.spyOn(peraMockInstance, 'getAccountInfo')
 
-    // Passed to `ClientProvider` in renderHook wrapper
+    // Passed to `WalletProvider` in renderHook wrapper
     mockClientProviders = {
       pera: peraMockInstance,
       defly: deflyMockInstance
@@ -72,7 +71,9 @@ describe('useWallet', () => {
 
   it('should return active and connected accounts', () => {
     const { result } = renderHook(() => useWallet(), {
-      wrapper: createWrapper(ClientProvider, { value: mockClientProviders })
+      wrapper: ({ children }) => (
+        <WalletProvider value={mockClientProviders}>{children}</WalletProvider>
+      )
     })
 
     // Active account
@@ -87,7 +88,9 @@ describe('useWallet', () => {
 
   it('should return `providers` array', async () => {
     const { result } = renderHook(() => useWallet(), {
-      wrapper: createWrapper(ClientProvider, { value: mockClientProviders })
+      wrapper: ({ children }) => (
+        <WalletProvider value={mockClientProviders}>{children}</WalletProvider>
+      )
     })
 
     const providers = result.current.providers
@@ -134,7 +137,9 @@ describe('useWallet', () => {
 
   it('should return status flags', () => {
     const { result } = renderHook(() => useWallet(), {
-      wrapper: createWrapper(ClientProvider, { value: mockClientProviders })
+      wrapper: ({ children }) => (
+        <WalletProvider value={mockClientProviders}>{children}</WalletProvider>
+      )
     })
 
     expect(result.current.isActive).toBe(true)
@@ -143,7 +148,9 @@ describe('useWallet', () => {
 
   it('should return `getAccountInfo`', async () => {
     const { result } = renderHook(() => useWallet(), {
-      wrapper: createWrapper(ClientProvider, { value: mockClientProviders })
+      wrapper: ({ children }) => (
+        <WalletProvider value={mockClientProviders}>{children}</WalletProvider>
+      )
     })
 
     await act(async () => {

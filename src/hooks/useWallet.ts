@@ -1,17 +1,17 @@
-import { useState, useMemo, useContext, useEffect } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import type algosdk from 'algosdk'
 import { getAlgosdk } from '../algod'
 import { useHydratedWalletStore, walletStoreSelector } from '../store/index'
 import { TransactionsArray, WalletClient, Provider } from '../types'
 import { PROVIDER_ID } from '../constants'
-import { ClientContext } from '../store/state/clientStore'
+import { useWalletContext } from '../context/WalletContext'
 import allClients from '../clients'
 import { clearAccounts } from '../utils/clearAccounts'
-import shallow from 'zustand/shallow'
+import { shallow } from 'zustand/shallow'
 
 export default function useWallet() {
   const [providers, setProviders] = useState<Provider[] | null>(null)
-  const clients = useContext(ClientContext)
+  const clients = useWalletContext()
 
   const {
     activeAccount,
