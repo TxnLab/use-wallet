@@ -1,3 +1,10 @@
+## [2.3.1](https://github.com/txnlab/use-wallet/compare/v2.3.0...v2.3.1) (2023-12-15)
+
+### Changes
+
+- Throw error if `useWallet` hook is being used outside the `WalletProvider` ([#125](https://github.com/txnlab/use-wallet/pull/125)) ([3ccc5e0](https://github.com/txnlab/use-wallet/commit/3ccc5e0251ff3f4f5f0da5950a038d8d1f21e70c))
+- Use named export of `zustand/shallow` to suppress deprecation warning ([263a56b](https://github.com/TxnLab/use-wallet/commit/263a56b95e9cab6112cc0f46f456ddbc107e7ee7))
+
 # [2.3.0](https://github.com/txnlab/use-wallet/compare/v2.2.0...v2.3.0) (2023-11-29)
 
 ### Features
