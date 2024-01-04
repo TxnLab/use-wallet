@@ -70,6 +70,11 @@ export type ProviderConfigMapping = {
     clientStatic?: undefined
     getDynamicClient?: undefined
   }
+  [PROVIDER_ID.KIBISIS]: {
+    clientOptions?: undefined
+    clientStatic?: undefined
+    getDynamicClient?: undefined
+  }
 }
 
 /**
