@@ -136,6 +136,7 @@ type ProviderDef =
   | PROVIDER_ID.ALGOSIGNER
   | PROVIDER_ID.MNEMONIC
   | PROVIDER_ID.CUSTOM
+  | PROVIDER_ID.KIBISIS
 
 export type ProvidersArray = NonEmptyArray<ProviderDef>
 

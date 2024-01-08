@@ -97,7 +97,7 @@ npm install @blockshake/defly-connect @perawallet/connect @daffiwallet/connect
 
 In the root of your app, initialize the `WalletProvider` with the `useInitializeProviders` hook.
 
-This example initializes Defly, Pera, Daffi and Exodus wallet providers. The default node configuration (mainnet via [AlgoNode](https://algonode.io/api/)) is used. See [Provider Configuration](#provider-configuration) for more options.
+This example initializes Defly, Pera, Daffi, Exodus and Kibisis wallet providers. The default node configuration (mainnet via [AlgoNode](https://algonode.io/api/)) is used. See [Provider Configuration](#provider-configuration) for more options.
 
 You can initialize your providers in two ways:
 
@@ -124,7 +124,8 @@ export default function App() {
       { id: PROVIDER_ID.DEFLY, clientStatic: DeflyWalletConnect },
       { id: PROVIDER_ID.PERA, clientStatic: PeraWalletConnect },
       { id: PROVIDER_ID.DAFFI, clientStatic: DaffiWalletConnect },
-      { id: PROVIDER_ID.EXODUS }
+      { id: PROVIDER_ID.EXODUS },
+      { id: PROVIDER_ID.KIBISIS }
     ]
   })
 
@@ -163,7 +164,8 @@ export default function App() {
       { id: PROVIDER_ID.DEFLY, getDynamicClient: getDynamicDeflyWalletConnect },
       { id: PROVIDER_ID.PERA, getDynamicClient: getDynamicPeraWalletConnect },
       { id: PROVIDER_ID.DAFFI, getDynamicClient: getDynamicDaffiWalletConnect },
-      { id: PROVIDER_ID.EXODUS }
+      { id: PROVIDER_ID.EXODUS },
+      { id: PROVIDER_ID.KIBISIS }
     ]
   })
 
@@ -477,6 +479,11 @@ useEffect(() => {
 - Website - https://www.exodus.com/
 - Download - https://www.exodus.com/download/
 
+### Kibisis Wallet
+
+- Website - https://kibis.is
+- Download - https://kibis.is/#download
+
 ### KMD (Algorand Key Management Daemon)
 
 - Documentation - https://developer.algorand.org/docs/rest-apis/kmd
@@ -640,7 +647,8 @@ export default function App() {
           }
         }
       },
-      { id: PROVIDER_ID.EXODUS }
+      { id: PROVIDER_ID.EXODUS },
+      { id: PROVIDER_ID.KIBISIS }
     ],
     nodeConfig: {
       network: 'mainnet',
