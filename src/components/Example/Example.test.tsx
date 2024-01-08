@@ -22,7 +22,8 @@ jest.mock('../../index', () => ({
     DEFLY: 'mock_defly_id',
     PERA: 'mock_pera_id',
     DAFFI: 'mock_daffi_id',
-    EXODUS: 'mock_exodus_id'
+    EXODUS: 'mock_exodus_id',
+    KIBISIS: 'mock_kibisis_id'
   },
   useInitializeProviders: jest.fn()
 }))

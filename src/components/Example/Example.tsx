@@ -32,7 +32,8 @@ export default function ConnectWallet() {
             return new ManualGoalSigningAlertPromptProvider(params.algosdkStatic ?? algosdk)
           }
         }
-      }
+      },
+      { id: PROVIDER_ID.KIBISIS }
     ]
   })
 
