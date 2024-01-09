@@ -307,7 +307,6 @@ class KibisisClient extends BaseClient {
 
     const result = await KibisisClient.sendRequestWithTimeout<SignTxnsParams, SignTxnsResult>({
       params: {
-        genesisHash: this.genesisHash,
         providerId: ARC_0013_PROVIDER_ID,
         txns
       },

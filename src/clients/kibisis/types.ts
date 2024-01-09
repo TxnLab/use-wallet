@@ -92,14 +92,11 @@ export interface GetProvidersResult {
 }
 
 export interface SignTxnsParams {
-  genesisHash: string
   providerId: string
   txns: Arc0001SignTxns[]
 }
 
 export interface SignTxnsResult {
-  genesisHash: string
-  genesisId: string
   providerId: string
   stxns: (string | null)[]
 }
