@@ -32,6 +32,7 @@ type ClientTypeMap = {
   [PROVIDER_ID.MYALGO]: MyAlgoWalletClient
   [PROVIDER_ID.PERA]: PeraWalletClient
   [PROVIDER_ID.WALLETCONNECT]: WalletConnectClient
+  [PROVIDER_ID.KIBISIS]: KibisisClient
 }
 
 export const createMockClient = <T extends PROVIDER_ID>(
@@ -54,7 +55,8 @@ export const createMockClient = <T extends PROVIDER_ID>(
     [PROVIDER_ID.MNEMONIC]: createMnemonicMockInstance,
     [PROVIDER_ID.MYALGO]: createMyAlgoMockInstance,
     [PROVIDER_ID.PERA]: createPeraMockInstance,
-    [PROVIDER_ID.WALLETCONNECT]: createWalletConnectMockInstance
+    [PROVIDER_ID.WALLETCONNECT]: createWalletConnectMockInstance,
+    [PROVIDER_ID.KIBISIS]: createKibisisMockInstance
   }
 
   return mockClientFactoryMap[providerId](clientOptions, accounts)
@@ -254,7 +256,7 @@ export const createKibisisMockInstance = (
       icon: 'kibisis-icon-b64',
       isWalletConnect: false
     },
-    network: 'test-network',
+    network: 'test-network'
   })
 
   // Mock the connect method

@@ -6,7 +6,8 @@ import {
   ARC_0013_CHANNEL_NAME,
   ARC_0013_ENABLE_REQUEST,
   ARC_0013_GET_PROVIDERS_REQUEST,
-  ARC_0013_PROVIDER_ID, ARC_0013_SIGN_TXNS_REQUEST,
+  ARC_0013_PROVIDER_ID,
+  ARC_0013_SIGN_TXNS_REQUEST,
   DEFAULT_REQUEST_TIMEOUT,
   ICON,
   LOWER_REQUEST_TIMEOUT,
@@ -28,9 +29,11 @@ import type {
   RequestMessage,
   ResponseError,
   ResponseMessage,
-  SendRequestWithTimeoutOptions, SignTxnsParams, SignTxnsResult
+  SendRequestWithTimeoutOptions,
+  SignTxnsParams,
+  SignTxnsResult
 } from './types'
-import { DecodedSignedTransaction, DecodedTransaction } from '../../types';
+import { DecodedSignedTransaction, DecodedTransaction } from '../../types'
 
 class KibisisClient extends BaseClient {
   genesisHash: string
@@ -75,7 +78,10 @@ class KibisisClient extends BaseClient {
       const algodClient = getAlgodClient(algosdk, algodOptions)
       const version = await algodClient.versionsCheck().do()
       const genesisHash = version['genesis_hash_b64'] // get the genesis hash of the network
-      const result = await KibisisClient.sendRequestWithTimeout<GetProvidersParams, GetProvidersResult>({
+      const result = await KibisisClient.sendRequestWithTimeout<
+        GetProvidersParams,
+        GetProvidersResult
+      >({
         params: {
           providerId: ARC_0013_PROVIDER_ID
         },
@@ -92,14 +98,16 @@ class KibisisClient extends BaseClient {
         } as ResponseError
       }
 
-      const networkConfiguration = result.networks.find((value) => value.genesisHash === genesisHash)
+      const networkConfiguration = result.networks.find(
+        (value) => value.genesisHash === genesisHash
+      )
 
       // check if the network is supported
       if (!networkConfiguration) {
         throw {
           code: NETWORK_NOT_SUPPORTED_ERROR,
           data: {
-            genesisHash,
+            genesisHash
           },
           message: `network "${network}" not supported on provider "${PROVIDER_ID.KIBISIS.toUpperCase()}"`,
           providerId: ARC_0013_PROVIDER_ID
@@ -144,7 +152,7 @@ class KibisisClient extends BaseClient {
       const channel = new BroadcastChannel(ARC_0013_CHANNEL_NAME)
       const requestId = crypto.randomUUID()
       // eslint-disable-next-line prefer-const
-      let timer: number;
+      let timer: number
 
       // listen to responses
       channel.onmessage = (message: MessageEvent<ResponseMessage<Result>>) => {
@@ -183,9 +191,9 @@ class KibisisClient extends BaseClient {
       channel.postMessage({
         id: requestId,
         params,
-        reference,
+        reference
       } as RequestMessage<Params>)
-    });
+    })
   }
 
   /**
@@ -212,7 +220,11 @@ class KibisisClient extends BaseClient {
   private async enable(): Promise<Arc0013Account[]> {
     const method = 'enable'
 
-    debugLog(`${PROVIDER_ID.KIBISIS.toUpperCase()}#${this.refreshSupportedMethods.name}(): check if "${method}" is supported on "${this.network}"`)
+    debugLog(
+      `${PROVIDER_ID.KIBISIS.toUpperCase()}#${
+        this.refreshSupportedMethods.name
+      }(): check if "${method}" is supported on "${this.network}"`
+    )
 
     // check the method is supported
     this.validateMethod(method)
@@ -245,9 +257,16 @@ class KibisisClient extends BaseClient {
    * @throws {UNKNOWN_ERROR} if the response result was empty.
    */
   private async refreshSupportedMethods(): Promise<void> {
-    debugLog(`${PROVIDER_ID.KIBISIS.toUpperCase()}#${this.refreshSupportedMethods.name}(): refreshing supported methods`)
+    debugLog(
+      `${PROVIDER_ID.KIBISIS.toUpperCase()}#${
+        this.refreshSupportedMethods.name
+      }(): refreshing supported methods`
+    )
 
-    const result = await KibisisClient.sendRequestWithTimeout<GetProvidersParams, GetProvidersResult>({
+    const result = await KibisisClient.sendRequestWithTimeout<
+      GetProvidersParams,
+      GetProvidersResult
+    >({
       params: {
         providerId: ARC_0013_PROVIDER_ID
       },
@@ -264,24 +283,32 @@ class KibisisClient extends BaseClient {
       } as ResponseError
     }
 
-    const networkConfiguration = result.networks.find((value) => value.genesisHash === this.genesisHash)
+    const networkConfiguration = result.networks.find(
+      (value) => value.genesisHash === this.genesisHash
+    )
 
     // check if the network is supported
     if (!networkConfiguration) {
       throw {
         code: NETWORK_NOT_SUPPORTED_ERROR,
         data: {
-          genesisHash: this.genesisHash,
+          genesisHash: this.genesisHash
         },
-        message: `network "${this.network}" not supported on provider "${PROVIDER_ID.KIBISIS.toUpperCase()}"`,
+        message: `network "${
+          this.network
+        }" not supported on provider "${PROVIDER_ID.KIBISIS.toUpperCase()}"`,
         providerId: ARC_0013_PROVIDER_ID
       } as ResponseError<{ genesisHash: string }>
     }
 
-    debugLog(`${PROVIDER_ID.KIBISIS.toUpperCase()}#${this.refreshSupportedMethods.name}(): methods [${networkConfiguration.methods.join(',')}] found for "${this.network}"`)
+    debugLog(
+      `${PROVIDER_ID.KIBISIS.toUpperCase()}#${
+        this.refreshSupportedMethods.name
+      }(): methods [${networkConfiguration.methods.join(',')}] found for "${this.network}"`
+    )
 
     // update the methods
-    this.methods = networkConfiguration.methods;
+    this.methods = networkConfiguration.methods
   }
 
   /**
@@ -300,7 +327,11 @@ class KibisisClient extends BaseClient {
   private async signTxns(txns: Arc0001SignTxns[]): Promise<(string | null)[]> {
     const method = 'signTxns'
 
-    debugLog(`${PROVIDER_ID.KIBISIS.toUpperCase()}#${this.signTransactions.name}(): check if "${method}" is supported on "${this.network}"`)
+    debugLog(
+      `${PROVIDER_ID.KIBISIS.toUpperCase()}#${
+        this.signTransactions.name
+      }(): check if "${method}" is supported on "${this.network}"`
+    )
 
     // check the method is supported
     this.validateMethod(method)
@@ -335,9 +366,11 @@ class KibisisClient extends BaseClient {
       throw {
         code: METHOD_NOT_SUPPORTED_ERROR,
         data: {
-          method,
+          method
         },
-        message: `"${method}" operation not supported on "${this.network}" for provider "${PROVIDER_ID.KIBISIS.toUpperCase()}"`,
+        message: `"${method}" operation not supported on "${
+          this.network
+        }" for provider "${PROVIDER_ID.KIBISIS.toUpperCase()}"`,
         providerId: ARC_0013_PROVIDER_ID
       } as ResponseError<{ method: string }>
     }
@@ -369,47 +402,54 @@ class KibisisClient extends BaseClient {
     transactions: Uint8Array[],
     indexesToSign?: number[],
     returnGroup = true
-  ): Promise<Uint8Array[]>  {
+  ): Promise<Uint8Array[]> {
     await this.refreshSupportedMethods() // refresh the supported methods
 
-    const txns: Arc0001SignTxns[] = await Promise.all(transactions.map<Promise<Arc0001SignTxns>>(async (value, index) => {
-      const decodedTxn = this.algosdk.decodeObj(value) as DecodedTransaction | DecodedSignedTransaction
-      const isSigned = !!(decodedTxn as DecodedSignedTransaction).txn
-      const sender = this.algosdk.encodeAddress(isSigned ? (decodedTxn as DecodedSignedTransaction).txn.snd : (decodedTxn as DecodedTransaction).snd)
-      const accountInfo = await this.getAccountInfo(sender)
-      const authAddr = accountInfo['auth-addr']
+    const txns: Arc0001SignTxns[] = await Promise.all(
+      transactions.map<Promise<Arc0001SignTxns>>(async (value, index) => {
+        const decodedTxn = this.algosdk.decodeObj(value) as
+          | DecodedTransaction
+          | DecodedSignedTransaction
+        const isSigned = !!(decodedTxn as DecodedSignedTransaction).txn
+        const sender = this.algosdk.encodeAddress(
+          isSigned
+            ? (decodedTxn as DecodedSignedTransaction).txn.snd
+            : (decodedTxn as DecodedTransaction).snd
+        )
+        const accountInfo = await this.getAccountInfo(sender)
+        const authAddr = accountInfo['auth-addr']
 
-      // if the transaction is signed, instruct the provider not to sign
-      if (isSigned) {
-        return {
-          txn: this.convertBytesToBase64(this.algosdk.decodeSignedTransaction(value).txn.toByte()),
-          signers: []
+        // if the transaction is signed, instruct the provider not to sign
+        if (isSigned) {
+          return {
+            txn: this.convertBytesToBase64(
+              this.algosdk.decodeSignedTransaction(value).txn.toByte()
+            ),
+            signers: []
+          }
         }
-      }
 
-      // if the transaction has been instructed to sign and the sender is authorized to sign, instruct the provider to sign
-      if (indexesToSign && indexesToSign.includes(index) && connectedAccounts.includes(sender)) {
+        // if the transaction has been instructed to sign and the sender is authorized to sign, instruct the provider to sign
+        if (indexesToSign && indexesToSign.includes(index) && connectedAccounts.includes(sender)) {
+          return {
+            txn: this.convertBytesToBase64(this.algosdk.decodeUnsignedTransaction(value).toByte()),
+            ...(authAddr && { authAddr })
+          }
+        }
+
+        // if the transaction is not signed, not instructed to sign or the sender is not authorized, instruct the provider not to sign
         return {
           txn: this.convertBytesToBase64(this.algosdk.decodeUnsignedTransaction(value).toByte()),
-          ...(authAddr && { authAddr })
+          signers: []
         }
-      }
-
-      // if the transaction is not signed, not instructed to sign or the sender is not authorized, instruct the provider not to sign
-      return {
-        txn: this.convertBytesToBase64(this.algosdk.decodeUnsignedTransaction(value).toByte()),
-        signers: []
-      }
-    }))
+      })
+    )
     const result = await this.signTxns(txns)
 
     // null values indicate transactions that were not signed by the provider, as defined in ARC-0001, see https://arc.algorand.foundation/ARCs/arc-0001#semantic-and-security-requirements
     return result.reduce<Uint8Array[]>((acc, value, index) => {
       if (value) {
-        return [
-          ...acc,
-          this.convertBase64ToBytes(value)
-        ]
+        return [...acc, this.convertBase64ToBytes(value)]
       }
 
       // if the group wants to be returned, get the transaction from the input
