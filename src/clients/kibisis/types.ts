@@ -11,7 +11,7 @@ export interface Arc0001SignTxns {
 
 export interface Arc0013Account {
   address: string
-  name: string
+  name?: string
 }
 
 export interface KibisisClientConstructor {
@@ -29,9 +29,16 @@ export interface NetworkConfiguration {
   methods: ProviderMethods[]
 }
 
-export type ProviderMethods = 'enable' | 'postTxns' | 'signAndPostTxns' | 'signBytes' | 'signTxns'
+export type ProviderMethods =
+  | 'enable'
+  | 'getProviders'
+  | 'postTxns'
+  | 'signAndPostTxns'
+  | 'signBytes'
+  | 'signTxns'
 
 export interface SendRequestWithTimeoutOptions<Params> {
+  method: ProviderMethods
   params: Params
   reference: string
   timeout?: number

@@ -82,6 +82,7 @@ class KibisisClient extends BaseClient {
         GetProvidersParams,
         GetProvidersResult
       >({
+        method: 'getProviders',
         params: {
           providerId: ARC_0013_PROVIDER_ID
         },
@@ -137,13 +138,14 @@ class KibisisClient extends BaseClient {
       ...KibisisClient.metadata,
       accounts: accounts.map(({ address, name }) => ({
         address,
-        name,
+        name: name || '',
         providerId: PROVIDER_ID.KIBISIS
       }))
     }
   }
 
   static async sendRequestWithTimeout<Params, Result>({
+    method,
     params,
     timeout,
     reference
@@ -157,7 +159,7 @@ class KibisisClient extends BaseClient {
       // listen to responses
       channel.onmessage = (message: MessageEvent<ResponseMessage<Result>>) => {
         // if the response's request id does not match the intended request, just ignore
-        if (message.data.requestId !== requestId) {
+        if (!message.data || message.data.requestId !== requestId) {
           return
         }
 
@@ -166,14 +168,17 @@ class KibisisClient extends BaseClient {
 
         // if there is an error, reject
         if (message.data.error) {
-          return reject(message.data.error)
+          reject(message.data.error)
+
+          // close the channel, we are done here
+          return channel.close()
         }
 
         // return the result
         resolve(message.data.result)
 
         // close the channel, we are done here
-        channel.close()
+        return channel.close()
       }
 
       timer = window.setTimeout(() => {
@@ -182,9 +187,12 @@ class KibisisClient extends BaseClient {
 
         reject({
           code: METHOD_TIMED_OUT_ERROR,
+          data: {
+            method
+          },
           message: `no response from provider "${PROVIDER_ID.KIBISIS.toUpperCase()}"`,
           providerId: ARC_0013_PROVIDER_ID
-        } as ResponseError)
+        } as ResponseError<{ method: ProviderMethods }>)
       }, timeout || DEFAULT_REQUEST_TIMEOUT)
 
       // broadcast the request
@@ -230,6 +238,7 @@ class KibisisClient extends BaseClient {
     this.validateMethod(method)
 
     const result = await KibisisClient.sendRequestWithTimeout<EnableParams, EnableResult>({
+      method,
       params: {
         genesisHash: this.genesisHash,
         providerId: ARC_0013_PROVIDER_ID
@@ -257,6 +266,8 @@ class KibisisClient extends BaseClient {
    * @throws {UNKNOWN_ERROR} if the response result was empty.
    */
   private async refreshSupportedMethods(): Promise<void> {
+    const method = 'getProviders'
+
     debugLog(
       `${PROVIDER_ID.KIBISIS.toUpperCase()}#${
         this.refreshSupportedMethods.name
@@ -267,6 +278,7 @@ class KibisisClient extends BaseClient {
       GetProvidersParams,
       GetProvidersResult
     >({
+      method,
       params: {
         providerId: ARC_0013_PROVIDER_ID
       },
@@ -337,6 +349,7 @@ class KibisisClient extends BaseClient {
     this.validateMethod(method)
 
     const result = await KibisisClient.sendRequestWithTimeout<SignTxnsParams, SignTxnsResult>({
+      method,
       params: {
         providerId: ARC_0013_PROVIDER_ID,
         txns
