@@ -3,11 +3,11 @@ import BaseClient from '../base'
 import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
 import { debugLog } from '../../utils/debugLog'
 import {
-  ARC_0013_CHANNEL_NAME,
-  ARC_0013_ENABLE_REQUEST,
-  ARC_0013_GET_PROVIDERS_REQUEST,
-  ARC_0013_PROVIDER_ID,
-  ARC_0013_SIGN_TXNS_REQUEST,
+  ARC_0027_CHANNEL_NAME,
+  ARC_0027_ENABLE_REQUEST,
+  ARC_0027_GET_PROVIDERS_REQUEST,
+  ARC_0027_PROVIDER_ID,
+  ARC_0027_SIGN_TXNS_REQUEST,
   DEFAULT_REQUEST_TIMEOUT,
   ICON,
   LOWER_REQUEST_TIMEOUT,
@@ -19,7 +19,7 @@ import {
 import type { InitParams, Network, Wallet } from '../../types'
 import type {
   Arc0001SignTxns,
-  Arc0013Account,
+  Arc0027Account,
   EnableParams,
   EnableResult,
   GetProvidersParams,
@@ -84,9 +84,9 @@ class KibisisClient extends BaseClient {
       >({
         method: 'getProviders',
         params: {
-          providerId: ARC_0013_PROVIDER_ID
+          providerId: ARC_0027_PROVIDER_ID
         },
-        reference: ARC_0013_GET_PROVIDERS_REQUEST,
+        reference: ARC_0027_GET_PROVIDERS_REQUEST,
         timeout: LOWER_REQUEST_TIMEOUT
       })
 
@@ -95,7 +95,7 @@ class KibisisClient extends BaseClient {
         throw {
           code: UNKNOWN_ERROR,
           message: `received response, but provider details were empty for provider "${PROVIDER_ID.KIBISIS.toUpperCase()}"`,
-          providerId: ARC_0013_PROVIDER_ID
+          providerId: ARC_0027_PROVIDER_ID
         } as ResponseError
       }
 
@@ -111,7 +111,7 @@ class KibisisClient extends BaseClient {
             genesisHash
           },
           message: `network "${network}" not supported on provider "${PROVIDER_ID.KIBISIS.toUpperCase()}"`,
-          providerId: ARC_0013_PROVIDER_ID
+          providerId: ARC_0027_PROVIDER_ID
         } as ResponseError<{ genesisHash: string }>
       }
 
@@ -133,7 +133,7 @@ class KibisisClient extends BaseClient {
     }
   }
 
-  static mapAccountsToWallet(accounts: Arc0013Account[]): Wallet {
+  static mapAccountsToWallet(accounts: Arc0027Account[]): Wallet {
     return {
       ...KibisisClient.metadata,
       accounts: accounts.map(({ address, name }) => ({
@@ -151,7 +151,7 @@ class KibisisClient extends BaseClient {
     reference
   }: SendRequestWithTimeoutOptions<Params>): Promise<Result | undefined> {
     return new Promise<Result | undefined>((resolve, reject) => {
-      const channel = new BroadcastChannel(ARC_0013_CHANNEL_NAME)
+      const channel = new BroadcastChannel(ARC_0027_CHANNEL_NAME)
       const requestId = crypto.randomUUID()
       // eslint-disable-next-line prefer-const
       let timer: number
@@ -191,7 +191,7 @@ class KibisisClient extends BaseClient {
             method
           },
           message: `no response from provider "${PROVIDER_ID.KIBISIS.toUpperCase()}"`,
-          providerId: ARC_0013_PROVIDER_ID
+          providerId: ARC_0027_PROVIDER_ID
         } as ResponseError<{ method: ProviderMethods }>)
       }, timeout || DEFAULT_REQUEST_TIMEOUT)
 
@@ -218,14 +218,14 @@ class KibisisClient extends BaseClient {
 
   /**
    * Calls the enable method on the provider that returns the authorized accounts.
-   * @returns {Arc0013Account[]} the authorized accounts.
+   * @returns {Arc0027Account[]} the authorized accounts.
    * @throws {METHOD_CANCELED_ERROR} if the method was cancelled by the user.
    * @throws {METHOD_NOT_SUPPORTED_ERROR} if the method is not supported for the configured network.
    * @throws {METHOD_TIMED_OUT_ERROR} if the method timed out by lack of response.
    * @throws {NETWORK_NOT_SUPPORTED_ERROR} if the network is not supported for the configured network.
    * @throws {UNKNOWN_ERROR} if the response result was empty.
    */
-  private async enable(): Promise<Arc0013Account[]> {
+  private async enable(): Promise<Arc0027Account[]> {
     const method = 'enable'
 
     debugLog(
@@ -241,9 +241,9 @@ class KibisisClient extends BaseClient {
       method,
       params: {
         genesisHash: this.genesisHash,
-        providerId: ARC_0013_PROVIDER_ID
+        providerId: ARC_0027_PROVIDER_ID
       },
-      reference: ARC_0013_ENABLE_REQUEST
+      reference: ARC_0027_ENABLE_REQUEST
     })
 
     // check for a result
@@ -251,7 +251,7 @@ class KibisisClient extends BaseClient {
       throw {
         code: UNKNOWN_ERROR,
         message: `received response, but "${method}" request details were empty for provider "${PROVIDER_ID.KIBISIS.toUpperCase()}"`,
-        providerId: ARC_0013_PROVIDER_ID
+        providerId: ARC_0027_PROVIDER_ID
       } as ResponseError
     }
 
@@ -280,9 +280,9 @@ class KibisisClient extends BaseClient {
     >({
       method,
       params: {
-        providerId: ARC_0013_PROVIDER_ID
+        providerId: ARC_0027_PROVIDER_ID
       },
-      reference: ARC_0013_GET_PROVIDERS_REQUEST,
+      reference: ARC_0027_GET_PROVIDERS_REQUEST,
       timeout: LOWER_REQUEST_TIMEOUT
     })
 
@@ -291,7 +291,7 @@ class KibisisClient extends BaseClient {
       throw {
         code: UNKNOWN_ERROR,
         message: `received response, but enable request details were empty for provider "${PROVIDER_ID.KIBISIS.toUpperCase()}"`,
-        providerId: ARC_0013_PROVIDER_ID
+        providerId: ARC_0027_PROVIDER_ID
       } as ResponseError
     }
 
@@ -309,7 +309,7 @@ class KibisisClient extends BaseClient {
         message: `network "${
           this.network
         }" not supported on provider "${PROVIDER_ID.KIBISIS.toUpperCase()}"`,
-        providerId: ARC_0013_PROVIDER_ID
+        providerId: ARC_0027_PROVIDER_ID
       } as ResponseError<{ genesisHash: string }>
     }
 
@@ -351,10 +351,10 @@ class KibisisClient extends BaseClient {
     const result = await KibisisClient.sendRequestWithTimeout<SignTxnsParams, SignTxnsResult>({
       method,
       params: {
-        providerId: ARC_0013_PROVIDER_ID,
+        providerId: ARC_0027_PROVIDER_ID,
         txns
       },
-      reference: ARC_0013_SIGN_TXNS_REQUEST
+      reference: ARC_0027_SIGN_TXNS_REQUEST
     })
 
     // check for a result
@@ -362,7 +362,7 @@ class KibisisClient extends BaseClient {
       throw {
         code: UNKNOWN_ERROR,
         message: `received response, but "${method}" request details were empty for provider "${PROVIDER_ID.KIBISIS.toUpperCase()}"`,
-        providerId: ARC_0013_PROVIDER_ID
+        providerId: ARC_0027_PROVIDER_ID
       } as ResponseError
     }
 
@@ -384,7 +384,7 @@ class KibisisClient extends BaseClient {
         message: `"${method}" operation not supported on "${
           this.network
         }" for provider "${PROVIDER_ID.KIBISIS.toUpperCase()}"`,
-        providerId: ARC_0013_PROVIDER_ID
+        providerId: ARC_0027_PROVIDER_ID
       } as ResponseError<{ method: string }>
     }
   }
@@ -396,7 +396,7 @@ class KibisisClient extends BaseClient {
   async connect(): Promise<Wallet> {
     await this.refreshSupportedMethods() // refresh the supported methods
 
-    const accounts: Arc0013Account[] = await this.enable()
+    const accounts: Arc0027Account[] = await this.enable()
 
     return KibisisClient.mapAccountsToWallet(accounts)
   }

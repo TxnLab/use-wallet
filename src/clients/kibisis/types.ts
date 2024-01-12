@@ -9,7 +9,7 @@ export interface Arc0001SignTxns {
   txn: string
 }
 
-export interface Arc0013Account {
+export interface Arc0027Account {
   address: string
   name?: string
 }
@@ -79,7 +79,7 @@ export interface EnableParams {
 }
 
 export interface EnableResult {
-  accounts: Arc0013Account[]
+  accounts: Arc0027Account[]
   genesisHash: string
   genesisId: string
   providerId: string

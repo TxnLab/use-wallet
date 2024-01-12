@@ -1,11 +1,12 @@
 /**
- * arc-0013
+ * arc-0027
  */
-export const ARC_0013_CHANNEL_NAME = 'arc0013:channel'
-export const ARC_0013_ENABLE_REQUEST = 'arc0013:enable:request'
-export const ARC_0013_GET_PROVIDERS_REQUEST = 'arc0013:get_providers:request'
-export const ARC_0013_PROVIDER_ID = 'f6d1c86b-4493-42fb-b88d-a62407b4cdf6'
-export const ARC_0013_SIGN_TXNS_REQUEST = 'arc0013:sign_txns:request'
+export const ARC_0027_PREFIX = 'arc0027'
+export const ARC_0027_CHANNEL_NAME = `${ARC_0027_PREFIX}:channel`
+export const ARC_0027_ENABLE_REQUEST = `${ARC_0027_PREFIX}:enable:request`
+export const ARC_0027_GET_PROVIDERS_REQUEST = `${ARC_0027_PREFIX}:get_providers:request`
+export const ARC_0027_PROVIDER_ID = 'f6d1c86b-4493-42fb-b88d-a62407b4cdf6'
+export const ARC_0027_SIGN_TXNS_REQUEST = `${ARC_0027_PREFIX}:sign_txns:request`
 /**
  * errors
  */
