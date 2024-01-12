@@ -1,6 +1,6 @@
 import React from 'react'
 import { DeflyWalletConnect } from '@blockshake/defly-connect'
-import { DaffiWalletConnect } from '@daffiwallet/connect'
+import LuteConnect from 'lute-connect'
 import { WalletProvider, PROVIDER_ID, useInitializeProviders, Network } from '../../index'
 import Account from './Account'
 import Connect from './Connect'
@@ -18,7 +18,7 @@ export default function ConnectWallet() {
     providers: [
       { id: PROVIDER_ID.DEFLY, clientStatic: DeflyWalletConnect },
       { id: PROVIDER_ID.PERA, getDynamicClient: getDynamicPeraWalletConnect },
-      { id: PROVIDER_ID.DAFFI, clientStatic: DaffiWalletConnect },
+      { id: PROVIDER_ID.LUTE, clientStatic: LuteConnect, clientOptions: { siteName: 'Storybook' } },
       { id: PROVIDER_ID.EXODUS },
       {
         id: PROVIDER_ID.CUSTOM,

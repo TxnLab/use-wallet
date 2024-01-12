@@ -125,6 +125,8 @@ type ProviderDef =
   | (ProviderConfig<PROVIDER_ID.PERA> & OneOfStaticOrDynamicClient<typeof PeraWalletConnect>)
   | (ProviderConfig<PROVIDER_ID.DEFLY> & OneOfStaticOrDynamicClient<typeof DeflyWalletConnect>)
   | (ProviderConfig<PROVIDER_ID.DAFFI> & OneOfStaticOrDynamicClient<typeof DaffiWalletConnect>)
+  | (ProviderConfig<PROVIDER_ID.LUTE> &
+      OneOfStaticOrDynamicClient<typeof LuteConnect> & { clientOptions: LuteConnectOptions })
   | (ProviderConfig<PROVIDER_ID.WALLETCONNECT> &
       OneOfStaticOrDynamicClient<typeof WalletConnectModalSign> & {
         clientOptions: WalletConnectModalSignOptions

@@ -53,15 +53,16 @@ class LuteClient extends BaseClient {
       } else if (getDynamicClient) {
         LuteConnect = await getDynamicClient()
       } else {
-        throw new Error(
-          'Lute Wallet provider missing required property: clientStatic or getDynamicClient'
-        )
+        throw new Error('Lute provider missing required property: clientStatic or getDynamicClient')
       }
 
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
       const algodClient = getAlgodClient(algosdk, algodOptions)
 
-      const lute = new LuteConnect(clientOptions ? clientOptions.siteName : 'This site')
+      if (!clientOptions) {
+        throw new Error('Lute provider missing required property: clientOptions')
+      }
+      const lute = new LuteConnect(clientOptions.siteName)
       const provider = new LuteClient({
         metadata: LuteClient.metadata,
         client: lute,
@@ -111,6 +112,20 @@ class LuteClient extends BaseClient {
     return
   }
 
+  shouldSignTxnObject(
+    txn: DecodedTransaction | DecodedSignedTransaction,
+    addresses: string[],
+    indexesToSign: number[] | undefined,
+    idx: number
+  ): boolean {
+    const isIndexMatch = !indexesToSign || indexesToSign.includes(idx)
+    const isSigned = 'txn' in txn
+    const canSign = !isSigned && addresses.includes(this.algosdk.encodeAddress(txn.snd))
+    const shouldSign = isIndexMatch && canSign
+
+    return shouldSign
+  }
+
   async signTransactions(
     connectedAccounts: string[],
     transactions: Uint8Array[],
@@ -126,39 +141,23 @@ class LuteClient extends BaseClient {
 
     // Marshal the transactions,
     // and add the signers property if they shouldn't be signed.
-    const txnsToSign = decodedTxns.reduce<WalletTransaction[]>((acc, txn, i) => {
+    const txnsToSign = decodedTxns.reduce<WalletTransaction[]>((acc, txn, idx) => {
       const isSigned = 'txn' in txn
+      const shouldSign = this.shouldSignTxnObject(txn, connectedAccounts, indexesToSign, idx)
 
-      // If the indexes to be signed is specified, designate that it should be signed
-      if (indexesToSign && indexesToSign.length && indexesToSign.includes(i)) {
-        signedIndexes.push(i)
+      if (shouldSign) {
+        signedIndexes.push(idx)
         acc.push({
-          txn: this.algosdk.decodeUnsignedTransaction(transactions[i]).toString()
+          txn: Buffer.from(transactions[idx]).toString('base64')
         })
-        // If the indexes to be signed is specified, but it's not included in it,
-        // designate that it should not be signed
-      } else if (indexesToSign && indexesToSign.length && !indexesToSign.includes(i)) {
+      } else {
         acc.push({
           txn: isSigned
-            ? this.algosdk.decodeSignedTransaction(transactions[i]).txn.toString()
-            : this.algosdk.decodeUnsignedTransaction(transactions[i]).toString(),
-          stxn: isSigned ? Buffer.from(transactions[i]).toString('base64') : undefined,
-          signers: []
-        })
-        // If the transaction is unsigned and is to be sent from a connected account,
-        // designate that it should be signed
-      } else if (!isSigned && connectedAccounts.includes(this.algosdk.encodeAddress(txn['snd']))) {
-        signedIndexes.push(i)
-        acc.push({
-          txn: this.algosdk.decodeUnsignedTransaction(transactions[i]).toString()
-        })
-        // Otherwise, designate that it should not be signed
-      } else if (isSigned) {
-        acc.push({
-          txn: isSigned
-            ? this.algosdk.decodeSignedTransaction(transactions[i]).txn.toString()
-            : this.algosdk.decodeUnsignedTransaction(transactions[i]).toString(),
-          stxn: isSigned ? Buffer.from(transactions[i]).toString('base64') : undefined,
+            ? Buffer.from(
+                this.algosdk.decodeSignedTransaction(transactions[idx]).txn.toByte()
+              ).toString('base64')
+            : Buffer.from(transactions[idx]).toString('base64'),
+          stxn: isSigned ? Buffer.from(transactions[idx]).toString('base64') : undefined,
           signers: []
         })
       }
