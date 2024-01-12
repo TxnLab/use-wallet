@@ -2,6 +2,7 @@ import type { PROVIDER_ID } from '../constants'
 import type { PeraWalletConnect } from '@perawallet/connect'
 import type { DeflyWalletConnect } from '@blockshake/defly-connect'
 import type { DaffiWalletConnect } from '@daffiwallet/connect'
+import type LuteConnect from 'lute-connect'
 import type MyAlgoConnect from '@randlabs/myalgo-connect'
 import type {
   WalletConnectModalSign,
@@ -13,6 +14,7 @@ import type { PeraWalletConnectOptions } from '../clients/pera/types'
 import type { DeflyWalletConnectOptions } from '../clients/defly/types'
 import type { ExodusOptions } from '../clients/exodus/types'
 import type { KmdOptions } from '../clients/kmd/types'
+import type { LuteConnectOptions } from '../clients/lute/types'
 import type { MyAlgoConnectOptions } from '../clients/myalgo/types'
 import type { DaffiWalletConnectOptions } from '../clients/daffi/types'
 import type { NonEmptyArray } from './utilities'
@@ -39,6 +41,11 @@ export type ProviderConfigMapping = {
     clientOptions?: WalletConnectModalSignOptions
     clientStatic?: typeof WalletConnectModalSign
     getDynamicClient?: () => Promise<typeof WalletConnectModalSign>
+  }
+  [PROVIDER_ID.LUTE]: {
+    clientOptions?: LuteConnectOptions
+    clientStatic?: typeof LuteConnect
+    getDynamicClient?: () => Promise<typeof LuteConnect>
   }
   [PROVIDER_ID.MYALGO]: {
     clientOptions?: MyAlgoConnectOptions
