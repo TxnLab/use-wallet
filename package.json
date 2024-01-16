@@ -1,18 +1,8 @@
 {
   "name": "@txnlab/use-wallet",
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/txnlab/use-wallet"
-  },
-  "bugs": {
-    "url": "https://github.com/txnlab/use-wallet/issues"
-  },
-  "homepage": "https://txnlab.github.io/use-wallet",
+  "author": "TxnLab, Inc.",
   "version": "2.3.1",
+  "license": "MIT",
   "description": "React hooks for using Algorand compatible wallets in dApps.",
   "scripts": {
     "dev": "yarn storybook",
@@ -28,8 +18,27 @@
     "pre-release": "yarn lint && yarn format && yarn check-types && yarn test && yarn build",
     "release": "release-it"
   },
-  "author": "txnlab",
-  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/txnlab/use-wallet"
+  },
+  "bugs": {
+    "url": "https://github.com/txnlab/use-wallet/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "types": "dist/index.d.ts",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "immer": "^9.0.15",
+    "zustand": "^4.3.8"
+  },
   "devDependencies": {
     "@babel/core": "^7.16.0",
     "@babel/preset-env": "^7.16.4",
@@ -116,16 +125,6 @@
     "@walletconnect/modal-sign-html": {
       "optional": true
     }
-  },
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
-  "files": [
-    "dist"
-  ],
-  "types": "dist/index.d.ts",
-  "dependencies": {
-    "immer": "^9.0.15",
-    "zustand": "^4.3.8"
   },
   "config": {
     "commitizen": {
