@@ -37,7 +37,7 @@
     "@babel/preset-typescript": "^7.16.0",
     "@blockshake/defly-connect": "^1.1.5",
     "@daffiwallet/connect": "^1.0.3",
-    "@mdx-js/react": "^2.3.0",
+    "@mdx-js/react": "^3.0.0",
     "@perawallet/connect": "^1.2.1",
     "@randlabs/myalgo-connect": "^1.4.2",
     "@release-it/conventional-changelog": "^7.0.0",
