@@ -163,7 +163,7 @@ const getDynamicDaffiWalletConnect = async () => {
   return DaffiWalletConnect
 }
 
-async function getDynamicLuteConnect() {
+const getDynamicLuteConnect = async () => {
   const LuteConnect = (await import('lute-connect')).default
   return LuteConnect
 }
