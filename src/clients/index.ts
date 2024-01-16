@@ -4,6 +4,7 @@ import myalgo from './myalgo'
 import defly from './defly'
 import exodus from './exodus'
 import algosigner from './algosigner'
+import lute from './lute'
 import walletconnect from './walletconnect2'
 import kmd from './kmd'
 import mnemonic from './mnemonic'
@@ -16,6 +17,7 @@ export {
   defly,
   exodus,
   algosigner,
+  lute,
   walletconnect,
   kmd,
   mnemonic,
@@ -30,6 +32,7 @@ export default {
   [defly.metadata.id]: defly,
   [exodus.metadata.id]: exodus,
   [algosigner.metadata.id]: algosigner,
+  [lute.metadata.id]: lute,
   [walletconnect.metadata.id]: walletconnect,
   [kmd.metadata.id]: kmd,
   [mnemonic.metadata.id]: mnemonic,

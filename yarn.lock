@@ -10820,6 +10820,11 @@ lru-cache@^7.14.1:
   resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-10.0.1.tgz#0a3be479df549cca0e5d693ac402ff19537a6b7a"
   integrity sha512-IJ4uwUTi2qCccrioU6g9g/5rvvVl13bsdczUUcqbciD9iLr095yj8DQKdObriEvuNSx325N1rV1O0sJFszx75g==
 
+lute-connect@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/lute-connect/-/lute-connect-1.0.7.tgz#298af4c8d007b800dcc2a78890b029ea84ad7ed4"
+  integrity sha512-m1AuiUQv75vTM7UScnKWiS0QJulr7Z2Vb6H1XlceVFJ8qDuf5LJicUzkxvlpR0Fy0kGLIhha0sqTYnFjQ/01uQ==
+
 lz-string@^1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/lz-string/-/lz-string-1.5.0.tgz#c1ab50f77887b712621201ba9fd4e3a6ed099941"
