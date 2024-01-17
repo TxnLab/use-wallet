@@ -210,11 +210,11 @@ class KibisisClient extends BaseClient {
    */
 
   private convertBytesToBase64(bytes: Uint8Array): string {
-    return Buffer.from(bytes).toString('base64');
+    return Buffer.from(bytes).toString('base64')
   }
 
   private convertBase64ToBytes(input: string): Uint8Array {
-    return Buffer.from(input, 'base64');
+    return Buffer.from(input, 'base64')
   }
 
   /**
@@ -432,7 +432,9 @@ class KibisisClient extends BaseClient {
         )
         const accountInfo = await this.getAccountInfo(sender)
         const authAddr = accountInfo['auth-addr']
-        const txn = this.convertBytesToBase64(this.algosdk.decodeUnsignedTransaction(value).toByte())
+        const txn = this.convertBytesToBase64(
+          this.algosdk.decodeUnsignedTransaction(value).toByte()
+        )
 
         // if the transaction is signed, instruct the provider not to sign by providing an empty signers array
         if (isSigned) {
@@ -446,7 +448,10 @@ class KibisisClient extends BaseClient {
         }
 
         // if the sender is not authorized or the index has not been included in the to be signed indexes, instruct the provider not to sign by providing an empty signers array
-        if (!connectedAccounts.includes(sender) || (indexesToSign && !indexesToSign.includes(index))) {
+        if (
+          !connectedAccounts.includes(sender) ||
+          (indexesToSign && !indexesToSign.includes(index))
+        ) {
           return {
             txn,
             signers: [],
