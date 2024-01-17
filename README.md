@@ -97,7 +97,7 @@ npm install @blockshake/defly-connect @perawallet/connect @daffiwallet/connect
 
 In the root of your app, initialize the `WalletProvider` with the `useInitializeProviders` hook.
 
-This example initializes Defly, Pera, Daffi, Exodus and Kibisis wallet providers. The default node configuration (mainnet via [AlgoNode](https://algonode.io/api/)) is used. See [Provider Configuration](#provider-configuration) for more options.
+This example initializes Defly, Pera, Daffi, Exodus, Lute and Kibisis wallet providers. The default node configuration (mainnet via [AlgoNode](https://algonode.io/api/)) is used. See [Provider Configuration](#provider-configuration) for more options.
 
 You can initialize your providers in two ways:
 
@@ -117,6 +117,7 @@ import { WalletProvider, useInitializeProviders, PROVIDER_ID } from '@txnlab/use
 import { DeflyWalletConnect } from '@blockshake/defly-connect'
 import { PeraWalletConnect } from '@perawallet/connect'
 import { DaffiWalletConnect } from '@daffiwallet/connect'
+import LuteConnect from 'lute-connect'
 
 export default function App() {
   const providers = useInitializeProviders({
@@ -125,6 +126,11 @@ export default function App() {
       { id: PROVIDER_ID.PERA, clientStatic: PeraWalletConnect },
       { id: PROVIDER_ID.DAFFI, clientStatic: DaffiWalletConnect },
       { id: PROVIDER_ID.EXODUS },
+      {
+        id: PROVIDER_ID.LUTE,
+        clientStatic: LuteConnect,
+        clientOptions: { siteName: 'YourSiteName' }
+      },
       { id: PROVIDER_ID.KIBISIS }
     ]
   })
@@ -158,6 +164,11 @@ const getDynamicDaffiWalletConnect = async () => {
   return DaffiWalletConnect
 }
 
+const getDynamicLuteConnect = async () => {
+  const LuteConnect = (await import('lute-connect')).default
+  return LuteConnect
+}
+
 export default function App() {
   const providers = useInitializeProviders({
     providers: [
@@ -165,6 +176,11 @@ export default function App() {
       { id: PROVIDER_ID.PERA, getDynamicClient: getDynamicPeraWalletConnect },
       { id: PROVIDER_ID.DAFFI, getDynamicClient: getDynamicDaffiWalletConnect },
       { id: PROVIDER_ID.EXODUS },
+      {
+        id: PROVIDER_ID.LUTE,
+        getDynamicClient: getDynamicLuteConnect,
+        clientOptions: { siteName: 'YourSiteName' }
+      },
       { id: PROVIDER_ID.KIBISIS }
     ]
   })
@@ -479,6 +495,12 @@ useEffect(() => {
 - Website - https://www.exodus.com/
 - Download - https://www.exodus.com/download/
 
+### Lute Wallet
+
+- Website - https://lute.app/
+- Install dependency - `npm install lute-connect`
+
+
 ### Kibisis Wallet
 
 - Website - https://kibis.is
@@ -624,6 +646,7 @@ import { DeflyWalletConnect } from '@blockshake/defly-connect'
 import { PeraWalletConnect } from '@perawallet/connect'
 import { DaffiWalletConnect } from '@daffiwallet/connect'
 import { WalletConnectModalSign } from '@walletconnect/modal-sign-html'
+import LuteConnect from 'lute-connect'
 
 export default function App() {
   const providers = useInitializeProviders({
@@ -648,6 +671,11 @@ export default function App() {
         }
       },
       { id: PROVIDER_ID.EXODUS },
+      {
+        id: PROVIDER_ID.LUTE,
+        clientStatic: LuteConnect,
+        clientOptions: { siteName: 'YourSiteName' }
+      },
       { id: PROVIDER_ID.KIBISIS }
     ],
     nodeConfig: {

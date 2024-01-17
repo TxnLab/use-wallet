@@ -3,12 +3,14 @@ import { DeflyWalletConnect } from '@blockshake/defly-connect'
 import { DaffiWalletConnect } from '@daffiwallet/connect'
 import { PeraWalletConnect } from '@perawallet/connect'
 import MyAlgoConnect from '@randlabs/myalgo-connect'
+import LuteConnect from 'lute-connect'
 import { WalletConnectModalSign } from '@walletconnect/modal-sign-html'
 import algosdk from 'algosdk'
 import AlgoSignerClient from '../clients/algosigner/client'
 import DaffiWalletClient from '../clients/daffi/client'
 import DeflyWalletClient from '../clients/defly/client'
 import ExodusClient from '../clients/exodus/client'
+import LuteClient from '../clients/lute/client'
 import KibisisClient from '../clients/kibisis/client'
 import KMDWalletClient from '../clients/kmd/client'
 import MnemonicWalletClient from '../clients/mnemonic/client'
@@ -32,6 +34,7 @@ type ClientTypeMap = {
   [PROVIDER_ID.MYALGO]: MyAlgoWalletClient
   [PROVIDER_ID.PERA]: PeraWalletClient
   [PROVIDER_ID.WALLETCONNECT]: WalletConnectClient
+  [PROVIDER_ID.LUTE]: LuteClient
   [PROVIDER_ID.KIBISIS]: KibisisClient
 }
 
@@ -56,6 +59,7 @@ export const createMockClient = <T extends PROVIDER_ID>(
     [PROVIDER_ID.MYALGO]: createMyAlgoMockInstance,
     [PROVIDER_ID.PERA]: createPeraMockInstance,
     [PROVIDER_ID.WALLETCONNECT]: createWalletConnectMockInstance,
+    [PROVIDER_ID.LUTE]: createLuteMockInstance,
     [PROVIDER_ID.KIBISIS]: createKibisisMockInstance
   }
 
@@ -233,6 +237,43 @@ export const createExodusMockInstance = (
   mockExodusClient.disconnect = jest.fn().mockImplementation(() => Promise.resolve())
 
   return mockExodusClient
+}
+
+// LUTE
+export const createLuteMockInstance = (
+  clientOptions?: ClientOptions,
+  accounts: Array<Account> = []
+): LuteClient => {
+  const mockLuteClient = new LuteClient({
+    metadata: {
+      id: PROVIDER_ID.LUTE,
+      name: 'Lute',
+      icon: 'lute-icon-b64',
+      isWalletConnect: false
+    },
+    client: new LuteConnect('Test'),
+    algosdk,
+    algodClient: {
+      accountInformation: () => ({
+        do: () => Promise.resolve({})
+      })
+    } as any,
+    network: 'test-network',
+    ...(clientOptions && clientOptions)
+  })
+
+  // Mock the connect method
+  mockLuteClient.connect = jest.fn().mockImplementation(() =>
+    Promise.resolve({
+      ...mockLuteClient.metadata,
+      accounts
+    })
+  )
+
+  // Mock the disconnect method
+  mockLuteClient.disconnect = jest.fn().mockImplementation(() => Promise.resolve())
+
+  return mockLuteClient
 }
 
 // KIBISIS
