@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer'
 import Algod, { getAlgodClient } from '../../algod'
 import BaseClient from '../base'
 import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
@@ -209,11 +210,11 @@ class KibisisClient extends BaseClient {
    */
 
   private convertBytesToBase64(bytes: Uint8Array): string {
-    return btoa(new TextDecoder().decode(bytes))
+    return Buffer.from(bytes).toString('base64');
   }
 
   private convertBase64ToBytes(input: string): Uint8Array {
-    return new TextEncoder().encode(atob(input))
+    return Buffer.from(input, 'base64');
   }
 
   /**
@@ -431,29 +432,32 @@ class KibisisClient extends BaseClient {
         )
         const accountInfo = await this.getAccountInfo(sender)
         const authAddr = accountInfo['auth-addr']
+        const txn = this.convertBytesToBase64(this.algosdk.decodeUnsignedTransaction(value).toByte())
 
-        // if the transaction is signed, instruct the provider not to sign
+        // if the transaction is signed, instruct the provider not to sign by providing an empty signers array
         if (isSigned) {
           return {
             txn: this.convertBytesToBase64(
               this.algosdk.decodeSignedTransaction(value).txn.toByte()
             ),
-            signers: []
-          }
-        }
-
-        // if the transaction has been instructed to sign and the sender is authorized to sign, instruct the provider to sign
-        if (indexesToSign && indexesToSign.includes(index) && connectedAccounts.includes(sender)) {
-          return {
-            txn: this.convertBytesToBase64(this.algosdk.decodeUnsignedTransaction(value).toByte()),
+            signers: [],
             ...(authAddr && { authAddr })
           }
         }
 
-        // if the transaction is not signed, not instructed to sign or the sender is not authorized, instruct the provider not to sign
+        // if the sender is not authorized or the index has not been included in the to be signed indexes, instruct the provider not to sign by providing an empty signers array
+        if (!connectedAccounts.includes(sender) || (indexesToSign && !indexesToSign.includes(index))) {
+          return {
+            txn,
+            signers: [],
+            ...(authAddr && { authAddr })
+          }
+        }
+
+        // if the transaction is not signed, has been authorized and/or is in the index, instruct the provider not to sign
         return {
-          txn: this.convertBytesToBase64(this.algosdk.decodeUnsignedTransaction(value).toByte()),
-          signers: []
+          txn,
+          ...(authAddr && { authAddr })
         }
       })
     )
