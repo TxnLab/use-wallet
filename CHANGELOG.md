@@ -1,3 +1,9 @@
+# [2.4.0](https://github.com/txnlab/use-wallet/compare/v2.3.1...v2.4.0) (2024-01-17)
+
+### Features
+
+- Lute Wallet provider ([#129](https://github.com/txnlab/use-wallet/pull/129)) ([e71503b](https://github.com/txnlab/use-wallet/commit/e71503b65e7a3bf1034965f3f8a6fb8fb993099f))
+
 ## [2.3.1](https://github.com/txnlab/use-wallet/compare/v2.3.0...v2.3.1) (2023-12-15)
 
 ### Changes
