@@ -498,6 +498,11 @@ useEffect(() => {
 - Website - https://lute.app/
 - Install dependency - `npm install lute-connect`
 
+### Magic Auth
+
+- Website - https://magic.link/
+- Install dependency - `npm install magic-sdk @magic-ext/algorand`
+
 ### KMD (Algorand Key Management Daemon)
 
 - Documentation - https://developer.algorand.org/docs/rest-apis/kmd
@@ -639,6 +644,7 @@ import { PeraWalletConnect } from '@perawallet/connect'
 import { DaffiWalletConnect } from '@daffiwallet/connect'
 import { WalletConnectModalSign } from '@walletconnect/modal-sign-html'
 import LuteConnect from 'lute-connect'
+import { Magic } from 'magic-sdk';
 
 export default function App() {
   const providers = useInitializeProviders({
@@ -667,7 +673,12 @@ export default function App() {
         id: PROVIDER_ID.LUTE,
         clientStatic: LuteConnect,
         clientOptions: { siteName: 'YourSiteName' }
-      }
+      },
+      {
+        id: PROVIDER_ID.MAGIC,
+        getDynamicClient: Magic,
+        clientOptions: { apiKey: 'API_KEY' },
+      },
     ],
     nodeConfig: {
       network: 'mainnet',
