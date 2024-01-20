@@ -1,18 +1,8 @@
 {
   "name": "@txnlab/use-wallet",
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/txnlab/use-wallet"
-  },
-  "bugs": {
-    "url": "https://github.com/txnlab/use-wallet/issues"
-  },
-  "homepage": "https://txnlab.github.io/use-wallet",
-  "version": "2.3.1",
+  "author": "TxnLab, Inc.",
+  "version": "2.4.0",
+  "license": "MIT",
   "description": "React hooks for using Algorand compatible wallets in dApps.",
   "scripts": {
     "dev": "yarn storybook",
@@ -28,8 +18,27 @@
     "pre-release": "yarn lint && yarn format && yarn check-types && yarn test && yarn build",
     "release": "release-it"
   },
-  "author": "txnlab",
-  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/txnlab/use-wallet"
+  },
+  "bugs": {
+    "url": "https://github.com/txnlab/use-wallet/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "types": "dist/index.d.ts",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "immer": "^9.0.15",
+    "zustand": "^4.3.8"
+  },
   "devDependencies": {
     "@babel/core": "^7.16.0",
     "@babel/preset-env": "^7.16.4",
@@ -37,7 +46,6 @@
     "@babel/preset-typescript": "^7.16.0",
     "@blockshake/defly-connect": "^1.1.5",
     "@daffiwallet/connect": "^1.0.3",
-    "@mdx-js/react": "^2.3.0",
     "@perawallet/connect": "^1.2.1",
     "@randlabs/myalgo-connect": "^1.4.2",
     "@release-it/conventional-changelog": "^7.0.0",
@@ -58,8 +66,6 @@
     "@typescript-eslint/parser": "^5.55.0",
     "@walletconnect/modal-sign-html": "^2.5.4",
     "algosdk": "^2.1.0",
-    "babel-jest": "^29.1.2",
-    "babel-loader": "^9.0.0",
     "buffer": "^6.0.3",
     "commitizen": "4.3.0",
     "css-loader": "^6.5.1",
@@ -70,17 +76,15 @@
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "gh-pages": "^5.0.0",
-    "html-webpack-plugin": "^5.5.0",
-    "identity-obj-proxy": "^3.0.0",
     "jest": "^29.1.2",
     "jest-canvas-mock": "^2.5.0",
     "jest-environment-jsdom": "^29.3.1",
+    "lute-connect": "^1.0.7",
     "postcss": "^8.4.17",
     "prettier": "2.8.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "release-it": "^16.1.0",
-    "require-from-string": "^2.0.2",
     "rimraf": "^5.0.1",
     "rollup": "^3.3.0",
     "rollup-plugin-analyzer": "^4.0.0",
@@ -131,16 +135,6 @@
     "@walletconnect/modal-sign-html": {
       "optional": true
     }
-  },
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
-  "files": [
-    "dist"
-  ],
-  "types": "dist/index.d.ts",
-  "dependencies": {
-    "immer": "^9.0.15",
-    "zustand": "^4.3.8"
   },
   "config": {
     "commitizen": {
