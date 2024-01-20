@@ -104,7 +104,7 @@ class MagicAuth extends BaseClient {
   async connect(_: () => void, email: string): Promise<Wallet> {
     await this.#client.auth.loginWithMagicLink({ email: email })
 
-    const userInfo = await this.#client.user.getMetadata()
+    const userInfo = await this.#client.user.getInfo()
 
     return {
       ...MagicAuth.metadata,
@@ -126,7 +126,7 @@ class MagicAuth extends BaseClient {
       return null
     }
 
-    const userInfo = await this.#client.user.getMetadata()
+    const userInfo = await this.#client.user.getInfo()
 
     return {
       ...MagicAuth.metadata,

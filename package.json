@@ -99,8 +99,8 @@
     "tsconfig-paths-webpack-plugin": "^4.0.1",
     "tslib": "^2.4.0",
     "typescript": "^4.8.4",
-    "@magic-ext/algorand": "^16.3.2",
-    "magic-sdk": "^21.3.1"
+    "@magic-ext/algorand": "^17.0.0",
+    "magic-sdk": "^22.0.0"
   },
   "peerDependencies": {
     "@blockshake/defly-connect": "^1.1.5",

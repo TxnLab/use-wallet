@@ -61,7 +61,7 @@ export const createMockClient = <T extends PROVIDER_ID>(
     [PROVIDER_ID.MYALGO]: createMyAlgoMockInstance,
     [PROVIDER_ID.PERA]: createPeraMockInstance,
     [PROVIDER_ID.WALLETCONNECT]: createWalletConnectMockInstance,
-    [PROVIDER_ID.LUTE]: createLuteMockInstance
+    [PROVIDER_ID.LUTE]: createLuteMockInstance,
     [PROVIDER_ID.MAGIC]: createMagicMockInstance
   }
 
