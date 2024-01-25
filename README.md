@@ -527,8 +527,9 @@ Support for these wallets will be removed in a future release.
 - GitHub - https://github.com/PureStake/algosigner
 - EOL Press Release - https://www.algorand.foundation/news/algosigner-support-ending
 
-### MyAlgo
+### MyAlgo (deprecation pending: January 30, 2024)
 
+- **DEPRECATION NOTICE** - https://wallet.myalgo.com/access
 - Website - https://wallet.myalgo.com/home
 - FAQ - https://wallet.myalgo.com/home#faq
 - Install dependency - `npm install @randlabs/myalgo-connect`
