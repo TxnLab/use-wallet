@@ -62,7 +62,7 @@ TxnLab provides `@txnlab/use-wallet` as a wallet integration tool and does not e
 
 ## Live Examples
 
-**Storybook demo** - https://txnlab.github.io/use-wallet
+<!-- **Storybook demo** - https://txnlab.github.io/use-wallet -->
 
 **Next.js example**
 
