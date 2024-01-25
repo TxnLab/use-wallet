@@ -97,7 +97,7 @@ npm install @blockshake/defly-connect @perawallet/connect @daffiwallet/connect
 
 In the root of your app, initialize the `WalletProvider` with the `useInitializeProviders` hook.
 
-This example initializes Defly, Pera, Daffi, Exodus, and Lute wallet providers. The default node configuration (mainnet via [AlgoNode](https://algonode.io/api/)) is used. See [Provider Configuration](#provider-configuration) for more options.
+This example initializes Defly, Pera, Daffi, Exodus, Lute and Kibisis wallet providers. The default node configuration (mainnet via [AlgoNode](https://algonode.io/api/)) is used. See [Provider Configuration](#provider-configuration) for more options.
 
 You can initialize your providers in two ways:
 
@@ -130,7 +130,8 @@ export default function App() {
         id: PROVIDER_ID.LUTE,
         clientStatic: LuteConnect,
         clientOptions: { siteName: 'YourSiteName' }
-      }
+      },
+      { id: PROVIDER_ID.KIBISIS }
     ]
   })
 
@@ -179,7 +180,8 @@ export default function App() {
         id: PROVIDER_ID.LUTE,
         getDynamicClient: getDynamicLuteConnect,
         clientOptions: { siteName: 'YourSiteName' }
-      }
+      },
+      { id: PROVIDER_ID.KIBISIS }
     ]
   })
 
@@ -498,6 +500,12 @@ useEffect(() => {
 - Website - https://lute.app/
 - Install dependency - `npm install lute-connect`
 
+
+### Kibisis Wallet
+
+- Website - https://kibis.is
+- Download - https://kibis.is/#download
+
 ### KMD (Algorand Key Management Daemon)
 
 - Documentation - https://developer.algorand.org/docs/rest-apis/kmd
@@ -667,7 +675,8 @@ export default function App() {
         id: PROVIDER_ID.LUTE,
         clientStatic: LuteConnect,
         clientOptions: { siteName: 'YourSiteName' }
-      }
+      },
+      { id: PROVIDER_ID.KIBISIS }
     ],
     nodeConfig: {
       network: 'mainnet',

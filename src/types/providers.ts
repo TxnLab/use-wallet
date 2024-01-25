@@ -77,6 +77,11 @@ export type ProviderConfigMapping = {
     clientStatic?: undefined
     getDynamicClient?: undefined
   }
+  [PROVIDER_ID.KIBISIS]: {
+    clientOptions?: undefined
+    clientStatic?: undefined
+    getDynamicClient?: undefined
+  }
 }
 
 /**
@@ -135,11 +140,13 @@ type ProviderDef =
   | ProviderConfig<PROVIDER_ID.EXODUS>
   | ProviderConfig<PROVIDER_ID.KMD>
   | ProviderConfig<PROVIDER_ID.CUSTOM>
+  | ProviderConfig<PROVIDER_ID.KIBISIS>
   | PROVIDER_ID.EXODUS
   | PROVIDER_ID.KMD
   | PROVIDER_ID.ALGOSIGNER
   | PROVIDER_ID.MNEMONIC
   | PROVIDER_ID.CUSTOM
+  | PROVIDER_ID.KIBISIS
 
 export type ProvidersArray = NonEmptyArray<ProviderDef>
 
