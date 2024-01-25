@@ -36,7 +36,13 @@ export default function ConnectWallet() {
         }
       },
       { id: PROVIDER_ID.KIBISIS }
-    ]
+    ],
+    nodeConfig: {
+      network: 'testnet',
+      nodeServer: 'https://testnet-api.algonode.cloud',
+      nodeToken: '',
+      nodePort: '443'
+    }
   })
 
   return (
