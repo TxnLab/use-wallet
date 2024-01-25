@@ -91,7 +91,7 @@
     "rollup-plugin-dts": "^5.0.0",
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-postcss": "^4.0.2",
-    "rollup-plugin-typescript2": "^0.35.0",
+    "rollup-plugin-typescript2": "^0.36.0",
     "sass": "^1.43.5",
     "sass-loader": "^13.1.0",
     "style-loader": "^3.3.1",
