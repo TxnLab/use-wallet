@@ -81,7 +81,7 @@
     "jest-environment-jsdom": "^29.3.1",
     "lute-connect": "^1.0.7",
     "postcss": "^8.4.17",
-    "prettier": "2.8.8",
+    "prettier": "^3.2.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "release-it": "^16.1.0",
