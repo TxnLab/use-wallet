@@ -507,8 +507,11 @@ useEffect(() => {
 
 ### Kibisis Wallet
 
+***NOTE:** Kibisis is in active development and currently only supports betanet and testnet.*
+
 - Website - https://kibis.is
 - Download - https://kibis.is/#download
+- Support/Issues - https://discord.com/channels/1055863853633785857/1181252381816655952
 
 ### KMD (Algorand Key Management Daemon)
 
