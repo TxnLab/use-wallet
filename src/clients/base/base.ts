@@ -101,14 +101,17 @@ abstract class BaseClient {
 
   groupTransactionsBySender(transactions: TransactionsArray) {
     function groupBySender(objectArray: TxnInfo[]) {
-      return objectArray.reduce(function (acc, obj) {
-        const sender = obj.from
-        if (!acc[sender]) {
-          acc[sender] = []
-        }
-        acc[sender].push(obj)
-        return acc
-      }, {} as Record<string, Array<TxnInfo>>)
+      return objectArray.reduce(
+        function (acc, obj) {
+          const sender = obj.from
+          if (!acc[sender]) {
+            acc[sender] = []
+          }
+          acc[sender].push(obj)
+          return acc
+        },
+        {} as Record<string, Array<TxnInfo>>
+      )
     }
 
     const decodedGroup = transactions.reduce((acc: TxnInfo[], [type, txn], index) => {
