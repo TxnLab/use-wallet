@@ -23,6 +23,10 @@ UseWallet supports most Algorand wallet providers, including Defly, Pera, Daffi,
 
 Version 2.x introduces [WalletConnect 2.0 support](#walletconnect-20-support).
 
+## Disclaimer
+
+TxnLab provides `@txnlab/use-wallet` as a wallet integration tool and does not endorse or assume responsibility for any external wallet providers' functionality or security.
+
 ## Table of Contents
 
 - [Live Examples](#live-examples)
