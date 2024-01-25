@@ -1,3 +1,8 @@
+# [2.5.0](https://github.com/txnlab/use-wallet/compare/v2.4.0...v2.5.0) (2024-01-25)
+
+### Features
+* Kibisis provider ([#128](https://github.com/txnlab/use-wallet/pull/128)) ([279e49a](https://github.com/txnlab/use-wallet/commit/279e49a107a855c7f010ce16121df22421ca83cf))
+
 # [2.4.0](https://github.com/txnlab/use-wallet/compare/v2.3.1...v2.4.0) (2024-01-17)
 
 ### Features
