@@ -45,8 +45,15 @@ export default function ConnectWallet() {
             return new ManualGoalSigningAlertPromptProvider(params.algosdkStatic ?? algosdk)
           }
         }
-      }
-    ]
+      },
+      { id: PROVIDER_ID.KIBISIS }
+    ],
+    nodeConfig: {
+      network: 'testnet',
+      nodeServer: 'https://testnet-api.algonode.cloud',
+      nodeToken: '',
+      nodePort: '443'
+    }
   })
 
   return (

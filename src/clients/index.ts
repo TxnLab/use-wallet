@@ -11,6 +11,7 @@ import kmd from './kmd'
 import mnemonic from './mnemonic'
 import { CustomProvider } from './custom/types'
 import custom from './custom'
+import kibisis from './kibisis'
 
 export {
   pera,
@@ -23,8 +24,9 @@ export {
   kmd,
   mnemonic,
   custom,
+  CustomProvider,
+  kibisis
   magic,
-  CustomProvider
 }
 
 export default {
@@ -38,6 +40,7 @@ export default {
   [walletconnect.metadata.id]: walletconnect,
   [kmd.metadata.id]: kmd,
   [mnemonic.metadata.id]: mnemonic,
+  [custom.metadata.id]: custom,
+  [kibisis.metadata.id]: kibisis
   [magic.metadata.id]: magic,
-  [custom.metadata.id]: custom
 }

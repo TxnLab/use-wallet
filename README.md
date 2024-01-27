@@ -23,6 +23,10 @@ UseWallet supports most Algorand wallet providers, including Defly, Pera, Daffi,
 
 Version 2.x introduces [WalletConnect 2.0 support](#walletconnect-20-support).
 
+## Disclaimer
+
+TxnLab provides `@txnlab/use-wallet` as a wallet integration tool and does not endorse or assume responsibility for any external wallet providers' functionality or security.
+
 ## Table of Contents
 
 - [Live Examples](#live-examples)
@@ -58,7 +62,7 @@ Version 2.x introduces [WalletConnect 2.0 support](#walletconnect-20-support).
 
 ## Live Examples
 
-**Storybook demo** - https://txnlab.github.io/use-wallet
+<!-- **Storybook demo** - https://txnlab.github.io/use-wallet -->
 
 **Next.js example**
 
@@ -97,7 +101,7 @@ npm install @blockshake/defly-connect @perawallet/connect @daffiwallet/connect
 
 In the root of your app, initialize the `WalletProvider` with the `useInitializeProviders` hook.
 
-This example initializes Defly, Pera, Daffi, Exodus, and Lute wallet providers. The default node configuration (mainnet via [AlgoNode](https://algonode.io/api/)) is used. See [Provider Configuration](#provider-configuration) for more options.
+This example initializes Defly, Pera, Daffi, Exodus, Lute and Kibisis wallet providers. The default node configuration (mainnet via [AlgoNode](https://algonode.io/api/)) is used. See [Provider Configuration](#provider-configuration) for more options.
 
 You can initialize your providers in two ways:
 
@@ -130,7 +134,8 @@ export default function App() {
         id: PROVIDER_ID.LUTE,
         clientStatic: LuteConnect,
         clientOptions: { siteName: 'YourSiteName' }
-      }
+      },
+      { id: PROVIDER_ID.KIBISIS }
     ]
   })
 
@@ -179,7 +184,8 @@ export default function App() {
         id: PROVIDER_ID.LUTE,
         getDynamicClient: getDynamicLuteConnect,
         clientOptions: { siteName: 'YourSiteName' }
-      }
+      },
+      { id: PROVIDER_ID.KIBISIS }
     ]
   })
 
@@ -498,6 +504,15 @@ useEffect(() => {
 - Website - https://lute.app/
 - Install dependency - `npm install lute-connect`
 
+
+### Kibisis Wallet
+
+***NOTE:** Kibisis is in active development and currently only supports betanet and testnet.*
+
+- Website - https://kibis.is
+- Download - https://kibis.is/#download
+- Support/Issues - https://discord.com/channels/1055863853633785857/1181252381816655952
+
 ### Magic Auth
 
 - Website - https://magic.link/
@@ -520,8 +535,9 @@ Support for these wallets will be removed in a future release.
 - GitHub - https://github.com/PureStake/algosigner
 - EOL Press Release - https://www.algorand.foundation/news/algosigner-support-ending
 
-### MyAlgo
+### MyAlgo (deprecation pending: January 30, 2024)
 
+- **DEPRECATION NOTICE** - https://wallet.myalgo.com/access
 - Website - https://wallet.myalgo.com/home
 - FAQ - https://wallet.myalgo.com/home#faq
 - Install dependency - `npm install @randlabs/myalgo-connect`
@@ -673,6 +689,8 @@ export default function App() {
         id: PROVIDER_ID.LUTE,
         clientStatic: LuteConnect,
         clientOptions: { siteName: 'YourSiteName' }
+      },
+      { id: PROVIDER_ID.KIBISIS }
       },
       {
         id: PROVIDER_ID.MAGIC,
