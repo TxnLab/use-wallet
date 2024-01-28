@@ -48,7 +48,7 @@ export default function useWallet() {
             accounts: getAccountsByProvider(id),
             isActive: activeAccount?.providerId === id,
             isConnected: connectedAccounts.some((accounts) => accounts.providerId === id),
-            connect: (onDisconnect, email) => connect(id, onDisconnect, email),
+            connect: (email) => connect(id, email),
             disconnect: () => disconnect(id),
             reconnect: () => reconnect(id),
             setActiveProvider: () => setActive(id),
@@ -113,20 +113,10 @@ export default function useWallet() {
     }
   }
 
-  const connect = async (id: PROVIDER_ID, onDisconnect?: () => void, email?: string) => {
+  const connect = async (id: PROVIDER_ID, email?: string) => {
     try {
       const walletClient = getClient(id)
-      const walletInfo = await walletClient?.connect(() => {
-        if (onDisconnect) {
-          onDisconnect()
-        }
-
-        clearAccounts(id)
-      }, email)
-
-      if (!walletInfo || !walletInfo.accounts.length) {
-        throw new Error('Failed to connect ' + id)
-      }
+      const walletInfo = await walletClient?.connect(() => clearAccounts(id), email)
 
       _setActiveAccount(walletInfo.accounts[0])
       addAccounts(walletInfo.accounts)

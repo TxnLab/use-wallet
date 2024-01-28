@@ -15,7 +15,7 @@ const getDynamicPeraWalletConnect = async () => {
   return PeraWalletConnect
 }
 
-const getDynamigMagic = async () => {
+const getDynamicMagic = async () => {
   const Magic = (await import('magic-sdk')).Magic
   return Magic
 }
@@ -30,7 +30,7 @@ export default function ConnectWallet() {
       { id: PROVIDER_ID.LUTE, clientStatic: LuteConnect, clientOptions: { siteName: 'Storybook' } },
       {
         id: PROVIDER_ID.MAGIC,
-        getDynamicClient: getDynamigMagic,
+        getDynamicClient: getDynamicMagic,
         clientOptions: { apiKey: DUMMY_MAGIC_PK }
       },
       {

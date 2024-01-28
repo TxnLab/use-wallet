@@ -12,7 +12,7 @@ export type Provider = {
   accounts: Account[]
   isActive: boolean
   isConnected: boolean
-  connect: (onDisconnect?: () => void, email?: string) => Promise<void>
+  connect: (email?: string) => Promise<void>
   disconnect: () => Promise<void>
   reconnect: () => Promise<void>
   setActiveProvider: () => void

@@ -1,3 +1,3 @@
-import pera from './client'
+import magic from './client'
 
-export default pera
+export default magic

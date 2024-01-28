@@ -64,7 +64,7 @@ export const createMockClient = <T extends PROVIDER_ID>(
     [PROVIDER_ID.PERA]: createPeraMockInstance,
     [PROVIDER_ID.WALLETCONNECT]: createWalletConnectMockInstance,
     [PROVIDER_ID.LUTE]: createLuteMockInstance,
-    [PROVIDER_ID.KIBISIS]: createKibisisMockInstance
+    [PROVIDER_ID.KIBISIS]: createKibisisMockInstance,
     [PROVIDER_ID.MAGIC]: createMagicMockInstance
   }
 

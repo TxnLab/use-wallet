@@ -25,8 +25,8 @@ export {
   mnemonic,
   custom,
   CustomProvider,
-  kibisis
-  magic,
+  kibisis,
+  magic
 }
 
 export default {
@@ -41,6 +41,6 @@ export default {
   [kmd.metadata.id]: kmd,
   [mnemonic.metadata.id]: mnemonic,
   [custom.metadata.id]: custom,
-  [kibisis.metadata.id]: kibisis
-  [magic.metadata.id]: magic,
+  [kibisis.metadata.id]: kibisis,
+  [magic.metadata.id]: magic
 }

@@ -35,10 +35,7 @@ export default function ConnectWallet() {
               )}
               <button
                 onClick={() => {
-                  provider.connect(
-                    undefined,
-                    provider.metadata.id === PROVIDER_ID.MAGIC ? email : undefined
-                  )
+                  provider.connect(provider.metadata.id === PROVIDER_ID.MAGIC ? email : undefined)
                 }}
                 disabled={provider.isConnected}
               >
