@@ -1,3 +1,9 @@
+## [2.6.1](https://github.com/txnlab/use-wallet/compare/v2.6.0...v2.6.1) (2024-01-30)
+
+### Bug Fixes
+
+- Fix package.json typo in peerDependenciesMeta (magic-sdk as optional) ([4c139d9](https://github.com/txnlab/use-wallet/commit/4c139d9696ec335f074423faf5b5cf248e937d28))
+
 # [2.6.0](https://github.com/txnlab/use-wallet/compare/v2.5.0...v2.6.0) (2024-01-30)
 
 ### Features
