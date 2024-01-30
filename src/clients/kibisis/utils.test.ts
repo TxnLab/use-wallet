@@ -16,7 +16,7 @@ describe(`${__dirname}/utils`, () => {
       Object.defineProperty(global, 'crypto', {
         configurable: true,
         value: {
-          getRandomValues,
+          getRandomValues
         }
       })
 
@@ -27,7 +27,7 @@ describe(`${__dirname}/utils`, () => {
       Object.defineProperty(global, 'crypto', {
         value: {
           getRandomValues,
-          randomUUID,
+          randomUUID
         }
       })
     })
