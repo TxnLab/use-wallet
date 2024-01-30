@@ -48,7 +48,7 @@ export default function useWallet() {
             accounts: getAccountsByProvider(id),
             isActive: activeAccount?.providerId === id,
             isConnected: connectedAccounts.some((accounts) => accounts.providerId === id),
-            connect: () => connect(id),
+            connect: (arg) => connect(id, arg),
             disconnect: () => disconnect(id),
             reconnect: () => reconnect(id),
             setActiveProvider: () => setActive(id),
@@ -113,14 +113,11 @@ export default function useWallet() {
     }
   }
 
-  const connect = async (id: PROVIDER_ID) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const connect = async (id: PROVIDER_ID, arg?: any) => {
     try {
       const walletClient = getClient(id)
-      const walletInfo = await walletClient?.connect(() => clearAccounts(id))
-
-      if (!walletInfo || !walletInfo.accounts.length) {
-        throw new Error('Failed to connect ' + id)
-      }
+      const walletInfo = await walletClient?.connect(() => clearAccounts(id), arg)
 
       _setActiveAccount(walletInfo.accounts[0])
       addAccounts(walletInfo.accounts)

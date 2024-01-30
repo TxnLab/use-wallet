@@ -12,7 +12,8 @@ export enum PROVIDER_ID {
   EXODUS = 'exodus',
   KIBISIS = 'kibisis',
   WALLETCONNECT = 'walletconnect',
-  MNEMONIC = 'mnemonic'
+  MNEMONIC = 'mnemonic',
+  MAGIC = 'magic'
 }
 
 export const DEFAULT_NETWORK: Network = 'mainnet'

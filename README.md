@@ -513,6 +513,11 @@ useEffect(() => {
 - Download - https://kibis.is/#download
 - Support/Issues - https://discord.com/channels/1055863853633785857/1181252381816655952
 
+### Magic Auth
+
+- Website - https://magic.link/
+- Install dependency - `npm install magic-sdk @magic-ext/algorand`
+
 ### KMD (Algorand Key Management Daemon)
 
 - Documentation - https://developer.algorand.org/docs/rest-apis/kmd
@@ -655,6 +660,7 @@ import { PeraWalletConnect } from '@perawallet/connect'
 import { DaffiWalletConnect } from '@daffiwallet/connect'
 import { WalletConnectModalSign } from '@walletconnect/modal-sign-html'
 import LuteConnect from 'lute-connect'
+import { Magic } from 'magic-sdk';
 
 export default function App() {
   const providers = useInitializeProviders({
@@ -685,6 +691,12 @@ export default function App() {
         clientOptions: { siteName: 'YourSiteName' }
       },
       { id: PROVIDER_ID.KIBISIS }
+      },
+      {
+        id: PROVIDER_ID.MAGIC,
+        getDynamicClient: Magic,
+        clientOptions: { apiKey: 'API_KEY' },
+      },
     ],
     nodeConfig: {
       network: 'mainnet',

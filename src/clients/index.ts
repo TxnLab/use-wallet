@@ -6,6 +6,7 @@ import exodus from './exodus'
 import algosigner from './algosigner'
 import lute from './lute'
 import walletconnect from './walletconnect2'
+import magic from './magic'
 import kmd from './kmd'
 import mnemonic from './mnemonic'
 import { CustomProvider } from './custom/types'
@@ -24,7 +25,8 @@ export {
   mnemonic,
   custom,
   CustomProvider,
-  kibisis
+  kibisis,
+  magic
 }
 
 export default {
@@ -39,5 +41,6 @@ export default {
   [kmd.metadata.id]: kmd,
   [mnemonic.metadata.id]: mnemonic,
   [custom.metadata.id]: custom,
-  [kibisis.metadata.id]: kibisis
+  [kibisis.metadata.id]: kibisis,
+  [magic.metadata.id]: magic
 }

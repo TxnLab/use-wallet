@@ -130,7 +130,7 @@ export class ManualGoalSigningAlertPromptProvider implements CustomProvider {
       }
 
       alert(`### Signing instructions ###
-  
+
   1. Check the value landed in your clipboard and if not check the web browser isn't waiting for you to grant permission to clipboard and either way try again or copy the value from the developer console if all else fails (F12)
   2. Load the value in the clipboard into a file e.g. unsigned.txn:
       \`echo {paste value} | base64 -d > unsigned.txn\`

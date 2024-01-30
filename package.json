@@ -41,11 +41,13 @@
   },
   "devDependencies": {
     "@babel/core": "^7.16.0",
+    "@babel/plugin-proposal-class-properties": "^7.18.6",
     "@babel/preset-env": "^7.16.4",
     "@babel/preset-react": "^7.16.0",
     "@babel/preset-typescript": "^7.16.0",
     "@blockshake/defly-connect": "^1.1.5",
     "@daffiwallet/connect": "^1.0.3",
+    "@magic-ext/algorand": "^17.0.0",
     "@perawallet/connect": "^1.2.1",
     "@randlabs/myalgo-connect": "^1.4.2",
     "@release-it/conventional-changelog": "^8.0.0",
@@ -80,6 +82,7 @@
     "jest-canvas-mock": "^2.5.0",
     "jest-environment-jsdom": "^29.3.1",
     "lute-connect": "^1.0.7",
+    "magic-sdk": "^22.0.0",
     "postcss": "^8.4.17",
     "prettier": "^3.2.4",
     "react": "^18.2.0",
@@ -103,13 +106,21 @@
   "peerDependencies": {
     "@blockshake/defly-connect": "^1.1.5",
     "@daffiwallet/connect": "^1.0.3",
+    "@magic-ext/algorand": "^17.0.0",
     "@perawallet/connect": "^1.2.1",
     "@randlabs/myalgo-connect": "^1.4.2",
     "algosdk": "^2.1.0",
+    "magic-sdk": "^22.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "peerDependenciesMeta": {
+    "@magic-ext/algorand": {
+      "optional": true
+    },
+    "@magic-sdk": {
+      "optional": true
+    },
     "@blockshake/defly-connect": {
       "optional": true
     },

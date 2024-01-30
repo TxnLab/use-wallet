@@ -20,6 +20,7 @@ import type { DaffiWalletConnectOptions } from '../clients/daffi/types'
 import type { NonEmptyArray } from './utilities'
 import type BaseClient from '../clients/base'
 import type { CustomOptions } from '../clients/custom/types'
+import { Magic } from 'magic-sdk'
 
 export type ProviderConfigMapping = {
   [PROVIDER_ID.PERA]: {
@@ -82,6 +83,11 @@ export type ProviderConfigMapping = {
     clientStatic?: undefined
     getDynamicClient?: undefined
   }
+  [PROVIDER_ID.MAGIC]: {
+    clientOptions?: { apiKey: string }
+    clientStatic?: undefined
+    getDynamicClient?: () => Promise<typeof Magic>
+  }
 }
 
 /**
@@ -128,6 +134,8 @@ type OneOfStaticOrDynamicClient<T> = StaticClient<T> | DynamicClient<T>
 
 type ProviderDef =
   | (ProviderConfig<PROVIDER_ID.PERA> & OneOfStaticOrDynamicClient<typeof PeraWalletConnect>)
+  | (ProviderConfig<PROVIDER_ID.MAGIC> &
+      OneOfStaticOrDynamicClient<typeof Magic> & { clientOptions: { apiKey: string } })
   | (ProviderConfig<PROVIDER_ID.DEFLY> & OneOfStaticOrDynamicClient<typeof DeflyWalletConnect>)
   | (ProviderConfig<PROVIDER_ID.DAFFI> & OneOfStaticOrDynamicClient<typeof DaffiWalletConnect>)
   | (ProviderConfig<PROVIDER_ID.LUTE> &
