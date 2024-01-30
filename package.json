@@ -120,7 +120,7 @@
     "@magic-ext/algorand": {
       "optional": true
     },
-    "@magic-sdk": {
+    "magic-sdk": {
       "optional": true
     },
     "@blockshake/defly-connect": {
