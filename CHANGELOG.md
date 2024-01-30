@@ -1,7 +1,19 @@
+# [2.6.0](https://github.com/txnlab/use-wallet/compare/v2.5.0...v2.6.0) (2024-01-30)
+
+### Features
+
+- Magic.link provider (email based authentication) ([#124](https://github.com/txnlab/use-wallet/pull/124)) ([85f8bef](https://github.com/txnlab/use-wallet/commit/85f8befb535a47386d77a4bd14dfcb891809fd01))
+
+### Bug Fixes
+
+- **Kibisis:** Lower `getProvider` timeout from 3 seconds to 0.75 seconds ([#133](https://github.com/txnlab/use-wallet/pull/133)) ([fadf667](https://github.com/txnlab/use-wallet/commit/fadf667d743580715f9c08664cf53a806fb5d9aa))
+- **Kibisis:** Remove native web Crypto API dependency when generating UUID ([#134](https://github.com/txnlab/use-wallet/pull/134)) ([54b43e8](https://github.com/txnlab/use-wallet/commit/54b43e81efe8f57b6c706e30fea3d5579727a1e6))
+
 # [2.5.0](https://github.com/txnlab/use-wallet/compare/v2.4.0...v2.5.0) (2024-01-25)
 
 ### Features
-* Kibisis provider ([#128](https://github.com/txnlab/use-wallet/pull/128)) ([279e49a](https://github.com/txnlab/use-wallet/commit/279e49a107a855c7f010ce16121df22421ca83cf))
+
+- Kibisis provider ([#128](https://github.com/txnlab/use-wallet/pull/128)) ([279e49a](https://github.com/txnlab/use-wallet/commit/279e49a107a855c7f010ce16121df22421ca83cf))
 
 # [2.4.0](https://github.com/txnlab/use-wallet/compare/v2.3.1...v2.4.0) (2024-01-17)
 
