@@ -7,8 +7,8 @@
  * @see {@link https://stackoverflow.com/a/2117523}
  */
 export function generateUuid(): string {
-  if (crypto.randomUUID) {
-    return crypto.randomUUID()
+  if (global.crypto.randomUUID) {
+    return global.crypto.randomUUID()
   }
 
   return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, (value) => {
@@ -16,7 +16,7 @@ export function generateUuid(): string {
 
     return (
       valueAsNumber ^
-      (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (valueAsNumber / 4)))
+      (global.crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (valueAsNumber / 4)))
     ).toString(16)
   })
 }

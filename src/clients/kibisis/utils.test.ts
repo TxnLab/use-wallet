@@ -13,9 +13,9 @@ describe(`${__dirname}/utils`, () => {
 
     it('should generate a valid uuid without the web crypto api', () => {
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      const cryptoRandomUUID = crypto.randomUUID
+      const cryptoRandomUUID = global.crypto.randomUUID
 
-      Object.defineProperty(crypto, 'randomUUID', {
+      Object.defineProperty(global.crypto, 'randomUUID', {
         configurable: true,
         value: undefined
       })
@@ -24,7 +24,7 @@ describe(`${__dirname}/utils`, () => {
 
       expect(validUuidRegex.test(result)).toBe(true)
 
-      Object.defineProperty(crypto, 'randomUUID', {
+      Object.defineProperty(global.crypto, 'randomUUID', {
         value: cryptoRandomUUID
       })
     })
