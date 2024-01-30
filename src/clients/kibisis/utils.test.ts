@@ -1,4 +1,5 @@
 import { generateUuid } from './utils'
+import { randomUUID, getRandomValues } from 'crypto'
 
 describe(`${__dirname}/utils`, () => {
   const validUuidRegex =
@@ -12,20 +13,22 @@ describe(`${__dirname}/utils`, () => {
     })
 
     it('should generate a valid uuid without the web crypto api', () => {
-      // eslint-disable-next-line @typescript-eslint/unbound-method
-      const cryptoRandomUUID = global.crypto.randomUUID
-
-      Object.defineProperty(global.crypto, 'randomUUID', {
+      Object.defineProperty(global, 'crypto', {
         configurable: true,
-        value: undefined
+        value: {
+          getRandomValues,
+        }
       })
 
       const result = generateUuid()
 
       expect(validUuidRegex.test(result)).toBe(true)
 
-      Object.defineProperty(global.crypto, 'randomUUID', {
-        value: cryptoRandomUUID
+      Object.defineProperty(global, 'crypto', {
+        value: {
+          getRandomValues,
+          randomUUID,
+        }
       })
     })
   })
