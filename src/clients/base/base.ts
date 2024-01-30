@@ -24,7 +24,8 @@ abstract class BaseClient {
 
   static metadata: Metadata
 
-  abstract connect(onDisconnect: () => void, email?: string): Promise<Wallet>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  abstract connect(onDisconnect: () => void, arg?: any): Promise<Wallet>
   abstract disconnect(): Promise<void>
   abstract reconnect(onDisconnect: () => void): Promise<Wallet | null>
   abstract signTransactions(

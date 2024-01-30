@@ -101,9 +101,14 @@ class MagicAuth extends BaseClient {
     }
   }
 
-  async connect(_: () => void, email: string): Promise<Wallet> {
-    await this.#client.auth.loginWithMagicLink({ email: email })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async connect(_: () => void, arg?: any): Promise<Wallet> {
+    if (!arg || typeof arg !== 'string') {
+      throw new Error('Magic Link provider requires an email (string) to connect')
+    }
 
+    const email = arg
+    await this.#client.auth.loginWithMagicLink({ email: email })
     const userInfo = await this.#client.user.getInfo()
 
     return {

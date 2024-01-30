@@ -12,7 +12,8 @@ export type Provider = {
   accounts: Account[]
   isActive: boolean
   isConnected: boolean
-  connect: (email?: string) => Promise<void>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  connect: (arg?: any) => Promise<void>
   disconnect: () => Promise<void>
   reconnect: () => Promise<void>
   setActiveProvider: () => void
