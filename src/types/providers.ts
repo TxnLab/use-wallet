@@ -155,7 +155,6 @@ type ProviderDef =
   | PROVIDER_ID.MNEMONIC
   | PROVIDER_ID.CUSTOM
   | PROVIDER_ID.KIBISIS
-  | PROVIDER_ID.MAGIC
 
 export type ProvidersArray = NonEmptyArray<ProviderDef>
 
