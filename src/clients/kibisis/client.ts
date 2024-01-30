@@ -35,6 +35,7 @@ import type {
   SignTxnsResult
 } from './types'
 import { DecodedSignedTransaction, DecodedTransaction } from '../../types'
+import { generateUuid } from './utils'
 
 class KibisisClient extends BaseClient {
   genesisHash: string
@@ -153,7 +154,7 @@ class KibisisClient extends BaseClient {
   }: SendRequestWithTimeoutOptions<Params>): Promise<Result | undefined> {
     return new Promise<Result | undefined>((resolve, reject) => {
       const channel = new BroadcastChannel(ARC_0027_CHANNEL_NAME)
-      const requestId = crypto.randomUUID()
+      const requestId = generateUuid()
       // eslint-disable-next-line prefer-const
       let timer: number
 
