@@ -7,12 +7,12 @@ import BaseClient from '../base'
 import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
 import { debugLog } from '../../utils/debugLog'
 import { ICON } from './constants'
+import type { AlgorandExtension } from '@magic-ext/algorand'
+import type { SDKBase, InstanceWithExtensions } from '@magic-sdk/provider'
 import type { DecodedSignedTransaction, DecodedTransaction, Network } from '../../types/node'
 import type { InitParams } from '../../types/providers'
 import type { Wallet } from '../../types/wallet'
 import type { MagicAuthTransaction, MagicAuthConstructor, MagicAuthConnectOptions } from './types'
-import { AlgorandExtension } from '@magic-ext/algorand'
-import { SDKBase, InstanceWithExtensions } from '@magic-sdk/provider'
 
 class MagicAuth extends BaseClient {
   #client: InstanceWithExtensions<
@@ -51,6 +51,8 @@ class MagicAuth extends BaseClient {
     algodOptions,
     clientStatic,
     getDynamicClient,
+    extensionStatic,
+    getDynamicExtension,
     algosdkStatic,
     network = DEFAULT_NETWORK
   }: InitParams<PROVIDER_ID.MAGIC>): Promise<BaseClient | null> {
@@ -62,20 +64,33 @@ class MagicAuth extends BaseClient {
         Magic = clientStatic
       } else if (getDynamicClient) {
         Magic = await getDynamicClient()
-      } else if (!clientOptions || !clientOptions.apiKey) {
-        throw new Error(
-          'Magic provider missing API Key to be passed by required property: clientOptions'
-        )
       } else {
         throw new Error(
           'Magic provider missing required property: clientStatic or getDynamicClient'
         )
       }
 
+      let AlgorandExtension
+      if (extensionStatic) {
+        AlgorandExtension = extensionStatic
+      } else if (getDynamicExtension) {
+        AlgorandExtension = await getDynamicExtension()
+      } else {
+        throw new Error(
+          'Magic provider missing required property: extensionStatic or getDynamicExtension'
+        )
+      }
+
+      if (!clientOptions || !clientOptions.apiKey) {
+        throw new Error(
+          'Magic provider missing API Key to be passed by required property: clientOptions'
+        )
+      }
+
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
       const algodClient = getAlgodClient(algosdk, algodOptions)
 
-      const magic = new Magic(clientOptions?.apiKey as string, {
+      const magic = new Magic(clientOptions?.apiKey, {
         extensions: {
           algorand: new AlgorandExtension({
             rpcUrl: ''

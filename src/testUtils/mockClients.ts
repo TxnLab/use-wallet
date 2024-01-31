@@ -4,6 +4,8 @@ import { DaffiWalletConnect } from '@daffiwallet/connect'
 import { PeraWalletConnect } from '@perawallet/connect'
 import MyAlgoConnect from '@randlabs/myalgo-connect'
 import LuteConnect from 'lute-connect'
+import { Magic } from 'magic-sdk'
+import { AlgorandExtension } from '@magic-ext/algorand'
 import { WalletConnectModalSign } from '@walletconnect/modal-sign-html'
 import algosdk from 'algosdk'
 import AlgoSignerClient from '../clients/algosigner/client'
@@ -23,8 +25,6 @@ import type { Exodus } from '../clients/exodus/types'
 import type { Account, ClientOptions } from '../types'
 import CustomWalletClient from '../clients/custom/client'
 import MagicAuthClient from '../clients/magic/client'
-import { AlgorandExtension } from '@magic-ext/algorand'
-import { Magic } from 'magic-sdk'
 
 type ClientTypeMap = {
   [PROVIDER_ID.ALGOSIGNER]: AlgoSignerClient
