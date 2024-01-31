@@ -504,10 +504,9 @@ useEffect(() => {
 - Website - https://lute.app/
 - Install dependency - `npm install lute-connect`
 
-
 ### Kibisis Wallet
 
-***NOTE:** Kibisis is in active development and currently only supports betanet and testnet.*
+**\*NOTE:** Kibisis is in active development and currently only supports betanet and testnet.\*
 
 - Website - https://kibis.is
 - Download - https://kibis.is/#download
@@ -660,7 +659,8 @@ import { PeraWalletConnect } from '@perawallet/connect'
 import { DaffiWalletConnect } from '@daffiwallet/connect'
 import { WalletConnectModalSign } from '@walletconnect/modal-sign-html'
 import LuteConnect from 'lute-connect'
-import { Magic } from 'magic-sdk';
+import { Magic } from 'magic-sdk'
+import { AlgorandExtension } from '@magic-ext/algorand'
 
 export default function App() {
   const providers = useInitializeProviders({
@@ -694,9 +694,10 @@ export default function App() {
       },
       {
         id: PROVIDER_ID.MAGIC,
-        getDynamicClient: Magic,
-        clientOptions: { apiKey: 'API_KEY' },
-      },
+        clientStatic: Magic,
+        extensionStatic: AlgorandExtension,
+        clientOptions: { apiKey: '<API_KEY>' }
+      }
     ],
     nodeConfig: {
       network: 'mainnet',
