@@ -1,3 +1,9 @@
+## [2.6.2](https://github.com/txnlab/use-wallet/compare/v2.6.1...v2.6.2) (2024-01-31)
+
+### Bug Fixes
+
+- **Magic:** Magic Algorand extension should be provided by consuming application ([#136](https://github.com/txnlab/use-wallet/pull/136)) ([a5ee9af](https://github.com/txnlab/use-wallet/commit/a5ee9af9173b30fb897b12387fecd6d9acbe435a)), closes [#135](https://github.com/txnlab/use-wallet/issues/135)
+
 ## [2.6.1](https://github.com/txnlab/use-wallet/compare/v2.6.0...v2.6.1) (2024-01-30)
 
 ### Bug Fixes
