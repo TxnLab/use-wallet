@@ -1,8 +1,8 @@
+import type { AlgorandExtension } from '@magic-ext/algorand'
+import type { SDKBase, InstanceWithExtensions } from '@magic-sdk/provider'
 import type algosdk from 'algosdk'
 import type { Network } from '../../types/node'
 import type { Metadata } from '../../types/wallet'
-import { SDKBase, InstanceWithExtensions } from '@magic-sdk/provider'
-import { AlgorandExtension } from '@magic-ext/algorand'
 
 export type MagicAuthConnectOptions = {
   apiKey: string

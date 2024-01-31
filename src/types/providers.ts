@@ -3,6 +3,8 @@ import type { PeraWalletConnect } from '@perawallet/connect'
 import type { DeflyWalletConnect } from '@blockshake/defly-connect'
 import type { DaffiWalletConnect } from '@daffiwallet/connect'
 import type LuteConnect from 'lute-connect'
+import type { Magic } from 'magic-sdk'
+import type { AlgorandExtension } from '@magic-ext/algorand'
 import type MyAlgoConnect from '@randlabs/myalgo-connect'
 import type {
   WalletConnectModalSign,
@@ -20,7 +22,6 @@ import type { DaffiWalletConnectOptions } from '../clients/daffi/types'
 import type { NonEmptyArray } from './utilities'
 import type BaseClient from '../clients/base'
 import type { CustomOptions } from '../clients/custom/types'
-import { Magic } from 'magic-sdk'
 
 export type ProviderConfigMapping = {
   [PROVIDER_ID.PERA]: {
@@ -87,6 +88,8 @@ export type ProviderConfigMapping = {
     clientOptions?: { apiKey: string }
     clientStatic?: undefined
     getDynamicClient?: () => Promise<typeof Magic>
+    extensionStatic?: typeof AlgorandExtension
+    getDynamicExtension?: () => Promise<typeof AlgorandExtension>
   }
 }
 
@@ -132,10 +135,25 @@ type DynamicClient<T> = {
 
 type OneOfStaticOrDynamicClient<T> = StaticClient<T> | DynamicClient<T>
 
+type StaticAlgoExtension<T> = {
+  extensionStatic: T
+  getDynamicExtension?: undefined
+}
+
+type DynamicAlgoExtension<T> = {
+  extensionStatic?: undefined
+  getDynamicExtension: () => Promise<T>
+}
+
+type OneOfStaticOrDynamicAlgoExtension<T> = StaticAlgoExtension<T> | DynamicAlgoExtension<T>
+
 type ProviderDef =
   | (ProviderConfig<PROVIDER_ID.PERA> & OneOfStaticOrDynamicClient<typeof PeraWalletConnect>)
   | (ProviderConfig<PROVIDER_ID.MAGIC> &
-      OneOfStaticOrDynamicClient<typeof Magic> & { clientOptions: { apiKey: string } })
+      OneOfStaticOrDynamicClient<typeof Magic> &
+      OneOfStaticOrDynamicAlgoExtension<typeof AlgorandExtension> & {
+        clientOptions: { apiKey: string }
+      })
   | (ProviderConfig<PROVIDER_ID.DEFLY> & OneOfStaticOrDynamicClient<typeof DeflyWalletConnect>)
   | (ProviderConfig<PROVIDER_ID.DAFFI> & OneOfStaticOrDynamicClient<typeof DaffiWalletConnect>)
   | (ProviderConfig<PROVIDER_ID.LUTE> &

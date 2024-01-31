@@ -1,3 +1,4 @@
+import algosdk from 'algosdk'
 import React from 'react'
 import { DeflyWalletConnect } from '@blockshake/defly-connect'
 import { DaffiWalletConnect } from '@daffiwallet/connect'
@@ -6,10 +7,10 @@ import { WalletProvider, PROVIDER_ID, useInitializeProviders, Network } from '..
 import Account from './Account'
 import Connect from './Connect'
 import Transact from './Transact'
-import algosdk from 'algosdk'
 import { ManualGoalSigningAlertPromptProvider } from './TestManualProvider'
 
 const DUMMY_MAGIC_PK = 'pk_live_D17FD8D89621B5F3'
+
 const getDynamicPeraWalletConnect = async () => {
   const PeraWalletConnect = (await import('@perawallet/connect')).PeraWalletConnect
   return PeraWalletConnect
@@ -18,6 +19,11 @@ const getDynamicPeraWalletConnect = async () => {
 const getDynamicMagic = async () => {
   const Magic = (await import('magic-sdk')).Magic
   return Magic
+}
+
+const getDynamicAlgoExtension = async () => {
+  const AlgorandExtension = (await import('@magic-ext/algorand')).AlgorandExtension
+  return AlgorandExtension
 }
 
 export default function ConnectWallet() {
@@ -31,6 +37,7 @@ export default function ConnectWallet() {
       {
         id: PROVIDER_ID.MAGIC,
         getDynamicClient: getDynamicMagic,
+        getDynamicExtension: getDynamicAlgoExtension,
         clientOptions: { apiKey: DUMMY_MAGIC_PK }
       },
       {
