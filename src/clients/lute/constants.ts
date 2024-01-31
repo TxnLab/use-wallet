@@ -1,4 +1,4 @@
-import { svgToBase64 } from 'src/utils/svgToBase64'
+import { svgToBase64 } from '../../../src/utils/svgToBase64'
 
 const svgMarkup = `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="1e3" height="1e3" fill="#ab47bc" version="1.1" viewBox="0 0 1e3 1e3" xmlns="http://www.w3.org/2000/svg">
