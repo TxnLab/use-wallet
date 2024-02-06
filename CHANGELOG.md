@@ -1,3 +1,13 @@
+# [2.7.0](https://github.com/txnlab/use-wallet/compare/v2.6.2...v2.7.0) (2024-02-06)
+
+### Features
+
+- **Lute:** New Lute icon, util function to convert SVG to Base64 ([#137](https://github.com/txnlab/use-wallet/pull/137)) ([b9b45f9](https://github.com/txnlab/use-wallet/commit/b9b45f958f34e162206f4fcc7414045121269f16))
+
+### Bug Fixes
+
+- **Kibisis:** Replace global object with window ([#139](https://github.com/txnlab/use-wallet/pull/139)) ([e686564](https://github.com/txnlab/use-wallet/commit/e686564f09e166fef9b21fdec117884934d7383a))
+
 ## [2.6.2](https://github.com/txnlab/use-wallet/compare/v2.6.1...v2.6.2) (2024-01-31)
 
 ### Bug Fixes
