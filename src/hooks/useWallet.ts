@@ -99,7 +99,7 @@ export default function useWallet() {
 
   const selectActiveAccount = (providerId: PROVIDER_ID, address: string) => {
     try {
-      const account = connectedActiveAccounts.find(
+      const account = connectedAccounts.find(
         (acct) => acct.address === address && acct.providerId === providerId
       )
 
