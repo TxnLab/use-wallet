@@ -13,7 +13,7 @@ export type Provider = {
   isActive: boolean
   isConnected: boolean
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  connect: (arg?: any) => Promise<void>
+  connect: (arg?: any, throws?: boolean) => Promise<void>
   disconnect: () => Promise<void>
   reconnect: () => Promise<void>
   setActiveProvider: () => void
