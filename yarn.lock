@@ -1811,10 +1811,10 @@
   dependencies:
     call-bind "^1.0.5"
 
-"@magic-ext/algorand@^17.0.0":
-  version "17.0.1"
-  resolved "https://registry.yarnpkg.com/@magic-ext/algorand/-/algorand-17.0.1.tgz#bc7c24b1284c95477d37cce0f5916a753c011047"
-  integrity sha512-4VHJMzbQEwQ5+eFv/unT5ZbpaIgfISOLp75b3sBJy+khfqVmv8P+KE6k53YffFytvJV055bvoGj7fHueGDlIEg==
+"@magic-ext/algorand@^20.0.0":
+  version "20.0.0"
+  resolved "https://registry.yarnpkg.com/@magic-ext/algorand/-/algorand-20.0.0.tgz#cf8d4829008d9b93fd4697865ad65444156a6b35"
+  integrity sha512-fA4vRTyoP55n7iSmboP2oxNfY1V7TXQ7a7s42old424lGEsOAT54y+gn2e4Pye6UoUNUYisra9jC2hZvmj3F/A==
 
 "@magic-sdk/commons@^18.0.1":
   version "18.0.1"

@@ -49,7 +49,7 @@
     "@babel/preset-typescript": "^7.16.0",
     "@blockshake/defly-connect": "^1.1.5",
     "@daffiwallet/connect": "^1.0.3",
-    "@magic-ext/algorand": "^17.0.0",
+    "@magic-ext/algorand": "^20.0.0",
     "@perawallet/connect": "^1.2.1",
     "@randlabs/myalgo-connect": "^1.4.2",
     "@release-it/conventional-changelog": "^8.0.0",
