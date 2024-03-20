@@ -24,8 +24,18 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install dependencies (with cache)
-        uses: bahmutov/npm-install@v1
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            .yarn/cache
+            node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        run: yarn install
 
       - name: Run ESLint
         run: yarn lint
