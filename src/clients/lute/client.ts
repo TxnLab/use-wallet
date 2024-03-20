@@ -166,7 +166,7 @@ class LuteClient extends BaseClient {
     }, [])
 
     // Sign them with the client.
-    const result = (await this.#client.signTxns(txnsToSign)) as (Uint8Array | null)[]
+    const result: (Uint8Array | null)[] = await this.#client.signTxns(txnsToSign)
 
     const signedTxns = transactions.reduce<Uint8Array[]>((acc, txn, i) => {
       if (signedIndexes.includes(i)) {
