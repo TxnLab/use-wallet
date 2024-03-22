@@ -1,7 +1,7 @@
 import type algosdk from 'algosdk'
 import type { Metadata, Network } from '../../types'
 
-export interface Arc0001SignTxns {
+export interface ARC0001SignTxns {
   authAddr?: string
   multisig?: string
   signers?: string[]
@@ -9,7 +9,7 @@ export interface Arc0001SignTxns {
   txn: string
 }
 
-export interface Arc0027Account {
+export interface ARC0027Account {
   address: string
   name?: string
 }
@@ -79,7 +79,7 @@ export interface EnableParams {
 }
 
 export interface EnableResult {
-  accounts: Arc0027Account[]
+  accounts: ARC0027Account[]
   genesisHash: string
   genesisId: string
   providerId: string
@@ -100,7 +100,7 @@ export interface GetProvidersResult {
 
 export interface SignTxnsParams {
   providerId: string
-  txns: Arc0001SignTxns[]
+  txns: ARC0001SignTxns[]
 }
 
 export interface SignTxnsResult {

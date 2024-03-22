@@ -19,8 +19,8 @@ import {
 } from './constants'
 import type { InitParams, Network, Wallet } from '../../types'
 import type {
-  Arc0001SignTxns,
-  Arc0027Account,
+  ARC0001SignTxns,
+  ARC0027Account,
   EnableParams,
   EnableResult,
   GetProvidersParams,
@@ -135,7 +135,7 @@ class KibisisClient extends BaseClient {
     }
   }
 
-  static mapAccountsToWallet(accounts: Arc0027Account[]): Wallet {
+  static mapAccountsToWallet(accounts: ARC0027Account[]): Wallet {
     return {
       ...KibisisClient.metadata,
       accounts: accounts.map(({ address, name }) => ({
@@ -220,14 +220,14 @@ class KibisisClient extends BaseClient {
 
   /**
    * Calls the enable method on the provider that returns the authorized accounts.
-   * @returns {Arc0027Account[]} the authorized accounts.
+   * @returns {ARC0027Account[]} the authorized accounts.
    * @throws {METHOD_CANCELED_ERROR} if the method was cancelled by the user.
    * @throws {METHOD_NOT_SUPPORTED_ERROR} if the method is not supported for the configured network.
    * @throws {METHOD_TIMED_OUT_ERROR} if the method timed out by lack of response.
    * @throws {NETWORK_NOT_SUPPORTED_ERROR} if the network is not supported for the configured network.
    * @throws {UNKNOWN_ERROR} if the response result was empty.
    */
-  private async enable(): Promise<Arc0027Account[]> {
+  private async enable(): Promise<ARC0027Account[]> {
     const method = 'enable'
 
     debugLog(
@@ -258,6 +258,61 @@ class KibisisClient extends BaseClient {
     }
 
     return result.accounts
+  }
+
+  /**
+   * Convenience function that concerts a raw transaction to an ARC-0001 transaction that is ready to be signed by the
+   * wallet.
+   * @param {Uint8Array} rawTransaction - the raw transaction to transform.
+   * @param {string[]} connectedAccounts - a list of connected accounts.
+   * @param {boolean} toSign - [optional] whether to sign the transaction or not.
+   * @returns {Promise<ARC0001SignTxns>} the transaction that is ready to be signed by the wallet.
+   * @private
+   */
+  private async mapRawTransactionToARC0001Transaction(rawTransaction: Uint8Array, connectedAccounts: string[], toSign?: boolean): Promise<ARC0001SignTxns> {
+    const decodedTxn = this.algosdk.decodeObj(rawTransaction) as
+      | DecodedTransaction
+      | DecodedSignedTransaction
+    const isSigned = !!(decodedTxn as DecodedSignedTransaction).txn
+    const sender = this.algosdk.encodeAddress(
+      isSigned
+        ? (decodedTxn as DecodedSignedTransaction).txn.snd
+        : (decodedTxn as DecodedTransaction).snd
+    )
+    const accountInfo = await this.getAccountInfo(sender)
+    const authAddr = accountInfo['auth-addr']
+    const txn = this.convertBytesToBase64(
+      this.algosdk.decodeUnsignedTransaction(rawTransaction).toByte()
+    )
+
+    // if the transaction is signed, instruct the provider not to sign by providing an empty signers array
+    if (isSigned) {
+      return {
+        txn: this.convertBytesToBase64(
+          this.algosdk.decodeSignedTransaction(rawTransaction).txn.toByte()
+        ),
+        signers: [],
+        ...(authAddr && { authAddr })
+      }
+    }
+
+    // if the sender is not authorized or the index has not been included in the to be signed indexes, instruct the provider not to sign by providing an empty signers array
+    if (
+      !connectedAccounts.includes(sender) ||
+      !toSign
+    ) {
+      return {
+        txn,
+        signers: [],
+        ...(authAddr && { authAddr })
+      }
+    }
+
+    // if the transaction is not signed, has been authorized and/or is in the index, instruct the provider not to sign
+    return {
+      txn,
+      ...(authAddr && { authAddr })
+    }
   }
 
   /**
@@ -327,7 +382,7 @@ class KibisisClient extends BaseClient {
 
   /**
    * Calls the signTxns methods to sign the supplied transactions.
-   * @param {Arc0001SignTxns[]} txns -  the unsigned or signed transactions as defined in ARC-0001.
+   * @param {ARC0001SignTxns[]} txns -  the unsigned or signed transactions as defined in ARC-0001.
    * @returns {(string | null)[]} the authorized accounts.
    * @throws {INVALID_INPUT_ERROR} if computed group ID for the txns does not match the assigned group ID.
    * @throws {INVALID_GROUP_ID_ERROR} if the unsigned txns is malformed or not conforming to ARC-0001.
@@ -338,7 +393,7 @@ class KibisisClient extends BaseClient {
    * @throws {UNAUTHORIZED_SIGNER_ERROR} if a signer in the request is not authorized by the provider.
    * @throws {UNKNOWN_ERROR} if the response result was empty.
    */
-  private async signTxns(txns: Arc0001SignTxns[]): Promise<(string | null)[]> {
+  private async signTxns(txns: ARC0001SignTxns[]): Promise<(string | null)[]> {
     const method = 'signTxns'
 
     debugLog(
@@ -398,7 +453,7 @@ class KibisisClient extends BaseClient {
   async connect(): Promise<Wallet> {
     await this.refreshSupportedMethods() // refresh the supported methods
 
-    const accounts: Arc0027Account[] = await this.enable()
+    const accounts: ARC0027Account[] = await this.enable()
 
     return KibisisClient.mapAccountsToWallet(accounts)
   }
@@ -414,60 +469,32 @@ class KibisisClient extends BaseClient {
 
   async signTransactions(
     connectedAccounts: string[],
-    transactions: Uint8Array[],
+    transactionsOrTransactionGroups: Uint8Array[] | Uint8Array[][],
     indexesToSign?: number[],
     returnGroup = true
   ): Promise<Uint8Array[]> {
     await this.refreshSupportedMethods() // refresh the supported methods
 
-    const txns: Arc0001SignTxns[] = await Promise.all(
-      transactions.map<Promise<Arc0001SignTxns>>(async (value, index) => {
-        const decodedTxn = this.algosdk.decodeObj(value) as
-          | DecodedTransaction
-          | DecodedSignedTransaction
-        const isSigned = !!(decodedTxn as DecodedSignedTransaction).txn
-        const sender = this.algosdk.encodeAddress(
-          isSigned
-            ? (decodedTxn as DecodedSignedTransaction).txn.snd
-            : (decodedTxn as DecodedTransaction).snd
-        )
-        const accountInfo = await this.getAccountInfo(sender)
-        const authAddr = accountInfo['auth-addr']
-        const txn = this.convertBytesToBase64(
-          this.algosdk.decodeUnsignedTransaction(value).toByte()
-        )
+    // TODO: the below disable/ignore is necessary as the reduce function throws a TS error for union types (https://github.com/microsoft/TypeScript/issues/36390), however, these can be removed when typescript is updated to 5.2.2+, as the issue has been fixed
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const transactions: ARC0001SignTxns[] = transactionsOrTransactionGroups.reduce<ARC0001SignTxns[]>((acc: ARC0001SignTxns[], currentValue: Uint8Array | Uint8Array[], index: number) => {
+      const toSign = indexesToSign && indexesToSign.includes(index)
 
-        // if the transaction is signed, instruct the provider not to sign by providing an empty signers array
-        if (isSigned) {
-          return {
-            txn: this.convertBytesToBase64(
-              this.algosdk.decodeSignedTransaction(value).txn.toByte()
-            ),
-            signers: [],
-            ...(authAddr && { authAddr })
-          }
-        }
+      // if an element is an array, concatenate each mapped element
+      if (Array.isArray(currentValue)) {
+        return [
+          ...acc,
+          ...currentValue.map((value) => this.mapRawTransactionToARC0001Transaction(value, connectedAccounts, toSign))
+        ]
+      }
 
-        // if the sender is not authorized or the index has not been included in the to be signed indexes, instruct the provider not to sign by providing an empty signers array
-        if (
-          !connectedAccounts.includes(sender) ||
-          (indexesToSign && !indexesToSign.includes(index))
-        ) {
-          return {
-            txn,
-            signers: [],
-            ...(authAddr && { authAddr })
-          }
-        }
-
-        // if the transaction is not signed, has been authorized and/or is in the index, instruct the provider not to sign
-        return {
-          txn,
-          ...(authAddr && { authAddr })
-        }
-      })
-    )
-    const result = await this.signTxns(txns)
+      return [
+        ...acc,
+        this.mapRawTransactionToARC0001Transaction(currentValue, connectedAccounts, toSign)
+      ]
+    }, [])
+    const result = await this.signTxns(transactions)
 
     // null values indicate transactions that were not signed by the provider, as defined in ARC-0001, see https://arc.algorand.foundation/ARCs/arc-0001#semantic-and-security-requirements
     return result.reduce<Uint8Array[]>((acc, value, index) => {
@@ -475,8 +502,8 @@ class KibisisClient extends BaseClient {
         return [...acc, this.convertBase64ToBytes(value)]
       }
 
-      // if the group wants to be returned, get the transaction from the input
-      return returnGroup ? [...acc, transactions[index]] : acc
+      // if the group wants to be returned, get the unsigned transaction
+      return returnGroup ? [...acc, this.convertBase64ToBytes(transactions[index].txn)] : acc
     }, [])
   }
 }
