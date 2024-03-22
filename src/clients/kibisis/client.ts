@@ -481,7 +481,7 @@ class KibisisClient extends BaseClient {
     const transactions: ARC0001SignTxns[] = transactionsOrTransactionGroups.reduce<ARC0001SignTxns[]>((acc: ARC0001SignTxns[], currentValue: Uint8Array | Uint8Array[], index: number) => {
       const toSign = indexesToSign && indexesToSign.includes(index)
 
-      // if an element is an array, concatenate each mapped element
+      // if an element is an array, concatenate each mapped element as we want a flat (one-dimensional) array to send to the wallet
       if (Array.isArray(currentValue)) {
         return [
           ...acc,
