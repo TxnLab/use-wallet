@@ -1,6 +1,5 @@
+import { NetworkId, WalletId, WalletManagerPlugin } from '@txnlab/use-wallet-vue'
 import { defineNuxtPlugin } from '#app'
-import { NetworkId, WalletId } from '@txnlab/use-wallet-js'
-import { WalletManagerPlugin } from '@txnlab/use-wallet-vue'
 
 export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.use(WalletManagerPlugin, {

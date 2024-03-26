@@ -384,12 +384,27 @@ importers:
 
   packages/use-wallet-vue:
     dependencies:
+      '@blockshake/defly-connect':
+        specifier: ^1.1.6
+        version: 1.1.6(algosdk@2.7.0)
+      '@perawallet/connect':
+        specifier: ^1.3.3
+        version: 1.3.4(algosdk@2.7.0)
       '@tanstack/vue-store':
         specifier: ^0.3.1
         version: 0.3.1(vue@3.4.21)
       '@txnlab/use-wallet-js':
         specifier: workspace:*
         version: link:../use-wallet-js
+      '@walletconnect/modal':
+        specifier: ^2.6.2
+        version: 2.6.2(@types/react@18.2.70)(react@18.2.0)
+      '@walletconnect/sign-client':
+        specifier: ^2.10.2
+        version: 2.11.3
+      lute-connect:
+        specifier: ^1.1.3
+        version: 1.1.3
     devDependencies:
       algosdk:
         specifier: ^2.7.0
