@@ -1,0 +1,59 @@
+.walletName {
+  line-height: 1.5;
+  margin: 1.33em 0;
+  text-align: center;
+}
+
+.walletName[data-active='true']:after {
+  content: ' [active]';
+}
+
+.walletButtons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  margin-bottom: 0.9em;
+}
+
+.walletButtons button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+.walletButtons button:not(:disabled):hover {
+  border-color: #0071ff;
+}
+.walletButtons button:focus,
+.walletButtons button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+.walletButtons button:disabled {
+  opacity: 0.75;
+  cursor: default;
+}
+
+.walletMenu {
+  margin-top: 1.5em;
+}
+
+.fallbackMsg {
+  font-size: 1.125rem;
+  line-height: 1.5rem;
+  text-align: center;
+  opacity: 0.5;
+  margin: 2em 0;
+}
+
+@media (prefers-color-scheme: light) {
+  .walletButtons button {
+    background-color: #ffffff;
+  }
+}

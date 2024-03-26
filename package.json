@@ -1,0 +1,55 @@
+{
+  "name": "use-wallet",
+  "description": "use-wallet monorepo",
+  "keywords": [
+    "algorand",
+    "wallet",
+    "walletconnect",
+    "pera",
+    "defly",
+    "exodus",
+    "algosdk",
+    "algokit",
+    "kmd",
+    "react",
+    "vue"
+  ],
+  "author": "Doug Richar <drichar@gmail.com>",
+  "license": "MIT",
+  "workspaces": [
+    "packages/use-wallet-js",
+    "packages/use-wallet-react",
+    "packages/use-wallet-vue",
+    "examples/use-wallet-example-vanilla-ts",
+    "examples/use-wallet-example-react",
+    "examples/use-wallet-example-vue"
+  ],
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r --if-present test",
+    "lint": "pnpm -r lint",
+    "prettier": "prettier --check .",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/txnlab/use-wallet.git"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.1.6",
+    "@testing-library/react": "^14.1.2",
+    "@typescript-eslint/eslint-plugin": "^6.7.2",
+    "@typescript-eslint/parser": "^6.7.2",
+    "@vitejs/plugin-react": "^4.2.1",
+    "@vitejs/plugin-vue": "^5.0.2",
+    "@vitejs/plugin-vue-jsx": "^3.1.0",
+    "@vue/test-utils": "^2.4.3",
+    "eslint": "^8.50.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "prettier": "3.2.5",
+    "vite": "^5.0.8",
+    "vitest": "^1.1.1",
+    "vue-demi": "^0.14.6"
+  }
+}

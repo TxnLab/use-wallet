@@ -1,0 +1,30 @@
+{
+  "name": "use-wallet-example-nextjs",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@blockshake/defly-connect": "^1.1.6",
+    "@perawallet/connect": "^1.3.3",
+    "@txnlab/use-wallet-js": "workspace:*",
+    "@txnlab/use-wallet-react": "workspace:*",
+    "@walletconnect/modal": "^2.6.2",
+    "@walletconnect/sign-client": "^2.10.2",
+    "algosdk": "^2.6.0",
+    "next": "14.1.0",
+    "react": "^18",
+    "react-dom": "^18"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.1.0",
+    "typescript": "^5"
+  }
+}

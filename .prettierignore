@@ -1,0 +1,8 @@
+**/node_modules
+**/dist
+**/.env
+**/.next
+**/.nuxt
+**/.output
+pnpm-lock.yaml
+*.code-workspace
