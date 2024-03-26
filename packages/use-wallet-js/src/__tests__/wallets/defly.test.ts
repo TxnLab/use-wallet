@@ -164,6 +164,8 @@ describe('DeflyWallet', () => {
 
       await wallet.resumeSession()
 
+      expect(console.info).toHaveBeenCalledWith('[DeflyWallet] Resuming session...')
+      expect(console.info).toHaveBeenCalledWith('[DeflyWallet] Initializing client...')
       expect(wallet.isConnected).toBe(true)
       expect(mockReconnectSession).toHaveBeenCalled()
     })
@@ -189,6 +191,7 @@ describe('DeflyWallet', () => {
 
       await wallet.resumeSession()
 
+      expect(console.info).not.toHaveBeenCalledWith('[DeflyWallet] Resuming session...')
       expect(wallet.isConnected).toBe(false)
       expect(mockReconnectSession).not.toHaveBeenCalled()
     })

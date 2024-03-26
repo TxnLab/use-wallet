@@ -140,8 +140,22 @@ export class KmdWallet extends BaseWallet {
     this.onDisconnect()
   }
 
-  public resumeSession(): Promise<void> {
-    return Promise.resolve()
+  public resumeSession = async (): Promise<void> => {
+    try {
+      const state = this.store.state
+      const walletState = state.wallets[this.id]
+
+      // No session to resume
+      if (!walletState) {
+        return
+      }
+
+      console.info('[KmdWallet] Resuming session...')
+      await this.initializeClient()
+    } catch (error: any) {
+      console.error(`[KmdWallet] Error resuming session: ${error.message}`)
+      this.onDisconnect()
+    }
   }
 
   public signTransactions = async (

@@ -136,7 +136,7 @@ export class PeraWallet extends BaseWallet {
         })
       }
     } catch (error: any) {
-      console.error(error)
+      console.error(`[PeraWallet] Error resuming session: ${error.message}`)
       this.onDisconnect()
     }
   }

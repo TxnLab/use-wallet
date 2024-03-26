@@ -164,6 +164,8 @@ describe('PeraWallet', () => {
 
       await wallet.resumeSession()
 
+      expect(console.info).toHaveBeenCalledWith('[PeraWallet] Resuming session...')
+      expect(console.info).toHaveBeenCalledWith('[PeraWallet] Initializing client...')
       expect(wallet.isConnected).toBe(true)
       expect(mockReconnectSession).toHaveBeenCalled()
     })
@@ -189,6 +191,7 @@ describe('PeraWallet', () => {
 
       await wallet.resumeSession()
 
+      expect(console.info).not.toHaveBeenCalledWith('[PeraWallet] Resuming session...')
       expect(wallet.isConnected).toBe(false)
       expect(mockReconnectSession).not.toHaveBeenCalled()
     })

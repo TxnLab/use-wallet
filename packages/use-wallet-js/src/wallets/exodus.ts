@@ -121,20 +121,23 @@ export class ExodusWallet extends BaseWallet {
   }
 
   public async resumeSession(): Promise<void> {
-    const state = this.store.state
-    const walletState = state.wallets[this.id]
+    try {
+      const state = this.store.state
+      const walletState = state.wallets[this.id]
 
-    if (!walletState) {
-      // No persisted state, abort
-      return
-    }
-    console.info('[ExodusWallet] Resuming session...')
+      if (!walletState) {
+        // No persisted state, abort
+        return
+      }
 
-    if (
-      window === undefined ||
-      (window as WindowExtended).algorand === undefined ||
-      (window as WindowExtended).algorand.isConnected !== true
-    ) {
+      console.info('[ExodusWallet] Resuming session...')
+      const client = await this.initializeClient()
+
+      if (!client.isConnected) {
+        throw new Error('Exodus is not connected.')
+      }
+    } catch (error: any) {
+      console.error(`[ExodusWallet] Error resuming session: ${error.message}`)
       this.onDisconnect()
     }
   }

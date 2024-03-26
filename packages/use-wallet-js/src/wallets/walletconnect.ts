@@ -236,7 +236,7 @@ export class WalletConnect extends BaseWallet {
         this.onSessionConnected(restoredSession)
       }
     } catch (error: any) {
-      console.error(error)
+      console.error(`[WalletConnect] Error resuming session: ${error.message}`)
       this.onDisconnect()
     }
   }

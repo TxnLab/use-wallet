@@ -177,9 +177,12 @@ describe('ExodusWallet', () => {
       })
 
       describe('when the Exodus extension is connected', () => {
-        it('should be a no-op', async () => {
+        it('should initialize client', async () => {
           expect(store.state.wallets[WalletId.EXODUS]).toBeDefined()
           await wallet.resumeSession()
+
+          expect(console.info).toHaveBeenCalledWith('[ExodusWallet] Resuming session...')
+          expect(console.info).toHaveBeenCalledWith('[ExodusWallet] Initializing client...')
           expect(store.state.wallets[WalletId.EXODUS]).toBeDefined()
         })
       })
@@ -190,9 +193,14 @@ describe('ExodusWallet', () => {
           window.algorand.isConnected = false
         })
 
-        it('should remove the wallet from the store if the extension is not found', async () => {
+        it('should remove the wallet from the store', async () => {
           expect(store.state.wallets[WalletId.EXODUS]).toBeDefined()
           await wallet.resumeSession()
+
+          expect(console.info).toHaveBeenCalledWith('[ExodusWallet] Resuming session...')
+          expect(console.error).toHaveBeenCalledWith(
+            `[ExodusWallet] Error resuming session: Exodus is not connected.`
+          )
           expect(store.state.wallets[WalletId.EXODUS]).toBeUndefined()
         })
 
@@ -207,6 +215,8 @@ describe('ExodusWallet', () => {
       it('should be a no-op', async () => {
         expect(store.state.wallets[WalletId.EXODUS]).toBeUndefined()
         await wallet.resumeSession()
+
+        expect(console.info).not.toHaveBeenCalledWith('[ExodusWallet] Resuming session...')
         expect(store.state.wallets[WalletId.EXODUS]).toBeUndefined()
       })
     })

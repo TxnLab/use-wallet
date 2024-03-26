@@ -156,8 +156,53 @@ describe('KmdWallet', () => {
   })
 
   describe('resumeSession', () => {
-    describe('when the client is not initialized', () => {
-      it('should throw an error', async () => {
+    describe('when there is KMD wallet data in the store', () => {
+      beforeEach(() => {
+        const account1 = {
+          name: 'KMD Wallet 1',
+          address: TEST_ADDRESS
+        }
+
+        store = new Store<State>({
+          ...defaultState,
+          wallets: {
+            [WalletId.KMD]: {
+              accounts: [account1],
+              activeAccount: account1
+            }
+          }
+        })
+
+        wallet = new KmdWallet({
+          id: WalletId.KMD,
+          metadata: {},
+          getAlgodClient: {} as any,
+          store,
+          subscribe: mockSubscribe
+        })
+      })
+
+      it('should initialize client', async () => {
+        expect(store.state.wallets[WalletId.KMD]).toBeDefined()
+        await wallet.resumeSession()
+
+        expect(console.info).toHaveBeenCalledWith('[KmdWallet] Resuming session...')
+        expect(console.info).toHaveBeenCalledWith('[KmdWallet] Initializing client...')
+        expect(store.state.wallets[WalletId.KMD]).toBeDefined()
+      })
+    })
+
+    describe('when there is no KMD wallet data in the store', () => {
+      it('should be a no-op', async () => {
+        expect(store.state.wallets[WalletId.KMD]).toBeUndefined()
+        await wallet.resumeSession()
+
+        expect(console.info).not.toHaveBeenCalledWith('[KmdWallet] Resuming session...')
+        expect(store.state.wallets[WalletId.KMD]).toBeUndefined()
+      })
+
+      it('signTransactions should throw an error', async () => {
+        await wallet.resumeSession()
         await expect(wallet.signTransactions([])).rejects.toThrowError(
           '[KmdWallet] Client not initialized!'
         )

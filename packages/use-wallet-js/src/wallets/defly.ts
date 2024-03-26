@@ -135,7 +135,7 @@ export class DeflyWallet extends BaseWallet {
         })
       }
     } catch (error: any) {
-      console.error(error)
+      console.error(`[DeflyWallet] Error resuming session: ${error.message}`)
       this.onDisconnect()
     }
   }

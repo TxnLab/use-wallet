@@ -133,10 +133,59 @@ describe('LuteWallet', () => {
   })
 
   describe('resumeSession', () => {
-    it('should be a no-op', async () => {
-      expect(store.state.wallets[WalletId.LUTE]).toBeUndefined()
-      await wallet.resumeSession()
-      expect(store.state.wallets[WalletId.LUTE]).toBeUndefined()
+    describe('when there is Lute wallet data in the store', () => {
+      beforeEach(() => {
+        const account1 = {
+          name: 'Lute Wallet 1',
+          address: 'mockAddress1'
+        }
+
+        store = new Store<State>({
+          ...defaultState,
+          wallets: {
+            [WalletId.LUTE]: {
+              accounts: [account1],
+              activeAccount: account1
+            }
+          }
+        })
+
+        wallet = new LuteWallet({
+          id: WalletId.LUTE,
+          options: {
+            siteName: 'Mock Site Name'
+          },
+          metadata: {},
+          getAlgodClient: () => ({}) as any,
+          store,
+          subscribe: mockSubscribe
+        })
+      })
+
+      it('should initialize client', async () => {
+        expect(store.state.wallets[WalletId.LUTE]).toBeDefined()
+        await wallet.resumeSession()
+
+        expect(console.info).toHaveBeenCalledWith('[LuteWallet] Resuming session...')
+        expect(store.state.wallets[WalletId.LUTE]).toBeDefined()
+      })
+    })
+
+    describe('when there is no Lute wallet data in the store', () => {
+      it('should be a no-op', async () => {
+        expect(store.state.wallets[WalletId.LUTE]).toBeUndefined()
+        await wallet.resumeSession()
+
+        expect(console.info).not.toHaveBeenCalledWith('[LuteWallet] Resuming session...')
+        expect(store.state.wallets[WalletId.LUTE]).toBeUndefined()
+      })
+
+      it('signTransactions should throw an error', async () => {
+        await wallet.resumeSession()
+        await expect(wallet.signTransactions([])).rejects.toThrowError(
+          '[LuteWallet] Client not initialized!'
+        )
+      })
     })
   })
 

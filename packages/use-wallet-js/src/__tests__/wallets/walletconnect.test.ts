@@ -285,6 +285,8 @@ describe('WalletConnect', () => {
 
       await wallet.resumeSession()
 
+      expect(console.info).toHaveBeenCalledWith('[WalletConnect] Resuming session...')
+      expect(console.info).toHaveBeenCalledWith('[WalletConnect] Initializing client...')
       expect(wallet.isConnected).toBe(true)
       expect(store.state.wallets[WalletId.WALLETCONNECT]).toBeDefined()
     })
@@ -293,6 +295,7 @@ describe('WalletConnect', () => {
       // No wallets in store
       await wallet.resumeSession()
 
+      expect(console.info).not.toHaveBeenCalledWith('[WalletConnect] Resuming session...')
       expect(wallet.isConnected).toBe(false)
       expect(store.state.wallets[WalletId.WALLETCONNECT]).toBeUndefined()
     })

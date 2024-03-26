@@ -21,6 +21,8 @@ interface WalletProviderProps {
 }
 
 export const WalletProvider = ({ manager, children }: WalletProviderProps): JSX.Element => {
+  const resumedRef = React.useRef(false)
+
   React.useEffect(() => {
     const resumeSessions = async () => {
       try {
@@ -30,8 +32,11 @@ export const WalletProvider = ({ manager, children }: WalletProviderProps): JSX.
       }
     }
 
-    resumeSessions()
-  }, [manager])
+    if (!resumedRef.current) {
+      resumeSessions()
+      resumedRef.current = true
+    }
+  }, [manager, resumedRef.current])
 
   return <WalletContext.Provider value={manager}>{children}</WalletContext.Provider>
 }
