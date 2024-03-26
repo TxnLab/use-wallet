@@ -1,7 +1,6 @@
 'use client'
 
-import { NetworkId, WalletId, WalletManager } from '@txnlab/use-wallet-js'
-import { WalletProvider } from '@txnlab/use-wallet-react'
+import { NetworkId, WalletId, WalletManager, WalletProvider } from '@txnlab/use-wallet-react'
 
 const walletManager = new WalletManager({
   wallets: [

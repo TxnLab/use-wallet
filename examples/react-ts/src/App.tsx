@@ -1,5 +1,4 @@
-import { NetworkId, WalletId, WalletManager } from '@txnlab/use-wallet-js'
-import { WalletProvider } from '@txnlab/use-wallet-react'
+import { NetworkId, WalletId, WalletManager, WalletProvider } from '@txnlab/use-wallet-react'
 import { Connect } from './Connect'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
