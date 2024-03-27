@@ -90,7 +90,7 @@ To initialize wallets with default options, pass the wallet ID using the `Wallet
 
 The `network` property is used to set the network for the application. Using the `NetworkId` emum, it can be set to either `BETANET`, `TESTNET`, `MAINNET`, or `LOCALNET`. If unset, the default is `TESTNET`.
 
-The active network is persisted to local storage. If your application supports [switching networks](#setactivenetworknetwork-networkid-void), when a user revisits your app or refreshes the page, the active network from the previous session will be restored.
+The active network is persisted to local storage. If your application supports switching networks, when a user revisits your app or refreshes the page, the active network from the previous session will be restored.
 
 #### `algod` (optional)
 
@@ -110,7 +110,7 @@ const walletManager = new WalletManager({
 })
 ```
 
-Or you can pass a mapped object of the network(s) you wish to configure with configurations keyed to `NetworkId` enum values:
+Or you can pass a mapped object configurations keyed to `NetworkId` enum values:
 
 ```ts
 const walletManager = new WalletManager({
@@ -130,8 +130,6 @@ const walletManager = new WalletManager({
   }
 })
 ```
-
-Environment variables can be used for these tokens and server URLs.
 
 ## Quick Start (React)
 
@@ -248,7 +246,7 @@ app.mount('#app')
 
 Now, in any component you have access the wallet manager and its state via the `useWallet` composable.
 
-```ts
+```vue
 <script setup lang="ts">
 import { useWallet } from '@txnlab/use-wallet-vue'
 import algosdk from 'algosdk'
@@ -278,7 +276,7 @@ const { wallets, activeWallet, activeAccount } = useWallet()
 
 To sign and send transactions, you can use the manager's `algodClient` instance and the `transactionSigner` provided by the active wallet.
 
-```ts
+```vue
 <script setup lang="ts">
 import { useWallet } from '@txnlab/use-wallet-vue'
 import algosdk from 'algosdk'
