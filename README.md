@@ -267,7 +267,7 @@ const { wallets, activeWallet, activeAccount } = useWallet()
       <h2>Active Wallet</h2>
       <p>{{ activeWallet.metadata.name }}</p>
       <h2>Active Account</h2>
-      <p>{{ activeAccount?.address }}</p>
+      <p>{{ activeAccount.address }}</p>
       <button @click="activeWallet.disconnect()">Disconnect</button>
     </div>
   </div>
