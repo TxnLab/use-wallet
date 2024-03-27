@@ -1,6 +1,7 @@
 # use-wallet v3 (beta)
 
-[![npm version](https://badge.fury.io/js/%40txnlab%2Fuse-wallet.svg)](https://badge.fury.io/js/%40txnlab%2Fuse-wallet) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![GitHub package.json version (branch)](https://img.shields.io/github/package-json/v/TxnLab/use-wallet/v3?filename=packages%2Fuse-wallet-js%2Fpackage.json&label=version)
+![GitHub License](https://img.shields.io/github/license/TxnLab/use-wallet)
 
 ## Overview
 
