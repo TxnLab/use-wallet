@@ -1,6 +1,6 @@
 # use-wallet v3 (beta)
 
-![GitHub package.json version (branch)](https://img.shields.io/github/package-json/v/TxnLab/use-wallet/v3?filename=packages%2Fuse-wallet-js%2Fpackage.json&label=version)
+![GitHub package.json version (branch)](https://img.shields.io/github/package-json/v/TxnLab/use-wallet/v3?filename=packages%2Fuse-wallet%2Fpackage.json&label=version)
 ![GitHub License](https://img.shields.io/github/license/TxnLab/use-wallet)
 
 ## Overview
