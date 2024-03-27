@@ -20,7 +20,7 @@ Use any NPM package manager to install one of the framework-specific adapters or
 ### React
 
 ```bash
-npm install @txnlab/use-wallet-react
+npm install @txnlab/use-wallet-react@beta
 ```
 
 Compatible with React v16.8+
@@ -28,7 +28,7 @@ Compatible with React v16.8+
 ### Vue
 
 ```bash
-npm install @txnlab/use-wallet-vue
+npm install @txnlab/use-wallet-vue@beta
 ```
 
 Compatible with Vue 3
@@ -36,7 +36,7 @@ Compatible with Vue 3
 ### Core Library
 
 ```bash
-npm install @txnlab/use-wallet
+npm install @txnlab/use-wallet@beta
 ```
 
 Compatible with any ES6+ project (TypeScript recommended)
