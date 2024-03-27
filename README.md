@@ -1,7 +1,7 @@
 # use-wallet v3 (beta)
 
-![GitHub package.json version (branch)](https://img.shields.io/github/package-json/v/TxnLab/use-wallet/v3?filename=packages%2Fuse-wallet%2Fpackage.json&label=version)
-![GitHub License](https://img.shields.io/github/license/TxnLab/use-wallet)
+[![GitHub package.json version (branch)](https://img.shields.io/github/package-json/v/TxnLab/use-wallet/v3?filename=packages%2Fuse-wallet%2Fpackage.json&label=version)](https://www.npmjs.com/package/@txnlab/use-wallet?activeTab=versions)
+[![GitHub License](https://img.shields.io/github/license/TxnLab/use-wallet)](https://github.com/TxnLab/use-wallet/blob/v3/LICENSE.md)
 
 ## Overview
 
