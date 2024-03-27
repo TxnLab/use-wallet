@@ -1,3 +1,3 @@
-# @txnlab/use-wallet-js example
+# @txnlab/use-wallet example
 
-This example provides a minimal setup to get [@txnlab/use-wallet-js](https://github.com/TxnLab/use-wallet-js/tree/main/packages/use-wallet-js) working in a Vite app with TypeScript.
+This example provides a minimal setup to get the [@txnlab/use-wallet](https://github.com/TxnLab/use-wallet/tree/v3/packages/use-wallet) core library working in a Vite app with TypeScript.

@@ -1,6 +1,6 @@
 # @txnlab/use-wallet-vue
 
-Vue wrapper for [@txnlab/use-wallet-js](https://github.com/TxnLab/use-wallet-js/tree/main/packages/use-wallet-js)
+Vue adapter for [@txnlab/use-wallet](https://github.com/TxnLab/use-wallet/tree/v3/packages/use-wallet)
 
 ## License
 

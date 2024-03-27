@@ -1,4 +1,4 @@
-import { BaseWallet, WalletManager } from '@txnlab/use-wallet-js'
+import { BaseWallet, WalletManager } from '@txnlab/use-wallet'
 import algosdk from 'algosdk'
 
 export class WalletComponent {

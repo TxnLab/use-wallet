@@ -1,4 +1,4 @@
-import { WalletManager, type WalletManagerConfig } from '@txnlab/use-wallet-js'
+import { WalletManager, type WalletManagerConfig } from '@txnlab/use-wallet'
 
 export const WalletManagerPlugin = {
   install(app: any, options: WalletManagerConfig) {

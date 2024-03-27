@@ -3,7 +3,7 @@
 import { useStore } from '@tanstack/react-store'
 import * as React from 'react'
 import { useWalletManager } from './WalletProvider'
-import type { WalletAccount, WalletMetadata } from '@txnlab/use-wallet-js'
+import type { WalletAccount, WalletMetadata } from '@txnlab/use-wallet'
 import type algosdk from 'algosdk'
 
 export interface Wallet {

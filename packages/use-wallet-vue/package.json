@@ -39,7 +39,7 @@
   ],
   "dependencies": {
     "@tanstack/vue-store": "^0.3.1",
-    "@txnlab/use-wallet-js": "workspace:*"
+    "@txnlab/use-wallet": "workspace:*"
   },
   "devDependencies": {
     "algosdk": "^2.7.0",

@@ -1,6 +1,6 @@
 # use-wallet v3 (beta)
 
-[![npm version](https://badge.fury.io/js/%40txnlab%2Fuse-wallet-js.svg)](https://badge.fury.io/js/%40txnlab%2Fuse-wallet-js) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![npm version](https://badge.fury.io/js/%40txnlab%2Fuse-wallet.svg)](https://badge.fury.io/js/%40txnlab%2Fuse-wallet) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Overview
 
@@ -35,7 +35,7 @@ Compatible with Vue 3
 ### Core Library
 
 ```bash
-npm install @txnlab/use-wallet-js
+npm install @txnlab/use-wallet
 ```
 
 Compatible with any ES6+ project (TypeScript recommended)
@@ -56,7 +56,7 @@ Some wallets require additional packages to be installed. The following table li
 The `WalletManager` class is responsible for initializing the wallet providers and managing the active wallet, network, and state. It accepts a configuration object with three properties: `wallets`, `network`, and `algod`.
 
 ```ts
-import { NetworkId, WalletId, WalletManager } from '@txnlab/use-wallet-js'
+import { NetworkId, WalletId, WalletManager } from '@txnlab/use-wallet'
 
 const walletManager = new WalletManager({
   wallets: [

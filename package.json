@@ -8,7 +8,7 @@
   "packageManager": "pnpm@8.15.5",
   "type": "module",
   "workspaces": [
-    "packages/use-wallet-js",
+    "packages/use-wallet",
     "packages/use-wallet-react",
     "packages/use-wallet-vue",
     "examples/use-wallet-example-vanilla-ts",

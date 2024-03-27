@@ -1,5 +1,5 @@
 import { useStore } from '@tanstack/vue-store'
-import { WalletManager, type WalletAccount, type WalletMetadata } from '@txnlab/use-wallet-js'
+import { WalletManager, type WalletAccount, type WalletMetadata } from '@txnlab/use-wallet'
 import { computed, inject } from 'vue'
 import type algosdk from 'algosdk'
 

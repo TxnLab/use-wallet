@@ -1,6 +1,6 @@
 # @txnlab/use-wallet-react
 
-React wrapper for [@txnlab/use-wallet-js](https://github.com/TxnLab/use-wallet-js/tree/main/packages/use-wallet-js)
+React adapter for [@txnlab/use-wallet](https://github.com/TxnLab/use-wallet/tree/v3/packages/use-wallet)
 
 ## License
 

@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { WalletId, WalletManager } from '@txnlab/use-wallet-js'
+import { WalletId, WalletManager } from '@txnlab/use-wallet'
 import React from 'react'
 import { WalletProvider, useWalletManager } from '../WalletProvider'
 

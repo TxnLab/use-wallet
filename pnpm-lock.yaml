@@ -114,9 +114,9 @@ importers:
       '@perawallet/connect':
         specifier: ^1.3.3
         version: 1.3.4(algosdk@2.7.0)
-      '@txnlab/use-wallet-js':
+      '@txnlab/use-wallet':
         specifier: workspace:*
-        version: link:../../packages/use-wallet-js
+        version: link:../../packages/use-wallet
       '@txnlab/use-wallet-vue':
         specifier: workspace:*
         version: link:../../packages/use-wallet-vue
@@ -218,9 +218,9 @@ importers:
       '@perawallet/connect':
         specifier: ^1.3.3
         version: 1.3.4(algosdk@2.7.0)
-      '@txnlab/use-wallet-js':
+      '@txnlab/use-wallet':
         specifier: workspace:*
-        version: link:../../packages/use-wallet-js
+        version: link:../../packages/use-wallet
       '@walletconnect/modal':
         specifier: ^2.6.2
         version: 2.6.2(@types/react@18.2.70)(react@18.2.0)
@@ -252,9 +252,9 @@ importers:
       '@perawallet/connect':
         specifier: ^1.3.3
         version: 1.3.4(algosdk@2.7.0)
-      '@txnlab/use-wallet-js':
+      '@txnlab/use-wallet':
         specifier: workspace:*
-        version: link:../../packages/use-wallet-js
+        version: link:../../packages/use-wallet
       '@txnlab/use-wallet-vue':
         specifier: workspace:*
         version: link:../../packages/use-wallet-vue
@@ -287,7 +287,7 @@ importers:
         specifier: ^1.8.25
         version: 1.8.27(typescript@5.4.3)
 
-  packages/use-wallet-js:
+  packages/use-wallet:
     dependencies:
       '@tanstack/store':
         specifier: ^0.3.1
@@ -347,9 +347,9 @@ importers:
       '@tanstack/react-store':
         specifier: ^0.3.1
         version: 0.3.1(react-dom@18.2.0)(react@18.2.0)
-      '@txnlab/use-wallet-js':
+      '@txnlab/use-wallet':
         specifier: workspace:*
-        version: link:../use-wallet-js
+        version: link:../use-wallet
       '@walletconnect/modal':
         specifier: ^2.6.2
         version: 2.6.2(@types/react@18.2.70)(react@18.2.0)
@@ -393,9 +393,9 @@ importers:
       '@tanstack/vue-store':
         specifier: ^0.3.1
         version: 0.3.1(vue@3.4.21)
-      '@txnlab/use-wallet-js':
+      '@txnlab/use-wallet':
         specifier: workspace:*
-        version: link:../use-wallet-js
+        version: link:../use-wallet
       '@walletconnect/modal':
         specifier: ^2.6.2
         version: 2.6.2(@types/react@18.2.70)(react@18.2.0)
@@ -3854,7 +3854,7 @@ packages:
   /@walletconnect/window-metadata@1.0.0:
     resolution: {integrity: sha512-9eFvmJxIKCC3YWOL97SgRkKhlyGXkrHwamfechmqszbypFspaSk+t2jQXAEU7YClHF6Qjw5eYOmy1//zFi9/GA==}
     dependencies:
-      '@walletconnect/window-getters': 1.0.0
+      '@walletconnect/window-getters': 1.0.1
 
   /@walletconnect/window-metadata@1.0.1:
     resolution: {integrity: sha512-9koTqyGrM2cqFRW517BPY/iEtUDx2r1+Pwwu5m7sJ7ka79wi3EyqhqcICk/yDmv6jAS1rjKgTKXlEhanYjijcA==}

@@ -1,5 +1,5 @@
 {
-  "name": "@txnlab/use-wallet-js",
+  "name": "@txnlab/use-wallet",
   "version": "3.0.0-alpha.16",
   "description": "TypeScript library for integrating Algorand wallets into decentralized applications",
   "author": "Doug Richar <drichar@gmail.com>",
@@ -7,7 +7,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/txnlab/use-wallet.git",
-    "directory": "packages/use-wallet-js"
+    "directory": "packages/use-wallet"
   },
   "type": "module",
   "main": "./dist/index.cjs",

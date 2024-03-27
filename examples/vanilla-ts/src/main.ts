@@ -1,7 +1,7 @@
 import './style.css'
 import typescriptLogo from './typescript.svg'
 import viteLogo from '/vite.svg'
-import { NetworkId, WalletId, WalletManager } from '@txnlab/use-wallet-js'
+import { NetworkId, WalletId, WalletManager } from '@txnlab/use-wallet'
 import { WalletComponent } from './WalletComponent'
 
 const walletManager = new WalletManager({
@@ -33,7 +33,7 @@ appDiv!.innerHTML = `
     <a href="https://www.typescriptlang.org/" target="_blank">
       <img src="${typescriptLogo}" class="logo vanilla" alt="TypeScript logo" />
     </a>
-    <h1>@txnlab/use-wallet-js</h1>
+    <h1>@txnlab/use-wallet</h1>
   </div>
 `
 

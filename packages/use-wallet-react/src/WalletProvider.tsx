@@ -1,6 +1,6 @@
 'use client'
 
-import { WalletManager } from '@txnlab/use-wallet-js'
+import { WalletManager } from '@txnlab/use-wallet'
 import * as React from 'react'
 
 const WalletContext = React.createContext<WalletManager | undefined>(undefined)

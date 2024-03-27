@@ -10,7 +10,7 @@ import {
   type State,
   type WalletAccount,
   PeraWallet
-} from '@txnlab/use-wallet-js'
+} from '@txnlab/use-wallet'
 import React from 'react'
 import { Wallet, useWallet } from '../useWallet'
 import { WalletProvider } from '../WalletProvider'
@@ -27,8 +27,8 @@ const mocks = vi.hoisted(() => {
   }
 })
 
-vi.mock('@txnlab/use-wallet-js', async (importOriginal) => {
-  const mod = await importOriginal<typeof import('@txnlab/use-wallet-js')>()
+vi.mock('@txnlab/use-wallet', async (importOriginal) => {
+  const mod = await importOriginal<typeof import('@txnlab/use-wallet')>()
   return {
     ...mod,
     DeflyWallet: class extends mod.BaseWallet {

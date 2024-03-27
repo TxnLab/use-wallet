@@ -9,7 +9,7 @@
     "./examples/nextjs",
     "./examples/nuxt",
     "./examples/react-ts",
-    "./packages/use-wallet-js",
+    "./packages/use-wallet",
     "./packages/use-wallet-react",
     "./packages/use-wallet-vue",
     "./examples/vanilla-ts",
