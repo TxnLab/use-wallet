@@ -1,53 +1,59 @@
-# UseWallet v3 Beta
+# use-wallet v3 (beta)
 
 [![npm version](https://badge.fury.io/js/%40txnlab%2Fuse-wallet-js.svg)](https://badge.fury.io/js/%40txnlab%2Fuse-wallet-js) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-UseWallet is a TypeScript library aimed at integrating Algorand wallets into decentralized applications (dApps). This vanilla JS version is a framework agnostic rewrite of the `@txnlab/use-wallet` React library: https://github.com/TxnLab/use-wallet
-
-:warning: **This library is currently in its beta stage and is not yet recommended for production use.**
-
 ## Overview
 
-This version of UseWallet generally follows the same design principles as the React version, with a few key differences:
+`use-wallet` is a TypeScript library that simplifies integrating Algorand wallets into decentralized applications (dApps).
 
-1. **Framework Agnostic:** Unlike v2, which uses React Hooks, v3 employs TypeScript classes, making it usable in non-React dApps.
+Version 3.x has been rewritten as a framework-agnostic core library that can be used in any JavaScript or TypeScript project. It ships with framework specific adapters for major frameworks (currently React and Vue only, more to come).
 
-2. **Efficient:** The core library has been optimized for speed and simplicity:
+### This is a beta release
 
-   - Framework-independent
-   - Implements on-demand loading for wallet SDKs
+:warning: The library is currently in beta stage and is not yet recommended for production use. The API is subject to change.
 
-3. **Dynamic SDK Initialization:** Instead of initializing all wallet SDKs upfront, v3 dynamically imports the relevant SDK only when a "Connect" action has been triggered.
+## Installation
 
-4. **Switching Networks**: The library lets you configure and set the network(s) your application uses, exposing an algod client instance for the current active network. This pattern was inspired by [solid-algo-wallets](https://github.com/SilentRhetoric/solid-algo-wallets) and allows for easy switching between public/local networks.
+Use any NPM package manager to install one of the framework-specific adapters or the standalone core library.
 
-5. **State Updates**: Each of the exported classes exposes a `subscribe` method for subscribing to state updates. In the absense of React, this provides a way for UI elements to re-render when the state changes.
+### React
 
-## Similar Structure to v2
+```bash
+npm install @txnlab/use-wallet-react
+```
 
-At a high level, v3 retains a familiar structure and API for users of v2.x, principally through the `WalletManager` class. This class echoes the `useWallet` hook API from the previous version, aiming to make transitions between versions as seamless as possible.
+Compatible with React v16.8+
 
-### Feedback and Issues
+### Vue
 
-Feedback from the Algorand community during this stage will impact the quality and utility of the final release! Engage with the development, report bugs, and start discussions using the [GitHub Issues](https://github.com/TxnLab/use-wallet/issues).
+```bash
+npm install @txnlab/use-wallet-vue
+```
 
-## Getting Started
+Compatible with Vue 3
 
-Install the package using NPM:
+### Core Library
 
 ```bash
 npm install @txnlab/use-wallet-js
 ```
 
-Install peer dependencies:
+Compatible with any ES6+ project (TypeScript recommended)
 
-```bash
-npm install @blockshake/defly-connect @perawallet/connect @walletconnect/modal @walletconnect/sign-client @walletconnect/types algosdk
-```
+### Wallet SDKs
+
+Some wallets require additional packages to be installed. The following table lists wallet providers and their corresponding packages.
+
+| Wallet Provider | Package(s)                                                                   |
+| --------------- | ---------------------------------------------------------------------------- |
+| Defly Wallet    | `@blockshake/defly-connect`                                                  |
+| Pera Wallet     | `@perawallet/connect`                                                        |
+| WalletConnect   | `@walletconnect/modal`, `@walletconnect/sign-client`, `@walletconnect/types` |
+| Lute Wallet     | `lute-connect`                                                               |
 
 ## Configuration
 
-The `WalletManager` class is the main entry point for the library. It is responsible for initializing the wallet SDKs, managing the network, and handling wallet connections.
+The `WalletManager` class is responsible for initializing the wallet providers and managing the active wallet, network, and state. It accepts a configuration object with three properties: `wallets`, `network`, and `algod`.
 
 ```ts
 import { NetworkId, WalletId, WalletManager } from '@txnlab/use-wallet-js'
@@ -60,6 +66,12 @@ const walletManager = new WalletManager({
     {
       id: WalletId.WALLETCONNECT,
       options: { projectId: '<YOUR_PROJECT_ID>' }
+    },
+    WalletId.KMD,
+    WalletId.KIBISIS,
+    {
+      id: WalletId.LUTE,
+      options: { siteName: '<YOUR_SITE_NAME>' }
     }
   ],
   network: NetworkId.TESTNET
@@ -72,27 +84,19 @@ Each wallet you wish to support must be included in the `wallets` array.
 
 To initialize wallets with default options, pass the wallet ID using the `WalletId` enum. To use custom options, pass an object with the `id` and `options` properties.
 
-> **Note:** WalletConnect's `projectId` option is required. You can get a project ID by registering your application at https://cloud.walletconnect.com/
+> **Note:** WalletConnect's `projectId` option is required. You can obtain a project ID by registering your application at https://cloud.walletconnect.com/
 
 #### `network` (optional)
 
-The `network` property is used to set the default network for the application. It can be set to either `BETANET`, `TESTNET`, `MAINNET`, or `LOCALNET`. The default (if unset) is `TESTNET`.
+The `network` property is used to set the network for the application. Using the `NetworkId` emum, it can be set to either `BETANET`, `TESTNET`, `MAINNET`, or `LOCALNET`. If unset, the default is `TESTNET`.
 
 The active network is persisted to local storage. If your application supports [switching networks](#setactivenetworknetwork-networkid-void), when a user revisits your app or refreshes the page, the active network from the previous session will be restored.
 
 #### `algod` (optional)
 
-The `WalletManager` class exposes an `algodClient` property, which is an instance of the `algosdk.Algodv2` class. This client is initialized with the default network, and can be used to make requests to an Algorand node.
+By default, the `WalletManager`'s algod client instance connects to [AlgoNode](https://algonode.io/api/)'s free (as in 🍺) API for public networks, and `http://localhost` for localnet. You can override this behavior by passing a custom `algod` configuration.
 
-```ts
-const algodClient = walletManager.algodClient
-```
-
-If the active network changes, the `algodClient` instance will be updated to reflect the new network.
-
-By default, the `algodClient` instance connects to [AlgoNode](https://algonode.io/api/)'s free (as in 🍺) API for public networks, and `http://localhost` for `LOCALNET`. You can override this behavior by passing an `algod` configuration object to the `WalletManager` constructor.
-
-To configure the `algodClient` for the active network only, pass an object with `token`, `baseServer` and `port` properties:
+If your app's network will not change, simply pass an object with `token`, `baseServer` and `port` properties:
 
 ```ts
 const walletManager = new WalletManager({
@@ -101,12 +105,12 @@ const walletManager = new WalletManager({
   algod: {
     token: '<YOUR_TOKEN>',
     baseServer: '<YOUR_SERVER_URL>',
-    port: '<YOUR_PORT>', // string | number
+    port: '<YOUR_PORT>'
   }
 })
 ```
 
-To configure the `algodClient` for specific networks, pass a mapped object of the network(s) you wish to configure, where each key is a `NetworkId` and each value is an `algod` configuration object:
+Or you can pass a mapped object of the network(s) you wish to configure with configurations keyed to `NetworkId` enum values:
 
 ```ts
 const walletManager = new WalletManager({
@@ -127,9 +131,205 @@ const walletManager = new WalletManager({
 })
 ```
 
+Environment variables can be used for these tokens and server URLs.
+
+## Quick Start (React)
+
+The `useWallet` hook is a React hook that provides access to the `WalletManager` instance and its state. It abstracts the `WalletManager` API and provides a simple interface for building a wallet menu and interacting with the active wallet.
+
+In the root of your application, wrap your app with the `WalletProvider` and pass the `walletManager` instance as a prop.
+
+```tsx
+import { NetworkId, WalletId, WalletManager, WalletProvider } from '@txnlab/use-wallet-react'
+
+// Create a manager instance
+const walletManager = new WalletManager({
+  wallets: [...],
+  network: NetworkId.TESTNET
+})
+
+function App() {
+  return (
+    // Provide the manager to your App
+    <WalletProvider manager={walletManager}>
+      <MyApp />
+    </WalletProvider>
+  )
+}
+
+render(<App />, document.getElementById('root'))
+```
+
+Now, in any component, you can use the `useWallet` hook to access the wallet manager and its state.
+
+```tsx
+import { useWallet } from '@txnlab/use-wallet-react'
+
+function WalletMenu() {
+  const { wallets, activeWallet, activeAccount } = useWallet()
+
+  return (
+    <div>
+      <h2>Wallets</h2>
+      <ul>
+        {wallets.map((wallet) => (
+          <li key={wallet.id}>
+            <button onClick={() => wallet.connect()}>{wallet.metadata.name}</button>
+          </li>
+        ))}
+      </ul>
+
+      {activeWallet && (
+        <div>
+          <h2>Active Wallet</h2>
+          <p>{activeWallet.metadata.name}</p>
+          <h2>Active Account</h2>
+          <p>{activeAccount?.address}</p>
+          <button onClick={() => activeWallet.disconnect()}>Disconnect</button>
+        </div>
+      )}
+    </div>
+  )
+}
+```
+
+To sign and send transactions, you can use the manager's `algodClient` instance and the `transactionSigner` provided by the active wallet.
+
+```tsx
+import { useWallet } from '@txnlab/use-wallet-react'
+import { algosdk } from 'algosdk'
+
+function SendAlgos() {
+  const { algodClient, activeAddress, transactionSigner } = useWallet()
+
+  const sendAlgos = async () => {
+    const atc = new algosdk.AtomicTransactionComposer()
+    const suggestedParams = await algodClient.getTransactionParams().do()
+
+    const txn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+      from: activeAddress,
+      to: '<RECIPIENT_ADDRESS>',
+      amount: 15000000,
+      suggestedParams
+    })
+
+    atc.addTransaction({ txn, signer: transactionSigner })
+
+    await atc.execute(algodClient, 4)
+  }
+
+  return <button onClick={sendAlgos}>Buy dev a Lavazza ☕️</button>
+}
+```
+
+To see fully functioning React examples, check out the [example apps](#example-apps) below.
+
+## Quick Start (Vue)
+
+The Vue adapter is a plugin that injects a `WalletManager` instance into the Vue app's context. It exposes a `useWallet` composable function, which lets you access the wallet manager from anywhere in your app.
+
+In the root of your application, install the plugin with your configuration object.
+
+```ts
+import { NetworkId, WalletId, WalletManagerPlugin } from '@txnlab/use-wallet-vue'
+import { createApp } from 'vue'
+import App from './App.vue'
+
+const app = createApp(App)
+
+// Install the plugin
+app.use(WalletManagerPlugin, {
+  wallets: [...],
+  network: NetworkId.TESTNET
+})
+
+app.mount('#app')
+```
+
+Now, in any component you have access the wallet manager and its state via the `useWallet` composable.
+
+```ts
+<script setup lang="ts">
+import { useWallet } from '@txnlab/use-wallet-vue'
+import algosdk from 'algosdk'
+
+const { wallets, activeWallet, activeAccount } = useWallet()
+</script>
+
+<template>
+  <div>
+    <h2>Wallets</h2>
+    <ul>
+      <li v-for="wallet in wallets" :key="wallet.id">
+        <button @click="wallet.connect()">{{ wallet.metadata.name }}</button>
+      </li>
+    </ul>
+
+    <div v-if="activeWallet">
+      <h2>Active Wallet</h2>
+      <p>{{ activeWallet.metadata.name }}</p>
+      <h2>Active Account</h2>
+      <p>{{ activeAccount?.address }}</p>
+      <button @click="activeWallet.disconnect()">Disconnect</button>
+    </div>
+  </div>
+</template>
+```
+
+To sign and send transactions, you can use the manager's `algodClient` instance and the `transactionSigner` provided by the active wallet.
+
+```ts
+<script setup lang="ts">
+import { useWallet } from '@txnlab/use-wallet-vue'
+import algosdk from 'algosdk'
+
+const { algodClient, activeAddress, transactionSigner } = useWallet()
+
+const sendAlgos = async () => {
+  const atc = new algosdk.AtomicTransactionComposer()
+  const suggestedParams = await algodClient.getTransactionParams().do()
+
+  const txn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+    from: activeAddress,
+    to: '<RECIPIENT_ADDRESS>',
+    amount: 15000000,
+    suggestedParams
+  })
+
+  atc.addTransaction({ txn, signer: transactionSigner })
+
+  await atc.execute(algodClient, 4)
+}
+</script>
+
+<template>
+  <button @click="sendAlgos">Buy dev a Lavazza ☕️</button>
+</template>
+```
+
+To see fully functioning Vue examples, check out the [example apps](#example-apps) below.
+
+## Example Apps
+
+The following examples demonstrate how to use the `use-wallet` v3 library in various frameworks.
+
+### React
+
+- [React](https://github.com/TxnLab/use-wallet/tree/v3/examples/react-ts)
+- [Next.js](https://github.com/TxnLab/use-wallet/tree/v3/examples/nextjs)
+
+### Vue
+
+- [Vue](https://github.com/TxnLab/use-wallet/tree/v3/examples/vue-ts)
+- [Nuxt](https://github.com/TxnLab/use-wallet/tree/v3/examples/nuxt)
+
+### Core Library
+
+- [Vanilla TypeScript](https://github.com/TxnLab/use-wallet/tree/v3/examples/vanilla-ts)
+
 ## WalletManager API
 
-The `WalletManager` class manages wallets, networks, and states.
+The following API is exposed via the `WalletManager` class instance. The framework adapters abstract the `WalletManager` class and expose a similar API via the `useWallet` hook (React) or composition function (Vue).
 
 ```ts
 class WalletManager {
@@ -141,13 +341,13 @@ class WalletManager {
 }
 ```
 
-### Methods
+### Public Methods
 
 ##### `subscribe(callback: (state: State) => void): (() => void)`
 
 - Subscribes to state changes.
 
-  - `callback`: The function to be executed when the state changes.
+  - `callback`: The function to be executed when state changes.
 
 ##### `setActiveNetwork(network: NetworkId): void`
 
@@ -155,15 +355,21 @@ class WalletManager {
 
   - `network`: The network to be set as active.
 
+##### `getWallet(walletId: WalletId): BaseWallet | undefined`
+
+- Returns a wallet instance by ID.
+
+  - `walletId`: The ID of the wallet to be retrieved.
+
 ##### `resumeSessions(): Promise<void>`
 
-- Refreshes/resumes the sessions of all wallets.
+- Re-initializes the connected wallet(s) from persisted storage when the app mounts. Framework adapters handle this automatically.
 
 ### Properties
 
 ##### `wallets: BaseWallet[]`
 
-- Returns all wallet instances.
+- Returns all initialized wallet instances.
 
 ##### `activeNetwork: NetworkId`
 
@@ -193,9 +399,57 @@ class WalletManager {
 
 - Returns the address of the currently active account.
 
+##### `signTransactions: BaseWallet.signTransactions`
+
+- Returns a function that signs transactions from an atomic transaction group with the active wallet. See the [description](#signtransactions) in the `BaseWallet` API below.
+
+##### `transactionSigner: BaseWallet.transactionSigner`
+
+- Returns a typed `TransactionSigner` function that signs transactions from an atomic transaction group with the active wallet. See the [description](#transactionsigner-transactionsigner) in the `BaseWallet` API below.
+
+## BaseWallet API
+
+The `BaseWallet` class is an abstract class that defines the interface for wallet implementations. Wallet providers all extend this class and implement its required methods.
+
+```ts
+abstract class BaseWallet {
+  constructor({ id, metadata, store, subscribe, getAlgodClient }: WalletConstructor<WalletId>)
+}
+```
+
+### Public Methods
+
+##### `subscribe(callback: (state: State) => void): (() => void)`
+
+- Subscribes to state changes.
+
+  - `callback`: The function to be executed when state changes.
+
+##### `connect(): Promise<WalletAccount[]>`
+
+- Connects the wallet to the dApp.
+
+##### `disconnect(): Promise<void>`
+
+- Disconnects the wallet from the dApp.
+
+##### `resumeSession(): Promise<void>`
+
+- Re-initializes the connected wallet from persisted storage when the app mounts.
+
+##### `setActive(): void`
+
+- Sets the wallet as the active wallet.
+
+##### `setActiveAccount(account: string): void`
+
+- Sets the active account.
+
+  - `account`: The account address to be set as active.
+
 ##### `signTransactions`
 
-- Throws an error if no active wallet, or returns the `signTransactions` method from the active wallet:
+- Signs transactions from an atomic transaction group with this wallet. This function accepts an array of either `algosdk.Transaction` objects or their serialized bytes. Transactions can be signed by any connected account in the wallet.
 
 ```ts
 public signTransactions(
@@ -207,7 +461,7 @@ public signTransactions(
 
 ##### `transactionSigner: TransactionSigner`
 
-- Throws an error if no active wallet, or returns a [`TransactionSigner`](https://github.com/algorand/js-algorand-sdk/blob/v2.6.0/src/signer.ts#L7-L18) function that signs with the active wallet.
+- A typed [`TransactionSigner`](https://github.com/algorand/js-algorand-sdk/blob/v2.7.0/src/signer.ts#L7-L18) function that signs transactions from an atomic transaction group with this wallet. It can be used with `AtomicTransactionComposer` - see https://developer.algorand.org/docs/get-details/atc/
 
 ```ts
 public transactionSigner(
@@ -216,29 +470,47 @@ public transactionSigner(
 ): Promise<Uint8Array[]>
 ```
 
-##### `transactionSignerAccount: TransactionSignerAccount`
+### Properties
 
-- Throws an error if no active account, or returns a [`TransactionSignerAccount`](https://github.com/algorandfoundation/algokit-utils-ts/blob/v4.0.0/docs/code/modules/index.md#gettransactionwithsigner) object with `addr` set to the active address and `signer` set to `this.transactionSigner` (see above).
+##### `id: WalletId`
 
-```ts
-/** A wrapper around `TransactionSigner` that also has the sender address. */
-interface TransactionSignerAccount {
-  addr: Readonly<string>
-  signer: TransactionSigner
-}
-```
+- The wallet's ID.
 
-## Example UI
+##### `metadata: WalletMetadata`
 
-See the [examples/vanilla-ts](https://github.com/TxnLab/use-wallet/tree/v3/examples/vanilla-ts) directory for a simple Vite app that demonstrates the library's functionality.
+- The wallet's metadata.
 
-## Switching Networks
+##### `name: string`
 
-> _Coming soon_
+- The wallet's name (uppercase).
 
-## Signing Transactions
+##### `accounts: WalletAccount[]`
 
-> _Coming soon_
+- The wallet's accounts.
+
+##### `addresses: string[]`
+
+- The wallet's account addresses.
+
+##### `activeAccount: WalletAccount | null`
+
+- The currently active account.
+
+##### `activeAddress: string | null`
+
+- The currently active account's address.
+
+##### `activeNetwork: NetworkId`
+
+- The currently active network.
+
+##### `isConnected: boolean`
+
+- Indicates whether the wallet is connected.
+
+##### `isActive: boolean`
+
+- Indicates whether the wallet is active.
 
 ## License
 
