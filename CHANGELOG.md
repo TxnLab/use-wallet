@@ -1,12 +1,14 @@
 # [2.8.0](https://github.com/txnlab/use-wallet/compare/v2.7.0...v2.8.0) (2024-03-27)
 
 ### Bug Fixes
-* Allow any connected account to be set active ([#141](https://github.com/txnlab/use-wallet/pull/141)) ([6220ed3](https://github.com/txnlab/use-wallet/commit/6220ed3f674de903b8e1d84c8e96f9ef342b4d34))
-* **Lute:** Fix ESLint error in LuteClient ([802d297](https://github.com/txnlab/use-wallet/commit/802d2972d4585f6ebf0e7bcfcf9180a9b28f56db))
-* Wrap postMessage in timeout to prevent race conditions ([#143](https://github.com/txnlab/use-wallet/pull/143)) ([2d18482](https://github.com/txnlab/use-wallet/commit/2d18482ef2dec3c250e9d2987479ca3c994d0825))
+
+- Allow any connected account to be set active ([#141](https://github.com/txnlab/use-wallet/pull/141)) ([6220ed3](https://github.com/txnlab/use-wallet/commit/6220ed3f674de903b8e1d84c8e96f9ef342b4d34))
+- **Lute:** Fix ESLint error in LuteClient ([802d297](https://github.com/txnlab/use-wallet/commit/802d2972d4585f6ebf0e7bcfcf9180a9b28f56db))
+- Wrap postMessage in timeout to prevent race conditions ([#143](https://github.com/txnlab/use-wallet/pull/143)) ([2d18482](https://github.com/txnlab/use-wallet/commit/2d18482ef2dec3c250e9d2987479ca3c994d0825))
 
 ### Features
-* Add ability to throw connection errors ([#142](https://github.com/txnlab/use-wallet/pull/142)) ([53689eb](https://github.com/txnlab/use-wallet/commit/53689eb2ad4bdbcca9c495749cb0bcd1ff96f636))
+
+- Add ability to throw connection errors ([#142](https://github.com/txnlab/use-wallet/pull/142)) ([53689eb](https://github.com/txnlab/use-wallet/commit/53689eb2ad4bdbcca9c495749cb0bcd1ff96f636))
 
 # [2.7.0](https://github.com/txnlab/use-wallet/compare/v2.6.2...v2.7.0) (2024-02-06)
 
