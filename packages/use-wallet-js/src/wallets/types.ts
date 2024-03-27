@@ -175,12 +175,6 @@ export interface SignerTransaction {
   message?: string
 }
 
-/** @see https://github.com/algorandfoundation/algokit-utils-ts/blob/v4.0.0/src/types/account.ts#L107-L111 */
-export interface TransactionSignerAccount {
-  addr: Readonly<string>
-  signer: algosdk.TransactionSigner
-}
-
 export interface JsonRpcRequest<T = any> {
   id: number
   jsonrpc: string

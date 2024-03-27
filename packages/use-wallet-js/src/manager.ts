@@ -22,7 +22,6 @@ import { createWalletMap, deepMerge } from 'src/utils'
 import type { BaseWallet } from 'src/wallets/base'
 import type {
   SupportedWallet,
-  TransactionSignerAccount,
   WalletAccount,
   WalletConfigMap,
   WalletId,
@@ -283,22 +282,5 @@ export class WalletManager {
       throw new Error('[Manager] No active wallet found!')
     }
     return this.activeWallet.transactionSigner
-  }
-
-  /**
-   * A wrapper around `TransactionSigner` that also has the sender address (the current active
-   * account). Can be used to produce a `TransactionWithSigner` object ready to be passed to an
-   * AtomicTransactionComposer's `addTransaction` method.
-   *
-   * @see https://github.com/algorandfoundation/algokit-utils-ts/blob/v4.0.0/docs/code/modules/index.md#gettransactionwithsigner
-   */
-  public get transactionSignerAccount(): TransactionSignerAccount {
-    if (!this.activeAddress) {
-      throw new Error('[Manager] No active account found!')
-    }
-    return {
-      addr: this.activeAddress,
-      signer: this.transactionSigner
-    }
   }
 }
