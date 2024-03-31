@@ -10,9 +10,11 @@
   "workspaces": [
     "packages/use-wallet",
     "packages/use-wallet-react",
+    "packages/use-wallet-solid",
     "packages/use-wallet-vue",
     "examples/use-wallet-example-vanilla-ts",
     "examples/use-wallet-example-react",
+    "examples/use-wallet-example-solid",
     "examples/use-wallet-example-vue"
   ],
   "scripts": {
@@ -36,6 +38,7 @@
     "eslint-plugin-prettier": "^5.0.1",
     "prettier": "3.2.5",
     "vite": "^5.0.8",
+    "vite-plugin-solid": "^2.8.2",
     "vitest": "^1.1.1",
     "vue-demi": "^0.14.6"
   }
