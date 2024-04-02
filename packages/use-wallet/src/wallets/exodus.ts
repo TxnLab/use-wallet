@@ -79,7 +79,7 @@ export class ExodusWallet extends BaseWallet {
     return client
   }
 
-  public async connect(): Promise<WalletAccount[]> {
+  public connect = async (): Promise<WalletAccount[]> => {
     console.info('[ExodusWallet] Connecting...')
     try {
       const client = this.client || (await this.initializeClient())
@@ -115,12 +115,12 @@ export class ExodusWallet extends BaseWallet {
     }
   }
 
-  public async disconnect(): Promise<void> {
+  public disconnect = async (): Promise<void> => {
     console.info('[ExodusWallet] Disconnecting...')
     this.onDisconnect()
   }
 
-  public async resumeSession(): Promise<void> {
+  public resumeSession = async (): Promise<void> => {
     try {
       const state = this.store.state
       const walletState = state.wallets[this.id]

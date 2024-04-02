@@ -56,7 +56,7 @@ export class PeraWallet extends BaseWallet {
     return client
   }
 
-  public async connect(): Promise<WalletAccount[]> {
+  public connect = async (): Promise<WalletAccount[]> => {
     console.info('[PeraWallet] Connecting...')
     try {
       const client = this.client || (await this.initializeClient())
@@ -92,7 +92,7 @@ export class PeraWallet extends BaseWallet {
     }
   }
 
-  public async disconnect(): Promise<void> {
+  public disconnect = async (): Promise<void> => {
     console.info('[PeraWallet] Disconnecting...')
     try {
       await this.client?.disconnect()
@@ -102,7 +102,7 @@ export class PeraWallet extends BaseWallet {
     }
   }
 
-  public async resumeSession(): Promise<void> {
+  public resumeSession = async (): Promise<void> => {
     try {
       const state = this.store.state
       const walletState = state.wallets[this.id]

@@ -94,7 +94,7 @@ export class KmdWallet extends BaseWallet {
     return client
   }
 
-  public async connect(): Promise<WalletAccount[]> {
+  public connect = async (): Promise<WalletAccount[]> => {
     console.info('[KmdWallet] Connecting...')
     try {
       if (!this.client) {
@@ -135,7 +135,7 @@ export class KmdWallet extends BaseWallet {
     }
   }
 
-  public async disconnect(): Promise<void> {
+  public disconnect = async (): Promise<void> => {
     console.info('[KmdWallet] Disconnecting...')
     this.onDisconnect()
   }

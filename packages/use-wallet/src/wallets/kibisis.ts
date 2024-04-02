@@ -388,7 +388,7 @@ export class KibisisWallet extends BaseWallet {
     }
   }
 
-  public async connect(): Promise<WalletAccount[]> {
+  public connect = async (): Promise<WalletAccount[]> => {
     console.info('[KibisisWallet] Connecting...')
     try {
       await this.getSupportedMethods()
@@ -417,12 +417,12 @@ export class KibisisWallet extends BaseWallet {
     }
   }
 
-  public async disconnect(): Promise<void> {
+  public disconnect = async (): Promise<void> => {
     console.info('[KibisisWallet] Disconnecting...')
     this.onDisconnect()
   }
 
-  public resumeSession(): Promise<void> {
+  public resumeSession = (): Promise<void> => {
     return Promise.resolve()
   }
 

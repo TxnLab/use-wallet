@@ -71,7 +71,7 @@ export class LuteWallet extends BaseWallet {
     return genesisId
   }
 
-  public async connect(): Promise<WalletAccount[]> {
+  public connect = async (): Promise<WalletAccount[]> => {
     console.info('[LuteWallet] Connecting...')
     try {
       const client = this.client || (await this.initializeClient())
@@ -104,12 +104,12 @@ export class LuteWallet extends BaseWallet {
     }
   }
 
-  public async disconnect(): Promise<void> {
+  public disconnect = async (): Promise<void> => {
     console.info('[LuteWallet] Disconnecting...')
     this.onDisconnect()
   }
 
-  public async resumeSession(): Promise<void> {
+  public resumeSession = async (): Promise<void> => {
     try {
       const state = this.store.state
       const walletState = state.wallets[this.id]

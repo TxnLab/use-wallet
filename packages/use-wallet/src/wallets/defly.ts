@@ -55,7 +55,7 @@ export class DeflyWallet extends BaseWallet {
     return client
   }
 
-  public async connect(): Promise<WalletAccount[]> {
+  public connect = async (): Promise<WalletAccount[]> => {
     console.info('[DeflyWallet] Connecting...')
     try {
       const client = this.client || (await this.initializeClient())
@@ -91,7 +91,7 @@ export class DeflyWallet extends BaseWallet {
     }
   }
 
-  public async disconnect(): Promise<void> {
+  public disconnect = async (): Promise<void> => {
     console.info('[DeflyWallet] Disconnecting...')
     try {
       await this.client?.disconnect()
@@ -101,7 +101,7 @@ export class DeflyWallet extends BaseWallet {
     }
   }
 
-  public async resumeSession(): Promise<void> {
+  public resumeSession = async (): Promise<void> => {
     try {
       const state = this.store.state
       const walletState = state.wallets[this.id]

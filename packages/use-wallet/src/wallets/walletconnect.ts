@@ -167,7 +167,7 @@ export class WalletConnect extends BaseWallet {
     return walletAccounts
   }
 
-  public async connect(): Promise<WalletAccount[]> {
+  public connect = async (): Promise<WalletAccount[]> => {
     console.info('[WalletConnect] Connecting...')
     try {
       const client = this.client || (await this.initializeClient())
@@ -201,7 +201,7 @@ export class WalletConnect extends BaseWallet {
     }
   }
 
-  public async disconnect(): Promise<void> {
+  public disconnect = async (): Promise<void> => {
     console.info('[WalletConnect] Disconnecting...')
     try {
       if (this.client && this.session) {
@@ -216,7 +216,7 @@ export class WalletConnect extends BaseWallet {
     }
   }
 
-  public async resumeSession(): Promise<void> {
+  public resumeSession = async (): Promise<void> => {
     try {
       const state = this.store.state
       const walletState = state.wallets[this.id]
