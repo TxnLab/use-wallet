@@ -42,12 +42,12 @@ export abstract class BaseWallet {
   public abstract disconnect(): Promise<void>
   public abstract resumeSession(): Promise<void>
 
-  public setActive(): void {
+  public setActive = (): void => {
     console.info(`[Wallet] Set active wallet: ${this.id}`)
     setActiveWallet(this.store, { walletId: this.id })
   }
 
-  public setActiveAccount(account: string): void {
+  public setActiveAccount = (account: string): void => {
     console.info(`[Wallet] Set active account: ${account}`)
     setActiveAccount(this.store, {
       walletId: this.id,
