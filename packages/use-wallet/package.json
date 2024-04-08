@@ -39,8 +39,7 @@
   "dependencies": {
     "@tanstack/store": "^0.3.1",
     "@walletconnect/utils": "^2.10.2",
-    "algosdk": "^2.7.0",
-    "buffer": "^6.0.3"
+    "algosdk": "^2.7.0"
   },
   "devDependencies": {
     "@blockshake/defly-connect": "^1.1.6",
