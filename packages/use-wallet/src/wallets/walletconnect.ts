@@ -148,7 +148,7 @@ export class WalletConnect extends BaseWallet {
         walletId: this.id,
         wallet: {
           accounts: walletAccounts,
-          activeAccount: walletAccounts[0]!
+          activeAccount: walletAccounts[0]
         }
       })
     } else {
@@ -232,7 +232,7 @@ export class WalletConnect extends BaseWallet {
 
       if (client.session.length) {
         const lastKeyIndex = client.session.keys.length - 1
-        const restoredSession = client.session.get(client.session.keys[lastKeyIndex]!)
+        const restoredSession = client.session.get(client.session.keys[lastKeyIndex])
         this.onSessionConnected(restoredSession)
       }
     } catch (error: any) {
@@ -271,7 +271,7 @@ export class WalletConnect extends BaseWallet {
       const isSigned = isSignedTxnObject(txnObject)
       const shouldSign = shouldSignTxnObject(txnObject, this.addresses, indexesToSign, idx)
 
-      const txnBuffer: Uint8Array = msgpackTxnGroup[idx]!
+      const txnBuffer: Uint8Array = msgpackTxnGroup[idx]
       const txn: algosdk.Transaction = isSigned
         ? algosdk.decodeSignedTransaction(txnBuffer).txn
         : algosdk.decodeUnsignedTransaction(txnBuffer)

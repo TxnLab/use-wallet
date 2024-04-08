@@ -400,7 +400,7 @@ export class KibisisWallet extends BaseWallet {
         address
       }))
 
-      const activeAccount = walletAccounts[0]!
+      const activeAccount = walletAccounts[0]
 
       addWallet(this.store, {
         walletId: this.id,
@@ -449,7 +449,7 @@ export class KibisisWallet extends BaseWallet {
         const isSigned = isSignedTxnObject(txnObject)
         const shouldSign = shouldSignTxnObject(txnObject, this.addresses, indexesToSign, idx)
 
-        const txnBuffer: Uint8Array = msgpackTxnGroup[idx]!
+        const txnBuffer: Uint8Array = msgpackTxnGroup[idx]
         const txn: algosdk.Transaction = isSigned
           ? algosdk.decodeSignedTransaction(txnBuffer).txn
           : algosdk.decodeUnsignedTransaction(txnBuffer)
