@@ -1,3 +1,9 @@
+## [3.0.0-beta.3](https://github.com/txnlab/use-wallet/compare/v3.0.0-beta.2...v3.0.0-beta.3) (2024-04-09)
+
+### Bug Fixes
+
+- **Core:** Perform byte array <-> b64 conversions w/ native JS ([#153](https://github.com/txnlab/use-wallet/pull/153)) ([054947c](https://github.com/txnlab/use-wallet/commit/054947c911a34fb297df9f368f61c252280c49f7))
+
 ## [3.0.0-beta.2](https://github.com/txnlab/use-wallet/compare/v3.0.0-beta.1...v3.0.0-beta.2) (2024-04-02)
 
 ### Bug Fixes
