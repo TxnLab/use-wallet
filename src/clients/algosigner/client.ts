@@ -7,6 +7,7 @@ import BaseClient from '../base'
 import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
 import { useWalletStore } from '../../store'
 import { debugLog } from '../../utils/debugLog'
+import { base64ToByteArray } from '../../utils/encoding'
 import { ICON } from './constants'
 import type { DecodedSignedTransaction, DecodedTransaction, Network } from '../../types/node'
 import type { InitParams } from '../../types/providers'
@@ -173,7 +174,7 @@ class AlgoSignerClient extends BaseClient {
     const signedTxns = transactions.reduce<Uint8Array[]>((acc, txn, i) => {
       if (signedIndexes.includes(i)) {
         const signedByUser = result[i]
-        signedByUser && acc.push(new Uint8Array(Buffer.from(signedByUser, 'base64')))
+        signedByUser && acc.push(base64ToByteArray(signedByUser))
       } else if (returnGroup) {
         acc.push(txn)
       }

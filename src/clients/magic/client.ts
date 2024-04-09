@@ -6,6 +6,7 @@ import Algod, { getAlgodClient } from '../../algod'
 import BaseClient from '../base'
 import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
 import { debugLog } from '../../utils/debugLog'
+import { base64ToByteArray, byteArrayToBase64 } from '../../utils/encoding'
 import { ICON } from './constants'
 import type { AlgorandExtension } from '@magic-ext/algorand'
 import type { SDKBase, InstanceWithExtensions } from '@magic-sdk/provider'
@@ -192,19 +193,19 @@ class MagicAuth extends BaseClient {
       if (indexesToSign && indexesToSign.length && indexesToSign.includes(i)) {
         signedIndexes.push(i)
         acc.push({
-          txn: Buffer.from(transactions[i]).toString('base64')
+          txn: byteArrayToBase64(transactions[i])
         })
         // If the indexes to be signed is specified, but it's not included in it,
         // designate that it should not be signed
       } else if (indexesToSign && indexesToSign.length && !indexesToSign.includes(i)) {
         acc.push({
           txn: isSigned
-            ? Buffer.from(
+            ? byteArrayToBase64(
                 this.algosdk.encodeUnsignedTransaction(
                   this.algosdk.decodeSignedTransaction(transactions[i]).txn
                 )
-              ).toString('base64')
-            : Buffer.from(transactions[i]).toString('base64'),
+              )
+            : byteArrayToBase64(transactions[i]),
           signers: []
         })
         // If the transaction is unsigned and is to be sent from a connected account,
@@ -212,21 +213,21 @@ class MagicAuth extends BaseClient {
       } else if (!isSigned && connectedAccounts.includes(this.algosdk.encodeAddress(txn['snd']))) {
         signedIndexes.push(i)
         acc.push({
-          txn: Buffer.from(transactions[i]).toString('base64')
+          txn: byteArrayToBase64(transactions[i])
         })
         // Otherwise, designate that it should not be signed
       } else if (isSigned) {
         acc.push({
-          txn: Buffer.from(
+          txn: byteArrayToBase64(
             this.algosdk.encodeUnsignedTransaction(
               this.algosdk.decodeSignedTransaction(transactions[i]).txn
             )
-          ).toString('base64'),
+          ),
           signers: []
         })
       } else if (!isSigned) {
         acc.push({
-          txn: Buffer.from(transactions[i]).toString('base64'),
+          txn: byteArrayToBase64(transactions[i]),
           signers: []
         })
       }
@@ -240,7 +241,7 @@ class MagicAuth extends BaseClient {
       const result = await this.#client.algorand.signGroupTransactionV2(txnsToSign)
       console.log(result)
       const decodedSignedTxns: Uint8Array[] = result.map((txn: string) => {
-        return Buffer.from(txn, 'base64')
+        return base64ToByteArray(txn)
       })
 
       // Join the newly signed transactions with the original group of transactions.

@@ -1,8 +1,8 @@
-import { Buffer } from 'buffer'
 import Algod, { getAlgodClient } from '../../algod'
 import BaseClient from '../base'
 import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
 import { debugLog } from '../../utils/debugLog'
+import { base64ToByteArray, byteArrayToBase64 } from '../../utils/encoding'
 import {
   ARC_0027_CHANNEL_NAME,
   ARC_0027_ENABLE_REQUEST,
@@ -214,11 +214,11 @@ class KibisisClient extends BaseClient {
    */
 
   private convertBytesToBase64(bytes: Uint8Array): string {
-    return Buffer.from(bytes).toString('base64')
+    return byteArrayToBase64(bytes)
   }
 
   private convertBase64ToBytes(input: string): Uint8Array {
-    return Buffer.from(input, 'base64')
+    return base64ToByteArray(input)
   }
 
   /**
