@@ -1,6 +1,7 @@
 import algosdk from 'algosdk'
 import { addWallet, type State } from 'src/store'
 import {
+  byteArrayToBase64,
   isSignedTxnObject,
   mergeSignedTxnsWithGroup,
   normalizeTxnGroup,
@@ -87,7 +88,7 @@ export class LuteWallet extends BaseWallet {
         address
       }))
 
-      const activeAccount = walletAccounts[0]!
+      const activeAccount = walletAccounts[0]
 
       addWallet(this.store, {
         walletId: this.id,
@@ -151,12 +152,12 @@ export class LuteWallet extends BaseWallet {
         const isSigned = isSignedTxnObject(txnObject)
         const shouldSign = shouldSignTxnObject(txnObject, this.addresses, indexesToSign, idx)
 
-        const txnBuffer: Uint8Array = msgpackTxnGroup[idx]!
+        const txnBuffer: Uint8Array = msgpackTxnGroup[idx]
         const txn: algosdk.Transaction = isSigned
           ? algosdk.decodeSignedTransaction(txnBuffer).txn
           : algosdk.decodeUnsignedTransaction(txnBuffer)
 
-        const txnBase64 = Buffer.from(txn.toByte()).toString('base64')
+        const txnBase64 = byteArrayToBase64(txn.toByte())
 
         if (shouldSign) {
           txnsToSign.push({ txn: txnBase64 })
@@ -200,7 +201,7 @@ export class LuteWallet extends BaseWallet {
       }
 
       const txnsToSign = txnGroup.reduce<WalletTransaction[]>((acc, txn, idx) => {
-        const txnBase64 = Buffer.from(txn.toByte()).toString('base64')
+        const txnBase64 = byteArrayToBase64(txn.toByte())
 
         if (indexesToSign.includes(idx)) {
           acc.push({ txn: txnBase64 })

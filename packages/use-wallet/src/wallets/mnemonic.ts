@@ -127,7 +127,7 @@ export class MnemonicWallet extends BaseWallet {
         const signedTxn = txn.signTxn(this.account!.sk)
         txnGroupSigned.push(signedTxn)
       } else if (returnGroup) {
-        txnGroupSigned.push(msgpackTxnGroup[idx]!)
+        txnGroupSigned.push(msgpackTxnGroup[idx])
       }
     })
 

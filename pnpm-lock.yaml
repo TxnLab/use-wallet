@@ -298,9 +298,6 @@ importers:
       algosdk:
         specifier: ^2.7.0
         version: 2.7.0
-      buffer:
-        specifier: ^6.0.3
-        version: 6.0.3
     devDependencies:
       '@blockshake/defly-connect':
         specifier: ^1.1.6

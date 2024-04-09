@@ -1,6 +1,8 @@
 import algosdk from 'algosdk'
 import { addWallet, type State } from 'src/store'
 import {
+  base64ToByteArray,
+  byteArrayToBase64,
   generateUuid,
   isSignedTxnObject,
   mergeSignedTxnsWithGroup,
@@ -400,7 +402,7 @@ export class KibisisWallet extends BaseWallet {
         address
       }))
 
-      const activeAccount = walletAccounts[0]!
+      const activeAccount = walletAccounts[0]
 
       addWallet(this.store, {
         walletId: this.id,
@@ -449,12 +451,12 @@ export class KibisisWallet extends BaseWallet {
         const isSigned = isSignedTxnObject(txnObject)
         const shouldSign = shouldSignTxnObject(txnObject, this.addresses, indexesToSign, idx)
 
-        const txnBuffer: Uint8Array = msgpackTxnGroup[idx]!
+        const txnBuffer: Uint8Array = msgpackTxnGroup[idx]
         const txn: algosdk.Transaction = isSigned
           ? algosdk.decodeSignedTransaction(txnBuffer).txn
           : algosdk.decodeUnsignedTransaction(txnBuffer)
 
-        const txnBase64 = Buffer.from(txn.toByte()).toString('base64')
+        const txnBase64 = byteArrayToBase64(txn.toByte())
 
         if (shouldSign) {
           txnsToSign.push({ txn: txnBase64 })
@@ -471,7 +473,7 @@ export class KibisisWallet extends BaseWallet {
       const signedTxnsBase64 = signTxnsResult.filter(Boolean) as string[]
 
       // Convert base64 signed transactions to msgpack
-      const signedTxns = signedTxnsBase64.map((txn) => new Uint8Array(Buffer.from(txn, 'base64')))
+      const signedTxns = signedTxnsBase64.map((txn) => base64ToByteArray(txn))
 
       // Merge signed transactions back into original group
       const txnGroupSigned = mergeSignedTxnsWithGroup(
@@ -497,7 +499,7 @@ export class KibisisWallet extends BaseWallet {
   ): Promise<Uint8Array[]> => {
     try {
       const txnsToSign = txnGroup.reduce<Arc0001SignTxns[]>((acc, txn, idx) => {
-        const txnBase64 = Buffer.from(txn.toByte()).toString('base64')
+        const txnBase64 = byteArrayToBase64(txn.toByte())
 
         if (indexesToSign.includes(idx)) {
           acc.push({ txn: txnBase64 })
@@ -510,7 +512,7 @@ export class KibisisWallet extends BaseWallet {
       const signTxnsResult = await this.signTxns(txnsToSign)
       const signedTxnsBase64 = signTxnsResult.filter(Boolean) as string[]
 
-      const signedTxns = signedTxnsBase64.map((txn) => new Uint8Array(Buffer.from(txn, 'base64')))
+      const signedTxns = signedTxnsBase64.map((txn) => base64ToByteArray(txn))
       return signedTxns
     } catch (error: any) {
       console.error(

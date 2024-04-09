@@ -3,6 +3,8 @@ import algosdk from 'algosdk'
 import { NetworkId, caipChainId } from 'src/network'
 import { addWallet, setAccounts, type State } from 'src/store'
 import {
+  base64ToByteArray,
+  byteArrayToBase64,
   compareAccounts,
   formatJsonRpcRequest,
   isSignedTxnObject,
@@ -148,7 +150,7 @@ export class WalletConnect extends BaseWallet {
         walletId: this.id,
         wallet: {
           accounts: walletAccounts,
-          activeAccount: walletAccounts[0]!
+          activeAccount: walletAccounts[0]
         }
       })
     } else {
@@ -232,7 +234,7 @@ export class WalletConnect extends BaseWallet {
 
       if (client.session.length) {
         const lastKeyIndex = client.session.keys.length - 1
-        const restoredSession = client.session.get(client.session.keys[lastKeyIndex]!)
+        const restoredSession = client.session.get(client.session.keys[lastKeyIndex])
         this.onSessionConnected(restoredSession)
       }
     } catch (error: any) {
@@ -271,12 +273,12 @@ export class WalletConnect extends BaseWallet {
       const isSigned = isSignedTxnObject(txnObject)
       const shouldSign = shouldSignTxnObject(txnObject, this.addresses, indexesToSign, idx)
 
-      const txnBuffer: Uint8Array = msgpackTxnGroup[idx]!
+      const txnBuffer: Uint8Array = msgpackTxnGroup[idx]
       const txn: algosdk.Transaction = isSigned
         ? algosdk.decodeSignedTransaction(txnBuffer).txn
         : algosdk.decodeUnsignedTransaction(txnBuffer)
 
-      const txnBase64 = Buffer.from(txn.toByte()).toString('base64')
+      const txnBase64 = byteArrayToBase64(txn.toByte())
 
       if (shouldSign) {
         txnsToSign.push({ txn: txnBase64 })
@@ -300,7 +302,7 @@ export class WalletConnect extends BaseWallet {
     const signedTxnsBase64 = signTxnsResult.filter(Boolean) as string[]
 
     // Convert base64 signed transactions to msgpack
-    const signedTxns = signedTxnsBase64.map((txn) => new Uint8Array(Buffer.from(txn, 'base64')))
+    const signedTxns = signedTxnsBase64.map((txn) => base64ToByteArray(txn))
 
     // Merge signed transactions back into original group
     const txnGroupSigned = mergeSignedTxnsWithGroup(
@@ -328,7 +330,7 @@ export class WalletConnect extends BaseWallet {
     }
 
     const txnsToSign = txnGroup.reduce<WalletTransaction[]>((acc, txn, idx) => {
-      const txnBase64 = Buffer.from(txn.toByte()).toString('base64')
+      const txnBase64 = byteArrayToBase64(txn.toByte())
 
       if (indexesToSign.includes(idx)) {
         acc.push({ txn: txnBase64 })
@@ -352,7 +354,7 @@ export class WalletConnect extends BaseWallet {
     const signedTxnsBase64 = signTxnsResult.filter(Boolean) as string[]
 
     // Convert base64 signed transactions to msgpack
-    const signedTxns = signedTxnsBase64.map((txn) => new Uint8Array(Buffer.from(txn, 'base64')))
+    const signedTxns = signedTxnsBase64.map((txn) => base64ToByteArray(txn))
 
     return signedTxns
   }
