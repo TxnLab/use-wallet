@@ -173,3 +173,7 @@ storybook-static/
 
 # NVM config
 .nvmrc
+
+# v3
+examples/
+packages/
