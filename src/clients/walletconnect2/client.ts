@@ -6,6 +6,7 @@ import Algod, { getAlgodClient } from '../../algod'
 import BaseClient from '../base'
 import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
 import { debugLog } from '../../utils/debugLog'
+import { base64ToByteArray, byteArrayToBase64 } from '../../utils/encoding'
 import { isPublicNetwork } from '../../utils/types'
 import { ALGORAND_CHAINS, ICON } from './constants'
 import { formatJsonRpcRequest } from './utils'
@@ -207,7 +208,7 @@ class WalletConnectClient extends BaseClient {
     const signedTxns = transactions.reduce<Uint8Array[]>((acc, txn, i) => {
       if (signedIndexes.includes(i)) {
         const signedTxn = lengthsMatch ? response[i] : response.shift()
-        signedTxn && acc.push(new Uint8Array(Buffer.from(signedTxn, 'base64')))
+        signedTxn && acc.push(base64ToByteArray(signedTxn))
       } else if (returnGroup) {
         acc.push(txn)
       }
@@ -245,17 +246,17 @@ class WalletConnectClient extends BaseClient {
       if (shouldSign) {
         signedIndexes.push(i)
         acc.push({
-          txn: Buffer.from(transactions[i]).toString('base64')
+          txn: byteArrayToBase64(transactions[i])
         })
       } else {
         acc.push({
           txn: isSigned
-            ? Buffer.from(
+            ? byteArrayToBase64(
                 this.algosdk.encodeUnsignedTransaction(
                   this.algosdk.decodeSignedTransaction(transactions[i]).txn
                 )
-              ).toString('base64')
-            : Buffer.from(transactions[i]).toString('base64'),
+              )
+            : byteArrayToBase64(transactions[i]),
           signers: []
         })
       }
