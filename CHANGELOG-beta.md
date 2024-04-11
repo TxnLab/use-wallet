@@ -1,3 +1,9 @@
+## [3.0.0-beta.5](https://github.com/txnlab/use-wallet/compare/v3.0.0-beta.4...v3.0.0-beta.5) (2024-04-11)
+
+### Hotfix
+
+- **Core:** Use correct Localnet algod default port ([#165](https://github.com/txnlab/use-wallet/pull/165)) ([ec1c4bb](https://github.com/txnlab/use-wallet/commit/ec1c4bb4151706bf930121549da12699a22fa714))
+
 ## [3.0.0-beta.4](https://github.com/txnlab/use-wallet/compare/v3.0.0-beta.3...v3.0.0-beta.4) (2024-04-11)
 
 ### Features
