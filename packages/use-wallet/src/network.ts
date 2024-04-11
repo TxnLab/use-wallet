@@ -52,7 +52,7 @@ export function createDefaultNetworkConfig(): NetworkConfigMap {
   const localnetConfig: AlgodConfig = {
     token: 'a'.repeat(64),
     baseServer: 'http://localhost',
-    port: 4002,
+    port: 4001,
     headers: {}
   }
 
