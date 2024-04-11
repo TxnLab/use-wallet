@@ -1,4 +1,3 @@
-import { getAppMetadata, getSdkError } from '@walletconnect/utils'
 import algosdk from 'algosdk'
 import { NetworkId, caipChainId } from 'src/network'
 import { addWallet, setAccounts, type State } from 'src/store'
@@ -65,7 +64,7 @@ export class WalletConnect extends BaseWallet {
     const {
       projectId,
       relayUrl = 'wss://relay.walletconnect.com',
-      metadata: _metadata = getAppMetadata(),
+      metadata: _metadata,
       ...modalOptions
     } = options
 
@@ -209,7 +208,10 @@ export class WalletConnect extends BaseWallet {
       if (this.client && this.session) {
         await this.client.disconnect({
           topic: this.session.topic,
-          reason: getSdkError('USER_DISCONNECTED')
+          reason: {
+            message: 'User disconnected.',
+            code: 6000
+          }
         })
       }
       this.onDisconnect()
