@@ -1,3 +1,17 @@
+## [3.0.0-beta.4](https://github.com/txnlab/use-wallet/compare/v3.0.0-beta.3...v3.0.0-beta.4) (2024-04-11)
+
+### Features
+
+- **Core:** Set default LocalNet network config ([#155](https://github.com/txnlab/use-wallet/pull/155)) ([ef65328](https://github.com/txnlab/use-wallet/commit/ef653283897c514705db8339c6413172d4802aa8))
+
+### Bug Fixes
+
+- **Core:** Use correct `this` context in setActiveNetwork ([#154](https://github.com/txnlab/use-wallet/pull/154)) ([b48dd33](https://github.com/txnlab/use-wallet/commit/b48dd33c98092a3165b6e034fd16e9dbd3ae0848))
+
+### Other Changes
+
+- Remove `@walletconnect/utils` dependency (drastically reducing bundle size) ([025d0a9](https://github.com/txnlab/use-wallet/commit/025d0a9face8bd3681354959d4a7271cdd881da3))
+
 ## [3.0.0-beta.3](https://github.com/txnlab/use-wallet/compare/v3.0.0-beta.2...v3.0.0-beta.3) (2024-04-09)
 
 ### Bug Fixes
