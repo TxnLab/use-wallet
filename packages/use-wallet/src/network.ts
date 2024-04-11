@@ -50,14 +50,27 @@ export const nodeServerMap = {
 }
 
 export function createDefaultNetworkConfig(): NetworkConfigMap {
-  return Object.values(NetworkId).reduce((acc, value) => {
-    acc[value as NetworkId] = {
-      token: '',
-      baseServer: nodeServerMap[value as NetworkId],
-      port: '',
-      headers: {}
-    }
-    return acc
+  const localnetConfig: AlgodConfig = {
+    token: 'a'.repeat(64),
+    baseServer: nodeServerMap[NetworkId.LOCALNET],
+    port: 4002,
+    headers: {}
+  }
+
+  return Object.values(NetworkId).reduce((configMap, value) => {
+    const network = value as NetworkId
+    const isLocalnet = network === NetworkId.LOCALNET
+
+    configMap[network] = isLocalnet
+      ? localnetConfig
+      : {
+          token: '',
+          baseServer: nodeServerMap[network],
+          port: '',
+          headers: {}
+        }
+
+    return configMap
   }, {} as NetworkConfigMap)
 }
 
