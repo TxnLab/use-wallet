@@ -45,14 +45,13 @@ export type NetworkConfig = Partial<AlgodConfig> | Partial<Record<NetworkId, Par
 export const nodeServerMap = {
   [NetworkId.MAINNET]: 'https://mainnet-api.algonode.cloud',
   [NetworkId.TESTNET]: 'https://testnet-api.algonode.cloud',
-  [NetworkId.BETANET]: 'https://betanet-api.algonode.cloud',
-  [NetworkId.LOCALNET]: 'http://localhost'
+  [NetworkId.BETANET]: 'https://betanet-api.algonode.cloud'
 }
 
 export function createDefaultNetworkConfig(): NetworkConfigMap {
   const localnetConfig: AlgodConfig = {
     token: 'a'.repeat(64),
-    baseServer: nodeServerMap[NetworkId.LOCALNET],
+    baseServer: 'http://localhost',
     port: 4002,
     headers: {}
   }
