@@ -2,11 +2,11 @@
 
 ### Features
 
-- **Core:** Set default LocalNet network config ([#155](https://github.com/txnlab/use-wallet/pull/155)) ([ef65328](https://github.com/txnlab/use-wallet/commit/ef653283897c514705db8339c6413172d4802aa8))
+- **Core:** Set default LocalNet network config ([#164](https://github.com/txnlab/use-wallet/pull/164)) ([ef65328](https://github.com/txnlab/use-wallet/commit/ef653283897c514705db8339c6413172d4802aa8))
 
 ### Bug Fixes
 
-- **Core:** Use correct `this` context in setActiveNetwork ([#154](https://github.com/txnlab/use-wallet/pull/154)) ([b48dd33](https://github.com/txnlab/use-wallet/commit/b48dd33c98092a3165b6e034fd16e9dbd3ae0848))
+- **Core:** Use correct `this` context in setActiveNetwork ([#163](https://github.com/txnlab/use-wallet/pull/163)) ([b48dd33](https://github.com/txnlab/use-wallet/commit/b48dd33c98092a3165b6e034fd16e9dbd3ae0848))
 
 ### Other Changes
 
