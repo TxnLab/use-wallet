@@ -206,7 +206,7 @@ export class WalletManager {
     return this.algodClient
   }
 
-  public setActiveNetwork(networkId: NetworkId): void {
+  public setActiveNetwork = (networkId: NetworkId): void => {
     setActiveNetwork(this.store, { networkId })
     this.algodClient = this.createAlgodClient(this.networkConfig[networkId])
   }

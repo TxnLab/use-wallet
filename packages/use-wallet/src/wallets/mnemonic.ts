@@ -49,7 +49,7 @@ export class MnemonicWallet extends BaseWallet {
     return account
   }
 
-  public async connect(): Promise<WalletAccount[]> {
+  public connect = async (): Promise<WalletAccount[]> => {
     console.info('[MnemonicWallet] Connecting...')
     try {
       const account = this.initializeAccount()
@@ -74,7 +74,7 @@ export class MnemonicWallet extends BaseWallet {
     }
   }
 
-  public async disconnect(): Promise<void> {
+  public disconnect = async (): Promise<void> => {
     console.info('[MnemonicWallet] Disconnecting...')
     try {
       this.account = null
@@ -84,7 +84,7 @@ export class MnemonicWallet extends BaseWallet {
     }
   }
 
-  public async resumeSession(): Promise<void> {
+  public resumeSession = async (): Promise<void> => {
     const state = this.store.state
     const walletState = state.wallets[this.id]
 
@@ -127,7 +127,7 @@ export class MnemonicWallet extends BaseWallet {
         const signedTxn = txn.signTxn(this.account!.sk)
         txnGroupSigned.push(signedTxn)
       } else if (returnGroup) {
-        txnGroupSigned.push(msgpackTxnGroup[idx]!)
+        txnGroupSigned.push(msgpackTxnGroup[idx])
       }
     })
 

@@ -40,6 +40,30 @@ export function compareAccounts(accounts: WalletAccount[], compareTo: WalletAcco
   return true
 }
 
+export function base64ToByteArray(blob: string): Uint8Array {
+  return stringToByteArray(atob(blob))
+}
+
+export function byteArrayToBase64(array: Uint8Array): string {
+  return btoa(byteArrayToString(array))
+}
+
+export function stringToByteArray(str: string): Uint8Array {
+  const array = new Uint8Array(str.length)
+  for (let i = 0; i < str.length; i++) {
+    array[i] = str.charCodeAt(i)
+  }
+  return array
+}
+
+export function byteArrayToString(array: Uint8Array): string {
+  let result = ''
+  for (let i = 0; i < array.length; i++) {
+    result += String.fromCharCode(array[i])
+  }
+  return result
+}
+
 export function isTransaction(
   item: algosdk.Transaction | algosdk.Transaction[] | Uint8Array | Uint8Array[]
 ): item is algosdk.Transaction | algosdk.Transaction[] {
@@ -122,7 +146,7 @@ export function mergeSignedTxnsWithGroup(
       const signedByUser = signedTxns.shift()
       signedByUser && acc.push(signedByUser)
     } else if (returnGroup) {
-      acc.push(txnGroup[i]!)
+      acc.push(txnGroup[i])
     }
     return acc
   }, [])
@@ -184,7 +208,7 @@ export function generateUuid(): string {
 
     return (
       valueAsNumber ^
-      (window.crypto.getRandomValues(new Uint8Array(1))[0]! & (15 >> (valueAsNumber / 4)))
+      (window.crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (valueAsNumber / 4)))
     ).toString(16)
   })
 }

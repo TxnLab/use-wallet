@@ -94,7 +94,7 @@ export class KmdWallet extends BaseWallet {
     return client
   }
 
-  public async connect(): Promise<WalletAccount[]> {
+  public connect = async (): Promise<WalletAccount[]> => {
     console.info('[KmdWallet] Connecting...')
     try {
       if (!this.client) {
@@ -116,7 +116,7 @@ export class KmdWallet extends BaseWallet {
         address
       }))
 
-      const activeAccount = walletAccounts[0]!
+      const activeAccount = walletAccounts[0]
 
       addWallet(this.store, {
         walletId: this.id,
@@ -135,7 +135,7 @@ export class KmdWallet extends BaseWallet {
     }
   }
 
-  public async disconnect(): Promise<void> {
+  public disconnect = async (): Promise<void> => {
     console.info('[KmdWallet] Disconnecting...')
     this.onDisconnect()
   }
@@ -186,7 +186,7 @@ export class KmdWallet extends BaseWallet {
       const isSigned = isSignedTxnObject(txnObject)
       const shouldSign = shouldSignTxnObject(txnObject, this.addresses, indexesToSign, idx)
 
-      const txnBuffer: Uint8Array = msgpackTxnGroup[idx]!
+      const txnBuffer: Uint8Array = msgpackTxnGroup[idx]
       const txn: algosdk.Transaction = isSigned
         ? algosdk.decodeSignedTransaction(txnBuffer).txn
         : algosdk.decodeUnsignedTransaction(txnBuffer)

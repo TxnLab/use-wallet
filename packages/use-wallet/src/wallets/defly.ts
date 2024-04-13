@@ -55,7 +55,7 @@ export class DeflyWallet extends BaseWallet {
     return client
   }
 
-  public async connect(): Promise<WalletAccount[]> {
+  public connect = async (): Promise<WalletAccount[]> => {
     console.info('[DeflyWallet] Connecting...')
     try {
       const client = this.client || (await this.initializeClient())
@@ -70,7 +70,7 @@ export class DeflyWallet extends BaseWallet {
         address
       }))
 
-      const activeAccount = walletAccounts[0]!
+      const activeAccount = walletAccounts[0]
 
       addWallet(this.store, {
         walletId: this.id,
@@ -91,7 +91,7 @@ export class DeflyWallet extends BaseWallet {
     }
   }
 
-  public async disconnect(): Promise<void> {
+  public disconnect = async (): Promise<void> => {
     console.info('[DeflyWallet] Disconnecting...')
     try {
       await this.client?.disconnect()
@@ -101,7 +101,7 @@ export class DeflyWallet extends BaseWallet {
     }
   }
 
-  public async resumeSession(): Promise<void> {
+  public resumeSession = async (): Promise<void> => {
     try {
       const state = this.store.state
       const walletState = state.wallets[this.id]
@@ -163,7 +163,7 @@ export class DeflyWallet extends BaseWallet {
       const isSigned = isSignedTxnObject(txnObject)
       const shouldSign = shouldSignTxnObject(txnObject, this.addresses, indexesToSign, idx)
 
-      const txnBuffer: Uint8Array = msgpackTxnGroup[idx]!
+      const txnBuffer: Uint8Array = msgpackTxnGroup[idx]
       const txn: algosdk.Transaction = isSigned
         ? algosdk.decodeSignedTransaction(txnBuffer).txn
         : algosdk.decodeUnsignedTransaction(txnBuffer)

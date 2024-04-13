@@ -56,7 +56,7 @@ export class PeraWallet extends BaseWallet {
     return client
   }
 
-  public async connect(): Promise<WalletAccount[]> {
+  public connect = async (): Promise<WalletAccount[]> => {
     console.info('[PeraWallet] Connecting...')
     try {
       const client = this.client || (await this.initializeClient())
@@ -71,7 +71,7 @@ export class PeraWallet extends BaseWallet {
         address
       }))
 
-      const activeAccount = walletAccounts[0]!
+      const activeAccount = walletAccounts[0]
 
       addWallet(this.store, {
         walletId: this.id,
@@ -92,7 +92,7 @@ export class PeraWallet extends BaseWallet {
     }
   }
 
-  public async disconnect(): Promise<void> {
+  public disconnect = async (): Promise<void> => {
     console.info('[PeraWallet] Disconnecting...')
     try {
       await this.client?.disconnect()
@@ -102,7 +102,7 @@ export class PeraWallet extends BaseWallet {
     }
   }
 
-  public async resumeSession(): Promise<void> {
+  public resumeSession = async (): Promise<void> => {
     try {
       const state = this.store.state
       const walletState = state.wallets[this.id]
@@ -164,7 +164,7 @@ export class PeraWallet extends BaseWallet {
       const isSigned = isSignedTxnObject(txnObject)
       const shouldSign = shouldSignTxnObject(txnObject, this.addresses, indexesToSign, idx)
 
-      const txnBuffer: Uint8Array = msgpackTxnGroup[idx]!
+      const txnBuffer: Uint8Array = msgpackTxnGroup[idx]
       const txn: algosdk.Transaction = isSigned
         ? algosdk.decodeSignedTransaction(txnBuffer).txn
         : algosdk.decodeUnsignedTransaction(txnBuffer)
