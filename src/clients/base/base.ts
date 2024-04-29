@@ -3,6 +3,7 @@ import { audio } from '../../media/audio'
 import type { AccountInfo, Asset, ClientOptions, Metadata, Wallet } from '../../types/wallet'
 import type { ConfirmedTxn, TxnType } from '../../types/node'
 import type { RawTxnResponse, TransactionsArray, TxnInfo } from '../../types/api'
+import { base64ToByteArray } from '../../utils/encoding'
 
 const getIsIOS = () => {
   if (typeof window !== 'undefined') {
@@ -84,8 +85,8 @@ abstract class BaseClient {
 
   decodeTransaction = (txn: string, isSigned: boolean) => {
     return isSigned
-      ? this.algosdk.decodeSignedTransaction(new Uint8Array(Buffer.from(txn, 'base64'))).txn
-      : this.algosdk.decodeUnsignedTransaction(new Uint8Array(Buffer.from(txn, 'base64')))
+      ? this.algosdk.decodeSignedTransaction(base64ToByteArray(txn)).txn
+      : this.algosdk.decodeUnsignedTransaction(base64ToByteArray(txn))
   }
 
   logEncodedTransaction(txn: string, isSigned: boolean) {

@@ -1,4 +1,5 @@
 import { encodeNFDTransactionsArray, NFDTransactionsArray } from './encodeNFDTransactionsArray'
+import { byteArrayToBase64 } from './encoding'
 
 describe('encodeNFDTransactionsArray', () => {
   it('should encode each transaction in the array to a Uint8Array', () => {
@@ -14,7 +15,7 @@ describe('encodeNFDTransactionsArray', () => {
     expect(result[1]).toBeInstanceOf(Uint8Array)
 
     // Verify if the decoded values match the expected base64 strings
-    expect(Buffer.from(result[0]).toString('base64')).toEqual(testTransactionsArray[0][1])
-    expect(Buffer.from(result[1]).toString('base64')).toEqual(testTransactionsArray[1][1])
+    expect(byteArrayToBase64(result[0])).toEqual(testTransactionsArray[0][1])
+    expect(byteArrayToBase64(result[1])).toEqual(testTransactionsArray[1][1])
   })
 })
