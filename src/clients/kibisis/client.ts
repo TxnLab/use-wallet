@@ -272,7 +272,11 @@ class KibisisClient extends BaseClient {
    * @returns {Promise<ARC0001SignTxns>} the transaction that is ready to be signed by the wallet.
    * @private
    */
-  private async mapRawTransactionToARC0001Transaction(rawTransaction: Uint8Array, connectedAccounts: string[], toSign?: boolean): Promise<ARC0001SignTxns> {
+  private async mapRawTransactionToARC0001Transaction(
+    rawTransaction: Uint8Array,
+    connectedAccounts: string[],
+    toSign?: boolean
+  ): Promise<ARC0001SignTxns> {
     const decodedTxn = this.algosdk.decodeObj(rawTransaction) as
       | DecodedTransaction
       | DecodedSignedTransaction
@@ -300,10 +304,7 @@ class KibisisClient extends BaseClient {
     }
 
     // if the sender is not authorized or the index has not been included in the to be signed indexes, instruct the provider not to sign by providing an empty signers array
-    if (
-      !connectedAccounts.includes(sender) ||
-      !toSign
-    ) {
+    if (!connectedAccounts.includes(sender) || !toSign) {
       return {
         txn,
         signers: [],
@@ -481,14 +482,18 @@ class KibisisClient extends BaseClient {
     // TODO: the below disable/ignore is necessary as the reduce function throws a TS error for union types (https://github.com/microsoft/TypeScript/issues/36390), however, these can be removed when typescript is updated to 5.2.2+, as the issue has been fixed
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    const transactions: ARC0001SignTxns[] = transactionsOrTransactionGroups.reduce<ARC0001SignTxns[]>((acc: ARC0001SignTxns[], currentValue: Uint8Array | Uint8Array[], index: number) => {
+    const transactions: ARC0001SignTxns[] = transactionsOrTransactionGroups.reduce<
+      ARC0001SignTxns[]
+    >((acc: ARC0001SignTxns[], currentValue: Uint8Array | Uint8Array[], index: number) => {
       const toSign = indexesToSign && indexesToSign.includes(index)
 
       // if an element is an array, concatenate each mapped element as we want a flat (one-dimensional) array to send to the wallet
       if (Array.isArray(currentValue)) {
         return [
           ...acc,
-          ...currentValue.map((value) => this.mapRawTransactionToARC0001Transaction(value, connectedAccounts, toSign))
+          ...currentValue.map((value) =>
+            this.mapRawTransactionToARC0001Transaction(value, connectedAccounts, toSign)
+          )
         ]
       }
 
