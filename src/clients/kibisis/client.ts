@@ -483,29 +483,36 @@ class KibisisClient extends BaseClient {
     // TODO: the below disable/ignore is necessary as the reduce function throws a TS error for union types (https://github.com/microsoft/TypeScript/issues/36390), however, these can be removed when typescript is updated to 5.2.2+, as the issue has been fixed
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    const flatTransactions: RawTransactionToSign[] = transactionsOrTransactionGroups.reduce((acc: RawTransactionToSign[], currentValue: Uint8Array | Uint8Array[], index: number) => {
-      const toSign = indexesToSign && indexesToSign.includes(index)
+    const flatTransactions: RawTransactionToSign[] = transactionsOrTransactionGroups.reduce(
+      (acc: RawTransactionToSign[], currentValue: Uint8Array | Uint8Array[], index: number) => {
+        const toSign = indexesToSign && indexesToSign.includes(index)
 
-      // if an element is an array, concatenate each mapped element as we want a flat (one-dimensional) array to sent to the wallet
-      if (Array.isArray(currentValue)) {
+        // if an element is an array, concatenate each mapped element as we want a flat (one-dimensional) array to sent to the wallet
+        if (Array.isArray(currentValue)) {
+          return [
+            ...acc,
+            ...currentValue.map((value) => ({
+              toSign,
+              transaction: value
+            }))
+          ]
+        }
+
         return [
           ...acc,
-          ...currentValue.map((value) => ({
+          {
             toSign,
-            transaction: value,
-          }))
+            transaction: currentValue
+          }
         ]
-      }
-
-      return [
-        ...acc,
-        {
-          toSign,
-          transaction: currentValue,
-        },
-      ]
-    }, [])
-    const transactions = await Promise.all(flatTransactions.map(({ toSign, transaction }) => this.mapRawTransactionToARC0001Transaction(transaction, connectedAccounts, toSign)))
+      },
+      []
+    )
+    const transactions = await Promise.all(
+      flatTransactions.map(({ toSign, transaction }) =>
+        this.mapRawTransactionToARC0001Transaction(transaction, connectedAccounts, toSign)
+      )
+    )
     const result = await this.signTxns(transactions)
 
     // null values indicate transactions that were not signed by the provider, as defined in ARC-0001, see https://arc.algorand.foundation/ARCs/arc-0001#semantic-and-security-requirements
