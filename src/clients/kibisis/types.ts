@@ -37,6 +37,11 @@ export type ProviderMethods =
   | 'signBytes'
   | 'signTxns'
 
+export interface RawTransactionToSign {
+  toSign: boolean
+  transaction: Uint8Array
+}
+
 export interface SendRequestWithTimeoutOptions<Params> {
   method: ProviderMethods
   params: Params
