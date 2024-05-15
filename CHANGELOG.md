@@ -1,3 +1,9 @@
+## [2.8.2](https://github.com/txnlab/use-wallet/compare/v2.8.1...v2.8.2) (2024-05-15)
+
+### Bug Fixes
+
+- **Lute:** Fix signedTxns reconstruction ([#168](https://github.com/txnlab/use-wallet/pull/168)) ([fd85530](https://github.com/txnlab/use-wallet/commit/fd855305dd230860545ca36bb72b7cd64c062c94))
+
 ## [2.8.1](https://github.com/txnlab/use-wallet/compare/v2.8.0...v2.8.1) (2024-04-09)
 
 ### Bug Fixes
