@@ -171,7 +171,7 @@ class LuteClient extends BaseClient {
 
     const signedTxns = transactions.reduce<Uint8Array[]>((acc, txn, i) => {
       if (signedIndexes.includes(i)) {
-        const signedByUser = result.shift()
+        const signedByUser = result[i]
         signedByUser && acc.push(signedByUser)
       } else if (returnGroup) {
         acc.push(txn)
