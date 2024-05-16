@@ -1,3 +1,13 @@
+## [3.0.0-beta.7](https://github.com/txnlab/use-wallet/compare/v3.0.0-beta.6...v3.0.0-beta.7) (2024-05-16)
+
+### Fixes
+
+- **Solid:** Fix transaction signing functions, add signing to example app ([#172](https://github.com/TxnLab/use-wallet/pull/172)) ([097638f](https://github.com/TxnLab/use-wallet/commit/097638f8a73cb0c43979614b356effc5e5019fc3))
+
+### Other Changes
+
+- Update README with SolidJS quick start ([9e2611b](https://github.com/TxnLab/use-wallet/commit/9e2611b17ee042d06e8a62d38af8c6f0d411b6c8))
+
 ## [3.0.0-beta.6](https://github.com/txnlab/use-wallet/compare/v3.0.0-beta.5...v3.0.0-beta.6) (2024-05-16)
 
 ### Features
