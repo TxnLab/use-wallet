@@ -7,7 +7,7 @@
 
 `use-wallet` is a TypeScript library that simplifies integrating Algorand wallets into decentralized applications (dApps).
 
-Version 3.x has been rewritten as a framework-agnostic core library that can be used in any JavaScript or TypeScript project. It ships with framework specific adapters for major frameworks (currently React and Vue only, more to come).
+Version 3.x has been rewritten as a framework-agnostic core library that can be used in any JavaScript or TypeScript project. It ships with framework specific adapters for React, Vue, and SolidJS.
 
 ### This is a beta release
 
@@ -33,6 +33,12 @@ npm install @txnlab/use-wallet-vue@beta
 
 Compatible with Vue 3
 
+### SolidJS
+
+```bash
+npm install @txnlab/use-wallet-solid@beta
+```
+
 ### Core Library
 
 ```bash
@@ -45,12 +51,12 @@ Compatible with any ES6+ project (TypeScript recommended)
 
 Some wallets require additional packages to be installed. The following table lists wallet providers and their corresponding packages.
 
-| Wallet Provider | Package(s)                                                                   |
-| --------------- | ---------------------------------------------------------------------------- |
-| Defly Wallet    | `@blockshake/defly-connect`                                                  |
-| Pera Wallet     | `@perawallet/connect`                                                        |
-| WalletConnect   | `@walletconnect/modal`, `@walletconnect/sign-client`, `@walletconnect/types` |
-| Lute Wallet     | `lute-connect`                                                               |
+| Wallet Provider | Package(s)                                           |
+| --------------- | ---------------------------------------------------- |
+| Defly Wallet    | `@blockshake/defly-connect`                          |
+| Pera Wallet     | `@perawallet/connect`                                |
+| WalletConnect   | `@walletconnect/modal`, `@walletconnect/sign-client` |
+| Lute Wallet     | `lute-connect`                                       |
 
 ## Configuration
 
@@ -140,6 +146,7 @@ In the root of your application, wrap your app with the `WalletProvider` and pas
 
 ```tsx
 import { NetworkId, WalletId, WalletManager, WalletProvider } from '@txnlab/use-wallet-react'
+import ReactDOM from 'react-dom/client'
 
 // Create a manager instance
 const walletManager = new WalletManager({
@@ -156,7 +163,7 @@ function App() {
   )
 }
 
-render(<App />, document.getElementById('root'))
+ReactDOM.createRoot(document.getElementById('root')!).render(<App />)
 ```
 
 Now, in any component, you can use the `useWallet` hook to access the wallet manager and its state.
@@ -308,27 +315,127 @@ const sendAlgos = async () => {
 
 To see fully functioning Vue examples, check out the [example apps](#example-apps) below.
 
+## Quick Start (SolidJS)
+
+The `useWallet` function provides access to the `WalletManager` instance and its state. It abstracts the `WalletManager` API and provides a simple interface for building a wallet menu and interacting with the active wallet.
+
+In the root of your application, wrap your app with the `WalletProvider` and pass the `walletManager` instance as a prop.
+
+```tsx
+import { NetworkId, WalletId, WalletManager, WalletProvider } from '@txnlab/use-wallet-solid'
+import { render } from 'solid-js/web'
+
+// Create a manager instance
+const walletManager = new WalletManager({
+  wallets: [...],
+  network: NetworkId.TESTNET
+})
+
+function App() {
+  return (
+    // Provide the manager to your App
+    <WalletProvider manager={walletManager}>
+      <MyApp />
+    </WalletProvider>
+  )
+}
+
+render(<App />, document.getElementById('root')!)
+```
+
+Now, in any component, you can use the `useWallet` hook to access the wallet manager and its state.
+
+```tsx
+import { useWallet } from '@txnlab/use-wallet-solid'
+import { For, Show } from 'solid-js'
+
+function WalletMenu() {
+  const { wallets, activeWallet, activeAccount } = useWallet()
+
+  return (
+    <div>
+      <h2>Wallets</h2>
+      <ul>
+        <For each={wallets}>
+          {(wallet) => (
+            <li>
+              <button onClick={() => wallet.connect()}>{wallet.metadata.name}</button>
+            </li>
+          )}
+        </For>
+      </ul>
+
+      <Show when={activeWallet()}>
+        <div>
+          <h2>Active Wallet</h2>
+          <p>{activeWallet().metadata.name}</p>
+          <h2>Active Account</h2>
+          <p>{activeAccount()?.address}</p>
+          <button onClick={() => activeWallet().disconnect()}>Disconnect</button>
+        </div>
+      </Show>
+    </div>
+  )
+}
+```
+
+To sign and send transactions, you can use the manager's `algodClient` instance and the `transactionSigner` provided by the active wallet.
+
+```tsx
+import { useWallet } from '@txnlab/use-wallet-solid'
+import { algosdk } from 'algosdk'
+
+function SendAlgos() {
+  const { algodClient, activeAddress, transactionSigner } = useWallet()
+
+  const sendAlgos = async () => {
+    const atc = new algosdk.AtomicTransactionComposer()
+    const suggestedParams = await algodClient().getTransactionParams().do()
+
+    const txn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+      from: activeAddress,
+      to: '<RECIPIENT_ADDRESS>',
+      amount: 15000000,
+      suggestedParams
+    })
+
+    atc.addTransaction({ txn, signer: transactionSigner })
+
+    await atc.execute(algodClient, 4)
+  }
+
+  return <button onClick={sendAlgos}>Buy dev a Lavazza ☕️</button>
+}
+```
+
+To see a fully functioning Solid example, check out the [example apps](#example-apps) below.
+
 ## Example Apps
 
 The following examples demonstrate how to use the `use-wallet` v3 library in various frameworks.
 
 ### React
 
-- [React](https://github.com/TxnLab/use-wallet/tree/v3/examples/react-ts)
+- [React (Vite)](https://github.com/TxnLab/use-wallet/tree/v3/examples/react-ts)
 - [Next.js](https://github.com/TxnLab/use-wallet/tree/v3/examples/nextjs)
 
 ### Vue
 
-- [Vue](https://github.com/TxnLab/use-wallet/tree/v3/examples/vue-ts)
+- [Vue (Vite)](https://github.com/TxnLab/use-wallet/tree/v3/examples/vue-ts)
 - [Nuxt](https://github.com/TxnLab/use-wallet/tree/v3/examples/nuxt)
+
+### SolidJS
+
+- [SolidJS (Vite)](https://github.com/TxnLab/use-wallet/tree/v3/examples/solid-ts)
+- _SolidStart (coming soon)_
 
 ### Core Library
 
-- [Vanilla TypeScript](https://github.com/TxnLab/use-wallet/tree/v3/examples/vanilla-ts)
+- [Vanilla TypeScript (Vite)](https://github.com/TxnLab/use-wallet/tree/v3/examples/vanilla-ts)
 
 ## WalletManager API
 
-The following API is exposed via the `WalletManager` class instance. The framework adapters abstract the `WalletManager` class and expose a similar API via the `useWallet` hook (React) or composition function (Vue).
+The following API is exposed via the `WalletManager` class instance. The framework adapters abstract the `WalletManager` class and expose a similar API via the `useWallet` function.
 
 ```ts
 class WalletManager {
