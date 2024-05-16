@@ -71,17 +71,19 @@ export function useWallet() {
     indexesToSign?: number[],
     returnGroup?: boolean
   ) => {
-    if (!activeWallet) {
+    const wallet = activeWallet()
+    if (!wallet) {
       throw new Error('No active wallet')
     }
-    return activeWallet()?.signTransactions(txnGroup, indexesToSign, returnGroup)
+    return wallet.signTransactions(txnGroup, indexesToSign, returnGroup)
   }
 
   const transactionSigner = (txnGroup: algosdk.Transaction[], indexesToSign: number[]) => {
-    if (!activeWallet) {
+    const wallet = activeWallet()
+    if (!wallet) {
       throw new Error('No active wallet')
     }
-    return activeWallet()?.transactionSigner(txnGroup, indexesToSign)
+    return wallet.transactionSigner(txnGroup, indexesToSign)
   }
 
   return {
