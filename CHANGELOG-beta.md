@@ -1,3 +1,13 @@
+## [3.0.0-beta.6](https://github.com/txnlab/use-wallet/compare/v3.0.0-beta.5...v3.0.0-beta.6) (2024-05-16)
+
+### Features
+
+- Solid.js framework adapter: use-wallet-solid ([#169](https://github.com/TxnLab/use-wallet/pull/169)) ([a5f407b](https://github.com/TxnLab/use-wallet/commit/a5f407b41e1351c4511e84b9da7ecaebbc0b76ce))
+
+### Other Changes
+
+- Update non-major dependencies ([#170](https://github.com/TxnLab/use-wallet/pull/170)) ([7157e24](https://github.com/TxnLab/use-wallet/commit/7157e248110ef6e6e46bd869191a6c5872b48707))
+
 ## [3.0.0-beta.5](https://github.com/txnlab/use-wallet/compare/v3.0.0-beta.4...v3.0.0-beta.5) (2024-04-11)
 
 ### Hotfix
