@@ -13,8 +13,9 @@ export function Connect() {
     activeWalletId,
     activeWalletState,
     algodClient,
+    isWalletActive,
+    isWalletConnected,
     setActiveNetwork,
-    walletStateMap,
     wallets
   } = useWallet()
 
@@ -34,23 +35,21 @@ export function Connect() {
               <button
                 type="button"
                 onClick={() => wallet.connect()}
-                disabled={!!walletStateMap()[wallet.id]?.accounts.length}
+                disabled={isWalletConnected(wallet.id)}
               >
                 Connect
               </button>
               <button
                 type="button"
                 onClick={() => wallet.disconnect()}
-                disabled={!wallet.isConnected}
+                disabled={!isWalletConnected(wallet.id)}
               >
                 Disconnect
               </button>
               <button
                 type="button"
                 onClick={() => wallet.setActive()}
-                disabled={
-                  !walletStateMap()[wallet.id]?.accounts.length || wallet.id === activeWalletId()
-                }
+                disabled={isWalletActive(wallet.id) || !isWalletConnected(wallet.id)}
               >
                 Set Active
               </button>
@@ -93,7 +92,6 @@ export function Connect() {
       <button onClick={() => algodClient().setIntEncoding(encoding.IntDecoding.SAFE)}>
         Set Int encoding
       </button>
-      <p>walletStateMap: {JSON.stringify(walletStateMap())}</p>
     </div>
   )
 }

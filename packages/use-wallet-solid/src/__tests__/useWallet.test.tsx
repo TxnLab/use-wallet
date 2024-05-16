@@ -6,7 +6,6 @@ import {
   NetworkId,
   WalletManager,
   WalletId,
-  defaultState,
   type State,
   type WalletAccount,
   PeraWallet
@@ -59,23 +58,8 @@ const mockSubscribe: (callback: (state: State) => void) => () => void = vi.fn(
   }
 )
 
-const mockStore = new Store<State>(defaultState)
-
-const mockDeflyWallet = new DeflyWallet({
-  id: WalletId.DEFLY,
-  metadata: { name: 'Defly', icon: 'icon' },
-  getAlgodClient: () => ({}) as any,
-  store: mockStore,
-  subscribe: mockSubscribe
-})
-
-const mockPeraWallet = new PeraWallet({
-  id: WalletId.PERA,
-  metadata: { name: 'Pera', icon: 'icon' },
-  getAlgodClient: () => ({}) as any,
-  store: mockStore,
-  subscribe: mockSubscribe
-})
+const testAccount1 = { name: 'Account 1', address: 'address1' }
+const testAccount2 = { name: 'Account 2', address: 'address2' }
 
 const TestComponent = () => {
   const {
@@ -88,7 +72,9 @@ const TestComponent = () => {
     activeWalletId,
     activeWalletState,
     setActiveNetwork,
-    walletStateMap,
+    isWalletActive,
+    isWalletConnected,
+    walletStore,
     wallets
   } = useWallet()
 
@@ -104,7 +90,7 @@ const TestComponent = () => {
       </div>
       <div data-testid="active-wallet-id">{JSON.stringify(activeWalletId())}</div>
       <div data-testid="active-wallet-state">{JSON.stringify(activeWalletState())}</div>
-      <div data-testid="wallet-state-map">{JSON.stringify(walletStateMap())}</div>
+      <div data-testid="wallet-store">{JSON.stringify(walletStore())}</div>
       <div data-testid="wallets">{wallets.map((wallet) => wallet.id).join(', ')}</div>
 
       <For each={wallets}>
@@ -112,36 +98,51 @@ const TestComponent = () => {
           <div data-testid="wallet">
             <h4 data-testid={`wallet-name-${wallet.id}`}>{wallet.metadata.name}</h4>
             <p data-testid={`wallet-status-${wallet.id}`}>
-              {wallet.id === activeWalletId()
+              {isWalletActive(wallet.id)
                 ? 'Active'
-                : Object.keys(walletStateMap()).includes(wallet.id)
+                : isWalletConnected(wallet.id)
                   ? 'Connected'
                   : 'Disconnected'}
             </p>
-            <button data-testid={`connect-btn-${wallet.id}`} onClick={() => wallet.connect()}>
+            <button
+              data-testid={`connect-btn-${wallet.id}`}
+              onClick={() => wallet.connect()}
+              disabled={isWalletConnected(wallet.id)}
+            >
               Connect
             </button>
-            <button data-testid={`disconnect-btn-${wallet.id}`} onClick={() => wallet.disconnect()}>
+            <button
+              data-testid={`disconnect-btn-${wallet.id}`}
+              onClick={() => wallet.disconnect()}
+              disabled={!isWalletConnected(wallet.id)}
+            >
               Disconnect
             </button>
-            <button data-testid={`set-active-btn-${wallet.id}`} onClick={() => wallet.setActive()}>
+            <button
+              data-testid={`set-active-btn-${wallet.id}`}
+              onClick={() => wallet.setActive()}
+              disabled={isWalletActive(wallet.id)}
+            >
               Set Active
             </button>
             <button
               data-testid={`set-active-account-btn-${wallet.id}`}
-              onClick={() => wallet.setActiveAccount('some-address')}
+              onClick={() => wallet.setActiveAccount(wallet.accounts[1].address)}
+              disabled={!isWalletActive(wallet.id) || !isWalletConnected(wallet.id)}
             >
               Set Active Account
             </button>
             <button
               data-testid={`sign-transactions-btn-${wallet.id}`}
               onClick={() => wallet.signTransactions([], [], true)}
+              disabled={!isWalletActive(wallet.id)}
             >
               Sign Transactions
             </button>
             <button
               data-testid={`transaction-signer-btn-${wallet.id}`}
               onClick={() => wallet.transactionSigner([], [])}
+              disabled={!isWalletActive(wallet.id)}
             >
               Transaction Signer
             </button>
@@ -160,15 +161,46 @@ const TestComponent = () => {
 }
 
 describe('useWallet', () => {
+  let mockStore: Store<State, (cb: State) => State>
   let mockWalletManager: WalletManager
+  let mockDeflyWallet: DeflyWallet
+  let mockPeraWallet: PeraWallet
   let mockWallets: Wallet[]
 
   beforeEach(() => {
     vi.clearAllMocks()
 
-    mockStore.setState(() => defaultState)
+    const defaultState = {
+      wallets: {},
+      activeWallet: null,
+      activeNetwork: NetworkId.TESTNET
+    }
+
+    mockStore = new Store<State>(defaultState)
+
+    mockDeflyWallet = new DeflyWallet({
+      id: WalletId.DEFLY,
+      metadata: { name: 'Defly', icon: 'icon' },
+      getAlgodClient: () => ({}) as any,
+      store: mockStore,
+      subscribe: mockSubscribe
+    })
+
+    mockPeraWallet = new PeraWallet({
+      id: WalletId.PERA,
+      metadata: { name: 'Pera', icon: 'icon' },
+      getAlgodClient: () => ({}) as any,
+      store: mockStore,
+      subscribe: mockSubscribe
+    })
 
     mockWalletManager = new WalletManager()
+    mockWalletManager._clients = new Map<WalletId, BaseWallet>([
+      [WalletId.DEFLY, mockDeflyWallet],
+      [WalletId.PERA, mockPeraWallet]
+    ])
+    mockWalletManager.store = mockStore
+
     mockWallets = [
       {
         id: () => mockDeflyWallet.id,
@@ -195,11 +227,6 @@ describe('useWallet', () => {
         setActiveAccount: expect.any(Function)
       }
     ]
-    mockWalletManager._clients = new Map<WalletId, BaseWallet>([
-      [WalletId.DEFLY, mockDeflyWallet],
-      [WalletId.PERA, mockPeraWallet]
-    ])
-    mockWalletManager.store = mockStore
   })
 
   it('initializes wallets and active wallet correctly', () => {
@@ -214,7 +241,7 @@ describe('useWallet', () => {
     expect(screen.getAllByTestId('wallet')).toHaveLength(2)
     expect(screen.getByTestId('active-wallet')).toHaveTextContent('null')
     expect(screen.getByTestId('active-account')).toHaveTextContent('null')
-    expect(screen.getByTestId('wallet-state-map')).toHaveTextContent('{}')
+    expect(screen.getByTestId('wallet-store')).toHaveTextContent('{}')
     expect(screen.getByTestId('active-network')).toHaveTextContent(NetworkId.TESTNET)
   })
 
@@ -230,6 +257,19 @@ describe('useWallet', () => {
     fireEvent.click(connectButton)
     expect(mocks.connect).toHaveBeenCalled()
 
+    // Simulate Defly wallet connection
+    mockStore.setState((state) => ({
+      ...state,
+      wallets: {
+        ...state.wallets,
+        [WalletId.DEFLY]: {
+          accounts: [testAccount1, testAccount2],
+          activeAccount: testAccount1
+        }
+      },
+      activeWallet: WalletId.DEFLY
+    }))
+
     // Trigger disconnect
     const disconnectButton = screen.getByTestId('disconnect-btn-defly')
     fireEvent.click(disconnectButton)
@@ -243,13 +283,34 @@ describe('useWallet', () => {
       </WalletProvider>
     ))
 
-    const setActiveButton = screen.getByTestId('set-active-btn-defly')
+    mockStore.setState((state) => ({
+      ...state,
+      wallets: {
+        ...state.wallets,
+        [WalletId.DEFLY]: {
+          accounts: [testAccount1, testAccount2],
+          activeAccount: testAccount1
+        },
+        [WalletId.PERA]: {
+          accounts: [testAccount1, testAccount2],
+          activeAccount: testAccount1
+        }
+      },
+      activeWallet: WalletId.DEFLY
+    }))
+
+    const setActiveButton = screen.getByTestId('set-active-btn-pera')
     fireEvent.click(setActiveButton)
     expect(mocks.setActive).toHaveBeenCalled()
 
-    const setActiveAccountButton = screen.getByTestId('set-active-account-btn-defly')
+    mockStore.setState((state) => ({
+      ...state,
+      activeWallet: WalletId.PERA
+    }))
+
+    const setActiveAccountButton = screen.getByTestId('set-active-account-btn-pera')
     fireEvent.click(setActiveAccountButton)
-    expect(mocks.setActiveAccount).toHaveBeenCalledWith('some-address')
+    expect(mocks.setActiveAccount).toHaveBeenCalledWith(testAccount2.address)
   })
 
   it('calls setActiveNetwork correctly', () => {
@@ -272,6 +333,18 @@ describe('useWallet', () => {
         <TestComponent />
       </WalletProvider>
     ))
+
+    mockStore.setState((state) => ({
+      ...state,
+      wallets: {
+        ...state.wallets,
+        [WalletId.DEFLY]: {
+          accounts: [testAccount1, testAccount2],
+          activeAccount: testAccount1
+        }
+      },
+      activeWallet: WalletId.DEFLY
+    }))
 
     const signTransactionsButton = screen.getByTestId('sign-transactions-btn-defly')
     fireEvent.click(signTransactionsButton)
@@ -297,7 +370,7 @@ describe('useWallet', () => {
     expect(screen.getByTestId('active-wallet-addresses')).toHaveTextContent('null')
     expect(screen.getByTestId('active-wallet-id')).toHaveTextContent('null')
     expect(screen.getByTestId('active-wallet-state')).toHaveTextContent('null')
-    expect(screen.getByTestId('wallet-state-map')).toHaveTextContent('{}')
+    expect(screen.getByTestId('wallet-store')).toHaveTextContent('{}')
     expect(screen.getByTestId('wallets')).toHaveTextContent(
       mockWallets.map((wallet) => wallet.id()).join(', ')
     )
@@ -307,41 +380,38 @@ describe('useWallet', () => {
     expect(screen.getByTestId('wallet-name-pera')).toHaveTextContent('Pera')
     expect(screen.getByTestId('wallet-status-pera')).toHaveTextContent('Disconnected')
 
-    const account1 = { name: 'Account 1', address: 'address1' }
-    const account2 = { name: 'Account 2', address: 'address2' }
-
     // Simulate Defly wallet connection
     mockStore.setState((state) => ({
       ...state,
       wallets: {
         ...state.wallets,
         [WalletId.DEFLY]: {
-          accounts: [account1, account2],
-          activeAccount: account1
+          accounts: [testAccount1, testAccount2],
+          activeAccount: testAccount1
         }
       },
       activeWallet: WalletId.DEFLY
     }))
 
-    expect(screen.getByTestId('active-account')).toHaveTextContent(JSON.stringify(account1))
-    expect(screen.getByTestId('active-address')).toHaveTextContent(account1.address)
+    expect(screen.getByTestId('active-account')).toHaveTextContent(JSON.stringify(testAccount1))
+    expect(screen.getByTestId('active-address')).toHaveTextContent(testAccount1.address)
     expect(screen.getByTestId('active-wallet')).toHaveTextContent(WalletId.DEFLY)
     expect(screen.getByTestId('active-wallet-accounts')).toHaveTextContent(
-      JSON.stringify([account1, account2])
+      JSON.stringify([testAccount1, testAccount2])
     )
     expect(screen.getByTestId('active-wallet-addresses')).toHaveTextContent('address1, address2')
     expect(screen.getByTestId('active-wallet-id')).toHaveTextContent(WalletId.DEFLY)
     expect(screen.getByTestId('active-wallet-state')).toHaveTextContent(
       JSON.stringify({
-        accounts: [account1, account2],
-        activeAccount: account1
+        accounts: [testAccount1, testAccount2],
+        activeAccount: testAccount1
       })
     )
-    expect(screen.getByTestId('wallet-state-map')).toHaveTextContent(
+    expect(screen.getByTestId('wallet-store')).toHaveTextContent(
       JSON.stringify({
         [WalletId.DEFLY]: {
-          accounts: [account1, account2],
-          activeAccount: account1
+          accounts: [testAccount1, testAccount2],
+          activeAccount: testAccount1
         }
       })
     )
@@ -354,8 +424,8 @@ describe('useWallet', () => {
       wallets: {
         ...state.wallets,
         [WalletId.PERA]: {
-          accounts: [account1, account2],
-          activeAccount: account1
+          accounts: [testAccount1, testAccount2],
+          activeAccount: testAccount1
         }
       },
       activeWallet: WalletId.PERA

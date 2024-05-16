@@ -1,7 +1,13 @@
 import { useStore } from '@tanstack/solid-store'
 import { createMemo } from 'solid-js'
 import { useWalletManager } from './WalletProvider'
-import type { NetworkId, WalletAccount, WalletId, WalletMetadata } from '@txnlab/use-wallet'
+import type {
+  NetworkId,
+  WalletAccount,
+  WalletId,
+  WalletMetadata,
+  WalletState
+} from '@txnlab/use-wallet'
 import type algosdk from 'algosdk'
 
 export interface Wallet {
@@ -20,19 +26,19 @@ export interface Wallet {
 export function useWallet() {
   const manager = createMemo(() => useWalletManager())
 
-  const walletStateMap = useStore(manager().store, (state) => {
+  const walletStore = useStore(manager().store, (state) => {
     return state.wallets
   })
+
+  const walletState = (walletId: WalletId): WalletState | null => walletStore()[walletId] || null
 
   const activeWalletId = useStore(manager().store, (state) => {
     return state.activeWallet
   })
 
-  const activeWallet = () =>
-    activeWalletId() !== null ? manager().getWallet(activeWalletId() as WalletId) || null : null
+  const activeWallet = () => manager().getWallet(activeWalletId() as WalletId) || null
 
-  const activeWalletState = () =>
-    activeWalletId() !== null ? walletStateMap()[activeWalletId() as WalletId] || null : null
+  const activeWalletState = () => walletState(activeWalletId() as WalletId)
 
   const activeWalletAccounts = () => activeWalletState()?.accounts ?? null
 
@@ -42,6 +48,10 @@ export function useWallet() {
   const activeAccount = () => activeWalletState()?.activeAccount ?? null
 
   const activeAddress = () => activeAccount()?.address ?? null
+
+  const isWalletActive = (walletId: WalletId) => walletId === activeWalletId()
+  const isWalletConnected = (walletId: WalletId) =>
+    !!walletState(walletId)?.accounts.length || false
 
   const activeNetworkState = createMemo(() => {
     return useStore(manager().store, (state) => state.activeNetwork)
@@ -76,7 +86,7 @@ export function useWallet() {
 
   return {
     activeWalletId,
-    walletStateMap,
+    walletStore,
     algodClient,
     activeNetwork,
     activeWallet,
@@ -85,6 +95,8 @@ export function useWallet() {
     activeWalletState,
     activeAccount,
     activeAddress,
+    isWalletActive,
+    isWalletConnected,
     setActiveNetwork,
     signTransactions,
     transactionSigner,
