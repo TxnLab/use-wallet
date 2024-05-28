@@ -122,6 +122,7 @@ import { DeflyWalletConnect } from '@blockshake/defly-connect'
 import { PeraWalletConnect } from '@perawallet/connect'
 import { DaffiWalletConnect } from '@daffiwallet/connect'
 import LuteConnect from 'lute-connect'
+import AVMWebProviderSDK from '@agoralabs-sh/avm-web-provider'
 
 export default function App() {
   const providers = useInitializeProviders({
@@ -135,7 +136,7 @@ export default function App() {
         clientStatic: LuteConnect,
         clientOptions: { siteName: 'YourSiteName' }
       },
-      { id: PROVIDER_ID.KIBISIS }
+      { id: PROVIDER_ID.KIBISIS, clientStatic: AVMWebProviderSDK }
     ]
   })
 
@@ -173,6 +174,11 @@ const getDynamicLuteConnect = async () => {
   return LuteConnect
 }
 
+const getDynamicAVMWebProviderSDK = async () => {
+  const AVMWebProviderSDK = (await import('@agoralabs-sh/avm-web-provider')).default
+  return AVMWebProviderSDK
+}
+
 export default function App() {
   const providers = useInitializeProviders({
     providers: [
@@ -185,7 +191,7 @@ export default function App() {
         getDynamicClient: getDynamicLuteConnect,
         clientOptions: { siteName: 'YourSiteName' }
       },
-      { id: PROVIDER_ID.KIBISIS }
+      { id: PROVIDER_ID.KIBISIS, getDynamicClient: getDynamicAVMWebProviderSDK }
     ]
   })
 
@@ -511,6 +517,7 @@ useEffect(() => {
 - Website - https://kibis.is
 - Download - https://kibis.is/#download
 - Support/Issues - https://discord.com/channels/1055863853633785857/1181252381816655952
+- Install dependency - `npm install @agoralabs-sh/avm-web-provider`
 
 ### Magic Auth
 
@@ -661,6 +668,7 @@ import { WalletConnectModalSign } from '@walletconnect/modal-sign-html'
 import LuteConnect from 'lute-connect'
 import { Magic } from 'magic-sdk'
 import { AlgorandExtension } from '@magic-ext/algorand'
+import AVMWebProviderSDK from '@agoralabs-sh/avm-web-provider'
 
 export default function App() {
   const providers = useInitializeProviders({
@@ -690,8 +698,7 @@ export default function App() {
         clientStatic: LuteConnect,
         clientOptions: { siteName: 'YourSiteName' }
       },
-      { id: PROVIDER_ID.KIBISIS }
-      },
+      { id: PROVIDER_ID.KIBISIS, clientStatic: AVMWebProviderSDK },
       {
         id: PROVIDER_ID.MAGIC,
         clientStatic: Magic,
