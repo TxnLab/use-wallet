@@ -1,9 +1,10 @@
-import { AVMWebClient } from '@agoralabs-sh/avm-web-provider'
+import type AVMWebProviderSDK from '@agoralabs-sh/avm-web-provider'
 import type algosdk from 'algosdk'
 import type { Metadata, Network } from '../../types'
 
 export interface ClientConstructorOptions {
-  avmWebClient: AVMWebClient
+  avmWebClient: AVMWebProviderSDK.AVMWebClient
+  avmWebProviderSDK: typeof AVMWebProviderSDK
   metadata: Metadata
   algosdk: typeof algosdk
   algodClient: algosdk.Algodv2

@@ -1,4 +1,5 @@
 import type { PROVIDER_ID } from '../constants'
+import type AVMWebProviderSDK from '@agoralabs-sh/avm-web-provider'
 import type { PeraWalletConnect } from '@perawallet/connect'
 import type { DeflyWalletConnect } from '@blockshake/defly-connect'
 import type { DaffiWalletConnect } from '@daffiwallet/connect'
@@ -81,8 +82,8 @@ export type ProviderConfigMapping = {
   }
   [PROVIDER_ID.KIBISIS]: {
     clientOptions?: undefined
-    clientStatic?: undefined
-    getDynamicClient?: undefined
+    clientStatic?: typeof AVMWebProviderSDK
+    getDynamicClient?: () => Promise<typeof AVMWebProviderSDK>
   }
   [PROVIDER_ID.MAGIC]: {
     clientOptions?: { apiKey: string }
@@ -166,7 +167,7 @@ type ProviderDef =
   | ProviderConfig<PROVIDER_ID.EXODUS>
   | ProviderConfig<PROVIDER_ID.KMD>
   | ProviderConfig<PROVIDER_ID.CUSTOM>
-  | ProviderConfig<PROVIDER_ID.KIBISIS>
+  | (ProviderConfig<PROVIDER_ID.KIBISIS> & OneOfStaticOrDynamicClient<typeof AVMWebProviderSDK>)
   | PROVIDER_ID.EXODUS
   | PROVIDER_ID.KMD
   | PROVIDER_ID.ALGOSIGNER

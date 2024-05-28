@@ -1,3 +1,4 @@
+import AVMWebProviderSDK from '@agoralabs-sh/avm-web-provider'
 import algosdk from 'algosdk'
 import React from 'react'
 import { DeflyWalletConnect } from '@blockshake/defly-connect'
@@ -53,7 +54,7 @@ export default function ConnectWallet() {
           }
         }
       },
-      { id: PROVIDER_ID.KIBISIS }
+      { id: PROVIDER_ID.KIBISIS, clientStatic: AVMWebProviderSDK }
     ],
     nodeConfig: {
       network: 'testnet',

@@ -1,10 +1,5 @@
-import {
-  ARC0027MethodEnum,
-  ARC0027MethodTimedOutError,
-  ARC0027UnknownError,
-  AVMWebClient,
-  LOWER_REQUEST_TIMEOUT,
-  DEFAULT_REQUEST_TIMEOUT,
+import type AVMWebProviderSDK from '@agoralabs-sh/avm-web-provider'
+import type {
   IAccount as IARC0027Account,
   IARC0001Transaction,
   IDisableResult,
@@ -25,12 +20,14 @@ import type { DecodedSignedTransaction, DecodedTransaction } from '../../types'
 import type { ClientConstructorOptions, RawTransactionToSign } from './types'
 
 class KibisisClient extends BaseClient {
-  avmWebClient: AVMWebClient
+  avmWebClient: AVMWebProviderSDK.AVMWebClient
+  avmWebProviderSDK: typeof AVMWebProviderSDK
   genesisHash: string
   network: Network
 
   constructor({
     avmWebClient,
+    avmWebProviderSDK,
     metadata,
     algosdk,
     algodClient,
@@ -40,6 +37,7 @@ class KibisisClient extends BaseClient {
     super(metadata, algosdk, algodClient)
 
     this.avmWebClient = avmWebClient
+    this.avmWebProviderSDK = avmWebProviderSDK
     this.genesisHash = genesisHash
     this.network = network
   }
@@ -55,22 +53,32 @@ class KibisisClient extends BaseClient {
    * public static functions
    */
 
-  static async init({
+  public static async init({
     algodOptions,
     algosdkStatic,
+    clientStatic,
+    getDynamicClient,
     network = DEFAULT_NETWORK
   }: InitParams<PROVIDER_ID.KIBISIS>): Promise<BaseClient | null> {
     const _functionName = 'init'
+    let avmWebProviderSDK: typeof AVMWebProviderSDK | null
 
     try {
       debugLog(`${PROVIDER_ID.KIBISIS.toUpperCase()}#${_functionName}: initializing...`)
+
+      avmWebProviderSDK = clientStatic || (getDynamicClient && await getDynamicClient()) || null
+
+      if (!avmWebProviderSDK) {
+        throw new Error('failed to initialize, the @agoralabs-sh/avm-web-provider sdk was not provided')
+      }
 
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
       const algodClient = getAlgodClient(algosdk, algodOptions)
       const version = await algodClient.versionsCheck().do()
       const genesisHash = version['genesis_hash_b64'] // get the genesis hash of the network
       const provider = new KibisisClient({
-        avmWebClient: AVMWebClient.init(),
+        avmWebClient: avmWebProviderSDK.AVMWebClient.init(),
+        avmWebProviderSDK,
         metadata: KibisisClient.metadata,
         algosdk: algosdk,
         algodClient: algodClient,
@@ -92,7 +100,7 @@ class KibisisClient extends BaseClient {
    * @param {IARC0027Account[]} accounts - a list of AVM Web Provider accounts.
    * @returns {Wallet} the account objects mapped to a wallet object.
    */
-  static mapAVMWebProviderAccountsToWallet(accounts: IARC0027Account[]): Wallet {
+  public static mapAVMWebProviderAccountsToWallet(accounts: IARC0027Account[]): Wallet {
     return {
       ...KibisisClient.metadata,
       accounts: accounts.map(({ address, name }) => ({
@@ -125,6 +133,13 @@ class KibisisClient extends BaseClient {
    * @throws {UnknownError} if the response result is empty.
    */
   private async _disable(): Promise<IDisableResult> {
+    const {
+      ARC0027MethodEnum,
+      ARC0027MethodTimedOutError,
+      ARC0027UnknownError,
+      LOWER_REQUEST_TIMEOUT
+    } = this.avmWebProviderSDK
+
     return new Promise<IDisableResult>((resolve, reject) => {
       const timerId = window.setTimeout(() => {
         // remove the listener
@@ -176,6 +191,13 @@ class KibisisClient extends BaseClient {
    * @throws {UnknownError} if the response result is empty.
    */
   private async _enable(): Promise<IEnableResult> {
+    const {
+      ARC0027MethodEnum,
+      ARC0027MethodTimedOutError,
+      ARC0027UnknownError,
+      DEFAULT_REQUEST_TIMEOUT
+    } = this.avmWebProviderSDK
+
     return new Promise<IEnableResult>((resolve, reject) => {
       const timerId = window.setTimeout(() => {
         // remove the listener
@@ -287,6 +309,13 @@ class KibisisClient extends BaseClient {
    * @throws {UnknownError} if the response result is empty.
    */
   private async _signTransactions(txns: IARC0001Transaction[]): Promise<ISignTransactionsResult> {
+    const {
+      ARC0027MethodEnum,
+      ARC0027MethodTimedOutError,
+      ARC0027UnknownError,
+      DEFAULT_REQUEST_TIMEOUT
+    } = this.avmWebProviderSDK
+
     return new Promise<ISignTransactionsResult>((resolve, reject) => {
       const timerId = window.setTimeout(() => {
         // remove the listener
