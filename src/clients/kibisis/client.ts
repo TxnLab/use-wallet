@@ -391,7 +391,7 @@ class KibisisClient extends BaseClient {
     // @ts-ignore
     const flatTransactions: RawTransactionToSign[] = transactionsOrTransactionGroups.reduce(
       (acc: RawTransactionToSign[], currentValue: Uint8Array | Uint8Array[], index: number) => {
-        const toSign = indexesToSign && indexesToSign.includes(index)
+        const toSign = indexesToSign ? indexesToSign.includes(index) : true
 
         // if an element is an array, concatenate each mapped element as we want a flat (one-dimensional) array to sent to the wallet
         if (Array.isArray(currentValue)) {
@@ -420,7 +420,6 @@ class KibisisClient extends BaseClient {
       )
     )
     const result = await this._signTransactions(transactions)
-
     // null values indicate transactions that were not signed by the provider, as defined in ARC-0001, see https://arc.algorand.foundation/ARCs/arc-0001#semantic-and-security-requirements
     return result.stxns.reduce<Uint8Array[]>((acc, value, index) => {
       if (value) {

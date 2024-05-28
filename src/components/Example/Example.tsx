@@ -1,4 +1,4 @@
-import AVMWebProviderSDK from '@agoralabs-sh/avm-web-provider'
+import * as AVMWebProviderSDK from '@agoralabs-sh/avm-web-provider'
 import algosdk from 'algosdk'
 import React from 'react'
 import { DeflyWalletConnect } from '@blockshake/defly-connect'

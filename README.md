@@ -122,7 +122,7 @@ import { DeflyWalletConnect } from '@blockshake/defly-connect'
 import { PeraWalletConnect } from '@perawallet/connect'
 import { DaffiWalletConnect } from '@daffiwallet/connect'
 import LuteConnect from 'lute-connect'
-import AVMWebProviderSDK from '@agoralabs-sh/avm-web-provider'
+import * as AVMWebProviderSDK from '@agoralabs-sh/avm-web-provider'
 
 export default function App() {
   const providers = useInitializeProviders({
@@ -175,7 +175,7 @@ const getDynamicLuteConnect = async () => {
 }
 
 const getDynamicAVMWebProviderSDK = async () => {
-  const AVMWebProviderSDK = (await import('@agoralabs-sh/avm-web-provider')).default
+  const AVMWebProviderSDK = (await import('@agoralabs-sh/avm-web-provider'))
   return AVMWebProviderSDK
 }
 
@@ -668,7 +668,7 @@ import { WalletConnectModalSign } from '@walletconnect/modal-sign-html'
 import LuteConnect from 'lute-connect'
 import { Magic } from 'magic-sdk'
 import { AlgorandExtension } from '@magic-ext/algorand'
-import AVMWebProviderSDK from '@agoralabs-sh/avm-web-provider'
+import * as AVMWebProviderSDK from '@agoralabs-sh/avm-web-provider'
 
 export default function App() {
   const providers = useInitializeProviders({
