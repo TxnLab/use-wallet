@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import * as AVMWebProviderSDK from '@agoralabs-sh/avm-web-provider'
 import { DeflyWalletConnect } from '@blockshake/defly-connect'
 import { DaffiWalletConnect } from '@daffiwallet/connect'
 import { PeraWalletConnect } from '@perawallet/connect'
@@ -294,8 +295,9 @@ export const createKibisisMockInstance = (
         do: () => Promise.resolve({})
       })
     } as any,
+    avmWebProviderSDK: AVMWebProviderSDK,
+    avmWebClient: AVMWebProviderSDK.AVMWebClient.init(),
     genesisHash: 'a2liaXNpcy10ZXN0LW5ldHdvcms=',
-    methods: ['enable', 'signTxns'],
     metadata: {
       id: PROVIDER_ID.KIBISIS,
       name: 'Kibisis',
