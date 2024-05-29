@@ -1,1 +1,1 @@
-export { default } from './client'
+export { default as KibisisWallet } from './client'

@@ -55,42 +55,6 @@ export default class KibisisWallet extends BaseWallet {
    * private functions
    */
 
-  private async _getGenesisHash(): Promise<string> {
-    const algodClient = this.getAlgodClient()
-    const version = await algodClient.versionsCheck().do()
-
-    return version.genesis_hash_b64
-  }
-
-  private async _initializeAVMWebClient(): Promise<AVMWebProviderSDK.AVMWebClient> {
-    const _functionName = '_initializeAVMWebClient'
-    const avmWebProviderSDK = this.avmWebProviderSDK || (await this._initializeAVMWebProviderSDK())
-
-    if (!this.avmWebClient) {
-      console.info(`[${KibisisWallet.name}]#${_functionName}: initializing new client...`)
-
-      this.avmWebClient = avmWebProviderSDK.AVMWebClient.init()
-    }
-
-    return this.avmWebClient
-  }
-
-  private async _initializeAVMWebProviderSDK(): Promise<typeof AVMWebProviderSDK> {
-    const _functionName = '_initializeAVMWebProviderSDK'
-
-    if (!this.avmWebProviderSDK) {
-      console.info(`[${KibisisWallet.name}]#${_functionName}: initializing @agoralabs-sh/avm-web-provider...`)
-
-      this.avmWebProviderSDK = await import('@agoralabs-sh/avm-web-provider')
-
-      if (!this.avmWebProviderSDK) {
-        throw new Error('failed to initialize, the @agoralabs-sh/avm-web-provider sdk was not provided')
-      }
-    }
-
-    return this.avmWebProviderSDK
-  }
-
   /**
    * Calls the "disable" method on the provider. This method will timeout after 0.75 seconds.
    * @returns {Promise<IDisableResult>} a promise that resolves to the result.
@@ -208,6 +172,42 @@ export default class KibisisWallet extends BaseWallet {
         providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
       })
     })
+  }
+
+  private async _getGenesisHash(): Promise<string> {
+    const algodClient = this.getAlgodClient()
+    const version = await algodClient.versionsCheck().do()
+
+    return version.genesis_hash_b64
+  }
+
+  private async _initializeAVMWebClient(): Promise<AVMWebProviderSDK.AVMWebClient> {
+    const _functionName = '_initializeAVMWebClient'
+    const avmWebProviderSDK = this.avmWebProviderSDK || (await this._initializeAVMWebProviderSDK())
+
+    if (!this.avmWebClient) {
+      console.info(`[${KibisisWallet.name}]#${_functionName}: initializing new client...`)
+
+      this.avmWebClient = avmWebProviderSDK.AVMWebClient.init()
+    }
+
+    return this.avmWebClient
+  }
+
+  private async _initializeAVMWebProviderSDK(): Promise<typeof AVMWebProviderSDK> {
+    const _functionName = '_initializeAVMWebProviderSDK'
+
+    if (!this.avmWebProviderSDK) {
+      console.info(`[${KibisisWallet.name}]#${_functionName}: initializing @agoralabs-sh/avm-web-provider...`)
+
+      this.avmWebProviderSDK = await import('@agoralabs-sh/avm-web-provider')
+
+      if (!this.avmWebProviderSDK) {
+        throw new Error('failed to initialize, the @agoralabs-sh/avm-web-provider sdk was not provided')
+      }
+    }
+
+    return this.avmWebProviderSDK
   }
 
   private _mapAVMWebProviderAccountToWalletAccounts(accounts: AVMWebProviderSDK.IAccount[]): WalletAccount[] {
