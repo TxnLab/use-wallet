@@ -11402,10 +11402,10 @@ lru-cache@^7.14.1:
   resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-7.18.3.tgz#f793896e0fd0e954a59dfdd82f0773808df6aa89"
   integrity sha512-jumlc0BIUrS3qJGgIkWZsyfAM7NCWiBcCDhnd+3NNM5KbBmLTgHVfWBcg6W+rLUsIpzpERPsvwUP7CckAQSOoA==
 
-lute-connect@^1.1.3:
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/lute-connect/-/lute-connect-1.1.3.tgz#0cdc7169aae0e6189b05d84240fdd59e02a06457"
-  integrity sha512-HMYUDNHx9bokZjSZ1BdvYqGr+oi0JpcxES4xYZhpq3s6O87ZzN/zwJMdWnc2/7g349k3433u8Z4ZiMLTGimt4w==
+lute-connect@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/lute-connect/-/lute-connect-1.2.0.tgz#78d2bc6d302f073a5e61672f6df2309e516d057b"
+  integrity sha512-irbecoBxkNmSVe12p+leZkksS/7qbHI2etvfxw60t4Lcjmn0XX80GMi+iInhFFRhwg7rxU378P2h6GO8AU+9AQ==
 
 lz-string@^1.5.0:
   version "1.5.0"

@@ -6,11 +6,11 @@ import type {
   IEnableResult,
   ISignTransactionsResult
 } from '@agoralabs-sh/avm-web-provider'
-import { Buffer } from 'buffer'
 import Algod, { getAlgodClient } from '../../algod'
 import BaseClient from '../base'
 import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
 import { debugLog } from '../../utils/debugLog'
+import { base64ToByteArray, byteArrayToBase64 } from '../../utils/encoding'
 import {
   ICON,
   KIBISIS_AVM_WEB_PROVIDER_ID,
@@ -114,14 +114,6 @@ class KibisisClient extends BaseClient {
   /**
    * private functions
    */
-
-  private convertBytesToBase64(bytes: Uint8Array): string {
-    return Buffer.from(bytes).toString('base64')
-  }
-
-  private convertBase64ToBytes(input: string): Uint8Array {
-    return Buffer.from(input, 'base64')
-  }
 
   /**
    * Calls the "disable" method on the provider. This method will timeout after 0.75 seconds.
@@ -263,14 +255,14 @@ class KibisisClient extends BaseClient {
     )
     const accountInfo = await this.getAccountInfo(sender)
     const authAddr = accountInfo['auth-addr']
-    const txn = this.convertBytesToBase64(
+    const txn = byteArrayToBase64(
       this.algosdk.decodeUnsignedTransaction(rawTransaction).toByte()
     )
 
     // if the transaction is signed, instruct the provider not to sign by providing an empty signers array
     if (isSigned) {
       return {
-        txn: this.convertBytesToBase64(
+        txn: byteArrayToBase64(
           this.algosdk.decodeSignedTransaction(rawTransaction).txn.toByte()
         ),
         signers: [],
@@ -423,11 +415,11 @@ class KibisisClient extends BaseClient {
     // null values indicate transactions that were not signed by the provider, as defined in ARC-0001, see https://arc.algorand.foundation/ARCs/arc-0001#semantic-and-security-requirements
     return result.stxns.reduce<Uint8Array[]>((acc, value, index) => {
       if (value) {
-        return [...acc, this.convertBase64ToBytes(value)]
+        return [...acc, base64ToByteArray(value)]
       }
 
       // if the group wants to be returned, get the unsigned transaction
-      return returnGroup ? [...acc, this.convertBase64ToBytes(transactions[index].txn)] : acc
+      return returnGroup ? [...acc, base64ToByteArray(transactions[index].txn)] : acc
     }, [])
   }
 }

@@ -170,3 +170,10 @@ storybook-static/
 
 # NPM config
 .npmrc
+
+# NVM config
+.nvmrc
+
+# v3
+examples/
+packages/

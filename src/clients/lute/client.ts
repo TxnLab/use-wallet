@@ -4,6 +4,7 @@ import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
 import { DecodedSignedTransaction, DecodedTransaction, Network } from '../../types/node'
 import type { InitParams } from '../../types/providers'
 import { debugLog } from '../../utils/debugLog'
+import { byteArrayToBase64 } from '../../utils/encoding'
 import BaseClient from '../base'
 import { ICON } from './constants'
 import type { LuteClientConstructor, LuteConnectOptions } from './types'
@@ -148,16 +149,16 @@ class LuteClient extends BaseClient {
       if (shouldSign) {
         signedIndexes.push(idx)
         acc.push({
-          txn: Buffer.from(transactions[idx]).toString('base64')
+          txn: byteArrayToBase64(transactions[idx])
         })
       } else {
         acc.push({
           txn: isSigned
-            ? Buffer.from(
+            ? byteArrayToBase64(
                 this.algosdk.decodeSignedTransaction(transactions[idx]).txn.toByte()
-              ).toString('base64')
-            : Buffer.from(transactions[idx]).toString('base64'),
-          stxn: isSigned ? Buffer.from(transactions[idx]).toString('base64') : undefined,
+              )
+            : byteArrayToBase64(transactions[idx]),
+          stxn: isSigned ? byteArrayToBase64(transactions[idx]) : undefined,
           signers: []
         })
       }
@@ -170,7 +171,7 @@ class LuteClient extends BaseClient {
 
     const signedTxns = transactions.reduce<Uint8Array[]>((acc, txn, i) => {
       if (signedIndexes.includes(i)) {
-        const signedByUser = result.shift()
+        const signedByUser = result[i]
         signedByUser && acc.push(signedByUser)
       } else if (returnGroup) {
         acc.push(txn)
