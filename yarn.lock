@@ -7,10 +7,10 @@
   resolved "https://registry.yarnpkg.com/@aashutoshrathi/word-wrap/-/word-wrap-1.2.6.tgz#bd9154aec9983f77b3a034ecaa015c2e4201f6cf"
   integrity sha512-1Yjs2SvM8TflER/OD3cOjhWWOZb58A2t7wpE2S9XfBYTiIl+XFhQG2bjy4Pu1I+EAlCNUzRDYDdFwFYUKvXcIA==
 
-"@agoralabs-sh/avm-web-provider@^1.6.1":
-  version "1.6.1"
-  resolved "https://registry.yarnpkg.com/@agoralabs-sh/avm-web-provider/-/avm-web-provider-1.6.1.tgz#34379dd479aba93cc2b048d3c5aece0a0be3dbda"
-  integrity sha512-f5aDfRWCvTvgbuLAiue61v5HkxNERhTGV5S7kayNfWyglpNAoYppPJUFxx+NWa29Huwnm+d16xlq0Fb12vYtbw==
+"@agoralabs-sh/avm-web-provider@^1.6.2":
+  version "1.6.2"
+  resolved "https://registry.yarnpkg.com/@agoralabs-sh/avm-web-provider/-/avm-web-provider-1.6.2.tgz#0b295a78a25bbd22e83ec1e2b65ef654a609a742"
+  integrity sha512-hSRRucn7wykuEDxoDCCB7qK0VVqXL8n86C8fwo3PkpIqJnER2xrrdaACc7/Q5TDc/Z6We/A3CpnNQWTy/J8TQw==
   dependencies:
     uuid "^9.0.1"
 
