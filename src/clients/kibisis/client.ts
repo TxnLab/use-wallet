@@ -11,10 +11,7 @@ import BaseClient from '../base'
 import { DEFAULT_NETWORK, PROVIDER_ID } from '../../constants'
 import { debugLog } from '../../utils/debugLog'
 import { base64ToByteArray, byteArrayToBase64 } from '../../utils/encoding'
-import {
-  ICON,
-  KIBISIS_AVM_WEB_PROVIDER_ID,
-} from './constants'
+import { ICON, KIBISIS_AVM_WEB_PROVIDER_ID } from './constants'
 import type { InitParams, Network, Wallet } from '../../types'
 import type { DecodedSignedTransaction, DecodedTransaction } from '../../types'
 import type { ClientConstructorOptions, RawTransactionToSign } from './types'
@@ -66,10 +63,12 @@ class KibisisClient extends BaseClient {
     try {
       debugLog(`${PROVIDER_ID.KIBISIS.toUpperCase()}#${_functionName}: initializing...`)
 
-      avmWebProviderSDK = clientStatic || (getDynamicClient && await getDynamicClient()) || null
+      avmWebProviderSDK = clientStatic || (getDynamicClient && (await getDynamicClient())) || null
 
       if (!avmWebProviderSDK) {
-        throw new Error('failed to initialize, the @agoralabs-sh/avm-web-provider sdk was not provided')
+        throw new Error(
+          'failed to initialize, the @agoralabs-sh/avm-web-provider sdk was not provided'
+        )
       }
 
       const algosdk = algosdkStatic || (await Algod.init(algodOptions)).algosdk
@@ -137,11 +136,13 @@ class KibisisClient extends BaseClient {
         // remove the listener
         this.avmWebClient.removeListener(listenerId)
 
-        reject(new ARC0027MethodTimedOutError({
-          method: ARC0027MethodEnum.Disable,
-          message: `no response from provider "${PROVIDER_ID.KIBISIS.toUpperCase()}"`,
-          providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
-        }))
+        reject(
+          new ARC0027MethodTimedOutError({
+            method: ARC0027MethodEnum.Disable,
+            message: `no response from provider "${PROVIDER_ID.KIBISIS.toUpperCase()}"`,
+            providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+          })
+        )
       }, LOWER_REQUEST_TIMEOUT)
       const listenerId = this.avmWebClient.onDisable(({ error, method, result }) => {
         // remove the listener, it is not needed
@@ -155,10 +156,12 @@ class KibisisClient extends BaseClient {
         }
 
         if (!result) {
-          return reject(new ARC0027UnknownError({
-            message: `received response, but "${method}" request details were empty for provider "${PROVIDER_ID.KIBISIS.toUpperCase()}"`,
-            providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
-          }))
+          return reject(
+            new ARC0027UnknownError({
+              message: `received response, but "${method}" request details were empty for provider "${PROVIDER_ID.KIBISIS.toUpperCase()}"`,
+              providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+            })
+          )
         }
 
         return resolve(result)
@@ -167,7 +170,7 @@ class KibisisClient extends BaseClient {
       // send the request
       this.avmWebClient.disable({
         genesisHash: this.genesisHash,
-        providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
+        providerId: KIBISIS_AVM_WEB_PROVIDER_ID
       })
     })
   }
@@ -195,11 +198,13 @@ class KibisisClient extends BaseClient {
         // remove the listener
         this.avmWebClient.removeListener(listenerId)
 
-        reject(new ARC0027MethodTimedOutError({
-          method: ARC0027MethodEnum.Enable,
-          message: `no response from provider "${PROVIDER_ID.KIBISIS.toUpperCase()}"`,
-          providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
-        }))
+        reject(
+          new ARC0027MethodTimedOutError({
+            method: ARC0027MethodEnum.Enable,
+            message: `no response from provider "${PROVIDER_ID.KIBISIS.toUpperCase()}"`,
+            providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+          })
+        )
       }, DEFAULT_REQUEST_TIMEOUT)
       const listenerId = this.avmWebClient.onEnable(({ error, method, result }) => {
         // remove the listener, it is not needed
@@ -213,10 +218,12 @@ class KibisisClient extends BaseClient {
         }
 
         if (!result) {
-          return reject(new ARC0027UnknownError({
-            message: `received response, but "${method}" request details were empty for provider "${PROVIDER_ID.KIBISIS.toUpperCase()}"`,
-            providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
-          }))
+          return reject(
+            new ARC0027UnknownError({
+              message: `received response, but "${method}" request details were empty for provider "${PROVIDER_ID.KIBISIS.toUpperCase()}"`,
+              providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+            })
+          )
         }
 
         return resolve(result)
@@ -225,7 +232,7 @@ class KibisisClient extends BaseClient {
       // send the request
       this.avmWebClient.enable({
         genesisHash: this.genesisHash,
-        providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
+        providerId: KIBISIS_AVM_WEB_PROVIDER_ID
       })
     })
   }
@@ -255,16 +262,12 @@ class KibisisClient extends BaseClient {
     )
     const accountInfo = await this.getAccountInfo(sender)
     const authAddr = accountInfo['auth-addr']
-    const txn = byteArrayToBase64(
-      this.algosdk.decodeUnsignedTransaction(rawTransaction).toByte()
-    )
+    const txn = byteArrayToBase64(this.algosdk.decodeUnsignedTransaction(rawTransaction).toByte())
 
     // if the transaction is signed, instruct the provider not to sign by providing an empty signers array
     if (isSigned) {
       return {
-        txn: byteArrayToBase64(
-          this.algosdk.decodeSignedTransaction(rawTransaction).txn.toByte()
-        ),
+        txn: byteArrayToBase64(this.algosdk.decodeSignedTransaction(rawTransaction).txn.toByte()),
         signers: [],
         ...(authAddr && { authAddr })
       }
@@ -313,11 +316,13 @@ class KibisisClient extends BaseClient {
         // remove the listener
         this.avmWebClient.removeListener(listenerId)
 
-        reject(new ARC0027MethodTimedOutError({
-          method: ARC0027MethodEnum.SignTransactions,
-          message: `no response from provider "${PROVIDER_ID.KIBISIS.toUpperCase()}"`,
-          providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
-        }))
+        reject(
+          new ARC0027MethodTimedOutError({
+            method: ARC0027MethodEnum.SignTransactions,
+            message: `no response from provider "${PROVIDER_ID.KIBISIS.toUpperCase()}"`,
+            providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+          })
+        )
       }, DEFAULT_REQUEST_TIMEOUT)
       const listenerId = this.avmWebClient.onSignTransactions(({ error, method, result }) => {
         // remove the listener, it is not needed
@@ -331,10 +336,12 @@ class KibisisClient extends BaseClient {
         }
 
         if (!result) {
-          return reject(new ARC0027UnknownError({
-            message: `received response, but "${method}" request details were empty for provider "${PROVIDER_ID.KIBISIS.toUpperCase()}"`,
-            providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
-          }))
+          return reject(
+            new ARC0027UnknownError({
+              message: `received response, but "${method}" request details were empty for provider "${PROVIDER_ID.KIBISIS.toUpperCase()}"`,
+              providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+            })
+          )
         }
 
         return resolve(result)
@@ -343,7 +350,7 @@ class KibisisClient extends BaseClient {
       // send the request
       this.avmWebClient.signTransactions({
         txns,
-        providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
+        providerId: KIBISIS_AVM_WEB_PROVIDER_ID
       })
     })
   }
@@ -356,7 +363,9 @@ class KibisisClient extends BaseClient {
     const _functionName = 'connect'
     const result = await this._enable()
 
-    debugLog(`${PROVIDER_ID.KIBISIS.toUpperCase()}#${_functionName}: successfully connected on network "${result.genesisId}"`)
+    debugLog(
+      `${PROVIDER_ID.KIBISIS.toUpperCase()}#${_functionName}: successfully connected on network "${result.genesisId}"`
+    )
 
     return KibisisClient.mapAVMWebProviderAccountsToWallet(result.accounts)
   }
@@ -365,7 +374,9 @@ class KibisisClient extends BaseClient {
     const _functionName = 'disconnect'
     const result = await this._disable()
 
-    debugLog(`${PROVIDER_ID.KIBISIS.toUpperCase()}#${_functionName}: successfully disconnected${result.sessionIds && result.sessionIds.length ? ` sessions [${result.sessionIds.join(',')}]` : ''} on network "${result.genesisId}"`)
+    debugLog(
+      `${PROVIDER_ID.KIBISIS.toUpperCase()}#${_functionName}: successfully disconnected${result.sessionIds && result.sessionIds.length ? ` sessions [${result.sessionIds.join(',')}]` : ''} on network "${result.genesisId}"`
+    )
   }
 
   async reconnect(): Promise<Wallet | null> {
