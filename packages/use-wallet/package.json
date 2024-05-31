@@ -38,7 +38,7 @@
   ],
   "dependencies": {
     "@tanstack/store": "^0.3.1",
-    "algosdk": "^2.7.0"
+    "algosdk": "2.7.0"
   },
   "devDependencies": {
     "@blockshake/defly-connect": "^1.1.6",

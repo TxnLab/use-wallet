@@ -333,7 +333,7 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1
       algosdk:
-        specifier: ^2.7.0
+        specifier: 2.7.0
         version: 2.7.0
     devDependencies:
       '@blockshake/defly-connect':
@@ -398,7 +398,7 @@ importers:
         specifier: ^18.2.45
         version: 18.2.70
       algosdk:
-        specifier: ^2.7.0
+        specifier: 2.7.0
         version: 2.7.0
       jsdom:
         specifier: ^24.0.0
@@ -444,7 +444,7 @@ importers:
         specifier: ^0.8.5
         version: 0.8.7(solid-js@1.8.16)
       algosdk:
-        specifier: ^2.7.0
+        specifier: 2.7.0
         version: 2.7.0
       solid-js:
         specifier: ^1.8.11
@@ -484,7 +484,7 @@ importers:
         version: 1.2.0
     devDependencies:
       algosdk:
-        specifier: ^2.7.0
+        specifier: 2.7.0
         version: 2.7.0
       tsup:
         specifier: ^8.0.0
