@@ -330,8 +330,8 @@ importers:
   packages/use-wallet:
     dependencies:
       '@tanstack/store':
-        specifier: ^0.3.1
-        version: 0.3.1
+        specifier: 0.4.1
+        version: 0.4.1
       algosdk:
         specifier: 2.7.0
         version: 2.7.0
@@ -379,8 +379,8 @@ importers:
         specifier: ^1.3.4
         version: 1.3.4(algosdk@2.7.0)
       '@tanstack/react-store':
-        specifier: ^0.3.1
-        version: 0.3.1(react-dom@18.2.0)(react@18.2.0)
+        specifier: 0.4.1
+        version: 0.4.1(react-dom@18.2.0)(react@18.2.0)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../use-wallet
@@ -425,8 +425,8 @@ importers:
         specifier: ^1.3.4
         version: 1.3.4(algosdk@2.7.0)
       '@tanstack/solid-store':
-        specifier: ^0.3.1
-        version: 0.3.1(solid-js@1.8.16)
+        specifier: 0.4.1
+        version: 0.4.1(solid-js@1.8.16)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../use-wallet
@@ -468,8 +468,8 @@ importers:
         specifier: ^1.3.4
         version: 1.3.4(algosdk@2.7.0)
       '@tanstack/vue-store':
-        specifier: ^0.3.1
-        version: 0.3.1(vue@3.4.21)
+        specifier: 0.4.1
+        version: 0.4.1(vue@3.4.21)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../use-wallet
@@ -2798,33 +2798,33 @@ packages:
       tslib: 2.6.2
     dev: false
 
-  /@tanstack/react-store@0.3.1(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-PfV271d345It6FdcX4c9gd+llKGddtvau8iJnybTAWmYVyDeFWfIIkiAJ5iNITJmI02AzqgtcV3QLNBBlpBUjA==}
+  /@tanstack/react-store@0.4.1(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-cyriofh2I6dPOPJf2W0K+ON5q08ezevLTUhC1txiUnrJ9XFFFPr0X8CmGnXzucI2c0t0V6wYZc0GCz4zOAeptg==}
     peerDependencies:
       react: ^17.0.0 || ^18.0.0
       react-dom: ^17.0.0 || ^18.0.0
     dependencies:
-      '@tanstack/store': 0.3.1
+      '@tanstack/store': 0.4.1
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       use-sync-external-store: 1.2.0(react@18.2.0)
     dev: false
 
-  /@tanstack/solid-store@0.3.1(solid-js@1.8.16):
-    resolution: {integrity: sha512-MBsV3kTHW0v+fHsSUfxpVUh2FVX/qmc6hTq8HdwOkleBcpVRiF8RX0gyCcE5+cE03LncKoIEw9hO80dOBEZbFw==}
+  /@tanstack/solid-store@0.4.1(solid-js@1.8.16):
+    resolution: {integrity: sha512-pxnABnOz6y+GrxFDMjPoNq8yqjuwBJVEcl4LPkS0FLFz3y3XzoBzUb3cd9zWQAebpIKJtUqfDOqWakkYlgiOsA==}
     peerDependencies:
       solid-js: ^1.6.0
     dependencies:
-      '@tanstack/store': 0.3.1
+      '@tanstack/store': 0.4.1
       solid-js: 1.8.16
     dev: false
 
-  /@tanstack/store@0.3.1:
-    resolution: {integrity: sha512-A49KN8SpLMWaNmZGPa9K982RQ81W+m7W6iStcQVeKeVS70JZRqkF0fDwKByREPq6qz9/kS0aQFOPQ0W6wIeU5g==}
+  /@tanstack/store@0.4.1:
+    resolution: {integrity: sha512-NvW3MomYSTzQK61AWdtWNIhWgszXFZDRgCNlvSDw/DBaoLqJIlZ0/gKLsditA8un/BGU1NR06+j0a/UNLgXA+Q==}
     dev: false
 
-  /@tanstack/vue-store@0.3.1(vue@3.4.21):
-    resolution: {integrity: sha512-7XhuxAO6z4FWz8QnluTd4njy4yh6yHVD+dVMV60kDNck+ZfnU8VrENMGaA5edIq5zX3ooAUcOtOXh7KgQv1P1A==}
+  /@tanstack/vue-store@0.4.1(vue@3.4.21):
+    resolution: {integrity: sha512-/a0N8VgYvV7Vmpn6cDR8sWjDZEulOlULtaFtzGHpMP0rz+toX6dpMbQctOvz6Hw3RNY3HoTzmkGHUgyuZNJqMw==}
     peerDependencies:
       '@vue/composition-api': ^1.2.1
       vue: ^2.5.0 || ^3.0.0
@@ -2832,7 +2832,7 @@ packages:
       '@vue/composition-api':
         optional: true
     dependencies:
-      '@tanstack/store': 0.3.1
+      '@tanstack/store': 0.4.1
       vue: 3.4.21(typescript@5.4.3)
       vue-demi: 0.14.7(vue@3.4.21)
     dev: false
