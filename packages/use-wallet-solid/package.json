@@ -61,12 +61,12 @@
     "dist"
   ],
   "dependencies": {
-    "@tanstack/solid-store": "^0.3.1",
+    "@tanstack/solid-store": "0.4.1",
     "@txnlab/use-wallet": "workspace:*"
   },
   "devDependencies": {
     "@solidjs/testing-library": "^0.8.5",
-    "algosdk": "^2.7.0",
+    "algosdk": "2.7.0",
     "solid-js": "^1.8.11",
     "tsup": "^8.0.0",
     "tsup-preset-solid": "^2.2.0",
