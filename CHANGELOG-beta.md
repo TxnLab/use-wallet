@@ -1,3 +1,9 @@
+## [3.0.0-beta.9](https://github.com/txnlab/use-wallet/compare/v3.0.0-beta.8...v3.0.0-beta.9) (2024-06-01)
+
+### Fixes
+
+- **Core:** Fallbacks for named/default Pera Connect v2 export ([b4ccb40](https://github.com/TxnLab/use-wallet/commit/b4ccb404f063b8cb7835540df6b6541527bf009c))
+
 ## [3.0.0-beta.8](https://github.com/txnlab/use-wallet/compare/v3.0.0-beta.7...v3.0.0-beta.8) (2024-06-01)
 
 ### :warning: BREAKING CHANGES
