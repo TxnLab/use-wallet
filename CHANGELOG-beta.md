@@ -1,3 +1,13 @@
+## [3.0.0-beta.8](https://github.com/txnlab/use-wallet/compare/v3.0.0-beta.7...v3.0.0-beta.8) (2024-06-01)
+
+### :warning: BREAKING CHANGES
+
+This release includes breaking changes. Please refer to the [release notes](https://github.com/TxnLab/use-wallet/releases/tag/v3.0.0-beta.8) for upgrade instructions.
+
+### Features
+
+- **Core:** Migrate Pera Wallet provider to Pera Connect v2 ([#179](https://github.com/TxnLab/use-wallet/pull/179)) ([87db889](https://github.com/TxnLab/use-wallet/commit/87db889e9403e8efa01db3ebce3d4f494d4c9280))
+
 ## [3.0.0-beta.7](https://github.com/txnlab/use-wallet/compare/v3.0.0-beta.6...v3.0.0-beta.7) (2024-05-16)
 
 ### Fixes
