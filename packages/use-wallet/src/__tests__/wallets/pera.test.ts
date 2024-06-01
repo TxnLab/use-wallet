@@ -1,5 +1,4 @@
 import { Store } from '@tanstack/store'
-import { PeraWalletConnect } from '@perawallet/connect'
 import algosdk from 'algosdk'
 import { StorageAdapter } from 'src/storage'
 import { LOCAL_STORAGE_KEY, State, defaultState } from 'src/store'
@@ -19,6 +18,20 @@ vi.spyOn(console, 'info').mockImplementation(() => {})
 vi.spyOn(console, 'warn').mockImplementation(() => {})
 vi.spyOn(console, 'error').mockImplementation(() => {})
 vi.spyOn(console, 'groupCollapsed').mockImplementation(() => {})
+
+const mockPeraWallet = {
+  connect: vi.fn(),
+  reconnectSession: vi.fn(),
+  disconnect: vi.fn(),
+  signTransaction: vi.fn(),
+  signData: vi.fn()
+}
+
+vi.mock('@perawallet/connect-beta', () => {
+  return {
+    PeraWalletConnect: vi.fn(() => mockPeraWallet)
+  }
+})
 
 describe('PeraWallet', () => {
   let wallet: PeraWallet
@@ -51,6 +64,9 @@ describe('PeraWallet', () => {
     store = new Store<State>(defaultState)
     wallet = new PeraWallet({
       id: WalletId.PERA,
+      options: {
+        projectId: 'mockProjectId'
+      },
       metadata: {},
       getAlgodClient: () => ({}) as any,
       store,
@@ -74,11 +90,7 @@ describe('PeraWallet', () => {
         address: 'mockAddress2'
       }
 
-      const mockConnect = vi
-        .fn()
-        .mockImplementation(() => Promise.resolve([account1.address, account2.address]))
-
-      vi.spyOn(PeraWalletConnect.prototype, 'connect').mockImplementation(mockConnect)
+      mockPeraWallet.connect.mockResolvedValue([account1.address, account2.address])
 
       const accounts = await wallet.connect()
 
@@ -91,9 +103,7 @@ describe('PeraWallet', () => {
     })
 
     it('should log an error and return an empty array when no accounts are found', async () => {
-      const mockConnect = vi.fn().mockImplementation(() => Promise.resolve([]))
-
-      vi.spyOn(PeraWalletConnect.prototype, 'connect').mockImplementation(mockConnect)
+      mockPeraWallet.connect.mockResolvedValue([])
 
       const accounts = await wallet.connect()
 
@@ -108,13 +118,7 @@ describe('PeraWallet', () => {
 
   describe('disconnect', () => {
     it('should disconnect client and remove wallet from store', async () => {
-      const mockConnect = vi.fn().mockImplementation(() => Promise.resolve(['mockAddress1']))
-
-      vi.spyOn(PeraWalletConnect.prototype, 'connect').mockImplementation(mockConnect)
-
-      const mockDisconnect = vi.fn().mockImplementation(() => Promise.resolve())
-
-      vi.spyOn(PeraWalletConnect.prototype, 'disconnect').mockImplementation(mockDisconnect)
+      mockPeraWallet.connect.mockResolvedValue(['mockAddress1'])
 
       // Connect first to initialize client
       await wallet.connect()
@@ -124,7 +128,7 @@ describe('PeraWallet', () => {
       await wallet.disconnect()
       expect(wallet.isConnected).toBe(false)
 
-      expect(mockDisconnect).toHaveBeenCalled()
+      expect(mockPeraWallet.disconnect).toHaveBeenCalled()
       expect(store.state.wallets[WalletId.PERA]).toBeUndefined()
     })
   })
@@ -148,26 +152,23 @@ describe('PeraWallet', () => {
 
       wallet = new PeraWallet({
         id: WalletId.PERA,
+        options: {
+          projectId: 'mockProjectId'
+        },
         metadata: {},
         getAlgodClient: () => ({}) as any,
         store,
         subscribe: mockSubscribe
       })
 
-      const mockReconnectSession = vi
-        .fn()
-        .mockImplementation(() => Promise.resolve([account.address]))
-
-      vi.spyOn(PeraWalletConnect.prototype, 'reconnectSession').mockImplementation(
-        mockReconnectSession
-      )
+      mockPeraWallet.reconnectSession.mockResolvedValue([account.address])
 
       await wallet.resumeSession()
 
       expect(console.info).toHaveBeenCalledWith('[PeraWallet] Resuming session...')
       expect(console.info).toHaveBeenCalledWith('[PeraWallet] Initializing client...')
       expect(wallet.isConnected).toBe(true)
-      expect(mockReconnectSession).toHaveBeenCalled()
+      expect(mockPeraWallet.reconnectSession).toHaveBeenCalled()
     })
 
     it(`should not call the client's reconnectSession method if Pera wallet data is not found in the store`, async () => {
@@ -176,24 +177,20 @@ describe('PeraWallet', () => {
 
       wallet = new PeraWallet({
         id: WalletId.PERA,
+        options: {
+          projectId: 'mockProjectId'
+        },
         metadata: {},
         getAlgodClient: () => ({}) as any,
         store,
         subscribe: mockSubscribe
       })
 
-      // Mock reconnectSession shouldn't be called
-      const mockReconnectSession = vi.fn()
-
-      vi.spyOn(PeraWalletConnect.prototype, 'reconnectSession').mockImplementation(
-        mockReconnectSession
-      )
-
       await wallet.resumeSession()
 
       expect(console.info).not.toHaveBeenCalledWith('[PeraWallet] Resuming session...')
       expect(wallet.isConnected).toBe(false)
-      expect(mockReconnectSession).not.toHaveBeenCalled()
+      expect(mockPeraWallet.reconnectSession).not.toHaveBeenCalled()
     })
 
     it('should update the store if accounts returned by the client do not match', async () => {
@@ -222,6 +219,9 @@ describe('PeraWallet', () => {
 
       wallet = new PeraWallet({
         id: WalletId.PERA,
+        options: {
+          projectId: 'mockProjectId'
+        },
         metadata: {},
         getAlgodClient: () => ({}) as any,
         store,
@@ -229,13 +229,7 @@ describe('PeraWallet', () => {
       })
 
       // Client only returns 'mockAddress2' on reconnect, 'mockAddress1' is missing
-      const mockReconnectSession = vi
-        .fn()
-        .mockImplementation(() => Promise.resolve(['mockAddress2']))
-
-      vi.spyOn(PeraWalletConnect.prototype, 'reconnectSession').mockImplementation(
-        mockReconnectSession
-      )
+      mockPeraWallet.reconnectSession.mockResolvedValue(['mockAddress2'])
 
       await wallet.resumeSession()
 
@@ -296,33 +290,21 @@ describe('PeraWallet', () => {
 
       beforeEach(async () => {
         // Mock two connected accounts, 7ZUECA and GD64YI
-        const mockConnect = vi
-          .fn()
-          .mockImplementation(() =>
-            Promise.resolve([
-              '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-              'GD64YIY3TWGDMCNPP553DZPPR6LDUSFQOIJVFDPPXWEG3FVOJCCDBBHU5A'
-            ])
-          )
-
-        vi.spyOn(PeraWalletConnect.prototype, 'connect').mockImplementation(mockConnect)
+        mockPeraWallet.connect.mockResolvedValue([
+          '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
+          'GD64YIY3TWGDMCNPP553DZPPR6LDUSFQOIJVFDPPXWEG3FVOJCCDBBHU5A'
+        ])
 
         await wallet.connect()
       })
 
       it('should correctly process and sign a single algosdk.Transaction', async () => {
-        const mockSignTransaction = vi
-          .fn()
-          .mockImplementation(() => Promise.resolve([mockSignedTxn]))
-
-        vi.spyOn(PeraWalletConnect.prototype, 'signTransaction').mockImplementation(
-          mockSignTransaction
-        )
+        mockPeraWallet.signTransaction.mockResolvedValue([mockSignedTxn])
 
         const result = await wallet.signTransactions([txn1])
 
         expect(result).toEqual([mockSignedTxn])
-        expect(mockSignTransaction).toHaveBeenCalledWith([
+        expect(mockPeraWallet.signTransaction).toHaveBeenCalledWith([
           [
             {
               txn: algosdk.decodeUnsignedTransaction(algosdk.encodeUnsignedTransaction(txn1))
@@ -332,19 +314,13 @@ describe('PeraWallet', () => {
       })
 
       it('should correctly process and sign a single algosdk.Transaction group', async () => {
-        const mockSignTransaction = vi
-          .fn()
-          .mockImplementation(() => Promise.resolve([mockSignedTxn, mockSignedTxn]))
-
-        vi.spyOn(PeraWalletConnect.prototype, 'signTransaction').mockImplementation(
-          mockSignTransaction
-        )
+        mockPeraWallet.signTransaction.mockResolvedValue([mockSignedTxn, mockSignedTxn])
 
         const txnGroup = algosdk.assignGroupID([txn1, txn2])
         const result = await wallet.signTransactions(txnGroup)
 
         expect(result).toEqual([mockSignedTxn, mockSignedTxn])
-        expect(mockSignTransaction).toHaveBeenCalledWith([
+        expect(mockPeraWallet.signTransaction).toHaveBeenCalledWith([
           [
             {
               txn: algosdk.decodeUnsignedTransaction(
@@ -361,13 +337,7 @@ describe('PeraWallet', () => {
       })
 
       it('should correctly process and sign multiple algosdk.Transaction groups', async () => {
-        const mockSignTransaction = vi
-          .fn()
-          .mockImplementation(() => Promise.resolve([mockSignedTxn, mockSignedTxn]))
-
-        vi.spyOn(PeraWalletConnect.prototype, 'signTransaction').mockImplementation(
-          mockSignTransaction
-        )
+        mockPeraWallet.signTransaction.mockResolvedValue([mockSignedTxn, mockSignedTxn])
 
         const txnGroup1 = algosdk.assignGroupID([txn1])
         const txnGroup2 = algosdk.assignGroupID([txn2])
@@ -375,7 +345,7 @@ describe('PeraWallet', () => {
         const result = await wallet.signTransactions([txnGroup1, txnGroup2])
 
         expect(result).toEqual([mockSignedTxn, mockSignedTxn])
-        expect(mockSignTransaction).toHaveBeenCalledWith([
+        expect(mockPeraWallet.signTransaction).toHaveBeenCalledWith([
           [
             {
               txn: algosdk.decodeUnsignedTransaction(
@@ -392,19 +362,13 @@ describe('PeraWallet', () => {
       })
 
       it('should correctly process and sign a single encoded transaction', async () => {
-        const mockSignTransaction = vi
-          .fn()
-          .mockImplementation(() => Promise.resolve([mockSignedTxn]))
-
-        vi.spyOn(PeraWalletConnect.prototype, 'signTransaction').mockImplementation(
-          mockSignTransaction
-        )
+        mockPeraWallet.signTransaction.mockResolvedValue([mockSignedTxn])
 
         const encodedTxn = txn1.toByte()
         const result = await wallet.signTransactions([encodedTxn])
 
         expect(result).toEqual([mockSignedTxn])
-        expect(mockSignTransaction).toHaveBeenCalledWith([
+        expect(mockPeraWallet.signTransaction).toHaveBeenCalledWith([
           [
             {
               txn: algosdk.decodeUnsignedTransaction(encodedTxn)
@@ -414,13 +378,7 @@ describe('PeraWallet', () => {
       })
 
       it('should correctly process and sign a single encoded transaction group', async () => {
-        const mockSignTransaction = vi
-          .fn()
-          .mockImplementation(() => Promise.resolve([mockSignedTxn, mockSignedTxn]))
-
-        vi.spyOn(PeraWalletConnect.prototype, 'signTransaction').mockImplementation(
-          mockSignTransaction
-        )
+        mockPeraWallet.signTransaction.mockResolvedValue([mockSignedTxn, mockSignedTxn])
 
         const txnGroup = algosdk.assignGroupID([txn1, txn2])
         const encodedTxnGroup = txnGroup.map((txn) => txn.toByte())
@@ -428,7 +386,7 @@ describe('PeraWallet', () => {
         const result = await wallet.signTransactions(encodedTxnGroup)
 
         expect(result).toEqual([mockSignedTxn, mockSignedTxn])
-        expect(mockSignTransaction).toHaveBeenCalledWith([
+        expect(mockPeraWallet.signTransaction).toHaveBeenCalledWith([
           [
             {
               txn: algosdk.decodeUnsignedTransaction(encodedTxnGroup[0]!)
@@ -441,13 +399,7 @@ describe('PeraWallet', () => {
       })
 
       it('should correctly process and sign multiple encoded transaction groups', async () => {
-        const mockSignTransaction = vi
-          .fn()
-          .mockImplementation(() => Promise.resolve([mockSignedTxn, mockSignedTxn]))
-
-        vi.spyOn(PeraWalletConnect.prototype, 'signTransaction').mockImplementation(
-          mockSignTransaction
-        )
+        mockPeraWallet.signTransaction.mockResolvedValue([mockSignedTxn, mockSignedTxn])
 
         const txnGroup1 = algosdk.assignGroupID([txn1])
         const encodedTxnGroup1 = txnGroup1.map((txn) => txn.toByte())
@@ -458,7 +410,7 @@ describe('PeraWallet', () => {
         const result = await wallet.signTransactions([encodedTxnGroup1, encodedTxnGroup2])
 
         expect(result).toEqual([mockSignedTxn, mockSignedTxn])
-        expect(mockSignTransaction).toHaveBeenCalledWith([
+        expect(mockPeraWallet.signTransaction).toHaveBeenCalledWith([
           [
             {
               txn: algosdk.decodeUnsignedTransaction(encodedTxnGroup1[0]!)
@@ -471,13 +423,7 @@ describe('PeraWallet', () => {
       })
 
       it('should determine which transactions to sign based on indexesToSign', async () => {
-        const mockSignTransaction = vi
-          .fn()
-          .mockImplementation(() => Promise.resolve([mockSignedTxn]))
-
-        vi.spyOn(PeraWalletConnect.prototype, 'signTransaction').mockImplementation(
-          mockSignTransaction
-        )
+        mockPeraWallet.signTransaction.mockResolvedValue([mockSignedTxn])
 
         const txnGroup = algosdk.assignGroupID([txn1, txn2])
         const indexesToSign = [1]
@@ -488,7 +434,7 @@ describe('PeraWallet', () => {
         const result = await wallet.signTransactions(txnGroup, indexesToSign, returnGroup)
 
         expect(result).toEqual(expectedResult)
-        expect(mockSignTransaction).toHaveBeenCalledWith([
+        expect(mockPeraWallet.signTransaction).toHaveBeenCalledWith([
           [
             {
               txn: algosdk.decodeUnsignedTransaction(
@@ -506,14 +452,6 @@ describe('PeraWallet', () => {
       })
 
       it('should correctly merge signed transactions back into the original group', async () => {
-        const mockSignTransaction = vi
-          .fn()
-          .mockImplementation(() => Promise.resolve([mockSignedTxn]))
-
-        vi.spyOn(PeraWalletConnect.prototype, 'signTransaction').mockImplementation(
-          mockSignTransaction
-        )
-
         const txnGroup = algosdk.assignGroupID([txn1, txn2])
         const returnGroup = true // Merge signed transaction back into original group
 
@@ -521,12 +459,16 @@ describe('PeraWallet', () => {
         const indexesToSign1 = [1]
         const expectedResult1 = [algosdk.encodeUnsignedTransaction(txnGroup[0]!), mockSignedTxn]
 
+        mockPeraWallet.signTransaction.mockResolvedValue([mockSignedTxn])
+
         const result1 = await wallet.signTransactions(txnGroup, indexesToSign1, returnGroup)
         expect(result1).toEqual(expectedResult1)
 
         // Only txn1 should be signed
         const indexesToSign2 = [0]
         const expectedResult2 = [mockSignedTxn, algosdk.encodeUnsignedTransaction(txnGroup[1]!)]
+
+        mockPeraWallet.signTransaction.mockResolvedValue([mockSignedTxn])
 
         const result2 = await wallet.signTransactions(txnGroup, indexesToSign2, returnGroup)
         expect(result2).toEqual(expectedResult2)
@@ -556,13 +498,7 @@ describe('PeraWallet', () => {
           amount: 3000
         })
 
-        const mockSignTransaction = vi
-          .fn()
-          .mockImplementation(() => Promise.resolve([mockSignedTxn, mockSignedTxn]))
-
-        vi.spyOn(PeraWalletConnect.prototype, 'signTransaction').mockImplementation(
-          mockSignTransaction
-        )
+        mockPeraWallet.signTransaction.mockResolvedValue([mockSignedTxn, mockSignedTxn])
 
         // txnGroup[1] can't be signed
         const txnGroup = algosdk.assignGroupID([txnCanSign1, txnCannotSign, txnCanSign2])
@@ -577,7 +513,7 @@ describe('PeraWallet', () => {
         const result = await wallet.signTransactions(txnGroup)
 
         expect(result).toEqual(expectedResult)
-        expect(mockSignTransaction).toHaveBeenCalledWith([
+        expect(mockPeraWallet.signTransaction).toHaveBeenCalledWith([
           [
             {
               txn: algosdk.decodeUnsignedTransaction(

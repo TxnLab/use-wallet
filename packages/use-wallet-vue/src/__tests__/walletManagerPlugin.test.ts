@@ -6,7 +6,7 @@ describe('WalletManagerPlugin', () => {
   it('installs correctly', () => {
     const app = createApp({})
     const mockConfig: WalletManagerConfig = {
-      wallets: [WalletId.DEFLY, WalletId.PERA]
+      wallets: [WalletId.DEFLY, WalletId.KIBISIS]
     }
     app.use(WalletManagerPlugin, mockConfig)
 

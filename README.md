@@ -54,7 +54,7 @@ Some wallets require additional packages to be installed. The following table li
 | Wallet Provider | Package(s)                                           |
 | --------------- | ---------------------------------------------------- |
 | Defly Wallet    | `@blockshake/defly-connect`                          |
-| Pera Wallet     | `@perawallet/connect`                                |
+| Pera Wallet     | `@perawallet/connect-beta`                           |
 | WalletConnect   | `@walletconnect/modal`, `@walletconnect/sign-client` |
 | Lute Wallet     | `lute-connect`                                       |
 
@@ -69,7 +69,10 @@ const walletManager = new WalletManager({
   wallets: [
     WalletId.DEFLY,
     WalletId.EXODUS,
-    WalletId.PERA,
+    {
+      id: WalletId.PERA,
+      options: { projectId: '<YOUR_PROJECT_ID>' }
+    },
     {
       id: WalletId.WALLETCONNECT,
       options: { projectId: '<YOUR_PROJECT_ID>' }
@@ -91,7 +94,7 @@ Each wallet you wish to support must be included in the `wallets` array.
 
 To initialize wallets with default options, pass the wallet ID using the `WalletId` enum. To use custom options, pass an object with the `id` and `options` properties.
 
-> **Note:** WalletConnect's `projectId` option is required. You can obtain a project ID by registering your application at https://cloud.walletconnect.com/
+> **Note:** Pera and WalletConnect's `projectId` option is required. You can obtain a project ID by registering your application at https://cloud.walletconnect.com/
 
 #### `network` (optional)
 
