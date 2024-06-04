@@ -57,7 +57,7 @@ export default class KibisisWallet extends BaseWallet {
 
   /**
    * Calls the "disable" method on the provider. This method will timeout after 0.75 seconds.
-   * @returns {Promise<IDisableResult>} a promise that resolves to the result.
+   * @returns {Promise<AVMWebProviderSDK.IDisableResult>} a promise that resolves to the result.
    * @private
    * @throws {MethodNotSupportedError} if the method is not supported for the configured network.
    * @throws {MethodTimedOutError} if the method timed out by lack of response (>= 3 minutes).
@@ -116,7 +116,7 @@ export default class KibisisWallet extends BaseWallet {
 
   /**
    * Calls the "enable" method on the provider. This method will timeout after 3 minutes.
-   * @returns {Promise<IEnableResult>} a promise that resolves to the result.
+   * @returns {Promise<AVMWebProviderSDK.IEnableResult>} a promise that resolves to the result.
    * @private
    * @throws {MethodCanceledError} if the method was cancelled by the user.
    * @throws {MethodNotSupportedError} if the method is not supported for the configured network.
@@ -220,7 +220,7 @@ export default class KibisisWallet extends BaseWallet {
   /**
    * Calls the "signTransactions" method to sign the supplied ARC-0001 transactions. This method will timeout after 3
    * minutes.
-   * @returns {Promise<ISignTransactionsResult>} a promise that resolves to the result.
+   * @returns {Promise<AVMWebProviderSDK.ISignTransactionsResult>} a promise that resolves to the result.
    * @private
    * @throws {InvalidInputError} if computed group ID for the txns does not match the assigned group ID.
    * @throws {InvalidGroupIdError} if the unsigned txns is malformed or not conforming to ARC-0001.
