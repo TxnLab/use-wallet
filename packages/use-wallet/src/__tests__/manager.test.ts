@@ -50,7 +50,7 @@ describe('WalletManager', () => {
   describe('constructor', () => {
     it('initializes with default network and wallets', () => {
       const manager = new WalletManager({
-        wallets: [WalletId.DEFLY, WalletId.PERA]
+        wallets: [WalletId.DEFLY, WalletId.KIBISIS]
       })
       expect(manager.wallets.length).toBe(2)
       expect(manager.activeNetwork).toBe(NetworkId.TESTNET)
@@ -59,7 +59,7 @@ describe('WalletManager', () => {
 
     it('initializes with custom network and wallets', () => {
       const manager = new WalletManager({
-        wallets: [WalletId.DEFLY, WalletId.PERA],
+        wallets: [WalletId.DEFLY, WalletId.KIBISIS],
         network: NetworkId.MAINNET
       })
       expect(manager.wallets.length).toBe(2)
@@ -69,7 +69,7 @@ describe('WalletManager', () => {
 
     it('initializes with custom algod config', () => {
       const manager = new WalletManager({
-        wallets: [WalletId.DEFLY, WalletId.PERA],
+        wallets: [WalletId.DEFLY, WalletId.KIBISIS],
         network: NetworkId.LOCALNET,
         algod: {
           baseServer: 'http://localhost',
@@ -90,7 +90,7 @@ describe('WalletManager', () => {
   describe('initializeWallets', () => {
     it('initializes wallets from string array', () => {
       const manager = new WalletManager({
-        wallets: [WalletId.DEFLY, WalletId.PERA]
+        wallets: [WalletId.DEFLY, WalletId.KIBISIS]
       })
       expect(manager.wallets.length).toBe(2)
     })
@@ -99,9 +99,9 @@ describe('WalletManager', () => {
       const manager = new WalletManager({
         wallets: [
           {
-            id: WalletId.DEFLY,
+            id: WalletId.PERA,
             options: {
-              shouldShowSignTxnToast: false
+              projectId: 'mock-project-id'
             }
           },
           {
@@ -153,7 +153,7 @@ describe('WalletManager', () => {
   describe('setActiveNetwork', () => {
     it('sets active network correctly', () => {
       const manager = new WalletManager({
-        wallets: [WalletId.DEFLY, WalletId.PERA]
+        wallets: [WalletId.DEFLY, WalletId.KIBISIS]
       })
       manager.setActiveNetwork(NetworkId.MAINNET)
       expect(manager.activeNetwork).toBe(NetworkId.MAINNET)
@@ -165,7 +165,7 @@ describe('WalletManager', () => {
   describe('subscribe', () => {
     it('adds and removes a subscriber', () => {
       const manager = new WalletManager({
-        wallets: [WalletId.DEFLY, WalletId.PERA]
+        wallets: [WalletId.DEFLY, WalletId.KIBISIS]
       })
       const callback = vi.fn()
       const unsubscribe = manager.subscribe(callback)
@@ -187,34 +187,34 @@ describe('WalletManager', () => {
     beforeEach(() => {
       mockInitialState = {
         wallets: {
-          [WalletId.PERA]: {
+          [WalletId.KIBISIS]: {
             accounts: [
               {
-                name: 'Pera Wallet 1',
+                name: 'Kibisis 1',
                 address: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q'
               },
               {
-                name: 'Pera Wallet 2',
+                name: 'Kibisis 2',
                 address: 'N2C374IRX7HEX2YEQWJBTRSVRHRUV4ZSF76S54WV4COTHRUNYRCI47R3WU'
               }
             ],
             activeAccount: {
-              name: 'Pera Wallet 1',
+              name: 'Kibisis 1',
               address: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q'
             }
           }
         },
-        activeWallet: WalletId.PERA,
+        activeWallet: WalletId.KIBISIS,
         activeNetwork: NetworkId.BETANET
       }
     })
 
     it('loads persisted state correctly', () => {
       const manager = new WalletManager({
-        wallets: [WalletId.DEFLY, WalletId.PERA]
+        wallets: [WalletId.DEFLY, WalletId.KIBISIS]
       })
       expect(manager.store.state).toEqual(mockInitialState)
-      expect(manager.activeWallet?.id).toBe(WalletId.PERA)
+      expect(manager.activeWallet?.id).toBe(WalletId.KIBISIS)
       expect(manager.activeNetwork).toBe(NetworkId.BETANET)
     })
 
@@ -222,7 +222,7 @@ describe('WalletManager', () => {
       mockInitialState = null
 
       const manager = new WalletManager({
-        wallets: [WalletId.DEFLY, WalletId.PERA]
+        wallets: [WalletId.DEFLY, WalletId.KIBISIS]
       })
 
       // Store initializes with default state if null is returned
@@ -237,7 +237,7 @@ describe('WalletManager', () => {
       mockInitialState = invalidState
 
       const manager = new WalletManager({
-        wallets: [WalletId.DEFLY, WalletId.PERA]
+        wallets: [WalletId.DEFLY, WalletId.KIBISIS]
       })
       expect(mockConsoleWarn).toHaveBeenCalledWith('[Store] Parsed state:', invalidState)
       expect(mockConsoleError).toHaveBeenCalledWith(
@@ -257,7 +257,7 @@ describe('WalletManager', () => {
       }
 
       const manager = new WalletManager({
-        wallets: [WalletId.DEFLY, WalletId.PERA]
+        wallets: [WalletId.DEFLY, WalletId.KIBISIS]
       })
       manager.setActiveNetwork(NetworkId.MAINNET)
 
@@ -272,47 +272,47 @@ describe('WalletManager', () => {
     beforeEach(() => {
       mockInitialState = {
         wallets: {
-          [WalletId.PERA]: {
+          [WalletId.KIBISIS]: {
             accounts: [
               {
-                name: 'Pera Wallet 1',
+                name: 'Kibisis 1',
                 address: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q'
               },
               {
-                name: 'Pera Wallet 2',
+                name: 'Kibisis 2',
                 address: 'N2C374IRX7HEX2YEQWJBTRSVRHRUV4ZSF76S54WV4COTHRUNYRCI47R3WU'
               }
             ],
             activeAccount: {
-              name: 'Pera Wallet 1',
+              name: 'Kibisis 1',
               address: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q'
             }
           }
         },
-        activeWallet: WalletId.PERA,
+        activeWallet: WalletId.KIBISIS,
         activeNetwork: NetworkId.BETANET
       }
     })
 
     it('returns the active wallet', () => {
       const manager = new WalletManager({
-        wallets: [WalletId.DEFLY, WalletId.PERA]
+        wallets: [WalletId.DEFLY, WalletId.KIBISIS]
       })
-      expect(manager.activeWallet?.id).toBe(WalletId.PERA)
+      expect(manager.activeWallet?.id).toBe(WalletId.KIBISIS)
     })
 
     it('returns null if no active wallet', () => {
       mockInitialState = null
 
       const manager = new WalletManager({
-        wallets: [WalletId.DEFLY, WalletId.PERA]
+        wallets: [WalletId.DEFLY, WalletId.KIBISIS]
       })
       expect(manager.activeWallet).toBeNull()
     })
 
     it('returns active wallet accounts', () => {
       const manager = new WalletManager({
-        wallets: [WalletId.DEFLY, WalletId.PERA]
+        wallets: [WalletId.DEFLY, WalletId.KIBISIS]
       })
       expect(manager.activeWalletAccounts?.length).toBe(2)
       expect(manager.activeWalletAddresses).toEqual([
@@ -334,7 +334,7 @@ describe('WalletManager', () => {
   describe('Transaction Signing', () => {
     it('throws error if no active wallet', () => {
       const manager = new WalletManager({
-        wallets: [WalletId.DEFLY, WalletId.PERA]
+        wallets: [WalletId.DEFLY, WalletId.KIBISIS]
       })
       expect(() => manager.signTransactions).toThrow()
     })
@@ -346,7 +346,7 @@ describe('WalletManager', () => {
   describe.skip('resumeSessions', () => {
     it('resumes sessions for all wallets', async () => {
       const manager = new WalletManager({
-        wallets: [WalletId.DEFLY, WalletId.PERA]
+        wallets: [WalletId.DEFLY, WalletId.KIBISIS]
       })
       await manager.resumeSessions()
 
