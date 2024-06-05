@@ -127,11 +127,27 @@ describe('CustomWallet', () => {
       expect(wallet.isConnected).toBe(false)
     })
 
-    it('should re-throw an error if thrown by provider', async () => {
+    it('should re-throw an error thrown by provider', async () => {
       vi.mocked(mockProvider.connect).mockRejectedValueOnce(new Error('mock error'))
 
       await expect(wallet.connect()).rejects.toThrowError('mock error')
       expect(wallet.isConnected).toBe(false)
+    })
+
+    it('should throw an error if provider.connect is not defined', async () => {
+      wallet = new CustomWallet({
+        id: WalletId.CUSTOM,
+        options: {
+          // @ts-expect-error invalid provider
+          provider: {} // connect is not defined
+        },
+        metadata: {},
+        getAlgodClient: {} as any,
+        store,
+        subscribe: mockSubscribe
+      })
+
+      await expect(wallet.connect()).rejects.toThrowError('[Custom] Method not supported: connect')
     })
   })
 
@@ -143,6 +159,30 @@ describe('CustomWallet', () => {
       await wallet.disconnect()
 
       expect(mockProvider.disconnect).toHaveBeenCalled()
+      expect(store.state.wallets[WalletId.CUSTOM]).toBeUndefined()
+      expect(wallet.isConnected).toBe(false)
+    })
+
+    it('should still work if provider.disconnect is not defined', async () => {
+      wallet = new CustomWallet({
+        id: WalletId.CUSTOM,
+        options: {
+          provider: {
+            connect: mockProvider.connect
+            // disconnect is not defined
+          }
+        },
+        metadata: {},
+        getAlgodClient: {} as any,
+        store,
+        subscribe: mockSubscribe
+      })
+
+      vi.mocked(mockProvider.connect).mockResolvedValueOnce([account1])
+
+      await wallet.connect()
+      await wallet.disconnect()
+
       expect(store.state.wallets[WalletId.CUSTOM]).toBeUndefined()
       expect(wallet.isConnected).toBe(false)
     })
@@ -172,10 +212,7 @@ describe('CustomWallet', () => {
         options: {
           provider: mockProvider
         },
-        metadata: {
-          name: 'Custom Provider',
-          icon: 'mock-icon'
-        },
+        metadata: {},
         getAlgodClient: {} as any,
         store,
         subscribe: mockSubscribe
@@ -203,10 +240,7 @@ describe('CustomWallet', () => {
         options: {
           provider: mockProvider
         },
-        metadata: {
-          name: 'Custom Provider',
-          icon: 'mock-icon'
-        },
+        metadata: {},
         getAlgodClient: {} as any,
         store,
         subscribe: mockSubscribe
@@ -222,51 +256,123 @@ describe('CustomWallet', () => {
       })
       expect(wallet.isConnected).toBe(true)
     })
+
+    it('should still work if provider.resumeSession is not defined', async () => {
+      store = new Store<State>({
+        ...defaultState,
+        wallets: {
+          [WalletId.CUSTOM]: {
+            accounts: [account1],
+            activeAccount: account1
+          }
+        }
+      })
+
+      wallet = new CustomWallet({
+        id: WalletId.CUSTOM,
+        options: {
+          provider: {
+            connect: mockProvider.connect
+            // resumeSession is not defined
+          }
+        },
+        metadata: {},
+        getAlgodClient: {} as any,
+        store,
+        subscribe: mockSubscribe
+      })
+
+      await wallet.resumeSession()
+
+      expect(wallet.isConnected).toBe(true)
+    })
   })
 
   describe('signTransactions', () => {
+    const txn = new algosdk.Transaction({
+      from: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
+      to: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
+      amount: 1000,
+      fee: 10,
+      firstRound: 51,
+      lastRound: 61,
+      genesisHash: 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=',
+      genesisID: 'mainnet-v1.0'
+    })
+
+    const txnGroup = [txn]
+    const indexesToSign = [0]
+
     it('should call provider.signTransactions', async () => {
-      const txn = new algosdk.Transaction({
-        from: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-        to: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-        amount: 1000,
-        fee: 10,
-        firstRound: 51,
-        lastRound: 61,
-        genesisHash: 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=',
-        genesisID: 'mainnet-v1.0'
-      })
-
-      const txnGroup = [txn]
-      const indexesToSign = [0]
-
       await wallet.signTransactions(txnGroup, indexesToSign)
 
       expect(mockProvider.signTransactions).toHaveBeenCalled()
       expect(mockProvider.signTransactions).toHaveBeenCalledWith(txnGroup, indexesToSign, true)
     })
+
+    it('should throw an error if provider.signTransactions is not defined', async () => {
+      wallet = new CustomWallet({
+        id: WalletId.CUSTOM,
+        options: {
+          provider: {
+            connect: mockProvider.connect,
+            // signTransactions is not defined
+            transactionSigner: mockProvider.transactionSigner
+          }
+        },
+        metadata: {},
+        getAlgodClient: {} as any,
+        store,
+        subscribe: mockSubscribe
+      })
+
+      await expect(wallet.signTransactions(txnGroup, indexesToSign)).rejects.toThrowError(
+        '[Custom] Method not supported: signTransactions'
+      )
+    })
   })
 
   describe('transactionSigner', () => {
+    const txn = new algosdk.Transaction({
+      from: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
+      to: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
+      amount: 1000,
+      fee: 10,
+      firstRound: 51,
+      lastRound: 61,
+      genesisHash: 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=',
+      genesisID: 'mainnet-v1.0'
+    })
+
+    const txnGroup = [txn]
+    const indexesToSign = [0]
+
     it('should call provider.transactionSigner', async () => {
-      const txn = new algosdk.Transaction({
-        from: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-        to: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-        amount: 1000,
-        fee: 10,
-        firstRound: 51,
-        lastRound: 61,
-        genesisHash: 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=',
-        genesisID: 'mainnet-v1.0'
-      })
-
-      const txnGroup = [txn]
-      const indexesToSign = [0]
-
       await wallet.transactionSigner(txnGroup, indexesToSign)
 
       expect(mockProvider.transactionSigner).toHaveBeenCalled()
       expect(mockProvider.transactionSigner).toHaveBeenCalledWith(txnGroup, indexesToSign)
+    })
+
+    it('should throw an error if provider.transactionSigner is not defined', async () => {
+      wallet = new CustomWallet({
+        id: WalletId.CUSTOM,
+        options: {
+          provider: {
+            connect: mockProvider.connect,
+            signTransactions: mockProvider.signTransactions
+            // transactionSigner is not defined
+          }
+        },
+        metadata: {},
+        getAlgodClient: {} as any,
+        store,
+        subscribe: mockSubscribe
+      })
+
+      await expect(wallet.transactionSigner(txnGroup, indexesToSign)).rejects.toThrowError(
+        '[Custom] Method not supported: transactionSigner'
+      )
     })
   })
 })

@@ -7,14 +7,17 @@ import type { WalletAccount, WalletConstructor, WalletId } from './types'
 
 export type CustomProvider = {
   connect(args?: Record<string, any>): Promise<WalletAccount[]>
-  disconnect(): Promise<void>
-  resumeSession(): Promise<WalletAccount[] | void>
-  signTransactions(
+  disconnect?(): Promise<void>
+  resumeSession?(): Promise<WalletAccount[] | void>
+  signTransactions?(
     txnGroup: algosdk.Transaction[] | algosdk.Transaction[][] | Uint8Array[] | Uint8Array[][],
     indexesToSign?: number[],
     returnGroup?: boolean
   ): Promise<Uint8Array[]>
-  transactionSigner(txnGroup: algosdk.Transaction[], indexesToSign: number[]): Promise<Uint8Array[]>
+  transactionSigner?(
+    txnGroup: algosdk.Transaction[],
+    indexesToSign: number[]
+  ): Promise<Uint8Array[]>
 }
 
 export interface CustomWalletOptions {
@@ -53,6 +56,10 @@ export class CustomWallet extends BaseWallet {
   public connect = async (args?: Record<string, any>): Promise<WalletAccount[]> => {
     console.info(`[${this.metadata.name}] Connecting...`)
     try {
+      if (!this.provider.connect) {
+        throw new Error(`[${this.metadata.name}] Method not supported: connect`)
+      }
+
       const walletAccounts = await this.provider.connect(args)
 
       if (walletAccounts.length === 0) {
@@ -81,7 +88,7 @@ export class CustomWallet extends BaseWallet {
 
   public disconnect = async (): Promise<void> => {
     console.info(`[${this.metadata.name}] Disconnecting...`)
-    await this.provider.disconnect()
+    await this.provider.disconnect?.()
     this.onDisconnect()
   }
 
@@ -97,7 +104,7 @@ export class CustomWallet extends BaseWallet {
 
       console.info(`[${this.metadata.name}] Resuming session...`)
 
-      const result = await this.provider.resumeSession()
+      const result = await this.provider.resumeSession?.()
 
       if (Array.isArray(result)) {
         const walletAccounts = result
@@ -130,6 +137,9 @@ export class CustomWallet extends BaseWallet {
     indexesToSign?: number[],
     returnGroup = true
   ): Promise<Uint8Array[]> => {
+    if (!this.provider.signTransactions) {
+      throw new Error(`[${this.metadata.name}] Method not supported: signTransactions`)
+    }
     return await this.provider.signTransactions(txnGroup, indexesToSign, returnGroup)
   }
 
@@ -137,6 +147,9 @@ export class CustomWallet extends BaseWallet {
     txnGroup: algosdk.Transaction[],
     indexesToSign: number[]
   ): Promise<Uint8Array[]> => {
+    if (!this.provider.transactionSigner) {
+      throw new Error(`[${this.metadata.name}] Method not supported: transactionSigner`)
+    }
     return await this.provider.transactionSigner(txnGroup, indexesToSign)
   }
 }
