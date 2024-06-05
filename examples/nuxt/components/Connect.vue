@@ -1,11 +1,24 @@
 <script setup lang="ts">
-import { useWallet, type Wallet } from '@txnlab/use-wallet-vue'
+import { WalletId, useWallet, type Wallet } from '@txnlab/use-wallet-vue'
 import algosdk from 'algosdk'
 import { ref } from 'vue'
 
 const { algodClient, transactionSigner, wallets: walletsRef } = useWallet()
 const wallets = computed(() => walletsRef.value)
 const isSending = ref(false)
+const magicEmail = ref('')
+
+const isMagicLink = (wallet: Wallet) => wallet.id === WalletId.MAGIC
+const isEmailValid = () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(magicEmail.value)
+const isConnectDisabled = (wallet: Wallet) =>
+  wallet.isConnected || (isMagicLink(wallet) && !isEmailValid())
+
+const getConnectArgs = (wallet: Wallet) => {
+  if (isMagicLink(wallet)) {
+    return { email: magicEmail.value }
+  }
+  return undefined
+}
 
 const setActiveAccount = (event: Event, wallet: Wallet) => {
   const target = event.target as HTMLSelectElement
@@ -51,12 +64,17 @@ const sendTransaction = async (wallet: Wallet) => {
 
 <template>
   <section>
-    <div v-for="wallet in wallets" :key="wallet.id">
-      <h4 class="wallet-name" :data-active="wallet.isActive">
+    <div v-for="wallet in wallets" :key="wallet.id" class="wallet-group">
+      <h4 :data-active="wallet.isActive">
         {{ wallet.metadata.name }}
       </h4>
       <div class="wallet-buttons">
-        <button @click="wallet.connect()" :disabled="wallet.isConnected">Connect</button>
+        <button
+          @click="wallet.connect(getConnectArgs(wallet))"
+          :disabled="isConnectDisabled(wallet)"
+        >
+          Connect
+        </button>
         <button @click="wallet.disconnect()" :disabled="!wallet.isConnected">Disconnect</button>
         <button
           v-if="!wallet.isActive"
@@ -69,8 +87,20 @@ const sendTransaction = async (wallet: Wallet) => {
           {{ isSending ? 'Sending Transaction...' : 'Send Transaction' }}
         </button>
       </div>
+
+      <div v-if="isMagicLink(wallet)" class="input-group">
+        <label for="magic-email">Email:</label>
+        <input
+          id="magic-email"
+          type="email"
+          v-model="magicEmail"
+          placeholder="Enter email to connect..."
+          :disabled="wallet.isConnected"
+        />
+      </div>
+
       <div v-if="wallet.isActive && wallet.accounts.length > 0">
-        <select class="wallet-menu" @change="(event) => setActiveAccount(event, wallet)">
+        <select @change="(event) => setActiveAccount(event, wallet)">
           <option
             v-for="account in wallet.accounts"
             :key="account.address"
@@ -93,14 +123,19 @@ section {
   line-height: 1.5;
 }
 
-.wallet-name {
-  line-height: 1.5;
-  margin-bottom: 1.33em;
-  text-align: center;
-  font-weight: bold;
+.wallet-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+  margin-bottom: 2em;
 }
 
-.wallet-name[data-active='true']:after {
+.wallet-group h4 {
+  margin: 0;
+}
+
+.wallet-group h4[data-active='true']:after {
   content: ' [active]';
 }
 
@@ -110,7 +145,27 @@ section {
   justify-content: center;
   flex-wrap: wrap;
   gap: 0.5em;
-  margin-bottom: 0.9em;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+}
+
+.input-group label {
+  margin-left: 1em;
+  font-weight: 500;
+}
+
+.input-group input {
+  min-width: 16em;
+}
+
+.input-group input[disabled] {
+  opacity: 0.75;
+  color: rgba(255, 255, 255, 0.3);
 }
 
 button {
@@ -138,26 +193,61 @@ button:disabled {
   color: #999;
 }
 
-.wallet-menu {
-  margin-top: 1.5em;
+input[type='text'],
+input[type='email'] {
+  border-radius: 8px;
+  border: 1px solid #1a1a1a;
+  padding: 0.6em 0.9em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  color: #ffffff;
+  transition: border-color 0.25s;
+}
+
+select {
+  border-radius: 8px;
+  border: 1px solid #1a1a1a;
+  padding: 0.6em 0.9em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  color: #ffffff;
+  transition: border-color 0.25s;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  -moz-appearance: none !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
 }
 
 @media (prefers-color-scheme: light) {
   button {
     background-color: #f9f9f9;
+    border-color: #cacaca;
     color: #1a1a1a;
   }
-
-  .wallet-menu {
-    border: 1px solid rgb(118, 118, 118);
+  button:disabled {
+    border-color: #dddddd;
   }
-}
+  input[type='text'],
+  input[type='email'],
+  select {
+    background-color: #f9f9f9;
+    color: #000000;
+    border-color: #cacaca;
+  }
 
-@media (prefers-color-scheme: dark) {
-  .wallet-menu {
-    border: 1px solid rgb(133, 133, 133);
-    background-color: rgb(59, 59, 59);
-    color: white;
+  .input-group input[disabled] {
+    opacity: 0.75;
+    color: rgba(16, 16, 16, 0.3);
   }
 }
 </style>

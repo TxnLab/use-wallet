@@ -17,7 +17,7 @@ export interface Wallet {
   activeAccount: () => WalletAccount | null
   isConnected: () => boolean
   isActive: () => boolean
-  connect: () => Promise<WalletAccount[]>
+  connect: (args?: Record<string, any>) => Promise<WalletAccount[]>
   disconnect: () => Promise<void>
   setActive: () => void
   setActiveAccount: (address: string) => void

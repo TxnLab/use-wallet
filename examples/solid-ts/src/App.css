@@ -18,11 +18,43 @@
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
+.wallet-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+  margin-bottom: 2em;
+}
+
+.wallet-group h4 {
+  margin: 0;
+}
+
 .wallet-buttons {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
   gap: 0.5em;
-  margin-bottom: 2em;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+}
+
+.input-group label {
+  margin-left: 1em;
+  font-weight: 500;
+}
+
+.input-group input {
+  min-width: 16em;
+}
+
+.input-group input[disabled] {
+  opacity: 0.75;
+  color: light-dark(rgba(16, 16, 16, 0.3), rgba(255, 255, 255, 0.3));
 }

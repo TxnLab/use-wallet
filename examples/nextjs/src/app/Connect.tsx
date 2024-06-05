@@ -1,14 +1,35 @@
 'use client'
 
-import { useWallet, type Wallet } from '@txnlab/use-wallet-react'
+import { WalletId, useWallet, type Wallet } from '@txnlab/use-wallet-react'
 import algosdk from 'algosdk'
 import * as React from 'react'
 import styles from './Connect.module.css'
 
 export function Connect() {
-  const [isSending, setIsSending] = React.useState(false)
-
   const { algodClient, activeAddress, transactionSigner, wallets } = useWallet()
+
+  const [isSending, setIsSending] = React.useState(false)
+  const [magicEmail, setMagicEmail] = React.useState('')
+
+  const isMagicLink = (wallet: Wallet) => wallet.id === WalletId.MAGIC
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(magicEmail)
+
+  const isConnectDisabled = (wallet: Wallet) => {
+    if (wallet.isConnected) {
+      return true
+    }
+    if (isMagicLink(wallet) && !isEmailValid) {
+      return true
+    }
+    return false
+  }
+
+  const getConnectArgs = (wallet: Wallet) => {
+    if (isMagicLink(wallet)) {
+      return { email: magicEmail }
+    }
+    return undefined
+  }
 
   const setActiveAccount = (event: React.ChangeEvent<HTMLSelectElement>, wallet: Wallet) => {
     const target = event.target
@@ -53,12 +74,16 @@ export function Connect() {
   return (
     <div>
       {wallets.map((wallet) => (
-        <div key={wallet.id}>
+        <div key={wallet.id} className={styles.walletGroup}>
           <h4 className={styles.walletName} data-active={wallet.isActive}>
             {wallet.metadata.name}
           </h4>
           <div className={styles.walletButtons}>
-            <button type="button" onClick={() => wallet.connect()} disabled={wallet.isConnected}>
+            <button
+              type="button"
+              onClick={() => wallet.connect(getConnectArgs(wallet))}
+              disabled={isConnectDisabled(wallet)}
+            >
               Connect
             </button>
             <button
@@ -82,6 +107,21 @@ export function Connect() {
               </button>
             )}
           </div>
+
+          {isMagicLink(wallet) && (
+            <div className={styles.inputGroup}>
+              <label htmlFor="magic-email">Email:</label>
+              <input
+                id="magic-email"
+                type="email"
+                value={magicEmail}
+                onChange={(e) => setMagicEmail(e.target.value)}
+                placeholder="Enter email to connect..."
+                disabled={wallet.isConnected}
+              />
+            </div>
+          )}
+
           {wallet.isActive && wallet.accounts.length > 0 && (
             <div>
               <select onChange={(e) => setActiveAccount(e, wallet)}>

@@ -57,6 +57,7 @@ Some wallets require additional packages to be installed. The following table li
 | Pera Wallet     | `@perawallet/connect-beta`                           |
 | WalletConnect   | `@walletconnect/modal`, `@walletconnect/sign-client` |
 | Lute Wallet     | `lute-connect`                                       |
+| Magic.link      | `magic-sdk`, `@magic-ext/algorand`                   |
 | Kibisis Wallet  | `@agoralabs-sh/avm-web-provider`                     |
 
 ## Configuration
@@ -83,6 +84,10 @@ const walletManager = new WalletManager({
     {
       id: WalletId.LUTE,
       options: { siteName: '<YOUR_SITE_NAME>' }
+    },
+    {
+      id: WalletId.MAGIC,
+      options: { apiKey: '<YOUR_API_KEY>' }
     }
   ],
   network: NetworkId.TESTNET
@@ -96,6 +101,8 @@ Each wallet you wish to support must be included in the `wallets` array.
 To initialize wallets with default options, pass the wallet ID using the `WalletId` enum. To use custom options, pass an object with the `id` and `options` properties.
 
 > **Note:** Pera and WalletConnect's `projectId` option is required. You can obtain a project ID by registering your application at https://cloud.walletconnect.com/
+
+> **Note:** Magic's required `apiKey` can be obtained by signing up at https://dashboard.magic.link/signup
 
 #### `network` (optional)
 

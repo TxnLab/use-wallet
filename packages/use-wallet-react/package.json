@@ -1,6 +1,6 @@
 {
   "name": "@txnlab/use-wallet-react",
-  "version": "3.0.0-beta.9",
+  "version": "3.0.0-beta.10",
   "description": "React library for integrating Algorand wallets into decentralized applications",
   "author": "Doug Richar <drichar@gmail.com>",
   "license": "MIT",
@@ -52,16 +52,21 @@
   },
   "peerDependencies": {
     "@blockshake/defly-connect": "^1.1.6",
+    "@magic-ext/algorand": "^23.0.2",
     "@perawallet/connect-beta": "2.0.11",
     "@walletconnect/modal": "^2.6.2",
     "@walletconnect/sign-client": "^2.10.2",
     "algosdk": "^2.7.0",
     "lute-connect": "^1.2.0",
+    "magic-sdk": "^28.0.3",
     "react": "^17.0.0 || ^18.0.0",
     "react-dom": "^17.0.0 || ^18.0.0"
   },
   "peerDependenciesMeta": {
     "@blockshake/defly-connect": {
+      "optional": true
+    },
+    "@magic-ext/algorand": {
       "optional": true
     },
     "@perawallet/connect-beta": {
@@ -74,6 +79,9 @@
       "optional": true
     },
     "lute-connect": {
+      "optional": true
+    },
+    "magic-sdk": {
       "optional": true
     }
   }

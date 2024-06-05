@@ -131,7 +131,7 @@ useHead({
   font-size: 3.2em;
   font-weight: 700;
   line-height: 1.1;
-  margin: 0.67em 0 0.25em;
+  margin: 0.67em 0;
 }
 
 .fallback-msg {
@@ -154,6 +154,9 @@ useHead({
 }
 
 @media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
   .dark\:bg-black {
     --tw-bg-opacity: 1;
     background-color: rgba(0, 0, 0, var(--tw-bg-opacity));
