@@ -1,5 +1,6 @@
 import algosdk from 'algosdk'
 import { WalletId, type JsonRpcRequest, type WalletAccount, type WalletMap } from './wallets/types'
+import { CustomWallet } from './wallets/custom'
 import { DeflyWallet } from './wallets/defly'
 import { ExodusWallet } from './wallets/exodus'
 import { KibisisWallet } from './wallets/kibisis'
@@ -12,6 +13,7 @@ import { WalletConnect } from './wallets/walletconnect'
 
 export function createWalletMap(): WalletMap {
   return {
+    [WalletId.CUSTOM]: CustomWallet,
     [WalletId.DEFLY]: DeflyWallet,
     [WalletId.EXODUS]: ExodusWallet,
     [WalletId.KIBISIS]: KibisisWallet,
