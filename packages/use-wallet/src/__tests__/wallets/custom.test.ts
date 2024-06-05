@@ -87,6 +87,23 @@ describe('CustomWallet', () => {
     mockInitialState = null
   })
 
+  describe('constructor', () => {
+    it('should throw an error if provider is not defined', () => {
+      expect(
+        () =>
+          new CustomWallet({
+            id: WalletId.CUSTOM,
+            // @ts-expect-error missing provider
+            options: {},
+            metadata: {},
+            getAlgodClient: {} as any,
+            store,
+            subscribe: mockSubscribe
+          })
+      ).toThrowError('[Custom] Missing required option: provider')
+    })
+  })
+
   describe('connect', () => {
     it('should return accounts and update store', async () => {
       vi.mocked(mockProvider.connect).mockResolvedValueOnce([account1, account2])
