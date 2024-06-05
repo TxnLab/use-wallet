@@ -1,3 +1,9 @@
+## [3.0.0-beta.10](https://github.com/txnlab/use-wallet/compare/v3.0.0-beta.9...v3.0.0-beta.10) (2024-06-04)
+
+### Features
+
+- **Core:** Add Magic provider ([#180](https://github.com/TxnLab/use-wallet/pull/180)) ([afb981f](https://github.com/TxnLab/use-wallet/commit/afb981f7e5cd0d960ffde9055e9cc9bb65ec86be))
+
 ## [3.0.0-beta.9](https://github.com/txnlab/use-wallet/compare/v3.0.0-beta.8...v3.0.0-beta.9) (2024-06-01)
 
 ### Fixes
