@@ -78,13 +78,80 @@ button:disabled {
   cursor: default;
 }
 
+input[type='text'],
+input[type='email'] {
+  border-radius: 8px;
+  border: 1px solid #1a1a1a;
+  padding: 0.6em 0.9em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  color: #ffffff;
+  transition: border-color 0.25s;
+}
+
+select {
+  border-radius: 8px;
+  border: 1px solid #1a1a1a;
+  padding: 0.6em 0.9em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  color: #ffffff;
+  transition: border-color 0.25s;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  -moz-appearance: none !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
+
+.wallet-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+  margin-bottom: 2em;
+}
+
+.wallet-group h4 {
+  margin: 0;
+}
+
 .wallet-buttons {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
   gap: 0.5em;
-  margin-bottom: 2em;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+}
+
+.input-group label {
+  margin-left: 1em;
+  font-weight: 500;
+}
+
+.input-group input {
+  min-width: 16em;
+}
+
+.input-group input[disabled] {
+  opacity: 0.75;
+  color: light-dark(rgba(16, 16, 16, 0.3), rgba(255, 255, 255, 0.3));
 }
 
 @media (prefers-color-scheme: light) {
@@ -97,5 +164,12 @@ button:disabled {
   }
   button {
     background-color: #f9f9f9;
+  }
+  input[type='text'],
+  input[type='email'],
+  select {
+    background-color: #f9f9f9;
+    color: #000000;
+    border-color: #f9f9f9;
   }
 }

@@ -1,10 +1,23 @@
 <script setup lang="ts">
-import { useWallet, type Wallet } from '@txnlab/use-wallet-vue'
+import { WalletId, useWallet, type Wallet } from '@txnlab/use-wallet-vue'
 import algosdk from 'algosdk'
 import { ref } from 'vue'
 
 const { algodClient, transactionSigner, wallets } = useWallet()
 const isSending = ref(false)
+const magicEmail = ref('')
+
+const isMagicLink = (wallet: Wallet) => wallet.id === WalletId.MAGIC
+const isEmailValid = () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(magicEmail.value)
+const isConnectDisabled = (wallet: Wallet) =>
+  wallet.isConnected || (isMagicLink(wallet) && !isEmailValid())
+
+const getConnectArgs = (wallet: Wallet) => {
+  if (isMagicLink(wallet)) {
+    return { email: magicEmail.value }
+  }
+  return undefined
+}
 
 const setActiveAccount = (event: Event, wallet: Wallet) => {
   const target = event.target as HTMLSelectElement
@@ -50,10 +63,15 @@ const sendTransaction = async (wallet: Wallet) => {
 
 <template>
   <div>
-    <div v-for="wallet in wallets" :key="wallet.id">
+    <div v-for="wallet in wallets" :key="wallet.id" class="wallet-group">
       <h4>{{ wallet.metadata.name }} <span v-if="wallet.isActive">[active]</span></h4>
       <div class="wallet-buttons">
-        <button @click="wallet.connect()" :disabled="wallet.isConnected">Connect</button>
+        <button
+          @click="wallet.connect(getConnectArgs(wallet))"
+          :disabled="isConnectDisabled(wallet)"
+        >
+          Connect
+        </button>
         <button @click="wallet.disconnect()" :disabled="!wallet.isConnected">Disconnect</button>
         <button
           v-if="!wallet.isActive"
@@ -66,6 +84,18 @@ const sendTransaction = async (wallet: Wallet) => {
           {{ isSending ? 'Sending Transaction...' : 'Send Transaction' }}
         </button>
       </div>
+
+      <div v-if="isMagicLink(wallet)" class="input-group">
+        <label for="magic-email">Email:</label>
+        <input
+          id="magic-email"
+          type="email"
+          v-model="magicEmail"
+          placeholder="Enter email to connect..."
+          :disabled="wallet.isConnected"
+        />
+      </div>
+
       <div v-if="wallet.isActive && wallet.accounts.length > 0">
         <select @change="(event) => setActiveAccount(event, wallet)">
           <option
@@ -82,12 +112,44 @@ const sendTransaction = async (wallet: Wallet) => {
 </template>
 
 <style scoped>
+.wallet-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+  margin-bottom: 2em;
+}
+
+.wallet-group h4 {
+  margin: 0;
+}
+
 .wallet-buttons {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
   gap: 0.5em;
-  margin-bottom: 2em;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+}
+
+.input-group label {
+  margin-left: 1em;
+  font-weight: 500;
+}
+
+.input-group input {
+  min-width: 16em;
+}
+
+.input-group input[disabled] {
+  opacity: 0.75;
+  color: light-dark(rgba(16, 16, 16, 0.3), rgba(255, 255, 255, 0.3));
 }
 </style>

@@ -22,6 +22,10 @@ app.use(WalletManagerPlugin, {
     {
       id: WalletId.LUTE,
       options: { siteName: 'Example Site' }
+    },
+    {
+      id: WalletId.MAGIC,
+      options: { apiKey: 'pk_live_D17FD8D89621B5F3' }
     }
   ],
   network: NetworkId.TESTNET

@@ -1,9 +1,11 @@
-import { useWallet, type BaseWallet } from '@txnlab/use-wallet-solid'
+import { useWallet, type BaseWallet, WalletId } from '@txnlab/use-wallet-solid'
 import algosdk from 'algosdk'
 import { For, Show, createSignal } from 'solid-js'
 
 export function Connect() {
   const [isSending, setIsSending] = createSignal(false)
+  const [magicEmail, setMagicEmail] = createSignal('')
+
   const {
     algodClient,
     activeAddress,
@@ -13,6 +15,26 @@ export function Connect() {
     transactionSigner,
     wallets
   } = useWallet()
+
+  const isMagicLink = (wallet: BaseWallet) => wallet.id === WalletId.MAGIC
+  const isEmailValid = () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(magicEmail())
+
+  const isConnectDisabled = (wallet: BaseWallet) => {
+    if (isWalletConnected(wallet.id)) {
+      return true
+    }
+    if (isMagicLink(wallet) && !isEmailValid()) {
+      return true
+    }
+    return false
+  }
+
+  const getConnectArgs = (wallet: BaseWallet) => {
+    if (isMagicLink(wallet)) {
+      return { email: magicEmail() }
+    }
+    return undefined
+  }
 
   const setActiveAccount = (event: Event & { target: HTMLSelectElement }, wallet: BaseWallet) => {
     const target = event.target
@@ -59,7 +81,7 @@ export function Connect() {
     <div>
       <For each={wallets}>
         {(wallet) => (
-          <div>
+          <div class="wallet-group">
             <h4>
               {wallet.metadata.name}{' '}
               <Show when={wallet.id === activeWalletId()} fallback="">
@@ -69,8 +91,8 @@ export function Connect() {
             <div class="wallet-buttons">
               <button
                 type="button"
-                onClick={() => wallet.connect()}
-                disabled={isWalletConnected(wallet.id)}
+                onClick={() => wallet.connect(getConnectArgs(wallet))}
+                disabled={isConnectDisabled(wallet)}
               >
                 Connect
               </button>
@@ -94,6 +116,20 @@ export function Connect() {
                 Set Active
               </button>
             </div>
+
+            <Show when={isMagicLink(wallet)}>
+              <div class="input-group">
+                <label for="magic-email">Email:</label>
+                <input
+                  id="magic-email"
+                  type="email"
+                  value={magicEmail()}
+                  onInput={(e) => setMagicEmail(e.target.value)}
+                  placeholder="Enter email to connect..."
+                  disabled={isWalletConnected(wallet.id)}
+                />
+              </div>
+            </Show>
 
             <Show when={wallet.id === activeWalletId() && wallet.accounts.length}>
               <div>
