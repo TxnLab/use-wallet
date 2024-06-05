@@ -10,7 +10,7 @@ export interface Wallet {
   activeAccount: WalletAccount | null
   isConnected: boolean
   isActive: boolean
-  connect: () => Promise<WalletAccount[]>
+  connect: (args?: Record<string, any>) => Promise<WalletAccount[]>
   disconnect: () => Promise<void>
   setActive: () => void
   setActiveAccount: (address: string) => void
@@ -42,7 +42,7 @@ export function useWallet() {
         activeAccount: walletState?.activeAccount ?? null,
         isConnected: !!walletState,
         isActive: wallet.id === activeWalletId.value,
-        connect: () => wallet.connect(),
+        connect: (args) => wallet.connect(args),
         disconnect: () => wallet.disconnect(),
         setActive: () => wallet.setActive(),
         setActiveAccount: (addr) => wallet.setActiveAccount(addr)

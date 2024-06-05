@@ -3,20 +3,20 @@ import { Store } from '@tanstack/solid-store'
 import {
   BaseWallet,
   DeflyWallet,
+  MagicAuth,
   NetworkId,
   WalletManager,
   WalletId,
   type State,
-  type WalletAccount,
-  PeraWallet
+  type WalletAccount
 } from '@txnlab/use-wallet'
-import { For } from 'solid-js'
+import { For, Show, createSignal } from 'solid-js'
 import { Wallet, useWallet } from '../useWallet'
 import { WalletProvider } from '../WalletProvider'
 
 const mocks = vi.hoisted(() => {
   return {
-    connect: vi.fn(() => Promise.resolve([] as WalletAccount[])),
+    connect: vi.fn((_args) => Promise.resolve([] as WalletAccount[])),
     disconnect: vi.fn(() => Promise.resolve()),
     setActive: vi.fn(),
     setActiveAccount: vi.fn(),
@@ -39,7 +39,7 @@ vi.mock('@txnlab/use-wallet', async (importOriginal) => {
       signTransactions = mocks.signTransactions
       transactionSigner = mocks.transactionSigner
     },
-    PeraWallet: class extends mod.BaseWallet {
+    MagicAuth: class extends mod.BaseWallet {
       connect = mocks.connect
       disconnect = mocks.disconnect
       setActive = mocks.setActive
@@ -78,6 +78,15 @@ const TestComponent = () => {
     wallets
   } = useWallet()
 
+  const [magicEmail, setMagicEmail] = createSignal('')
+
+  const getConnectArgs = (wallet: BaseWallet) => {
+    if (wallet.id === WalletId.MAGIC) {
+      return { email: magicEmail() }
+    }
+    return undefined
+  }
+
   return (
     <div>
       <div data-testid="active-account">{JSON.stringify(activeAccount())}</div>
@@ -106,11 +115,21 @@ const TestComponent = () => {
             </p>
             <button
               data-testid={`connect-btn-${wallet.id}`}
-              onClick={() => wallet.connect()}
+              onClick={() => wallet.connect(getConnectArgs(wallet))}
               disabled={isWalletConnected(wallet.id)}
             >
               Connect
             </button>
+            <Show when={wallet.id === WalletId.MAGIC}>
+              <input
+                data-testid="magic-email"
+                type="email"
+                value={magicEmail()}
+                onInput={(e) => setMagicEmail(e.target.value)}
+                placeholder="Enter email to connect..."
+                disabled={isWalletConnected(wallet.id)}
+              />
+            </Show>
             <button
               data-testid={`disconnect-btn-${wallet.id}`}
               onClick={() => wallet.disconnect()}
@@ -127,7 +146,7 @@ const TestComponent = () => {
             </button>
             <button
               data-testid={`set-active-account-btn-${wallet.id}`}
-              onClick={() => wallet.setActiveAccount(wallet.accounts[1].address)}
+              onClick={() => wallet.setActiveAccount(wallet.accounts[0].address)}
               disabled={!isWalletActive(wallet.id) || !isWalletConnected(wallet.id)}
             >
               Set Active Account
@@ -164,7 +183,7 @@ describe('useWallet', () => {
   let mockStore: Store<State, (cb: State) => State>
   let mockWalletManager: WalletManager
   let mockDeflyWallet: DeflyWallet
-  let mockPeraWallet: PeraWallet
+  let mockMagicAuth: MagicAuth
   let mockWallets: Wallet[]
 
   beforeEach(() => {
@@ -186,9 +205,9 @@ describe('useWallet', () => {
       subscribe: mockSubscribe
     })
 
-    mockPeraWallet = new PeraWallet({
-      id: WalletId.PERA,
-      metadata: { name: 'Pera', icon: 'icon' },
+    mockMagicAuth = new MagicAuth({
+      id: WalletId.MAGIC,
+      metadata: { name: 'Magic', icon: 'icon' },
       getAlgodClient: () => ({}) as any,
       store: mockStore,
       subscribe: mockSubscribe
@@ -197,7 +216,7 @@ describe('useWallet', () => {
     mockWalletManager = new WalletManager()
     mockWalletManager._clients = new Map<WalletId, BaseWallet>([
       [WalletId.DEFLY, mockDeflyWallet],
-      [WalletId.PERA, mockPeraWallet]
+      [WalletId.MAGIC, mockMagicAuth]
     ])
     mockWalletManager.store = mockStore
 
@@ -215,8 +234,8 @@ describe('useWallet', () => {
         setActiveAccount: expect.any(Function)
       },
       {
-        id: () => mockPeraWallet.id,
-        metadata: () => mockPeraWallet.metadata,
+        id: () => mockMagicAuth.id,
+        metadata: () => mockMagicAuth.metadata,
         accounts: () => [],
         activeAccount: () => null,
         isConnected: () => false,
@@ -252,7 +271,7 @@ describe('useWallet', () => {
       </WalletProvider>
     ))
 
-    // Trigger connect
+    // Trigger connect for Defly wallet
     const connectButton = screen.getByTestId('connect-btn-defly')
     fireEvent.click(connectButton)
     expect(mocks.connect).toHaveBeenCalled()
@@ -264,7 +283,7 @@ describe('useWallet', () => {
         ...state.wallets,
         [WalletId.DEFLY]: {
           accounts: [testAccount1, testAccount2],
-          activeAccount: testAccount1
+          activeAccount: testAccount2
         }
       },
       activeWallet: WalletId.DEFLY
@@ -274,6 +293,25 @@ describe('useWallet', () => {
     const disconnectButton = screen.getByTestId('disconnect-btn-defly')
     fireEvent.click(disconnectButton)
     expect(mocks.disconnect).toHaveBeenCalled()
+  })
+
+  it('calls connect with email for Magic wallet', async () => {
+    render(() => (
+      <WalletProvider manager={mockWalletManager}>
+        <TestComponent />
+      </WalletProvider>
+    ))
+
+    // Set the email address
+    const emailInput = screen.getByTestId('magic-email') as HTMLInputElement
+    fireEvent.input(emailInput, { target: { value: 'test@example.com' } })
+
+    // Trigger connect for Magic wallet
+    const connectButton = screen.getByTestId('connect-btn-magic')
+    fireEvent.click(connectButton)
+
+    // Assert that connect was called with the email address
+    expect(mocks.connect).toHaveBeenCalledWith({ email: 'test@example.com' })
   })
 
   it('calls setActive and setActiveAccount correctly', () => {
@@ -289,28 +327,28 @@ describe('useWallet', () => {
         ...state.wallets,
         [WalletId.DEFLY]: {
           accounts: [testAccount1, testAccount2],
-          activeAccount: testAccount1
+          activeAccount: testAccount2
         },
-        [WalletId.PERA]: {
-          accounts: [testAccount1, testAccount2],
+        [WalletId.MAGIC]: {
+          accounts: [testAccount1],
           activeAccount: testAccount1
         }
       },
       activeWallet: WalletId.DEFLY
     }))
 
-    const setActiveButton = screen.getByTestId('set-active-btn-pera')
+    const setActiveButton = screen.getByTestId('set-active-btn-magic')
     fireEvent.click(setActiveButton)
     expect(mocks.setActive).toHaveBeenCalled()
 
     mockStore.setState((state) => ({
       ...state,
-      activeWallet: WalletId.PERA
+      activeWallet: WalletId.MAGIC
     }))
 
-    const setActiveAccountButton = screen.getByTestId('set-active-account-btn-pera')
+    const setActiveAccountButton = screen.getByTestId('set-active-account-btn-magic')
     fireEvent.click(setActiveAccountButton)
-    expect(mocks.setActiveAccount).toHaveBeenCalledWith(testAccount2.address)
+    expect(mocks.setActiveAccount).toHaveBeenCalledWith(testAccount1.address)
   })
 
   it('calls setActiveNetwork correctly', () => {
@@ -340,7 +378,7 @@ describe('useWallet', () => {
         ...state.wallets,
         [WalletId.DEFLY]: {
           accounts: [testAccount1, testAccount2],
-          activeAccount: testAccount1
+          activeAccount: testAccount2
         }
       },
       activeWallet: WalletId.DEFLY
@@ -377,8 +415,8 @@ describe('useWallet', () => {
     expect(screen.getAllByTestId('wallet')).toHaveLength(2)
     expect(screen.getByTestId('wallet-name-defly')).toHaveTextContent('Defly')
     expect(screen.getByTestId('wallet-status-defly')).toHaveTextContent('Disconnected')
-    expect(screen.getByTestId('wallet-name-pera')).toHaveTextContent('Pera')
-    expect(screen.getByTestId('wallet-status-pera')).toHaveTextContent('Disconnected')
+    expect(screen.getByTestId('wallet-name-magic')).toHaveTextContent('Magic')
+    expect(screen.getByTestId('wallet-status-magic')).toHaveTextContent('Disconnected')
 
     // Simulate Defly wallet connection
     mockStore.setState((state) => ({
@@ -387,14 +425,14 @@ describe('useWallet', () => {
         ...state.wallets,
         [WalletId.DEFLY]: {
           accounts: [testAccount1, testAccount2],
-          activeAccount: testAccount1
+          activeAccount: testAccount2
         }
       },
       activeWallet: WalletId.DEFLY
     }))
 
-    expect(screen.getByTestId('active-account')).toHaveTextContent(JSON.stringify(testAccount1))
-    expect(screen.getByTestId('active-address')).toHaveTextContent(testAccount1.address)
+    expect(screen.getByTestId('active-account')).toHaveTextContent(JSON.stringify(testAccount2))
+    expect(screen.getByTestId('active-address')).toHaveTextContent(testAccount2.address)
     expect(screen.getByTestId('active-wallet')).toHaveTextContent(WalletId.DEFLY)
     expect(screen.getByTestId('active-wallet-accounts')).toHaveTextContent(
       JSON.stringify([testAccount1, testAccount2])
@@ -404,35 +442,35 @@ describe('useWallet', () => {
     expect(screen.getByTestId('active-wallet-state')).toHaveTextContent(
       JSON.stringify({
         accounts: [testAccount1, testAccount2],
-        activeAccount: testAccount1
+        activeAccount: testAccount2
       })
     )
     expect(screen.getByTestId('wallet-store')).toHaveTextContent(
       JSON.stringify({
         [WalletId.DEFLY]: {
           accounts: [testAccount1, testAccount2],
-          activeAccount: testAccount1
+          activeAccount: testAccount2
         }
       })
     )
     expect(screen.getByTestId('wallet-status-defly')).toHaveTextContent('Active')
-    expect(screen.getByTestId('wallet-status-pera')).toHaveTextContent('Disconnected')
+    expect(screen.getByTestId('wallet-status-magic')).toHaveTextContent('Disconnected')
 
-    // Simulate Pera wallet connection
+    // Simulate Magic wallet connection
     mockStore.setState((state) => ({
       ...state,
       wallets: {
         ...state.wallets,
-        [WalletId.PERA]: {
-          accounts: [testAccount1, testAccount2],
+        [WalletId.MAGIC]: {
+          accounts: [testAccount1],
           activeAccount: testAccount1
         }
       },
-      activeWallet: WalletId.PERA
+      activeWallet: WalletId.MAGIC
     }))
 
     expect(screen.getByTestId('wallet-status-defly')).toHaveTextContent('Connected')
-    expect(screen.getByTestId('wallet-status-pera')).toHaveTextContent('Active')
+    expect(screen.getByTestId('wallet-status-magic')).toHaveTextContent('Active')
 
     // Set active network to mainnet
     mockStore.setState((state) => ({
