@@ -42,6 +42,8 @@
   },
   "devDependencies": {
     "@blockshake/defly-connect": "^1.1.6",
+    "@magic-ext/algorand": "^23.0.2",
+    "@magic-sdk/provider": "^28.0.2",
     "@perawallet/connect-beta": "2.0.11",
     "@types/node": "^20.6.5",
     "@walletconnect/modal": "^2.6.2",
@@ -50,6 +52,7 @@
     "@walletconnect/types": "^2.10.2",
     "algo-msgpack-with-bigint": "^2.1.1",
     "lute-connect": "^1.2.0",
+    "magic-sdk": "^28.0.3",
     "tsup": "^8.0.0",
     "typescript": "^5.2.2"
   },

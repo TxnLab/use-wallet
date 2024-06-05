@@ -2,13 +2,13 @@ import { Store } from '@tanstack/vue-store'
 import {
   BaseWallet,
   DeflyWallet,
+  MagicAuth,
   NetworkId,
   WalletManager,
   WalletId,
   defaultState,
   type State,
-  type WalletAccount,
-  PeraWallet
+  type WalletAccount
 } from '@txnlab/use-wallet'
 import { mount } from '@vue/test-utils'
 import { inject, nextTick } from 'vue'
@@ -16,7 +16,7 @@ import { useWallet, type Wallet } from '../useWallet'
 
 const mocks = vi.hoisted(() => {
   return {
-    connect: vi.fn(() => Promise.resolve([] as WalletAccount[])),
+    connect: vi.fn((_args) => Promise.resolve([] as WalletAccount[])),
     disconnect: vi.fn(() => Promise.resolve()),
     setActive: vi.fn(),
     setActiveAccount: vi.fn(),
@@ -39,7 +39,7 @@ vi.mock('@txnlab/use-wallet', async (importOriginal) => {
       signTransactions = mocks.signTransactions
       transactionSigner = mocks.transactionSigner
     },
-    PeraWallet: class extends mod.BaseWallet {
+    MagicAuth: class extends mod.BaseWallet {
       connect = mocks.connect
       disconnect = mocks.disconnect
       setActive = mocks.setActive
@@ -76,9 +76,12 @@ const mockDeflyWallet = new DeflyWallet({
   subscribe: mockSubscribe
 })
 
-const mockPeraWallet = new PeraWallet({
-  id: WalletId.PERA,
-  metadata: { name: 'Pera', icon: 'icon' },
+const mockMagicAuth = new MagicAuth({
+  id: WalletId.MAGIC,
+  options: {
+    apiKey: 'api-key'
+  },
+  metadata: { name: 'Magic', icon: 'icon' },
   getAlgodClient: () => ({}) as any,
   store: mockStore,
   subscribe: mockSubscribe
@@ -108,8 +111,8 @@ describe('useWallet', () => {
         setActiveAccount: expect.any(Function)
       },
       {
-        id: mockPeraWallet.id,
-        metadata: mockPeraWallet.metadata,
+        id: mockMagicAuth.id,
+        metadata: mockMagicAuth.metadata,
         accounts: [],
         activeAccount: null,
         isConnected: false,
@@ -122,7 +125,7 @@ describe('useWallet', () => {
     ]
     mockWalletManager._clients = new Map<WalletId, BaseWallet>([
       [WalletId.DEFLY, mockDeflyWallet],
-      [WalletId.PERA, mockPeraWallet]
+      [WalletId.MAGIC, mockMagicAuth]
     ])
     mockWalletManager.store = mockStore
   })
@@ -146,11 +149,21 @@ describe('useWallet', () => {
     vi.mocked(inject).mockImplementation(() => mockWalletManager)
     const { wallets } = useWallet()
 
-    // Simulate connect and disconnect
-    await wallets.value[0].connect()
-    await wallets.value[0].disconnect()
+    const defly = wallets.value[0]
+    const magic = wallets.value[1]
 
-    expect(mocks.connect).toHaveBeenCalled()
+    // Simulate connect and disconnect for Defly (no args)
+    await defly.connect()
+    await defly.disconnect()
+
+    expect(mocks.connect).toHaveBeenCalledWith(undefined)
+    expect(mocks.disconnect).toHaveBeenCalled()
+
+    // Simulate connect and disconnect for Magic (with email)
+    await magic.connect({ email: 'test@example.com' })
+    await magic.disconnect()
+
+    expect(mocks.connect).toHaveBeenCalledWith({ email: 'test@example.com' })
     expect(mocks.disconnect).toHaveBeenCalled()
   })
 

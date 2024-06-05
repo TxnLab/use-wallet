@@ -38,7 +38,7 @@ export abstract class BaseWallet {
 
   // ---------- Public Methods ---------------------------------------- //
 
-  public abstract connect(): Promise<WalletAccount[]>
+  public abstract connect(args?: Record<string, any>): Promise<WalletAccount[]>
   public abstract disconnect(): Promise<void>
   public abstract resumeSession(): Promise<void>
 
