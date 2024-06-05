@@ -1,3 +1,4 @@
+import { CustomWallet, CustomWalletOptions } from './custom'
 import { DeflyWallet, type DeflyWalletConnectOptions } from './defly'
 import { ExodusWallet, type ExodusOptions } from './exodus'
 import { KibisisWallet } from './kibisis'
@@ -13,6 +14,7 @@ import type { State } from 'src/store'
 
 export enum WalletId {
   DEFLY = 'defly',
+  CUSTOM = 'custom',
   EXODUS = 'exodus',
   KIBISIS = 'kibisis',
   KMD = 'kmd',
@@ -24,6 +26,7 @@ export enum WalletId {
 }
 
 export type WalletMap = {
+  [WalletId.CUSTOM]: typeof CustomWallet
   [WalletId.DEFLY]: typeof DeflyWallet
   [WalletId.EXODUS]: typeof ExodusWallet
   [WalletId.KIBISIS]: typeof KibisisWallet
@@ -36,6 +39,7 @@ export type WalletMap = {
 }
 
 export type WalletOptionsMap = {
+  [WalletId.CUSTOM]: CustomWalletOptions
   [WalletId.DEFLY]: DeflyWalletConnectOptions
   [WalletId.EXODUS]: ExodusOptions
   [WalletId.KIBISIS]: Record<string, never>
