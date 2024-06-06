@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import {
   ARC0027MethodCanceledError,
   ARC0027MethodEnum,
@@ -57,11 +59,8 @@ function createWalletWithStore(store: Store<State>): KibisisWallet {
 }
 
 function mockSignTransactionsResponseOnce(stxns: (string | null)[]): void {
-  /* eslint-disable @typescript-eslint/ban-ts-comment */
-  // @ts-ignore
   vi.spyOn(KibisisWallet.prototype, '_signTransactions')
     .mockReset()
-    // @ts-ignore
     .mockImplementationOnce(() =>
       Promise.resolve({
         providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
@@ -98,12 +97,8 @@ describe('KibisisWallet', () => {
         mockInitialState = JSON.parse(value)
       }
     })
-
-    /* eslint-disable @typescript-eslint/ban-ts-comment */
-    // @ts-ignore
     vi.spyOn(KibisisWallet.prototype, '_disable')
       .mockReset()
-      // @ts-ignore
       .mockImplementation(() =>
         Promise.resolve({
           genesisHash: TESTNET_GENESIS_HASH,
@@ -111,10 +106,8 @@ describe('KibisisWallet', () => {
           providerId: KIBISIS_AVM_WEB_PROVIDER_ID
         } as IDisableResult)
       )
-    // @ts-ignore
     vi.spyOn(KibisisWallet.prototype, '_enable')
       .mockReset()
-      // @ts-ignore
       .mockImplementation(() =>
         Promise.resolve({
           accounts: [account1, account2],
@@ -123,7 +116,6 @@ describe('KibisisWallet', () => {
           providerId: KIBISIS_AVM_WEB_PROVIDER_ID
         } as IEnableResult)
       )
-    /* eslint-disable @typescript-eslint/ban-ts-comment */
 
     store = new Store<State>(defaultState)
     wallet = createWalletWithStore(store)
@@ -159,13 +151,9 @@ describe('KibisisWallet', () => {
       })
 
       // Mock error response
-      /* eslint-disable @typescript-eslint/ban-ts-comment */
-      // @ts-ignore
       vi.spyOn(KibisisWallet.prototype, '_enable')
         .mockReset()
-        // @ts-ignore
         .mockImplementationOnce(() => Promise.reject(error))
-      /* eslint-disable @typescript-eslint/ban-ts-comment */
 
       // Connect wallet (should fail)
       const accounts = await wallet.connect()
@@ -246,10 +234,8 @@ describe('KibisisWallet', () => {
       wallet = createWalletWithStore(store)
 
       // Client only returns 'account2' on reconnect, 'account1' is missing
-      // @ts-ignore
       vi.spyOn(KibisisWallet.prototype, '_enable')
         .mockReset()
-        // @ts-ignore
         .mockImplementation(() =>
           Promise.resolve({
             accounts: [account2],
@@ -258,7 +244,6 @@ describe('KibisisWallet', () => {
             providerId: KIBISIS_AVM_WEB_PROVIDER_ID
           })
         )
-      /* eslint-disable @typescript-eslint/ban-ts-comment */
 
       await wallet.resumeSession()
 
@@ -318,18 +303,14 @@ describe('KibisisWallet', () => {
     const signedTxnEncoded2 = new Uint8Array(Buffer.from(signedTxnStr2, 'base64'))
 
     beforeEach(async () => {
-      /* eslint-disable @typescript-eslint/ban-ts-comment */
-      // @ts-ignore
       vi.spyOn(KibisisWallet.prototype, '_signTransactions')
         .mockReset()
-        // @ts-ignore
         .mockImplementation(() =>
           Promise.resolve({
             providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
             stxns: [signedTxnStr1]
           } as ISignTransactionsResult)
         )
-      /* eslint-disable @typescript-eslint/ban-ts-comment */
 
       await wallet.connect()
     })
@@ -353,13 +334,9 @@ describe('KibisisWallet', () => {
       })
 
       // Mock signTxns error response
-      /* eslint-disable @typescript-eslint/ban-ts-comment */
-      // @ts-ignore
       vi.spyOn(KibisisWallet.prototype, '_signTransactions')
         .mockReset()
-        // @ts-ignore
         .mockImplementationOnce(() => Promise.reject(error))
-      /* eslint-disable @typescript-eslint/ban-ts-comment */
 
       try {
         // Signing transaction should fail
