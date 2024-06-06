@@ -3,10 +3,7 @@ import type { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
 
 // constants
-import {
-  ICON,
-  KIBISIS_AVM_WEB_PROVIDER_ID,
-} from './constants'
+import { ICON, KIBISIS_AVM_WEB_PROVIDER_ID } from './constants'
 
 // store
 import { addWallet, setAccounts, type State } from 'src/store'
@@ -79,11 +76,13 @@ export default class KibisisWallet extends BaseWallet {
         // remove the listener
         avmWebClient.removeListener(listenerId)
 
-        reject(new ARC0027MethodTimedOutError({
-          method: ARC0027MethodEnum.Disable,
-          message: `no response from provider "${this.metadata.name}"`,
-          providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
-        }))
+        reject(
+          new ARC0027MethodTimedOutError({
+            method: ARC0027MethodEnum.Disable,
+            message: `no response from provider "${this.metadata.name}"`,
+            providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+          })
+        )
       }, LOWER_REQUEST_TIMEOUT)
       const listenerId = avmWebClient.onDisable(({ error, method, result }) => {
         // remove the listener, it is not needed
@@ -97,10 +96,12 @@ export default class KibisisWallet extends BaseWallet {
         }
 
         if (!result) {
-          return reject(new ARC0027UnknownError({
-            message: `received response, but "${method}" request details were empty for provider "${this.metadata.name}"`,
-            providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
-          }))
+          return reject(
+            new ARC0027UnknownError({
+              message: `received response, but "${method}" request details were empty for provider "${this.metadata.name}"`,
+              providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+            })
+          )
         }
 
         return resolve(result)
@@ -109,7 +110,7 @@ export default class KibisisWallet extends BaseWallet {
       // send the request
       avmWebClient.disable({
         genesisHash,
-        providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
+        providerId: KIBISIS_AVM_WEB_PROVIDER_ID
       })
     })
   }
@@ -139,11 +140,13 @@ export default class KibisisWallet extends BaseWallet {
         // remove the listener
         avmWebClient.removeListener(listenerId)
 
-        reject(new ARC0027MethodTimedOutError({
-          method: ARC0027MethodEnum.Enable,
-          message: `no response from provider "${this.metadata.name}"`,
-          providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
-        }))
+        reject(
+          new ARC0027MethodTimedOutError({
+            method: ARC0027MethodEnum.Enable,
+            message: `no response from provider "${this.metadata.name}"`,
+            providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+          })
+        )
       }, DEFAULT_REQUEST_TIMEOUT)
       const listenerId = avmWebClient.onEnable(({ error, method, result }) => {
         // remove the listener, it is not needed
@@ -157,10 +160,12 @@ export default class KibisisWallet extends BaseWallet {
         }
 
         if (!result) {
-          return reject(new ARC0027UnknownError({
-            message: `received response, but "${method}" request details were empty for provider "${this.metadata.name}"`,
-            providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
-          }))
+          return reject(
+            new ARC0027UnknownError({
+              message: `received response, but "${method}" request details were empty for provider "${this.metadata.name}"`,
+              providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+            })
+          )
         }
 
         return resolve(result)
@@ -169,7 +174,7 @@ export default class KibisisWallet extends BaseWallet {
       // send the request
       avmWebClient.enable({
         genesisHash,
-        providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
+        providerId: KIBISIS_AVM_WEB_PROVIDER_ID
       })
     })
   }
@@ -198,19 +203,25 @@ export default class KibisisWallet extends BaseWallet {
     const _functionName = '_initializeAVMWebProviderSDK'
 
     if (!this.avmWebProviderSDK) {
-      console.info(`[${KibisisWallet.name}]#${_functionName}: initializing @agoralabs-sh/avm-web-provider...`)
+      console.info(
+        `[${KibisisWallet.name}]#${_functionName}: initializing @agoralabs-sh/avm-web-provider...`
+      )
 
       this.avmWebProviderSDK = await import('@agoralabs-sh/avm-web-provider')
 
       if (!this.avmWebProviderSDK) {
-        throw new Error('failed to initialize, the @agoralabs-sh/avm-web-provider sdk was not provided')
+        throw new Error(
+          'failed to initialize, the @agoralabs-sh/avm-web-provider sdk was not provided'
+        )
       }
     }
 
     return this.avmWebProviderSDK
   }
 
-  private _mapAVMWebProviderAccountToWalletAccounts(accounts: AVMWebProviderSDK.IAccount[]): WalletAccount[] {
+  private _mapAVMWebProviderAccountToWalletAccounts(
+    accounts: AVMWebProviderSDK.IAccount[]
+  ): WalletAccount[] {
     return accounts.map(({ address, name }, idx) => ({
       name: name || `Kibisis Wallet ${idx + 1}`,
       address
@@ -231,7 +242,9 @@ export default class KibisisWallet extends BaseWallet {
    * @throws {UnauthorizedSignerError} if a signer in the request is not authorized by the provider.
    * @throws {UnknownError} if the response result is empty.
    */
-  private async _signTransactions(txns: AVMWebProviderSDK.IARC0001Transaction[]): Promise<AVMWebProviderSDK.ISignTransactionsResult> {
+  private async _signTransactions(
+    txns: AVMWebProviderSDK.IARC0001Transaction[]
+  ): Promise<AVMWebProviderSDK.ISignTransactionsResult> {
     const {
       ARC0027MethodEnum,
       ARC0027MethodTimedOutError,
@@ -245,11 +258,13 @@ export default class KibisisWallet extends BaseWallet {
         // remove the listener
         avmWebClient.removeListener(listenerId)
 
-        reject(new ARC0027MethodTimedOutError({
-          method: ARC0027MethodEnum.SignTransactions,
-          message: `no response from provider "${this.metadata.name}"`,
-          providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
-        }))
+        reject(
+          new ARC0027MethodTimedOutError({
+            method: ARC0027MethodEnum.SignTransactions,
+            message: `no response from provider "${this.metadata.name}"`,
+            providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+          })
+        )
       }, DEFAULT_REQUEST_TIMEOUT)
       const listenerId = avmWebClient.onSignTransactions(({ error, method, result }) => {
         // remove the listener, it is not needed
@@ -263,10 +278,12 @@ export default class KibisisWallet extends BaseWallet {
         }
 
         if (!result) {
-          return reject(new ARC0027UnknownError({
-            message: `received response, but "${method}" request details were empty for provider "${this.metadata.name}"`,
-            providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
-          }))
+          return reject(
+            new ARC0027UnknownError({
+              message: `received response, but "${method}" request details were empty for provider "${this.metadata.name}"`,
+              providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+            })
+          )
         }
 
         return resolve(result)
@@ -275,7 +292,7 @@ export default class KibisisWallet extends BaseWallet {
       // send the request
       avmWebClient.signTransactions({
         txns,
-        providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
+        providerId: KIBISIS_AVM_WEB_PROVIDER_ID
       })
     })
   }
@@ -292,11 +309,15 @@ export default class KibisisWallet extends BaseWallet {
 
       result = await this._enable()
 
-      console.info(`[${this.metadata.name}] successfully connected on network "${result.genesisId}"`)
+      console.info(
+        `[${this.metadata.name}] successfully connected on network "${result.genesisId}"`
+      )
     } catch (error: any) {
       console.error(
         `[${this.metadata.name}] error connecting: ` +
-        (isAVMWebProviderSDKError(error) ? `${error.message} (code: ${error.code})` : error.message)
+          (isAVMWebProviderSDKError(error)
+            ? `${error.message} (code: ${error.code})`
+            : error.message)
       )
       return []
     }
@@ -322,11 +343,15 @@ export default class KibisisWallet extends BaseWallet {
 
       result = await this._disable()
 
-      console.info(`[${this.metadata.name}] successfully disconnected${result.sessionIds && result.sessionIds.length ? ` sessions [${result.sessionIds.join(',')}]` : ''} on network "${result.genesisId}"`)
+      console.info(
+        `[${this.metadata.name}] successfully disconnected${result.sessionIds && result.sessionIds.length ? ` sessions [${result.sessionIds.join(',')}]` : ''} on network "${result.genesisId}"`
+      )
     } catch (error: any) {
       console.error(
         `[${this.metadata.name}] error disconnecting: ` +
-        (isAVMWebProviderSDKError(error) ? `${error.message} (code: ${error.code})` : error.message)
+          (isAVMWebProviderSDKError(error)
+            ? `${error.message} (code: ${error.code})`
+            : error.message)
       )
     }
 
@@ -365,7 +390,9 @@ export default class KibisisWallet extends BaseWallet {
     } catch (error: any) {
       console.error(
         `[${this.metadata.name}] error resuming session: ` +
-        (isAVMWebProviderSDKError(error) ? `${error.message} (code: ${error.code})` : error.message)
+          (isAVMWebProviderSDKError(error)
+            ? `${error.message} (code: ${error.code})`
+            : error.message)
       )
       this.onDisconnect()
     }
@@ -414,16 +441,13 @@ export default class KibisisWallet extends BaseWallet {
       const signedTxns = signedTxnsBase64.map((txn) => base64ToByteArray(txn))
 
       // Merge signed transactions back into original group
-      return mergeSignedTxnsWithGroup(
-        signedTxns,
-        msgpackTxnGroup,
-        signedIndexes,
-        returnGroup
-      )
+      return mergeSignedTxnsWithGroup(signedTxns, msgpackTxnGroup, signedIndexes, returnGroup)
     } catch (error: any) {
       console.error(
         `[${this.metadata.name}] error signing transactions: ` +
-        (isAVMWebProviderSDKError(error) ? `${error.message} (code: ${error.code})` : error.message)
+          (isAVMWebProviderSDKError(error)
+            ? `${error.message} (code: ${error.code})`
+            : error.message)
       )
       throw error
     }
@@ -434,16 +458,19 @@ export default class KibisisWallet extends BaseWallet {
     indexesToSign: number[]
   ): Promise<Uint8Array[]> {
     try {
-      const txnsToSign = txnGroup.reduce<AVMWebProviderSDK.IARC0001Transaction[]>((acc, txn, idx) => {
-        const txnBase64 = byteArrayToBase64(txn.toByte())
+      const txnsToSign = txnGroup.reduce<AVMWebProviderSDK.IARC0001Transaction[]>(
+        (acc, txn, idx) => {
+          const txnBase64 = byteArrayToBase64(txn.toByte())
 
-        if (indexesToSign.includes(idx)) {
-          acc.push({ txn: txnBase64 })
-        } else {
-          acc.push({ txn: txnBase64, signers: [] })
-        }
-        return acc
-      }, [])
+          if (indexesToSign.includes(idx)) {
+            acc.push({ txn: txnBase64 })
+          } else {
+            acc.push({ txn: txnBase64, signers: [] })
+          }
+          return acc
+        },
+        []
+      )
 
       const result = await this._signTransactions(txnsToSign)
       const signedTxnsBase64 = result.stxns.filter(Boolean) as string[]
@@ -452,7 +479,9 @@ export default class KibisisWallet extends BaseWallet {
     } catch (error: any) {
       console.error(
         `[${this.metadata.name}] error signing transactions: ` +
-        (isAVMWebProviderSDKError(error) ? `${error.message} (code: ${error.code})` : error.message)
+          (isAVMWebProviderSDKError(error)
+            ? `${error.message} (code: ${error.code})`
+            : error.message)
       )
       throw error
     }

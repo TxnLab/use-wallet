@@ -52,7 +52,7 @@ Compatible with any ES6+ project (TypeScript recommended)
 Some wallets require additional packages to be installed. The following table lists wallet providers and their corresponding packages.
 
 | Wallet Provider | Package(s)                                           |
-|-----------------|------------------------------------------------------|
+| --------------- | ---------------------------------------------------- |
 | Defly Wallet    | `@blockshake/defly-connect`                          |
 | Pera Wallet     | `@perawallet/connect-beta`                           |
 | WalletConnect   | `@walletconnect/modal`, `@walletconnect/sign-client` |

@@ -50,11 +50,9 @@ function createWalletWithStore(store: Store<State>): KibisisWallet {
         })
       }) as any,
     store,
-    subscribe: vi.fn(
-      () => {
-        return () => console.log('unsubscribe')
-      }
-    )
+    subscribe: vi.fn(() => {
+      return () => console.log('unsubscribe')
+    })
   })
 }
 
@@ -64,10 +62,12 @@ function mockSignTransactionsResponseOnce(stxns: (string | null)[]): void {
   vi.spyOn(KibisisWallet.prototype, '_signTransactions')
     .mockReset()
     // @ts-ignore
-    .mockImplementationOnce(() => Promise.resolve({
-      providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
-      stxns,
-    } as ISignTransactionsResult))
+    .mockImplementationOnce(() =>
+      Promise.resolve({
+        providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
+        stxns
+      } as ISignTransactionsResult)
+    )
 }
 
 describe('KibisisWallet', () => {
@@ -104,21 +104,25 @@ describe('KibisisWallet', () => {
     vi.spyOn(KibisisWallet.prototype, '_disable')
       .mockReset()
       // @ts-ignore
-      .mockImplementation(() => Promise.resolve({
-        genesisHash: TESTNET_GENESIS_HASH,
-        genesisId: TESTNET_GENESIS_ID,
-        providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
-      } as IDisableResult))
+      .mockImplementation(() =>
+        Promise.resolve({
+          genesisHash: TESTNET_GENESIS_HASH,
+          genesisId: TESTNET_GENESIS_ID,
+          providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+        } as IDisableResult)
+      )
     // @ts-ignore
     vi.spyOn(KibisisWallet.prototype, '_enable')
       .mockReset()
       // @ts-ignore
-      .mockImplementation(() => Promise.resolve({
-        accounts: [account1, account2],
-        genesisHash: TESTNET_GENESIS_HASH,
-        genesisId: TESTNET_GENESIS_ID,
-        providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
-      } as IEnableResult))
+      .mockImplementation(() =>
+        Promise.resolve({
+          accounts: [account1, account2],
+          genesisHash: TESTNET_GENESIS_HASH,
+          genesisId: TESTNET_GENESIS_ID,
+          providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+        } as IEnableResult)
+      )
     /* eslint-disable @typescript-eslint/ban-ts-comment */
 
     store = new Store<State>(defaultState)
@@ -151,7 +155,7 @@ describe('KibisisWallet', () => {
       const error = new ARC0027MethodCanceledError({
         message: `user dismissed action`,
         method: ARC0027MethodEnum.Enable,
-        providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
+        providerId: KIBISIS_AVM_WEB_PROVIDER_ID
       })
 
       // Mock error response
@@ -170,7 +174,9 @@ describe('KibisisWallet', () => {
       expect(wallet.isConnected).toBe(false)
 
       // Error message logged
-      expect(console.error).toHaveBeenCalledWith(`[${KibisisWallet.defaultMetadata.name}] error connecting: ${error.message} (code: ${error.code})`)
+      expect(console.error).toHaveBeenCalledWith(
+        `[${KibisisWallet.defaultMetadata.name}] error connecting: ${error.message} (code: ${error.code})`
+      )
 
       // No accounts returned
       expect(accounts).toEqual([])
@@ -244,12 +250,14 @@ describe('KibisisWallet', () => {
       vi.spyOn(KibisisWallet.prototype, '_enable')
         .mockReset()
         // @ts-ignore
-        .mockImplementation(() => Promise.resolve({
-          accounts: [account2],
-          genesisHash: TESTNET_GENESIS_HASH,
-          genesisId: TESTNET_GENESIS_ID,
-          providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
-        }))
+        .mockImplementation(() =>
+          Promise.resolve({
+            accounts: [account2],
+            genesisHash: TESTNET_GENESIS_HASH,
+            genesisId: TESTNET_GENESIS_ID,
+            providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+          })
+        )
       /* eslint-disable @typescript-eslint/ban-ts-comment */
 
       await wallet.resumeSession()
@@ -315,10 +323,12 @@ describe('KibisisWallet', () => {
       vi.spyOn(KibisisWallet.prototype, '_signTransactions')
         .mockReset()
         // @ts-ignore
-        .mockImplementation(() => Promise.resolve({
-          providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
-          stxns: [signedTxnStr1],
-        } as ISignTransactionsResult))
+        .mockImplementation(() =>
+          Promise.resolve({
+            providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
+            stxns: [signedTxnStr1]
+          } as ISignTransactionsResult)
+        )
       /* eslint-disable @typescript-eslint/ban-ts-comment */
 
       await wallet.connect()
@@ -339,7 +349,7 @@ describe('KibisisWallet', () => {
       const error = new ARC0027MethodCanceledError({
         message: `user dismissed action`,
         method: ARC0027MethodEnum.SignTransactions,
-        providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
+        providerId: KIBISIS_AVM_WEB_PROVIDER_ID
       })
 
       // Mock signTxns error response
