@@ -75,18 +75,20 @@ export function useWallet() {
     return activeAccount.value?.address ?? null
   })
 
-  const signTransactions = (
-    txnGroup: algosdk.Transaction[] | algosdk.Transaction[][] | Uint8Array[] | Uint8Array[][],
-    indexesToSign?: number[],
-    returnGroup?: boolean
-  ) => {
+  const signTransactions = <T extends algosdk.Transaction[] | Uint8Array[]>(
+    txnGroup: T | T[],
+    indexesToSign?: number[]
+  ): Promise<Uint8Array[]> => {
     if (!activeWallet.value) {
       throw new Error('No active wallet')
     }
-    return activeWallet.value.signTransactions(txnGroup, indexesToSign, returnGroup)
+    return activeWallet.value.signTransactions(txnGroup, indexesToSign)
   }
 
-  const transactionSigner = (txnGroup: algosdk.Transaction[], indexesToSign: number[]) => {
+  const transactionSigner = (
+    txnGroup: algosdk.Transaction[],
+    indexesToSign: number[]
+  ): Promise<Uint8Array[]> => {
     if (!activeWallet.value) {
       throw new Error('No active wallet')
     }

@@ -153,7 +153,7 @@ const TestComponent = () => {
             </button>
             <button
               data-testid={`sign-transactions-btn-${wallet.id}`}
-              onClick={() => wallet.signTransactions([], [], true)}
+              onClick={() => wallet.signTransactions([], [])}
               disabled={!isWalletActive(wallet.id)}
             >
               Sign Transactions
@@ -386,7 +386,7 @@ describe('useWallet', () => {
 
     const signTransactionsButton = screen.getByTestId('sign-transactions-btn-defly')
     fireEvent.click(signTransactionsButton)
-    expect(mocks.signTransactions).toHaveBeenCalledWith([], [], true)
+    expect(mocks.signTransactions).toHaveBeenCalledWith([], [])
 
     const transactionSignerButton = screen.getByTestId('transaction-signer-btn-defly')
     fireEvent.click(transactionSignerButton)
