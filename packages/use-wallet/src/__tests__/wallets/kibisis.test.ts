@@ -1,10 +1,20 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+import {
+  ARC0027MethodCanceledError,
+  ARC0027MethodEnum,
+  IDisableResult,
+  IEnableResult,
+  ISignTransactionsResult
+} from '@agoralabs-sh/avm-web-provider'
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
 import * as msgpack from 'algo-msgpack-with-bigint'
 import { StorageAdapter } from 'src/storage'
-import { LOCAL_STORAGE_KEY, State, defaultState } from 'src/store'
+import { defaultState, LOCAL_STORAGE_KEY, State } from 'src/store'
 import { WalletId } from 'src/wallets'
-import * as Kibisis from 'src/wallets/kibisis'
+import { KibisisWallet, KIBISIS_AVM_WEB_PROVIDER_ID } from 'src/wallets/kibisis'
+import { expect } from 'vitest'
 
 // Mock storage adapter
 vi.mock('src/storage', () => ({
@@ -21,65 +31,56 @@ vi.spyOn(console, 'error').mockImplementation(() => {})
 vi.spyOn(console, 'groupCollapsed').mockImplementation(() => {})
 
 // Constants
-const TESTNET_GENESIS_HASH = Kibisis.ALGORAND_TESTNET_GENESIS_HASH
+const TESTNET_GENESIS_HASH = 'SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI='
+const TESTNET_GENESIS_ID = 'testnet-v1.0'
 const ACCOUNT_1 = '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q'
 const ACCOUNT_2 = 'GD64YIY3TWGDMCNPP553DZPPR6LDUSFQOIJVFDPPXWEG3FVOJCCDBBHU5A'
 
 /**
- * Mocks the two responses expected from a successful `connect` method call.
- * @param {Partial<Kibisis.EnableResult>} accountsResponse accounts returned by enable request
+ * Convenience function that initializes a wallet from a supplied store.
+ * @param {Store<State>} store - a store to initialize the wallet with.
+ * @returns {KibisisWallet} an initialized wallet.
  */
-function mockConnectResponses(accountsResponse: Partial<Kibisis.EnableResult>) {
-  vi.spyOn(Kibisis.KibisisWallet, 'sendRequestWithTimeout')
-    .mockReset()
-    // First request (getProviders)
-    .mockImplementationOnce(() =>
-      Promise.resolve({
-        networks: [
-          {
-            genesisHash: TESTNET_GENESIS_HASH,
-            methods: ['enable', 'signTxns']
-          }
-        ]
-      })
-    )
-    // Second request (enable)
-    .mockImplementationOnce(() => Promise.resolve(accountsResponse))
+function createWalletWithStore(store: Store<State>): KibisisWallet {
+  return new KibisisWallet({
+    id: WalletId.KIBISIS,
+    metadata: {},
+    getAlgodClient: () =>
+      ({
+        versionsCheck: () => ({
+          do: () => Promise.resolve({ genesis_hash_b64: TESTNET_GENESIS_HASH })
+        })
+      }) as any,
+    store,
+    subscribe: vi.fn(() => {
+      return () => console.log('unsubscribe')
+    })
+  })
 }
 
-/**
- * Mocks the two responses expected from a successful `signTransactions` method call.
- * @param {Partial<Kibisis.SignTxnsResult>} stxnsResponse signed transactions returned by signTxns request
- */
-function mockSignTxnsResponses(stxnsResponse: Partial<Kibisis.SignTxnsResult>) {
-  vi.spyOn(Kibisis.KibisisWallet, 'sendRequestWithTimeout')
+function mockSignTransactionsResponseOnce(stxns: (string | null)[]): void {
+  vi.spyOn(KibisisWallet.prototype, '_signTransactions')
     .mockReset()
-    // First request (getProviders)
     .mockImplementationOnce(() =>
       Promise.resolve({
-        networks: [
-          {
-            genesisHash: TESTNET_GENESIS_HASH,
-            methods: ['enable', 'signTxns']
-          }
-        ]
-      })
+        providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
+        stxns
+      } as ISignTransactionsResult)
     )
-    // Second request (signTxns)
-    .mockImplementationOnce(() => Promise.resolve(stxnsResponse))
 }
 
 describe('KibisisWallet', () => {
-  let wallet: Kibisis.KibisisWallet
+  const account1 = {
+    name: 'Kibisis Wallet 1',
+    address: ACCOUNT_1
+  }
+  const account2 = {
+    name: 'Kibisis Wallet 2',
+    address: ACCOUNT_2
+  }
+  let wallet: KibisisWallet
   let store: Store<State>
   let mockInitialState: State | null = null
-
-  const mockSubscribe: (callback: (state: State) => void) => () => void = vi.fn(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (callback: (state: State) => void) => {
-      return () => console.log('unsubscribe')
-    }
-  )
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -96,33 +97,28 @@ describe('KibisisWallet', () => {
         mockInitialState = JSON.parse(value)
       }
     })
-
-    mockConnectResponses({
-      accounts: [
-        {
-          name: 'Kibisis Wallet 1',
-          address: ACCOUNT_1
-        },
-        {
-          name: 'Kibisis Wallet 2',
-          address: ACCOUNT_2
-        }
-      ]
-    })
+    vi.spyOn(KibisisWallet.prototype, '_disable')
+      .mockReset()
+      .mockImplementation(() =>
+        Promise.resolve({
+          genesisHash: TESTNET_GENESIS_HASH,
+          genesisId: TESTNET_GENESIS_ID,
+          providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+        } as IDisableResult)
+      )
+    vi.spyOn(KibisisWallet.prototype, '_enable')
+      .mockReset()
+      .mockImplementation(() =>
+        Promise.resolve({
+          accounts: [account1, account2],
+          genesisHash: TESTNET_GENESIS_HASH,
+          genesisId: TESTNET_GENESIS_ID,
+          providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+        } as IEnableResult)
+      )
 
     store = new Store<State>(defaultState)
-    wallet = new Kibisis.KibisisWallet({
-      id: WalletId.KIBISIS,
-      metadata: {},
-      getAlgodClient: () =>
-        ({
-          versionsCheck: () => ({
-            do: () => Promise.resolve({ genesis_hash_b64: TESTNET_GENESIS_HASH })
-          })
-        }) as any,
-      store,
-      subscribe: mockSubscribe
-    })
+    wallet = createWalletWithStore(store)
   })
 
   afterEach(async () => {
@@ -131,31 +127,6 @@ describe('KibisisWallet', () => {
   })
 
   describe('connect', () => {
-    it('should call sendRequestWithTimeout with correct arguments', async () => {
-      // Connect wallet
-      await wallet.connect()
-
-      // First call (getProviders)
-      expect(Kibisis.KibisisWallet.sendRequestWithTimeout).toHaveBeenCalledWith({
-        method: 'getProviders',
-        params: {
-          providerId: Kibisis.ARC_0027_PROVIDER_ID
-        },
-        reference: Kibisis.ARC_0027_GET_PROVIDERS_REQUEST,
-        timeout: Kibisis.LOWER_REQUEST_TIMEOUT
-      })
-
-      // Second call (enable)
-      expect(Kibisis.KibisisWallet.sendRequestWithTimeout).toHaveBeenCalledWith({
-        method: 'enable',
-        params: {
-          genesisHash: TESTNET_GENESIS_HASH,
-          providerId: Kibisis.ARC_0027_PROVIDER_ID
-        },
-        reference: Kibisis.ARC_0027_ENABLE_REQUEST
-      })
-    })
-
     it('should initialize client, return account objects, and update store', async () => {
       // Connect wallet
       const accounts = await wallet.connect()
@@ -163,46 +134,26 @@ describe('KibisisWallet', () => {
       expect(wallet.isConnected).toBe(true)
 
       // Accounts returned
-      expect(accounts).toEqual([
-        {
-          name: 'Kibisis Wallet 1',
-          address: ACCOUNT_1
-        },
-        {
-          name: 'Kibisis Wallet 2',
-          address: ACCOUNT_2
-        }
-      ])
+      expect(accounts).toEqual([account1, account2])
 
       // Store updated
       expect(store.state.wallets[WalletId.KIBISIS]).toEqual({
-        accounts: [
-          {
-            name: 'Kibisis Wallet 1',
-            address: ACCOUNT_1
-          },
-          {
-            name: 'Kibisis Wallet 2',
-            address: ACCOUNT_2
-          }
-        ],
-        activeAccount: {
-          name: 'Kibisis Wallet 1',
-          address: ACCOUNT_1
-        }
+        accounts: [account1, account2],
+        activeAccount: account1
       })
     })
 
     it('should handle errors gracefully', async () => {
-      // Mock error response
-      vi.spyOn(Kibisis.KibisisWallet, 'sendRequestWithTimeout').mockRejectedValue({
-        code: Kibisis.NETWORK_NOT_SUPPORTED_ERROR,
-        data: {
-          genesisHash: 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8='
-        },
-        message: `Network "MAINNET" not supported on provider "KIBISIS"`,
-        providerId: Kibisis.ARC_0027_PROVIDER_ID
+      const error = new ARC0027MethodCanceledError({
+        message: `user dismissed action`,
+        method: ARC0027MethodEnum.Enable,
+        providerId: KIBISIS_AVM_WEB_PROVIDER_ID
       })
+
+      // Mock error response
+      vi.spyOn(KibisisWallet.prototype, '_enable')
+        .mockReset()
+        .mockImplementationOnce(() => Promise.reject(error))
 
       // Connect wallet (should fail)
       const accounts = await wallet.connect()
@@ -212,7 +163,7 @@ describe('KibisisWallet', () => {
 
       // Error message logged
       expect(console.error).toHaveBeenCalledWith(
-        `[KibisisWallet] Error connecting: Network "MAINNET" not supported on provider "KIBISIS"`
+        `[${KibisisWallet.defaultMetadata.name}] error connecting: ${error.message} (code: ${error.code})`
       )
 
       // No accounts returned
@@ -240,15 +191,69 @@ describe('KibisisWallet', () => {
   })
 
   describe('resumeSession', () => {
-    it('should be a no-op', async () => {
-      // Initial state
-      expect(store.state.wallets[WalletId.KIBISIS]).toBeUndefined()
+    it(`should call the client's _enable method if Kibisis wallet data is found in the store`, async () => {
+      store = new Store<State>({
+        ...defaultState,
+        wallets: {
+          [WalletId.KIBISIS]: {
+            accounts: [account1],
+            activeAccount: account1
+          }
+        }
+      })
+      wallet = createWalletWithStore(store)
 
-      // Resume session
       await wallet.resumeSession()
 
-      // No change to store
-      expect(store.state.wallets[WalletId.KIBISIS]).toBeUndefined()
+      expect(wallet.isConnected).toBe(true)
+      expect(wallet['_enable']).toHaveBeenCalled()
+    })
+
+    it(`should not call the client's _enable method if Kibisis wallet data is not found in the store`, async () => {
+      // No wallets in store
+      store = new Store<State>(defaultState)
+      wallet = createWalletWithStore(store)
+
+      await wallet.resumeSession()
+
+      expect(wallet.isConnected).toBe(false)
+      expect(wallet['_enable']).not.toHaveBeenCalled()
+    })
+
+    it('should update the store if accounts returned by the client do not match', async () => {
+      // Store contains 'account1' and 'account2', with 'account1' as active
+      store = new Store<State>({
+        ...defaultState,
+        wallets: {
+          [WalletId.KIBISIS]: {
+            accounts: [account1, account2],
+            activeAccount: account1
+          }
+        }
+      })
+      wallet = createWalletWithStore(store)
+
+      // Client only returns 'account2' on reconnect, 'account1' is missing
+      vi.spyOn(KibisisWallet.prototype, '_enable')
+        .mockReset()
+        .mockImplementation(() =>
+          Promise.resolve({
+            accounts: [account2],
+            genesisHash: TESTNET_GENESIS_HASH,
+            genesisId: TESTNET_GENESIS_ID,
+            providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+          })
+        )
+
+      await wallet.resumeSession()
+
+      expect(wallet.isConnected).toBe(true)
+      expect(wallet['_enable']).toHaveBeenCalled()
+      // Store now only contains 'mockAddress2', which is set as active
+      expect(store.state.wallets[WalletId.KIBISIS]).toEqual({
+        accounts: [account2],
+        activeAccount: account2
+      })
     })
   })
 
@@ -297,166 +302,103 @@ describe('KibisisWallet', () => {
     const signedTxnEncoded1 = new Uint8Array(Buffer.from(signedTxnStr1, 'base64'))
     const signedTxnEncoded2 = new Uint8Array(Buffer.from(signedTxnStr2, 'base64'))
 
-    // Expected arguments for signTxns request
-    function expectedSignTxnsArgs(txns: Kibisis.Arc0001SignTxns[]) {
-      return {
-        method: 'signTxns',
-        params: {
-          providerId: Kibisis.ARC_0027_PROVIDER_ID,
-          txns
-        },
-        reference: Kibisis.ARC_0027_SIGN_TXNS_REQUEST
-      }
-    }
-
     beforeEach(async () => {
+      vi.spyOn(KibisisWallet.prototype, '_signTransactions')
+        .mockReset()
+        .mockImplementation(() =>
+          Promise.resolve({
+            providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
+            stxns: [signedTxnStr1]
+          } as ISignTransactionsResult)
+        )
+
       await wallet.connect()
     })
 
-    it('should call sendRequestWithTimeout with correct arguments', async () => {
-      // Mock sendRequestWithTimeout responses
-      mockSignTxnsResponses({ stxns: [signedTxnStr1] })
-
+    it('should call _signTransactions with correct arguments', async () => {
       // Sign transaction
       await wallet.signTransactions([txn1])
 
-      // First call (getProviders)
-      expect(Kibisis.KibisisWallet.sendRequestWithTimeout).toHaveBeenCalledWith({
-        method: 'getProviders',
-        params: {
-          providerId: Kibisis.ARC_0027_PROVIDER_ID
-        },
-        reference: Kibisis.ARC_0027_GET_PROVIDERS_REQUEST,
-        timeout: Kibisis.LOWER_REQUEST_TIMEOUT
-      })
-
-      // Second call (signTxns)
-      expect(Kibisis.KibisisWallet.sendRequestWithTimeout).toHaveBeenCalledWith({
-        method: 'signTxns',
-        params: {
-          providerId: Kibisis.ARC_0027_PROVIDER_ID,
-          txns: [
-            {
-              txn: Buffer.from(txn1.toByte()).toString('base64')
-            }
-          ]
-        },
-        reference: Kibisis.ARC_0027_SIGN_TXNS_REQUEST
-      })
+      expect(wallet['_signTransactions']).toHaveBeenCalledWith([
+        {
+          txn: Buffer.from(txn1.toByte()).toString('base64')
+        }
+      ])
     })
 
     it('should log errors and re-throw to the consuming application', async () => {
-      // Mock getProviders response
-      vi.spyOn(Kibisis.KibisisWallet, 'sendRequestWithTimeout')
+      const error = new ARC0027MethodCanceledError({
+        message: `user dismissed action`,
+        method: ARC0027MethodEnum.SignTransactions,
+        providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+      })
+
+      // Mock signTxns error response
+      vi.spyOn(KibisisWallet.prototype, '_signTransactions')
         .mockReset()
-        .mockImplementationOnce(() =>
-          Promise.resolve({
-            networks: [
-              {
-                genesisHash: TESTNET_GENESIS_HASH,
-                methods: ['enable', 'signTxns']
-              }
-            ]
-          })
-        )
-
-      // Mock signTxns error response
-      const responseError: Kibisis.ResponseError = {
-        code: Kibisis.METHOD_CANCELED_ERROR,
-        data: undefined,
-        message: `Signing was canceled by the user`,
-        providerId: Kibisis.ARC_0027_PROVIDER_ID
-      }
-
-      // Mock signTxns error response
-      vi.spyOn(Kibisis.KibisisWallet, 'sendRequestWithTimeout').mockRejectedValue(responseError)
+        .mockImplementationOnce(() => Promise.reject(error))
 
       try {
         // Signing transaction should fail
         await expect(wallet.signTransactions([txn1])).rejects.toThrowError()
       } catch (error: any) {
-        expect(error).toEqual(responseError)
+        expect(error).toEqual(error)
 
         // Error message logged
         expect(console.error).toHaveBeenCalledWith(
-          `[KibisisWallet] Error signing transactions: ${responseError.message} (code: ${responseError.code})`
+          `[${KibisisWallet.defaultMetadata.name}] error signing transactions: ${error.message} (code: ${error.code})`
         )
       }
     })
 
     it('should correctly process and sign a single algosdk.Transaction', async () => {
-      mockSignTxnsResponses({ stxns: [signedTxnStr1] })
+      mockSignTransactionsResponseOnce([signedTxnStr1])
 
       const result = await wallet.signTransactions([txn1])
 
       expect(result).toEqual([signedTxnEncoded1])
 
-      expect(Kibisis.KibisisWallet.sendRequestWithTimeout).toHaveBeenCalledWith(
-        expectedSignTxnsArgs([
-          {
-            txn: Buffer.from(txn1.toByte()).toString('base64')
-          }
-        ])
-      )
+      expect(wallet['_signTransactions']).toHaveBeenCalledWith([
+        {
+          txn: Buffer.from(txn1.toByte()).toString('base64')
+        }
+      ])
     })
 
-    it('should correctly process and sign a single algosdk.Transaction group', async () => {
-      mockSignTxnsResponses({ stxns: [signedTxnStr1, signedTxnStr2] })
+    it('should correctly process and sign a multiple algosdk.Transaction group', async () => {
+      mockSignTransactionsResponseOnce([signedTxnStr1, signedTxnStr2])
 
       const result = await wallet.signTransactions([txn1, txn2])
 
       expect(result).toEqual([signedTxnEncoded1, signedTxnEncoded2])
 
-      expect(Kibisis.KibisisWallet.sendRequestWithTimeout).toHaveBeenCalledWith(
-        expectedSignTxnsArgs([
-          {
-            txn: Buffer.from(txn1.toByte()).toString('base64')
-          },
-          {
-            txn: Buffer.from(txn2.toByte()).toString('base64')
-          }
-        ])
-      )
-    })
-
-    it('should correctly process and sign multiple algosdk.Transaction groups', async () => {
-      mockSignTxnsResponses({ stxns: [signedTxnStr1, signedTxnStr2] })
-
-      const result = await wallet.signTransactions([[txn1], [txn2]])
-
-      expect(result).toEqual([signedTxnEncoded1, signedTxnEncoded2])
-
-      expect(Kibisis.KibisisWallet.sendRequestWithTimeout).toHaveBeenCalledWith(
-        expectedSignTxnsArgs([
-          {
-            txn: Buffer.from(txn1.toByte()).toString('base64')
-          },
-          {
-            txn: Buffer.from(txn2.toByte()).toString('base64')
-          }
-        ])
-      )
+      expect(wallet['_signTransactions']).toHaveBeenCalledWith([
+        {
+          txn: Buffer.from(txn1.toByte()).toString('base64')
+        },
+        {
+          txn: Buffer.from(txn2.toByte()).toString('base64')
+        }
+      ])
     })
 
     it('should correctly process and sign a single encoded transaction', async () => {
-      mockSignTxnsResponses({ stxns: [signedTxnStr1] })
+      mockSignTransactionsResponseOnce([signedTxnStr1])
 
       const encodedTxn = txn1.toByte()
       const result = await wallet.signTransactions([encodedTxn])
 
       expect(result).toEqual([signedTxnEncoded1])
 
-      expect(Kibisis.KibisisWallet.sendRequestWithTimeout).toHaveBeenCalledWith(
-        expectedSignTxnsArgs([
-          {
-            txn: Buffer.from(txn1.toByte()).toString('base64')
-          }
-        ])
-      )
+      expect(wallet['_signTransactions']).toHaveBeenCalledWith([
+        {
+          txn: Buffer.from(txn1.toByte()).toString('base64')
+        }
+      ])
     })
 
     it('should correctly process and sign a single encoded transaction group', async () => {
-      mockSignTxnsResponses({ stxns: [signedTxnStr1, signedTxnStr2] })
+      mockSignTransactionsResponseOnce([signedTxnStr1, signedTxnStr2])
 
       const txnGroup = [txn1, txn2]
       const encodedTxnGroup = txnGroup.map((txn) => txn.toByte())
@@ -465,39 +407,35 @@ describe('KibisisWallet', () => {
 
       expect(result).toEqual([signedTxnEncoded1, signedTxnEncoded2])
 
-      expect(Kibisis.KibisisWallet.sendRequestWithTimeout).toHaveBeenCalledWith(
-        expectedSignTxnsArgs([
-          {
-            txn: Buffer.from(txn1.toByte()).toString('base64')
-          },
-          {
-            txn: Buffer.from(txn2.toByte()).toString('base64')
-          }
-        ])
-      )
+      expect(wallet['_signTransactions']).toHaveBeenCalledWith([
+        {
+          txn: Buffer.from(txn1.toByte()).toString('base64')
+        },
+        {
+          txn: Buffer.from(txn2.toByte()).toString('base64')
+        }
+      ])
     })
 
     it('should correctly process and sign multiple encoded transaction groups', async () => {
-      mockSignTxnsResponses({ stxns: [signedTxnStr1, signedTxnStr2] })
+      mockSignTransactionsResponseOnce([signedTxnStr1, signedTxnStr2])
 
       const result = await wallet.signTransactions([[txn1.toByte()], [txn2.toByte()]])
 
       expect(result).toEqual([signedTxnEncoded1, signedTxnEncoded2])
 
-      expect(Kibisis.KibisisWallet.sendRequestWithTimeout).toHaveBeenCalledWith(
-        expectedSignTxnsArgs([
-          {
-            txn: Buffer.from(txn1.toByte()).toString('base64')
-          },
-          {
-            txn: Buffer.from(txn2.toByte()).toString('base64')
-          }
-        ])
-      )
+      expect(wallet['_signTransactions']).toHaveBeenCalledWith([
+        {
+          txn: Buffer.from(txn1.toByte()).toString('base64')
+        },
+        {
+          txn: Buffer.from(txn2.toByte()).toString('base64')
+        }
+      ])
     })
 
     it('should determine which transactions to sign based on indexesToSign', async () => {
-      mockSignTxnsResponses({ stxns: [null, signedTxnStr2] })
+      mockSignTransactionsResponseOnce([null, signedTxnStr2])
 
       const txnGroup = [txn1, txn2]
       const indexesToSign = [1] // Only sign txn2
@@ -509,21 +447,19 @@ describe('KibisisWallet', () => {
 
       expect(result).toEqual(expectedResult)
 
-      expect(Kibisis.KibisisWallet.sendRequestWithTimeout).toHaveBeenCalledWith(
-        expectedSignTxnsArgs([
-          {
-            txn: Buffer.from(txn1.toByte()).toString('base64'),
-            signers: [] // txn1 should not be signed
-          },
-          {
-            txn: Buffer.from(txn2.toByte()).toString('base64')
-          }
-        ])
-      )
+      expect(wallet['_signTransactions']).toHaveBeenCalledWith([
+        {
+          txn: Buffer.from(txn1.toByte()).toString('base64'),
+          signers: [] // txn1 should not be signed
+        },
+        {
+          txn: Buffer.from(txn2.toByte()).toString('base64')
+        }
+      ])
     })
 
     it('should correctly merge signed transactions back into the original group', async () => {
-      mockSignTxnsResponses({ stxns: [null, signedTxnStr2] })
+      mockSignTransactionsResponseOnce([null, signedTxnStr2])
 
       const txnGroup = [txn1, txn2]
       const returnGroup = true // Merge signed transaction back into original group
@@ -535,7 +471,7 @@ describe('KibisisWallet', () => {
       const result1 = await wallet.signTransactions(txnGroup, indexesToSign1, returnGroup)
       expect(result1).toEqual(expectedResult1)
 
-      mockSignTxnsResponses({ stxns: [signedTxnStr1, null] })
+      mockSignTransactionsResponseOnce([signedTxnStr1, null])
 
       // Only txn1 should be signed
       const indexesToSign2 = [0]
@@ -553,7 +489,7 @@ describe('KibisisWallet', () => {
         amount: 3000
       })
 
-      mockSignTxnsResponses({ stxns: [signedTxnStr1, null, signedTxnStr2] })
+      mockSignTransactionsResponseOnce([signedTxnStr1, null, signedTxnStr2])
 
       const result = await wallet.signTransactions([txn1, txnCannotSign, txn2])
 
@@ -566,20 +502,18 @@ describe('KibisisWallet', () => {
 
       expect(result).toEqual(expectedResult)
 
-      expect(Kibisis.KibisisWallet.sendRequestWithTimeout).toHaveBeenCalledWith(
-        expectedSignTxnsArgs([
-          {
-            txn: Buffer.from(txn1.toByte()).toString('base64')
-          },
-          {
-            txn: Buffer.from(txnCannotSign.toByte()).toString('base64'),
-            signers: [] // txnCannotSign should not be signed
-          },
-          {
-            txn: Buffer.from(txn2.toByte()).toString('base64')
-          }
-        ])
-      )
+      expect(wallet['_signTransactions']).toHaveBeenCalledWith([
+        {
+          txn: Buffer.from(txn1.toByte()).toString('base64')
+        },
+        {
+          txn: Buffer.from(txnCannotSign.toByte()).toString('base64'),
+          signers: [] // txnCannotSign should not be signed
+        },
+        {
+          txn: Buffer.from(txn2.toByte()).toString('base64')
+        }
+      ])
     })
   })
 })

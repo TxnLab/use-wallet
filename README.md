@@ -58,6 +58,7 @@ Some wallets require additional packages to be installed. The following table li
 | WalletConnect   | `@walletconnect/modal`, `@walletconnect/sign-client` |
 | Lute Wallet     | `lute-connect`                                       |
 | Magic.link      | `magic-sdk`, `@magic-ext/algorand`                   |
+| Kibisis Wallet  | `@agoralabs-sh/avm-web-provider`                     |
 
 ## Configuration
 

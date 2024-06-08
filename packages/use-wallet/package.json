@@ -41,6 +41,7 @@
     "algosdk": "2.7.0"
   },
   "devDependencies": {
+    "@agoralabs-sh/avm-web-provider": "^1.6.2",
     "@blockshake/defly-connect": "^1.1.6",
     "@magic-ext/algorand": "^23.0.2",
     "@magic-sdk/provider": "^28.0.2",
@@ -57,6 +58,7 @@
     "typescript": "^5.2.2"
   },
   "peerDependencies": {
+    "@agoralabs-sh/avm-web-provider": "^1.6.2",
     "@blockshake/defly-connect": "^1.1.6",
     "@perawallet/connect-beta": "^2.0.11",
     "@walletconnect/modal": "^2.6.2",
@@ -64,6 +66,9 @@
     "lute-connect": "^1.2.0"
   },
   "peerDependenciesMeta": {
+    "@agoralabs-sh/avm-web-provider": {
+      "optional": true
+    },
     "@blockshake/defly-connect": {
       "optional": true
     },
