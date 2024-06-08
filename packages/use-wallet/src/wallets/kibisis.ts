@@ -1,18 +1,17 @@
-import type AVMWebProviderSDK from '@agoralabs-sh/avm-web-provider'
 import algosdk from 'algosdk'
-import type { Store } from '@tanstack/store'
-import { addWallet, setAccounts, type State } from 'src/store'
-import { WalletId, type WalletAccount, type WalletConstructor } from 'src/wallets/types'
+import { WalletState, addWallet, setAccounts, type State } from 'src/store'
 import {
   base64ToByteArray,
   byteArrayToBase64,
   compareAccounts,
-  isSignedTxnObject,
-  mergeSignedTxnsWithGroup,
-  normalizeTxnGroup,
-  shouldSignTxnObject
+  flattenTxnGroup,
+  isSignedTxn,
+  isTransactionArray
 } from 'src/utils'
 import { BaseWallet } from 'src/wallets/base'
+import { WalletId, type WalletAccount, type WalletConstructor } from 'src/wallets/types'
+import type AVMWebProviderSDK from '@agoralabs-sh/avm-web-provider'
+import type { Store } from '@tanstack/store'
 
 export function isAVMWebProviderSDKError(error: any): error is AVMWebProviderSDK.BaseARC0027Error {
   return typeof error === 'object' && 'code' in error && 'message' in error
@@ -220,7 +219,7 @@ export class KibisisWallet extends BaseWallet {
     accounts: AVMWebProviderSDK.IAccount[]
   ): WalletAccount[] {
     return accounts.map(({ address, name }, idx) => ({
-      name: name || `Kibisis Wallet ${idx + 1}`,
+      name: name || `[${this.metadata.name}] Account ${idx + 1}`,
       address
     }))
   }
@@ -302,57 +301,58 @@ export class KibisisWallet extends BaseWallet {
     let result: AVMWebProviderSDK.IEnableResult
 
     try {
-      console.info(`[${this.metadata.name}] connecting...`)
+      console.info(`[${this.metadata.name}] Connecting...`)
 
       result = await this._enable()
 
       console.info(
-        `[${this.metadata.name}] successfully connected on network "${result.genesisId}"`
+        `[${this.metadata.name}] Successfully connected on network "${result.genesisId}"`
       )
     } catch (error: any) {
       console.error(
-        `[${this.metadata.name}] error connecting: ` +
+        `[${this.metadata.name}] Error connecting: ` +
           (isAVMWebProviderSDKError(error)
             ? `${error.message} (code: ${error.code})`
             : error.message)
       )
-      return []
+      throw error
     }
 
     const walletAccounts = this._mapAVMWebProviderAccountToWalletAccounts(result.accounts)
 
+    const walletState: WalletState = {
+      accounts: walletAccounts,
+      activeAccount: walletAccounts[0]
+    }
+
     addWallet(this.store, {
       walletId: this.id,
-      wallet: {
-        accounts: walletAccounts,
-        activeAccount: walletAccounts[0]
-      }
+      wallet: walletState
     })
 
+    console.info(`[${this.metadata.name}] ✅ Connected.`, walletState)
     return walletAccounts
   }
 
   public async disconnect(): Promise<void> {
-    let result: AVMWebProviderSDK.IDisableResult
-
     try {
-      console.info(`[${this.metadata.name}] disconnecting...`)
+      console.info(`[${this.metadata.name}] Disconnecting...`)
+      this.onDisconnect()
 
-      result = await this._disable()
+      const result = await this._disable()
 
       console.info(
-        `[${this.metadata.name}] successfully disconnected${result.sessionIds && result.sessionIds.length ? ` sessions [${result.sessionIds.join(',')}]` : ''} on network "${result.genesisId}"`
+        `[${this.metadata.name}] Successfully disconnected${result.sessionIds && result.sessionIds.length ? ` sessions [${result.sessionIds.join(',')}]` : ''} on network "${result.genesisId}"`
       )
     } catch (error: any) {
       console.error(
-        `[${this.metadata.name}] error disconnecting: ` +
+        `[${this.metadata.name}] Error disconnecting: ` +
           (isAVMWebProviderSDKError(error)
             ? `${error.message} (code: ${error.code})`
             : error.message)
       )
+      throw error
     }
-
-    this.onDisconnect()
   }
 
   public async resumeSession(): Promise<void> {
@@ -365,19 +365,22 @@ export class KibisisWallet extends BaseWallet {
     }
 
     try {
-      console.info(`[${this.metadata.name}] resuming session...`)
+      console.info(`[${this.metadata.name}] Resuming session...`)
 
       result = await this._enable()
 
       if (result.accounts.length === 0) {
-        throw new Error(`[${this.metadata.name}] no accounts found!`)
+        throw new Error(`No accounts found!`)
       }
 
       const walletAccounts = this._mapAVMWebProviderAccountToWalletAccounts(result.accounts)
       const match = compareAccounts(walletAccounts, walletState.accounts)
 
       if (!match) {
-        console.warn(`[${this.metadata.name}] session accounts mismatch, updating accounts`)
+        console.warn(`[${this.metadata.name}] Session accounts mismatch, updating accounts`, {
+          prev: walletState.accounts,
+          current: walletAccounts
+        })
 
         setAccounts(this.store, {
           walletId: this.id,
@@ -386,59 +389,101 @@ export class KibisisWallet extends BaseWallet {
       }
     } catch (error: any) {
       console.error(
-        `[${this.metadata.name}] error resuming session: ` +
+        `[${this.metadata.name}] Error resuming session: ` +
           (isAVMWebProviderSDKError(error)
             ? `${error.message} (code: ${error.code})`
             : error.message)
       )
       this.onDisconnect()
+      throw error
     }
   }
 
-  public async signTransactions(
-    txnGroup: algosdk.Transaction[] | algosdk.Transaction[][] | Uint8Array[] | Uint8Array[][],
-    indexesToSign?: number[],
-    returnGroup = true
-  ): Promise<Uint8Array[]> {
+  private processTxns(
+    txnGroup: algosdk.Transaction[],
+    indexesToSign?: number[]
+  ): AVMWebProviderSDK.IARC0001Transaction[] {
+    const txnsToSign: AVMWebProviderSDK.IARC0001Transaction[] = []
+
+    txnGroup.forEach((txn, index) => {
+      const isIndexMatch = !indexesToSign || indexesToSign.includes(index)
+      const signer = algosdk.encodeAddress(txn.from.publicKey)
+      const canSignTxn = this.addresses.includes(signer)
+
+      const txnString = byteArrayToBase64(txn.toByte())
+
+      if (isIndexMatch && canSignTxn) {
+        txnsToSign.push({ txn: txnString })
+      } else {
+        txnsToSign.push({ txn: txnString, signers: [] })
+      }
+    })
+
+    return txnsToSign
+  }
+
+  private processEncodedTxns(
+    txnGroup: Uint8Array[],
+    indexesToSign?: number[]
+  ): AVMWebProviderSDK.IARC0001Transaction[] {
+    const txnsToSign: AVMWebProviderSDK.IARC0001Transaction[] = []
+
+    txnGroup.forEach((txnBuffer, index) => {
+      const txnDecodeObj = algosdk.decodeObj(txnBuffer) as
+        | algosdk.EncodedTransaction
+        | algosdk.EncodedSignedTransaction
+
+      const isSigned = isSignedTxn(txnDecodeObj)
+
+      const txn: algosdk.Transaction = isSigned
+        ? algosdk.decodeSignedTransaction(txnBuffer).txn
+        : algosdk.decodeUnsignedTransaction(txnBuffer)
+
+      const isIndexMatch = !indexesToSign || indexesToSign.includes(index)
+      const signer = algosdk.encodeAddress(txn.from.publicKey)
+      const canSignTxn = !isSigned && this.addresses.includes(signer)
+
+      const txnString = byteArrayToBase64(txn.toByte())
+
+      if (isIndexMatch && canSignTxn) {
+        txnsToSign.push({ txn: txnString })
+      } else {
+        txnsToSign.push({ txn: txnString, signers: [] })
+      }
+    })
+
+    return txnsToSign
+  }
+
+  public signTransactions = async <T extends algosdk.Transaction[] | Uint8Array[]>(
+    txnGroup: T | T[],
+    indexesToSign?: number[]
+  ): Promise<Uint8Array[]> => {
     try {
-      const msgpackTxnGroup: Uint8Array[] = normalizeTxnGroup(txnGroup)
-      const signedIndexes: number[] = []
-      const txnsToSign: AVMWebProviderSDK.IARC0001Transaction[] = []
-      // Decode transactions to access properties
-      const decodedObjects = msgpackTxnGroup.map((txn) => {
-        return algosdk.decodeObj(txn)
-      }) as Array<algosdk.EncodedTransaction | algosdk.EncodedSignedTransaction>
+      let txnsToSign: AVMWebProviderSDK.IARC0001Transaction[] = []
 
-      // Marshal transactions into `AVMWebProviderSDK.IARC0001Transaction[]`
-      decodedObjects.forEach((txnObject, idx) => {
-        const isSigned = isSignedTxnObject(txnObject)
-        const shouldSign = shouldSignTxnObject(txnObject, this.addresses, indexesToSign, idx)
+      // Determine type and process transactions for signing
+      if (isTransactionArray(txnGroup)) {
+        const flatTxns: algosdk.Transaction[] = flattenTxnGroup(txnGroup)
+        txnsToSign = this.processTxns(flatTxns, indexesToSign)
+      } else {
+        const flatTxns: Uint8Array[] = flattenTxnGroup(txnGroup as Uint8Array[])
+        txnsToSign = this.processEncodedTxns(flatTxns, indexesToSign)
+      }
 
-        const txnBuffer: Uint8Array = msgpackTxnGroup[idx]
-        const txn: algosdk.Transaction = isSigned
-          ? algosdk.decodeSignedTransaction(txnBuffer).txn
-          : algosdk.decodeUnsignedTransaction(txnBuffer)
+      // Sign transactions
+      const signTxnsResult = await this._signTransactions(txnsToSign)
 
-        const txnBase64 = byteArrayToBase64(txn.toByte())
-
-        if (shouldSign) {
-          txnsToSign.push({ txn: txnBase64 })
-          signedIndexes.push(idx)
-        } else {
-          txnsToSign.push({ txn: txnBase64, signers: [] })
+      // Filter out null values
+      const signedTxns = signTxnsResult.stxns.reduce<Uint8Array[]>((acc, value) => {
+        if (value !== null) {
+          const signedTxn = base64ToByteArray(value)
+          acc.push(signedTxn)
         }
-      })
+        return acc
+      }, [])
 
-      const result = await this._signTransactions(txnsToSign)
-
-      // Filter out null results
-      const signedTxnsBase64 = result.stxns.filter(Boolean) as string[]
-
-      // Convert base64 signed transactions to msgpack
-      const signedTxns = signedTxnsBase64.map((txn) => base64ToByteArray(txn))
-
-      // Merge signed transactions back into original group
-      return mergeSignedTxnsWithGroup(signedTxns, msgpackTxnGroup, signedIndexes, returnGroup)
+      return signedTxns
     } catch (error: any) {
       console.error(
         `[${this.metadata.name}] error signing transactions: ` +
@@ -450,37 +495,10 @@ export class KibisisWallet extends BaseWallet {
     }
   }
 
-  public async transactionSigner(
+  public transactionSigner = async (
     txnGroup: algosdk.Transaction[],
     indexesToSign: number[]
-  ): Promise<Uint8Array[]> {
-    try {
-      const txnsToSign = txnGroup.reduce<AVMWebProviderSDK.IARC0001Transaction[]>(
-        (acc, txn, idx) => {
-          const txnBase64 = byteArrayToBase64(txn.toByte())
-
-          if (indexesToSign.includes(idx)) {
-            acc.push({ txn: txnBase64 })
-          } else {
-            acc.push({ txn: txnBase64, signers: [] })
-          }
-          return acc
-        },
-        []
-      )
-
-      const result = await this._signTransactions(txnsToSign)
-      const signedTxnsBase64 = result.stxns.filter(Boolean) as string[]
-
-      return signedTxnsBase64.map((txn) => base64ToByteArray(txn))
-    } catch (error: any) {
-      console.error(
-        `[${this.metadata.name}] error signing transactions: ` +
-          (isAVMWebProviderSDKError(error)
-            ? `${error.message} (code: ${error.code})`
-            : error.message)
-      )
-      throw error
-    }
+  ): Promise<Uint8Array[]> => {
+    return this.signTransactions(txnGroup, indexesToSign)
   }
 }

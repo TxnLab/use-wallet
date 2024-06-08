@@ -3,17 +3,21 @@ import { WalletState, addWallet, setAccounts, type State } from 'src/store'
 import {
   base64ToByteArray,
   byteArrayToBase64,
-  isSignedTxnObject,
-  mergeSignedTxnsWithGroup,
-  normalizeTxnGroup,
-  shouldSignTxnObject
+  flattenTxnGroup,
+  isSignedTxn,
+  isTransactionArray
 } from 'src/utils'
-import { BaseWallet } from './base'
+import { BaseWallet } from 'src/wallets/base'
 import type { Store } from '@tanstack/store'
 import type { InstanceWithExtensions, SDKBase } from '@magic-sdk/provider'
 import type { AlgorandExtension } from '@magic-ext/algorand'
-import type { WalletAccount, WalletConstructor, WalletId, WalletTransaction } from './types'
-import { MagicUserMetadata } from 'magic-sdk'
+import type { MagicUserMetadata } from 'magic-sdk'
+import type {
+  WalletAccount,
+  WalletConstructor,
+  WalletId,
+  WalletTransaction
+} from 'src/wallets/types'
 
 /** @see https://magic.link/docs/blockchains/other-chains/other/algorand */
 
@@ -51,7 +55,7 @@ export class MagicAuth extends BaseWallet {
   }: WalletConstructor<WalletId.MAGIC>) {
     super({ id, metadata, getAlgodClient, store, subscribe })
     if (!options?.apiKey) {
-      throw new Error('[Magic] Missing required option: apiKey')
+      throw new Error(`[${this.metadata.name}] Missing required option: apiKey`)
     }
     this.options = options
     this.store = store
@@ -60,7 +64,7 @@ export class MagicAuth extends BaseWallet {
   static defaultMetadata = { name: 'Magic', icon }
 
   private async initializeClient(): Promise<MagicAuthClient> {
-    console.info('[Magic] Initializing client...')
+    console.info(`[${this.metadata.name}] Initializing client...`)
     const Magic = (await import('magic-sdk')).Magic
     const AlgorandExtension = (await import('@magic-ext/algorand')).AlgorandExtension
     const client = new Magic(this.options.apiKey as string, {
@@ -75,7 +79,7 @@ export class MagicAuth extends BaseWallet {
   }
 
   public connect = async (args?: Record<string, any>): Promise<WalletAccount[]> => {
-    console.info('[Magic] Connecting...')
+    console.info(`[${this.metadata.name}] Connecting...`)
     if (!args?.email || typeof args.email !== 'string') {
       throw new Error('Magic Link provider requires an email (string) to connect')
     }
@@ -84,7 +88,7 @@ export class MagicAuth extends BaseWallet {
 
     const client = this.client || (await this.initializeClient())
 
-    console.info(`[Magic] Logging in ${email}...`)
+    console.info(`[${this.metadata.name}] Logging in ${email}...`)
     await client.auth.loginWithMagicLink({ email })
 
     const userInfo = await client.user.getInfo()
@@ -99,7 +103,7 @@ export class MagicAuth extends BaseWallet {
 
     this.userInfo = userInfo
 
-    console.info(`[Magic] Login successful`, userInfo)
+    console.info(`[${this.metadata.name}] Login successful`, userInfo)
     const walletAccount: WalletAccount = {
       name: userInfo.email ?? 'Magic Wallet 1',
       address: userInfo.publicAddress
@@ -115,20 +119,17 @@ export class MagicAuth extends BaseWallet {
       wallet: walletState
     })
 
-    console.info('[Magic] ✅ Connected.', walletState)
+    console.info(`[${this.metadata.name}] ✅ Connected.`, walletState)
     return [walletAccount]
   }
 
   public disconnect = async (): Promise<void> => {
-    console.info('[Magic] Disconnecting...')
-    try {
-      this.onDisconnect()
-      console.info(`[Magic] Logging out ${this.userInfo?.email || 'user'}...`)
-      await this.client?.user.logout()
-      console.info('[Magic] Disconnected.')
-    } catch (error) {
-      console.error(error)
-    }
+    console.info(`[${this.metadata.name}] Disconnecting...`)
+    this.onDisconnect()
+    const client = this.client || (await this.initializeClient())
+    console.info(`[${this.metadata.name}] Logging out ${this.userInfo?.email || 'user'}...`)
+    await client.user.logout()
+    console.info(`[${this.metadata.name}] Disconnected.`)
   }
 
   public resumeSession = async (): Promise<void> => {
@@ -141,12 +142,12 @@ export class MagicAuth extends BaseWallet {
         return
       }
 
-      console.info('[Magic] Resuming session...')
+      console.info(`[${this.metadata.name}] Resuming session...`)
       const client = this.client || (await this.initializeClient())
       const isLoggedIn = await client.user.isLoggedIn()
 
       if (!isLoggedIn) {
-        console.warn('[Magic] Not logged in, please reconnect...')
+        console.warn(`[${this.metadata.name}] Not logged in, please reconnect...`)
         this.onDisconnect()
         return
       }
@@ -166,7 +167,7 @@ export class MagicAuth extends BaseWallet {
       this.userInfo = userInfo
 
       const walletAccount: WalletAccount = {
-        name: userInfo.email ?? 'Magic Wallet 1',
+        name: userInfo.email ?? `${this.metadata.name} Account 1`,
         address: userInfo.publicAddress
       }
 
@@ -178,7 +179,7 @@ export class MagicAuth extends BaseWallet {
       const match = name === storedName && address === storedAddress
 
       if (!match) {
-        console.warn(`[Magic] Session account mismatch, updating account`, {
+        console.warn(`[${this.metadata.name}] Session account mismatch, updating account`, {
           prev: storedAccount,
           current: walletAccount
         })
@@ -187,95 +188,108 @@ export class MagicAuth extends BaseWallet {
           accounts: [walletAccount]
         })
       }
-      console.info('[Magic] Session resumed.')
+      console.info(`[${this.metadata.name}] Session resumed.`)
     } catch (error: any) {
-      console.error(`[Magic] Error resuming session: ${error.message}`)
+      console.error(`[${this.metadata.name}] Error resuming session: ${error.message}`)
+      this.onDisconnect()
+      throw error
     }
   }
 
-  public signTransactions = async (
-    txnGroup: algosdk.Transaction[] | algosdk.Transaction[][] | Uint8Array[] | Uint8Array[][],
-    indexesToSign?: number[],
-    returnGroup = true
-  ): Promise<Uint8Array[]> => {
-    if (!this.client) {
-      throw new Error('[Magic] Client not initialized!')
-    }
+  private processTxns(
+    txnGroup: algosdk.Transaction[],
+    indexesToSign?: number[]
+  ): WalletTransaction[] {
     const txnsToSign: WalletTransaction[] = []
-    const signedIndexes: number[] = []
 
-    const msgpackTxnGroup: Uint8Array[] = normalizeTxnGroup(txnGroup)
+    txnGroup.forEach((txn, index) => {
+      const isIndexMatch = !indexesToSign || indexesToSign.includes(index)
+      const signer = algosdk.encodeAddress(txn.from.publicKey)
+      const canSignTxn = this.addresses.includes(signer)
 
-    // Decode transactions to access properties
-    const decodedObjects = msgpackTxnGroup.map((txn) => {
-      return algosdk.decodeObj(txn)
-    }) as Array<algosdk.EncodedTransaction | algosdk.EncodedSignedTransaction>
+      const txnString = byteArrayToBase64(txn.toByte())
 
-    // Marshal transactions into `WalletTransaction[]`
-    decodedObjects.forEach((txnObject, idx) => {
-      const isSigned = isSignedTxnObject(txnObject)
-      const shouldSign = shouldSignTxnObject(txnObject, this.addresses, indexesToSign, idx)
+      if (isIndexMatch && canSignTxn) {
+        txnsToSign.push({ txn: txnString })
+      } else {
+        txnsToSign.push({ txn: txnString, signers: [] })
+      }
+    })
 
-      const txnBuffer: Uint8Array = msgpackTxnGroup[idx]
+    return txnsToSign
+  }
+
+  private processEncodedTxns(
+    txnGroup: Uint8Array[],
+    indexesToSign?: number[]
+  ): WalletTransaction[] {
+    const txnsToSign: WalletTransaction[] = []
+
+    txnGroup.forEach((txnBuffer, index) => {
+      const txnDecodeObj = algosdk.decodeObj(txnBuffer) as
+        | algosdk.EncodedTransaction
+        | algosdk.EncodedSignedTransaction
+
+      const isSigned = isSignedTxn(txnDecodeObj)
+
       const txn: algosdk.Transaction = isSigned
         ? algosdk.decodeSignedTransaction(txnBuffer).txn
         : algosdk.decodeUnsignedTransaction(txnBuffer)
 
-      const txnBase64 = byteArrayToBase64(txn.toByte())
+      const isIndexMatch = !indexesToSign || indexesToSign.includes(index)
+      const signer = algosdk.encodeAddress(txn.from.publicKey)
+      const canSignTxn = !isSigned && this.addresses.includes(signer)
 
-      if (shouldSign) {
-        txnsToSign.push({ txn: txnBase64 })
-        signedIndexes.push(idx)
+      const txnString = byteArrayToBase64(txn.toByte())
+
+      if (isIndexMatch && canSignTxn) {
+        txnsToSign.push({ txn: txnString })
       } else {
-        txnsToSign.push({ txn: txnBase64, signers: [] })
+        txnsToSign.push({ txn: txnString, signers: [] })
       }
     })
 
+    return txnsToSign
+  }
+
+  public signTransactions = async <T extends algosdk.Transaction[] | Uint8Array[]>(
+    txnGroup: T | T[],
+    indexesToSign?: number[]
+  ): Promise<Uint8Array[]> => {
+    let txnsToSign: WalletTransaction[] = []
+
+    // Determine type and process transactions for signing
+    if (isTransactionArray(txnGroup)) {
+      const flatTxns: algosdk.Transaction[] = flattenTxnGroup(txnGroup)
+      txnsToSign = this.processTxns(flatTxns, indexesToSign)
+    } else {
+      const flatTxns: Uint8Array[] = flattenTxnGroup(txnGroup as Uint8Array[])
+      txnsToSign = this.processEncodedTxns(flatTxns, indexesToSign)
+    }
+
+    const client = this.client || (await this.initializeClient())
+
     // Sign transactions
-    const signTxnsResult = (await this.client.algorand.signGroupTransactionV2(
+    const signTxnsResult = (await client.algorand.signGroupTransactionV2(
       txnsToSign
     )) as SignTxnsResult
 
-    // Filter out undefined results
-    const signedTxnsBase64 = signTxnsResult.filter(Boolean) as string[]
+    // Filter out undefined values and convert to Uint8Array[]
+    const signedTxns = signTxnsResult.reduce<Uint8Array[]>((acc, value) => {
+      if (value !== undefined) {
+        const signedTxn = base64ToByteArray(value)
+        acc.push(signedTxn)
+      }
+      return acc
+    }, [])
 
-    // Convert base64 signed transactions to msgpack
-    const signedTxns = signedTxnsBase64.map((txn) => base64ToByteArray(txn))
-
-    // Merge signed transactions back into original group
-    const txnGroupSigned = mergeSignedTxnsWithGroup(
-      signedTxns,
-      msgpackTxnGroup,
-      signedIndexes,
-      returnGroup
-    )
-
-    return txnGroupSigned
+    return signedTxns
   }
 
   public transactionSigner = async (
     txnGroup: algosdk.Transaction[],
     indexesToSign: number[]
   ): Promise<Uint8Array[]> => {
-    if (!this.client) {
-      throw new Error('[Magic] Client not initialized!')
-    }
-
-    const txnsToSign = txnGroup.reduce<WalletTransaction[]>((acc, txn, idx) => {
-      const txnBase64 = byteArrayToBase64(txn.toByte())
-
-      if (indexesToSign.includes(idx)) {
-        acc.push({ txn: txnBase64 })
-      } else {
-        acc.push({ txn: txnBase64, signers: [] })
-      }
-      return acc
-    }, [])
-
-    const signTxnsResult = await this.client.algorand.signGroupTransactionV2(txnsToSign)
-    const signedTxnsBase64 = signTxnsResult.filter(Boolean) as string[]
-
-    const signedTxns = signedTxnsBase64.map((txn) => base64ToByteArray(txn))
-    return signedTxns
+    return this.signTransactions(txnGroup, indexesToSign)
   }
 }

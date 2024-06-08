@@ -89,10 +89,23 @@ export function isTransaction(
   }
 }
 
-export function isSignedTxnObject(
-  item: algosdk.EncodedTransaction | algosdk.EncodedSignedTransaction
-): item is algosdk.EncodedSignedTransaction {
-  return (item as algosdk.EncodedSignedTransaction).txn !== undefined
+export function isSignedTxn(
+  txnDecodeObj: algosdk.EncodedTransaction | algosdk.EncodedSignedTransaction
+): txnDecodeObj is algosdk.EncodedSignedTransaction {
+  return (txnDecodeObj as algosdk.EncodedSignedTransaction).txn !== undefined
+}
+
+export function isTransactionArray(
+  txnGroup: any
+): txnGroup is algosdk.Transaction[] | algosdk.Transaction[][] {
+  return (
+    txnGroup[0] instanceof algosdk.Transaction ||
+    (Array.isArray(txnGroup[0]) && txnGroup[0][0] instanceof algosdk.Transaction)
+  )
+}
+
+export function flattenTxnGroup<T>(txnGroup: T[]): T extends (infer U)[] ? U[] : T[] {
+  return Array.isArray(txnGroup[0]) ? ((txnGroup as any[]).flat() as any) : txnGroup
 }
 
 export function normalizeTxnGroup(
@@ -132,7 +145,7 @@ export function shouldSignTxnObject(
   idx: number
 ): boolean {
   const isIndexMatch = !indexesToSign || indexesToSign.includes(idx)
-  const isSigned = isSignedTxnObject(txnObject)
+  const isSigned = isSignedTxn(txnObject)
   const canSign = !isSigned && addresses.includes(algosdk.encodeAddress(txnObject.snd))
   const shouldSign = isIndexMatch && canSign
 

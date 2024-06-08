@@ -189,3 +189,15 @@ export interface JsonRpcRequest<T = any> {
   method: string
   params: T
 }
+
+export class SignTxnsError extends Error {
+  code: number
+  data?: any
+
+  constructor(message: string, code: number, data?: any) {
+    super(message)
+    this.name = 'SignTxnsError'
+    this.code = code
+    this.data = data
+  }
+}

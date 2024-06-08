@@ -1,18 +1,17 @@
 import algosdk from 'algosdk'
 import { WalletState, addWallet, setAccounts, type State } from 'src/store'
 import { compareAccounts } from 'src/utils'
-import { BaseWallet } from './base'
+import { BaseWallet } from 'src/wallets/base'
 import type { Store } from '@tanstack/store'
-import type { WalletAccount, WalletConstructor, WalletId } from './types'
+import type { WalletAccount, WalletConstructor, WalletId } from 'src/wallets/types'
 
 export type CustomProvider = {
   connect(args?: Record<string, any>): Promise<WalletAccount[]>
   disconnect?(): Promise<void>
   resumeSession?(): Promise<WalletAccount[] | void>
-  signTransactions?(
-    txnGroup: algosdk.Transaction[] | algosdk.Transaction[][] | Uint8Array[] | Uint8Array[][],
-    indexesToSign?: number[],
-    returnGroup?: boolean
+  signTransactions?<T extends algosdk.Transaction[] | Uint8Array[]>(
+    txnGroup: T | T[],
+    indexesToSign?: number[]
   ): Promise<Uint8Array[]>
   transactionSigner?(
     txnGroup: algosdk.Transaction[],
@@ -24,9 +23,11 @@ export interface CustomWalletOptions {
   provider: CustomProvider
 }
 
-const svgIcon = `<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-  <rect width="24" height="24" fill="gray" />
-</svg>`
+const icon = `data:image/svg+xml;base64,${btoa(`
+<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <rect width="24" height="24" fill="#525252" />
+</svg>
+`)}`
 
 export class CustomWallet extends BaseWallet {
   private provider: CustomProvider
@@ -48,10 +49,7 @@ export class CustomWallet extends BaseWallet {
     this.store = store
   }
 
-  static defaultMetadata = {
-    name: 'Custom',
-    icon: `data:image/svg+xml;base64,${btoa(svgIcon)}`
-  }
+  static defaultMetadata = { name: 'Custom', icon }
 
   public connect = async (args?: Record<string, any>): Promise<WalletAccount[]> => {
     console.info(`[${this.metadata.name}] Connecting...`)
@@ -88,8 +86,8 @@ export class CustomWallet extends BaseWallet {
 
   public disconnect = async (): Promise<void> => {
     console.info(`[${this.metadata.name}] Disconnecting...`)
-    await this.provider.disconnect?.()
     this.onDisconnect()
+    await this.provider.disconnect?.()
   }
 
   public resumeSession = async (): Promise<void> => {
@@ -129,18 +127,18 @@ export class CustomWallet extends BaseWallet {
       console.info(`[${this.metadata.name}] Session resumed.`)
     } catch (error: any) {
       console.error(`[${this.metadata.name}] Error resuming session:`, error.message)
+      throw error
     }
   }
 
-  public signTransactions = async (
-    txnGroup: algosdk.Transaction[] | algosdk.Transaction[][] | Uint8Array[] | Uint8Array[][],
-    indexesToSign?: number[],
-    returnGroup = true
+  public signTransactions = async <T extends algosdk.Transaction[] | Uint8Array[]>(
+    txnGroup: T | T[],
+    indexesToSign?: number[]
   ): Promise<Uint8Array[]> => {
     if (!this.provider.signTransactions) {
       throw new Error(`[${this.metadata.name}] Method not supported: signTransactions`)
     }
-    return await this.provider.signTransactions(txnGroup, indexesToSign, returnGroup)
+    return await this.provider.signTransactions(txnGroup, indexesToSign)
   }
 
   public transactionSigner = async (

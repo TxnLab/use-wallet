@@ -1,16 +1,20 @@
 import algosdk from 'algosdk'
-import { addWallet, type State } from 'src/store'
+import { WalletState, addWallet, type State } from 'src/store'
 import {
   base64ToByteArray,
   byteArrayToBase64,
-  isSignedTxnObject,
-  mergeSignedTxnsWithGroup,
-  normalizeTxnGroup,
-  shouldSignTxnObject
+  flattenTxnGroup,
+  isSignedTxn,
+  isTransactionArray
 } from 'src/utils'
-import { BaseWallet } from './base'
+import { BaseWallet } from 'src/wallets/base'
 import type { Store } from '@tanstack/store'
-import type { WalletAccount, WalletConstructor, WalletId, WalletTransaction } from './types'
+import type {
+  WalletAccount,
+  WalletConstructor,
+  WalletId,
+  WalletTransaction
+} from 'src/wallets/types'
 
 /** @see https://docs.exodus.com/api-reference/algorand-provider-arc-api/ */
 
@@ -72,7 +76,7 @@ export class ExodusWallet extends BaseWallet {
   static defaultMetadata = { name: 'Exodus', icon }
 
   private async initializeClient(): Promise<Exodus> {
-    console.info('[ExodusWallet] Initializing client...')
+    console.info(`[${this.metadata.name}] Initializing client...`)
     if (typeof window === 'undefined' || (window as WindowExtended).algorand === undefined) {
       throw new Error('Exodus is not available.')
     }
@@ -82,44 +86,38 @@ export class ExodusWallet extends BaseWallet {
   }
 
   public connect = async (): Promise<WalletAccount[]> => {
-    console.info('[ExodusWallet] Connecting...')
-    try {
-      const client = this.client || (await this.initializeClient())
-      const { accounts } = await client.enable(this.options)
+    console.info(`[${this.metadata.name}] Connecting...`)
+    const client = this.client || (await this.initializeClient())
+    const { accounts } = await client.enable(this.options)
 
-      if (accounts.length === 0) {
-        throw new Error('No accounts found!')
-      }
-
-      const walletAccounts = accounts.map((address: string, idx: number) => ({
-        name: `Exodus Wallet ${idx + 1}`,
-        address
-      }))
-
-      const activeAccount = walletAccounts[0]
-
-      addWallet(this.store, {
-        walletId: this.id,
-        wallet: {
-          accounts: walletAccounts,
-          activeAccount
-        }
-      })
-
-      return walletAccounts
-    } catch (error: any) {
-      if (error.name === 'UserRejectedRequestError') {
-        console.info('[ExodusWallet] Connection cancelled.')
-      } else {
-        console.error(`[ExodusWallet] Error connecting: ${error.message}`)
-      }
-      return []
+    if (accounts.length === 0) {
+      throw new Error('No accounts found!')
     }
+
+    const walletAccounts = accounts.map((address: string, idx: number) => ({
+      name: `${this.metadata.name} Account ${idx + 1}`,
+      address
+    }))
+
+    const activeAccount = walletAccounts[0]
+
+    const walletState: WalletState = {
+      accounts: walletAccounts,
+      activeAccount
+    }
+
+    addWallet(this.store, {
+      walletId: this.id,
+      wallet: walletState
+    })
+
+    console.info(`[${this.metadata.name}] ✅ Connected.`, walletState)
+    return walletAccounts
   }
 
   public disconnect = async (): Promise<void> => {
-    console.info('[ExodusWallet] Disconnecting...')
     this.onDisconnect()
+    console.info(`[${this.metadata.name}] Disconnected.`)
   }
 
   public resumeSession = async (): Promise<void> => {
@@ -127,104 +125,116 @@ export class ExodusWallet extends BaseWallet {
       const state = this.store.state
       const walletState = state.wallets[this.id]
 
+      // No session to resume
       if (!walletState) {
-        // No persisted state, abort
         return
       }
 
-      console.info('[ExodusWallet] Resuming session...')
+      console.info(`[${this.metadata.name}] Resuming session...`)
       const client = await this.initializeClient()
 
       if (!client.isConnected) {
         throw new Error('Exodus is not connected.')
       }
     } catch (error: any) {
-      console.error(`[ExodusWallet] Error resuming session: ${error.message}`)
+      console.error(`[${this.metadata.name}] Error resuming session: ${error.message}`)
       this.onDisconnect()
+      throw error
     }
   }
 
-  public signTransactions = async (
-    txnGroup: algosdk.Transaction[] | algosdk.Transaction[][] | Uint8Array[] | Uint8Array[][],
-    indexesToSign?: number[],
-    returnGroup = true
-  ): Promise<Uint8Array[]> => {
-    if (!this.client) {
-      throw new Error('[ExodusWallet] Client not initialized!')
-    }
+  private processTxns(
+    txnGroup: algosdk.Transaction[],
+    indexesToSign?: number[]
+  ): WalletTransaction[] {
     const txnsToSign: WalletTransaction[] = []
-    const signedIndexes: number[] = []
 
-    const msgpackTxnGroup: Uint8Array[] = normalizeTxnGroup(txnGroup)
+    txnGroup.forEach((txn, index) => {
+      const isIndexMatch = !indexesToSign || indexesToSign.includes(index)
+      const signer = algosdk.encodeAddress(txn.from.publicKey)
+      const canSignTxn = this.addresses.includes(signer)
 
-    // Decode transactions to access properties
-    const decodedObjects = msgpackTxnGroup.map((txn) => {
-      return algosdk.decodeObj(txn)
-    }) as Array<algosdk.EncodedTransaction | algosdk.EncodedSignedTransaction>
+      const txnString = byteArrayToBase64(txn.toByte())
 
-    // Marshal transactions into `WalletTransaction[]`
-    decodedObjects.forEach((txnObject, idx) => {
-      const isSigned = isSignedTxnObject(txnObject)
-      const shouldSign = shouldSignTxnObject(txnObject, this.addresses, indexesToSign, idx)
+      if (isIndexMatch && canSignTxn) {
+        txnsToSign.push({ txn: txnString })
+      } else {
+        txnsToSign.push({ txn: txnString, signers: [] })
+      }
+    })
 
-      const txnBuffer: Uint8Array = msgpackTxnGroup[idx]
+    return txnsToSign
+  }
+
+  private processEncodedTxns(
+    txnGroup: Uint8Array[],
+    indexesToSign?: number[]
+  ): WalletTransaction[] {
+    const txnsToSign: WalletTransaction[] = []
+
+    txnGroup.forEach((txnBuffer, index) => {
+      const txnDecodeObj = algosdk.decodeObj(txnBuffer) as
+        | algosdk.EncodedTransaction
+        | algosdk.EncodedSignedTransaction
+
+      const isSigned = isSignedTxn(txnDecodeObj)
+
       const txn: algosdk.Transaction = isSigned
         ? algosdk.decodeSignedTransaction(txnBuffer).txn
         : algosdk.decodeUnsignedTransaction(txnBuffer)
 
-      const txnBase64 = byteArrayToBase64(txn.toByte())
+      const isIndexMatch = !indexesToSign || indexesToSign.includes(index)
+      const signer = algosdk.encodeAddress(txn.from.publicKey)
+      const canSignTxn = !isSigned && this.addresses.includes(signer)
 
-      if (shouldSign) {
-        txnsToSign.push({ txn: txnBase64 })
-        signedIndexes.push(idx)
+      const txnString = byteArrayToBase64(txn.toByte())
+
+      if (isIndexMatch && canSignTxn) {
+        txnsToSign.push({ txn: txnString })
       } else {
-        txnsToSign.push({ txn: txnBase64, signers: [] })
+        txnsToSign.push({ txn: txnString, signers: [] })
       }
     })
 
+    return txnsToSign
+  }
+
+  public signTransactions = async <T extends algosdk.Transaction[] | Uint8Array[]>(
+    txnGroup: T | T[],
+    indexesToSign?: number[]
+  ): Promise<Uint8Array[]> => {
+    let txnsToSign: WalletTransaction[] = []
+
+    // Determine type and process transactions for signing
+    if (isTransactionArray(txnGroup)) {
+      const flatTxns: algosdk.Transaction[] = flattenTxnGroup(txnGroup)
+      txnsToSign = this.processTxns(flatTxns, indexesToSign)
+    } else {
+      const flatTxns: Uint8Array[] = flattenTxnGroup(txnGroup as Uint8Array[])
+      txnsToSign = this.processEncodedTxns(flatTxns, indexesToSign)
+    }
+
+    const client = this.client || (await this.initializeClient())
+
     // Sign transactions
-    const signTxnsResult = await this.client.signTxns(txnsToSign)
+    const signTxnsResult = await client.signTxns(txnsToSign)
 
-    // Filter out null results
-    const signedTxnsBase64 = signTxnsResult.filter(Boolean) as string[]
+    // Filter out null values and convert to Uint8Array[]
+    const signedTxns = signTxnsResult.reduce<Uint8Array[]>((acc, value) => {
+      if (value !== null) {
+        const signedTxn = base64ToByteArray(value)
+        acc.push(signedTxn)
+      }
+      return acc
+    }, [])
 
-    // Convert base64 signed transactions to msgpack
-    const signedTxns = signedTxnsBase64.map((txn) => base64ToByteArray(txn))
-
-    // Merge signed transactions back into original group
-    const txnGroupSigned = mergeSignedTxnsWithGroup(
-      signedTxns,
-      msgpackTxnGroup,
-      signedIndexes,
-      returnGroup
-    )
-
-    return txnGroupSigned
+    return signedTxns
   }
 
   public transactionSigner = async (
     txnGroup: algosdk.Transaction[],
     indexesToSign: number[]
   ): Promise<Uint8Array[]> => {
-    if (!this.client) {
-      throw new Error('[ExodusWallet] Client not initialized!')
-    }
-
-    const txnsToSign = txnGroup.reduce<WalletTransaction[]>((acc, txn, idx) => {
-      const txnBase64 = byteArrayToBase64(txn.toByte())
-
-      if (indexesToSign.includes(idx)) {
-        acc.push({ txn: txnBase64 })
-      } else {
-        acc.push({ txn: txnBase64, signers: [] })
-      }
-      return acc
-    }, [])
-
-    const signTxnsResult = await this.client.signTxns(txnsToSign)
-    const signedTxnsBase64 = signTxnsResult.filter(Boolean) as string[]
-
-    const signedTxns = signedTxnsBase64.map((txn) => base64ToByteArray(txn))
-    return signedTxns
+    return this.signTransactions(txnGroup, indexesToSign)
   }
 }

@@ -3,7 +3,7 @@ import {
   compareAccounts,
   deepMerge,
   formatJsonRpcRequest,
-  isSignedTxnObject,
+  isSignedTxn,
   isTransaction,
   mergeSignedTxnsWithGroup,
   normalizeTxnGroup,
@@ -79,7 +79,7 @@ describe('isTransaction', () => {
   })
 })
 
-describe('isSignedTxnObject', () => {
+describe('isSignedTxn', () => {
   const transaction = new algosdk.Transaction({
     from: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
     to: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
@@ -106,11 +106,11 @@ describe('isSignedTxnObject', () => {
   const encodedSignedTxn = { txn: encodedTxn, sig: Buffer.from('sig') }
 
   it('should return true if the object is a signed transaction', () => {
-    expect(isSignedTxnObject(encodedSignedTxn)).toBe(true)
+    expect(isSignedTxn(encodedSignedTxn)).toBe(true)
   })
 
   it('should return false if the object is not a signed transaction', () => {
-    expect(isSignedTxnObject(encodedTxn)).toBe(false)
+    expect(isSignedTxn(encodedTxn)).toBe(false)
   })
 })
 
