@@ -160,7 +160,7 @@ export interface WalletTransaction {
   groupMessage?: string
 }
 
-/** @see https://github.com/perawallet/connect/blob/1.3.3/src/util/model/peraWalletModels.ts */
+/** @see https://github.com/perawallet/connect/blob/1.3.4/src/util/model/peraWalletModels.ts */
 export interface SignerTransaction {
   txn: algosdk.Transaction
 
