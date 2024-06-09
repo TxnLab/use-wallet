@@ -23,8 +23,8 @@ export interface CustomWalletOptions {
   provider: CustomProvider
 }
 
-const icon = `data:image/svg+xml;base64,${btoa(`
-<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+const ICON = `data:image/svg+xml;base64,${btoa(`
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
   <rect width="24" height="24" fill="#525252" />
 </svg>
 `)}`
@@ -49,7 +49,10 @@ export class CustomWallet extends BaseWallet {
     this.store = store
   }
 
-  static defaultMetadata = { name: 'Custom', icon }
+  static defaultMetadata = {
+    name: 'Custom',
+    icon: ICON
+  }
 
   public connect = async (args?: Record<string, any>): Promise<WalletAccount[]> => {
     console.info(`[${this.metadata.name}] Connecting...`)

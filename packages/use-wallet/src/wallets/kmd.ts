@@ -44,7 +44,7 @@ interface ListKeysResponse {
   error?: boolean
 }
 
-const icon = `data:image/svg+xml;base64,${btoa(`
+const ICON = `data:image/svg+xml;base64,${btoa(`
 <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
   <linearGradient id="algokitGradient" gradientUnits="userSpaceOnUse" x1="0" y1="400" x2="400" y2="0">
     <stop offset="0" style="stop-color:#31D8EE"/>
@@ -87,7 +87,10 @@ export class KmdWallet extends BaseWallet {
     this.store = store
   }
 
-  static defaultMetadata = { name: 'KMD', icon }
+  static defaultMetadata = {
+    name: 'KMD',
+    icon: ICON
+  }
 
   private async initializeClient(): Promise<algosdk.Kmd> {
     console.info(`[${this.metadata.name}] Initializing client...`)

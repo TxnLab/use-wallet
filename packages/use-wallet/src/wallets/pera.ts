@@ -19,8 +19,17 @@ export interface PeraWalletConnectOptions {
   compactMode?: boolean
 }
 
-const icon =
-  'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c3ZnIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNzcgMTg3Ij48cmVjdCB4PSItMTEuMzgiIHk9Ii0yNS45NyIgd2lkdGg9IjIwMC4wMiIgaGVpZ2h0PSIyMzEuNTMiIHN0eWxlPSJmaWxsOiNmZTU7Ii8+PHBhdGggZD0iTTk0LjA1LDU5LjYxYzIuMDUsOC40OCwxLjM2LDE1Ljk0LTEuNTUsMTYuNjYtMi45LC43Mi02LjkxLTUuNTctOC45Ni0xNC4wNS0yLjA1LTguNDgtMS4zNi0xNS45NCwxLjU1LTE2LjY2LDIuOS0uNzIsNi45MSw1LjU3LDguOTYsMTQuMDVaIiBzdHlsZT0iZmlsbDojMWMxYzFjOyIvPjxwYXRoIGQ9Ik0xMjcuODUsNjYuOWMtNC41My00LjgxLTEzLjU1LTMuNS0yMC4xNSwyLjkxLTYuNTksNi40MS04LjI2LDE1LjUtMy43MywyMC4zMSw0LjUzLDQuOCwxMy41NSwzLjUsMjAuMTUtMi45MXM4LjI2LTE1LjUsMy43My0yMC4zMVoiIHN0eWxlPSJmaWxsOiMxYzFjMWM7Ii8+PHBhdGggZD0iTTkxLjc5LDE0MC40N2MyLjktLjcyLDMuNDktOC42LDEuMzItMTcuNjEtMi4xNy05LTYuMjktMTUuNzEtOS4xOS0xNC45OS0yLjksLjcyLTMuNDksOC42LTEuMzIsMTcuNjEsMi4xNyw5LDYuMjksMTUuNzEsOS4xOSwxNC45OVoiIHN0eWxlPSJmaWxsOiMxYzFjMWM7Ii8+PHBhdGggZD0iTTYyLjIyLDcxLjNjOC4zNywyLjQ3LDE0LjQ4LDYuOCwxMy42Niw5LjY3LS44MywyLjg3LTguMjgsMy4yLTE2LjY1LC43My04LjM3LTIuNDctMTQuNDgtNi44LTEzLjY2LTkuNjcsLjgzLTIuODcsOC4yOC0zLjIsMTYuNjUtLjczWiIgc3R5bGU9ImZpbGw6IzFjMWMxYzsiLz48cGF0aCBkPSJNMTE2LjU0LDEwMy43NGM4Ljg4LDIuNjIsMTUuNDEsNy4wNywxNC41OSw5Ljk0LS44MywyLjg3LTguNywzLjA4LTE3LjU4LC40Ni04Ljg4LTIuNjItMTUuNDEtNy4wNy0xNC41OS05Ljk0LC44My0yLjg3LDguNy0zLjA4LDE3LjU4LS40NloiIHN0eWxlPSJmaWxsOiMxYzFjMWM7Ii8+PHBhdGggZD0iTTcxLjY0LDk3LjcxYy0yLjA4LTIuMTUtOC44OCwuOTgtMTUuMiw2Ljk5LTYuMzIsNi4wMS05Ljc2LDEyLjYzLTcuNjksMTQuNzgsMi4wOCwyLjE1LDguODgtLjk4LDE1LjItNi45OSw2LjMyLTYuMDEsOS43Ni0xMi42Myw3LjY5LTE0Ljc4WiIgc3R5bGU9ImZpbGw6IzFjMWMxYzsiLz48L3N2Zz4='
+const ICON = `data:image/svg+xml;base64,${btoa(`
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <rect fill="#FFEE55" width="200" height="200" />
+  <path fill="#1C1C1C" d="M106.1,64.3c2.2,9.1,1.5,17-1.7,17.8c-3.1,0.8-7.4-6-9.6-15c-2.2-9.1-1.5-17,1.7-17.8 C99.6,48.5,103.9,55.2,106.1,64.3z" />
+  <path fill="#1C1C1C" d="M142.2,72.1c-4.8-5.1-14.5-3.7-21.6,3.1c-7,6.9-8.8,16.6-4,21.7c4.8,5.1,14.5,3.7,21.6-3.1 C145.3,86.9,147.1,77.2,142.2,72.1z" />
+  <path fill="#1C1C1C" d="M103.7,150.8c3.1-0.8,3.7-9.2,1.4-18.8c-2.3-9.6-6.7-16.8-9.8-16c-3.1,0.8-3.7,9.2-1.4,18.8 C96.2,144.3,100.6,151.5,103.7,150.8z" />
+  <path fill="#1C1C1C" d="M72.1,76.8c9,2.6,15.5,7.3,14.6,10.3c-0.9,3.1-8.9,3.4-17.8,0.8s-15.5-7.3-14.6-10.3 C55.1,74.5,63.1,74.1,72.1,76.8z" />
+  <path fill="#1C1C1C" d="M130.2,111.5c9.5,2.8,16.5,7.6,15.6,10.6c-0.9,3.1-9.3,3.3-18.8,0.5c-9.5-2.8-16.5-7.6-15.6-10.6 C112.2,108.9,120.7,108.7,130.2,111.5z" />
+  <path fill="#1C1C1C" d="M82.1,105c-2.2-2.3-9.5,1-16.3,7.5c-6.8,6.4-10.4,13.5-8.2,15.8c2.2,2.3,9.5-1,16.3-7.5 C80.7,114.4,84.3,107.3,82.1,105z" />
+</svg>
+`)}`
 
 export class PeraWallet extends BaseWallet {
   private client: PeraWalletConnect | null = null
@@ -44,7 +53,10 @@ export class PeraWallet extends BaseWallet {
     this.store = store
   }
 
-  static defaultMetadata = { name: 'Pera', icon }
+  static defaultMetadata = {
+    name: 'Pera',
+    icon: ICON
+  }
 
   private async initializeClient(): Promise<PeraWalletConnect> {
     console.info(`[${this.metadata.name}] Initializing client...`)
