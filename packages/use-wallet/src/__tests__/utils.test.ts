@@ -2,12 +2,10 @@ import algosdk from 'algosdk'
 import {
   compareAccounts,
   deepMerge,
+  flattenTxnGroup,
   formatJsonRpcRequest,
   isSignedTxn,
-  isTransaction,
-  mergeSignedTxnsWithGroup,
-  normalizeTxnGroup,
-  shouldSignTxnObject
+  isTransactionArray
 } from 'src/utils'
 
 describe('compareAccounts', () => {
@@ -48,37 +46,6 @@ describe('compareAccounts', () => {
   })
 })
 
-describe('isTransaction', () => {
-  const transaction = new algosdk.Transaction({
-    from: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-    to: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-    fee: 10,
-    amount: 847,
-    firstRound: 51,
-    lastRound: 61,
-    genesisHash: 'JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI=',
-    genesisID: 'testnet-v1.0'
-  })
-
-  const uInt8Array = transaction.toByte()
-
-  it('should return true if the item is a single Transaction', () => {
-    expect(isTransaction(transaction)).toBe(true)
-  })
-
-  it('should return true if the item is an array of transactions', () => {
-    expect(isTransaction([transaction, transaction])).toBe(true)
-  })
-
-  it('should return false if the item is a single Uint8Array', () => {
-    expect(isTransaction(uInt8Array)).toBe(false)
-  })
-
-  it('should return false if the item is an array of Uint8Arrays', () => {
-    expect(isTransaction([uInt8Array, uInt8Array])).toBe(false)
-  })
-})
-
 describe('isSignedTxn', () => {
   const transaction = new algosdk.Transaction({
     from: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
@@ -114,78 +81,7 @@ describe('isSignedTxn', () => {
   })
 })
 
-describe('normalizeTxnGroup', () => {
-  it('should throw an error if the transaction group is empty', () => {
-    expect(() => normalizeTxnGroup([])).toThrow('Empty transaction group!')
-  })
-
-  const transaction1 = new algosdk.Transaction({
-    from: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-    to: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-    fee: 10,
-    amount: 1000,
-    firstRound: 51,
-    lastRound: 61,
-    genesisHash: 'JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI=',
-    genesisID: 'testnet-v1.0'
-  })
-  const transaction2 = new algosdk.Transaction({
-    from: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-    to: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-    fee: 10,
-    amount: 2000,
-    firstRound: 51,
-    lastRound: 61,
-    genesisHash: 'JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI=',
-    genesisID: 'testnet-v1.0'
-  })
-
-  describe('with algosdk.Transaction[]', () => {
-    it('should return an array of Uint8Arrays for a single array of transactions', () => {
-      const txnGroup = [transaction1, transaction2]
-
-      const normalized = normalizeTxnGroup(txnGroup)
-      expect(normalized).toBeInstanceOf(Array)
-      expect(normalized.every((item) => item instanceof Uint8Array)).toBe(true)
-    })
-  })
-
-  describe('with algosdk.Transaction[][]', () => {
-    it('should return a flat array of Uint8Arrays for a nested array of transactions', () => {
-      const txnGroup = [[transaction1], [transaction2]]
-
-      const normalized = normalizeTxnGroup(txnGroup)
-      expect(normalized).toBeInstanceOf(Array)
-      expect(normalized.length).toBe(2)
-      expect(normalized.every((item) => item instanceof Uint8Array)).toBe(true)
-    })
-  })
-
-  const uInt8Array1 = transaction1.toByte()
-  const uInt8Array2 = transaction2.toByte()
-
-  describe('with Uint8Array[]', () => {
-    it('should return the same array of Uint8Arrays if input is a single array of Uint8Arrays', () => {
-      const txnGroup = [uInt8Array1, uInt8Array2]
-
-      const normalized = normalizeTxnGroup(txnGroup)
-      expect(normalized).toEqual(txnGroup)
-    })
-  })
-
-  describe('with Uint8Array[][]', () => {
-    it('should return a flat array of Uint8Arrays for a nested array of Uint8Arrays', () => {
-      const txnGroup = [[uInt8Array1], [uInt8Array2]]
-
-      const normalized = normalizeTxnGroup(txnGroup)
-      expect(normalized).toBeInstanceOf(Array)
-      expect(normalized.length).toBe(2)
-      expect(normalized.every((item) => item instanceof Uint8Array)).toBe(true)
-    })
-  })
-})
-
-describe('shouldSignTxnObject', () => {
+describe('isTransactionArray', () => {
   const transaction = new algosdk.Transaction({
     from: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
     to: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
@@ -197,137 +93,73 @@ describe('shouldSignTxnObject', () => {
     genesisID: 'testnet-v1.0'
   })
 
-  const encodedTxn = {
-    amt: transaction.amount,
-    fee: transaction.fee,
-    fv: transaction.firstRound,
-    lv: transaction.lastRound,
-    snd: Buffer.from(transaction.from.publicKey),
-    type: 'pay',
-    gen: transaction.genesisID,
-    gh: transaction.genesisHash,
-    grp: Buffer.from(new Uint8Array(0))
-  }
+  const uInt8Array = transaction.toByte()
 
-  const addresses = ['7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q']
-
-  it('should return true if the transaction object is not signed and indexesToSign is undefined', () => {
-    const indexesToSign = undefined
-    const idx = 0
-
-    expect(shouldSignTxnObject(encodedTxn, addresses, indexesToSign, idx)).toBe(true)
+  it('should return true if the item is an array of transactions', () => {
+    expect(isTransactionArray([transaction, transaction])).toBe(true)
   })
 
-  it('should return true if the transaction object is not signed and indexesToSign includes the index', () => {
-    const indexesToSign = [0]
-    const idx = 0
-
-    expect(shouldSignTxnObject(encodedTxn, addresses, indexesToSign, idx)).toBe(true)
+  it('should return true if the item is a nested array of transactions', () => {
+    expect(isTransactionArray([[transaction, transaction], [transaction]])).toBe(true)
   })
 
-  it('should return false if the transaction object is not signed and indexesToSign does not include the index', () => {
-    const indexesToSign = [1]
-    const idx = 0
-
-    expect(shouldSignTxnObject(encodedTxn, addresses, indexesToSign, idx)).toBe(false)
+  it('should return false if the item is a single Transaction', () => {
+    expect(isTransactionArray(transaction)).toBe(false)
   })
 
-  it('should return false if the transaction object is signed', () => {
-    const indexesToSign = undefined
-    const idx = 0
-    const encodedSignedTxn = { txn: encodedTxn, sig: Buffer.from('sig') }
-
-    expect(shouldSignTxnObject(encodedSignedTxn, addresses, indexesToSign, idx)).toBe(false)
+  it('should return false if the item is a single Uint8Array', () => {
+    expect(isTransactionArray(uInt8Array)).toBe(false)
   })
 
-  it('should return false if addresses do not include the sender address', () => {
-    const indexesToSign = undefined
-    const idx = 0
-    const addresses = ['addr1', 'addr2']
+  it('should return false if the item is an array of Uint8Arrays', () => {
+    expect(isTransactionArray([uInt8Array, uInt8Array])).toBe(false)
+  })
 
-    expect(shouldSignTxnObject(encodedTxn, addresses, indexesToSign, idx)).toBe(false)
+  it('should return false if the item is a nested array of Uint8Arrays', () => {
+    expect(isTransactionArray([[uInt8Array, uInt8Array], [uInt8Array]])).toBe(false)
   })
 })
 
-describe('mergeSignedTxnsWithGroup', () => {
+describe('flattenTxnGroup', () => {
   const transaction1 = new algosdk.Transaction({
     from: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
     to: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
     fee: 10,
-    amount: 1000,
+    amount: 847,
     firstRound: 51,
     lastRound: 61,
     genesisHash: 'JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI=',
     genesisID: 'testnet-v1.0'
   })
+
   const transaction2 = new algosdk.Transaction({
     from: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
     to: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-    fee: 10,
-    amount: 2000,
-    firstRound: 51,
-    lastRound: 61,
+    fee: 15,
+    amount: 500,
+    firstRound: 100,
+    lastRound: 200,
     genesisHash: 'JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI=',
     genesisID: 'testnet-v1.0'
   })
 
-  const uInt8Array1 = transaction1.toByte()
-  const uInt8Array2 = transaction2.toByte()
+  const nestedTxnGroup = [[transaction1, transaction2], [transaction1]]
+  const flatTxnGroup = [transaction1, transaction2, transaction1]
 
-  it('should merge all signed transactions into the group when all are signed', () => {
-    const signedTxn1 = new Uint8Array(Buffer.from('signedTxn1Str', 'base64'))
-    const signedTxn2 = new Uint8Array(Buffer.from('signedTxn2Str', 'base64'))
-    const txnGroup = [uInt8Array1, uInt8Array2]
-    const signedIndexes = [0, 1]
-    const returnGroup = true
-
-    const merged = mergeSignedTxnsWithGroup(
-      [signedTxn1, signedTxn2],
-      txnGroup,
-      signedIndexes,
-      returnGroup
-    )
-    expect(merged).toEqual([signedTxn1, signedTxn2])
+  it('should flatten a nested transaction group', () => {
+    expect(flattenTxnGroup(nestedTxnGroup)).toEqual(flatTxnGroup)
   })
 
-  it('should merge all signed transactions into the group when only some are signed', () => {
-    const signedTxn1 = new Uint8Array(Buffer.from('signedTxn1Str', 'base64'))
-    const txnGroup = [uInt8Array1, uInt8Array2]
-    const signedIndexes = [0]
-    const returnGroup = true
-
-    const merged = mergeSignedTxnsWithGroup([signedTxn1], txnGroup, signedIndexes, returnGroup)
-    expect(merged).toEqual([signedTxn1, uInt8Array2])
+  it('should return the same array if the transaction group is already flat', () => {
+    expect(flattenTxnGroup(flatTxnGroup)).toEqual(flatTxnGroup)
   })
 
-  it('should merge all signed transactions into the group when none are signed', () => {
-    const txnGroup = [uInt8Array1, uInt8Array2]
-    const returnGroup = true
-
-    const merged = mergeSignedTxnsWithGroup([], txnGroup, [], returnGroup)
-    expect(merged).toEqual(txnGroup)
+  it('should return the same array if it is not an array of arrays', () => {
+    expect(flattenTxnGroup([transaction1, transaction2])).toEqual([transaction1, transaction2])
   })
 
-  it('should only return signed transactions if returnGroup is false', () => {
-    const signedTxn1 = new Uint8Array(Buffer.from('signedTxn1Str', 'base64'))
-    const signedTxn2 = new Uint8Array(Buffer.from('signedTxn2Str', 'base64'))
-    const txnGroup = [uInt8Array1, uInt8Array2]
-    const returnGroup = false
-
-    const signedIndexes1 = [0, 1]
-
-    const merged1 = mergeSignedTxnsWithGroup(
-      [signedTxn1, signedTxn2],
-      txnGroup,
-      signedIndexes1,
-      returnGroup
-    )
-    expect(merged1).toEqual([signedTxn1, signedTxn2])
-
-    const signedIndexes2 = [0]
-
-    const merged2 = mergeSignedTxnsWithGroup([signedTxn1], txnGroup, signedIndexes2, returnGroup)
-    expect(merged2).toEqual([signedTxn1])
+  it('should handle an empty array', () => {
+    expect(flattenTxnGroup([])).toEqual([])
   })
 })
 
