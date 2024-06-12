@@ -160,7 +160,7 @@ export interface WalletTransaction {
   groupMessage?: string
 }
 
-/** @see https://github.com/perawallet/connect/blob/1.3.3/src/util/model/peraWalletModels.ts */
+/** @see https://github.com/perawallet/connect/blob/1.3.4/src/util/model/peraWalletModels.ts */
 export interface SignerTransaction {
   txn: algosdk.Transaction
 
@@ -188,4 +188,16 @@ export interface JsonRpcRequest<T = any> {
   jsonrpc: string
   method: string
   params: T
+}
+
+export class SignTxnsError extends Error {
+  code: number
+  data?: any
+
+  constructor(message: string, code: number, data?: any) {
+    super(message)
+    this.name = 'SignTxnsError'
+    this.code = code
+    this.data = data
+  }
 }

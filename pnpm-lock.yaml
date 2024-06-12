@@ -363,9 +363,6 @@ importers:
       '@walletconnect/types':
         specifier: ^2.10.2
         version: 2.11.3
-      algo-msgpack-with-bigint:
-        specifier: ^2.1.1
-        version: 2.1.1
       lute-connect:
         specifier: ^1.2.0
         version: 1.2.0

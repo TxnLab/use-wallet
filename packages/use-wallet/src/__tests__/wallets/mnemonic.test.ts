@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Store } from '@tanstack/store'
-import * as msgpack from 'algo-msgpack-with-bigint'
 import algosdk from 'algosdk'
+import { NetworkId } from 'src/network'
 import { StorageAdapter } from 'src/storage'
 import { LOCAL_STORAGE_KEY, State, defaultState } from 'src/store'
-import { MnemonicWallet } from 'src/wallets/mnemonic'
+import { LOCAL_STORAGE_MNEMONIC_KEY, MnemonicWallet } from 'src/wallets/mnemonic'
 import { WalletId } from 'src/wallets/types'
 
 const ACCOUNT_MNEMONIC =
@@ -20,22 +20,37 @@ vi.mock('src/storage', () => ({
 }))
 
 // Spy/suppress console output
-vi.spyOn(console, 'info').mockImplementation(() => {})
+vi.spyOn(console, 'info').mockImplementation(() => {}) // @todo: remove when debug logger is implemented
 vi.spyOn(console, 'warn').mockImplementation(() => {})
-vi.spyOn(console, 'error').mockImplementation(() => {})
-vi.spyOn(console, 'groupCollapsed').mockImplementation(() => {})
+
+function createWalletWithStore(store: Store<State>): MnemonicWallet {
+  return new MnemonicWallet({
+    id: WalletId.MNEMONIC,
+    metadata: {},
+    getAlgodClient: {} as any,
+    store,
+    subscribe: vi.fn()
+  })
+}
 
 describe('MnemonicWallet', () => {
   let wallet: MnemonicWallet
   let store: Store<State>
   let mockInitialState: State | null = null
 
-  const mockSubscribe: (callback: (state: State) => void) => () => void = vi.fn(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (callback: (state: State) => void) => {
-      return () => console.log('unsubscribe')
-    }
-  )
+  const account1 = {
+    name: 'Mnemonic Account',
+    address: TEST_ADDRESS
+  }
+
+  const setActiveNetwork = (networkId: NetworkId) => {
+    store.setState((state) => {
+      return {
+        ...state,
+        activeNetwork: networkId
+      }
+    })
+  }
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -47,6 +62,9 @@ describe('MnemonicWallet', () => {
       if (key === LOCAL_STORAGE_KEY && mockInitialState !== null) {
         return JSON.stringify(mockInitialState)
       }
+      if (key === LOCAL_STORAGE_MNEMONIC_KEY) {
+        return ACCOUNT_MNEMONIC
+      }
       return null
     })
 
@@ -57,13 +75,7 @@ describe('MnemonicWallet', () => {
     })
 
     store = new Store<State>(defaultState)
-    wallet = new MnemonicWallet({
-      id: WalletId.MNEMONIC,
-      metadata: {},
-      getAlgodClient: {} as any,
-      store,
-      subscribe: mockSubscribe
-    })
+    wallet = createWalletWithStore(store)
   })
 
   afterEach(async () => {
@@ -73,12 +85,7 @@ describe('MnemonicWallet', () => {
   })
 
   describe('connect', () => {
-    it('should initialize client, return account objects, and update store', async () => {
-      const account1 = {
-        name: 'Mnemonic Account',
-        address: TEST_ADDRESS
-      }
-
+    it('should initialize client, return account, and update store', async () => {
       const accounts = await wallet.connect()
 
       expect(wallet.isConnected).toBe(true)
@@ -88,15 +95,19 @@ describe('MnemonicWallet', () => {
         activeAccount: account1
       })
     })
+
+    it('should throw an error if active network is MainNet', async () => {
+      setActiveNetwork(NetworkId.MAINNET)
+
+      await expect(wallet.connect()).rejects.toThrow('MainNet active network detected. Aborting.')
+      expect(store.state.wallets[WalletId.MNEMONIC]).toBeUndefined()
+      expect(wallet.isConnected).toBe(false)
+    })
   })
 
   describe('disconnect', () => {
     it('should disconnect client and remove wallet from store', async () => {
       await wallet.connect()
-
-      expect(wallet.isConnected).toBe(true)
-      expect(store.state.wallets[WalletId.MNEMONIC]).toBeDefined()
-
       await wallet.disconnect()
       expect(wallet.isConnected).toBe(false)
       expect(store.state.wallets[WalletId.MNEMONIC]).toBeUndefined()
@@ -104,237 +115,162 @@ describe('MnemonicWallet', () => {
   })
 
   describe('resumeSession', () => {
-    describe('when the client is not initialized', () => {
-      it('should throw an error', async () => {
-        await expect(wallet.signTransactions([])).rejects.toThrowError(
-          '[MnemonicWallet] Client not initialized!'
+    it('should do nothing if no session is found', async () => {
+      await wallet.resumeSession()
+
+      expect(wallet.isConnected).toBe(false)
+    })
+
+    it('should disconnect if session is found', async () => {
+      store = new Store<State>({
+        ...defaultState,
+        wallets: {
+          [WalletId.MNEMONIC]: {
+            accounts: [account1],
+            activeAccount: account1
+          }
+        }
+      })
+
+      wallet = createWalletWithStore(store)
+
+      await wallet.resumeSession()
+
+      expect(wallet.isConnected).toBe(false)
+      expect(store.state.wallets[WalletId.MNEMONIC]).toBeUndefined()
+    })
+
+    it('should throw an error if active network is MainNet', async () => {
+      setActiveNetwork(NetworkId.MAINNET)
+
+      await expect(wallet.resumeSession()).rejects.toThrow(
+        'MainNet active network detected. Aborting.'
+      )
+      expect(store.state.wallets[WalletId.MNEMONIC]).toBeUndefined()
+      expect(wallet.isConnected).toBe(false)
+    })
+  })
+
+  describe('signing transactions', () => {
+    const txnParams = {
+      from: TEST_ADDRESS,
+      to: TEST_ADDRESS,
+      fee: 10,
+      firstRound: 51,
+      lastRound: 61,
+      genesisHash: 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=',
+      genesisID: 'mainnet-v1.0'
+    }
+
+    // Transactions used in tests
+    const txn1 = new algosdk.Transaction({ ...txnParams, amount: 1000 })
+    const txn2 = new algosdk.Transaction({ ...txnParams, amount: 2000 })
+    const txn3 = new algosdk.Transaction({ ...txnParams, amount: 3000 })
+    const txn4 = new algosdk.Transaction({ ...txnParams, amount: 4000 })
+
+    beforeEach(async () => {
+      await wallet.connect()
+    })
+
+    describe('signTransactions', () => {
+      const { sk } = algosdk.mnemonicToSecretKey(ACCOUNT_MNEMONIC)
+
+      it('should correctly process and sign a single algosdk.Transaction', async () => {
+        const result = await wallet.signTransactions([txn1])
+
+        expect(result).toEqual([txn1.signTxn(sk)])
+      })
+
+      it('should correctly process and sign a single algosdk.Transaction group', async () => {
+        const txnGroup = algosdk.assignGroupID([txn1, txn2, txn3])
+        const result = await wallet.signTransactions(txnGroup)
+
+        const expected = txnGroup.map((txn) => txn.signTxn(sk))
+        expect(result).toEqual(expected)
+      })
+
+      it('should process and sign multiple algosdk.Transaction groups', async () => {
+        const txnGroup1 = algosdk.assignGroupID([txn1, txn2])
+        const txnGroup2 = algosdk.assignGroupID([txn3, txn4])
+
+        const result = await wallet.signTransactions([txnGroup1, txnGroup2])
+
+        const expected = [...txnGroup1, ...txnGroup2].map((txn) => txn.signTxn(sk))
+        expect(result).toEqual(expected)
+      })
+
+      it('should process and sign a single encoded transaction', async () => {
+        const encodedTxn = txn1.toByte()
+        const result = await wallet.signTransactions([encodedTxn])
+
+        expect(result).toEqual([txn1.signTxn(sk)])
+      })
+
+      it('should process and sign a single encoded transaction group', async () => {
+        const txnGroup = algosdk.assignGroupID([txn1, txn2, txn3])
+        const encodedGroup = txnGroup.map((txn) => txn.toByte())
+
+        const result = await wallet.signTransactions(encodedGroup)
+
+        const expected = txnGroup.map((txn) => txn.signTxn(sk))
+        expect(result).toEqual(expected)
+      })
+
+      it('should process and sign multiple encoded transaction groups', async () => {
+        const txnGroup1 = algosdk.assignGroupID([txn1, txn2])
+        const encodedGroup1 = txnGroup1.map((txn) => txn.toByte())
+
+        const txnGroup2 = algosdk.assignGroupID([txn3, txn4])
+        const encodedGroup2 = txnGroup2.map((txn) => txn.toByte())
+
+        const result = await wallet.signTransactions([encodedGroup1, encodedGroup2])
+
+        const expected = [...txnGroup1, ...txnGroup2].map((txn) => txn.signTxn(sk))
+        expect(result).toEqual(expected)
+      })
+
+      it('should determine which transactions to sign based on indexesToSign', async () => {
+        const [gtxn1, gtxn2, gtxn3, gtxn4] = algosdk.assignGroupID([txn1, txn2, txn3, txn4])
+        const indexesToSign = [0, 1, 3]
+
+        const result = await wallet.signTransactions([gtxn1, gtxn2, gtxn3, gtxn4], indexesToSign)
+
+        const expected = [gtxn1, gtxn2, gtxn4].map((txn) => txn.signTxn(sk))
+        expect(result).toEqual(expected)
+      })
+
+      it('should throw an error if active network is MainNet', async () => {
+        setActiveNetwork(NetworkId.MAINNET)
+
+        await expect(wallet.signTransactions([])).rejects.toThrow(
+          'MainNet active network detected. Aborting.'
         )
+        expect(store.state.wallets[WalletId.MNEMONIC]).toBeUndefined()
+        expect(wallet.isConnected).toBe(false)
       })
     })
-  })
 
-  describe('signTransactions', () => {
-    const txn1 = new algosdk.Transaction({
-      fee: 10,
-      firstRound: 51,
-      lastRound: 61,
-      genesisHash: 'SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=',
-      genesisID: 'testnet-v1.0',
-      from: TEST_ADDRESS,
-      to: 'GD64YIY3TWGDMCNPP553DZPPR6LDUSFQOIJVFDPPXWEG3FVOJCCDBBHU5A',
-      amount: 1000,
-      flatFee: true
-    })
+    describe('transactionSigner', () => {
+      it('should call signTransactions with the correct arguments', async () => {
+        const txnGroup = algosdk.assignGroupID([txn1, txn2])
+        const indexesToSign = [1]
 
-    const txn2 = new algosdk.Transaction({
-      fee: 10,
-      firstRound: 51,
-      lastRound: 61,
-      genesisHash: 'SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=',
-      genesisID: 'testnet-v1.0',
-      from: TEST_ADDRESS,
-      to: 'EW64GC6F24M7NDSC5R3ES4YUVE3ZXXNMARJHDCCCLIHZU6TBEOC7XRSBG4',
-      amount: 2000,
-      flatFee: true
-    })
+        const signTransactionsSpy = vi.spyOn(wallet, 'signTransactions')
 
-    const txn3 = new algosdk.Transaction({
-      fee: 10,
-      firstRound: 51,
-      lastRound: 61,
-      genesisHash: 'SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=',
-      genesisID: 'testnet-v1.0',
-      from: TEST_ADDRESS,
-      to: 'EW64GC6F24M7NDSC5R3ES4YUVE3ZXXNMARJHDCCCLIHZU6TBEOC7XRSBG4',
-      amount: 3000,
-      flatFee: true
-    })
+        await wallet.transactionSigner(txnGroup, indexesToSign)
 
-    const txn4 = new algosdk.Transaction({
-      fee: 10,
-      firstRound: 51,
-      lastRound: 61,
-      genesisHash: 'SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=',
-      genesisID: 'testnet-v1.0',
-      from: TEST_ADDRESS,
-      to: 'EW64GC6F24M7NDSC5R3ES4YUVE3ZXXNMARJHDCCCLIHZU6TBEOC7XRSBG4',
-      amount: 4000,
-      flatFee: true
-    })
+        expect(signTransactionsSpy).toHaveBeenCalledWith(txnGroup, indexesToSign)
+      })
 
-    const { sk } = algosdk.mnemonicToSecretKey(ACCOUNT_MNEMONIC)
+      it('should throw an error if active network is MainNet', async () => {
+        setActiveNetwork(NetworkId.MAINNET)
 
-    it('should correctly process and sign a single algosdk.Transaction', async () => {
-      await wallet.connect()
-
-      const signedTxnResult = await wallet.signTransactions([txn1])
-
-      const expectedSignedTxn = txn1.signTxn(sk)
-
-      expect(signedTxnResult).toEqual([expectedSignedTxn])
-    })
-
-    it('should correctly process and sign a single algosdk.Transaction group', async () => {
-      algosdk.assignGroupID([txn1, txn2])
-
-      await wallet.connect()
-
-      const signedTxnResult = await wallet.signTransactions([txn1, txn2])
-
-      const expectedTxnGroup = [txn1, txn2].map((txn) => txn.signTxn(sk))
-
-      expect(signedTxnResult).toEqual(expectedTxnGroup)
-    })
-
-    it('should determine which transactions to sign based on indexesToSign', async () => {
-      await wallet.connect()
-
-      const signedTxnResult = await wallet.signTransactions([txn1, txn2, txn3, txn4], [0, 2])
-
-      const expectedSignedTxn1 = txn1.signTxn(sk)
-
-      const expectedSignedTxn3 = txn3.signTxn(sk)
-
-      const expectedTxnGroup = [
-        expectedSignedTxn1,
-        algosdk.encodeUnsignedTransaction(txn2),
-        expectedSignedTxn3,
-        algosdk.encodeUnsignedTransaction(txn4)
-      ]
-
-      expect(signedTxnResult).toEqual(expectedTxnGroup)
-    })
-
-    it('should determine which transactions to sign based on indexesToSign and return only signed transactions', async () => {
-      await wallet.connect()
-
-      const signedTxnResult = await wallet.signTransactions([txn1, txn2, txn3, txn4], [0, 2], false)
-
-      const expectedSignedTxn1 = txn1.signTxn(sk)
-
-      const expectedSignedTxn3 = txn3.signTxn(sk)
-
-      const expectedTxnGroup = [expectedSignedTxn1, expectedSignedTxn3]
-
-      expect(signedTxnResult).toEqual(expectedTxnGroup)
-    })
-
-    it('should correctly process and sign a single encoded algosdk.Transaction', async () => {
-      await wallet.connect()
-
-      const encodedTxn1 = algosdk.encodeUnsignedTransaction(txn1)
-
-      const signedTxnResult = await wallet.signTransactions([encodedTxn1])
-
-      const expectedSignedTxn = txn1.signTxn(sk)
-
-      expect(signedTxnResult).toEqual([expectedSignedTxn])
-    })
-
-    it('should correctly process and sign a single encoded algosdk.Transaction group', async () => {
-      await wallet.connect()
-
-      const encodedTxn1 = algosdk.encodeUnsignedTransaction(txn1)
-      const encodedTxn2 = algosdk.encodeUnsignedTransaction(txn2)
-
-      const signedTxnResult = await wallet.signTransactions([encodedTxn1, encodedTxn2])
-
-      const exceptedSignedTxnGroup = [txn1.signTxn(sk), txn2.signTxn(sk)]
-
-      expect(signedTxnResult).toEqual(exceptedSignedTxnGroup)
-    })
-  })
-
-  describe('transactionSigner', () => {
-    const txn1 = new algosdk.Transaction({
-      fee: 10,
-      firstRound: 51,
-      lastRound: 61,
-      genesisHash: 'SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=',
-      genesisID: 'testnet-v1.0',
-      from: TEST_ADDRESS,
-      to: 'GD64YIY3TWGDMCNPP553DZPPR6LDUSFQOIJVFDPPXWEG3FVOJCCDBBHU5A',
-      amount: 1000,
-      flatFee: true
-    })
-
-    const txn2 = new algosdk.Transaction({
-      fee: 10,
-      firstRound: 51,
-      lastRound: 61,
-      genesisHash: 'SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=',
-      genesisID: 'testnet-v1.0',
-      from: TEST_ADDRESS,
-      to: 'EW64GC6F24M7NDSC5R3ES4YUVE3ZXXNMARJHDCCCLIHZU6TBEOC7XRSBG4',
-      amount: 2000,
-      flatFee: true
-    })
-
-    const txn3 = new algosdk.Transaction({
-      fee: 10,
-      firstRound: 51,
-      lastRound: 61,
-      genesisHash: 'SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=',
-      genesisID: 'testnet-v1.0',
-      from: TEST_ADDRESS,
-      to: 'EW64GC6F24M7NDSC5R3ES4YUVE3ZXXNMARJHDCCCLIHZU6TBEOC7XRSBG4',
-      amount: 3000,
-      flatFee: true
-    })
-
-    const txn4 = new algosdk.Transaction({
-      fee: 10,
-      firstRound: 51,
-      lastRound: 61,
-      genesisHash: 'SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=',
-      genesisID: 'testnet-v1.0',
-      from: TEST_ADDRESS,
-      to: 'EW64GC6F24M7NDSC5R3ES4YUVE3ZXXNMARJHDCCCLIHZU6TBEOC7XRSBG4',
-      amount: 4000,
-      flatFee: true
-    })
-
-    const { sk } = algosdk.mnemonicToSecretKey(ACCOUNT_MNEMONIC)
-
-    it('should correctly process and sign a single algosdk.Transaction', async () => {
-      await wallet.connect()
-
-      const signedTxnResult = await wallet.transactionSigner([txn1], [0])
-
-      const expectedSignedTxn = txn1.signTxn(sk)
-
-      expect(signedTxnResult).toEqual([expectedSignedTxn])
-    })
-
-    it('should correctly process and sign a single algosdk.Transaction group', async () => {
-      algosdk.assignGroupID([txn1, txn2])
-
-      await wallet.connect()
-
-      const signedTxnResult = await wallet.signTransactions([txn1, txn2], [0, 1])
-
-      const expectedTxnGroup = [txn1, txn2].map((txn) => txn.signTxn(sk))
-
-      expect(signedTxnResult).toEqual(expectedTxnGroup)
-    })
-
-    it('should determine which transactions to sign based on indexesToSign', async () => {
-      await wallet.connect()
-
-      const signedTxnResult = await wallet.signTransactions([txn1, txn2, txn3, txn4], [0, 2])
-
-      const expectedSignedTxn1 = txn1.signTxn(sk)
-
-      const expectedSignedTxn3 = txn3.signTxn(sk)
-
-      const expectedTxnGroup = [
-        expectedSignedTxn1,
-        algosdk.encodeUnsignedTransaction(txn2),
-        expectedSignedTxn3,
-        algosdk.encodeUnsignedTransaction(txn4)
-      ]
-
-      expect(signedTxnResult).toEqual(expectedTxnGroup)
+        await expect(wallet.transactionSigner([], [])).rejects.toThrow(
+          'MainNet active network detected. Aborting.'
+        )
+        expect(store.state.wallets[WalletId.MNEMONIC]).toBeUndefined()
+        expect(wallet.isConnected).toBe(false)
+      })
     })
   })
 })

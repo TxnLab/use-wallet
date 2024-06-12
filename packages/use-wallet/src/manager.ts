@@ -257,7 +257,7 @@ export class WalletManager {
 
   // ---------- Sign Transactions ------------------------------------- //
 
-  public get signTransactions() {
+  public get signTransactions(): BaseWallet['signTransactions'] {
     if (!this.activeWallet) {
       throw new Error('[Manager] No active wallet found!')
     }
@@ -269,7 +269,7 @@ export class WalletManager {
    * specific to each wallet, but the function will always return a promise that resolves to an
    * array of encoded signed transactions matching the length of the indexesToSign array.
    *
-   * @see https://github.com/algorand/js-algorand-sdk/blob/v2.6.0/src/signer.ts#L7-L18
+   * @see https://github.com/algorand/js-algorand-sdk/blob/v2.8.0/src/signer.ts#L7-L18
    *
    * @param txnGroup - The atomic group containing transactions to be signed
    * @param indexesToSign - An array of indexes in the atomic transaction group that should be signed

@@ -1,16 +1,20 @@
 import algosdk from 'algosdk'
-import { addWallet, type State } from 'src/store'
+import { WalletState, addWallet, type State } from 'src/store'
 import {
   base64ToByteArray,
   byteArrayToBase64,
-  isSignedTxnObject,
-  mergeSignedTxnsWithGroup,
-  normalizeTxnGroup,
-  shouldSignTxnObject
+  flattenTxnGroup,
+  isSignedTxn,
+  isTransactionArray
 } from 'src/utils'
-import { BaseWallet } from './base'
+import { BaseWallet } from 'src/wallets/base'
 import type { Store } from '@tanstack/store'
-import type { WalletAccount, WalletConstructor, WalletId, WalletTransaction } from './types'
+import type {
+  WalletAccount,
+  WalletConstructor,
+  WalletId,
+  WalletTransaction
+} from 'src/wallets/types'
 
 /** @see https://docs.exodus.com/api-reference/algorand-provider-arc-api/ */
 
@@ -47,8 +51,32 @@ export interface Exodus {
 
 export type WindowExtended = { algorand: Exodus } & Window & typeof globalThis
 
-const icon =
-  'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDI2LjUuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IgoJIHZpZXdCb3g9IjAgMCAzMDAgMzAwIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCAzMDAgMzAwOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+CjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+Cgkuc3Qwe2ZpbGw6dXJsKCNTVkdJRF8xXyk7fQoJLnN0MXtmaWxsOnVybCgjU1ZHSURfMDAwMDAwNDM0MjYxNjcxNDAxMDY1ODIyNzAwMDAwMDIxMzA3Njg5MDYwNzMxMTM0ODRfKTt9Cgkuc3Qye2ZpbGw6dXJsKCNTVkdJRF8wMDAwMDEwMjUxOTMxNjAxNTI3NjU4MTY0MDAwMDAxNjI3NDExMjM4MzE3NTY0MTc1OV8pO2ZpbHRlcjp1cmwoI0Fkb2JlX09wYWNpdHlNYXNrRmlsdGVyKTt9Cgkuc3Qze2ZpbGw6dXJsKCNTVkdJRF8wMDAwMDEzODU2MzM4MjQ2MjA4NjAyMDM1MDAwMDAxNDg3ODQ5MDI3MDc4MjA3MTIwN18pO30KCS5zdDR7bWFzazp1cmwoI21hc2swXzE2NjFfMjk1XzAwMDAwMDg4MTMyMjUxNTk3NDQxNTczNDkwMDAwMDExNjkzNjEyMDE4NTA2NjgxNDgxXyk7fQoJLnN0NXtmaWxsOnVybCgjU1ZHSURfMDAwMDAxMDYxMjA2MzI0NjE3OTI4NzExNjAwMDAwMDc0MzM5MTMwMzgzMzc3NjY1NzZfKTt9Cjwvc3R5bGU+CjxnPgoJCgkJPGxpbmVhckdyYWRpZW50IGlkPSJTVkdJRF8xXyIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIHgxPSIyNDYuNjAzIiB5MT0iOS4yMjEyIiB4Mj0iMTc0LjE1OCIgeTI9IjMwOC41NDI2IiBncmFkaWVudFRyYW5zZm9ybT0ibWF0cml4KDEgMCAwIC0xIDAgMzAyKSI+CgkJPHN0b3AgIG9mZnNldD0iMCIgc3R5bGU9InN0b3AtY29sb3I6IzBCNDZGOSIvPgoJCTxzdG9wICBvZmZzZXQ9IjEiIHN0eWxlPSJzdG9wLWNvbG9yOiNCQkZCRTAiLz4KCTwvbGluZWFyR3JhZGllbnQ+Cgk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjc0LjcsOTMuOUwxNjYuNiwyM3YzOS42bDY5LjQsNDUuMWwtOC4yLDI1LjhoLTYxLjJ2MzIuOWg2MS4ybDguMiwyNS44bC02OS40LDQ1LjFWMjc3bDEwOC4yLTcwLjdMMjU3LDE1MC4xCgkJTDI3NC43LDkzLjl6Ii8+CgkKCQk8bGluZWFyR3JhZGllbnQgaWQ9IlNWR0lEXzAwMDAwMDE4MjI4MjM3MTUxMjM5MTUxMzIwMDAwMDE3ODM4NjY0MjU5NzY2MjczOTI1XyIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIHgxPSIxMjkuMzUxNiIgeTE9Ii0xOS4xNTczIiB4Mj0iNTYuOTA2NiIgeTI9IjI4MC4xNjQxIiBncmFkaWVudFRyYW5zZm9ybT0ibWF0cml4KDEgMCAwIC0xIDAgMzAyKSI+CgkJPHN0b3AgIG9mZnNldD0iMCIgc3R5bGU9InN0b3AtY29sb3I6IzBCNDZGOSIvPgoJCTxzdG9wICBvZmZzZXQ9IjEiIHN0eWxlPSJzdG9wLWNvbG9yOiNCQkZCRTAiLz4KCTwvbGluZWFyR3JhZGllbnQ+Cgk8cGF0aCBzdHlsZT0iZmlsbDp1cmwoI1NWR0lEXzAwMDAwMDE4MjI4MjM3MTUxMjM5MTUxMzIwMDAwMDE3ODM4NjY0MjU5NzY2MjczOTI1Xyk7IiBkPSJNNzIuNSwxNjYuNGg2MXYtMzIuOUg3Mi4ybC03LjktMjUuOAoJCWw2OS4yLTQ1LjFWMjNMMjUuMyw5My45TDQzLDE1MC4xbC0xNy43LDU2LjJMMTMzLjcsMjc3di0zOS42bC02OS40LTQ1LjFMNzIuNSwxNjYuNHoiLz4KCTxkZWZzPgoJCTxmaWx0ZXIgaWQ9IkFkb2JlX09wYWNpdHlNYXNrRmlsdGVyIiBmaWx0ZXJVbml0cz0idXNlclNwYWNlT25Vc2UiIHg9IjI1LjQiIHk9IjIzIiB3aWR0aD0iMjQ3LjYiIGhlaWdodD0iMjU0Ij4KCQkJPGZlQ29sb3JNYXRyaXggIHR5cGU9Im1hdHJpeCIgdmFsdWVzPSIxIDAgMCAwIDAgIDAgMSAwIDAgMCAgMCAwIDEgMCAwICAwIDAgMCAxIDAiLz4KCQk8L2ZpbHRlcj4KCTwvZGVmcz4KCQoJCTxtYXNrIG1hc2tVbml0cz0idXNlclNwYWNlT25Vc2UiIHg9IjI1LjQiIHk9IjIzIiB3aWR0aD0iMjQ3LjYiIGhlaWdodD0iMjU0IiBpZD0ibWFzazBfMTY2MV8yOTVfMDAwMDAwODgxMzIyNTE1OTc0NDE1NzM0OTAwMDAwMTE2OTM2MTIwMTg1MDY2ODE0ODFfIj4KCQkKCQkJPGxpbmVhckdyYWRpZW50IGlkPSJTVkdJRF8wMDAwMDE2NTkyOTcyNDMwMzE2NDIwMzAwMDAwMDAwNzEwMTkwNDk4NDUxOTkxNTE2Ml8iIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiB4MT0iMjQ2LjYwMzgiIHkxPSI5LjIyMTQiIHgyPSIxNzQuMTU4OCIgeTI9IjMwOC41NDI4IiBncmFkaWVudFRyYW5zZm9ybT0ibWF0cml4KDEgMCAwIC0xIDAgMzAyKSI+CgkJCTxzdG9wICBvZmZzZXQ9IjAiIHN0eWxlPSJzdG9wLWNvbG9yOiMwQjQ2RjkiLz4KCQkJPHN0b3AgIG9mZnNldD0iMSIgc3R5bGU9InN0b3AtY29sb3I6I0JCRkJFMCIvPgoJCTwvbGluZWFyR3JhZGllbnQ+CgkJPHBhdGggc3R5bGU9ImZpbGw6dXJsKCNTVkdJRF8wMDAwMDE2NTkyOTcyNDMwMzE2NDIwMzAwMDAwMDAwNzEwMTkwNDk4NDUxOTkxNTE2Ml8pO2ZpbHRlcjp1cmwoI0Fkb2JlX09wYWNpdHlNYXNrRmlsdGVyKTsiIGQ9IgoJCQlNMjc0LjcsOTMuOUwxNjYuNiwyM3YzOS42bDY5LjQsNDUuMWwtOC4yLDI1LjhoLTYxLjJ2MzIuOWg2MS4ybDguMiwyNS44bC02OS40LDQ1LjFWMjc3bDEwOC4yLTcwLjdMMjU3LDE1MC4xTDI3NC43LDkzLjl6Ii8+CgkJCgkJCTxsaW5lYXJHcmFkaWVudCBpZD0iU1ZHSURfMDAwMDAxMTk4MTE3MDc2MjE0NzI4MTQyNzAwMDAwMTA4Mjk2NTkzODM4NTEyMDI0OTFfIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjEyOS4zNTIxIiB5MT0iLTE5LjE1NzEiIHgyPSI1Ni45MDcxIiB5Mj0iMjgwLjE2NDIiIGdyYWRpZW50VHJhbnNmb3JtPSJtYXRyaXgoMSAwIDAgLTEgMCAzMDIpIj4KCQkJPHN0b3AgIG9mZnNldD0iMCIgc3R5bGU9InN0b3AtY29sb3I6IzBCNDZGOSIvPgoJCQk8c3RvcCAgb2Zmc2V0PSIxIiBzdHlsZT0ic3RvcC1jb2xvcjojQkJGQkUwIi8+CgkJPC9saW5lYXJHcmFkaWVudD4KCQk8cGF0aCBzdHlsZT0iZmlsbDp1cmwoI1NWR0lEXzAwMDAwMTE5ODExNzA3NjIxNDcyODE0MjcwMDAwMDEwODI5NjU5MzgzODUxMjAyNDkxXyk7IiBkPSJNNzIuNSwxNjYuNGg2MXYtMzIuOUg3Mi4ybC03LjktMjUuOAoJCQlsNjkuMi00NS4xVjIzTDI1LjMsOTMuOUw0MywxNTAuMWwtMTcuNyw1Ni4yTDEzMy43LDI3N3YtMzkuNmwtNjkuNC00NS4xTDcyLjUsMTY2LjR6Ii8+Cgk8L21hc2s+Cgk8ZyBjbGFzcz0ic3Q0Ij4KCQkKCQkJPGxpbmVhckdyYWRpZW50IGlkPSJTVkdJRF8wMDAwMDEwOTAxOTkxODU1Nzc3MzA1MzQyMDAwMDAxNzYwMjQwNTkwODA2NzEyMDMwMF8iIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiB4MT0iNDYuNDY2MiIgeTE9IjIyOC43NTU0IiB4Mj0iMTcxLjg2MzgiIHkyPSIxMzUuMTAzOSIgZ3JhZGllbnRUcmFuc2Zvcm09Im1hdHJpeCgxIDAgMCAtMSAwIDMwMikiPgoJCQk8c3RvcCAgb2Zmc2V0PSIwLjExOTgiIHN0eWxlPSJzdG9wLWNvbG9yOiM4OTUyRkY7c3RvcC1vcGFjaXR5OjAuODciLz4KCQkJPHN0b3AgIG9mZnNldD0iMSIgc3R5bGU9InN0b3AtY29sb3I6I0RBQkRGRjtzdG9wLW9wYWNpdHk6MCIvPgoJCTwvbGluZWFyR3JhZGllbnQ+CgkJCgkJCTxyZWN0IHg9IjI1LjQiIHk9IjIzIiBzdHlsZT0iZmlsbDp1cmwoI1NWR0lEXzAwMDAwMTA5MDE5OTE4NTU3NzczMDUzNDIwMDAwMDE3NjAyNDA1OTA4MDY3MTIwMzAwXyk7IiB3aWR0aD0iMjQ3LjYiIGhlaWdodD0iMjU0Ii8+Cgk8L2c+CjwvZz4KPC9zdmc+Cg=='
+const ICON = `data:image/svg+xml;base64,${btoa(`
+<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+  <linearGradient id="grad1" gradientUnits="userSpaceOnUse" x1="246.603" y1="9.2212" x2="174.158" y2="308.5426" gradientTransform="matrix(1 0 0 -1 0 302)">
+    <stop offset="0" stop-color="#0B46F9" />
+    <stop offset="1" stop-color="#BBFBE0" />
+  </linearGradient>
+  <path fill="url(#grad1)" d="M274.7,93.9L166.6,23v39.6l69.4,45.1l-8.2,25.8h-61.2v32.9h61.2l8.2,25.8l-69.4,45.1V277l108.2-70.7L257,150.1L274.7,93.9z" />
+  
+  <linearGradient id="grad2" gradientUnits="userSpaceOnUse" x1="129.3516" y1="-19.1573" x2="56.9066" y2="280.1641" gradientTransform="matrix(1 0 0 -1 0 302)">
+    <stop offset="0" stop-color="#0B46F9" />
+    <stop offset="1" stop-color="#BBFBE0" />
+  </linearGradient>
+  <path fill="url(#grad2)" d="M72.5,166.4h61v-32.9H72.2l-7.9-25.8l69.2-45.1V23L25.3,93.9L43,150.1l-17.7,56.2L133.7,277v-39.6l-69.4-45.1L72.5,166.4z" />
+  
+  <mask id="mask1" maskUnits="userSpaceOnUse" x="25.4" y="23" width="247.6" height="254">
+    <path fill="url(#grad1)" d="M274.7,93.9L166.6,23v39.6l69.4,45.1l-8.2,25.8h-61.2v32.9h61.2l8.2,25.8l-69.4,45.1V277l108.2-70.7L257,150.1L274.7,93.9z" />
+    <path fill="url(#grad2)" d="M72.5,166.4h61v-32.9H72.2l-7.9-25.8l69.2-45.1V23L25.3,93.9L43,150.1l-17.7,56.2L133.7,277v-39.6l-69.4-45.1L72.5,166.4z" />
+  </mask>
+  
+  <linearGradient id="grad3" gradientUnits="userSpaceOnUse" x1="46.4662" y1="228.7554" x2="171.8638" y2="135.1039" gradientTransform="matrix(1 0 0 -1 0 302)">
+    <stop offset="0.1198" stop-color="#8952FF" stop-opacity="0.87" />
+    <stop offset="1" stop-color="#DABDFF" stop-opacity="0" />
+  </linearGradient>
+  <rect x="25.4" y="23" width="247.6" height="254" fill="url(#grad3)" mask="url(#mask1)" />
+</svg>
+`)}`
 
 export class ExodusWallet extends BaseWallet {
   private client: Exodus | null = null
@@ -69,10 +97,13 @@ export class ExodusWallet extends BaseWallet {
     this.store = store
   }
 
-  static defaultMetadata = { name: 'Exodus', icon }
+  static defaultMetadata = {
+    name: 'Exodus',
+    icon: ICON
+  }
 
   private async initializeClient(): Promise<Exodus> {
-    console.info('[ExodusWallet] Initializing client...')
+    console.info(`[${this.metadata.name}] Initializing client...`)
     if (typeof window === 'undefined' || (window as WindowExtended).algorand === undefined) {
       throw new Error('Exodus is not available.')
     }
@@ -82,44 +113,38 @@ export class ExodusWallet extends BaseWallet {
   }
 
   public connect = async (): Promise<WalletAccount[]> => {
-    console.info('[ExodusWallet] Connecting...')
-    try {
-      const client = this.client || (await this.initializeClient())
-      const { accounts } = await client.enable(this.options)
+    console.info(`[${this.metadata.name}] Connecting...`)
+    const client = this.client || (await this.initializeClient())
+    const { accounts } = await client.enable(this.options)
 
-      if (accounts.length === 0) {
-        throw new Error('No accounts found!')
-      }
-
-      const walletAccounts = accounts.map((address: string, idx: number) => ({
-        name: `Exodus Wallet ${idx + 1}`,
-        address
-      }))
-
-      const activeAccount = walletAccounts[0]
-
-      addWallet(this.store, {
-        walletId: this.id,
-        wallet: {
-          accounts: walletAccounts,
-          activeAccount
-        }
-      })
-
-      return walletAccounts
-    } catch (error: any) {
-      if (error.name === 'UserRejectedRequestError') {
-        console.info('[ExodusWallet] Connection cancelled.')
-      } else {
-        console.error(`[ExodusWallet] Error connecting: ${error.message}`)
-      }
-      return []
+    if (accounts.length === 0) {
+      throw new Error('No accounts found!')
     }
+
+    const walletAccounts = accounts.map((address: string, idx: number) => ({
+      name: `${this.metadata.name} Account ${idx + 1}`,
+      address
+    }))
+
+    const activeAccount = walletAccounts[0]
+
+    const walletState: WalletState = {
+      accounts: walletAccounts,
+      activeAccount
+    }
+
+    addWallet(this.store, {
+      walletId: this.id,
+      wallet: walletState
+    })
+
+    console.info(`[${this.metadata.name}] ✅ Connected.`, walletState)
+    return walletAccounts
   }
 
   public disconnect = async (): Promise<void> => {
-    console.info('[ExodusWallet] Disconnecting...')
     this.onDisconnect()
+    console.info(`[${this.metadata.name}] Disconnected.`)
   }
 
   public resumeSession = async (): Promise<void> => {
@@ -127,104 +152,116 @@ export class ExodusWallet extends BaseWallet {
       const state = this.store.state
       const walletState = state.wallets[this.id]
 
+      // No session to resume
       if (!walletState) {
-        // No persisted state, abort
         return
       }
 
-      console.info('[ExodusWallet] Resuming session...')
+      console.info(`[${this.metadata.name}] Resuming session...`)
       const client = await this.initializeClient()
 
       if (!client.isConnected) {
         throw new Error('Exodus is not connected.')
       }
     } catch (error: any) {
-      console.error(`[ExodusWallet] Error resuming session: ${error.message}`)
+      console.error(`[${this.metadata.name}] Error resuming session: ${error.message}`)
       this.onDisconnect()
+      throw error
     }
   }
 
-  public signTransactions = async (
-    txnGroup: algosdk.Transaction[] | algosdk.Transaction[][] | Uint8Array[] | Uint8Array[][],
-    indexesToSign?: number[],
-    returnGroup = true
-  ): Promise<Uint8Array[]> => {
-    if (!this.client) {
-      throw new Error('[ExodusWallet] Client not initialized!')
-    }
+  private processTxns(
+    txnGroup: algosdk.Transaction[],
+    indexesToSign?: number[]
+  ): WalletTransaction[] {
     const txnsToSign: WalletTransaction[] = []
-    const signedIndexes: number[] = []
 
-    const msgpackTxnGroup: Uint8Array[] = normalizeTxnGroup(txnGroup)
+    txnGroup.forEach((txn, index) => {
+      const isIndexMatch = !indexesToSign || indexesToSign.includes(index)
+      const signer = algosdk.encodeAddress(txn.from.publicKey)
+      const canSignTxn = this.addresses.includes(signer)
 
-    // Decode transactions to access properties
-    const decodedObjects = msgpackTxnGroup.map((txn) => {
-      return algosdk.decodeObj(txn)
-    }) as Array<algosdk.EncodedTransaction | algosdk.EncodedSignedTransaction>
+      const txnString = byteArrayToBase64(txn.toByte())
 
-    // Marshal transactions into `WalletTransaction[]`
-    decodedObjects.forEach((txnObject, idx) => {
-      const isSigned = isSignedTxnObject(txnObject)
-      const shouldSign = shouldSignTxnObject(txnObject, this.addresses, indexesToSign, idx)
+      if (isIndexMatch && canSignTxn) {
+        txnsToSign.push({ txn: txnString })
+      } else {
+        txnsToSign.push({ txn: txnString, signers: [] })
+      }
+    })
 
-      const txnBuffer: Uint8Array = msgpackTxnGroup[idx]
+    return txnsToSign
+  }
+
+  private processEncodedTxns(
+    txnGroup: Uint8Array[],
+    indexesToSign?: number[]
+  ): WalletTransaction[] {
+    const txnsToSign: WalletTransaction[] = []
+
+    txnGroup.forEach((txnBuffer, index) => {
+      const txnDecodeObj = algosdk.decodeObj(txnBuffer) as
+        | algosdk.EncodedTransaction
+        | algosdk.EncodedSignedTransaction
+
+      const isSigned = isSignedTxn(txnDecodeObj)
+
       const txn: algosdk.Transaction = isSigned
         ? algosdk.decodeSignedTransaction(txnBuffer).txn
         : algosdk.decodeUnsignedTransaction(txnBuffer)
 
-      const txnBase64 = byteArrayToBase64(txn.toByte())
+      const isIndexMatch = !indexesToSign || indexesToSign.includes(index)
+      const signer = algosdk.encodeAddress(txn.from.publicKey)
+      const canSignTxn = !isSigned && this.addresses.includes(signer)
 
-      if (shouldSign) {
-        txnsToSign.push({ txn: txnBase64 })
-        signedIndexes.push(idx)
+      const txnString = byteArrayToBase64(txn.toByte())
+
+      if (isIndexMatch && canSignTxn) {
+        txnsToSign.push({ txn: txnString })
       } else {
-        txnsToSign.push({ txn: txnBase64, signers: [] })
+        txnsToSign.push({ txn: txnString, signers: [] })
       }
     })
 
+    return txnsToSign
+  }
+
+  public signTransactions = async <T extends algosdk.Transaction[] | Uint8Array[]>(
+    txnGroup: T | T[],
+    indexesToSign?: number[]
+  ): Promise<Uint8Array[]> => {
+    let txnsToSign: WalletTransaction[] = []
+
+    // Determine type and process transactions for signing
+    if (isTransactionArray(txnGroup)) {
+      const flatTxns: algosdk.Transaction[] = flattenTxnGroup(txnGroup)
+      txnsToSign = this.processTxns(flatTxns, indexesToSign)
+    } else {
+      const flatTxns: Uint8Array[] = flattenTxnGroup(txnGroup as Uint8Array[])
+      txnsToSign = this.processEncodedTxns(flatTxns, indexesToSign)
+    }
+
+    const client = this.client || (await this.initializeClient())
+
     // Sign transactions
-    const signTxnsResult = await this.client.signTxns(txnsToSign)
+    const signTxnsResult = await client.signTxns(txnsToSign)
 
-    // Filter out null results
-    const signedTxnsBase64 = signTxnsResult.filter(Boolean) as string[]
+    // Filter out null values and convert to Uint8Array[]
+    const signedTxns = signTxnsResult.reduce<Uint8Array[]>((acc, value) => {
+      if (value !== null) {
+        const signedTxn = base64ToByteArray(value)
+        acc.push(signedTxn)
+      }
+      return acc
+    }, [])
 
-    // Convert base64 signed transactions to msgpack
-    const signedTxns = signedTxnsBase64.map((txn) => base64ToByteArray(txn))
-
-    // Merge signed transactions back into original group
-    const txnGroupSigned = mergeSignedTxnsWithGroup(
-      signedTxns,
-      msgpackTxnGroup,
-      signedIndexes,
-      returnGroup
-    )
-
-    return txnGroupSigned
+    return signedTxns
   }
 
   public transactionSigner = async (
     txnGroup: algosdk.Transaction[],
     indexesToSign: number[]
   ): Promise<Uint8Array[]> => {
-    if (!this.client) {
-      throw new Error('[ExodusWallet] Client not initialized!')
-    }
-
-    const txnsToSign = txnGroup.reduce<WalletTransaction[]>((acc, txn, idx) => {
-      const txnBase64 = byteArrayToBase64(txn.toByte())
-
-      if (indexesToSign.includes(idx)) {
-        acc.push({ txn: txnBase64 })
-      } else {
-        acc.push({ txn: txnBase64, signers: [] })
-      }
-      return acc
-    }, [])
-
-    const signTxnsResult = await this.client.signTxns(txnsToSign)
-    const signedTxnsBase64 = signTxnsResult.filter(Boolean) as string[]
-
-    const signedTxns = signedTxnsBase64.map((txn) => base64ToByteArray(txn))
-    return signedTxns
+    return this.signTransactions(txnGroup, indexesToSign)
   }
 }

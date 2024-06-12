@@ -9,12 +9,11 @@ import {
 } from '@agoralabs-sh/avm-web-provider'
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
-import * as msgpack from 'algo-msgpack-with-bigint'
 import { StorageAdapter } from 'src/storage'
 import { defaultState, LOCAL_STORAGE_KEY, State } from 'src/store'
 import { WalletId } from 'src/wallets'
 import { KibisisWallet, KIBISIS_AVM_WEB_PROVIDER_ID } from 'src/wallets/kibisis'
-import { expect } from 'vitest'
+import { base64ToByteArray, byteArrayToBase64 } from 'src/utils'
 
 // Mock storage adapter
 vi.mock('src/storage', () => ({
@@ -25,10 +24,9 @@ vi.mock('src/storage', () => ({
 }))
 
 // Spy/suppress console output
-vi.spyOn(console, 'info').mockImplementation(() => {})
+vi.spyOn(console, 'info').mockImplementation(() => {}) // @todo: remove when debug logger is implemented
 vi.spyOn(console, 'warn').mockImplementation(() => {})
 vi.spyOn(console, 'error').mockImplementation(() => {})
-vi.spyOn(console, 'groupCollapsed').mockImplementation(() => {})
 
 // Constants
 const TESTNET_GENESIS_HASH = 'SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI='
@@ -52,9 +50,7 @@ function createWalletWithStore(store: Store<State>): KibisisWallet {
         })
       }) as any,
     store,
-    subscribe: vi.fn(() => {
-      return () => console.log('unsubscribe')
-    })
+    subscribe: vi.fn()
   })
 }
 
@@ -70,17 +66,18 @@ function mockSignTransactionsResponseOnce(stxns: (string | null)[]): void {
 }
 
 describe('KibisisWallet', () => {
-  const account1 = {
-    name: 'Kibisis Wallet 1',
-    address: ACCOUNT_1
-  }
-  const account2 = {
-    name: 'Kibisis Wallet 2',
-    address: ACCOUNT_2
-  }
   let wallet: KibisisWallet
   let store: Store<State>
   let mockInitialState: State | null = null
+
+  const account1 = {
+    name: 'Kibisis Account 1',
+    address: ACCOUNT_1
+  }
+  const account2 = {
+    name: 'Kibisis Account 2',
+    address: ACCOUNT_2
+  }
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -127,7 +124,7 @@ describe('KibisisWallet', () => {
   })
 
   describe('connect', () => {
-    it('should initialize client, return account objects, and update store', async () => {
+    it('should initialize client, return accounts, and update store', async () => {
       // Connect wallet
       const accounts = await wallet.connect()
 
@@ -156,18 +153,15 @@ describe('KibisisWallet', () => {
         .mockImplementationOnce(() => Promise.reject(error))
 
       // Connect wallet (should fail)
-      const accounts = await wallet.connect()
+      await expect(wallet.connect()).rejects.toThrow(`user dismissed action`)
 
       // Wallet is not connected
       expect(wallet.isConnected).toBe(false)
 
       // Error message logged
       expect(console.error).toHaveBeenCalledWith(
-        `[${KibisisWallet.defaultMetadata.name}] error connecting: ${error.message} (code: ${error.code})`
+        `[${KibisisWallet.defaultMetadata.name}] Error connecting: ${error.message} (code: ${error.code})`
       )
-
-      // No accounts returned
-      expect(accounts).toEqual([])
 
       // Store not updated
       expect(store.state.wallets[WalletId.KIBISIS]).toBeUndefined()
@@ -191,6 +185,12 @@ describe('KibisisWallet', () => {
   })
 
   describe('resumeSession', () => {
+    it('should do nothing if no session is found', async () => {
+      await wallet.resumeSession()
+
+      expect(wallet.isConnected).toBe(false)
+    })
+
     it(`should call the client's _enable method if Kibisis wallet data is found in the store`, async () => {
       store = new Store<State>({
         ...defaultState,
@@ -257,8 +257,10 @@ describe('KibisisWallet', () => {
     })
   })
 
-  describe('signTransactions', () => {
+  describe('signing transactions', () => {
     const txnParams = {
+      from: ACCOUNT_1,
+      to: ACCOUNT_2,
       fee: 10,
       firstRound: 51,
       lastRound: 61,
@@ -267,40 +269,13 @@ describe('KibisisWallet', () => {
     }
 
     // Transactions used in tests
-    const txn1 = new algosdk.Transaction({
-      ...txnParams,
-      from: ACCOUNT_1,
-      to: ACCOUNT_1,
-      amount: 1000
-    })
-    const txn2 = new algosdk.Transaction({
-      ...txnParams,
-      from: ACCOUNT_1,
-      to: ACCOUNT_1,
-      amount: 2000
-    })
+    const txn1 = new algosdk.Transaction({ ...txnParams, amount: 1000 })
+    const txn2 = new algosdk.Transaction({ ...txnParams, amount: 2000 })
+    const txn3 = new algosdk.Transaction({ ...txnParams, amount: 3000 })
+    const txn4 = new algosdk.Transaction({ ...txnParams, amount: 4000 })
 
-    // Signed transactions
-    const signedTxn1 = {
-      txn: Buffer.from(txn1.toByte()).toString('base64'),
-      sig: 'mockBase64Signature'
-    }
-    const signedTxn2 = {
-      txn: Buffer.from(txn2.toByte()).toString('base64'),
-      sig: 'mockBase64Signature'
-    }
-
-    // Signed transactions (base64 strings) returned by Kibisis
-    const signedTxnStr1 = Buffer.from(
-      new Uint8Array(msgpack.encode(signedTxn1, { sortKeys: true }))
-    ).toString('base64')
-    const signedTxnStr2 = Buffer.from(
-      new Uint8Array(msgpack.encode(signedTxn2, { sortKeys: true }))
-    ).toString('base64')
-
-    // Signed transactions (Uint8Array) returned by use-wallet
-    const signedTxnEncoded1 = new Uint8Array(Buffer.from(signedTxnStr1, 'base64'))
-    const signedTxnEncoded2 = new Uint8Array(Buffer.from(signedTxnStr2, 'base64'))
+    // Mock signed transactions (base64 strings) returned by Kibisis
+    const mockSignedTxns = [byteArrayToBase64(txn1.toByte())]
 
     beforeEach(async () => {
       vi.spyOn(KibisisWallet.prototype, '_signTransactions')
@@ -308,212 +283,184 @@ describe('KibisisWallet', () => {
         .mockImplementation(() =>
           Promise.resolve({
             providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
-            stxns: [signedTxnStr1]
+            stxns: mockSignedTxns
           } as ISignTransactionsResult)
         )
 
       await wallet.connect()
     })
 
-    it('should call _signTransactions with correct arguments', async () => {
-      // Sign transaction
-      await wallet.signTransactions([txn1])
+    describe('signTransactions', () => {
+      it('should call _signTransactions with correct arguments', async () => {
+        // Sign transaction
+        await wallet.signTransactions([txn1])
 
-      expect(wallet['_signTransactions']).toHaveBeenCalledWith([
-        {
-          txn: Buffer.from(txn1.toByte()).toString('base64')
-        }
-      ])
-    })
-
-    it('should log errors and re-throw to the consuming application', async () => {
-      const error = new ARC0027MethodCanceledError({
-        message: `user dismissed action`,
-        method: ARC0027MethodEnum.SignTransactions,
-        providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+        expect(wallet['_signTransactions']).toHaveBeenCalledWith([
+          { txn: byteArrayToBase64(txn1.toByte()) }
+        ])
       })
 
-      // Mock signTxns error response
-      vi.spyOn(KibisisWallet.prototype, '_signTransactions')
-        .mockReset()
-        .mockImplementationOnce(() => Promise.reject(error))
+      it('should log errors and re-throw to the consuming application', async () => {
+        const error = new ARC0027MethodCanceledError({
+          message: `user dismissed action`,
+          method: ARC0027MethodEnum.SignTransactions,
+          providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+        })
 
-      try {
-        // Signing transaction should fail
-        await expect(wallet.signTransactions([txn1])).rejects.toThrowError()
-      } catch (error: any) {
-        expect(error).toEqual(error)
+        // Mock signTxns error response
+        vi.spyOn(KibisisWallet.prototype, '_signTransactions')
+          .mockReset()
+          .mockImplementationOnce(() => Promise.reject(error))
 
-        // Error message logged
-        expect(console.error).toHaveBeenCalledWith(
-          `[${KibisisWallet.defaultMetadata.name}] error signing transactions: ${error.message} (code: ${error.code})`
-        )
-      }
-    })
+        try {
+          // Signing transaction should fail
+          await expect(wallet.signTransactions([txn1])).rejects.toThrowError()
+        } catch (error: any) {
+          expect(error).toEqual(error)
 
-    it('should correctly process and sign a single algosdk.Transaction', async () => {
-      mockSignTransactionsResponseOnce([signedTxnStr1])
-
-      const result = await wallet.signTransactions([txn1])
-
-      expect(result).toEqual([signedTxnEncoded1])
-
-      expect(wallet['_signTransactions']).toHaveBeenCalledWith([
-        {
-          txn: Buffer.from(txn1.toByte()).toString('base64')
+          // Error message logged
+          expect(console.error).toHaveBeenCalledWith(
+            `[${KibisisWallet.defaultMetadata.name}] error signing transactions: ${error.message} (code: ${error.code})`
+          )
         }
-      ])
-    })
-
-    it('should correctly process and sign a multiple algosdk.Transaction group', async () => {
-      mockSignTransactionsResponseOnce([signedTxnStr1, signedTxnStr2])
-
-      const result = await wallet.signTransactions([txn1, txn2])
-
-      expect(result).toEqual([signedTxnEncoded1, signedTxnEncoded2])
-
-      expect(wallet['_signTransactions']).toHaveBeenCalledWith([
-        {
-          txn: Buffer.from(txn1.toByte()).toString('base64')
-        },
-        {
-          txn: Buffer.from(txn2.toByte()).toString('base64')
-        }
-      ])
-    })
-
-    it('should correctly process and sign a single encoded transaction', async () => {
-      mockSignTransactionsResponseOnce([signedTxnStr1])
-
-      const encodedTxn = txn1.toByte()
-      const result = await wallet.signTransactions([encodedTxn])
-
-      expect(result).toEqual([signedTxnEncoded1])
-
-      expect(wallet['_signTransactions']).toHaveBeenCalledWith([
-        {
-          txn: Buffer.from(txn1.toByte()).toString('base64')
-        }
-      ])
-    })
-
-    it('should correctly process and sign a single encoded transaction group', async () => {
-      mockSignTransactionsResponseOnce([signedTxnStr1, signedTxnStr2])
-
-      const txnGroup = [txn1, txn2]
-      const encodedTxnGroup = txnGroup.map((txn) => txn.toByte())
-
-      const result = await wallet.signTransactions(encodedTxnGroup)
-
-      expect(result).toEqual([signedTxnEncoded1, signedTxnEncoded2])
-
-      expect(wallet['_signTransactions']).toHaveBeenCalledWith([
-        {
-          txn: Buffer.from(txn1.toByte()).toString('base64')
-        },
-        {
-          txn: Buffer.from(txn2.toByte()).toString('base64')
-        }
-      ])
-    })
-
-    it('should correctly process and sign multiple encoded transaction groups', async () => {
-      mockSignTransactionsResponseOnce([signedTxnStr1, signedTxnStr2])
-
-      const result = await wallet.signTransactions([[txn1.toByte()], [txn2.toByte()]])
-
-      expect(result).toEqual([signedTxnEncoded1, signedTxnEncoded2])
-
-      expect(wallet['_signTransactions']).toHaveBeenCalledWith([
-        {
-          txn: Buffer.from(txn1.toByte()).toString('base64')
-        },
-        {
-          txn: Buffer.from(txn2.toByte()).toString('base64')
-        }
-      ])
-    })
-
-    it('should determine which transactions to sign based on indexesToSign', async () => {
-      mockSignTransactionsResponseOnce([null, signedTxnStr2])
-
-      const txnGroup = [txn1, txn2]
-      const indexesToSign = [1] // Only sign txn2
-      const returnGroup = false // Return only the signed transaction
-
-      const expectedResult = [signedTxnEncoded2]
-
-      const result = await wallet.signTransactions(txnGroup, indexesToSign, returnGroup)
-
-      expect(result).toEqual(expectedResult)
-
-      expect(wallet['_signTransactions']).toHaveBeenCalledWith([
-        {
-          txn: Buffer.from(txn1.toByte()).toString('base64'),
-          signers: [] // txn1 should not be signed
-        },
-        {
-          txn: Buffer.from(txn2.toByte()).toString('base64')
-        }
-      ])
-    })
-
-    it('should correctly merge signed transactions back into the original group', async () => {
-      mockSignTransactionsResponseOnce([null, signedTxnStr2])
-
-      const txnGroup = [txn1, txn2]
-      const returnGroup = true // Merge signed transaction back into original group
-
-      // Only txn2 should be signed
-      const indexesToSign1 = [1]
-      const expectedResult1 = [algosdk.encodeUnsignedTransaction(txn1), signedTxnEncoded2]
-
-      const result1 = await wallet.signTransactions(txnGroup, indexesToSign1, returnGroup)
-      expect(result1).toEqual(expectedResult1)
-
-      mockSignTransactionsResponseOnce([signedTxnStr1, null])
-
-      // Only txn1 should be signed
-      const indexesToSign2 = [0]
-      const expectedResult2 = [signedTxnEncoded1, algosdk.encodeUnsignedTransaction(txn2)]
-
-      const result2 = await wallet.signTransactions(txnGroup, indexesToSign2, returnGroup)
-      expect(result2).toEqual(expectedResult2)
-    })
-
-    it('should only send transactions with connected signers for signature', async () => {
-      const txnCannotSign = new algosdk.Transaction({
-        ...txnParams,
-        from: 'EW64GC6F24M7NDSC5R3ES4YUVE3ZXXNMARJHDCCCLIHZU6TBEOC7XRSBG4', // EW64GC is not connected
-        to: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-        amount: 3000
       })
 
-      mockSignTransactionsResponseOnce([signedTxnStr1, null, signedTxnStr2])
+      it('should correctly process and sign a single algosdk.Transaction', async () => {
+        await wallet.signTransactions([txn1])
 
-      const result = await wallet.signTransactions([txn1, txnCannotSign, txn2])
+        expect(wallet['_signTransactions']).toHaveBeenCalledWith([
+          { txn: byteArrayToBase64(txn1.toByte()) }
+        ])
+      })
 
-      // expectedResult[1] should be original unsigned transaction
-      const expectedResult = [
-        signedTxnEncoded1,
-        algosdk.encodeUnsignedTransaction(txnCannotSign),
-        signedTxnEncoded2
-      ]
+      it('should correctly process and sign a multiple algosdk.Transaction group', async () => {
+        const [gtxn1, gtxn2, gtxn3] = algosdk.assignGroupID([txn1, txn2, txn3])
+        await wallet.signTransactions([gtxn1, gtxn2, gtxn3])
 
-      expect(result).toEqual(expectedResult)
+        expect(wallet['_signTransactions']).toHaveBeenCalledWith([
+          { txn: byteArrayToBase64(gtxn1.toByte()) },
+          { txn: byteArrayToBase64(gtxn2.toByte()) },
+          { txn: byteArrayToBase64(gtxn3.toByte()) }
+        ])
+      })
 
-      expect(wallet['_signTransactions']).toHaveBeenCalledWith([
-        {
-          txn: Buffer.from(txn1.toByte()).toString('base64')
-        },
-        {
-          txn: Buffer.from(txnCannotSign.toByte()).toString('base64'),
-          signers: [] // txnCannotSign should not be signed
-        },
-        {
-          txn: Buffer.from(txn2.toByte()).toString('base64')
-        }
-      ])
+      it('should correctly process and sign a single encoded transaction', async () => {
+        const encodedTxn = txn1.toByte()
+        await wallet.signTransactions([encodedTxn])
+
+        expect(wallet['_signTransactions']).toHaveBeenCalledWith([
+          { txn: byteArrayToBase64(txn1.toByte()) }
+        ])
+      })
+
+      it('should correctly process and sign a single encoded transaction group', async () => {
+        const txnGroup = algosdk.assignGroupID([txn1, txn2, txn3])
+        const [gtxn1, gtxn2, gtxn3] = txnGroup.map((txn) => txn.toByte())
+
+        await wallet.signTransactions([gtxn1, gtxn2, gtxn3])
+
+        expect(wallet['_signTransactions']).toHaveBeenCalledWith([
+          { txn: byteArrayToBase64(gtxn1) },
+          { txn: byteArrayToBase64(gtxn2) },
+          { txn: byteArrayToBase64(gtxn3) }
+        ])
+      })
+
+      it('should correctly process and sign multiple encoded transaction groups', async () => {
+        const txnGroup1 = algosdk.assignGroupID([txn1, txn2])
+        const [g1txn1, g1txn2] = txnGroup1.map((txn) => txn.toByte())
+
+        const txnGroup2 = algosdk.assignGroupID([txn3, txn4])
+        const [g2txn1, g2txn2] = txnGroup2.map((txn) => txn.toByte())
+
+        await wallet.signTransactions([
+          [g1txn1, g1txn2],
+          [g2txn1, g2txn2]
+        ])
+
+        expect(wallet['_signTransactions']).toHaveBeenCalledWith([
+          { txn: byteArrayToBase64(g1txn1) },
+          { txn: byteArrayToBase64(g1txn2) },
+          { txn: byteArrayToBase64(g2txn1) },
+          { txn: byteArrayToBase64(g2txn2) }
+        ])
+      })
+
+      it('should determine which transactions to sign based on indexesToSign', async () => {
+        const [gtxn1, gtxn2, gtxn3, gtxn4] = algosdk.assignGroupID([txn1, txn2, txn3, txn4])
+        const indexesToSign = [0, 1, 3]
+
+        const gtxn1String = byteArrayToBase64(gtxn1.toByte())
+        const gtxn2String = byteArrayToBase64(gtxn2.toByte())
+        const gtxn4String = byteArrayToBase64(gtxn4.toByte())
+
+        mockSignTransactionsResponseOnce([gtxn1String, gtxn2String, null, gtxn4String])
+
+        const result = await wallet.signTransactions([gtxn1, gtxn2, gtxn3, gtxn4], indexesToSign)
+
+        expect(wallet['_signTransactions']).toHaveBeenCalledWith([
+          { txn: byteArrayToBase64(gtxn1.toByte()) },
+          { txn: byteArrayToBase64(gtxn2.toByte()) },
+          { txn: byteArrayToBase64(gtxn3.toByte()), signers: [] },
+          { txn: byteArrayToBase64(gtxn4.toByte()) }
+        ])
+
+        // Only encoded "signed" transactions should be returned
+        expect(result).toHaveLength(indexesToSign.length)
+        expect(result).toEqual([
+          base64ToByteArray(gtxn1String),
+          base64ToByteArray(gtxn2String),
+          base64ToByteArray(gtxn4String)
+        ])
+      })
+
+      it('should only send transactions with connected signers for signature', async () => {
+        const canSignTxn1 = new algosdk.Transaction({
+          ...txnParams,
+          from: ACCOUNT_1,
+          amount: 1000
+        })
+
+        const cannotSignTxn2 = new algosdk.Transaction({
+          ...txnParams,
+          from: 'EW64GC6F24M7NDSC5R3ES4YUVE3ZXXNMARJHDCCCLIHZU6TBEOC7XRSBG4', // EW64GC is not connected
+          amount: 2000
+        })
+
+        const canSignTxn3 = new algosdk.Transaction({
+          ...txnParams,
+          from: ACCOUNT_2,
+          amount: 3000
+        })
+
+        // Signer for gtxn2 is not a connected account
+        const [gtxn1, gtxn2, gtxn3] = algosdk.assignGroupID([
+          canSignTxn1,
+          cannotSignTxn2, // Should not be signed
+          canSignTxn3
+        ])
+
+        await wallet.signTransactions([gtxn1, gtxn2, gtxn3])
+
+        expect(wallet['_signTransactions']).toHaveBeenCalledWith([
+          { txn: byteArrayToBase64(gtxn1.toByte()) },
+          { txn: byteArrayToBase64(gtxn2.toByte()), signers: [] },
+          { txn: byteArrayToBase64(gtxn3.toByte()) }
+        ])
+      })
+    })
+
+    describe('transactionSigner', () => {
+      it('should call signTransactions with the correct arguments', async () => {
+        const txnGroup = algosdk.assignGroupID([txn1, txn2])
+        const indexesToSign = [1]
+
+        const signTransactionsSpy = vi.spyOn(wallet, 'signTransactions')
+
+        await wallet.transactionSigner(txnGroup, indexesToSign)
+
+        expect(signTransactionsSpy).toHaveBeenCalledWith(txnGroup, indexesToSign)
+      })
     })
   })
 })

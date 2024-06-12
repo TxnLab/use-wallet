@@ -68,92 +68,23 @@ export function byteArrayToString(array: Uint8Array): string {
   return result
 }
 
-export function isTransaction(
-  item: algosdk.Transaction | algosdk.Transaction[] | Uint8Array | Uint8Array[]
-): item is algosdk.Transaction | algosdk.Transaction[] {
-  if (Array.isArray(item)) {
-    return item.every(
-      (elem) =>
-        typeof elem === 'object' &&
-        elem !== null &&
-        'genesisID' in elem &&
-        typeof elem.genesisID === 'string'
-    )
-  } else {
-    return (
-      typeof item === 'object' &&
-      item !== null &&
-      'genesisID' in item &&
-      typeof item.genesisID === 'string'
-    )
-  }
+export function isSignedTxn(
+  txnDecodeObj: algosdk.EncodedTransaction | algosdk.EncodedSignedTransaction
+): txnDecodeObj is algosdk.EncodedSignedTransaction {
+  return (txnDecodeObj as algosdk.EncodedSignedTransaction).txn !== undefined
 }
 
-export function isSignedTxnObject(
-  item: algosdk.EncodedTransaction | algosdk.EncodedSignedTransaction
-): item is algosdk.EncodedSignedTransaction {
-  return (item as algosdk.EncodedSignedTransaction).txn !== undefined
+export function isTransactionArray(
+  txnGroup: any
+): txnGroup is algosdk.Transaction[] | algosdk.Transaction[][] {
+  return (
+    txnGroup[0] instanceof algosdk.Transaction ||
+    (Array.isArray(txnGroup[0]) && txnGroup[0][0] instanceof algosdk.Transaction)
+  )
 }
 
-export function normalizeTxnGroup(
-  txnGroup: algosdk.Transaction[] | algosdk.Transaction[][] | Uint8Array[] | Uint8Array[][]
-): Uint8Array[] {
-  if (!txnGroup[0]) {
-    throw new Error('Empty transaction group!')
-  }
-
-  const isTransactionType = isTransaction(txnGroup[0])
-
-  // Handle `algosdk.Transaction[] | algosdk.Transaction[]` types
-  if (isTransactionType) {
-    const transactionGroup: algosdk.Transaction[] = Array.isArray(txnGroup[0])
-      ? (txnGroup as algosdk.Transaction[][]).flatMap((txn) => txn)
-      : (txnGroup as algosdk.Transaction[])
-
-    return transactionGroup.map((txn) => {
-      return algosdk.encodeUnsignedTransaction(txn)
-    })
-  }
-
-  // Handle `Uint8Array[] | Uint8Array[][]` types
-  else {
-    const transactionGroup: Uint8Array[] = Array.isArray(txnGroup[0])
-      ? (txnGroup as Uint8Array[][]).flatMap((txn) => txn)
-      : (txnGroup as Uint8Array[])
-
-    return transactionGroup
-  }
-}
-
-export function shouldSignTxnObject(
-  txnObject: any,
-  addresses: string[],
-  indexesToSign: number[] | undefined,
-  idx: number
-): boolean {
-  const isIndexMatch = !indexesToSign || indexesToSign.includes(idx)
-  const isSigned = isSignedTxnObject(txnObject)
-  const canSign = !isSigned && addresses.includes(algosdk.encodeAddress(txnObject.snd))
-  const shouldSign = isIndexMatch && canSign
-
-  return shouldSign
-}
-
-export function mergeSignedTxnsWithGroup(
-  signedTxns: Uint8Array[],
-  txnGroup: Uint8Array[],
-  signedIndexes: number[],
-  returnGroup: boolean
-): Uint8Array[] {
-  return txnGroup.reduce<Uint8Array[]>((acc, txn, i) => {
-    if (signedIndexes.includes(i)) {
-      const signedByUser = signedTxns.shift()
-      signedByUser && acc.push(signedByUser)
-    } else if (returnGroup) {
-      acc.push(txnGroup[i])
-    }
-    return acc
-  }, [])
+export function flattenTxnGroup<T>(txnGroup: T[]): T extends (infer U)[] ? U[] : T[] {
+  return Array.isArray(txnGroup[0]) ? ((txnGroup as any[]).flat() as any) : txnGroup
 }
 
 function getPayloadId(): number {
@@ -192,27 +123,4 @@ export function deepMerge(target: any, source: any): any {
   })
 
   return target
-}
-
-/**
- * Generates a UUID version 4 string. This function attempts to use the `crypto.randomUUID()` function from the Web
- * Crypto API if it is available, otherwise it uses a polyfill method.
- *
- * NOTE: `crypto.randomUUID()` is not available in non-secure contexts; only localhost and HTTPS.
- * @returns {string} a valid UUID version 4 string.
- * @see {@link https://stackoverflow.com/a/2117523}
- */
-export function generateUuid(): string {
-  if (window.crypto.randomUUID) {
-    return window.crypto.randomUUID()
-  }
-
-  return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, (value) => {
-    const valueAsNumber: number = parseInt(value)
-
-    return (
-      valueAsNumber ^
-      (window.crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (valueAsNumber / 4)))
-    ).toString(16)
-  })
 }

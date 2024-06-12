@@ -66,19 +66,21 @@ export function useWallet() {
   // @todo: Not reactive when intDecoding is changed
   const algodClient = createMemo(() => manager().algodClient)
 
-  const signTransactions = (
-    txnGroup: algosdk.Transaction[] | algosdk.Transaction[][] | Uint8Array[] | Uint8Array[][],
-    indexesToSign?: number[],
-    returnGroup?: boolean
-  ) => {
+  const signTransactions = <T extends algosdk.Transaction[] | Uint8Array[]>(
+    txnGroup: T | T[],
+    indexesToSign?: number[]
+  ): Promise<Uint8Array[]> => {
     const wallet = activeWallet()
     if (!wallet) {
       throw new Error('No active wallet')
     }
-    return wallet.signTransactions(txnGroup, indexesToSign, returnGroup)
+    return wallet.signTransactions(txnGroup, indexesToSign)
   }
 
-  const transactionSigner = (txnGroup: algosdk.Transaction[], indexesToSign: number[]) => {
+  const transactionSigner = (
+    txnGroup: algosdk.Transaction[],
+    indexesToSign: number[]
+  ): Promise<Uint8Array[]> => {
     const wallet = activeWallet()
     if (!wallet) {
       throw new Error('No active wallet')

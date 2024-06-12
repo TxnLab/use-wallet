@@ -1,8 +1,8 @@
 import { Store } from '@tanstack/store'
-import * as msgpack from 'algo-msgpack-with-bigint'
 import algosdk from 'algosdk'
 import { StorageAdapter } from 'src/storage'
 import { LOCAL_STORAGE_KEY, State, WalletState, defaultState } from 'src/store'
+import { base64ToByteArray, byteArrayToBase64 } from 'src/utils'
 import { MagicAuth } from 'src/wallets/magic'
 import { WalletId } from 'src/wallets/types'
 
@@ -15,13 +15,12 @@ vi.mock('src/storage', () => ({
 }))
 
 // Spy/suppress console output
-vi.spyOn(console, 'info').mockImplementation(() => {})
+vi.spyOn(console, 'info').mockImplementation(() => {}) // @todo: remove when debug logger is implemented
 vi.spyOn(console, 'warn').mockImplementation(() => {})
-vi.spyOn(console, 'groupCollapsed').mockImplementation(() => {})
 
 const mockMagicClient = {
   auth: {
-    loginWithMagicLink: vi.fn().mockImplementation(() => Promise.resolve())
+    loginWithMagicLink: vi.fn()
   },
   user: {
     getInfo: vi.fn(),
@@ -35,9 +34,22 @@ const mockMagicClient = {
 
 vi.mock('magic-sdk', () => {
   return {
-    Magic: vi.fn().mockImplementation(() => mockMagicClient)
+    Magic: vi.fn(() => mockMagicClient)
   }
 })
+
+function createWalletWithStore(store: Store<State>): MagicAuth {
+  return new MagicAuth({
+    id: WalletId.MAGIC,
+    options: {
+      apiKey: 'mock-api-key'
+    },
+    metadata: {},
+    getAlgodClient: {} as any,
+    store,
+    subscribe: vi.fn()
+  })
+}
 
 describe('MagicAuth', () => {
   let wallet: MagicAuth
@@ -47,12 +59,10 @@ describe('MagicAuth', () => {
   const email = 'test@example.com'
   const publicAddress = 'mockAddress'
 
-  const mockSubscribe: (callback: (state: State) => void) => () => void = vi.fn(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (callback: (state: State) => void) => {
-      return () => console.log('unsubscribe')
-    }
-  )
+  const account = {
+    name: email,
+    address: publicAddress
+  }
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -71,16 +81,9 @@ describe('MagicAuth', () => {
     })
 
     store = new Store<State>(defaultState)
-    wallet = new MagicAuth({
-      id: WalletId.MAGIC,
-      options: {
-        apiKey: 'mock-api-key'
-      },
-      metadata: {},
-      getAlgodClient: {} as any,
-      store,
-      subscribe: mockSubscribe
-    })
+    wallet = createWalletWithStore(store)
+
+    mockMagicClient.auth.loginWithMagicLink.mockImplementation(() => Promise.resolve())
   })
 
   afterEach(async () => {
@@ -89,12 +92,7 @@ describe('MagicAuth', () => {
   })
 
   describe('connect', () => {
-    it('should initialize client, auth, return account object, and update store', async () => {
-      const account = {
-        name: email,
-        address: publicAddress
-      }
-
+    it('should initialize client, auth, return account, and update store', async () => {
       mockMagicClient.user.getInfo.mockResolvedValueOnce({ email, publicAddress })
 
       const result = await wallet.connect({ email })
@@ -146,6 +144,18 @@ describe('MagicAuth', () => {
       expect(wallet.isConnected).toBe(false)
       expect(store.state.wallets[WalletId.MAGIC]).toBeUndefined()
     })
+
+    it('should throw an error if client.user.logout fails', async () => {
+      mockMagicClient.user.getInfo.mockResolvedValueOnce({ email, publicAddress })
+      mockMagicClient.user.logout.mockRejectedValueOnce(new Error('Logout error'))
+
+      await wallet.connect({ email })
+      await expect(wallet.disconnect()).rejects.toThrow('Logout error')
+
+      // Should still update store/state
+      expect(store.state.wallets[WalletId.MAGIC]).toBeUndefined()
+      expect(wallet.isConnected).toBe(false)
+    })
   })
 
   describe('resumeSession', () => {
@@ -177,24 +187,16 @@ describe('MagicAuth', () => {
         }
       })
 
-      wallet = new MagicAuth({
-        id: WalletId.MAGIC,
-        options: {
-          apiKey: 'mock-api-key'
-        },
-        metadata: {},
-        getAlgodClient: {} as any,
-        store,
-        subscribe: mockSubscribe
-      })
+      wallet = createWalletWithStore(store)
 
       mockMagicClient.user.isLoggedIn.mockResolvedValueOnce(false)
       await wallet.resumeSession()
 
       expect(mockMagicClient.user.isLoggedIn).toHaveBeenCalled()
       expect(mockMagicClient.user.getInfo).not.toHaveBeenCalled()
-      expect(wallet.isConnected).toBe(false)
+
       expect(store.state.wallets[WalletId.MAGIC]).toBeUndefined()
+      expect(wallet.isConnected).toBe(false)
     })
 
     it('should resume session if session is found', async () => {
@@ -218,27 +220,21 @@ describe('MagicAuth', () => {
         }
       })
 
-      wallet = new MagicAuth({
-        id: WalletId.MAGIC,
-        options: {
-          apiKey: 'mock-api-key'
-        },
-        metadata: {},
-        getAlgodClient: {} as any,
-        store,
-        subscribe: mockSubscribe
-      })
+      wallet = createWalletWithStore(store)
 
       mockMagicClient.user.isLoggedIn.mockResolvedValueOnce(true)
+      mockMagicClient.user.getInfo.mockResolvedValueOnce({ email, publicAddress })
+
       await wallet.resumeSession()
 
       expect(mockMagicClient.user.isLoggedIn).toHaveBeenCalled()
       expect(mockMagicClient.user.getInfo).toHaveBeenCalled()
-      expect(wallet.isConnected).toBe(true)
+
       expect(store.state.wallets[WalletId.MAGIC]).toEqual(walletState)
+      expect(wallet.isConnected).toBe(true)
     })
 
-    it('should update the store if the user info does not match the stored account', async () => {
+    it('should update the store if accounts do not match', async () => {
       const prevAccount = {
         name: 'foo@example.com',
         address: 'mockAddress1'
@@ -261,16 +257,7 @@ describe('MagicAuth', () => {
         }
       })
 
-      wallet = new MagicAuth({
-        id: WalletId.MAGIC,
-        options: {
-          apiKey: 'mock-api-key'
-        },
-        metadata: {},
-        getAlgodClient: {} as any,
-        store,
-        subscribe: mockSubscribe
-      })
+      wallet = createWalletWithStore(store)
 
       mockMagicClient.user.isLoggedIn.mockResolvedValueOnce(true)
       mockMagicClient.user.getInfo.mockResolvedValueOnce({
@@ -294,251 +281,187 @@ describe('MagicAuth', () => {
     })
   })
 
-  describe('signTransactions', () => {
-    it('should throw an error if client is not initialized', async () => {
-      await expect(wallet.signTransactions([])).rejects.toThrow('[Magic] Client not initialized!')
+  describe('signing transactions', () => {
+    // Connected accounts
+    const connectedAcct = '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q'
+
+    // Not connected account
+    const notConnectedAcct = 'EW64GC6F24M7NDSC5R3ES4YUVE3ZXXNMARJHDCCCLIHZU6TBEOC7XRSBG4'
+
+    const txnParams = {
+      from: connectedAcct,
+      to: connectedAcct,
+      fee: 10,
+      firstRound: 51,
+      lastRound: 61,
+      genesisHash: 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=',
+      genesisID: 'mainnet-v1.0'
+    }
+
+    // Transactions used in tests
+    const txn1 = new algosdk.Transaction({ ...txnParams, amount: 1000 })
+    const txn2 = new algosdk.Transaction({ ...txnParams, amount: 2000 })
+    const txn3 = new algosdk.Transaction({ ...txnParams, amount: 3000 })
+    const txn4 = new algosdk.Transaction({ ...txnParams, amount: 4000 })
+
+    beforeEach(async () => {
+      // Mock two connected accounts
+      mockMagicClient.user.getInfo.mockResolvedValueOnce({
+        email,
+        publicAddress: connectedAcct
+      })
+
+      const mockSignedTxn = byteArrayToBase64(txn1.toByte())
+      mockMagicClient.algorand.signGroupTransactionV2.mockResolvedValue([mockSignedTxn])
+
+      await wallet.connect({ email })
     })
 
-    describe('with client initialized', () => {
-      const txnParams = {
-        fee: 10,
-        firstRound: 51,
-        lastRound: 61,
-        genesisHash: 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=',
-        genesisID: 'mainnet-v1.0'
-      }
-
-      // Transactions used in tests
-      const txn1 = new algosdk.Transaction({
-        ...txnParams,
-        from: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-        to: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-        amount: 1000
-      })
-      const txn2 = new algosdk.Transaction({
-        ...txnParams,
-        from: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-        to: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-        amount: 2000
-      })
-
-      // Signed transaction objects to be base64 encoded
-      const signedTxnObj1 = {
-        txn: Buffer.from(txn1.toByte()).toString('base64'),
-        sig: 'mockBase64Signature'
-      }
-      const signedTxnObj2 = {
-        txn: Buffer.from(txn2.toByte()).toString('base64'),
-        sig: 'mockBase64Signature'
-      }
-
-      // Signed transactions (base64 strings) returned by Magic client
-      const signedTxnStr1 = Buffer.from(
-        new Uint8Array(msgpack.encode(signedTxnObj1, { sortKeys: true }))
-      ).toString('base64')
-      const signedTxnStr2 = Buffer.from(
-        new Uint8Array(msgpack.encode(signedTxnObj2, { sortKeys: true }))
-      ).toString('base64')
-
-      // Signed transactions (Uint8Array) returned by MagicAuth.signTransactions
-      const signedTxnEncoded1 = new Uint8Array(Buffer.from(signedTxnStr1, 'base64'))
-      const signedTxnEncoded2 = new Uint8Array(Buffer.from(signedTxnStr2, 'base64'))
-
-      beforeEach(async () => {
-        mockMagicClient.user.getInfo.mockResolvedValueOnce({
-          email,
-          publicAddress: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q'
-        })
-        await wallet.connect({ email })
-      })
-
+    describe('signTransactions', () => {
       it('should correctly process and sign a single algosdk.Transaction', async () => {
-        mockMagicClient.algorand.signGroupTransactionV2.mockResolvedValueOnce([signedTxnStr1])
+        await wallet.signTransactions([txn1])
 
-        const result = await wallet.signTransactions([txn1])
-
-        expect(result).toEqual([signedTxnEncoded1])
         expect(mockMagicClient.algorand.signGroupTransactionV2).toHaveBeenCalledWith([
-          {
-            txn: Buffer.from(txn1.toByte()).toString('base64')
-          }
+          { txn: byteArrayToBase64(txn1.toByte()) }
         ])
       })
 
       it('should correctly process and sign a single algosdk.Transaction group', async () => {
-        mockMagicClient.algorand.signGroupTransactionV2.mockResolvedValueOnce([
-          signedTxnStr1,
-          signedTxnStr2
-        ])
+        const [gtxn1, gtxn2, gtxn3] = algosdk.assignGroupID([txn1, txn2, txn3])
+        await wallet.signTransactions([gtxn1, gtxn2, gtxn3])
 
-        const result = await wallet.signTransactions([txn1, txn2])
-
-        expect(result).toEqual([signedTxnEncoded1, signedTxnEncoded2])
         expect(mockMagicClient.algorand.signGroupTransactionV2).toHaveBeenCalledWith([
-          {
-            txn: Buffer.from(txn1.toByte()).toString('base64')
-          },
-          {
-            txn: Buffer.from(txn2.toByte()).toString('base64')
-          }
+          { txn: byteArrayToBase64(gtxn1.toByte()) },
+          { txn: byteArrayToBase64(gtxn2.toByte()) },
+          { txn: byteArrayToBase64(gtxn3.toByte()) }
         ])
       })
 
       it('should correctly process and sign multiple algosdk.Transaction groups', async () => {
-        mockMagicClient.algorand.signGroupTransactionV2.mockResolvedValueOnce([
-          signedTxnStr1,
-          signedTxnStr2
+        const [g1txn1, g1txn2] = algosdk.assignGroupID([txn1, txn2])
+        const [g2txn1, g2txn2] = algosdk.assignGroupID([txn3, txn4])
+
+        await wallet.signTransactions([
+          [g1txn1, g1txn2],
+          [g2txn1, g2txn2]
         ])
 
-        const result = await wallet.signTransactions([[txn1], [txn2]])
-
-        expect(result).toEqual([signedTxnEncoded1, signedTxnEncoded2])
         expect(mockMagicClient.algorand.signGroupTransactionV2).toHaveBeenCalledWith([
-          {
-            txn: Buffer.from(txn1.toByte()).toString('base64')
-          },
-          {
-            txn: Buffer.from(txn2.toByte()).toString('base64')
-          }
+          { txn: byteArrayToBase64(g1txn1.toByte()) },
+          { txn: byteArrayToBase64(g1txn2.toByte()) },
+          { txn: byteArrayToBase64(g2txn1.toByte()) },
+          { txn: byteArrayToBase64(g2txn2.toByte()) }
         ])
       })
 
       it('should correctly process and sign a single encoded transaction', async () => {
-        mockMagicClient.algorand.signGroupTransactionV2.mockResolvedValueOnce([signedTxnStr1])
-
         const encodedTxn = txn1.toByte()
-        const result = await wallet.signTransactions([encodedTxn])
+        await wallet.signTransactions([encodedTxn])
 
-        expect(result).toEqual([signedTxnEncoded1])
         expect(mockMagicClient.algorand.signGroupTransactionV2).toHaveBeenCalledWith([
-          {
-            txn: Buffer.from(txn1.toByte()).toString('base64')
-          }
+          { txn: byteArrayToBase64(txn1.toByte()) }
         ])
       })
 
       it('should correctly process and sign a single encoded transaction group', async () => {
-        mockMagicClient.algorand.signGroupTransactionV2.mockResolvedValueOnce([
-          signedTxnStr1,
-          signedTxnStr2
-        ])
+        const txnGroup = algosdk.assignGroupID([txn1, txn2, txn3])
+        const [gtxn1, gtxn2, gtxn3] = txnGroup.map((txn) => txn.toByte())
 
-        const txnGroup = [txn1, txn2]
-        const encodedTxnGroup = txnGroup.map((txn) => txn.toByte())
+        await wallet.signTransactions([gtxn1, gtxn2, gtxn3])
 
-        const result = await wallet.signTransactions(encodedTxnGroup)
-
-        expect(result).toEqual([signedTxnEncoded1, signedTxnEncoded2])
         expect(mockMagicClient.algorand.signGroupTransactionV2).toHaveBeenCalledWith([
-          {
-            txn: Buffer.from(txn1.toByte()).toString('base64')
-          },
-          {
-            txn: Buffer.from(txn2.toByte()).toString('base64')
-          }
+          { txn: byteArrayToBase64(gtxn1) },
+          { txn: byteArrayToBase64(gtxn2) },
+          { txn: byteArrayToBase64(gtxn3) }
         ])
       })
 
       it('should correctly process and sign multiple encoded transaction groups', async () => {
-        mockMagicClient.algorand.signGroupTransactionV2.mockResolvedValueOnce([
-          signedTxnStr1,
-          signedTxnStr2
+        const txnGroup1 = algosdk.assignGroupID([txn1, txn2])
+        const [g1txn1, g1txn2] = txnGroup1.map((txn) => txn.toByte())
+
+        const txnGroup2 = algosdk.assignGroupID([txn3, txn4])
+        const [g2txn1, g2txn2] = txnGroup2.map((txn) => txn.toByte())
+
+        await wallet.signTransactions([
+          [g1txn1, g1txn2],
+          [g2txn1, g2txn2]
         ])
 
-        const result = await wallet.signTransactions([[txn1.toByte()], [txn2.toByte()]])
-
-        expect(result).toEqual([signedTxnEncoded1, signedTxnEncoded2])
         expect(mockMagicClient.algorand.signGroupTransactionV2).toHaveBeenCalledWith([
-          {
-            txn: Buffer.from(txn1.toByte()).toString('base64')
-          },
-          {
-            txn: Buffer.from(txn2.toByte()).toString('base64')
-          }
+          { txn: byteArrayToBase64(g1txn1) },
+          { txn: byteArrayToBase64(g1txn2) },
+          { txn: byteArrayToBase64(g2txn1) },
+          { txn: byteArrayToBase64(g2txn2) }
         ])
       })
 
       it('should determine which transactions to sign based on indexesToSign', async () => {
-        mockMagicClient.algorand.signGroupTransactionV2.mockResolvedValueOnce([null, signedTxnStr2])
+        const [gtxn1, gtxn2, gtxn3, gtxn4] = algosdk.assignGroupID([txn1, txn2, txn3, txn4])
+        const indexesToSign = [0, 1, 3]
 
-        const txnGroup = [txn1, txn2]
-        const indexesToSign = [1]
-        const returnGroup = false // Return only the signed transaction
+        const gtxn1String = byteArrayToBase64(gtxn1.toByte())
+        const gtxn2String = byteArrayToBase64(gtxn2.toByte())
+        const gtxn4String = byteArrayToBase64(gtxn4.toByte())
 
-        const expectedResult = [signedTxnEncoded2]
-
-        const result = await wallet.signTransactions(txnGroup, indexesToSign, returnGroup)
-
-        expect(result).toEqual(expectedResult)
-        expect(mockMagicClient.algorand.signGroupTransactionV2).toHaveBeenCalledWith([
-          {
-            txn: Buffer.from(txn1.toByte()).toString('base64'),
-            signers: [] // txn1 should not be signed
-          },
-          {
-            txn: Buffer.from(txn2.toByte()).toString('base64')
-          }
+        // Mock signGroupTransactionV2 to return "signed" (not really) base64 transactions or undefined
+        mockMagicClient.algorand.signGroupTransactionV2.mockResolvedValueOnce([
+          gtxn1String,
+          gtxn2String,
+          undefined,
+          gtxn4String
         ])
-      })
 
-      it('should correctly merge signed transactions back into the original group', async () => {
-        mockMagicClient.algorand.signGroupTransactionV2.mockResolvedValueOnce([null, signedTxnStr2])
+        const result = await wallet.signTransactions([gtxn1, gtxn2, gtxn3, gtxn4], indexesToSign)
 
-        const txnGroup = [txn1, txn2]
-        const returnGroup = true // Merge signed transaction back into original group
+        expect(mockMagicClient.algorand.signGroupTransactionV2).toHaveBeenCalledWith([
+          { txn: byteArrayToBase64(gtxn1.toByte()) },
+          { txn: byteArrayToBase64(gtxn2.toByte()) },
+          { txn: byteArrayToBase64(gtxn3.toByte()), signers: [] },
+          { txn: byteArrayToBase64(gtxn4.toByte()) }
+        ])
 
-        // Only txn2 should be signed
-        const indexesToSign1 = [1]
-        const expectedResult1 = [algosdk.encodeUnsignedTransaction(txn1), signedTxnEncoded2]
-
-        const result1 = await wallet.signTransactions(txnGroup, indexesToSign1, returnGroup)
-        expect(result1).toEqual(expectedResult1)
-
-        mockMagicClient.algorand.signGroupTransactionV2.mockResolvedValueOnce([signedTxnStr1, null])
-
-        // Only txn1 should be signed
-        const indexesToSign2 = [0]
-        const expectedResult2 = [signedTxnEncoded1, algosdk.encodeUnsignedTransaction(txn2)]
-
-        const result2 = await wallet.signTransactions(txnGroup, indexesToSign2, returnGroup)
-        expect(result2).toEqual(expectedResult2)
+        // Only encoded "signed" transactions should be returned
+        expect(result).toHaveLength(indexesToSign.length)
+        expect(result).toEqual([
+          base64ToByteArray(gtxn1String),
+          base64ToByteArray(gtxn2String),
+          base64ToByteArray(gtxn4String)
+        ])
       })
 
       it('should only send transactions with connected signers for signature', async () => {
-        const txnCannotSign = new algosdk.Transaction({
+        const canSignTxn1 = new algosdk.Transaction({
           ...txnParams,
-          from: 'EW64GC6F24M7NDSC5R3ES4YUVE3ZXXNMARJHDCCCLIHZU6TBEOC7XRSBG4', // EW64GC is not connected
-          to: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
+          from: connectedAcct,
+          amount: 1000
+        })
+
+        const cannotSignTxn2 = new algosdk.Transaction({
+          ...txnParams,
+          from: notConnectedAcct,
+          amount: 2000
+        })
+
+        const canSignTxn3 = new algosdk.Transaction({
+          ...txnParams,
+          from: connectedAcct,
           amount: 3000
         })
 
-        mockMagicClient.algorand.signGroupTransactionV2.mockResolvedValueOnce([
-          signedTxnStr1,
-          null,
-          signedTxnStr2
+        // Signer for gtxn2 is not a connected account
+        const [gtxn1, gtxn2, gtxn3] = algosdk.assignGroupID([
+          canSignTxn1,
+          cannotSignTxn2, // Should not be signed
+          canSignTxn3
         ])
 
-        const result = await wallet.signTransactions([txn1, txnCannotSign, txn2])
+        await wallet.signTransactions([gtxn1, gtxn2, gtxn3])
 
-        // expectedResult[1] should be original unsigned transaction
-        const expectedResult = [
-          signedTxnEncoded1,
-          algosdk.encodeUnsignedTransaction(txnCannotSign),
-          signedTxnEncoded2
-        ]
-
-        expect(result).toEqual(expectedResult)
         expect(mockMagicClient.algorand.signGroupTransactionV2).toHaveBeenCalledWith([
-          {
-            txn: Buffer.from(txn1.toByte()).toString('base64')
-          },
-          {
-            txn: Buffer.from(txnCannotSign.toByte()).toString('base64'),
-            signers: [] // should not be signed
-          },
-          {
-            txn: Buffer.from(txn2.toByte()).toString('base64')
-          }
+          { txn: byteArrayToBase64(gtxn1.toByte()) },
+          { txn: byteArrayToBase64(gtxn2.toByte()), signers: [] },
+          { txn: byteArrayToBase64(gtxn3.toByte()) }
         ])
       })
     })

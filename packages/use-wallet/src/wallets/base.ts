@@ -2,7 +2,7 @@ import { setActiveWallet, setActiveAccount, removeWallet, type State } from 'src
 import type { Store } from '@tanstack/store'
 import type algosdk from 'algosdk'
 import type { NetworkId } from 'src/network'
-import type { WalletAccount, WalletConstructor, WalletId, WalletMetadata } from './types'
+import type { WalletAccount, WalletConstructor, WalletId, WalletMetadata } from 'src/wallets/types'
 
 interface WalletConstructorType {
   new (...args: any[]): BaseWallet
@@ -55,10 +55,9 @@ export abstract class BaseWallet {
     })
   }
 
-  public abstract signTransactions(
-    txnGroup: algosdk.Transaction[] | algosdk.Transaction[][] | Uint8Array[] | Uint8Array[][],
-    indexesToSign?: number[],
-    returnGroup?: boolean
+  public abstract signTransactions<T extends algosdk.Transaction[] | Uint8Array[]>(
+    txnGroup: T | T[],
+    indexesToSign?: number[]
   ): Promise<Uint8Array[]>
 
   public abstract transactionSigner(
