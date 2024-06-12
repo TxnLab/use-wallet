@@ -15,9 +15,8 @@ vi.mock('src/storage', () => ({
 // Spy/suppress console output
 vi.spyOn(console, 'info').mockImplementation(() => {})
 vi.spyOn(console, 'warn').mockImplementation(() => {})
-vi.spyOn(console, 'groupCollapsed').mockImplementation(() => {})
 
-// Mock custom provider
+// Mock a custom provider
 class MockProvider implements CustomProvider {
   constructor() {}
   connect = vi.fn()
@@ -28,6 +27,22 @@ class MockProvider implements CustomProvider {
 }
 
 const mockProvider = new MockProvider()
+
+function createWalletWithStore(store: Store<State>): CustomWallet {
+  return new CustomWallet({
+    id: WalletId.CUSTOM,
+    options: {
+      provider: mockProvider
+    },
+    metadata: {
+      name: 'Custom Provider',
+      icon: 'mock-icon'
+    },
+    getAlgodClient: {} as any,
+    store,
+    subscribe: vi.fn()
+  })
+}
 
 describe('CustomWallet', () => {
   let wallet: CustomWallet
@@ -42,13 +57,6 @@ describe('CustomWallet', () => {
     name: 'Account 2',
     address: 'mockAddress2'
   }
-
-  const mockSubscribe: (callback: (state: State) => void) => () => void = vi.fn(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (callback: (state: State) => void) => {
-      return () => console.log('unsubscribe')
-    }
-  )
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -67,19 +75,7 @@ describe('CustomWallet', () => {
     })
 
     store = new Store<State>(defaultState)
-    wallet = new CustomWallet({
-      id: WalletId.CUSTOM,
-      options: {
-        provider: mockProvider
-      },
-      metadata: {
-        name: 'Custom Provider',
-        icon: 'mock-icon'
-      },
-      getAlgodClient: {} as any,
-      store,
-      subscribe: mockSubscribe
-    })
+    wallet = createWalletWithStore(store)
   })
 
   afterEach(async () => {
@@ -98,7 +94,7 @@ describe('CustomWallet', () => {
             metadata: {},
             getAlgodClient: {} as any,
             store,
-            subscribe: mockSubscribe
+            subscribe: vi.fn()
           })
       ).toThrowError('[Custom] Missing required option: provider')
     })
@@ -144,7 +140,7 @@ describe('CustomWallet', () => {
         metadata: {},
         getAlgodClient: {} as any,
         store,
-        subscribe: mockSubscribe
+        subscribe: vi.fn()
       })
 
       await expect(wallet.connect()).rejects.toThrowError('[Custom] Method not supported: connect')
@@ -175,7 +171,7 @@ describe('CustomWallet', () => {
         metadata: {},
         getAlgodClient: {} as any,
         store,
-        subscribe: mockSubscribe
+        subscribe: vi.fn()
       })
 
       vi.mocked(mockProvider.connect).mockResolvedValueOnce([account1])
@@ -207,16 +203,7 @@ describe('CustomWallet', () => {
         }
       })
 
-      wallet = new CustomWallet({
-        id: WalletId.CUSTOM,
-        options: {
-          provider: mockProvider
-        },
-        metadata: {},
-        getAlgodClient: {} as any,
-        store,
-        subscribe: mockSubscribe
-      })
+      wallet = wallet = createWalletWithStore(store)
 
       await wallet.resumeSession()
 
@@ -235,16 +222,7 @@ describe('CustomWallet', () => {
         }
       })
 
-      wallet = new CustomWallet({
-        id: WalletId.CUSTOM,
-        options: {
-          provider: mockProvider
-        },
-        metadata: {},
-        getAlgodClient: {} as any,
-        store,
-        subscribe: mockSubscribe
-      })
+      wallet = wallet = createWalletWithStore(store)
 
       vi.mocked(mockProvider.resumeSession).mockResolvedValueOnce([account2, account1])
 
@@ -279,7 +257,7 @@ describe('CustomWallet', () => {
         metadata: {},
         getAlgodClient: {} as any,
         store,
-        subscribe: mockSubscribe
+        subscribe: vi.fn()
       })
 
       await wallet.resumeSession()
@@ -307,7 +285,7 @@ describe('CustomWallet', () => {
       await wallet.signTransactions(txnGroup, indexesToSign)
 
       expect(mockProvider.signTransactions).toHaveBeenCalled()
-      expect(mockProvider.signTransactions).toHaveBeenCalledWith(txnGroup, indexesToSign, true)
+      expect(mockProvider.signTransactions).toHaveBeenCalledWith(txnGroup, indexesToSign)
     })
 
     it('should throw an error if provider.signTransactions is not defined', async () => {
@@ -323,7 +301,7 @@ describe('CustomWallet', () => {
         metadata: {},
         getAlgodClient: {} as any,
         store,
-        subscribe: mockSubscribe
+        subscribe: vi.fn()
       })
 
       await expect(wallet.signTransactions(txnGroup, indexesToSign)).rejects.toThrowError(
@@ -367,7 +345,7 @@ describe('CustomWallet', () => {
         metadata: {},
         getAlgodClient: {} as any,
         store,
-        subscribe: mockSubscribe
+        subscribe: vi.fn()
       })
 
       await expect(wallet.transactionSigner(txnGroup, indexesToSign)).rejects.toThrowError(

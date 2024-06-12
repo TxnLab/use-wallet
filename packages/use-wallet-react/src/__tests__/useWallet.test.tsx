@@ -202,11 +202,11 @@ describe('useWallet', () => {
 
     // Simulate calling signTransactions and transactionSigner
     await act(async () => {
-      await result.current.signTransactions([], [], true)
+      await result.current.signTransactions([], [])
       await result.current.transactionSigner([], [])
     })
 
-    expect(mocks.signTransactions).toHaveBeenCalledWith([], [], true)
+    expect(mocks.signTransactions).toHaveBeenCalledWith([], [])
     expect(mocks.transactionSigner).toHaveBeenCalledWith([], [])
   })
 

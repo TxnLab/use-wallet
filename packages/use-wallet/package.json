@@ -51,7 +51,6 @@
     "@walletconnect/modal-core": "^2.6.2",
     "@walletconnect/sign-client": "^2.10.2",
     "@walletconnect/types": "^2.10.2",
-    "algo-msgpack-with-bigint": "^2.1.1",
     "lute-connect": "^1.2.0",
     "magic-sdk": "^28.0.3",
     "tsup": "^8.0.0",

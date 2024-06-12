@@ -1,8 +1,8 @@
 import { Store } from '@tanstack/store'
-import * as msgpack from 'algo-msgpack-with-bigint'
 import algosdk from 'algosdk'
 import { StorageAdapter } from 'src/storage'
-import { LOCAL_STORAGE_KEY, State, defaultState } from 'src/store'
+import { LOCAL_STORAGE_KEY, State, WalletState, defaultState } from 'src/store'
+import { base64ToByteArray, byteArrayToBase64 } from 'src/utils'
 import { Exodus, ExodusWallet } from 'src/wallets/exodus'
 import { WalletId } from 'src/wallets/types'
 
@@ -15,51 +15,49 @@ vi.mock('src/storage', () => ({
 }))
 
 // Spy/suppress console output
-vi.spyOn(console, 'info').mockImplementation(() => {})
+vi.spyOn(console, 'info').mockImplementation(() => {}) // @todo: remove when debug logger is implemented
 vi.spyOn(console, 'warn').mockImplementation(() => {})
-vi.spyOn(console, 'error').mockImplementation(() => {})
-vi.spyOn(console, 'groupCollapsed').mockImplementation(() => {})
 
-const mockEnableFn = vi.fn().mockImplementation(() => {
-  return Promise.resolve({
-    genesisID: 'mainnet-v1.0',
-    genesisHash: 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=',
-    accounts: [
-      '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-      'GD64YIY3TWGDMCNPP553DZPPR6LDUSFQOIJVFDPPXWEG3FVOJCCDBBHU5A'
-    ]
-  })
-})
-
-const mockSignTxns = vi.fn().mockResolvedValue(['mockBase64SignedTxn'])
+const mockEnableFn = vi.fn()
+const mockSignTxns = vi.fn()
 
 // Mock Exodus extension
 const mockExodus: Exodus = {
   isConnected: true,
-  address: 'mock-address',
+  address: 'mockAddress1',
   enable: mockEnableFn,
   signTxns: mockSignTxns
 }
 
-Object.defineProperties(global, {
-  window: {
-    value: {
-      algorand: mockExodus
-    }
+Object.defineProperty(global, 'window', {
+  value: {
+    algorand: mockExodus
   }
 })
+
+function createWalletWithStore(store: Store<State>): ExodusWallet {
+  return new ExodusWallet({
+    id: WalletId.EXODUS,
+    metadata: {},
+    getAlgodClient: () => ({}) as any,
+    store,
+    subscribe: vi.fn()
+  })
+}
 
 describe('ExodusWallet', () => {
   let wallet: ExodusWallet
   let store: Store<State>
   let mockInitialState: State | null = null
 
-  const mockSubscribe: (callback: (state: State) => void) => () => void = vi.fn(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (callback: (state: State) => void) => {
-      return () => console.log('unsubscribe')
-    }
-  )
+  const account1 = {
+    name: 'Exodus Account 1',
+    address: 'mockAddress1'
+  }
+  const account2 = {
+    name: 'Exodus Account 2',
+    address: 'mockAddress2'
+  }
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -78,13 +76,7 @@ describe('ExodusWallet', () => {
     })
 
     store = new Store<State>(defaultState)
-    wallet = new ExodusWallet({
-      id: WalletId.EXODUS,
-      metadata: {},
-      getAlgodClient: () => ({}) as any,
-      store,
-      subscribe: mockSubscribe
-    })
+    wallet = createWalletWithStore(store)
   })
 
   afterEach(async () => {
@@ -93,15 +85,12 @@ describe('ExodusWallet', () => {
   })
 
   describe('connect', () => {
-    it('should initialize client, return account objects, and update store', async () => {
-      const account1 = {
-        name: 'Exodus Wallet 1',
-        address: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q'
-      }
-      const account2 = {
-        name: 'Exodus Wallet 2',
-        address: 'GD64YIY3TWGDMCNPP553DZPPR6LDUSFQOIJVFDPPXWEG3FVOJCCDBBHU5A'
-      }
+    it('should initialize client, return accounts, and update store', async () => {
+      mockEnableFn.mockResolvedValueOnce({
+        genesisID: 'mainnet-v1.0',
+        genesisHash: 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=',
+        accounts: [account1.address, account2.address]
+      })
 
       const accounts = await wallet.connect()
 
@@ -113,117 +102,114 @@ describe('ExodusWallet', () => {
       })
     })
 
-    it('should log an error and return an empty array when no accounts are found', async () => {
+    it('should throw an error if an empty array is returned', async () => {
       mockEnableFn.mockResolvedValueOnce({
         genesisID: 'mainnet-v1.0',
         genesisHash: 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=',
         accounts: []
       })
 
-      const accounts = await wallet.connect()
-
-      expect(wallet.isConnected).toBe(false)
-      expect(console.error).toHaveBeenCalledWith(
-        '[ExodusWallet] Error connecting: No accounts found!'
-      )
-      expect(accounts).toEqual([])
+      await expect(wallet.connect()).rejects.toThrow('No accounts found!')
       expect(store.state.wallets[WalletId.EXODUS]).toBeUndefined()
+      expect(wallet.isConnected).toBe(false)
+    })
+
+    it('should throw an error if connection fails', async () => {
+      // @ts-expect-error defined using Object.defineProperty
+      window.algorand = undefined
+
+      await expect(wallet.connect()).rejects.toThrow('Exodus is not available.')
+      expect(store.state.wallets[WalletId.EXODUS]).toBeUndefined()
+      expect(wallet.isConnected).toBe(false)
+
+      // @ts-expect-error defined using Object.defineProperty
+      window.algorand = mockExodus
     })
   })
 
   describe('disconnect', () => {
     it('should disconnect client and remove wallet from store', async () => {
-      // Connect first to initialize client
+      mockEnableFn.mockResolvedValueOnce({
+        genesisID: 'mainnet-v1.0',
+        genesisHash: 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=',
+        accounts: [account1.address]
+      })
+
       await wallet.connect()
-      expect(wallet.isConnected).toBe(true)
-      expect(store.state.wallets[WalletId.EXODUS]).toBeDefined()
-
       await wallet.disconnect()
-      expect(wallet.isConnected).toBe(false)
 
+      expect(wallet.isConnected).toBe(false)
       expect(store.state.wallets[WalletId.EXODUS]).toBeUndefined()
     })
   })
 
   describe('resumeSession', () => {
-    describe('when there is Exodus wallet data in the store', () => {
-      beforeEach(() => {
-        const account1 = {
-          name: 'Exodus Wallet 1',
-          address: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q'
-        }
-        const account2 = {
-          name: 'Exodus Wallet 2',
-          address: 'GD64YIY3TWGDMCNPP553DZPPR6LDUSFQOIJVFDPPXWEG3FVOJCCDBBHU5A'
-        }
+    it('should do nothing if no session is found', async () => {
+      await wallet.resumeSession()
 
-        store = new Store<State>({
-          ...defaultState,
-          wallets: {
-            [WalletId.EXODUS]: {
-              accounts: [account1, account2],
-              activeAccount: account1
-            }
-          }
-        })
-
-        wallet = new ExodusWallet({
-          id: WalletId.EXODUS,
-          metadata: {},
-          getAlgodClient: () => ({}) as any,
-          store,
-          subscribe: mockSubscribe
-        })
-      })
-
-      describe('when the Exodus extension is connected', () => {
-        it('should initialize client', async () => {
-          expect(store.state.wallets[WalletId.EXODUS]).toBeDefined()
-          await wallet.resumeSession()
-
-          expect(console.info).toHaveBeenCalledWith('[ExodusWallet] Resuming session...')
-          expect(console.info).toHaveBeenCalledWith('[ExodusWallet] Initializing client...')
-          expect(store.state.wallets[WalletId.EXODUS]).toBeDefined()
-        })
-      })
-
-      describe('when the Exodus extension is not connected', () => {
-        beforeEach(() => {
-          // @ts-expect-error - algorand does not exist on window
-          window.algorand.isConnected = false
-        })
-
-        it('should remove the wallet from the store', async () => {
-          expect(store.state.wallets[WalletId.EXODUS]).toBeDefined()
-          await wallet.resumeSession()
-
-          expect(console.info).toHaveBeenCalledWith('[ExodusWallet] Resuming session...')
-          expect(console.error).toHaveBeenCalledWith(
-            `[ExodusWallet] Error resuming session: Exodus is not connected.`
-          )
-          expect(store.state.wallets[WalletId.EXODUS]).toBeUndefined()
-        })
-
-        afterEach(() => {
-          // @ts-expect-error - algorand does not exist on window
-          window.algorand.isConnected = true
-        })
-      })
+      expect(wallet.isConnected).toBe(false)
     })
 
-    describe('when there is no Exodus wallet data in the store', () => {
-      it('should be a no-op', async () => {
-        expect(store.state.wallets[WalletId.EXODUS]).toBeUndefined()
-        await wallet.resumeSession()
+    it('should resume session if session is found', async () => {
+      const walletState: WalletState = {
+        accounts: [account1],
+        activeAccount: account1
+      }
 
-        expect(console.info).not.toHaveBeenCalledWith('[ExodusWallet] Resuming session...')
-        expect(store.state.wallets[WalletId.EXODUS]).toBeUndefined()
+      store = new Store<State>({
+        ...defaultState,
+        wallets: {
+          [WalletId.EXODUS]: walletState
+        }
       })
+
+      wallet = createWalletWithStore(store)
+
+      await wallet.resumeSession()
+
+      expect(wallet.isConnected).toBe(true)
+      expect(store.state.wallets[WalletId.EXODUS]).toEqual(walletState)
+    })
+
+    it('should throw an error and disconnect if isConnected is false', async () => {
+      // @ts-expect-error defined using Object.defineProperty
+      window.algorand.isConnected = false
+
+      const walletState: WalletState = {
+        accounts: [account1],
+        activeAccount: account1
+      }
+
+      store = new Store<State>({
+        ...defaultState,
+        wallets: {
+          [WalletId.EXODUS]: walletState
+        }
+      })
+
+      wallet = createWalletWithStore(store)
+
+      await expect(wallet.resumeSession()).rejects.toThrow('Exodus is not connected.')
+
+      expect(wallet.isConnected).toBe(false)
+      expect(store.state.wallets[WalletId.EXODUS]).toBeUndefined()
+
+      // @ts-expect-error defined using Object.defineProperty
+      window.algorand.isConnected = true
     })
   })
 
-  describe('signTransactions', () => {
+  describe('signing transactions', () => {
+    // Connected accounts
+    const connectedAcct1 = '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q'
+    const connectedAcct2 = 'GD64YIY3TWGDMCNPP553DZPPR6LDUSFQOIJVFDPPXWEG3FVOJCCDBBHU5A'
+
+    // Not connected account
+    const notConnectedAcct = 'EW64GC6F24M7NDSC5R3ES4YUVE3ZXXNMARJHDCCCLIHZU6TBEOC7XRSBG4'
+
     const txnParams = {
+      from: connectedAcct1,
+      to: connectedAcct2,
       fee: 10,
       firstRound: 51,
       lastRound: 61,
@@ -232,217 +218,176 @@ describe('ExodusWallet', () => {
     }
 
     // Transactions used in tests
-    const txn1 = new algosdk.Transaction({
-      ...txnParams,
-      from: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-      to: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-      amount: 1000
-    })
-    const txn2 = new algosdk.Transaction({
-      ...txnParams,
-      from: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-      to: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-      amount: 2000
-    })
-
-    // Signed transaction objects to be base64 encoded
-    const signedTxnObj1 = {
-      txn: Buffer.from(txn1.toByte()).toString('base64'),
-      sig: 'mockBase64Signature'
-    }
-    const signedTxnObj2 = {
-      txn: Buffer.from(txn2.toByte()).toString('base64'),
-      sig: 'mockBase64Signature'
-    }
-
-    // Signed transactions (base64 strings) returned by Exodus extension
-    const signedTxnStr1 = Buffer.from(
-      new Uint8Array(msgpack.encode(signedTxnObj1, { sortKeys: true }))
-    ).toString('base64')
-    const signedTxnStr2 = Buffer.from(
-      new Uint8Array(msgpack.encode(signedTxnObj2, { sortKeys: true }))
-    ).toString('base64')
-
-    // Signed transactions (Uint8Array) returned by ExodusWallet.signTransactions
-    const signedTxnEncoded1 = new Uint8Array(Buffer.from(signedTxnStr1, 'base64'))
-    const signedTxnEncoded2 = new Uint8Array(Buffer.from(signedTxnStr2, 'base64'))
+    const txn1 = new algosdk.Transaction({ ...txnParams, amount: 1000 })
+    const txn2 = new algosdk.Transaction({ ...txnParams, amount: 2000 })
+    const txn3 = new algosdk.Transaction({ ...txnParams, amount: 3000 })
+    const txn4 = new algosdk.Transaction({ ...txnParams, amount: 4000 })
 
     beforeEach(async () => {
+      // Mock two connected accounts
+      mockEnableFn.mockResolvedValueOnce({
+        genesisID: 'mainnet-v1.0',
+        genesisHash: 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=',
+        accounts: [connectedAcct1, connectedAcct2]
+      })
+
+      const mockSignedTxn = byteArrayToBase64(txn1.toByte())
+      mockSignTxns.mockResolvedValue([mockSignedTxn])
+
       await wallet.connect()
     })
 
-    it('should correctly process and sign a single algosdk.Transaction', async () => {
-      mockSignTxns.mockResolvedValueOnce([signedTxnStr1])
+    describe('signTransactions', () => {
+      it('should correctly process and sign a single algosdk.Transaction', async () => {
+        await wallet.signTransactions([txn1])
 
-      const result = await wallet.signTransactions([txn1])
-
-      expect(result).toEqual([signedTxnEncoded1])
-      expect(mockSignTxns).toHaveBeenCalledWith([
-        {
-          txn: Buffer.from(txn1.toByte()).toString('base64')
-        }
-      ])
-    })
-
-    it('should correctly process and sign a single algosdk.Transaction group', async () => {
-      mockSignTxns.mockResolvedValueOnce([signedTxnStr1, signedTxnStr2])
-
-      const result = await wallet.signTransactions([txn1, txn2])
-
-      expect(result).toEqual([signedTxnEncoded1, signedTxnEncoded2])
-      expect(mockSignTxns).toHaveBeenCalledWith([
-        {
-          txn: Buffer.from(txn1.toByte()).toString('base64')
-        },
-        {
-          txn: Buffer.from(txn2.toByte()).toString('base64')
-        }
-      ])
-    })
-
-    it('should correctly process and sign multiple algosdk.Transaction groups', async () => {
-      mockSignTxns.mockResolvedValueOnce([signedTxnStr1, signedTxnStr2])
-
-      const result = await wallet.signTransactions([[txn1], [txn2]])
-
-      expect(result).toEqual([signedTxnEncoded1, signedTxnEncoded2])
-      expect(mockSignTxns).toHaveBeenCalledWith([
-        {
-          txn: Buffer.from(txn1.toByte()).toString('base64')
-        },
-        {
-          txn: Buffer.from(txn2.toByte()).toString('base64')
-        }
-      ])
-    })
-
-    it('should correctly process and sign a single encoded transaction', async () => {
-      mockSignTxns.mockResolvedValueOnce([signedTxnStr1])
-
-      const encodedTxn = txn1.toByte()
-      const result = await wallet.signTransactions([encodedTxn])
-
-      expect(result).toEqual([signedTxnEncoded1])
-      expect(mockSignTxns).toHaveBeenCalledWith([
-        {
-          txn: Buffer.from(txn1.toByte()).toString('base64')
-        }
-      ])
-    })
-
-    it('should correctly process and sign a single encoded transaction group', async () => {
-      mockSignTxns.mockResolvedValueOnce([signedTxnStr1, signedTxnStr2])
-
-      const txnGroup = [txn1, txn2]
-      const encodedTxnGroup = txnGroup.map((txn) => txn.toByte())
-
-      const result = await wallet.signTransactions(encodedTxnGroup)
-
-      expect(result).toEqual([signedTxnEncoded1, signedTxnEncoded2])
-      expect(mockSignTxns).toHaveBeenCalledWith([
-        {
-          txn: Buffer.from(txn1.toByte()).toString('base64')
-        },
-        {
-          txn: Buffer.from(txn2.toByte()).toString('base64')
-        }
-      ])
-    })
-
-    it('should correctly process and sign multiple encoded transaction groups', async () => {
-      mockSignTxns.mockResolvedValueOnce([signedTxnStr1, signedTxnStr2])
-
-      const result = await wallet.signTransactions([[txn1.toByte()], [txn2.toByte()]])
-
-      expect(result).toEqual([signedTxnEncoded1, signedTxnEncoded2])
-      expect(mockSignTxns).toHaveBeenCalledWith([
-        {
-          txn: Buffer.from(txn1.toByte()).toString('base64')
-        },
-        {
-          txn: Buffer.from(txn2.toByte()).toString('base64')
-        }
-      ])
-    })
-
-    it('should determine which transactions to sign based on indexesToSign', async () => {
-      mockSignTxns.mockResolvedValueOnce([null, signedTxnStr2])
-
-      const txnGroup = [txn1, txn2]
-      const indexesToSign = [1]
-      const returnGroup = false // Return only the signed transaction
-
-      const expectedResult = [signedTxnEncoded2]
-
-      const result = await wallet.signTransactions(txnGroup, indexesToSign, returnGroup)
-
-      expect(result).toEqual(expectedResult)
-      expect(mockSignTxns).toHaveBeenCalledWith([
-        {
-          txn: Buffer.from(txn1.toByte()).toString('base64'),
-          signers: [] // txn1 should not be signed
-        },
-        {
-          txn: Buffer.from(txn2.toByte()).toString('base64')
-        }
-      ])
-    })
-
-    it('should correctly merge signed transactions back into the original group', async () => {
-      mockSignTxns.mockResolvedValueOnce([null, signedTxnStr2])
-
-      const txnGroup = [txn1, txn2]
-      const returnGroup = true // Merge signed transaction back into original group
-
-      // Only txn2 should be signed
-      const indexesToSign1 = [1]
-      const expectedResult1 = [algosdk.encodeUnsignedTransaction(txn1), signedTxnEncoded2]
-
-      const result1 = await wallet.signTransactions(txnGroup, indexesToSign1, returnGroup)
-      expect(result1).toEqual(expectedResult1)
-
-      mockSignTxns.mockResolvedValueOnce([signedTxnStr1, null])
-
-      // Only txn1 should be signed
-      const indexesToSign2 = [0]
-      const expectedResult2 = [signedTxnEncoded1, algosdk.encodeUnsignedTransaction(txn2)]
-
-      const result2 = await wallet.signTransactions(txnGroup, indexesToSign2, returnGroup)
-      expect(result2).toEqual(expectedResult2)
-    })
-
-    it('should only send transactions with connected signers for signature', async () => {
-      const txnCannotSign = new algosdk.Transaction({
-        ...txnParams,
-        from: 'EW64GC6F24M7NDSC5R3ES4YUVE3ZXXNMARJHDCCCLIHZU6TBEOC7XRSBG4', // EW64GC is not connected
-        to: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-        amount: 3000
+        expect(mockSignTxns).toHaveBeenCalledWith([{ txn: byteArrayToBase64(txn1.toByte()) }])
       })
 
-      mockSignTxns.mockResolvedValueOnce([signedTxnStr1, null, signedTxnStr2])
+      it('should correctly process and sign a single algosdk.Transaction group', async () => {
+        const [gtxn1, gtxn2, gtxn3] = algosdk.assignGroupID([txn1, txn2, txn3])
+        await wallet.signTransactions([gtxn1, gtxn2, gtxn3])
 
-      const result = await wallet.signTransactions([txn1, txnCannotSign, txn2])
+        expect(mockSignTxns).toHaveBeenCalledWith([
+          { txn: byteArrayToBase64(gtxn1.toByte()) },
+          { txn: byteArrayToBase64(gtxn2.toByte()) },
+          { txn: byteArrayToBase64(gtxn3.toByte()) }
+        ])
+      })
 
-      // expectedResult[1] should be original unsigned transaction
-      const expectedResult = [
-        signedTxnEncoded1,
-        algosdk.encodeUnsignedTransaction(txnCannotSign),
-        signedTxnEncoded2
-      ]
+      it('should correctly process and sign multiple algosdk.Transaction groups', async () => {
+        const [g1txn1, g1txn2] = algosdk.assignGroupID([txn1, txn2])
+        const [g2txn1, g2txn2] = algosdk.assignGroupID([txn3, txn4])
 
-      expect(result).toEqual(expectedResult)
-      expect(mockSignTxns).toHaveBeenCalledWith([
-        {
-          txn: Buffer.from(txn1.toByte()).toString('base64')
-        },
-        {
-          txn: Buffer.from(txnCannotSign.toByte()).toString('base64'),
-          signers: [] // should not be signed
-        },
-        {
-          txn: Buffer.from(txn2.toByte()).toString('base64')
-        }
-      ])
+        await wallet.signTransactions([
+          [g1txn1, g1txn2],
+          [g2txn1, g2txn2]
+        ])
+
+        expect(mockSignTxns).toHaveBeenCalledWith([
+          { txn: byteArrayToBase64(g1txn1.toByte()) },
+          { txn: byteArrayToBase64(g1txn2.toByte()) },
+          { txn: byteArrayToBase64(g2txn1.toByte()) },
+          { txn: byteArrayToBase64(g2txn2.toByte()) }
+        ])
+      })
+
+      it('should correctly process and sign a single encoded transaction', async () => {
+        const encodedTxn = txn1.toByte()
+        await wallet.signTransactions([encodedTxn])
+
+        expect(mockSignTxns).toHaveBeenCalledWith([{ txn: byteArrayToBase64(txn1.toByte()) }])
+      })
+
+      it('should correctly process and sign a single encoded transaction group', async () => {
+        const txnGroup = algosdk.assignGroupID([txn1, txn2, txn3])
+        const [gtxn1, gtxn2, gtxn3] = txnGroup.map((txn) => txn.toByte())
+
+        await wallet.signTransactions([gtxn1, gtxn2, gtxn3])
+
+        expect(mockSignTxns).toHaveBeenCalledWith([
+          { txn: byteArrayToBase64(gtxn1) },
+          { txn: byteArrayToBase64(gtxn2) },
+          { txn: byteArrayToBase64(gtxn3) }
+        ])
+      })
+
+      it('should correctly process and sign multiple encoded transaction groups', async () => {
+        const txnGroup1 = algosdk.assignGroupID([txn1, txn2])
+        const [g1txn1, g1txn2] = txnGroup1.map((txn) => txn.toByte())
+
+        const txnGroup2 = algosdk.assignGroupID([txn3, txn4])
+        const [g2txn1, g2txn2] = txnGroup2.map((txn) => txn.toByte())
+
+        await wallet.signTransactions([
+          [g1txn1, g1txn2],
+          [g2txn1, g2txn2]
+        ])
+
+        expect(mockSignTxns).toHaveBeenCalledWith([
+          { txn: byteArrayToBase64(g1txn1) },
+          { txn: byteArrayToBase64(g1txn2) },
+          { txn: byteArrayToBase64(g2txn1) },
+          { txn: byteArrayToBase64(g2txn2) }
+        ])
+      })
+
+      it('should determine which transactions to sign based on indexesToSign', async () => {
+        const [gtxn1, gtxn2, gtxn3, gtxn4] = algosdk.assignGroupID([txn1, txn2, txn3, txn4])
+        const indexesToSign = [0, 1, 3]
+
+        const gtxn1String = byteArrayToBase64(gtxn1.toByte())
+        const gtxn2String = byteArrayToBase64(gtxn2.toByte())
+        const gtxn4String = byteArrayToBase64(gtxn4.toByte())
+
+        // Mock signTxns to return "signed" (not really) base64 transactions or null
+        mockSignTxns.mockResolvedValueOnce([gtxn1String, gtxn2String, null, gtxn4String])
+
+        const result = await wallet.signTransactions([gtxn1, gtxn2, gtxn3, gtxn4], indexesToSign)
+
+        expect(mockSignTxns).toHaveBeenCalledWith([
+          { txn: byteArrayToBase64(gtxn1.toByte()) },
+          { txn: byteArrayToBase64(gtxn2.toByte()) },
+          { txn: byteArrayToBase64(gtxn3.toByte()), signers: [] },
+          { txn: byteArrayToBase64(gtxn4.toByte()) }
+        ])
+
+        // Only encoded "signed" transactions should be returned
+        expect(result).toHaveLength(indexesToSign.length)
+        expect(result).toEqual([
+          base64ToByteArray(gtxn1String),
+          base64ToByteArray(gtxn2String),
+          base64ToByteArray(gtxn4String)
+        ])
+      })
+
+      it('should only send transactions with connected signers for signature', async () => {
+        const canSignTxn1 = new algosdk.Transaction({
+          ...txnParams,
+          from: connectedAcct1,
+          amount: 1000
+        })
+
+        const cannotSignTxn2 = new algosdk.Transaction({
+          ...txnParams,
+          from: notConnectedAcct,
+          amount: 2000
+        })
+
+        const canSignTxn3 = new algosdk.Transaction({
+          ...txnParams,
+          from: connectedAcct2,
+          amount: 3000
+        })
+
+        // Signer for gtxn2 is not a connected account
+        const [gtxn1, gtxn2, gtxn3] = algosdk.assignGroupID([
+          canSignTxn1,
+          cannotSignTxn2, // Should not be signed
+          canSignTxn3
+        ])
+
+        await wallet.signTransactions([gtxn1, gtxn2, gtxn3])
+
+        expect(mockSignTxns).toHaveBeenCalledWith([
+          { txn: byteArrayToBase64(gtxn1.toByte()) },
+          { txn: byteArrayToBase64(gtxn2.toByte()), signers: [] },
+          { txn: byteArrayToBase64(gtxn3.toByte()) }
+        ])
+      })
+    })
+
+    describe('transactionSigner', () => {
+      it('should call signTransactions with the correct arguments', async () => {
+        const txnGroup = algosdk.assignGroupID([txn1, txn2])
+        const indexesToSign = [1]
+
+        const signTransactionsSpy = vi.spyOn(wallet, 'signTransactions')
+
+        await wallet.transactionSigner(txnGroup, indexesToSign)
+
+        expect(signTransactionsSpy).toHaveBeenCalledWith(txnGroup, indexesToSign)
+      })
     })
   })
 })

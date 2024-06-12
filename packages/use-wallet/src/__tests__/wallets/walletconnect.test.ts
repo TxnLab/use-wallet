@@ -1,11 +1,13 @@
 import { Store } from '@tanstack/store'
 import { ModalCtrl } from '@walletconnect/modal-core'
-import * as msgpack from 'algo-msgpack-with-bigint'
 import algosdk from 'algosdk'
+import { NetworkId, caipChainId } from 'src/network'
 import { StorageAdapter } from 'src/storage'
-import { LOCAL_STORAGE_KEY, State, defaultState } from 'src/store'
+import { LOCAL_STORAGE_KEY, State, WalletState, defaultState } from 'src/store'
+import { base64ToByteArray, byteArrayToBase64 } from 'src/utils'
 import { WalletConnect } from 'src/wallets/walletconnect'
 import { WalletId, WalletTransaction } from 'src/wallets/types'
+import { SessionTypes } from '@walletconnect/types'
 
 // Mock storage adapter
 vi.mock('src/storage', () => ({
@@ -16,10 +18,8 @@ vi.mock('src/storage', () => ({
 }))
 
 // Spy/suppress console output
-vi.spyOn(console, 'info').mockImplementation(() => {})
+vi.spyOn(console, 'info').mockImplementation(() => {}) // @todo: remove when debug logger is implemented
 vi.spyOn(console, 'warn').mockImplementation(() => {})
-vi.spyOn(console, 'error').mockImplementation(() => {})
-vi.spyOn(console, 'groupCollapsed').mockImplementation(() => {})
 
 const mockSignClient = {
   on: vi.fn(),
@@ -43,16 +43,15 @@ vi.mock('@walletconnect/sign-client', () => {
 
 vi.spyOn(ModalCtrl, 'open').mockImplementation(() => Promise.resolve())
 vi.spyOn(ModalCtrl, 'close').mockImplementation(() => {})
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-vi.spyOn(ModalCtrl, 'subscribe').mockImplementation((callback: (state: any) => void) => {
+vi.spyOn(ModalCtrl, 'subscribe').mockImplementation((_callback: (state: any) => void) => {
   return () => console.log('unsubscribe')
 })
 
-const createMockSessionStruct = (overrides = {}) => {
-  const defaultSessionStruct = {
+function createMockSession(accounts: string[] = []): SessionTypes.Struct {
+  return {
     namespaces: {
       algorand: {
-        accounts: [],
+        accounts: accounts.map((address) => `${caipChainId[NetworkId.TESTNET]}:${address}`),
         methods: ['algo_signTxn'],
         events: []
       }
@@ -68,9 +67,9 @@ const createMockSessionStruct = (overrides = {}) => {
     requiredNamespaces: {
       algorand: {
         chains: [
-          'algorand:wGHE2Pwdvd7S12BL5FaOP20EGYesN73k',
-          'algorand:SGO1GKSzyE7IEPItTxCByw9x8FmnrCDe',
-          'algorand:mFgazF-2uRS1tMiL9dsj01hJGySEmPN2'
+          caipChainId[NetworkId.MAINNET]!,
+          caipChainId[NetworkId.TESTNET]!,
+          caipChainId[NetworkId.BETANET]!
         ],
         methods: ['algo_signTxn'],
         events: []
@@ -96,8 +95,19 @@ const createMockSessionStruct = (overrides = {}) => {
       }
     }
   }
+}
 
-  return { ...defaultSessionStruct, ...overrides }
+function createWalletWithStore(store: Store<State>): WalletConnect {
+  return new WalletConnect({
+    id: WalletId.WALLETCONNECT,
+    options: {
+      projectId: 'mockProjectId'
+    },
+    metadata: {},
+    getAlgodClient: () => ({}) as any,
+    store,
+    subscribe: vi.fn()
+  })
 }
 
 describe('WalletConnect', () => {
@@ -105,12 +115,14 @@ describe('WalletConnect', () => {
   let store: Store<State>
   let mockInitialState: State | null = null
 
-  const mockSubscribe: (callback: (state: State) => void) => () => void = vi.fn(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (callback: (state: State) => void) => {
-      return () => console.log('unsubscribe')
-    }
-  )
+  const account1 = {
+    name: 'WalletConnect Account 1',
+    address: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q'
+  }
+  const account2 = {
+    name: 'WalletConnect Account 2',
+    address: 'GD64YIY3TWGDMCNPP553DZPPR6LDUSFQOIJVFDPPXWEG3FVOJCCDBBHU5A'
+  }
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -129,16 +141,7 @@ describe('WalletConnect', () => {
     })
 
     store = new Store<State>(defaultState)
-    wallet = new WalletConnect({
-      id: WalletId.WALLETCONNECT,
-      options: {
-        projectId: 'mockProjectId'
-      },
-      metadata: {},
-      getAlgodClient: () => ({}) as any,
-      store,
-      subscribe: mockSubscribe
-    })
+    wallet = createWalletWithStore(store)
   })
 
   afterEach(async () => {
@@ -147,30 +150,9 @@ describe('WalletConnect', () => {
   })
 
   describe('connect', () => {
-    it('should initialize client, return account objects, and update store', async () => {
-      const account1 = {
-        name: 'WalletConnect 1',
-        address: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q'
-      }
-      const account2 = {
-        name: 'WalletConnect 2',
-        address: 'GD64YIY3TWGDMCNPP553DZPPR6LDUSFQOIJVFDPPXWEG3FVOJCCDBBHU5A'
-      }
-
-      const mockSession = createMockSessionStruct({
-        namespaces: {
-          algorand: {
-            accounts: [
-              'algorand:SGO1GKSzyE7IEPItTxCByw9x8FmnrCDe:7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-              'algorand:SGO1GKSzyE7IEPItTxCByw9x8FmnrCDe:GD64YIY3TWGDMCNPP553DZPPR6LDUSFQOIJVFDPPXWEG3FVOJCCDBBHU5A'
-            ],
-            methods: ['algo_signTxn'],
-            events: []
-          }
-        }
-      })
-
-      mockSignClient.connect.mockResolvedValue({
+    it('should initialize client, return accounts, and update store', async () => {
+      const mockSession = createMockSession([account1.address, account2.address])
+      mockSignClient.connect.mockResolvedValueOnce({
         uri: 'mock-uri',
         approval: vi.fn().mockResolvedValue(mockSession)
       })
@@ -185,99 +167,73 @@ describe('WalletConnect', () => {
       })
     })
 
-    it('should log an error and return an empty array when no accounts are found', async () => {
-      const mockSession = createMockSessionStruct()
+    it('should throw an error if no URI is returned', async () => {
+      const mockSession = createMockSession([])
+      mockSignClient.connect.mockResolvedValueOnce({
+        approval: vi.fn().mockResolvedValue(mockSession)
+      })
 
-      mockSignClient.connect.mockResolvedValue({
+      await expect(wallet.connect()).rejects.toThrow('No URI found')
+
+      expect(store.state.wallets[WalletId.WALLETCONNECT]).toBeUndefined()
+      expect(wallet.isConnected).toBe(false)
+    })
+
+    it('should throw an error if an empty array is returned', async () => {
+      const mockSession = createMockSession([])
+      mockSignClient.connect.mockResolvedValueOnce({
         uri: 'mock-uri',
         approval: vi.fn().mockResolvedValue(mockSession)
       })
 
-      const accounts = await wallet.connect()
+      await expect(wallet.connect()).rejects.toThrow('No accounts found!')
 
-      expect(wallet.isConnected).toBe(false)
-      expect(console.error).toHaveBeenCalledWith(
-        '[WalletConnect] Error connecting: No accounts found!'
-      )
-      expect(accounts).toEqual([])
       expect(store.state.wallets[WalletId.WALLETCONNECT]).toBeUndefined()
+      expect(wallet.isConnected).toBe(false)
     })
   })
 
   describe('disconnect', () => {
     it('should disconnect client and remove wallet from store', async () => {
-      const mockSession = createMockSessionStruct({
-        namespaces: {
-          algorand: {
-            accounts: [
-              'algorand:SGO1GKSzyE7IEPItTxCByw9x8FmnrCDe:7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-              'algorand:SGO1GKSzyE7IEPItTxCByw9x8FmnrCDe:GD64YIY3TWGDMCNPP553DZPPR6LDUSFQOIJVFDPPXWEG3FVOJCCDBBHU5A'
-            ],
-            methods: ['algo_signTxn'],
-            events: []
-          }
-        }
-      })
-
-      mockSignClient.connect.mockResolvedValue({
+      const mockSession = createMockSession([account1.address, account2.address])
+      mockSignClient.connect.mockResolvedValueOnce({
         uri: 'mock-uri',
         approval: vi.fn().mockResolvedValue(mockSession)
       })
 
-      // Connect first to initialize client
       await wallet.connect()
-      expect(wallet.isConnected).toBe(true)
-      expect(store.state.wallets[WalletId.WALLETCONNECT]).toBeDefined()
-
       await wallet.disconnect()
-      expect(wallet.isConnected).toBe(false)
 
       expect(mockSignClient.disconnect).toHaveBeenCalled()
+      expect(wallet.isConnected).toBe(false)
       expect(store.state.wallets[WalletId.WALLETCONNECT]).toBeUndefined()
     })
   })
 
   describe('resumeSession', () => {
-    it('should automatically connect if WalletConnect wallet data is found in the store', async () => {
-      const account = {
-        name: 'WalletConnect 1',
-        address: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q'
+    it('should do nothing if no session is found', async () => {
+      await wallet.resumeSession()
+
+      expect(wallet.isConnected).toBe(false)
+    })
+
+    it('should resume session if session is found', async () => {
+      const walletState: WalletState = {
+        accounts: [account1],
+        activeAccount: account1
       }
 
       store = new Store<State>({
         ...defaultState,
         wallets: {
-          [WalletId.WALLETCONNECT]: {
-            accounts: [account],
-            activeAccount: account
-          }
+          [WalletId.WALLETCONNECT]: walletState
         }
       })
 
-      wallet = new WalletConnect({
-        id: WalletId.WALLETCONNECT,
-        options: {
-          projectId: 'mockProjectId'
-        },
-        metadata: {},
-        getAlgodClient: () => ({}) as any,
-        store,
-        subscribe: mockSubscribe
-      })
+      wallet = createWalletWithStore(store)
 
-      const mockSession = createMockSessionStruct({
-        namespaces: {
-          algorand: {
-            accounts: [
-              'algorand:SGO1GKSzyE7IEPItTxCByw9x8FmnrCDe:7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q'
-            ],
-            methods: ['algo_signTxn'],
-            events: []
-          }
-        }
-      })
-
-      mockSignClient.session.get.mockImplementation(() => mockSession)
+      const mockSession = createMockSession([account1.address])
+      mockSignClient.session.get.mockImplementationOnce(() => mockSession)
 
       const mockSessionKey = 'mockSessionKey'
       mockSignClient.session.keys = [mockSessionKey]
@@ -285,387 +241,298 @@ describe('WalletConnect', () => {
 
       await wallet.resumeSession()
 
-      expect(console.info).toHaveBeenCalledWith('[WalletConnect] Resuming session...')
-      expect(console.info).toHaveBeenCalledWith('[WalletConnect] Initializing client...')
       expect(wallet.isConnected).toBe(true)
-      expect(store.state.wallets[WalletId.WALLETCONNECT]).toBeDefined()
+      expect(store.state.wallets[WalletId.WALLETCONNECT]).toEqual(walletState)
     })
 
-    it('should not automatically connect if WalletConnect wallet data is not found in the store', async () => {
-      // No wallets in store
-      await wallet.resumeSession()
-
-      expect(console.info).not.toHaveBeenCalledWith('[WalletConnect] Resuming session...')
-      expect(wallet.isConnected).toBe(false)
-      expect(store.state.wallets[WalletId.WALLETCONNECT]).toBeUndefined()
-    })
-
-    it('should update the store if accounts returned by the client do not match', async () => {
-      // Store contains '7ZUECA' and 'GD64YI', with '7ZUECA' as active
-      store = new Store<State>({
-        ...defaultState,
-        wallets: {
-          [WalletId.WALLETCONNECT]: {
-            accounts: [
-              {
-                name: 'WalletConnect 1',
-                address: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q'
-              },
-              {
-                name: 'WalletConnect 2',
-                address: 'GD64YIY3TWGDMCNPP553DZPPR6LDUSFQOIJVFDPPXWEG3FVOJCCDBBHU5A'
-              }
-            ],
-            activeAccount: {
-              name: 'WalletConnect 1',
-              address: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q'
-            }
-          }
-        }
-      })
-
-      wallet = new WalletConnect({
-        id: WalletId.WALLETCONNECT,
-        options: {
-          projectId: 'mockProjectId'
-        },
-        metadata: {},
-        getAlgodClient: () => ({}) as any,
-        store,
-        subscribe: mockSubscribe
-      })
-
-      // Client only returns 'GD64YI' on reconnect, '7ZUECA' is missing
-      const mockSession = createMockSessionStruct({
-        namespaces: {
-          algorand: {
-            accounts: [
-              'algorand:SGO1GKSzyE7IEPItTxCByw9x8FmnrCDe:GD64YIY3TWGDMCNPP553DZPPR6LDUSFQOIJVFDPPXWEG3FVOJCCDBBHU5A'
-            ],
-            methods: ['algo_signTxn'],
-            events: []
-          }
-        }
-      })
-
-      mockSignClient.session.get.mockImplementation(() => mockSession)
-
-      await wallet.resumeSession()
-
-      expect(console.warn).toHaveBeenCalledWith(
-        '[WalletConnect] Session accounts mismatch, updating accounts'
-      )
-
-      // Store now only contains 'GD64YI', which is set as active
-      expect(store.state.wallets[WalletId.WALLETCONNECT]).toEqual({
+    it('should update the store if accounts do not match', async () => {
+      // Stored accounts are '7ZUECA' and 'GD64YI'
+      const prevWalletState = {
         accounts: [
           {
-            name: 'WalletConnect 1', // auto-generated name
+            name: 'WalletConnect Account 1',
+            address: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q'
+          },
+          {
+            name: 'WalletConnect Account 2',
             address: 'GD64YIY3TWGDMCNPP553DZPPR6LDUSFQOIJVFDPPXWEG3FVOJCCDBBHU5A'
           }
         ],
         activeAccount: {
-          name: 'WalletConnect 1',
-          address: 'GD64YIY3TWGDMCNPP553DZPPR6LDUSFQOIJVFDPPXWEG3FVOJCCDBBHU5A'
+          name: 'WalletConnect Account 1',
+          address: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q'
+        }
+      }
+
+      store = new Store<State>({
+        ...defaultState,
+        wallets: {
+          [WalletId.WALLETCONNECT]: prevWalletState
         }
       })
+
+      wallet = createWalletWithStore(store)
+
+      const newAccounts = ['GD64YIY3TWGDMCNPP553DZPPR6LDUSFQOIJVFDPPXWEG3FVOJCCDBBHU5A']
+
+      const newWalletState: WalletState = {
+        accounts: [
+          {
+            name: 'WalletConnect Account 1',
+            address: 'GD64YIY3TWGDMCNPP553DZPPR6LDUSFQOIJVFDPPXWEG3FVOJCCDBBHU5A'
+          }
+        ],
+        activeAccount: {
+          name: 'WalletConnect Account 1',
+          address: 'GD64YIY3TWGDMCNPP553DZPPR6LDUSFQOIJVFDPPXWEG3FVOJCCDBBHU5A'
+        }
+      }
+
+      // Client only returns 'GD64YI' on reconnect
+      const mockSession = createMockSession(newAccounts)
+      mockSignClient.session.get.mockImplementationOnce(() => mockSession)
+
+      await wallet.resumeSession()
+
+      expect(console.warn).toHaveBeenCalledWith(
+        '[WalletConnect] Session accounts mismatch, updating accounts',
+        {
+          prev: prevWalletState.accounts,
+          current: newWalletState.accounts
+        }
+      )
+      expect(store.state.wallets[WalletId.WALLETCONNECT]).toEqual(newWalletState)
     })
   })
 
-  describe('signTransactions', () => {
-    describe('when the client is not initialized', () => {
-      it('should throw an error', async () => {
-        await expect(wallet.signTransactions([])).rejects.toThrowError(
-          '[WalletConnect] Client not initialized!'
-        )
+  describe('signing transactions', () => {
+    // Connected accounts
+    const connectedAcct1 = '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q'
+    const connectedAcct2 = 'GD64YIY3TWGDMCNPP553DZPPR6LDUSFQOIJVFDPPXWEG3FVOJCCDBBHU5A'
+
+    // Not connected account
+    const notConnectedAcct = 'EW64GC6F24M7NDSC5R3ES4YUVE3ZXXNMARJHDCCCLIHZU6TBEOC7XRSBG4'
+
+    const txnParams = {
+      from: connectedAcct1,
+      to: connectedAcct2,
+      fee: 10,
+      firstRound: 51,
+      lastRound: 61,
+      genesisHash: 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=',
+      genesisID: 'mainnet-v1.0'
+    }
+
+    // Transactions used in tests
+    const txn1 = new algosdk.Transaction({ ...txnParams, amount: 1000 })
+    const txn2 = new algosdk.Transaction({ ...txnParams, amount: 2000 })
+    const txn3 = new algosdk.Transaction({ ...txnParams, amount: 3000 })
+    const txn4 = new algosdk.Transaction({ ...txnParams, amount: 4000 })
+
+    const expectedRpcRequest = (params: WalletTransaction[][]) => {
+      return {
+        chainId: caipChainId[NetworkId.TESTNET],
+        topic: 'mock-topic',
+        request: expect.objectContaining({
+          jsonrpc: '2.0',
+          method: 'algo_signTxn',
+          params
+        })
+      }
+    }
+
+    beforeEach(async () => {
+      // Mock two connected accounts
+      const mockSession = createMockSession([account1.address, account2.address])
+      mockSignClient.connect.mockResolvedValueOnce({
+        uri: 'mock-uri',
+        approval: vi.fn().mockResolvedValue(mockSession)
       })
+
+      const mockSignedTxn = byteArrayToBase64(txn1.toByte())
+      mockSignClient.request.mockResolvedValue([mockSignedTxn])
+
+      await wallet.connect()
     })
 
-    describe('when the client is initialized', () => {
-      const txnParams = {
-        fee: 10,
-        firstRound: 51,
-        lastRound: 61,
-        genesisHash: 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=',
-        genesisID: 'mainnet-v1.0'
-      }
+    describe('signTransactions', () => {
+      it('should process and sign a single algosdk.Transaction', async () => {
+        await wallet.signTransactions([txn1])
 
-      // Transactions used in tests
-      const txn1 = new algosdk.Transaction({
-        ...txnParams,
-        from: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-        to: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-        amount: 1000
-      })
-      const txn2 = new algosdk.Transaction({
-        ...txnParams,
-        from: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-        to: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-        amount: 2000
-      })
-
-      // Signed transaction objects to be base64 encoded
-      const signedTxnObj1 = {
-        txn: Buffer.from(txn1.toByte()).toString('base64'),
-        sig: 'mockBase64Signature'
-      }
-      const signedTxnObj2 = {
-        txn: Buffer.from(txn2.toByte()).toString('base64'),
-        sig: 'mockBase64Signature'
-      }
-
-      // Signed transactions (base64 strings) returned by Exodus extension
-      const signedTxnStr1 = Buffer.from(
-        new Uint8Array(msgpack.encode(signedTxnObj1, { sortKeys: true }))
-      ).toString('base64')
-      const signedTxnStr2 = Buffer.from(
-        new Uint8Array(msgpack.encode(signedTxnObj2, { sortKeys: true }))
-      ).toString('base64')
-
-      // Signed transactions (Uint8Array) returned by ExodusWallet.signTransactions
-      const signedTxnEncoded1 = new Uint8Array(Buffer.from(signedTxnStr1, 'base64'))
-      const signedTxnEncoded2 = new Uint8Array(Buffer.from(signedTxnStr2, 'base64'))
-
-      function createExpectedRpcRequest(params: WalletTransaction[][]) {
-        return {
-          chainId: 'algorand:SGO1GKSzyE7IEPItTxCByw9x8FmnrCDe',
-          topic: 'mock-topic',
-          request: expect.objectContaining({
-            // ignore generated `id` property
-            jsonrpc: '2.0',
-            method: 'algo_signTxn',
-            params
-          })
-        }
-      }
-
-      beforeEach(async () => {
-        // Mock two connected accounts, 7ZUECA and GD64YI
-        const mockSession = createMockSessionStruct({
-          namespaces: {
-            algorand: {
-              accounts: [
-                'algorand:SGO1GKSzyE7IEPItTxCByw9x8FmnrCDe:7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-                'algorand:SGO1GKSzyE7IEPItTxCByw9x8FmnrCDe:GD64YIY3TWGDMCNPP553DZPPR6LDUSFQOIJVFDPPXWEG3FVOJCCDBBHU5A'
-              ],
-              methods: ['algo_signTxn'],
-              events: []
-            }
-          }
-        })
-
-        mockSignClient.connect.mockResolvedValue({
-          uri: 'mock-uri',
-          approval: vi.fn().mockResolvedValue(mockSession)
-        })
-
-        await wallet.connect()
-      })
-
-      it('should correctly process and sign a single algosdk.Transaction', async () => {
-        mockSignClient.request.mockResolvedValueOnce([signedTxnStr1])
-
-        const result = await wallet.signTransactions([txn1])
-
-        expect(result).toEqual([signedTxnEncoded1])
         expect(mockSignClient.request).toHaveBeenCalledWith(
-          createExpectedRpcRequest([
+          expectedRpcRequest([[{ txn: byteArrayToBase64(txn1.toByte()) }]])
+        )
+      })
+
+      it('should process and sign a single algosdk.Transaction group', async () => {
+        const [gtxn1, gtxn2, gtxn3] = algosdk.assignGroupID([txn1, txn2, txn3])
+        await wallet.signTransactions([gtxn1, gtxn2, gtxn3])
+
+        expect(mockSignClient.request).toHaveBeenCalledWith(
+          expectedRpcRequest([
             [
-              {
-                txn: Buffer.from(txn1.toByte()).toString('base64')
-              }
+              { txn: byteArrayToBase64(gtxn1.toByte()) },
+              { txn: byteArrayToBase64(gtxn2.toByte()) },
+              { txn: byteArrayToBase64(gtxn3.toByte()) }
             ]
           ])
         )
       })
 
-      it('should correctly process and sign a single algosdk.Transaction group', async () => {
-        mockSignClient.request.mockResolvedValueOnce([signedTxnStr1, signedTxnStr2])
+      it('should process and sign multiple algosdk.Transaction groups', async () => {
+        const [g1txn1, g1txn2] = algosdk.assignGroupID([txn1, txn2])
+        const [g2txn1, g2txn2] = algosdk.assignGroupID([txn3, txn4])
 
-        const result = await wallet.signTransactions([txn1, txn2])
+        await wallet.signTransactions([
+          [g1txn1, g1txn2],
+          [g2txn1, g2txn2]
+        ])
 
-        expect(result).toEqual([signedTxnEncoded1, signedTxnEncoded2])
         expect(mockSignClient.request).toHaveBeenCalledWith(
-          createExpectedRpcRequest([
+          expectedRpcRequest([
             [
-              {
-                txn: Buffer.from(txn1.toByte()).toString('base64')
-              },
-              {
-                txn: Buffer.from(txn2.toByte()).toString('base64')
-              }
+              { txn: byteArrayToBase64(g1txn1.toByte()) },
+              { txn: byteArrayToBase64(g1txn2.toByte()) },
+              { txn: byteArrayToBase64(g2txn1.toByte()) },
+              { txn: byteArrayToBase64(g2txn2.toByte()) }
             ]
           ])
         )
       })
 
-      it('should correctly process and sign multiple algosdk.Transaction groups', async () => {
-        mockSignClient.request.mockResolvedValueOnce([signedTxnStr1, signedTxnStr2])
-
-        const result = await wallet.signTransactions([[txn1], [txn2]])
-
-        expect(result).toEqual([signedTxnEncoded1, signedTxnEncoded2])
-        expect(mockSignClient.request).toHaveBeenCalledWith(
-          createExpectedRpcRequest([
-            [
-              {
-                txn: Buffer.from(txn1.toByte()).toString('base64')
-              },
-              {
-                txn: Buffer.from(txn2.toByte()).toString('base64')
-              }
-            ]
-          ])
-        )
-      })
-
-      it('should correctly process and sign a single encoded transaction', async () => {
-        mockSignClient.request.mockResolvedValueOnce([signedTxnStr1])
-
+      it('should process and sign a single encoded transaction', async () => {
         const encodedTxn = txn1.toByte()
-        const result = await wallet.signTransactions([encodedTxn])
+        await wallet.signTransactions([encodedTxn])
 
-        expect(result).toEqual([signedTxnEncoded1])
         expect(mockSignClient.request).toHaveBeenCalledWith(
-          createExpectedRpcRequest([
+          expectedRpcRequest([[{ txn: byteArrayToBase64(txn1.toByte()) }]])
+        )
+      })
+
+      it('should process and sign a single encoded transaction group', async () => {
+        const txnGroup = algosdk.assignGroupID([txn1, txn2, txn3])
+        const [gtxn1, gtxn2, gtxn3] = txnGroup.map((txn) => txn.toByte())
+
+        await wallet.signTransactions([gtxn1, gtxn2, gtxn3])
+
+        expect(mockSignClient.request).toHaveBeenCalledWith(
+          expectedRpcRequest([
             [
-              {
-                txn: Buffer.from(txn1.toByte()).toString('base64')
-              }
+              { txn: byteArrayToBase64(gtxn1) },
+              { txn: byteArrayToBase64(gtxn2) },
+              { txn: byteArrayToBase64(gtxn3) }
             ]
           ])
         )
       })
 
-      it('should correctly process and sign a single encoded transaction group', async () => {
-        mockSignClient.request.mockResolvedValueOnce([signedTxnStr1, signedTxnStr2])
+      it('should process and sign multiple encoded transaction groups', async () => {
+        const txnGroup1 = algosdk.assignGroupID([txn1, txn2])
+        const [g1txn1, g1txn2] = txnGroup1.map((txn) => txn.toByte())
 
-        const txnGroup = [txn1, txn2]
-        const encodedTxnGroup = txnGroup.map((txn) => txn.toByte())
+        const txnGroup2 = algosdk.assignGroupID([txn3, txn4])
+        const [g2txn1, g2txn2] = txnGroup2.map((txn) => txn.toByte())
 
-        const result = await wallet.signTransactions(encodedTxnGroup)
+        await wallet.signTransactions([
+          [g1txn1, g1txn2],
+          [g2txn1, g2txn2]
+        ])
 
-        expect(result).toEqual([signedTxnEncoded1, signedTxnEncoded2])
         expect(mockSignClient.request).toHaveBeenCalledWith(
-          createExpectedRpcRequest([
+          expectedRpcRequest([
             [
-              {
-                txn: Buffer.from(txn1.toByte()).toString('base64')
-              },
-              {
-                txn: Buffer.from(txn2.toByte()).toString('base64')
-              }
-            ]
-          ])
-        )
-      })
-
-      it('should correctly process and sign multiple encoded transaction groups', async () => {
-        mockSignClient.request.mockResolvedValueOnce([signedTxnStr1, signedTxnStr2])
-
-        const result = await wallet.signTransactions([[txn1.toByte()], [txn2.toByte()]])
-
-        expect(result).toEqual([signedTxnEncoded1, signedTxnEncoded2])
-        expect(mockSignClient.request).toHaveBeenCalledWith(
-          createExpectedRpcRequest([
-            [
-              {
-                txn: Buffer.from(txn1.toByte()).toString('base64')
-              },
-              {
-                txn: Buffer.from(txn2.toByte()).toString('base64')
-              }
+              { txn: byteArrayToBase64(g1txn1) },
+              { txn: byteArrayToBase64(g1txn2) },
+              { txn: byteArrayToBase64(g2txn1) },
+              { txn: byteArrayToBase64(g2txn2) }
             ]
           ])
         )
       })
 
       it('should determine which transactions to sign based on indexesToSign', async () => {
-        mockSignClient.request.mockResolvedValueOnce([null, signedTxnStr2])
+        const [gtxn1, gtxn2, gtxn3, gtxn4] = algosdk.assignGroupID([txn1, txn2, txn3, txn4])
+        const indexesToSign = [0, 1, 3]
 
-        const txnGroup = [txn1, txn2]
-        const indexesToSign = [1]
-        const returnGroup = false // Return only the signed transaction
+        const gtxn1String = byteArrayToBase64(gtxn1.toByte())
+        const gtxn2String = byteArrayToBase64(gtxn2.toByte())
+        const gtxn4String = byteArrayToBase64(gtxn4.toByte())
 
-        const expectedResult = [signedTxnEncoded2]
+        // Mock signClient.request to return "signed" (not really) base64 transactions or null
+        mockSignClient.request.mockResolvedValueOnce([gtxn1String, gtxn2String, null, gtxn4String])
 
-        const result = await wallet.signTransactions(txnGroup, indexesToSign, returnGroup)
+        const result = await wallet.signTransactions([gtxn1, gtxn2, gtxn3, gtxn4], indexesToSign)
 
-        expect(result).toEqual(expectedResult)
         expect(mockSignClient.request).toHaveBeenCalledWith(
-          createExpectedRpcRequest([
+          expectedRpcRequest([
             [
-              {
-                txn: Buffer.from(txn1.toByte()).toString('base64'),
-                signers: [] // txn1 should not be signed
-              },
-              {
-                txn: Buffer.from(txn2.toByte()).toString('base64')
-              }
+              { txn: byteArrayToBase64(gtxn1.toByte()) },
+              { txn: byteArrayToBase64(gtxn2.toByte()) },
+              { txn: byteArrayToBase64(gtxn3.toByte()), signers: [] },
+              { txn: byteArrayToBase64(gtxn4.toByte()) }
             ]
           ])
         )
-      })
 
-      it('should correctly merge signed transactions back into the original group', async () => {
-        mockSignClient.request.mockResolvedValueOnce([null, signedTxnStr2])
-
-        const txnGroup = [txn1, txn2]
-        const returnGroup = true // Merge signed transaction back into original group
-
-        // Only txn2 should be signed
-        const indexesToSign1 = [1]
-        const expectedResult1 = [algosdk.encodeUnsignedTransaction(txn1), signedTxnEncoded2]
-
-        const result1 = await wallet.signTransactions(txnGroup, indexesToSign1, returnGroup)
-        expect(result1).toEqual(expectedResult1)
-
-        mockSignClient.request.mockResolvedValueOnce([signedTxnStr1, null])
-
-        // Only txn1 should be signed
-        const indexesToSign2 = [0]
-        const expectedResult2 = [signedTxnEncoded1, algosdk.encodeUnsignedTransaction(txn2)]
-
-        const result2 = await wallet.signTransactions(txnGroup, indexesToSign2, returnGroup)
-        expect(result2).toEqual(expectedResult2)
+        // Only encoded "signed" transactions should be returned
+        expect(result).toHaveLength(indexesToSign.length)
+        expect(result).toEqual([
+          base64ToByteArray(gtxn1String),
+          base64ToByteArray(gtxn2String),
+          base64ToByteArray(gtxn4String)
+        ])
       })
 
       it('should only send transactions with connected signers for signature', async () => {
-        const txnCannotSign = new algosdk.Transaction({
+        const canSignTxn1 = new algosdk.Transaction({
           ...txnParams,
-          from: 'EW64GC6F24M7NDSC5R3ES4YUVE3ZXXNMARJHDCCCLIHZU6TBEOC7XRSBG4', // EW64GC is not connected
-          to: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
+          from: connectedAcct1,
+          amount: 1000
+        })
+
+        const cannotSignTxn2 = new algosdk.Transaction({
+          ...txnParams,
+          from: notConnectedAcct,
+          amount: 2000
+        })
+
+        const canSignTxn3 = new algosdk.Transaction({
+          ...txnParams,
+          from: connectedAcct2,
           amount: 3000
         })
 
-        mockSignClient.request.mockResolvedValueOnce([signedTxnStr1, null, signedTxnStr2])
+        // Signer for gtxn2 is not a connected account
+        const [gtxn1, gtxn2, gtxn3] = algosdk.assignGroupID([
+          canSignTxn1,
+          cannotSignTxn2, // Should not be signed
+          canSignTxn3
+        ])
 
-        const result = await wallet.signTransactions([txn1, txnCannotSign, txn2])
+        await wallet.signTransactions([gtxn1, gtxn2, gtxn3])
 
-        // expectedResult[1] should be original unsigned transaction
-        const expectedResult = [
-          signedTxnEncoded1,
-          algosdk.encodeUnsignedTransaction(txnCannotSign),
-          signedTxnEncoded2
-        ]
-
-        expect(result).toEqual(expectedResult)
         expect(mockSignClient.request).toHaveBeenCalledWith(
-          createExpectedRpcRequest([
+          expectedRpcRequest([
             [
-              {
-                txn: Buffer.from(txn1.toByte()).toString('base64')
-              },
-              {
-                txn: Buffer.from(txnCannotSign.toByte()).toString('base64'),
-                signers: [] // should not be signed
-              },
-              {
-                txn: Buffer.from(txn2.toByte()).toString('base64')
-              }
+              { txn: byteArrayToBase64(gtxn1.toByte()) },
+              { txn: byteArrayToBase64(gtxn2.toByte()), signers: [] },
+              { txn: byteArrayToBase64(gtxn3.toByte()) }
             ]
           ])
         )
+      })
+    })
+
+    describe('transactionSigner', () => {
+      it('should call signTransactions with the correct arguments', async () => {
+        const txnGroup = algosdk.assignGroupID([txn1, txn2])
+        const indexesToSign = [1]
+
+        const signTransactionsSpy = vi.spyOn(wallet, 'signTransactions')
+
+        await wallet.transactionSigner(txnGroup, indexesToSign)
+
+        expect(signTransactionsSpy).toHaveBeenCalledWith(txnGroup, indexesToSign)
       })
     })
   })
