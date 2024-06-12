@@ -45,7 +45,7 @@
     "@blockshake/defly-connect": "^1.1.6",
     "@magic-ext/algorand": "^23.0.2",
     "@magic-sdk/provider": "^28.0.2",
-    "@perawallet/connect-beta": "2.0.11",
+    "@perawallet/connect-beta": "^2.0.11",
     "@types/node": "^20.6.5",
     "@walletconnect/modal": "^2.6.2",
     "@walletconnect/modal-core": "^2.6.2",

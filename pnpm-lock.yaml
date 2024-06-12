@@ -346,7 +346,7 @@ importers:
         specifier: ^28.0.2
         version: 28.0.2(localforage@1.10.0)
       '@perawallet/connect-beta':
-        specifier: 2.0.11
+        specifier: ^2.0.11
         version: 2.0.11(algosdk@2.7.0)(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
       '@types/node':
         specifier: ^20.6.5
@@ -385,7 +385,7 @@ importers:
         specifier: ^23.0.2
         version: 23.0.2
       '@perawallet/connect-beta':
-        specifier: 2.0.11
+        specifier: ^2.0.11
         version: 2.0.11(algosdk@2.7.0)(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
       '@tanstack/react-store':
         specifier: 0.4.1
@@ -472,7 +472,7 @@ importers:
         version: 8.0.2(postcss@8.4.38)(typescript@5.4.3)
       tsup-preset-solid:
         specifier: ^2.2.0
-        version: 2.2.0(esbuild@0.19.12)(solid-js@1.8.16)(tsup@8.0.2(postcss@8.4.38)(typescript@5.4.3))
+        version: 2.2.0(esbuild@0.20.2)(solid-js@1.8.16)(tsup@8.0.2(postcss@8.4.38)(typescript@5.4.3))
       typescript:
         specifier: ^5.2.2
         version: 5.4.3
@@ -10191,12 +10191,12 @@ snapshots:
       d: 1.0.2
       ext: 1.7.0
 
-  esbuild-plugin-solid@0.5.0(esbuild@0.19.12)(solid-js@1.8.16):
+  esbuild-plugin-solid@0.5.0(esbuild@0.20.2)(solid-js@1.8.16):
     dependencies:
       '@babel/core': 7.23.7
       '@babel/preset-typescript': 7.24.1(@babel/core@7.23.7)
       babel-preset-solid: 1.8.16(@babel/core@7.23.7)
-      esbuild: 0.19.12
+      esbuild: 0.20.2
       solid-js: 1.8.16
     transitivePeerDependencies:
       - supports-color
@@ -13242,9 +13242,9 @@ snapshots:
 
   tslib@2.6.2: {}
 
-  tsup-preset-solid@2.2.0(esbuild@0.19.12)(solid-js@1.8.16)(tsup@8.0.2(postcss@8.4.38)(typescript@5.4.3)):
+  tsup-preset-solid@2.2.0(esbuild@0.20.2)(solid-js@1.8.16)(tsup@8.0.2(postcss@8.4.38)(typescript@5.4.3)):
     dependencies:
-      esbuild-plugin-solid: 0.5.0(esbuild@0.19.12)(solid-js@1.8.16)
+      esbuild-plugin-solid: 0.5.0(esbuild@0.20.2)(solid-js@1.8.16)
       tsup: 8.0.2(postcss@8.4.38)(typescript@5.4.3)
     transitivePeerDependencies:
       - esbuild
