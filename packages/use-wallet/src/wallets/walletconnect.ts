@@ -40,6 +40,8 @@ type WalletConnectModalOptions = Pick<
 
 export type WalletConnectOptions = SignClientOptions & WalletConnectModalOptions
 
+export type SignTxnsResponse = Array<Uint8Array | string | null | undefined>
+
 export class SessionError extends Error {
   constructor(message: string) {
     super(message)
@@ -352,16 +354,16 @@ export class WalletConnect extends BaseWallet {
       const request = formatJsonRpcRequest('algo_signTxn', [txnsToSign])
 
       // Sign transactions
-      const signTxnsResult = await client.request<Array<string | null>>({
+      const signTxnsResult = await client.request<SignTxnsResponse>({
         chainId: caipChainId[this.activeNetwork]!,
         topic: this.session.topic,
         request
       })
 
-      // Filter out null values
+      // Filter out nullish values
       const signedTxns = signTxnsResult.reduce<Uint8Array[]>((acc, value) => {
-        if (value !== null) {
-          const signedTxn = base64ToByteArray(value)
+        if (value) {
+          const signedTxn = typeof value === 'string' ? base64ToByteArray(value) : value
           acc.push(signedTxn)
         }
         return acc
