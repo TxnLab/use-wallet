@@ -521,6 +521,24 @@ describe('WalletConnect', () => {
           ])
         )
       })
+
+      it('should return encoded signed transactions if the wallet returns base64 strings', async () => {
+        const signedTxn = byteArrayToBase64(txn1.toByte())
+        mockSignClient.request.mockResolvedValueOnce([signedTxn])
+
+        const result = await wallet.signTransactions([txn1])
+
+        expect(result).toEqual([txn1.toByte()])
+      })
+
+      it('should return encoded signed transactions if the wallet returns Uint8Arrays', async () => {
+        const signedTxn = txn1.toByte()
+        mockSignClient.request.mockResolvedValueOnce([signedTxn])
+
+        const result = await wallet.signTransactions([txn1])
+
+        expect(result).toEqual([txn1.toByte()])
+      })
     })
 
     describe('transactionSigner', () => {
