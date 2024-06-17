@@ -82,14 +82,19 @@ export class WalletConnect extends BaseWallet {
     const {
       projectId,
       relayUrl = 'wss://relay.walletconnect.com',
-      metadata: optsMetadata,
+      metadata: metadataOptions,
       ...modalOptions
     } = options
+
+    const clientMetadata: SignClientTypes.Metadata = {
+      ...this.getWindowMetadata(),
+      ...metadataOptions
+    }
 
     this.options = {
       projectId,
       relayUrl,
-      ...optsMetadata
+      metadata: clientMetadata
     }
 
     this.modalOptions = modalOptions
@@ -100,6 +105,159 @@ export class WalletConnect extends BaseWallet {
   static defaultMetadata = {
     name: 'WalletConnect',
     icon: ICON
+  }
+
+  /**
+   * Get metadata from the current window. This is adapted from the @walletconnect/utils
+   * implementation, to avoid requiring the entire package as a dependency.
+   * @see https://github.com/WalletConnect/walletconnect-utils/blob/master/browser/window-metadata/src/index.ts
+   */
+  private getWindowMetadata(): SignClientTypes.Metadata {
+    let doc: Document
+    let loc: Location
+
+    const defaultMetadata = {
+      name: '',
+      description: '',
+      url: '',
+      icons: []
+    }
+
+    function getFromWindow<T>(name: string): T | undefined {
+      let res: T | undefined
+      if (typeof window !== 'undefined' && typeof (window as any)[name] !== 'undefined') {
+        res = (window as any)[name]
+      }
+      return res
+    }
+
+    function getFromWindowOrThrow<T>(name: string): T {
+      const res = getFromWindow<T>(name)
+      if (!res) {
+        throw new Error(`${name} is not defined in Window`)
+      }
+      return res
+    }
+
+    function getDocumentOrThrow(): Document {
+      return getFromWindowOrThrow<Document>('document')
+    }
+
+    function getLocationOrThrow(): Location {
+      return getFromWindowOrThrow<Location>('location')
+    }
+
+    try {
+      doc = getDocumentOrThrow()
+      loc = getLocationOrThrow()
+    } catch (e) {
+      return defaultMetadata
+    }
+
+    function getIcons(): string[] {
+      const links: HTMLCollectionOf<HTMLLinkElement> = doc.getElementsByTagName('link')
+      const icons: string[] = []
+
+      for (let i = 0; i < links.length; i++) {
+        const link: HTMLLinkElement = links[i]
+
+        const rel: string | null = link.getAttribute('rel')
+        if (rel) {
+          if (rel.toLowerCase().indexOf('icon') > -1) {
+            const href: string | null = link.getAttribute('href')
+
+            if (href) {
+              if (
+                href.toLowerCase().indexOf('https:') === -1 &&
+                href.toLowerCase().indexOf('http:') === -1 &&
+                href.indexOf('//') !== 0
+              ) {
+                let absoluteHref: string = loc.protocol + '//' + loc.host
+
+                if (href.indexOf('/') === 0) {
+                  absoluteHref += href
+                } else {
+                  const path: string[] = loc.pathname.split('/')
+                  path.pop()
+                  const finalPath: string = path.join('/')
+                  absoluteHref += finalPath + '/' + href
+                }
+
+                icons.push(absoluteHref)
+              } else if (href.indexOf('//') === 0) {
+                const absoluteUrl: string = loc.protocol + href
+
+                icons.push(absoluteUrl)
+              } else {
+                icons.push(href)
+              }
+            }
+          }
+        }
+      }
+
+      return icons
+    }
+
+    function getWindowMetadataOfAny(...args: string[]): string {
+      const metaTags: HTMLCollectionOf<HTMLMetaElement> = doc.getElementsByTagName('meta')
+
+      for (let i = 0; i < metaTags.length; i++) {
+        const tag: HTMLMetaElement = metaTags[i]
+        const attributes: Array<string | null> = ['itemprop', 'property', 'name']
+          .map((target: string) => tag.getAttribute(target))
+          .filter((attr: string | null) => {
+            if (attr) {
+              return args.includes(attr)
+            }
+            return false
+          })
+
+        if (attributes.length && attributes) {
+          const content: string | null = tag.getAttribute('content')
+          if (content) {
+            return content
+          }
+        }
+      }
+
+      return ''
+    }
+
+    function getName(): string {
+      let name: string = getWindowMetadataOfAny('name', 'og:site_name', 'og:title', 'twitter:title')
+
+      if (!name) {
+        name = doc.title
+      }
+
+      return name
+    }
+
+    function getDescription(): string {
+      const description: string = getWindowMetadataOfAny(
+        'description',
+        'og:description',
+        'twitter:description',
+        'keywords'
+      )
+
+      return description
+    }
+
+    const name: string = getName()
+    const description: string = getDescription()
+    const url: string = loc.origin
+    const icons: string[] = getIcons()
+
+    const meta: SignClientTypes.Metadata = {
+      description,
+      url,
+      icons,
+      name
+    }
+
+    return meta
   }
 
   private async initializeClient(): Promise<SignClient> {
