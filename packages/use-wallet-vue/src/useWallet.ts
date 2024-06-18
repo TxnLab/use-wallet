@@ -1,7 +1,12 @@
 import { useStore } from '@tanstack/vue-store'
-import { WalletManager, type WalletAccount, type WalletMetadata } from '@txnlab/use-wallet'
-import { computed, inject } from 'vue'
-import type algosdk from 'algosdk'
+import {
+  NetworkId,
+  WalletManager,
+  type WalletAccount,
+  type WalletMetadata
+} from '@txnlab/use-wallet'
+import algosdk from 'algosdk'
+import { computed, inject, ref } from 'vue'
 
 export interface Wallet {
   id: string
@@ -16,17 +21,27 @@ export interface Wallet {
   setActiveAccount: (address: string) => void
 }
 
+export type SetAlgodClient = (client: algosdk.Algodv2) => void
+
 export function useWallet() {
   const manager = inject<WalletManager>('walletManager')
+  const algodClient = inject<ReturnType<typeof ref<algosdk.Algodv2>>>('algodClient')
+  const setAlgodClient = inject<SetAlgodClient>('setAlgodClient') as SetAlgodClient
 
   if (!manager) {
     throw new Error('WalletManager plugin is not properly installed')
   }
-
-  const algodClient: algosdk.Algodv2 = manager.algodClient
+  if (!algodClient || !setAlgodClient) {
+    throw new Error('Algod client or setter not properly installed')
+  }
 
   const activeNetwork = useStore(manager.store, (state) => state.activeNetwork)
-  const setActiveNetwork = manager.setActiveNetwork
+  const setActiveNetwork = (networkId: NetworkId) => {
+    manager.setActiveNetwork(networkId)
+    const { token, baseServer, port, headers } = manager.networkConfig[networkId]
+    const newClient = new algosdk.Algodv2(token, baseServer, port, headers)
+    setAlgodClient(newClient)
+  }
 
   const walletStateMap = useStore(manager.store, (state) => state.wallets)
   const activeWalletId = useStore(manager.store, (state) => state.activeWallet)
@@ -105,6 +120,7 @@ export function useWallet() {
     activeAccount,
     activeAddress,
     setActiveNetwork,
+    setAlgodClient,
     signTransactions,
     transactionSigner
   }
