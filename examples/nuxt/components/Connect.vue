@@ -35,7 +35,7 @@ const sendTransaction = async (wallet: Wallet) => {
 
   try {
     const atc = new algosdk.AtomicTransactionComposer()
-    const suggestedParams = await algodClient.getTransactionParams().do()
+    const suggestedParams = await algodClient.value.getTransactionParams().do()
 
     const transaction = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
       from: wallet.activeAccount.address,
@@ -48,7 +48,7 @@ const sendTransaction = async (wallet: Wallet) => {
 
     console.info(`[App] Sending transaction...`, transaction)
 
-    const result = await atc.execute(algodClient, 4)
+    const result = await atc.execute(algodClient.value, 4)
 
     console.info(`[App] ✅ Successfully sent transaction!`, {
       confirmedRound: result.confirmedRound,
