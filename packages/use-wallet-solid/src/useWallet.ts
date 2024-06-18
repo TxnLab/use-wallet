@@ -26,7 +26,7 @@ export interface Wallet {
 export function useWallet() {
   const manager = createMemo(() => useWalletManager())
 
-  const [algodClient, setAlgodClient] = createSignal<algosdk.Algodv2 | null>(manager().algodClient)
+  const [algodClient, setAlgodClient] = createSignal<algosdk.Algodv2>(manager().algodClient)
 
   const walletStore = useStore(manager().store, (state) => state.wallets)
 
