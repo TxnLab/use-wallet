@@ -51,11 +51,7 @@ export function useWallet() {
   const isWalletConnected = (walletId: WalletId) =>
     !!walletState(walletId)?.accounts.length || false
 
-  const activeNetworkState = createMemo(() => {
-    return useStore(manager().store, (state) => state.activeNetwork)
-  })
-
-  const activeNetwork = () => activeNetworkState()()
+  const activeNetwork = useStore(manager().store, (state) => state.activeNetwork)
 
   const setActiveNetwork = (network: NetworkId) => {
     manager().setActiveNetwork(network)
