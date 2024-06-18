@@ -1,10 +1,13 @@
+import { Store } from '@tanstack/store'
 import { NetworkId } from 'src/network'
 import { LOCAL_STORAGE_KEY, State, defaultState } from 'src/store'
 import { WalletManager } from 'src/manager'
 import { StorageAdapter } from 'src/storage'
-// import { DeflyWallet } from 'src/wallets/defly'
-// import { PeraWallet } from 'src/wallets/pera'
+import { BaseWallet } from 'src/wallets/base'
+import { DeflyWallet } from 'src/wallets/defly'
+import { KibisisWallet } from 'src/wallets/kibisis'
 import { WalletId } from 'src/wallets/types'
+import type { Mock } from 'vitest'
 
 // Mock storage adapter
 vi.mock('src/storage', () => ({
@@ -23,12 +26,59 @@ const mockConsoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {})
 // Mock console.error
 const mockConsoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
 
-// const deflyResumeSession = vi
-//   .spyOn(DeflyWallet.prototype, 'resumeSession')
-//   .mockImplementation(() => Promise.resolve())
-// const peraResumeSession = vi
-//   .spyOn(PeraWallet.prototype, 'resumeSession')
-//   .mockImplementation(() => Promise.resolve())
+vi.mock('src/wallets/defly', () => ({
+  DeflyWallet: class DeflyWallet {
+    constructor() {
+      this.resumeSession = vi.fn().mockImplementation(() => Promise.resolve())
+      this.disconnect = vi.fn().mockImplementation(() => Promise.resolve())
+    }
+    static defaultMetadata = {
+      name: 'Defly',
+      icon: 'icon-data'
+    }
+    resumeSession: Mock
+    disconnect: Mock
+    get isConnected() {
+      return true
+    }
+  }
+}))
+
+vi.mock('src/wallets/kibisis', () => ({
+  KibisisWallet: class KibisisWallet {
+    constructor() {
+      this.resumeSession = vi.fn().mockImplementation(() => Promise.resolve())
+      this.disconnect = vi.fn().mockImplementation(() => Promise.resolve())
+    }
+    static defaultMetadata = {
+      name: 'Kibisis',
+      icon: 'icon-data'
+    }
+    resumeSession: Mock
+    disconnect: Mock
+    get isConnected() {
+      return true
+    }
+  }
+}))
+
+const mockStore = new Store<State>(defaultState)
+
+const mockDeflyWallet = new DeflyWallet({
+  id: WalletId.DEFLY,
+  metadata: { name: 'Defly', icon: 'icon' },
+  getAlgodClient: () => ({}) as any,
+  store: mockStore,
+  subscribe: vi.fn()
+})
+
+const mockKibisisWallet = new KibisisWallet({
+  id: WalletId.KIBISIS,
+  metadata: { name: 'Kibisis', icon: 'icon' },
+  getAlgodClient: () => ({}) as any,
+  store: mockStore,
+  subscribe: vi.fn()
+})
 
 describe('WalletManager', () => {
   let mockInitialState: State | null = null
@@ -151,19 +201,49 @@ describe('WalletManager', () => {
   })
 
   describe('setActiveNetwork', () => {
-    it('sets active network correctly', () => {
+    it('sets active network correctly', async () => {
       const manager = new WalletManager({
         wallets: [WalletId.DEFLY, WalletId.KIBISIS]
       })
-      manager.setActiveNetwork(NetworkId.MAINNET)
+      manager._clients = new Map<WalletId, BaseWallet>([
+        [WalletId.DEFLY, mockDeflyWallet],
+        [WalletId.KIBISIS, mockKibisisWallet]
+      ])
+
+      // Mock isConnected to return true
+      vi.spyOn(mockDeflyWallet, 'isConnected', 'get').mockReturnValue(true)
+      vi.spyOn(mockKibisisWallet, 'isConnected', 'get').mockReturnValue(true)
+
+      const disconnectMock = vi.spyOn(manager, 'disconnect')
+
+      await manager.setActiveNetwork(NetworkId.MAINNET)
+
+      expect(disconnectMock).toHaveBeenCalled()
       expect(manager.activeNetwork).toBe(NetworkId.MAINNET)
     })
 
-    // @todo: Test for handling of invalid network
+    it('does not call disconnect if the network is already active', async () => {
+      const manager = new WalletManager({
+        wallets: [WalletId.DEFLY, WalletId.KIBISIS]
+      })
+      manager._clients = new Map<WalletId, BaseWallet>([
+        [WalletId.DEFLY, mockDeflyWallet],
+        [WalletId.KIBISIS, mockKibisisWallet]
+      ])
+
+      const disconnectMock = vi.spyOn(manager, 'disconnect')
+
+      // Set initial active network
+      manager.store.setState((state) => ({ ...state, activeNetwork: NetworkId.MAINNET }))
+
+      await manager.setActiveNetwork(NetworkId.MAINNET)
+
+      expect(disconnectMock).not.toHaveBeenCalled()
+    })
   })
 
   describe('subscribe', () => {
-    it('adds and removes a subscriber', () => {
+    it('adds and removes a subscriber', async () => {
       const manager = new WalletManager({
         wallets: [WalletId.DEFLY, WalletId.KIBISIS]
       })
@@ -171,7 +251,7 @@ describe('WalletManager', () => {
       const unsubscribe = manager.subscribe(callback)
 
       // Trigger a state change
-      manager.setActiveNetwork(NetworkId.MAINNET)
+      await manager.setActiveNetwork(NetworkId.MAINNET)
 
       expect(callback).toHaveBeenCalled()
 
@@ -249,7 +329,7 @@ describe('WalletManager', () => {
   })
 
   describe('savePersistedState', () => {
-    it('saves state to local storage', () => {
+    it('saves state to local storage', async () => {
       const stateToSave: State = {
         wallets: {},
         activeWallet: null,
@@ -259,7 +339,7 @@ describe('WalletManager', () => {
       const manager = new WalletManager({
         wallets: [WalletId.DEFLY, WalletId.KIBISIS]
       })
-      manager.setActiveNetwork(NetworkId.MAINNET)
+      await manager.setActiveNetwork(NetworkId.MAINNET)
 
       expect(vi.mocked(StorageAdapter.setItem)).toHaveBeenCalledWith(
         LOCAL_STORAGE_KEY,
@@ -342,16 +422,74 @@ describe('WalletManager', () => {
     // @todo: Tests for successful signing
   })
 
-  // @todo: Find out why this fails in Vitest
-  describe.skip('resumeSessions', () => {
+  describe('resumeSessions', () => {
     it('resumes sessions for all wallets', async () => {
       const manager = new WalletManager({
         wallets: [WalletId.DEFLY, WalletId.KIBISIS]
       })
+      manager._clients = new Map<WalletId, BaseWallet>([
+        [WalletId.DEFLY, mockDeflyWallet],
+        [WalletId.KIBISIS, mockKibisisWallet]
+      ])
       await manager.resumeSessions()
 
-      // expect(deflyResumeSession).toHaveBeenCalled()
-      // expect(peraResumeSession).toHaveBeenCalled()
+      const deflyResumeSessionMock = mockDeflyWallet.resumeSession as Mock
+      const kibisisResumeSessionMock = mockKibisisWallet.resumeSession as Mock
+
+      expect(deflyResumeSessionMock).toHaveBeenCalled()
+      expect(kibisisResumeSessionMock).toHaveBeenCalled()
+
+      const calls = [
+        deflyResumeSessionMock.mock.calls.length,
+        kibisisResumeSessionMock.mock.calls.length
+      ]
+      expect(calls).toEqual([1, 1])
+    })
+  })
+
+  describe('disconnect', () => {
+    it('disconnects all connected wallets', async () => {
+      const manager = new WalletManager({
+        wallets: [WalletId.DEFLY, WalletId.KIBISIS]
+      })
+      manager._clients = new Map<WalletId, BaseWallet>([
+        [WalletId.DEFLY, mockDeflyWallet],
+        [WalletId.KIBISIS, mockKibisisWallet]
+      ])
+
+      // Mock isConnected to return true for the test
+      vi.spyOn(mockDeflyWallet, 'isConnected', 'get').mockReturnValue(true)
+      vi.spyOn(mockKibisisWallet, 'isConnected', 'get').mockReturnValue(true)
+
+      const deflyDisconnectMock = mockDeflyWallet.disconnect as Mock
+      const kibisisDisconnectMock = mockKibisisWallet.disconnect as Mock
+
+      await manager.disconnect()
+
+      expect(deflyDisconnectMock).toHaveBeenCalled()
+      expect(kibisisDisconnectMock).toHaveBeenCalled()
+    })
+
+    it('does not call disconnect on wallets that are not connected', async () => {
+      const manager = new WalletManager({
+        wallets: [WalletId.DEFLY, WalletId.KIBISIS]
+      })
+      manager._clients = new Map<WalletId, BaseWallet>([
+        [WalletId.DEFLY, mockDeflyWallet],
+        [WalletId.KIBISIS, mockKibisisWallet]
+      ])
+
+      // Mock isConnected to return false for the test
+      vi.spyOn(mockDeflyWallet, 'isConnected', 'get').mockReturnValue(false)
+      vi.spyOn(mockKibisisWallet, 'isConnected', 'get').mockReturnValue(false)
+
+      const deflyDisconnectMock = mockDeflyWallet.disconnect as Mock
+      const kibisisDisconnectMock = mockKibisisWallet.disconnect as Mock
+
+      await manager.disconnect()
+
+      expect(deflyDisconnectMock).not.toHaveBeenCalled()
+      expect(kibisisDisconnectMock).not.toHaveBeenCalled()
     })
   })
 })

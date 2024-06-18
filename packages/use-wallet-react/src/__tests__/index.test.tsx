@@ -464,8 +464,8 @@ describe('useWallet', () => {
     const newNetwork = NetworkId.MAINNET
     const { result } = renderHook(() => useWallet(), { wrapper })
 
-    act(() => {
-      result.current.setActiveNetwork(newNetwork)
+    act(async () => {
+      await result.current.setActiveNetwork(newNetwork)
     })
 
     expect(result.current.activeNetwork).toBe(newNetwork)

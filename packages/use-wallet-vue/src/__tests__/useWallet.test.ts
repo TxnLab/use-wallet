@@ -295,7 +295,7 @@ describe('useWallet', () => {
     const newNetwork = NetworkId.MAINNET
     const newAlgodClient = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud/', '')
 
-    mockWalletManager.setActiveNetwork = (networkId: NetworkId) => {
+    mockWalletManager.setActiveNetwork = async (networkId: NetworkId) => {
       mockSetAlgodClient(newAlgodClient)
       mockWalletManager.store.setState((state) => ({
         ...state,
