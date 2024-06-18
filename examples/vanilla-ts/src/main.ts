@@ -2,6 +2,7 @@ import './style.css'
 import typescriptLogo from './typescript.svg'
 import viteLogo from '/vite.svg'
 import { NetworkId, WalletId, WalletManager } from '@txnlab/use-wallet'
+import { ActiveNetwork } from './ActiveNetwork'
 import { WalletComponent } from './WalletComponent'
 
 const walletManager = new WalletManager({
@@ -43,6 +44,9 @@ appDiv!.innerHTML = `
     <h1>@txnlab/use-wallet</h1>
   </div>
 `
+
+const activeNetwork = new ActiveNetwork(walletManager)
+appDiv?.appendChild(activeNetwork.element)
 
 const walletComponents = walletManager.wallets.map(
   (wallet) => new WalletComponent(wallet, walletManager)

@@ -1,9 +1,15 @@
 <script setup lang="ts">
-import { WalletId, useWallet, type Wallet } from '@txnlab/use-wallet-vue'
+import { NetworkId, WalletId, useWallet, type Wallet } from '@txnlab/use-wallet-vue'
 import algosdk from 'algosdk'
 import { ref } from 'vue'
 
-const { algodClient, transactionSigner, wallets: walletsRef } = useWallet()
+const {
+  algodClient,
+  activeNetwork,
+  setActiveNetwork,
+  transactionSigner,
+  wallets: walletsRef
+} = useWallet()
 const wallets = computed(() => walletsRef.value)
 const isSending = ref(false)
 const magicEmail = ref('')
@@ -64,6 +70,35 @@ const sendTransaction = async (wallet: Wallet) => {
 
 <template>
   <section>
+    <div className="network-group">
+      <h4>
+        Current Network: <span className="active-network">{{ activeNetwork }}</span>
+      </h4>
+      <div className="network-buttons">
+        <button
+          type="button"
+          @click="() => setActiveNetwork(NetworkId.BETANET)"
+          :disabled="activeNetwork === NetworkId.BETANET"
+        >
+          Set to Betanet
+        </button>
+        <button
+          type="button"
+          @click="() => setActiveNetwork(NetworkId.TESTNET)"
+          :disabled="activeNetwork === NetworkId.TESTNET"
+        >
+          Set to Testnet
+        </button>
+        <button
+          type="button"
+          @click="() => setActiveNetwork(NetworkId.MAINNET)"
+          :disabled="activeNetwork === NetworkId.MAINNET"
+        >
+          Set to Mainnet
+        </button>
+      </div>
+    </div>
+
     <div v-for="wallet in wallets" :key="wallet.id" class="wallet-group">
       <h4 :data-active="wallet.isActive">
         {{ wallet.metadata.name }}
@@ -121,6 +156,36 @@ section {
   align-items: center;
   justify-content: center;
   line-height: 1.5;
+}
+
+.network-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+  margin: 2em;
+  padding: 2em;
+  background-color: rgba(255, 255, 255, 0.025);
+  border-color: rgba(255, 255, 255, 0.1);
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 8px;
+}
+
+.network-group h4 {
+  margin: 0;
+}
+
+.network-group .active-network {
+  text-transform: capitalize;
+}
+
+.network-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5em;
 }
 
 .wallet-group {
@@ -248,6 +313,11 @@ select {
   .input-group input[disabled] {
     opacity: 0.75;
     color: rgba(16, 16, 16, 0.3);
+  }
+
+  .network-group {
+    background-color: rgba(0, 0, 0, 0.025);
+    border-color: rgba(0, 0, 0, 0.1);
   }
 }
 </style>
