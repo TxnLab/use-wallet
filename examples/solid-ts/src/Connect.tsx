@@ -134,18 +134,20 @@ export function Connect() {
               >
                 Disconnect
               </button>
-              <Show when={wallet.id === activeWalletId()}>
+              <Show when={isWalletActive(wallet.id)}>
                 <button type="button" onClick={sendTransaction} disabled={isSending()}>
                   {isSending() ? 'Sending Transaction...' : 'Send Transaction'}
                 </button>
               </Show>
-              <button
-                type="button"
-                onClick={() => wallet.setActive()}
-                disabled={isWalletActive(wallet.id) || !isWalletConnected(wallet.id)}
-              >
-                Set Active
-              </button>
+              <Show when={!isWalletActive(wallet.id)}>
+                <button
+                  type="button"
+                  onClick={() => wallet.setActive()}
+                  disabled={!isWalletConnected(wallet.id)}
+                >
+                  Set Active
+                </button>
+              </Show>
             </div>
 
             <Show when={isMagicLink(wallet)}>
