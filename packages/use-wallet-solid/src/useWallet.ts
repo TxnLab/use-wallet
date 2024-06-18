@@ -1,5 +1,6 @@
 import { useStore } from '@tanstack/solid-store'
-import { createMemo } from 'solid-js'
+import algosdk from 'algosdk'
+import { createMemo, createSignal } from 'solid-js'
 import { useWalletManager } from './WalletProvider'
 import type {
   NetworkId,
@@ -8,7 +9,6 @@ import type {
   WalletMetadata,
   WalletState
 } from '@txnlab/use-wallet'
-import type algosdk from 'algosdk'
 
 export interface Wallet {
   id: () => string
@@ -26,15 +26,13 @@ export interface Wallet {
 export function useWallet() {
   const manager = createMemo(() => useWalletManager())
 
-  const walletStore = useStore(manager().store, (state) => {
-    return state.wallets
-  })
+  const [algodClient, setAlgodClient] = createSignal<algosdk.Algodv2 | null>(manager().algodClient)
+
+  const walletStore = useStore(manager().store, (state) => state.wallets)
 
   const walletState = (walletId: WalletId): WalletState | null => walletStore()[walletId] || null
 
-  const activeWalletId = useStore(manager().store, (state) => {
-    return state.activeWallet
-  })
+  const activeWalletId = useStore(manager().store, (state) => state.activeWallet)
 
   const activeWallet = () => manager().getWallet(activeWalletId() as WalletId) || null
 
@@ -57,14 +55,14 @@ export function useWallet() {
     return useStore(manager().store, (state) => state.activeNetwork)
   })
 
-  // Returning a function to access the current value allows for lazy evaluation
-  // while ensuring the use of `createMemo` above keeps the reactivity intact.
   const activeNetwork = () => activeNetworkState()()
 
-  const setActiveNetwork = (network: NetworkId) => manager().setActiveNetwork(network)
-
-  // @todo: Not reactive when intDecoding is changed
-  const algodClient = createMemo(() => manager().algodClient)
+  const setActiveNetwork = (network: NetworkId) => {
+    manager().setActiveNetwork(network)
+    const { token, baseServer, port, headers } = manager().networkConfig[network]
+    const newClient = new algosdk.Algodv2(token, baseServer, port, headers)
+    setAlgodClient(newClient)
+  }
 
   const signTransactions = <T extends algosdk.Transaction[] | Uint8Array[]>(
     txnGroup: T | T[],
@@ -102,6 +100,7 @@ export function useWallet() {
     isWalletActive,
     isWalletConnected,
     setActiveNetwork,
+    setAlgodClient,
     signTransactions,
     transactionSigner,
     wallets: manager().wallets

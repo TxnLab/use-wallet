@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@solidjs/testing-library'
+import { fireEvent, render, screen, waitFor } from '@solidjs/testing-library'
 import { Store } from '@tanstack/solid-store'
 import {
   BaseWallet,
@@ -13,6 +13,7 @@ import {
 import { For, Show, createSignal } from 'solid-js'
 import { Wallet, useWallet } from '../useWallet'
 import { WalletProvider } from '../WalletProvider'
+import algosdk from 'algosdk'
 
 const mocks = vi.hoisted(() => {
   return {
@@ -75,7 +76,9 @@ const TestComponent = () => {
     isWalletActive,
     isWalletConnected,
     walletStore,
-    wallets
+    wallets,
+    algodClient,
+    setAlgodClient
   } = useWallet()
 
   const [magicEmail, setMagicEmail] = createSignal('')
@@ -101,6 +104,7 @@ const TestComponent = () => {
       <div data-testid="active-wallet-state">{JSON.stringify(activeWalletState())}</div>
       <div data-testid="wallet-store">{JSON.stringify(walletStore())}</div>
       <div data-testid="wallets">{wallets.map((wallet) => wallet.id).join(', ')}</div>
+      <div data-testid="algod-client">{JSON.stringify(algodClient())}</div>
 
       <For each={wallets}>
         {(wallet) => (
@@ -175,6 +179,13 @@ const TestComponent = () => {
       >
         Set Active Network to Mainnet
       </button>
+
+      <button
+        data-testid="set-algod-client-btn"
+        onClick={() => setAlgodClient(new algosdk.Algodv2('new-token', 'https://new-server', ''))}
+      >
+        Set Algod Client
+      </button>
     </div>
   )
 }
@@ -185,6 +196,9 @@ describe('useWallet', () => {
   let mockDeflyWallet: DeflyWallet
   let mockMagicAuth: MagicAuth
   let mockWallets: Wallet[]
+  let mockSetAlgodClient: (client: algosdk.Algodv2) => void
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  let mockAlgodClient: algosdk.Algodv2
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -246,6 +260,12 @@ describe('useWallet', () => {
         setActiveAccount: expect.any(Function)
       }
     ]
+
+    mockAlgodClient = new algosdk.Algodv2('token', 'https://server', '')
+
+    mockSetAlgodClient = (client: algosdk.Algodv2) => {
+      mockAlgodClient = client
+    }
   })
 
   it('initializes wallets and active wallet correctly', () => {
@@ -363,6 +383,51 @@ describe('useWallet', () => {
     const setActiveNetworkButton = screen.getByTestId('set-active-network-btn')
     fireEvent.click(setActiveNetworkButton)
     expect(screen.getByTestId('active-network')).toHaveTextContent(NetworkId.MAINNET)
+  })
+
+  it('reactively updates the algodClient', async () => {
+    render(() => (
+      <WalletProvider manager={mockWalletManager}>
+        <TestComponent />
+      </WalletProvider>
+    ))
+
+    const newAlgodClient = new algosdk.Algodv2('new-token', 'https://new-server', '')
+
+    // Assuming TestComponent has a button that sets a new Algod client
+    const setAlgodClientButton = screen.getByTestId('set-algod-client-btn')
+    fireEvent.click(setAlgodClientButton)
+
+    // Wait for state update
+    await waitFor(() => {
+      expect(screen.getByTestId('algod-client')).toHaveTextContent(JSON.stringify(newAlgodClient))
+    })
+  })
+
+  it('updates algodClient when setActiveNetwork is called', async () => {
+    render(() => (
+      <WalletProvider manager={mockWalletManager}>
+        <TestComponent />
+      </WalletProvider>
+    ))
+
+    const newAlgodClient = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud/', '')
+
+    mockWalletManager.setActiveNetwork = (networkId: NetworkId) => {
+      mockSetAlgodClient(newAlgodClient)
+      mockWalletManager.store.setState((state) => ({
+        ...state,
+        activeNetwork: networkId
+      }))
+    }
+
+    const setActiveNetworkButton = screen.getByTestId('set-active-network-btn')
+    fireEvent.click(setActiveNetworkButton)
+
+    // Wait for state update
+    await waitFor(() => {
+      expect(screen.getByTestId('algod-client')).toHaveTextContent(JSON.stringify(newAlgodClient))
+    })
   })
 
   it('calls signTransactions and transactionSigner correctly', async () => {
