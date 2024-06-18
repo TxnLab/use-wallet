@@ -37,7 +37,15 @@ export const useWallet = () => {
 
   const activeNetwork = useStore(manager.store, (state) => state.activeNetwork)
 
-  const setActiveNetwork = (networkId: NetworkId) => {
+  const setActiveNetwork = async (networkId: NetworkId): Promise<void> => {
+    if (networkId === activeNetwork) {
+      return
+    }
+    // Disconnect any connected wallets
+    await manager.disconnect()
+
+    console.info(`[React] Creating Algodv2 client for ${networkId}...`)
+
     const { token = '', baseServer, port = '', headers = {} } = manager.networkConfig[networkId]
     const newClient = new algosdk.Algodv2(token, baseServer, port, headers)
     setAlgodClient(newClient)
@@ -46,6 +54,8 @@ export const useWallet = () => {
       ...state,
       activeNetwork: networkId
     }))
+
+    console.info(`[React] ✅ Active network set to ${networkId}.`)
   }
 
   const walletStateMap = useStore(manager.store, (state) => state.wallets)

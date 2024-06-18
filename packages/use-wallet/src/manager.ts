@@ -176,6 +176,14 @@ export class WalletManager {
     await Promise.all(promises)
   }
 
+  public async disconnect(): Promise<void> {
+    const promises = this.wallets
+      .filter((wallet) => wallet.isConnected)
+      .map((wallet) => wallet?.disconnect())
+
+    await Promise.all(promises)
+  }
+
   // ---------- Network ----------------------------------------------- //
 
   private initNetworkConfig(network: NetworkId, config: NetworkConfig): NetworkConfigMap {
@@ -206,9 +214,17 @@ export class WalletManager {
     return this.algodClient
   }
 
-  public setActiveNetwork = (networkId: NetworkId): void => {
+  public setActiveNetwork = async (networkId: NetworkId): Promise<void> => {
+    if (this.activeNetwork === networkId) {
+      return
+    }
+    // Disconnect any connected wallets
+    await this.disconnect()
+
     setActiveNetwork(this.store, { networkId })
     this.algodClient = this.createAlgodClient(this.networkConfig[networkId])
+
+    console.info(`[Manager] ✅ Active network set to ${networkId}.`)
   }
 
   public get activeNetwork(): NetworkId {
