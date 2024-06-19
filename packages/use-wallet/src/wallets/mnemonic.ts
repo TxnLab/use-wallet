@@ -211,20 +211,4 @@ export class MnemonicWallet extends BaseWallet {
     const signedTxns = txnsToSign.map((txn) => txn.signTxn(this.account!.sk))
     return signedTxns
   }
-
-  public transactionSigner = async (
-    txnGroup: algosdk.Transaction[],
-    indexesToSign: number[]
-  ): Promise<Uint8Array[]> => {
-    const signTxnsResult = await this.signTransactions(txnGroup, indexesToSign)
-
-    const signedTxns = signTxnsResult.reduce<Uint8Array[]>((acc, value) => {
-      if (value !== null) {
-        acc.push(value)
-      }
-      return acc
-    }, [])
-
-    return signedTxns
-  }
 }

@@ -60,10 +60,21 @@ export abstract class BaseWallet {
     indexesToSign?: number[]
   ): Promise<(Uint8Array | null)[]>
 
-  public abstract transactionSigner(
+  public transactionSigner = async (
     txnGroup: algosdk.Transaction[],
     indexesToSign: number[]
-  ): Promise<Uint8Array[]>
+  ): Promise<Uint8Array[]> => {
+    const signTxnsResult = await this.signTransactions(txnGroup, indexesToSign)
+
+    const signedTxns = signTxnsResult.reduce<Uint8Array[]>((acc, value) => {
+      if (value !== null) {
+        acc.push(value)
+      }
+      return acc
+    }, [])
+
+    return signedTxns
+  }
 
   // ---------- Derived Properties ------------------------------------ //
 
