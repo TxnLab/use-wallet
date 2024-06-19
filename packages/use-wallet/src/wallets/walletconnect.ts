@@ -489,7 +489,7 @@ export class WalletConnect extends BaseWallet {
   public signTransactions = async <T extends algosdk.Transaction[] | Uint8Array[]>(
     txnGroup: T | T[],
     indexesToSign?: number[]
-  ): Promise<Uint8Array[]> => {
+  ): Promise<(Uint8Array | null)[]> => {
     try {
       if (!this.session) {
         throw new SessionError(`No session found!`)
@@ -518,7 +518,7 @@ export class WalletConnect extends BaseWallet {
         request
       })
 
-      // Filter out nullish values
+      // Filter out unsigned transactions, convert base64 strings to Uint8Array
       const signedTxns = signTxnsResult.reduce<Uint8Array[]>((acc, value) => {
         if (value) {
           const signedTxn = typeof value === 'string' ? base64ToByteArray(value) : value
@@ -527,7 +527,20 @@ export class WalletConnect extends BaseWallet {
         return acc
       }, [])
 
-      return signedTxns
+      // ARC-0001 - Return null for unsigned transactions
+      const result = txnsToSign.reduce<(Uint8Array | null)[]>((acc, txn) => {
+        if (txn.signers && txn.signers.length == 0) {
+          acc.push(null)
+        } else {
+          const signedTxn = signedTxns.shift()
+          if (signedTxn) {
+            acc.push(signedTxn)
+          }
+        }
+        return acc
+      }, [])
+
+      return result
     } catch (error) {
       if (error instanceof SessionError) {
         this.onDisconnect()
@@ -541,6 +554,15 @@ export class WalletConnect extends BaseWallet {
     txnGroup: algosdk.Transaction[],
     indexesToSign: number[]
   ): Promise<Uint8Array[]> => {
-    return this.signTransactions(txnGroup, indexesToSign)
+    const signTxnsResult = await this.signTransactions(txnGroup, indexesToSign)
+
+    const signedTxns = signTxnsResult.reduce<Uint8Array[]>((acc, value) => {
+      if (value !== null) {
+        acc.push(value)
+      }
+      return acc
+    }, [])
+
+    return signedTxns
   }
 }

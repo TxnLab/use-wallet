@@ -300,6 +300,8 @@ describe('DeflyWallet', () => {
     const txn3 = new algosdk.Transaction({ ...txnParams, amount: 3000 })
     const txn4 = new algosdk.Transaction({ ...txnParams, amount: 4000 })
 
+    const sTxn = new Uint8Array([1, 2, 3, 4])
+
     beforeEach(async () => {
       // Mock two connected accounts
       mockDeflyWallet.connect.mockResolvedValueOnce([connectedAcct1, connectedAcct2])
@@ -309,6 +311,8 @@ describe('DeflyWallet', () => {
 
     describe('signTransactions', () => {
       it('should process and sign a single algosdk.Transaction', async () => {
+        mockDeflyWallet.signTransaction.mockResolvedValueOnce([sTxn])
+
         await wallet.signTransactions([txn1])
 
         expect(mockDeflyWallet.signTransaction).toHaveBeenCalledWith([[{ txn: txn1 }]])
@@ -316,6 +320,9 @@ describe('DeflyWallet', () => {
 
       it('should process and sign a single algosdk.Transaction group', async () => {
         const [gtxn1, gtxn2, gtxn3] = algosdk.assignGroupID([txn1, txn2, txn3])
+
+        mockDeflyWallet.signTransaction.mockResolvedValueOnce([sTxn, sTxn])
+
         await wallet.signTransactions([gtxn1, gtxn2, gtxn3])
 
         expect(mockDeflyWallet.signTransaction).toHaveBeenCalledWith([
@@ -326,6 +333,8 @@ describe('DeflyWallet', () => {
       it('should process and sign multiple algosdk.Transaction groups', async () => {
         const [g1txn1, g1txn2] = algosdk.assignGroupID([txn1, txn2])
         const [g2txn1, g2txn2] = algosdk.assignGroupID([txn3, txn4])
+
+        mockDeflyWallet.signTransaction.mockResolvedValueOnce([sTxn, sTxn, sTxn, sTxn])
 
         await wallet.signTransactions([
           [g1txn1, g1txn2],
@@ -339,6 +348,9 @@ describe('DeflyWallet', () => {
 
       it('should process and sign a single encoded transaction', async () => {
         const encodedTxn = txn1.toByte()
+
+        mockDeflyWallet.signTransaction.mockResolvedValueOnce([sTxn])
+
         await wallet.signTransactions([encodedTxn])
 
         expect(mockDeflyWallet.signTransaction).toHaveBeenCalledWith([
@@ -349,6 +361,8 @@ describe('DeflyWallet', () => {
       it('should process and sign a single encoded transaction group', async () => {
         const txnGroup = algosdk.assignGroupID([txn1, txn2, txn3])
         const [gtxn1, gtxn2, gtxn3] = txnGroup.map((txn) => txn.toByte())
+
+        mockDeflyWallet.signTransaction.mockResolvedValueOnce([sTxn, sTxn, sTxn])
 
         await wallet.signTransactions([gtxn1, gtxn2, gtxn3])
 
@@ -368,6 +382,8 @@ describe('DeflyWallet', () => {
         const txnGroup2 = algosdk.assignGroupID([txn3, txn4])
         const [g2txn1, g2txn2] = txnGroup2.map((txn) => txn.toByte())
 
+        mockDeflyWallet.signTransaction.mockResolvedValueOnce([sTxn, sTxn, sTxn, sTxn])
+
         await wallet.signTransactions([
           [g1txn1, g1txn2],
           [g2txn1, g2txn2]
@@ -385,9 +401,18 @@ describe('DeflyWallet', () => {
 
       it('should determine which transactions to sign based on indexesToSign', async () => {
         const [gtxn1, gtxn2, gtxn3, gtxn4] = algosdk.assignGroupID([txn1, txn2, txn3, txn4])
+
+        const txnGroup = [gtxn1, gtxn2, gtxn3, gtxn4]
         const indexesToSign = [0, 1, 3]
 
-        await wallet.signTransactions([gtxn1, gtxn2, gtxn3, gtxn4], indexesToSign)
+        mockDeflyWallet.signTransaction.mockResolvedValueOnce([sTxn, sTxn, sTxn])
+
+        await expect(wallet.signTransactions(txnGroup, indexesToSign)).resolves.toEqual([
+          sTxn,
+          sTxn,
+          null,
+          sTxn
+        ])
 
         expect(mockDeflyWallet.signTransaction).toHaveBeenCalledWith([
           [{ txn: gtxn1 }, { txn: gtxn2 }, { txn: gtxn3, signers: [] }, { txn: gtxn4 }]
@@ -420,10 +445,29 @@ describe('DeflyWallet', () => {
           canSignTxn3
         ])
 
-        await wallet.signTransactions([gtxn1, gtxn2, gtxn3])
+        mockDeflyWallet.signTransaction.mockResolvedValueOnce([sTxn, sTxn])
+
+        await expect(wallet.signTransactions([gtxn1, gtxn2, gtxn3])).resolves.toEqual([
+          sTxn,
+          null,
+          sTxn
+        ])
 
         expect(mockDeflyWallet.signTransaction).toHaveBeenCalledWith([
           [{ txn: gtxn1 }, { txn: gtxn2, signers: [] }, { txn: gtxn3 }]
+        ])
+      })
+
+      it('should insert null values in response for transactions that were not signed', async () => {
+        const txnGroup = algosdk.assignGroupID([txn1, txn2, txn3])
+        const indexesToSign = [0, 2]
+
+        mockDeflyWallet.signTransaction.mockResolvedValueOnce([sTxn, sTxn])
+
+        await expect(wallet.signTransactions(txnGroup, indexesToSign)).resolves.toEqual([
+          sTxn,
+          null,
+          sTxn
         ])
       })
     })
@@ -433,7 +477,9 @@ describe('DeflyWallet', () => {
         const txnGroup = algosdk.assignGroupID([txn1, txn2])
         const indexesToSign = [1]
 
-        const signTransactionsSpy = vi.spyOn(wallet, 'signTransactions')
+        const signTransactionsSpy = vi
+          .spyOn(wallet, 'signTransactions')
+          .mockImplementationOnce(() => Promise.resolve([sTxn]))
 
         await wallet.transactionSigner(txnGroup, indexesToSign)
 

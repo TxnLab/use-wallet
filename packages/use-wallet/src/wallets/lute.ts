@@ -185,7 +185,7 @@ export class LuteWallet extends BaseWallet {
   public signTransactions = async <T extends algosdk.Transaction[] | Uint8Array[]>(
     txnGroup: T | T[],
     indexesToSign?: number[]
-  ): Promise<Uint8Array[]> => {
+  ): Promise<(Uint8Array | null)[]> => {
     try {
       let txnsToSign: WalletTransaction[] = []
 
@@ -203,15 +203,7 @@ export class LuteWallet extends BaseWallet {
       // Sign transactions
       const signTxnsResult = await client.signTxns(txnsToSign)
 
-      // Filter out null values
-      const signedTxns = signTxnsResult.reduce<Uint8Array[]>((acc, value) => {
-        if (value !== null) {
-          acc.push(value)
-        }
-        return acc
-      }, [])
-
-      return signedTxns
+      return signTxnsResult
     } catch (error) {
       if (isSignTxnsError(error)) {
         throw new SignTxnsError(error.message, error.code)
@@ -224,6 +216,15 @@ export class LuteWallet extends BaseWallet {
     txnGroup: algosdk.Transaction[],
     indexesToSign: number[]
   ): Promise<Uint8Array[]> => {
-    return this.signTransactions(txnGroup, indexesToSign)
+    const signTxnsResult = await this.signTransactions(txnGroup, indexesToSign)
+
+    const signedTxns = signTxnsResult.reduce<Uint8Array[]>((acc, value) => {
+      if (value !== null) {
+        acc.push(value)
+      }
+      return acc
+    }, [])
+
+    return signedTxns
   }
 }

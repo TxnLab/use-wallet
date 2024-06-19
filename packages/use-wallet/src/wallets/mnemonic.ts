@@ -192,7 +192,7 @@ export class MnemonicWallet extends BaseWallet {
   public signTransactions = async <T extends algosdk.Transaction[] | Uint8Array[]>(
     txnGroup: T | T[],
     indexesToSign?: number[]
-  ): Promise<Uint8Array[]> => {
+  ): Promise<(Uint8Array | null)[]> => {
     // Throw error if MainNet is active
     this.checkMainnet()
 
@@ -216,9 +216,15 @@ export class MnemonicWallet extends BaseWallet {
     txnGroup: algosdk.Transaction[],
     indexesToSign: number[]
   ): Promise<Uint8Array[]> => {
-    // Throw error if MainNet is active
-    this.checkMainnet()
+    const signTxnsResult = await this.signTransactions(txnGroup, indexesToSign)
 
-    return this.signTransactions(txnGroup, indexesToSign)
+    const signedTxns = signTxnsResult.reduce<Uint8Array[]>((acc, value) => {
+      if (value !== null) {
+        acc.push(value)
+      }
+      return acc
+    }, [])
+
+    return signedTxns
   }
 }

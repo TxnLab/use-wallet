@@ -58,7 +58,7 @@ export abstract class BaseWallet {
   public abstract signTransactions<T extends algosdk.Transaction[] | Uint8Array[]>(
     txnGroup: T | T[],
     indexesToSign?: number[]
-  ): Promise<Uint8Array[]>
+  ): Promise<(Uint8Array | null)[]>
 
   public abstract transactionSigner(
     txnGroup: algosdk.Transaction[],

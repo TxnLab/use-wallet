@@ -463,7 +463,7 @@ export class KibisisWallet extends BaseWallet {
   public signTransactions = async <T extends algosdk.Transaction[] | Uint8Array[]>(
     txnGroup: T | T[],
     indexesToSign?: number[]
-  ): Promise<Uint8Array[]> => {
+  ): Promise<(Uint8Array | null)[]> => {
     try {
       let txnsToSign: AVMWebProviderSDK.IARC0001Transaction[] = []
 
@@ -479,16 +479,15 @@ export class KibisisWallet extends BaseWallet {
       // Sign transactions
       const signTxnsResult = await this._signTransactions(txnsToSign)
 
-      // Filter out null values
-      const signedTxns = signTxnsResult.stxns.reduce<Uint8Array[]>((acc, value) => {
-        if (value !== null) {
-          const signedTxn = base64ToByteArray(value)
-          acc.push(signedTxn)
+      // Convert base64 to Uint8Array
+      const result = signTxnsResult.stxns.map((value) => {
+        if (value === null) {
+          return null
         }
-        return acc
-      }, [])
+        return base64ToByteArray(value)
+      })
 
-      return signedTxns
+      return result
     } catch (error: any) {
       console.error(
         `[${this.metadata.name}] error signing transactions: ` +
@@ -504,6 +503,15 @@ export class KibisisWallet extends BaseWallet {
     txnGroup: algosdk.Transaction[],
     indexesToSign: number[]
   ): Promise<Uint8Array[]> => {
-    return this.signTransactions(txnGroup, indexesToSign)
+    const signTxnsResult = await this.signTransactions(txnGroup, indexesToSign)
+
+    const signedTxns = signTxnsResult.reduce<Uint8Array[]>((acc, value) => {
+      if (value !== null) {
+        acc.push(value)
+      }
+      return acc
+    }, [])
+
+    return signedTxns
   }
 }

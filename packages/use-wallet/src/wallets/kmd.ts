@@ -213,7 +213,7 @@ export class KmdWallet extends BaseWallet {
   public signTransactions = async <T extends algosdk.Transaction[] | Uint8Array[]>(
     txnGroup: T | T[],
     indexesToSign?: number[]
-  ): Promise<Uint8Array[]> => {
+  ): Promise<(Uint8Array | null)[]> => {
     let txnsToSign: algosdk.Transaction[] = []
 
     // Determine type and process transactions for signing
@@ -246,7 +246,16 @@ export class KmdWallet extends BaseWallet {
     txnGroup: algosdk.Transaction[],
     indexesToSign: number[]
   ): Promise<Uint8Array[]> => {
-    return this.signTransactions(txnGroup, indexesToSign)
+    const signTxnsResult = await this.signTransactions(txnGroup, indexesToSign)
+
+    const signedTxns = signTxnsResult.reduce<Uint8Array[]>((acc, value) => {
+      if (value !== null) {
+        acc.push(value)
+      }
+      return acc
+    }, [])
+
+    return signedTxns
   }
 
   private async fetchWalletId(): Promise<string> {

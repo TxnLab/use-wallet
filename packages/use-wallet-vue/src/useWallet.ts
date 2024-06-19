@@ -107,7 +107,7 @@ export function useWallet() {
   const signTransactions = <T extends algosdk.Transaction[] | Uint8Array[]>(
     txnGroup: T | T[],
     indexesToSign?: number[]
-  ): Promise<Uint8Array[]> => {
+  ): Promise<(Uint8Array | null)[]> => {
     if (!activeWallet.value) {
       throw new Error('No active wallet')
     }

@@ -261,7 +261,7 @@ export class MagicAuth extends BaseWallet {
   public signTransactions = async <T extends algosdk.Transaction[] | Uint8Array[]>(
     txnGroup: T | T[],
     indexesToSign?: number[]
-  ): Promise<Uint8Array[]> => {
+  ): Promise<(Uint8Array | null)[]> => {
     let txnsToSign: WalletTransaction[] = []
 
     // Determine type and process transactions for signing
@@ -280,22 +280,30 @@ export class MagicAuth extends BaseWallet {
       txnsToSign
     )) as SignTxnsResult
 
-    // Filter out undefined values and convert to Uint8Array[]
-    const signedTxns = signTxnsResult.reduce<Uint8Array[]>((acc, value) => {
-      if (value !== undefined) {
-        const signedTxn = base64ToByteArray(value)
-        acc.push(signedTxn)
+    // Convert base64 to Uint8Array, undefined to null
+    const result = signTxnsResult.map((value) => {
+      if (value === undefined) {
+        return null
       }
-      return acc
-    }, [])
+      return base64ToByteArray(value)
+    })
 
-    return signedTxns
+    return result
   }
 
   public transactionSigner = async (
     txnGroup: algosdk.Transaction[],
     indexesToSign: number[]
   ): Promise<Uint8Array[]> => {
-    return this.signTransactions(txnGroup, indexesToSign)
+    const signTxnsResult = await this.signTransactions(txnGroup, indexesToSign)
+
+    const signedTxns = signTxnsResult.reduce<Uint8Array[]>((acc, value) => {
+      if (value !== null) {
+        acc.push(value)
+      }
+      return acc
+    }, [])
+
+    return signedTxns
   }
 }
