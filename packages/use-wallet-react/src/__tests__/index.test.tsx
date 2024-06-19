@@ -460,11 +460,11 @@ describe('useWallet', () => {
     expect(result.current.algodClient).toBe(newAlgodClient)
   })
 
-  it('calls setActiveNetwork correctly and updates algodClient', () => {
+  it('calls setActiveNetwork correctly and updates algodClient', async () => {
     const newNetwork = NetworkId.MAINNET
     const { result } = renderHook(() => useWallet(), { wrapper })
 
-    act(async () => {
+    await act(async () => {
       await result.current.setActiveNetwork(newNetwork)
     })
 

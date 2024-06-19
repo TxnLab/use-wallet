@@ -52,13 +52,6 @@ vi.mock('@txnlab/use-wallet', async (importOriginal) => {
   }
 })
 
-const mockSubscribe: (callback: (state: State) => void) => () => void = vi.fn(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  (callback: (state: State) => void) => {
-    return () => console.log('unsubscribe')
-  }
-)
-
 const testAccount1 = { name: 'Account 1', address: 'address1' }
 const testAccount2 = { name: 'Account 2', address: 'address2' }
 
@@ -216,7 +209,7 @@ describe('useWallet', () => {
       metadata: { name: 'Defly', icon: 'icon' },
       getAlgodClient: () => ({}) as any,
       store: mockStore,
-      subscribe: mockSubscribe
+      subscribe: vi.fn()
     })
 
     mockMagicAuth = new MagicAuth({
@@ -224,7 +217,7 @@ describe('useWallet', () => {
       metadata: { name: 'Magic', icon: 'icon' },
       getAlgodClient: () => ({}) as any,
       store: mockStore,
-      subscribe: mockSubscribe
+      subscribe: vi.fn()
     })
 
     mockWalletManager = new WalletManager()
@@ -371,7 +364,7 @@ describe('useWallet', () => {
     expect(mocks.setActiveAccount).toHaveBeenCalledWith(testAccount1.address)
   })
 
-  it('calls setActiveNetwork correctly', () => {
+  it('calls setActiveNetwork correctly', async () => {
     render(() => (
       <WalletProvider manager={mockWalletManager}>
         <TestComponent />
@@ -382,7 +375,10 @@ describe('useWallet', () => {
 
     const setActiveNetworkButton = screen.getByTestId('set-active-network-btn')
     fireEvent.click(setActiveNetworkButton)
-    expect(screen.getByTestId('active-network')).toHaveTextContent(NetworkId.MAINNET)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('active-network')).toHaveTextContent(NetworkId.MAINNET)
+    })
   })
 
   it('reactively updates the algodClient', async () => {
@@ -394,7 +390,6 @@ describe('useWallet', () => {
 
     const newAlgodClient = new algosdk.Algodv2('new-token', 'https://new-server', '')
 
-    // Assuming TestComponent has a button that sets a new Algod client
     const setAlgodClientButton = screen.getByTestId('set-algod-client-btn')
     fireEvent.click(setAlgodClientButton)
 
