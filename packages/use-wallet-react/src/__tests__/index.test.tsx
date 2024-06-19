@@ -1,5 +1,5 @@
 import { Store } from '@tanstack/react-store'
-import { renderHook, act, render } from '@testing-library/react'
+import { renderHook, act, render, screen } from '@testing-library/react'
 import {
   BaseWallet,
   DeflyWallet,
@@ -12,8 +12,8 @@ import {
   type WalletAccount
 } from '@txnlab/use-wallet'
 import * as React from 'react'
-import { Wallet, useWallet } from '../useWallet'
-import { WalletProvider } from '../WalletProvider'
+import { Wallet, WalletProvider, useWallet } from '../index'
+import algosdk from 'algosdk'
 
 const mocks = vi.hoisted(() => {
   return {
@@ -52,13 +52,6 @@ vi.mock('@txnlab/use-wallet', async (importOriginal) => {
   }
 })
 
-const mockSubscribe: (callback: (state: State) => void) => () => void = vi.fn(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  (callback: (state: State) => void) => {
-    return () => console.log('unsubscribe')
-  }
-)
-
 const mockStore = new Store<State>(defaultState)
 
 const mockDeflyWallet = new DeflyWallet({
@@ -66,7 +59,7 @@ const mockDeflyWallet = new DeflyWallet({
   metadata: { name: 'Defly', icon: 'icon' },
   getAlgodClient: () => ({}) as any,
   store: mockStore,
-  subscribe: mockSubscribe
+  subscribe: vi.fn()
 })
 
 const mockMagicAuth = new MagicAuth({
@@ -77,7 +70,106 @@ const mockMagicAuth = new MagicAuth({
   metadata: { name: 'Magic', icon: 'icon' },
   getAlgodClient: () => ({}) as any,
   store: mockStore,
-  subscribe: mockSubscribe
+  subscribe: vi.fn()
+})
+
+describe('WalletProvider', () => {
+  it('provides the wallet context to its children', () => {
+    const TestComponent = () => {
+      const { wallets } = useWallet()
+      return <h1>{wallets ? 'Context provided' : 'No context'}</h1>
+    }
+
+    const walletManager = new WalletManager({
+      wallets: [WalletId.DEFLY]
+    })
+
+    render(
+      <WalletProvider manager={walletManager}>
+        <TestComponent />
+      </WalletProvider>
+    )
+
+    expect(screen.getByText('Context provided')).toBeInTheDocument()
+  })
+
+  it('throws an error when useWallet is used outside of WalletProvider', () => {
+    const TestComponent = () => {
+      try {
+        useWallet()
+        return <div>No error thrown</div>
+      } catch (error: any) {
+        return <div>{error.message}</div>
+      }
+    }
+
+    render(<TestComponent />)
+    expect(screen.getByText('useWallet must be used within the WalletProvider')).toBeInTheDocument()
+  })
+
+  it('calls resumeSessions on mount', async () => {
+    const mockResumeSessions = vi.fn()
+    const fakeManager = { resumeSessions: mockResumeSessions }
+
+    render(
+      <WalletProvider manager={fakeManager as unknown as WalletManager}>
+        <div />
+      </WalletProvider>
+    )
+
+    expect(mockResumeSessions).toHaveBeenCalled()
+  })
+
+  it('updates algodClient when setAlgodClient is called', () => {
+    const newAlgodClient = new algosdk.Algodv2('mock-token', 'https://mock-server', '')
+    const TestComponent = () => {
+      const { setAlgodClient } = useWallet()
+      React.useEffect(() => {
+        setAlgodClient(newAlgodClient)
+      }, [setAlgodClient])
+      return null
+    }
+
+    const walletManager = new WalletManager({
+      wallets: [WalletId.DEFLY]
+    })
+
+    render(
+      <WalletProvider manager={walletManager}>
+        <TestComponent />
+      </WalletProvider>
+    )
+
+    expect(walletManager.algodClient).toBe(newAlgodClient)
+  })
+
+  it('updates activeNetwork and algodClient when setActiveNetwork is called', async () => {
+    const newNetwork = NetworkId.MAINNET
+
+    const walletManager = new WalletManager({
+      wallets: [WalletId.DEFLY],
+      network: NetworkId.TESTNET
+    })
+
+    const TestComponent = () => {
+      const { setActiveNetwork } = useWallet()
+      return <button onClick={() => setActiveNetwork(newNetwork)}>Change Network</button>
+    }
+
+    render(
+      <WalletProvider manager={walletManager}>
+        <TestComponent />
+      </WalletProvider>
+    )
+
+    await act(async () => {
+      screen.getByText('Change Network').click()
+    })
+
+    expect(walletManager.store.state.activeNetwork).toBe(newNetwork)
+    const { token, baseServer, port, headers } = walletManager.networkConfig[newNetwork]
+    expect(walletManager.algodClient).toEqual(new algosdk.Algodv2(token, baseServer, port, headers))
+  })
 })
 
 describe('useWallet', () => {
@@ -355,5 +447,31 @@ describe('useWallet', () => {
       })
     )
     expect(getByTestId('active-address')).toHaveTextContent(JSON.stringify('address1'))
+  })
+
+  it('calls setAlgodClient correctly', () => {
+    const newAlgodClient = new algosdk.Algodv2('mock-token', 'https://mock-server', '')
+    const { result } = renderHook(() => useWallet(), { wrapper })
+
+    act(() => {
+      result.current.setAlgodClient(newAlgodClient)
+    })
+
+    expect(result.current.algodClient).toBe(newAlgodClient)
+  })
+
+  it('calls setActiveNetwork correctly and updates algodClient', async () => {
+    const newNetwork = NetworkId.MAINNET
+    const { result } = renderHook(() => useWallet(), { wrapper })
+
+    await act(async () => {
+      await result.current.setActiveNetwork(newNetwork)
+    })
+
+    expect(result.current.activeNetwork).toBe(newNetwork)
+    const { token, baseServer, port, headers } = mockWalletManager.networkConfig[newNetwork]
+    expect(result.current.algodClient).toEqual(
+      new algosdk.Algodv2(token, baseServer, port, headers)
+    )
   })
 })

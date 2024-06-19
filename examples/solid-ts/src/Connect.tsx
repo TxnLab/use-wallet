@@ -1,4 +1,4 @@
-import { useWallet, type BaseWallet, WalletId } from '@txnlab/use-wallet-solid'
+import { useWallet, type BaseWallet, WalletId, NetworkId } from '@txnlab/use-wallet-solid'
 import algosdk from 'algosdk'
 import { For, Show, createSignal } from 'solid-js'
 
@@ -9,6 +9,8 @@ export function Connect() {
   const {
     algodClient,
     activeAddress,
+    activeNetwork,
+    setActiveNetwork,
     activeWalletId,
     isWalletActive,
     isWalletConnected,
@@ -79,6 +81,35 @@ export function Connect() {
 
   return (
     <div>
+      <div class="network-group">
+        <h4>
+          Current Network: <span class="active-network">{activeNetwork()}</span>
+        </h4>
+        <div class="network-buttons">
+          <button
+            type="button"
+            onClick={() => setActiveNetwork(NetworkId.BETANET)}
+            disabled={activeNetwork() === NetworkId.BETANET}
+          >
+            Set to Betanet
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveNetwork(NetworkId.TESTNET)}
+            disabled={activeNetwork() === NetworkId.TESTNET}
+          >
+            Set to Testnet
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveNetwork(NetworkId.MAINNET)}
+            disabled={activeNetwork() === NetworkId.MAINNET}
+          >
+            Set to Mainnet
+          </button>
+        </div>
+      </div>
+
       <For each={wallets}>
         {(wallet) => (
           <div class="wallet-group">
@@ -103,18 +134,20 @@ export function Connect() {
               >
                 Disconnect
               </button>
-              <Show when={wallet.id === activeWalletId()}>
+              <Show when={isWalletActive(wallet.id)}>
                 <button type="button" onClick={sendTransaction} disabled={isSending()}>
                   {isSending() ? 'Sending Transaction...' : 'Send Transaction'}
                 </button>
               </Show>
-              <button
-                type="button"
-                onClick={() => wallet.setActive()}
-                disabled={isWalletActive(wallet.id) || !isWalletConnected(wallet.id)}
-              >
-                Set Active
-              </button>
+              <Show when={!isWalletActive(wallet.id)}>
+                <button
+                  type="button"
+                  onClick={() => wallet.setActive()}
+                  disabled={!isWalletConnected(wallet.id)}
+                >
+                  Set Active
+                </button>
+              </Show>
             </div>
 
             <Show when={isMagicLink(wallet)}>

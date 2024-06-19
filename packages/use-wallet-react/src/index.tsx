@@ -1,10 +1,17 @@
-'use client'
-
 import { useStore } from '@tanstack/react-store'
+import { NetworkId, WalletAccount, WalletManager, WalletMetadata } from '@txnlab/use-wallet'
+import algosdk from 'algosdk'
 import * as React from 'react'
-import { useWalletManager } from './WalletProvider'
-import type { WalletAccount, WalletMetadata } from '@txnlab/use-wallet'
-import type algosdk from 'algosdk'
+
+export * from '@txnlab/use-wallet'
+
+interface IWalletContext {
+  manager: WalletManager
+  algodClient: algosdk.Algodv2
+  setAlgodClient: React.Dispatch<React.SetStateAction<algosdk.Algodv2>>
+}
+
+const WalletContext = React.createContext<IWalletContext | undefined>(undefined)
 
 export interface Wallet {
   id: string
@@ -19,10 +26,37 @@ export interface Wallet {
   setActiveAccount: (address: string) => void
 }
 
-export function useWallet() {
-  const manager = useWalletManager()
+export const useWallet = () => {
+  const context = React.useContext(WalletContext)
 
-  const algodClient: algosdk.Algodv2 = manager.algodClient
+  if (!context) {
+    throw new Error('useWallet must be used within the WalletProvider')
+  }
+
+  const { manager, algodClient, setAlgodClient } = context
+
+  const activeNetwork = useStore(manager.store, (state) => state.activeNetwork)
+
+  const setActiveNetwork = async (networkId: NetworkId): Promise<void> => {
+    if (networkId === activeNetwork) {
+      return
+    }
+    // Disconnect any connected wallets
+    await manager.disconnect()
+
+    console.info(`[React] Creating Algodv2 client for ${networkId}...`)
+
+    const { token = '', baseServer, port = '', headers = {} } = manager.networkConfig[networkId]
+    const newClient = new algosdk.Algodv2(token, baseServer, port, headers)
+    setAlgodClient(newClient)
+
+    manager.store.setState((state) => ({
+      ...state,
+      activeNetwork: networkId
+    }))
+
+    console.info(`[React] ✅ Active network set to ${networkId}.`)
+  }
 
   const walletStateMap = useStore(manager.store, (state) => state.wallets)
   const activeWalletId = useStore(manager.store, (state) => state.activeWallet)
@@ -54,9 +88,6 @@ export function useWallet() {
   const activeAccount = activeWalletState?.activeAccount ?? null
   const activeAddress = activeAccount?.address ?? null
 
-  const activeNetwork = useStore(manager.store, (state) => state.activeNetwork)
-  const setActiveNetwork = manager.setActiveNetwork
-
   const signTransactions = <T extends algosdk.Transaction[] | Uint8Array[]>(
     txnGroup: T | T[],
     indexesToSign?: number[]
@@ -87,7 +118,44 @@ export function useWallet() {
     activeAccount,
     activeAddress,
     setActiveNetwork,
+    setAlgodClient,
     signTransactions,
     transactionSigner
   }
+}
+
+interface WalletProviderProps {
+  manager: WalletManager
+  children: React.ReactNode
+}
+
+export const WalletProvider = ({ manager, children }: WalletProviderProps): JSX.Element => {
+  const [algodClient, setAlgodClient] = React.useState(manager.algodClient)
+
+  React.useEffect(() => {
+    manager.algodClient = algodClient
+  }, [algodClient, manager])
+
+  const resumedRef = React.useRef(false)
+
+  React.useEffect(() => {
+    const resumeSessions = async () => {
+      try {
+        await manager.resumeSessions()
+      } catch (error) {
+        console.error('Error resuming sessions:', error)
+      }
+    }
+
+    if (!resumedRef.current) {
+      resumeSessions()
+      resumedRef.current = true
+    }
+  }, [manager])
+
+  return (
+    <WalletContext.Provider value={{ manager, algodClient, setAlgodClient }}>
+      {children}
+    </WalletContext.Provider>
+  )
 }

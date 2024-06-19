@@ -1,3 +1,4 @@
+/* eslint-disable no-extra-semi */
 import { Store } from '@tanstack/vue-store'
 import {
   BaseWallet,
@@ -11,8 +12,10 @@ import {
   type WalletAccount
 } from '@txnlab/use-wallet'
 import { mount } from '@vue/test-utils'
-import { inject, nextTick } from 'vue'
+import algosdk from 'algosdk'
+import { inject, nextTick, ref, type InjectionKey } from 'vue'
 import { useWallet, type Wallet } from '../useWallet'
+import type { Mock } from 'vitest'
 
 const mocks = vi.hoisted(() => {
   return {
@@ -51,20 +54,20 @@ vi.mock('@txnlab/use-wallet', async (importOriginal) => {
   }
 })
 
+let mockWalletManager: WalletManager
+
 vi.mock('vue', async (importOriginal) => {
   const mod = await importOriginal<typeof import('vue')>()
   return {
     ...mod,
-    inject: vi.fn().mockImplementation(() => new WalletManager())
+    inject: vi.fn((token: string | InjectionKey<unknown>) => {
+      if (token === 'walletManager') return mockWalletManager
+      if (token === 'setAlgodClient') return mockSetAlgodClient
+      if (token === 'algodClient') return ref(mockAlgodClient)
+      return null
+    })
   }
 })
-
-const mockSubscribe: (callback: (state: State) => void) => () => void = vi.fn(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  (callback: (state: State) => void) => {
-    return () => console.log('unsubscribe')
-  }
-)
 
 const mockStore = new Store<State>(defaultState)
 
@@ -73,7 +76,7 @@ const mockDeflyWallet = new DeflyWallet({
   metadata: { name: 'Defly', icon: 'icon' },
   getAlgodClient: () => ({}) as any,
   store: mockStore,
-  subscribe: mockSubscribe
+  subscribe: vi.fn()
 })
 
 const mockMagicAuth = new MagicAuth({
@@ -84,12 +87,24 @@ const mockMagicAuth = new MagicAuth({
   metadata: { name: 'Magic', icon: 'icon' },
   getAlgodClient: () => ({}) as any,
   store: mockStore,
-  subscribe: mockSubscribe
+  subscribe: vi.fn()
 })
 
+const mockAlgodClient = ref(new algosdk.Algodv2('token', 'https://server', ''))
+
+const mockSetAlgodClient = (client: algosdk.Algodv2) => {
+  mockAlgodClient.value = client
+}
+
 describe('useWallet', () => {
-  let mockWalletManager: WalletManager
   let mockWallets: Wallet[]
+
+  const mockInjectImplementation = (token: string | InjectionKey<unknown>) => {
+    if (token === 'walletManager') return mockWalletManager
+    if (token === 'setAlgodClient') return mockSetAlgodClient
+    if (token === 'algodClient') return mockAlgodClient
+    return null
+  }
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -128,15 +143,20 @@ describe('useWallet', () => {
       [WalletId.MAGIC, mockMagicAuth]
     ])
     mockWalletManager.store = mockStore
+    ;(inject as Mock).mockImplementation(mockInjectImplementation)
   })
 
   it('throws an error if WalletManager is not installed', () => {
-    vi.mocked(inject).mockImplementation(() => null)
+    ;(inject as Mock).mockImplementation((token: string | InjectionKey<unknown>) => {
+      if (token === 'walletManager') return null
+      if (token === 'setAlgodClient') return null
+      if (token === 'algodClient') return null
+      return null
+    })
     expect(() => useWallet()).toThrow('WalletManager plugin is not properly installed')
   })
 
   it('initializes wallets and active wallet correctly', () => {
-    vi.mocked(inject).mockImplementation(() => mockWalletManager)
     const { wallets, activeWallet, activeAccount, activeNetwork } = useWallet()
 
     expect(wallets.value).toEqual(mockWallets)
@@ -146,7 +166,6 @@ describe('useWallet', () => {
   })
 
   it('correctly handles wallet connect/disconnect', async () => {
-    vi.mocked(inject).mockImplementation(() => mockWalletManager)
     const { wallets } = useWallet()
 
     const defly = wallets.value[0]
@@ -168,7 +187,6 @@ describe('useWallet', () => {
   })
 
   it('calls setActive and setActiveAccount correctly', () => {
-    vi.mocked(inject).mockImplementation(() => mockWalletManager)
     const { wallets } = useWallet()
 
     // Simulate setActive
@@ -180,7 +198,6 @@ describe('useWallet', () => {
   })
 
   it('calls signTransactions and transactionSigner correctly', async () => {
-    vi.mocked(inject).mockImplementation(() => mockWalletManager)
     const { signTransactions, transactionSigner } = useWallet()
 
     mockStore.setState((state) => ({
@@ -211,7 +228,6 @@ describe('useWallet', () => {
   })
 
   it('updates wallets when store state changes', () => {
-    vi.mocked(inject).mockImplementation(() => mockWalletManager)
     const { wallets } = useWallet()
 
     mockStore.setState((state) => ({
@@ -261,14 +277,40 @@ describe('useWallet', () => {
     ])
   })
 
-  /**
-   * @todo Fix this test
-   *
-   * This test passed before implementing StorageAdapter in core lib. Mocking a state change should
-   * update the activeWallet and activeAddress in the component, but it doesn't.
-   */
-  it.skip('integrates correctly with Vue component', async () => {
-    vi.mocked(inject).mockImplementation(() => mockWalletManager)
+  it('reactively updates the algodClient', async () => {
+    const { algodClient, setAlgodClient } = useWallet()
+
+    const newAlgodClient = new algosdk.Algodv2('mock-token', 'https://mock-server', '')
+
+    setAlgodClient(newAlgodClient)
+
+    await nextTick()
+
+    expect(algodClient.value).toStrictEqual(newAlgodClient)
+  })
+
+  it('updates algodClient when setActiveNetwork is called', async () => {
+    const { setActiveNetwork, algodClient } = useWallet()
+
+    const newNetwork = NetworkId.MAINNET
+    const newAlgodClient = new algosdk.Algodv2('mock-token', 'https://mock-server', '')
+
+    mockWalletManager.setActiveNetwork = async (networkId: NetworkId) => {
+      mockSetAlgodClient(newAlgodClient)
+      mockWalletManager.store.setState((state) => ({
+        ...state,
+        activeNetwork: networkId
+      }))
+    }
+
+    setActiveNetwork(newNetwork)
+
+    await nextTick()
+
+    expect(algodClient.value).toStrictEqual(newAlgodClient)
+  })
+
+  it('integrates correctly with Vue component', async () => {
     const { wallets, activeWallet, activeAddress, activeNetwork } = useWallet()
 
     const TestComponent = {
@@ -337,7 +379,7 @@ describe('useWallet', () => {
     expect(activeAddress.value).toBe('address1')
 
     expect(wrapper.get('[data-testid="activeNetwork"]').text()).toBe(NetworkId.TESTNET)
-    expect(wrapper.get('[data-testid="activeWallet"]').text()).toBe(WalletId.DEFLY) // fails
-    expect(wrapper.get('[data-testid="activeAddress"]').text()).toBe('address1') // fails
+    expect(wrapper.get('[data-testid="activeWallet"]').text()).toBe(WalletId.DEFLY)
+    expect(wrapper.get('[data-testid="activeAddress"]').text()).toBe('address1')
   })
 })

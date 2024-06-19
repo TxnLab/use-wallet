@@ -1,12 +1,19 @@
 'use client'
 
-import { WalletId, useWallet, type Wallet } from '@txnlab/use-wallet-react'
+import { NetworkId, WalletId, useWallet, type Wallet } from '@txnlab/use-wallet-react'
 import algosdk from 'algosdk'
 import * as React from 'react'
 import styles from './Connect.module.css'
 
 export function Connect() {
-  const { algodClient, activeAddress, transactionSigner, wallets } = useWallet()
+  const {
+    algodClient,
+    activeAddress,
+    activeNetwork,
+    setActiveNetwork,
+    transactionSigner,
+    wallets
+  } = useWallet()
 
   const [isSending, setIsSending] = React.useState(false)
   const [magicEmail, setMagicEmail] = React.useState('')
@@ -73,6 +80,35 @@ export function Connect() {
 
   return (
     <div>
+      <div className={styles.networkGroup}>
+        <h4>
+          Current Network: <span className={styles.activeNetwork}>{activeNetwork}</span>
+        </h4>
+        <div className={styles.networkButtons}>
+          <button
+            type="button"
+            onClick={() => setActiveNetwork(NetworkId.BETANET)}
+            disabled={activeNetwork === NetworkId.BETANET}
+          >
+            Set to Betanet
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveNetwork(NetworkId.TESTNET)}
+            disabled={activeNetwork === NetworkId.TESTNET}
+          >
+            Set to Testnet
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveNetwork(NetworkId.MAINNET)}
+            disabled={activeNetwork === NetworkId.MAINNET}
+          >
+            Set to Mainnet
+          </button>
+        </div>
+      </div>
+
       {wallets.map((wallet) => (
         <div key={wallet.id} className={styles.walletGroup}>
           <h4 className={styles.walletName} data-active={wallet.isActive}>
