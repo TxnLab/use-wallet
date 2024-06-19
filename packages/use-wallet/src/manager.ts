@@ -280,19 +280,6 @@ export class WalletManager {
     return this.activeWallet.signTransactions
   }
 
-  /**
-   * A function which can sign transactions from an atomic transaction group. The logic will be
-   * specific to each wallet, but the function will always return a promise that resolves to an
-   * array of encoded signed transactions matching the length of the indexesToSign array.
-   *
-   * @see https://github.com/algorand/js-algorand-sdk/blob/v2.8.0/src/signer.ts#L7-L18
-   *
-   * @param txnGroup - The atomic group containing transactions to be signed
-   * @param indexesToSign - An array of indexes in the atomic transaction group that should be signed
-   * @returns A promise which resolves an array of encoded signed transactions. The length of the
-   *   array will be the same as the length of indexesToSign, and each index i in the array
-   *   corresponds to the signed transaction from txnGroup[indexesToSign[i]]
-   */
   public get transactionSigner(): algosdk.TransactionSigner {
     if (!this.activeWallet) {
       throw new Error('[Manager] No active wallet found!')
