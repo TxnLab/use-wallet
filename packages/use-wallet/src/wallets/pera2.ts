@@ -2,7 +2,7 @@ import algosdk from 'algosdk'
 import { WalletState, addWallet, setAccounts, type State } from 'src/store'
 import { compareAccounts, flattenTxnGroup, isSignedTxn, isTransactionArray } from 'src/utils'
 import { BaseWallet } from 'src/wallets/base'
-import type { PeraWalletConnect } from '@perawallet/connect'
+import type { PeraWalletConnect } from '@perawallet/connect-beta'
 import type { Store } from '@tanstack/store'
 import type {
   SignerTransaction,
@@ -12,6 +12,7 @@ import type {
 } from 'src/wallets/types'
 
 export interface PeraWalletConnectOptions {
+  projectId: string
   bridge?: string
   shouldShowSignTxnToast?: boolean
   chainId?: 416001 | 416002 | 416003 | 4160
@@ -41,10 +42,13 @@ export class PeraWallet extends BaseWallet {
     store,
     subscribe,
     getAlgodClient,
-    options = {},
+    options,
     metadata = {}
-  }: WalletConstructor<WalletId.PERA>) {
+  }: WalletConstructor<WalletId.PERA2>) {
     super({ id, metadata, getAlgodClient, store, subscribe })
+    if (!options?.projectId) {
+      throw new Error(`[${this.metadata.name}] Missing required option: projectId`)
+    }
     this.options = options
     this.store = store
   }
@@ -56,13 +60,12 @@ export class PeraWallet extends BaseWallet {
 
   private async initializeClient(): Promise<PeraWalletConnect> {
     console.info(`[${this.metadata.name}] Initializing client...`)
-    const module = await import('@perawallet/connect')
-    const PeraWalletConnect = module.default
-      ? module.default.PeraWalletConnect
-      : module.PeraWalletConnect
+    const module = await import('@perawallet/connect-beta')
+
+    const PeraWalletConnect = module.PeraWalletConnect || module.default.PeraWalletConnect
 
     const client = new PeraWalletConnect(this.options)
-    client.connector?.on('disconnect', this.onDisconnect)
+    client.client?.on('session_delete', this.onDisconnect)
     this.client = client
     return client
   }
