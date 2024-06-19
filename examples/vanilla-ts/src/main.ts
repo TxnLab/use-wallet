@@ -9,10 +9,7 @@ const walletManager = new WalletManager({
   wallets: [
     WalletId.DEFLY,
     WalletId.EXODUS,
-    {
-      id: WalletId.PERA,
-      options: { projectId: 'fcfde0713d43baa0d23be0773c80a72b' }
-    },
+    WalletId.PERA,
     {
       id: WalletId.WALLETCONNECT,
       options: { projectId: 'fcfde0713d43baa0d23be0773c80a72b' }

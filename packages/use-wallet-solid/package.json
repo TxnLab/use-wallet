@@ -75,6 +75,7 @@
   "peerDependencies": {
     "@blockshake/defly-connect": "^1.1.6",
     "@magic-ext/algorand": "^23.0.2",
+    "@perawallet/connect": "^1.3.4",
     "@perawallet/connect-beta": "^2.0.11",
     "@walletconnect/modal": "^2.6.2",
     "@walletconnect/sign-client": "^2.10.2",
@@ -87,6 +88,9 @@
       "optional": true
     },
     "@magic-ext/algorand": {
+      "optional": true
+    },
+    "@perawallet/connect": {
       "optional": true
     },
     "@perawallet/connect-beta": {

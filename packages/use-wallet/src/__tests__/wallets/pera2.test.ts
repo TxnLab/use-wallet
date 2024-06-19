@@ -2,7 +2,7 @@ import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
 import { StorageAdapter } from 'src/storage'
 import { LOCAL_STORAGE_KEY, State, WalletState, defaultState } from 'src/store'
-import { PeraWallet } from 'src/wallets/pera'
+import { PeraWallet } from 'src/wallets/pera2'
 import { WalletId } from 'src/wallets/types'
 
 // Mock storage adapter
@@ -25,20 +25,18 @@ const mockPeraWallet = {
   signData: vi.fn()
 }
 
-vi.mock('@perawallet/connect', async (importOriginal) => {
-  const module = await importOriginal<typeof import('@perawallet/connect')>()
+vi.mock('@perawallet/connect-beta', () => {
   return {
-    ...module,
-    default: {
-      ...module,
-      PeraWalletConnect: vi.fn(() => mockPeraWallet)
-    }
+    PeraWalletConnect: vi.fn(() => mockPeraWallet)
   }
 })
 
 function createWalletWithStore(store: Store<State>): PeraWallet {
   return new PeraWallet({
     id: WalletId.PERA,
+    options: {
+      projectId: 'mockProjectId'
+    },
     metadata: {},
     getAlgodClient: () => ({}) as any,
     store,

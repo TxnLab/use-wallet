@@ -54,7 +54,7 @@ Some wallets require additional packages to be installed. The following table li
 | Wallet Provider | Package(s)                                           |
 | --------------- | ---------------------------------------------------- |
 | Defly Wallet    | `@blockshake/defly-connect`                          |
-| Pera Wallet     | `@perawallet/connect-beta`                           |
+| Pera Wallet     | `@perawallet/connect`                                |
 | WalletConnect   | `@walletconnect/modal`, `@walletconnect/sign-client` |
 | Lute Wallet     | `lute-connect`                                       |
 | Magic.link      | `magic-sdk`, `@magic-ext/algorand`                   |
@@ -71,10 +71,7 @@ const walletManager = new WalletManager({
   wallets: [
     WalletId.DEFLY,
     WalletId.EXODUS,
-    {
-      id: WalletId.PERA,
-      options: { projectId: '<YOUR_PROJECT_ID>' }
-    },
+    WalletId.PERA,
     {
       id: WalletId.WALLETCONNECT,
       options: { projectId: '<YOUR_PROJECT_ID>' }
@@ -100,7 +97,7 @@ Each wallet you wish to support must be included in the `wallets` array.
 
 To initialize wallets with default options, pass the wallet ID using the `WalletId` enum. To use custom options, pass an object with the `id` and `options` properties.
 
-> **Note:** Pera and WalletConnect's `projectId` option is required. You can obtain a project ID by registering your application at https://cloud.walletconnect.com/
+> **Note:** WalletConnect's `projectId` option is required. You can obtain a project ID by registering your application at https://cloud.walletconnect.com/
 
 > **Note:** Magic's required `apiKey` can be obtained by signing up at https://dashboard.magic.link/signup
 

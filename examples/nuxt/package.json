@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@blockshake/defly-connect": "^1.1.6",
-    "@perawallet/connect-beta": "2.0.11",
+    "@perawallet/connect": "^1.3.4",
     "@txnlab/use-wallet": "workspace:*",
     "@txnlab/use-wallet-vue": "workspace:*",
     "@walletconnect/modal": "^2.6.2",

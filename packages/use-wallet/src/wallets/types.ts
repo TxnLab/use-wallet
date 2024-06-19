@@ -7,6 +7,10 @@ import { LuteConnectOptions, LuteWallet } from './lute'
 import { MagicAuth, MagicAuthOptions } from './magic'
 import { MnemonicWallet, type MnemonicOptions } from './mnemonic'
 import { PeraWallet, type PeraWalletConnectOptions } from './pera'
+import {
+  PeraWallet as PeraWalletBeta,
+  type PeraWalletConnectOptions as PeraWalletConnectBetaOptions
+} from './pera2'
 import { WalletConnect, type WalletConnectOptions } from './walletconnect'
 import type { Store } from '@tanstack/store'
 import type algosdk from 'algosdk'
@@ -22,6 +26,7 @@ export enum WalletId {
   MAGIC = 'magic',
   MNEMONIC = 'mnemonic',
   PERA = 'pera',
+  PERA2 = 'pera-beta',
   WALLETCONNECT = 'walletconnect'
 }
 
@@ -35,6 +40,7 @@ export type WalletMap = {
   [WalletId.MAGIC]: typeof MagicAuth
   [WalletId.MNEMONIC]: typeof MnemonicWallet
   [WalletId.PERA]: typeof PeraWallet
+  [WalletId.PERA2]: typeof PeraWalletBeta
   [WalletId.WALLETCONNECT]: typeof WalletConnect
 }
 
@@ -48,6 +54,7 @@ export type WalletOptionsMap = {
   [WalletId.MAGIC]: MagicAuthOptions
   [WalletId.MNEMONIC]: MnemonicOptions
   [WalletId.PERA]: PeraWalletConnectOptions
+  [WalletId.PERA2]: PeraWalletConnectBetaOptions
   [WalletId.WALLETCONNECT]: WalletConnectOptions
 }
 

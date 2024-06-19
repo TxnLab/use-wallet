@@ -62,9 +62,9 @@ importers:
       '@blockshake/defly-connect':
         specifier: ^1.1.6
         version: 1.1.6(algosdk@2.7.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@perawallet/connect-beta':
-        specifier: 2.0.11
-        version: 2.0.11(algosdk@2.7.0)(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
+      '@perawallet/connect':
+        specifier: ^1.3.4
+        version: 1.3.4(algosdk@2.7.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet-react':
         specifier: workspace:*
         version: link:../../packages/use-wallet-react
@@ -114,9 +114,9 @@ importers:
       '@blockshake/defly-connect':
         specifier: ^1.1.6
         version: 1.1.6(algosdk@2.7.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@perawallet/connect-beta':
-        specifier: 2.0.11
-        version: 2.0.11(algosdk@2.7.0)(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
+      '@perawallet/connect':
+        specifier: ^1.3.4
+        version: 1.3.4(algosdk@2.7.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../../packages/use-wallet
@@ -157,9 +157,9 @@ importers:
       '@blockshake/defly-connect':
         specifier: ^1.1.6
         version: 1.1.6(algosdk@2.7.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@perawallet/connect-beta':
-        specifier: 2.0.11
-        version: 2.0.11(algosdk@2.7.0)(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
+      '@perawallet/connect':
+        specifier: ^1.3.4
+        version: 1.3.4(algosdk@2.7.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet-react':
         specifier: workspace:*
         version: link:../../packages/use-wallet-react
@@ -218,9 +218,9 @@ importers:
       '@blockshake/defly-connect':
         specifier: ^1.1.6
         version: 1.1.6(algosdk@2.7.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@perawallet/connect-beta':
-        specifier: 2.0.11
-        version: 2.0.11(algosdk@2.7.0)(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
+      '@perawallet/connect':
+        specifier: ^1.3.4
+        version: 1.3.4(algosdk@2.7.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet-solid':
         specifier: workspace:*
         version: link:../../packages/use-wallet-solid
@@ -255,9 +255,9 @@ importers:
       '@blockshake/defly-connect':
         specifier: ^1.1.6
         version: 1.1.6(algosdk@2.7.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@perawallet/connect-beta':
-        specifier: 2.0.11
-        version: 2.0.11(algosdk@2.7.0)(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
+      '@perawallet/connect':
+        specifier: ^1.3.4
+        version: 1.3.4(algosdk@2.7.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../../packages/use-wallet
@@ -289,9 +289,9 @@ importers:
       '@blockshake/defly-connect':
         specifier: ^1.1.6
         version: 1.1.6(algosdk@2.7.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@perawallet/connect-beta':
-        specifier: 2.0.11
-        version: 2.0.11(algosdk@2.7.0)(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
+      '@perawallet/connect':
+        specifier: ^1.3.4
+        version: 1.3.4(algosdk@2.7.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet-vue':
         specifier: workspace:*
         version: link:../../packages/use-wallet-vue
@@ -345,6 +345,9 @@ importers:
       '@magic-sdk/provider':
         specifier: ^28.0.2
         version: 28.0.2(localforage@1.10.0)
+      '@perawallet/connect':
+        specifier: ^1.3.4
+        version: 1.3.4(algosdk@2.7.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect-beta':
         specifier: ^2.0.11
         version: 2.0.11(algosdk@2.7.0)(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
@@ -384,6 +387,9 @@ importers:
       '@magic-ext/algorand':
         specifier: ^23.0.2
         version: 23.0.2
+      '@perawallet/connect':
+        specifier: ^1.3.4
+        version: 1.3.4(algosdk@2.7.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect-beta':
         specifier: ^2.0.11
         version: 2.0.11(algosdk@2.7.0)(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
@@ -436,6 +442,9 @@ importers:
       '@magic-ext/algorand':
         specifier: ^23.0.2
         version: 23.0.2
+      '@perawallet/connect':
+        specifier: ^1.3.4
+        version: 1.3.4(algosdk@2.7.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect-beta':
         specifier: ^2.0.11
         version: 2.0.11(algosdk@2.7.0)(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
@@ -485,6 +494,9 @@ importers:
       '@magic-ext/algorand':
         specifier: ^23.0.2
         version: 23.0.2
+      '@perawallet/connect':
+        specifier: ^1.3.4
+        version: 1.3.4(algosdk@2.7.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect-beta':
         specifier: ^2.0.11
         version: 2.0.11(algosdk@2.7.0)(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
@@ -1626,6 +1638,11 @@ packages:
 
   '@perawallet/connect-beta@2.0.11':
     resolution: {integrity: sha512-2mIf0WN3B+91mYDM7acO2o8RuLsNv6iI2LgPLkJhqbomMWfmW7QIA8qoFNZky4hK8t/AZUrvZfgQabYjJRQ/ig==}
+    peerDependencies:
+      algosdk: ^2.1.0
+
+  '@perawallet/connect@1.3.4':
+    resolution: {integrity: sha512-PRnD1YEXXoWjTlfWmZCGGHQWn7Zquxh44bXmEtluklq/kTkBOk5CToZWng1J/Ae9g0xMR85B1Y/xwnriFufcpA==}
     peerDependencies:
       algosdk: ^2.1.0
 
@@ -7806,6 +7823,19 @@ snapshots:
       - encoding
       - ioredis
       - uWebSockets.js
+      - utf-8-validate
+
+  '@perawallet/connect@1.3.4(algosdk@2.7.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+    dependencies:
+      '@evanhahn/lottie-web-light': 5.8.1
+      '@walletconnect/client': 1.8.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@walletconnect/types': 1.8.0
+      algosdk: 2.7.0
+      bowser: 2.11.0
+      buffer: 6.0.3
+      qr-code-styling: 1.6.0-rc.1
+    transitivePeerDependencies:
+      - bufferutil
       - utf-8-validate
 
   '@pkgjs/parseargs@0.11.0':
