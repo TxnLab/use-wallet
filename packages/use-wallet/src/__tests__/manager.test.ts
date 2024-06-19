@@ -149,10 +149,7 @@ describe('WalletManager', () => {
       const manager = new WalletManager({
         wallets: [
           {
-            id: WalletId.PERA,
-            options: {
-              projectId: 'mock-project-id'
-            }
+            id: WalletId.PERA
           },
           {
             id: WalletId.WALLETCONNECT,
