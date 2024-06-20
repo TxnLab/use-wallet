@@ -1,4 +1,4 @@
-# use-wallet v3 (beta)
+# use-wallet v3
 
 [![GitHub package.json version (branch)](https://img.shields.io/github/package-json/v/TxnLab/use-wallet/v3?filename=packages%2Fuse-wallet%2Fpackage.json&label=version)](https://www.npmjs.com/package/@txnlab/use-wallet?activeTab=versions)
 [![GitHub License](https://img.shields.io/github/license/TxnLab/use-wallet)](https://github.com/TxnLab/use-wallet/blob/v3/LICENSE.md)
@@ -9,10 +9,6 @@
 
 Version 3.x has been rewritten as a framework-agnostic core library that can be used in any JavaScript or TypeScript project. It ships with framework specific adapters for React, Vue, and SolidJS.
 
-### This is a beta release
-
-:warning: The library is currently in beta stage and is not yet recommended for production use. The API is subject to change.
-
 ## Installation
 
 Use any NPM package manager to install one of the framework-specific adapters or the standalone core library.
@@ -20,7 +16,7 @@ Use any NPM package manager to install one of the framework-specific adapters or
 ### React
 
 ```bash
-npm install @txnlab/use-wallet-react@beta
+npm install @txnlab/use-wallet-react@next
 ```
 
 Compatible with React v16.8+
@@ -28,7 +24,7 @@ Compatible with React v16.8+
 ### Vue
 
 ```bash
-npm install @txnlab/use-wallet-vue@beta
+npm install @txnlab/use-wallet-vue@next
 ```
 
 Compatible with Vue 3
@@ -36,13 +32,13 @@ Compatible with Vue 3
 ### SolidJS
 
 ```bash
-npm install @txnlab/use-wallet-solid@beta
+npm install @txnlab/use-wallet-solid@next
 ```
 
 ### Core Library
 
 ```bash
-npm install @txnlab/use-wallet@beta
+npm install @txnlab/use-wallet@next
 ```
 
 Compatible with any ES6+ project (TypeScript recommended)
@@ -207,7 +203,7 @@ function WalletMenu() {
 }
 ```
 
-To sign and send transactions, you can use the manager's `algodClient` instance and the `transactionSigner` provided by the active wallet.
+To sign and send transactions, you can use the library's `algodClient` instance and the `transactionSigner` provided by the active wallet.
 
 ```tsx
 import { useWallet } from '@txnlab/use-wallet-react'
@@ -290,7 +286,7 @@ const { wallets, activeWallet, activeAccount } = useWallet()
 </template>
 ```
 
-To sign and send transactions, you can use the manager's `algodClient` instance and the `transactionSigner` provided by the active wallet.
+To sign and send transactions, you can use the library's `algodClient` instance and the `transactionSigner` provided by the active wallet.
 
 ```vue
 <script setup lang="ts">
@@ -301,7 +297,7 @@ const { algodClient, activeAddress, transactionSigner } = useWallet()
 
 const sendAlgos = async () => {
   const atc = new algosdk.AtomicTransactionComposer()
-  const suggestedParams = await algodClient.getTransactionParams().do()
+  const suggestedParams = await algodClient.value.getTransactionParams().do()
 
   const txn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
     from: activeAddress,
@@ -387,7 +383,7 @@ function WalletMenu() {
 }
 ```
 
-To sign and send transactions, you can use the manager's `algodClient` instance and the `transactionSigner` provided by the active wallet.
+To sign and send transactions, you can use the library's `algodClient` instance and the `transactionSigner` provided by the active wallet.
 
 ```tsx
 import { useWallet } from '@txnlab/use-wallet-solid'
@@ -473,11 +469,10 @@ class ExampleProvider implements CustomProvider {
 
   async signTransactions(
     txnGroup: algosdk.Transaction[] | algosdk.Transaction[][] | Uint8Array[] | Uint8Array[][],
-    indexesToSign?: number[],
-    returnGroup?: boolean
-  ): Promise<Uint8Array[]> {
+    indexesToSign?: number[]
+  ): Promise<(Uint8Array | null)[]> {
     // Sign transactions with the wallet
-    // Return signed transactions only or the original group if `returnGroup` is true
+    // Return array matching length of `txnGroup` with signed transactions or null if unsigned
   }
 
   async transactionSigner(
@@ -639,14 +634,13 @@ abstract class BaseWallet {
 ```ts
 public signTransactions(
   txnGroup: algosdk.Transaction[] | algosdk.Transaction[][] | Uint8Array[] | Uint8Array[][],
-  indexesToSign?: number[],
-  returnGroup?: boolean // default: true
-): Promise<Uint8Array[]>
+  indexesToSign?: number[]
+): Promise<(Uint8Array | null)[]>
 ```
 
 ##### `transactionSigner: TransactionSigner`
 
-- A typed [`TransactionSigner`](https://github.com/algorand/js-algorand-sdk/blob/v2.7.0/src/signer.ts#L7-L18) function that signs transactions from an atomic transaction group with this wallet. It can be used with `AtomicTransactionComposer` - see https://developer.algorand.org/docs/get-details/atc/
+- A typed [`TransactionSigner`](https://github.com/algorand/js-algorand-sdk/blob/v2.8.0/src/signer.ts#L7-L18) function that signs transactions from an atomic transaction group with this wallet. It can be used with `AtomicTransactionComposer` - see https://developer.algorand.org/docs/get-details/atc/
 
 ```ts
 public transactionSigner(
