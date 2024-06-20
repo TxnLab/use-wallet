@@ -1,3 +1,9 @@
+## [3.0.0-rc.2](https://github.com/txnlab/use-wallet/compare/v3.0.0-rc.1...v3.0.0-rc.2) (2024-06-20)
+
+### Fixes
+
+- **Core:** Fixes `isTransactionArray` utility function ([#190](https://github.com/TxnLab/use-wallet/pull/190)) ([0e119ea](https://github.com/TxnLab/use-wallet/commit/0e119ea22efb50b2a3337291059b51fd2dcb621e))
+
 ## [3.0.0-rc.1](https://github.com/txnlab/use-wallet/compare/v3.0.0-beta.10...v3.0.0-rc.1) (2024-06-20)
 
 ### :warning: BREAKING CHANGES
