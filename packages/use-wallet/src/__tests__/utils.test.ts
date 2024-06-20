@@ -5,6 +5,7 @@ import {
   flattenTxnGroup,
   formatJsonRpcRequest,
   isSignedTxn,
+  isTransaction,
   isTransactionArray
 } from 'src/utils'
 
@@ -78,6 +79,41 @@ describe('isSignedTxn', () => {
 
   it('should return false if the object is not a signed transaction', () => {
     expect(isSignedTxn(encodedTxn)).toBe(false)
+  })
+})
+
+describe('isTransaction', () => {
+  const transaction = new algosdk.Transaction({
+    from: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
+    to: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
+    fee: 10,
+    amount: 847,
+    firstRound: 51,
+    lastRound: 61,
+    genesisHash: 'JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI=',
+    genesisID: 'testnet-v1.0'
+  })
+
+  const uInt8Array = transaction.toByte()
+
+  it('should return true if the item is a Transaction', () => {
+    expect(isTransaction(transaction)).toBe(true)
+  })
+
+  it('should return false if the item is a Uint8Array', () => {
+    expect(isTransaction(uInt8Array)).toBe(false)
+  })
+
+  it('should return false if the item is an object that is not a Transaction', () => {
+    expect(isTransaction({})).toBe(false)
+  })
+
+  it('should return false if the item is an array of Transactions', () => {
+    expect(isTransaction([transaction, transaction])).toBe(false)
+  })
+
+  it('should return false if the item is an array of Uint8Arrays', () => {
+    expect(isTransaction([uInt8Array, uInt8Array])).toBe(false)
   })
 })
 
