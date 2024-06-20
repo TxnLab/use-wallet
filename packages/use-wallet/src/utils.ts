@@ -76,13 +76,28 @@ export function isSignedTxn(
   return (txnDecodeObj as algosdk.EncodedSignedTransaction).txn !== undefined
 }
 
+export function isTransaction(item: any): item is algosdk.Transaction {
+  return (
+    item && typeof item === 'object' && 'genesisID' in item && typeof item.genesisID === 'string'
+  )
+}
+
 export function isTransactionArray(
   txnGroup: any
 ): txnGroup is algosdk.Transaction[] | algosdk.Transaction[][] {
-  return (
-    txnGroup[0] instanceof algosdk.Transaction ||
-    (Array.isArray(txnGroup[0]) && txnGroup[0][0] instanceof algosdk.Transaction)
-  )
+  if (!Array.isArray(txnGroup) || txnGroup.length === 0) {
+    return false
+  }
+
+  if (isTransaction(txnGroup[0])) {
+    return true
+  }
+
+  if (Array.isArray(txnGroup[0]) && txnGroup[0].length > 0 && isTransaction(txnGroup[0][0])) {
+    return true
+  }
+
+  return false
 }
 
 export function flattenTxnGroup<T>(txnGroup: T[]): T extends (infer U)[] ? U[] : T[] {
