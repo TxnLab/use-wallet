@@ -452,6 +452,7 @@ describe('WalletConnect', () => {
 
       it('should determine which transactions to sign based on indexesToSign', async () => {
         const [gtxn1, gtxn2, gtxn3, gtxn4] = algosdk.assignGroupID([txn1, txn2, txn3, txn4])
+        const txnGroup = [gtxn1, gtxn2, gtxn3, gtxn4]
         const indexesToSign = [0, 1, 3]
 
         const gtxn1String = byteArrayToBase64(gtxn1.toByte())
@@ -461,7 +462,12 @@ describe('WalletConnect', () => {
         // Mock signClient.request to return "signed" (not really) base64 transactions or null
         mockSignClient.request.mockResolvedValueOnce([gtxn1String, gtxn2String, null, gtxn4String])
 
-        const result = await wallet.signTransactions([gtxn1, gtxn2, gtxn3, gtxn4], indexesToSign)
+        await expect(wallet.signTransactions(txnGroup, indexesToSign)).resolves.toEqual([
+          base64ToByteArray(gtxn1String),
+          base64ToByteArray(gtxn2String),
+          null,
+          base64ToByteArray(gtxn4String)
+        ])
 
         expect(mockSignClient.request).toHaveBeenCalledWith(
           expectedRpcRequest([
@@ -473,14 +479,6 @@ describe('WalletConnect', () => {
             ]
           ])
         )
-
-        // Only encoded "signed" transactions should be returned
-        expect(result).toHaveLength(indexesToSign.length)
-        expect(result).toEqual([
-          base64ToByteArray(gtxn1String),
-          base64ToByteArray(gtxn2String),
-          base64ToByteArray(gtxn4String)
-        ])
       })
 
       it('should only send transactions with connected signers for signature', async () => {

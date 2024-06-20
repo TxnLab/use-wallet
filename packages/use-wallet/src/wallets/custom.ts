@@ -12,7 +12,7 @@ export type CustomProvider = {
   signTransactions?<T extends algosdk.Transaction[] | Uint8Array[]>(
     txnGroup: T | T[],
     indexesToSign?: number[]
-  ): Promise<Uint8Array[]>
+  ): Promise<(Uint8Array | null)[]>
   transactionSigner?(
     txnGroup: algosdk.Transaction[],
     indexesToSign: number[]
@@ -137,7 +137,7 @@ export class CustomWallet extends BaseWallet {
   public signTransactions = async <T extends algosdk.Transaction[] | Uint8Array[]>(
     txnGroup: T | T[],
     indexesToSign?: number[]
-  ): Promise<Uint8Array[]> => {
+  ): Promise<(Uint8Array | null)[]> => {
     if (!this.provider.signTransactions) {
       throw new Error(`[${this.metadata.name}] Method not supported: signTransactions`)
     }

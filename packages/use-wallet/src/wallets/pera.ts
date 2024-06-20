@@ -203,7 +203,7 @@ export class PeraWallet extends BaseWallet {
   public signTransactions = async <T extends algosdk.Transaction[] | Uint8Array[]>(
     txnGroup: T | T[],
     indexesToSign?: number[]
-  ): Promise<Uint8Array[]> => {
+  ): Promise<(Uint8Array | null)[]> => {
     let txnsToSign: SignerTransaction[] = []
 
     // Determine type and process transactions for signing
@@ -219,13 +219,20 @@ export class PeraWallet extends BaseWallet {
 
     // Sign transactions
     const signedTxns = await client.signTransaction([txnsToSign])
-    return signedTxns
-  }
 
-  public transactionSigner = async (
-    txnGroup: algosdk.Transaction[],
-    indexesToSign: number[]
-  ): Promise<Uint8Array[]> => {
-    return this.signTransactions(txnGroup, indexesToSign)
+    // ARC-0001 - Return null for unsigned transactions
+    const result = txnsToSign.reduce<(Uint8Array | null)[]>((acc, txn) => {
+      if (txn.signers && txn.signers.length == 0) {
+        acc.push(null)
+      } else {
+        const signedTxn = signedTxns.shift()
+        if (signedTxn) {
+          acc.push(signedTxn)
+        }
+      }
+      return acc
+    }, [])
+
+    return result
   }
 }

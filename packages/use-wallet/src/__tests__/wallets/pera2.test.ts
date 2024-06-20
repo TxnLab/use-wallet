@@ -299,6 +299,8 @@ describe('PeraWallet', () => {
     const txn3 = new algosdk.Transaction({ ...txnParams, amount: 3000 })
     const txn4 = new algosdk.Transaction({ ...txnParams, amount: 4000 })
 
+    const sTxn = new Uint8Array([1, 2, 3, 4])
+
     beforeEach(async () => {
       // Mock two connected accounts
       mockPeraWallet.connect.mockResolvedValueOnce([connectedAcct1, connectedAcct2])
@@ -308,6 +310,8 @@ describe('PeraWallet', () => {
 
     describe('signTransactions', () => {
       it('should process and sign a single algosdk.Transaction', async () => {
+        mockPeraWallet.signTransaction.mockResolvedValueOnce([sTxn])
+
         await wallet.signTransactions([txn1])
 
         expect(mockPeraWallet.signTransaction).toHaveBeenCalledWith([[{ txn: txn1 }]])
@@ -315,6 +319,9 @@ describe('PeraWallet', () => {
 
       it('should process and sign a single algosdk.Transaction group', async () => {
         const [gtxn1, gtxn2, gtxn3] = algosdk.assignGroupID([txn1, txn2, txn3])
+
+        mockPeraWallet.signTransaction.mockResolvedValueOnce([sTxn, sTxn])
+
         await wallet.signTransactions([gtxn1, gtxn2, gtxn3])
 
         expect(mockPeraWallet.signTransaction).toHaveBeenCalledWith([
@@ -325,6 +332,8 @@ describe('PeraWallet', () => {
       it('should process and sign multiple algosdk.Transaction groups', async () => {
         const [g1txn1, g1txn2] = algosdk.assignGroupID([txn1, txn2])
         const [g2txn1, g2txn2] = algosdk.assignGroupID([txn3, txn4])
+
+        mockPeraWallet.signTransaction.mockResolvedValueOnce([sTxn, sTxn, sTxn, sTxn])
 
         await wallet.signTransactions([
           [g1txn1, g1txn2],
@@ -338,6 +347,9 @@ describe('PeraWallet', () => {
 
       it('should process and sign a single encoded transaction', async () => {
         const encodedTxn = txn1.toByte()
+
+        mockPeraWallet.signTransaction.mockResolvedValueOnce([sTxn])
+
         await wallet.signTransactions([encodedTxn])
 
         expect(mockPeraWallet.signTransaction).toHaveBeenCalledWith([
@@ -348,6 +360,8 @@ describe('PeraWallet', () => {
       it('should process and sign a single encoded transaction group', async () => {
         const txnGroup = algosdk.assignGroupID([txn1, txn2, txn3])
         const [gtxn1, gtxn2, gtxn3] = txnGroup.map((txn) => txn.toByte())
+
+        mockPeraWallet.signTransaction.mockResolvedValueOnce([sTxn, sTxn, sTxn])
 
         await wallet.signTransactions([gtxn1, gtxn2, gtxn3])
 
@@ -367,6 +381,8 @@ describe('PeraWallet', () => {
         const txnGroup2 = algosdk.assignGroupID([txn3, txn4])
         const [g2txn1, g2txn2] = txnGroup2.map((txn) => txn.toByte())
 
+        mockPeraWallet.signTransaction.mockResolvedValueOnce([sTxn, sTxn, sTxn, sTxn])
+
         await wallet.signTransactions([
           [g1txn1, g1txn2],
           [g2txn1, g2txn2]
@@ -384,9 +400,18 @@ describe('PeraWallet', () => {
 
       it('should determine which transactions to sign based on indexesToSign', async () => {
         const [gtxn1, gtxn2, gtxn3, gtxn4] = algosdk.assignGroupID([txn1, txn2, txn3, txn4])
+
+        const txnGroup = [gtxn1, gtxn2, gtxn3, gtxn4]
         const indexesToSign = [0, 1, 3]
 
-        await wallet.signTransactions([gtxn1, gtxn2, gtxn3, gtxn4], indexesToSign)
+        mockPeraWallet.signTransaction.mockResolvedValueOnce([sTxn, sTxn, sTxn])
+
+        await expect(wallet.signTransactions(txnGroup, indexesToSign)).resolves.toEqual([
+          sTxn,
+          sTxn,
+          null,
+          sTxn
+        ])
 
         expect(mockPeraWallet.signTransaction).toHaveBeenCalledWith([
           [{ txn: gtxn1 }, { txn: gtxn2 }, { txn: gtxn3, signers: [] }, { txn: gtxn4 }]
@@ -419,10 +444,29 @@ describe('PeraWallet', () => {
           canSignTxn3
         ])
 
-        await wallet.signTransactions([gtxn1, gtxn2, gtxn3])
+        mockPeraWallet.signTransaction.mockResolvedValueOnce([sTxn, sTxn])
+
+        await expect(wallet.signTransactions([gtxn1, gtxn2, gtxn3])).resolves.toEqual([
+          sTxn,
+          null,
+          sTxn
+        ])
 
         expect(mockPeraWallet.signTransaction).toHaveBeenCalledWith([
           [{ txn: gtxn1 }, { txn: gtxn2, signers: [] }, { txn: gtxn3 }]
+        ])
+      })
+
+      it('should insert null values in response for transactions that were not signed', async () => {
+        const txnGroup = algosdk.assignGroupID([txn1, txn2, txn3])
+        const indexesToSign = [0, 2]
+
+        mockPeraWallet.signTransaction.mockResolvedValueOnce([sTxn, sTxn])
+
+        await expect(wallet.signTransactions(txnGroup, indexesToSign)).resolves.toEqual([
+          sTxn,
+          null,
+          sTxn
         ])
       })
     })
@@ -432,7 +476,9 @@ describe('PeraWallet', () => {
         const txnGroup = algosdk.assignGroupID([txn1, txn2])
         const indexesToSign = [1]
 
-        const signTransactionsSpy = vi.spyOn(wallet, 'signTransactions')
+        const signTransactionsSpy = vi
+          .spyOn(wallet, 'signTransactions')
+          .mockImplementationOnce(() => Promise.resolve([sTxn]))
 
         await wallet.transactionSigner(txnGroup, indexesToSign)
 

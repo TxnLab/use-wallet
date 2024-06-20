@@ -229,7 +229,7 @@ export class ExodusWallet extends BaseWallet {
   public signTransactions = async <T extends algosdk.Transaction[] | Uint8Array[]>(
     txnGroup: T | T[],
     indexesToSign?: number[]
-  ): Promise<Uint8Array[]> => {
+  ): Promise<(Uint8Array | null)[]> => {
     let txnsToSign: WalletTransaction[] = []
 
     // Determine type and process transactions for signing
@@ -246,22 +246,14 @@ export class ExodusWallet extends BaseWallet {
     // Sign transactions
     const signTxnsResult = await client.signTxns(txnsToSign)
 
-    // Filter out null values and convert to Uint8Array[]
-    const signedTxns = signTxnsResult.reduce<Uint8Array[]>((acc, value) => {
-      if (value !== null) {
-        const signedTxn = base64ToByteArray(value)
-        acc.push(signedTxn)
+    // Convert base64 to Uint8Array
+    const result = signTxnsResult.map((value) => {
+      if (value === null) {
+        return null
       }
-      return acc
-    }, [])
+      return base64ToByteArray(value)
+    })
 
-    return signedTxns
-  }
-
-  public transactionSigner = async (
-    txnGroup: algosdk.Transaction[],
-    indexesToSign: number[]
-  ): Promise<Uint8Array[]> => {
-    return this.signTransactions(txnGroup, indexesToSign)
+    return result
   }
 }

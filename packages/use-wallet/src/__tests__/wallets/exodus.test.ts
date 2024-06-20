@@ -314,6 +314,7 @@ describe('ExodusWallet', () => {
 
       it('should determine which transactions to sign based on indexesToSign', async () => {
         const [gtxn1, gtxn2, gtxn3, gtxn4] = algosdk.assignGroupID([txn1, txn2, txn3, txn4])
+        const txnGroup = [gtxn1, gtxn2, gtxn3, gtxn4]
         const indexesToSign = [0, 1, 3]
 
         const gtxn1String = byteArrayToBase64(gtxn1.toByte())
@@ -323,21 +324,18 @@ describe('ExodusWallet', () => {
         // Mock signTxns to return "signed" (not really) base64 transactions or null
         mockSignTxns.mockResolvedValueOnce([gtxn1String, gtxn2String, null, gtxn4String])
 
-        const result = await wallet.signTransactions([gtxn1, gtxn2, gtxn3, gtxn4], indexesToSign)
+        await expect(wallet.signTransactions(txnGroup, indexesToSign)).resolves.toEqual([
+          base64ToByteArray(gtxn1String),
+          base64ToByteArray(gtxn2String),
+          null,
+          base64ToByteArray(gtxn4String)
+        ])
 
         expect(mockSignTxns).toHaveBeenCalledWith([
           { txn: byteArrayToBase64(gtxn1.toByte()) },
           { txn: byteArrayToBase64(gtxn2.toByte()) },
           { txn: byteArrayToBase64(gtxn3.toByte()), signers: [] },
           { txn: byteArrayToBase64(gtxn4.toByte()) }
-        ])
-
-        // Only encoded "signed" transactions should be returned
-        expect(result).toHaveLength(indexesToSign.length)
-        expect(result).toEqual([
-          base64ToByteArray(gtxn1String),
-          base64ToByteArray(gtxn2String),
-          base64ToByteArray(gtxn4String)
         ])
       })
 
