@@ -5,9 +5,21 @@
 
 ## Overview
 
-`use-wallet` is a TypeScript library that simplifies integrating Algorand wallets into decentralized applications (dApps).
+`use-wallet` is a TypeScript library that makes it easy to integrate Algorand wallets into your decentralized applications.
 
-Version 3.x has been rewritten as a framework-agnostic core library that can be used in any JavaScript or TypeScript project. It ships with framework specific adapters for React, Vue, and SolidJS.
+Version 3.x has been rewritten as a framework-agnostic core library that can be used in any modern JavaScript or TypeScript project. It ships with framework specific adapters for React, Vue, and SolidJS.
+
+## Get Started
+
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Quick Start (React)](#quick-start-react)
+- [Quick Start (Vue)](#quick-start-vue)
+- [Quick Start (SolidJS)](#quick-start-solidjs)
+- [Example Apps](#example-apps)
+- [Custom Provider](#custom-provider)
+- [WalletManager API](#walletmanager-api)
+- [BaseWallet API](#basewallet-api)
 
 ## Installation
 
