@@ -1,3 +1,28 @@
+## [3.0.0-rc.1](https://github.com/txnlab/use-wallet/compare/v3.0.0-beta.10...v3.0.0-rc.1) (2024-06-20)
+
+### :warning: BREAKING CHANGES
+
+This release includes breaking changes. Please refer to the [release notes](https://github.com/TxnLab/use-wallet/releases/tag/v3.0.0-rc.1) for upgrade instructions.
+
+### Features
+
+- **Core:** Add Custom provider ([#181](https://github.com/TxnLab/use-wallet/pull/181)) ([bdaf3ee](https://github.com/TxnLab/use-wallet/commit/bdaf3eee5a2359245958be6b11976bf78b9a79a7))
+- **Kibisis:** Implement AVM provider with Kibisis client ([#175](https://github.com/TxnLab/use-wallet/pull/175)) ([9a7203d](https://github.com/TxnLab/use-wallet/commit/9a7203d99be510f33fa26b2e527fd7931f5247ec))
+- **Core:** Wallet provider updates ([#183](https://github.com/TxnLab/use-wallet/pull/183)) ([1b7720a](https://github.com/TxnLab/use-wallet/commit/1b7720a9af064021d41278505b8cbf5dd31456cf))
+- **Core:** Switching networks ([#187](https://github.com/TxnLab/use-wallet/pull/187)) ([ef07c4d](https://github.com/TxnLab/use-wallet/commit/ef07c4df30bf6dfb251b072fe944aeb77e0de8c9))
+- **Core:** Revert Pera provider to Pera Connect v1 ([#188](https://github.com/TxnLab/use-wallet/pull/188)) ([4a5c947](https://github.com/TxnLab/use-wallet/commit/4a5c9479760a4ddb365a89d0e26ea472f9881c72))
+- **Core:** `signTransactions` response should match length of `txnGroup` ([#189](https://github.com/TxnLab/use-wallet/pull/189)) ([5244482](https://github.com/TxnLab/use-wallet/commit/5244482385bffa10a0ef2e4263f30dba286444a7))
+
+### Fixes
+
+- **WalletConnect:** Handle all response types from `algo_signTxn` ([#185](https://github.com/TxnLab/use-wallet/pull/185)) ([1e246e1](https://github.com/TxnLab/use-wallet/commit/1e246e18352c36ebaff1e478825c2dce6cdde4b1))
+- **WalletConnect:** Get default metadata from window ([#186](https://github.com/TxnLab/use-wallet/pull/186)) ([2c1762d](https://github.com/TxnLab/use-wallet/commit/2c1762d49944863884127d4a32a1edc499d33d03))
+
+### Other Changes
+
+- Upgrade to pnpm v9 ([#182](https://github.com/TxnLab/use-wallet/pull/182)) ([a33ad92](https://github.com/TxnLab/use-wallet/commit/a33ad9260c2b52a61b1c1c2ee231426652213c8b))
+- Set `@perawallet/connect-beta` to ^2.0.11 ([#184](https://github.com/TxnLab/use-wallet/pull/184)) ([4f2330a](https://github.com/TxnLab/use-wallet/commit/4f2330a1a0eb3b23e8a32fe5cbf0d7264b1235d1))
+
 ## [3.0.0-beta.10](https://github.com/txnlab/use-wallet/compare/v3.0.0-beta.9...v3.0.0-beta.10) (2024-06-04)
 
 ### Features
