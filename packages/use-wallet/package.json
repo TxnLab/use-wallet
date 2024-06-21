@@ -37,8 +37,7 @@
     "dist"
   ],
   "dependencies": {
-    "@tanstack/store": "0.4.1",
-    "algosdk": "2.7.0"
+    "@tanstack/store": "0.4.1"
   },
   "devDependencies": {
     "@agoralabs-sh/avm-web-provider": "^1.6.2",
@@ -64,6 +63,7 @@
     "@perawallet/connect-beta": "^2.0.11",
     "@walletconnect/modal": "^2.6.2",
     "@walletconnect/sign-client": "^2.10.2",
+    "algosdk": "^2.7.0",
     "lute-connect": "^1.2.0"
   },
   "peerDependenciesMeta": {
