@@ -91,7 +91,7 @@
     "react-dom": "^18.2.0",
     "release-it": "^16.1.0",
     "rimraf": "^5.0.1",
-    "rollup": "^3.3.0",
+    "rollup": "^4.0.0",
     "rollup-plugin-analyzer": "^4.0.0",
     "rollup-plugin-dts": "^5.0.0",
     "rollup-plugin-peer-deps-external": "^2.2.4",
