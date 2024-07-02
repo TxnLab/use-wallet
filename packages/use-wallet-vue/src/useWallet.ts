@@ -40,8 +40,6 @@ export function useWallet() {
     if (networkId === activeNetwork.value) {
       return
     }
-    // Disconnect any connected wallets
-    await manager.disconnect()
 
     console.info(`[Vue] Creating Algodv2 client for ${networkId}...`)
 

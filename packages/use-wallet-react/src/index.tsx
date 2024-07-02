@@ -41,8 +41,6 @@ export const useWallet = () => {
     if (networkId === activeNetwork) {
       return
     }
-    // Disconnect any connected wallets
-    await manager.disconnect()
 
     console.info(`[React] Creating Algodv2 client for ${networkId}...`)
 

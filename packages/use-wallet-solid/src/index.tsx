@@ -88,8 +88,6 @@ export function useWallet() {
     if (activeNetwork() === networkId) {
       return
     }
-    // Disconnect any connected wallets
-    await manager().disconnect()
 
     console.info(`[Solid] Creating Algodv2 client for ${networkId}...`)
 
