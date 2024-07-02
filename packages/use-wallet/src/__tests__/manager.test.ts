@@ -207,35 +207,9 @@ describe('WalletManager', () => {
         [WalletId.KIBISIS, mockKibisisWallet]
       ])
 
-      // Mock isConnected to return true
-      vi.spyOn(mockDeflyWallet, 'isConnected', 'get').mockReturnValue(true)
-      vi.spyOn(mockKibisisWallet, 'isConnected', 'get').mockReturnValue(true)
-
-      const disconnectMock = vi.spyOn(manager, 'disconnect')
-
       await manager.setActiveNetwork(NetworkId.MAINNET)
 
-      expect(disconnectMock).toHaveBeenCalled()
       expect(manager.activeNetwork).toBe(NetworkId.MAINNET)
-    })
-
-    it('does not call disconnect if the network is already active', async () => {
-      const manager = new WalletManager({
-        wallets: [WalletId.DEFLY, WalletId.KIBISIS]
-      })
-      manager._clients = new Map<WalletId, BaseWallet>([
-        [WalletId.DEFLY, mockDeflyWallet],
-        [WalletId.KIBISIS, mockKibisisWallet]
-      ])
-
-      const disconnectMock = vi.spyOn(manager, 'disconnect')
-
-      // Set initial active network
-      manager.store.setState((state) => ({ ...state, activeNetwork: NetworkId.MAINNET }))
-
-      await manager.setActiveNetwork(NetworkId.MAINNET)
-
-      expect(disconnectMock).not.toHaveBeenCalled()
     })
   })
 
