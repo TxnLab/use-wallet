@@ -218,8 +218,6 @@ export class WalletManager {
     if (this.activeNetwork === networkId) {
       return
     }
-    // Disconnect any connected wallets
-    await this.disconnect()
 
     setActiveNetwork(this.store, { networkId })
     this.algodClient = this.createAlgodClient(this.networkConfig[networkId])
