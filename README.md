@@ -11,6 +11,7 @@ Version 3.x has been rewritten as a framework-agnostic core library that can be 
 
 ## Get Started
 
+- [Pre-requisites](#pre-requisites)
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Quick Start (React)](#quick-start-react)
@@ -21,9 +22,17 @@ Version 3.x has been rewritten as a framework-agnostic core library that can be 
 - [WalletManager API](#walletmanager-api)
 - [BaseWallet API](#basewallet-api)
 
+## Pre-requisites
+
+The library uses the `algosdk` package installed in your project as a peer dependency. Use your preferred package manager to install it.
+
+```bash
+npm install algosdk
+```
+
 ## Installation
 
-Use any NPM package manager to install one of the framework-specific adapters or the standalone core library.
+Install one of the framework-specific adapters or the standalone core library.
 
 ### React
 
