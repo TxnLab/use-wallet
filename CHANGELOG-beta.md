@@ -1,3 +1,11 @@
+## [3.0.0-rc.3](https://github.com/txnlab/use-wallet/compare/v3.0.0-rc.2...v3.0.0-rc.3) (2024-07-02)
+
+### Fixes
+
+- Move `algosdk` to peerDependencies ([#193](https://github.com/TxnLab/use-wallet/pull/193)) ([179ba8d](https://github.com/TxnLab/use-wallet/commit/179ba8d5abe112b6444c013ecae042f93b16c8ff))
+- Add `algosdk` to devDependencies, sync versions ([#197](https://github.com/TxnLab/use-wallet/pull/197)) ([332f360](https://github.com/TxnLab/use-wallet/commit/332f360eb9307bae286c450a68d3108d0a371b92))
+- Switching networks should not disconnect wallets ([#198](https://github.com/TxnLab/use-wallet/pull/198)) ([47e5704](https://github.com/TxnLab/use-wallet/commit/47e5704589e736b788810fdb943e4a81c4346b39))
+
 ## [3.0.0-rc.2](https://github.com/txnlab/use-wallet/compare/v3.0.0-rc.1...v3.0.0-rc.2) (2024-06-20)
 
 ### Fixes
