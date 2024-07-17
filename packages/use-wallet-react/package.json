@@ -44,11 +44,11 @@
   "devDependencies": {
     "@types/react": "^18.2.45",
     "algosdk": "2.8.0",
-    "jsdom": "^24.0.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "tsup": "^8.0.0",
-    "typescript": "^5.2.2"
+    "jsdom": "24.0.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "tsup": "8.0.2",
+    "typescript": "5.4.3"
   },
   "peerDependencies": {
     "@blockshake/defly-connect": "^1.1.6",

@@ -26,21 +26,21 @@
     "typecheck": "pnpm -r typecheck"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^6.1.6",
-    "@testing-library/react": "^14.1.2",
-    "@typescript-eslint/eslint-plugin": "^6.7.2",
-    "@typescript-eslint/parser": "^6.7.2",
-    "@vitejs/plugin-react": "^4.2.1",
-    "@vitejs/plugin-vue": "^5.0.2",
-    "@vitejs/plugin-vue-jsx": "^3.1.0",
-    "@vue/test-utils": "^2.4.3",
-    "eslint": "^8.50.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-prettier": "^5.0.1",
+    "@testing-library/jest-dom": "6.4.2",
+    "@testing-library/react": "14.2.2",
+    "@typescript-eslint/eslint-plugin": "6.21.0",
+    "@typescript-eslint/parser": "6.21.0",
+    "@vitejs/plugin-react": "4.2.1",
+    "@vitejs/plugin-vue": "5.0.4",
+    "@vitejs/plugin-vue-jsx": "3.1.0",
+    "@vue/test-utils": "2.4.5",
+    "eslint": "8.57.0",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-plugin-prettier": "5.1.3",
     "prettier": "3.2.5",
-    "vite": "^5.0.8",
-    "vite-plugin-solid": "^2.8.2",
-    "vitest": "^1.1.1",
-    "vue-demi": "^0.14.6"
+    "vite": "5.2.6",
+    "vite-plugin-solid": "2.10.2",
+    "vitest": "1.4.0",
+    "vue-demi": "0.14.7"
   }
 }
