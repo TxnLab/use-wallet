@@ -23,7 +23,7 @@
       {
         "groupName": "non-major dependencies",
         "labels": ["packages"],
-        "matchFileNames": ["packages/**"],
+        "matchFileNames": ["package.json", "packages/**"],
         "matchDepTypes": ["dependencies", "devDependencies"],
         "matchUpdateTypes": ["patch", "minor"],
         "semanticCommitScope": "deps"
@@ -31,7 +31,7 @@
       {
         "groupName": "non-major peer dependencies",
         "labels": ["packages"],
-        "matchFileNames": ["packages/**"],
+        "matchFileNames": ["package.json", "packages/**"],
         "matchDepTypes": ["optionalDependencies", "peerDependencies"],
         "matchUpdateTypes": ["patch", "minor"],
         "semanticCommitScope": "deps"
