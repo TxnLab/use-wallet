@@ -16,7 +16,7 @@
   "npm": {
     "lockFileMaintenance": {
       "enabled": true,
-      "extends": "on the 2nd day of the month"
+      "schedule": "on the 2nd day of the month"
     },
     "minimumReleaseAge": "3 days",
     "packageRules": [
