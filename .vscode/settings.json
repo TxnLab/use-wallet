@@ -6,12 +6,14 @@
   "git.closeDiffOnOperation": true,
   "javascript.validate.enable": true,
   "eslint.workingDirectories": [
+    "./packages/use-wallet",
+    "./packages/use-wallet-react",
+    "./packages/use-wallet-solid",
+    "./packages/use-wallet-vue",
     "./examples/nextjs",
     "./examples/nuxt",
     "./examples/react-ts",
-    "./packages/use-wallet",
-    "./packages/use-wallet-react",
-    "./packages/use-wallet-vue",
+    "./examples/solid-ts",
     "./examples/vanilla-ts",
     "./examples/vue-ts"
   ]
