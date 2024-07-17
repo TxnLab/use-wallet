@@ -43,9 +43,9 @@
   },
   "devDependencies": {
     "algosdk": "2.8.0",
-    "tsup": "^8.0.0",
-    "typescript": "^5.2.2",
-    "vue": "^3.3.13"
+    "tsup": "8.0.2",
+    "typescript": "5.4.3",
+    "vue": "3.4.21"
   },
   "peerDependencies": {
     "@blockshake/defly-connect": "^1.1.6",
