@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"],
+  "extends": ["config:js-lib"],
   "dependencyDashboard": true,
   "configMigration": true,
   "timezone": "America/New_York",
@@ -26,7 +26,6 @@
         "matchFileNames": ["packages/**"],
         "matchDepTypes": ["dependencies", "devDependencies"],
         "matchUpdateTypes": ["patch", "minor"],
-        "rangeStrategy": "pin",
         "semanticCommitScope": "deps"
       },
       {
@@ -35,7 +34,6 @@
         "matchFileNames": ["packages/**"],
         "matchDepTypes": ["optionalDependencies", "peerDependencies"],
         "matchUpdateTypes": ["patch", "minor"],
-        "rangeStrategy": "bump",
         "semanticCommitScope": "deps"
       },
       {
@@ -44,7 +42,6 @@
         "matchFileNames": ["examples/**"],
         "matchDepTypes": ["dependencies", "devDependencies"],
         "matchUpdateTypes": ["patch", "minor"],
-        "rangeStrategy": "auto",
         "semanticCommitScope": "examples"
       },
       {
