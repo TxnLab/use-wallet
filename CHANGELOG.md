@@ -1,3 +1,23 @@
+# [3.0.0](https://github.com/TxnLab/use-wallet/releases/tag/v3.0.0) (2024-07-17)
+
+### Summary
+
+Version 3.0.0 introduces a complete rewrite of the `use-wallet` library, now structured as a monorepo to support vanilla JavaScript/TypeScript applications with reactive framework-specific adapters. This major release focuses on improving flexibility, performance, and developer experience.
+
+### Key Features
+
+- **Framework-Agnostic Core:** Rewritten in vanilla TypeScript for broader compatibility.
+- **Framework Adapters:** Initial support for React, Vue, and Solid.js with adapters for Angular and Svelte planned.
+- **Enhanced Performance:** More lightweight and easier to debug.
+- **Expanded Examples:** Includes demo apps for vanilla TypeScript, React, Vue, Solid.js, and server-side rendering examples for Next.js and Nuxt.
+- **Improved Tooling:** Adoption of PNPM for package management and Vitest for testing.
+- **Network Switching:** Easy switching between different networks (MainNet, TestNet, LocalNet).
+- **Increased Test Coverage:** Ensuring robustness and reliability.
+
+### Breaking Changes
+
+This version includes significant API changes. Please refer to the [Migration Guide](https://txnlab.gitbook.io/use-wallet/guides/migrating-from-v2.x) for detailed upgrade instructions.
+
 ## [3.0.0-rc.3](https://github.com/txnlab/use-wallet/compare/v3.0.0-rc.2...v3.0.0-rc.3) (2024-07-02)
 
 ### Fixes

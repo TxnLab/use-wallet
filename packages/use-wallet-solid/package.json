@@ -1,6 +1,6 @@
 {
   "name": "@txnlab/use-wallet-solid",
-  "version": "3.0.0-rc.3",
+  "version": "3.0.0",
   "description": "Solid.js library for integrating Algorand wallets into decentralized applications",
   "author": "Doug Richar <drichar@gmail.com>",
   "license": "MIT",
