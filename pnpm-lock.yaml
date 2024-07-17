@@ -413,7 +413,7 @@ importers:
         version: 28.0.3
     devDependencies:
       '@types/react':
-        specifier: ^18.2.45
+        specifier: 18.2.70
         version: 18.2.70
       algosdk:
         specifier: 2.8.0
