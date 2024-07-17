@@ -3,14 +3,14 @@ name: CI
 on:
   pull_request:
     branches:
-      - '*'
+      - 'v3' # Update to 'main' before merging
   push:
     branches:
-      - 'main'
+      - 'v3' # Update to 'main' before merging
 
 jobs:
   run-ci:
-    name: Run Type Check & Linters
+    name: Build, Lint, Typecheck, and Test
     runs-on: ubuntu-latest
 
     steps:
@@ -19,35 +19,44 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Node
+      - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
-      - name: Cache dependencies
-        uses: actions/cache@v4
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
         with:
-          path: |
-            .yarn/cache
-            node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          version: 9.2.0
+          run_install: false
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - uses: actions/cache@v4
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: yarn install
+        run: pnpm install
 
-      - name: Run ESLint
-        run: yarn lint
+      - name: Build
+        run: pnpm build
 
-      - name: Run Prettier check
-        run: yarn format
+      - name: Lint
+        run: pnpm lint
 
-      - name: Run TypeScript type check
-        run: yarn check-types
+      - name: Prettier
+        run: pnpm prettier
 
-      - name: Run unit tests
-        run: yarn test
+      - name: Typecheck
+        run: pnpm typecheck
 
-      - name: Run build
-        run: yarn build
+      - name: Run tests
+        run: pnpm test

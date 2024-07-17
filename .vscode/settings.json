@@ -1,7 +1,18 @@
 {
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
   "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
-  }
+  "git.closeDiffOnOperation": true,
+  "javascript.validate.enable": true,
+  "eslint.workingDirectories": [
+    "./examples/nextjs",
+    "./examples/nuxt",
+    "./examples/react-ts",
+    "./packages/use-wallet",
+    "./packages/use-wallet-react",
+    "./packages/use-wallet-vue",
+    "./examples/vanilla-ts",
+    "./examples/vue-ts"
+  ]
 }

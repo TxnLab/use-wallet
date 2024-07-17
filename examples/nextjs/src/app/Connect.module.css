@@ -1,0 +1,72 @@
+.networkGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+  margin: 2em;
+  padding: 2em;
+  background-color: light-dark(rgba(0, 0, 0, 0.025), rgba(255, 255, 255, 0.025));
+  border-color: light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.1));
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 8px;
+}
+
+.networkGroup h4 {
+  margin: 0;
+}
+
+.networkGroup .activeNetwork {
+  text-transform: capitalize;
+}
+
+.networkButtons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5em;
+}
+
+.walletGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+  margin-bottom: 2em;
+}
+
+.walletGroup h4 {
+  line-height: 1.5;
+  margin: 0;
+}
+
+.walletGroup h4[data-active='true']:after {
+  content: ' [active]';
+}
+
+.walletButtons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5em;
+}
+
+.inputGroup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+}
+.inputGroup label {
+  margin-left: 1em;
+  font-weight: 500;
+}
+.inputGroup input {
+  min-width: 16em;
+}
+.inputGroup input[disabled] {
+  opacity: 0.75;
+  color: light-dark(rgba(16, 16, 16, 0.3), rgba(255, 255, 255, 0.3));
+}

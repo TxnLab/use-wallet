@@ -1,19 +1,4 @@
-# dependencies
-/node_modules
-
-# testing
-/coverage
-
-# production
-/dist
-
-# misc
-.DS_Store
-
-# debug
-yarn-debug.log*
-yarn-error.log*
-
-# VS Code
+node_modules
+dist
+.env
 *.code-workspace
-.vscode
