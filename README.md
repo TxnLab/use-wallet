@@ -15,3 +15,5 @@ A framework agnostic Algorand wallet integration library with reactive framework
 - Full TypeScript support
 
 ### Visit [txnlab.gitbook.io/use-wallet](https://txnlab.gitbook.io/use-wallet) for docs, guides, and examples!
+
+### [Become a sponsor!](https://github.com/sponsors/TxnLab/)
