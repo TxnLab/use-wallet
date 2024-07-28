@@ -1,4 +1,5 @@
 import { Store } from '@tanstack/store'
+import { Algodv2 } from 'algosdk'
 import { NetworkId } from 'src/network'
 import {
   State,
@@ -408,7 +409,8 @@ describe('Type Guards', () => {
       const defaultState: State = {
         wallets: {},
         activeWallet: null,
-        activeNetwork: NetworkId.TESTNET
+        activeNetwork: NetworkId.TESTNET,
+        algodClient: new Algodv2('', 'https://testnet-api.algonode.cloud/')
       }
       expect(isValidState(defaultState)).toBe(true)
 
@@ -444,7 +446,8 @@ describe('Type Guards', () => {
           }
         },
         activeWallet: WalletId.DEFLY,
-        activeNetwork: NetworkId.TESTNET
+        activeNetwork: NetworkId.TESTNET,
+        algodClient: new Algodv2('', 'https://testnet-api.algonode.cloud/')
       }
       expect(isValidState(state)).toBe(true)
     })

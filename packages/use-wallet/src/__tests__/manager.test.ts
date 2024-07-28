@@ -8,6 +8,7 @@ import { DeflyWallet } from 'src/wallets/defly'
 import { KibisisWallet } from 'src/wallets/kibisis'
 import { WalletId } from 'src/wallets/types'
 import type { Mock } from 'vitest'
+import { Algodv2 } from 'algosdk'
 
 // Mock storage adapter
 vi.mock('src/storage', () => ({
@@ -256,7 +257,8 @@ describe('WalletManager', () => {
           }
         },
         activeWallet: WalletId.KIBISIS,
-        activeNetwork: NetworkId.BETANET
+        activeNetwork: NetworkId.BETANET,
+        algodClient: new Algodv2('', 'https://betanet-api.algonode.cloud/')
       }
     })
 
@@ -304,7 +306,8 @@ describe('WalletManager', () => {
       const stateToSave: State = {
         wallets: {},
         activeWallet: null,
-        activeNetwork: NetworkId.MAINNET
+        activeNetwork: NetworkId.MAINNET,
+        algodClient: new Algodv2('', 'https://mainnet-api.algonode.cloud/')
       }
 
       const manager = new WalletManager({
@@ -341,7 +344,8 @@ describe('WalletManager', () => {
           }
         },
         activeWallet: WalletId.KIBISIS,
-        activeNetwork: NetworkId.BETANET
+        activeNetwork: NetworkId.BETANET,
+        algodClient: new Algodv2('', 'https://betanet-api.algonode.cloud/')
       }
     })
 
