@@ -69,8 +69,7 @@ const TestComponent = () => {
     isWalletConnected,
     walletStore,
     wallets,
-    algodClient,
-    setAlgodClient
+    algodClient
   } = useWallet()
 
   const [magicEmail, setMagicEmail] = createSignal('')
@@ -171,13 +170,6 @@ const TestComponent = () => {
       >
         Set Active Network to Mainnet
       </button>
-
-      <button
-        data-testid="set-algod-client-btn"
-        onClick={() => setAlgodClient(new algosdk.Algodv2('new-token', 'https://new-server', ''))}
-      >
-        Set Algod Client
-      </button>
     </div>
   )
 }
@@ -198,7 +190,8 @@ describe('useWallet', () => {
     const defaultState = {
       wallets: {},
       activeWallet: null,
-      activeNetwork: NetworkId.TESTNET
+      activeNetwork: NetworkId.TESTNET,
+      algodClient: new algosdk.Algodv2('', 'https://testnet-api.algonode.cloud/')
     }
 
     mockStore = new Store<State>(defaultState)
@@ -380,23 +373,23 @@ describe('useWallet', () => {
     })
   })
 
-  it('reactively updates the algodClient', async () => {
-    render(() => (
-      <WalletProvider manager={mockWalletManager}>
-        <TestComponent />
-      </WalletProvider>
-    ))
+  // it('reactively updates the algodClient', async () => {
+  //   render(() => (
+  //     <WalletProvider manager={mockWalletManager}>
+  //       <TestComponent />
+  //     </WalletProvider>
+  //   ))
 
-    const newAlgodClient = new algosdk.Algodv2('new-token', 'https://new-server', '')
+  //   const newAlgodClient = new algosdk.Algodv2('new-token', 'https://new-server', '')
 
-    const setAlgodClientButton = screen.getByTestId('set-algod-client-btn')
-    fireEvent.click(setAlgodClientButton)
+  //   const setAlgodClientButton = screen.getByTestId('set-algod-client-btn')
+  //   fireEvent.click(setAlgodClientButton)
 
-    // Wait for state update
-    await waitFor(() => {
-      expect(screen.getByTestId('algod-client')).toHaveTextContent(JSON.stringify(newAlgodClient))
-    })
-  })
+  //   // Wait for state update
+  //   await waitFor(() => {
+  //     expect(screen.getByTestId('algod-client')).toHaveTextContent(JSON.stringify(newAlgodClient))
+  //   })
+  // })
 
   it('updates algodClient when setActiveNetwork is called', async () => {
     render(() => (

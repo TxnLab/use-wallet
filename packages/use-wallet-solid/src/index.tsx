@@ -1,6 +1,6 @@
 import { useStore } from '@tanstack/solid-store'
 import algosdk from 'algosdk'
-import { JSX, createContext, createMemo, createSignal, onMount, useContext } from 'solid-js'
+import { JSX, createContext, createMemo, onMount, useContext } from 'solid-js'
 import type {
   NetworkId,
   WalletAccount,
@@ -57,7 +57,7 @@ export interface Wallet {
 export function useWallet() {
   const manager = createMemo(() => useWalletManager())
 
-  const [algodClient, setAlgodClient] = createSignal<algosdk.Algodv2>(manager().algodClient)
+  const algodClient = useStore(manager().store, (state) => state.algodClient)
 
   const walletStore = useStore(manager().store, (state) => state.wallets)
 
@@ -93,13 +93,13 @@ export function useWallet() {
 
     const { token, baseServer, port, headers } = manager().networkConfig[networkId]
     const newClient = new algosdk.Algodv2(token, baseServer, port, headers)
-    setAlgodClient(newClient)
 
     manager().algodClient = newClient
 
     manager().store.setState((state) => ({
       ...state,
-      activeNetwork: networkId
+      activeNetwork: networkId,
+      algodClient: newClient
     }))
 
     console.info(`[Solid] ✅ Active network set to ${networkId}.`)
@@ -141,7 +141,6 @@ export function useWallet() {
     isWalletActive,
     isWalletConnected,
     setActiveNetwork,
-    setAlgodClient,
     signTransactions,
     transactionSigner,
     wallets: manager().wallets

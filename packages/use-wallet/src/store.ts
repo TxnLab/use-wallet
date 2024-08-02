@@ -1,6 +1,7 @@
 import { NetworkId, isValidNetworkId } from 'src/network'
 import { WalletId, type WalletAccount } from 'src/wallets'
 import type { Store } from '@tanstack/store'
+import { Algodv2 } from 'algosdk'
 
 export type WalletState = {
   accounts: WalletAccount[]
@@ -13,12 +14,14 @@ export interface State {
   wallets: WalletStateMap
   activeWallet: WalletId | null
   activeNetwork: NetworkId
+  algodClient: Algodv2
 }
 
 export const defaultState: State = {
   wallets: {},
   activeWallet: null,
-  activeNetwork: NetworkId.TESTNET
+  activeNetwork: NetworkId.TESTNET,
+  algodClient: new Algodv2('', 'https://testnet-api.algonode.cloud/')
 }
 
 export const LOCAL_STORAGE_KEY = '@txnlab/use-wallet:v3'
