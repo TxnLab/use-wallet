@@ -1,3 +1,9 @@
+# [3.1.0](https://github.com/txnlab/use-wallet/compare/v3.0.0...v3.1.0) (2024-08-02)
+
+### Features
+
+- Reactive algodClient for SolidJS ([#204](https://github.com/txnlab/use-wallet/pull/204)) ([11ef688](https://github.com/txnlab/use-wallet/commit/11ef688efa724aa94e99232d60c55b2e2a9d41c8))
+
 # [3.0.0](https://github.com/TxnLab/use-wallet/releases/tag/v3.0.0) (2024-07-17)
 
 ### Summary
