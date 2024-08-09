@@ -1,3 +1,9 @@
+## [3.1.2](https://github.com/txnlab/use-wallet/compare/v3.1.1...v3.1.2) (2024-08-09)
+
+### Bug Fixes
+
+- Revert "fix(core): fix Webpack static analysis issue with dynamic imports ([#211](https://github.com/txnlab/use-wallet/pull/211))" ([fc1529b](https://github.com/txnlab/use-wallet/commit/fc1529bc49edd1b70d13a57084000eeddbf00460))
+
 ## [3.1.1](https://github.com/txnlab/use-wallet/compare/v3.1.0...v3.1.1) (2024-08-09)
 
 ### Bug Fixes
