@@ -262,8 +262,7 @@ export class WalletConnect extends BaseWallet {
 
   private async initializeClient(): Promise<SignClient> {
     console.info(`[${this.metadata.name}] Initializing client...`)
-    const SignClient = (await import(/* webpackIgnore: true */ '@walletconnect/sign-client'))
-      .SignClient
+    const SignClient = (await import('@walletconnect/sign-client')).SignClient
     const client = await SignClient.init(this.options)
 
     client.on('session_event', (args) => {
@@ -289,8 +288,7 @@ export class WalletConnect extends BaseWallet {
 
   private async initializeModal(): Promise<WalletConnectModal> {
     console.info(`[${this.metadata.name}] Initializing modal...`)
-    const WalletConnectModal = (await import(/* webpackIgnore: true */ '@walletconnect/modal'))
-      .WalletConnectModal
+    const WalletConnectModal = (await import('@walletconnect/modal')).WalletConnectModal
     const modal = new WalletConnectModal({
       projectId: this.options.projectId,
       chains: this.chains,

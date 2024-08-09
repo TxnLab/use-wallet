@@ -71,9 +71,8 @@ export class MagicAuth extends BaseWallet {
 
   private async initializeClient(): Promise<MagicAuthClient> {
     console.info(`[${this.metadata.name}] Initializing client...`)
-    const Magic = (await import(/* webpackIgnore: true */ 'magic-sdk')).Magic
-    const AlgorandExtension = (await import(/* webpackIgnore: true */ '@magic-ext/algorand'))
-      .AlgorandExtension
+    const Magic = (await import('magic-sdk')).Magic
+    const AlgorandExtension = (await import('@magic-ext/algorand')).AlgorandExtension
     const client = new Magic(this.options.apiKey as string, {
       extensions: {
         algorand: new AlgorandExtension({
