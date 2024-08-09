@@ -208,7 +208,9 @@ export class KibisisWallet extends BaseWallet {
         `[${KibisisWallet.name}]#${_functionName}: initializing @agoralabs-sh/avm-web-provider...`
       )
 
-      this.avmWebProviderSDK = await import('@agoralabs-sh/avm-web-provider')
+      this.avmWebProviderSDK = await import(
+        /* webpackIgnore: true */ '@agoralabs-sh/avm-web-provider'
+      )
 
       if (!this.avmWebProviderSDK) {
         throw new Error(

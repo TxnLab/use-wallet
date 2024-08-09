@@ -55,7 +55,7 @@ export class LuteWallet extends BaseWallet {
 
   private async initializeClient(): Promise<LuteConnect> {
     console.info(`[${this.metadata.name}] Initializing client...`)
-    const module = await import('lute-connect')
+    const module = await import(/* webpackIgnore: true */ 'lute-connect')
     const LuteConnect = module.default
 
     const client = new LuteConnect(this.options.siteName as string)
