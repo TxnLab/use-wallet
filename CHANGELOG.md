@@ -1,3 +1,9 @@
+## [3.1.3](https://github.com/txnlab/use-wallet/compare/v3.1.2...v3.1.3) (2024-08-10)
+
+### Bug Fixes
+
+- **Next.js Example:** Resolve Webpack "module not found" errors ([#212](https://github.com/txnlab/use-wallet/pull/212)) ([b0eea4d](https://github.com/txnlab/use-wallet/commit/b0eea4d89732e462e58e559a5a1f064932a77d10))
+
 ## [3.1.2](https://github.com/txnlab/use-wallet/compare/v3.1.1...v3.1.2) (2024-08-09)
 
 ### Bug Fixes
