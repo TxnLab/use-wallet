@@ -67,7 +67,6 @@ export class WalletManager {
 
     this.networkConfig = this.initNetworkConfig(network, algod)
     this.algodClient = this.createAlgodClient(this.networkConfig[network])
-
     this.initializeWallets(wallets)
   }
 
