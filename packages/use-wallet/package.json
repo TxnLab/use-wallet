@@ -37,6 +37,7 @@
     "dist"
   ],
   "dependencies": {
+    "@algorandfoundation/liquid-client": "github:algorandfoundation/liquid-auth-js",
     "@tanstack/store": "0.4.1"
   },
   "devDependencies": {
