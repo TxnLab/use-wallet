@@ -16,6 +16,9 @@ const walletManager = new WalletManager({
     },
     WalletId.KMD,
     WalletId.KIBISIS,
+    {id: WalletId.LIQUID,
+      options: { RTC_config_username: 'username', RTC_config_credential: 'credential' }
+    },
     {
       id: WalletId.LUTE,
       options: { siteName: 'Example Site' }
