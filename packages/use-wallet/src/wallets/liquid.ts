@@ -3,7 +3,7 @@ import { WalletAccount, WalletConstructor, WalletId } from './types'
 import { SignalClient } from '@algorandfoundation/liquid-client'
 import algosdk from 'algosdk'
 import { Store } from '@tanstack/store'
-import { State } from 'src/store'
+import { addWallet, State, WalletState } from 'src/store'
 
 export type LiquidOptions = {
   RTC_config_username: string,
@@ -34,6 +34,8 @@ export class LiquidWallet extends BaseWallet{
   private options: LiquidOptions
   private client: SignalClient
   private RTC_CONFIGURATION: RTCConfiguration
+  private modal: LiquidAuthModal | undefined
+  private dataChannel: RTCDataChannel | undefined
 
   constructor({
     id,
@@ -95,17 +97,53 @@ export class LiquidWallet extends BaseWallet{
     const requestId = SignalClient.generateRequestId();
     const altRequestId = requestId;
   
-    const modal = new LiquidAuthModal(this.client, this.RTC_CONFIGURATION, requestId, altRequestId);
+    if (!this.modal) {
+      this.modal = new LiquidAuthModal(this.client, this.RTC_CONFIGURATION, requestId, altRequestId);
+      
+      // Append the modal to the document body
+      document.body.appendChild(this.modal);
+    }
   
-    // Append the modal to the document body
-    document.body.appendChild(modal);
+    this.modal.show();
+    this.dataChannel = this.modal.dataChannel
+
+    // how to receive the accounts?
+    // send a request for the account addresses?
+
+    //TODO: make use of fetch(`${window.origin}/auth/session`).then(r=>r.json())
+    //      instead of relying on the link-message 
+    const account = this.modal.address
+
+    if (!account) {
+      throw new Error('No accounts found!')
+    }
+
+    const walletAccounts: WalletAccount[] = [{
+      name: `${this.metadata.name} Account 1`,
+      address: account.toString()
+    }];
+
+    const walletState: WalletState = {
+      accounts: walletAccounts,
+      activeAccount: walletAccounts[0]
+    }
+
+    addWallet(this.store, {
+      walletId: this.id,
+      wallet: walletState
+    })
+
+    console.info(`[${this.metadata.name}] ✅ Connected.`, walletState)
+    return Promise.resolve(walletAccounts)
   
-    modal.show();
-  
-    return Promise.resolve([]);
   }
   
   public disconnect(): Promise<void> {
+    this.client.close();
+
+    // clean up
+    /// clean up the modal, removing it from append
+    /// reset the variables and state
     throw new Error('Method not implemented.');
   }
   
@@ -117,12 +155,17 @@ export class LiquidWallet extends BaseWallet{
     _txnGroup: T | T[],
     _indexesToSign?: number[]
   ): Promise<(Uint8Array | null)[]> {
+
+  // trick should be here: https://github.com/algorandfoundation/liquid-auth-android/blob/dbbd796b19c050399bb88552bb529fd135957bc9/demo/src/main/java/foundation/algorand/demo/AnswerActivity.kt#L494
+  
+  // send the transaction bytes with the data channel, using "type": "transaction"
+  // receive the signed transaction bytes with the data channel, using "type": "transaction-signature"
+
     throw new Error('Method not implemented.');
   }
 }
   
   /* ----------- UI Component ----------- */
-  // Inspired by DeflyWalletConnectModal.ts in blockshake's Defly
 
 class LiquidAuthModal extends HTMLElement {
   localIdElement!: HTMLElement
@@ -133,6 +176,7 @@ class LiquidAuthModal extends HTMLElement {
   client: SignalClient
   RTC_CONFIGURATION: RTCConfiguration
   dataChannel!: RTCDataChannel
+  address: algosdk.Address | undefined
 
   constructor(client: SignalClient, RTC_CONFIGURATION: RTCConfiguration, requestId: string, altRequestId: string) {
     super();
@@ -167,6 +211,7 @@ class LiquidAuthModal extends HTMLElement {
           position: relative;
           max-width: 500px;
           width: 100%;
+          color: black;
         }
         .close-button {
           position: absolute;
@@ -176,6 +221,7 @@ class LiquidAuthModal extends HTMLElement {
           border: none;
           font-size: 20px;
           cursor: pointer;
+          color: black;
         }
       `;
   
@@ -277,7 +323,12 @@ class LiquidAuthModal extends HTMLElement {
       this.client.peer(this.requestId, 'offer', this.RTC_CONFIGURATION).then(this.handleDataChannel);
   
       // Once the link message is received by the remote wallet, hide the offer
-      this.client.on('link-message', () => {
+      this.client.on('link-message', (message) => {
+        const parsedMessage = JSON.parse(message);
+
+        // TODO: rely on /auth/session instead
+        this.address = parsedMessage.get("wallet")
+
         console.log("hide offer");
         const offerElement = this.shadowRoot!.querySelector('.offer') as HTMLElement;
         if (offerElement) {
