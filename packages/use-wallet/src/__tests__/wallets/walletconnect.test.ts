@@ -537,6 +537,15 @@ describe('WalletConnect', () => {
 
         expect(result).toEqual([txn1.toByte()])
       })
+
+      it('should return encoded signed transactions if the wallet returns untyped byte arrays', async () => {
+        const signedTxn = Array.from(txn1.toByte())
+        mockSignClient.request.mockResolvedValueOnce([signedTxn])
+
+        const result = await wallet.signTransactions([txn1])
+
+        expect(result).toEqual([txn1.toByte()])
+      })
     })
 
     describe('transactionSigner', () => {
