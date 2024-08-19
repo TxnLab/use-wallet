@@ -1,3 +1,9 @@
+## [3.1.4](https://github.com/txnlab/use-wallet/compare/v3.1.3...v3.1.4) (2024-08-19)
+
+### Bug Fixes
+
+- **WalletConnect:** Handle untyped byte arrays returned by sign request ([#218](https://github.com/txnlab/use-wallet/pull/218)) ([9a39164](https://github.com/txnlab/use-wallet/commit/9a39164c5e58fa2673f52297f04ab72180c53b51))
+
 ## [3.1.3](https://github.com/txnlab/use-wallet/compare/v3.1.2...v3.1.3) (2024-08-10)
 
 ### Bug Fixes
