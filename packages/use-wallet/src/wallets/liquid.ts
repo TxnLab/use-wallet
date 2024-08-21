@@ -161,6 +161,11 @@ export class LiquidWallet extends BaseWallet{
   // send the transaction bytes with the data channel, using "type": "transaction"
   // receive the signed transaction bytes with the data channel, using "type": "transaction-signature"
 
+  const transactionBytesJson = JSON.stringify(_txnGroup)
+  this.dataChannel!.send('transaction')
+
+  // long term needs to be an authentication process, so that MITM attacks cannot replace the transaction bytes
+
     throw new Error('Method not implemented.');
   }
 }
@@ -283,6 +288,33 @@ class LiquidAuthModal extends HTMLElement {
   
       const sendMessageButton = this.shadowRoot.querySelector('#send-message') as HTMLButtonElement;
       sendMessageButton.addEventListener('click', () => this.sendMessage());
+    }
+  }
+
+  /**
+   * Check if a session exists
+   * @returns 
+   */
+  async checkSession() {
+    try {
+      const response = await fetch(`${window.origin}/auth/session`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Session data:', data);
+        return data;
+      } else {
+        console.log('No session found');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error querying session:', error);
+      return null;
     }
   }
 
