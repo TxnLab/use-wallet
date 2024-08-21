@@ -51,24 +51,22 @@ export function addWallet(
 
 export function removeWallet(store: Store<State>, { walletId }: { walletId: WalletId }) {
   store.setState((state) => {
-    const newWallets = { ...state.wallets }
-    delete newWallets[walletId]
+    const updatedWallets = { ...state.wallets }
+    delete updatedWallets[walletId]
 
     return {
       ...state,
-      wallets: newWallets,
+      wallets: updatedWallets,
       activeWallet: state.activeWallet === walletId ? null : state.activeWallet
     }
   })
 }
 
 export function setActiveWallet(store: Store<State>, { walletId }: { walletId: WalletId | null }) {
-  store.setState((state) => {
-    return {
-      ...state,
-      activeWallet: walletId
-    }
-  })
+  store.setState((state) => ({
+    ...state,
+    activeWallet: walletId
+  }))
 }
 
 export function setActiveAccount(
@@ -146,12 +144,10 @@ export function setAccounts(
 }
 
 export function setActiveNetwork(store: Store<State>, { networkId }: { networkId: NetworkId }) {
-  store.setState((state) => {
-    return {
-      ...state,
-      activeNetwork: networkId
-    }
-  })
+  store.setState((state) => ({
+    ...state,
+    activeNetwork: networkId
+  }))
 }
 
 // Type guards
