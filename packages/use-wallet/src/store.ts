@@ -33,14 +33,17 @@ export function addWallet(
   { walletId, wallet }: { walletId: WalletId; wallet: WalletState }
 ) {
   store.setState((state) => {
-    const newWallets = {
+    const updatedWallets = {
       ...state.wallets,
-      [walletId]: wallet
+      [walletId]: {
+        accounts: wallet.accounts.map((account) => ({ ...account })),
+        activeAccount: wallet.activeAccount ? { ...wallet.activeAccount } : null
+      }
     }
 
     return {
       ...state,
-      wallets: newWallets,
+      wallets: updatedWallets,
       activeWallet: walletId
     }
   })
@@ -110,31 +113,34 @@ export function setAccounts(
   store.setState((state) => {
     const wallet = state.wallets[walletId]
     if (!wallet) {
+      console.warn(`Wallet with id "${walletId}" not found`)
       return state
     }
 
-    // Check if `accounts` includes `wallet.activeAccount`
-    const isActiveAccountConnected = accounts.some(
+    const newAccounts = accounts.map((account) => ({ ...account }))
+
+    const isActiveAccountConnected = newAccounts.some(
       (account) => account.address === wallet.activeAccount?.address
     )
 
-    const activeAccount = isActiveAccountConnected ? wallet.activeAccount! : accounts[0] || null
+    const newActiveAccount = isActiveAccountConnected
+      ? { ...wallet.activeAccount! }
+      : newAccounts[0] || null
 
-    const newWallet = {
+    const updatedWallet = {
       ...wallet,
-      accounts,
-      activeAccount
+      accounts: newAccounts,
+      activeAccount: newActiveAccount
     }
 
-    // Create a new map with the updated wallet
-    const newWallets = {
+    const updatedWallets = {
       ...state.wallets,
-      [walletId]: newWallet
+      [walletId]: updatedWallet
     }
 
     return {
       ...state,
-      wallets: newWallets
+      wallets: updatedWallets
     }
   })
 }

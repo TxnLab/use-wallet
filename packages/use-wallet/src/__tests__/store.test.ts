@@ -42,6 +42,43 @@ describe('Mutations', () => {
       expect(state.wallets[walletId]).toEqual(walletState)
       expect(state.activeWallet).toBe(walletId)
     })
+
+    it('should create new object references when adding a wallet', () => {
+      const walletId = WalletId.DEFLY
+      const account1 = {
+        name: 'Defly Wallet 1',
+        address: 'address1'
+      }
+      const account2 = {
+        name: 'Defly Wallet 2',
+        address: 'address2'
+      }
+      const walletState = {
+        accounts: [account1, account2],
+        activeAccount: account1
+      }
+
+      const originalWalletState = { ...walletState }
+
+      addWallet(store, { walletId, wallet: walletState })
+
+      const storedWallet = store.state.wallets[walletId]
+
+      // Check that new object references were created
+      expect(storedWallet).not.toBe(walletState)
+      expect(storedWallet?.accounts).not.toBe(walletState.accounts)
+      expect(storedWallet?.activeAccount).not.toBe(walletState.activeAccount)
+
+      // Check that the content is still correct
+      expect(storedWallet?.accounts).toEqual([account1, account2])
+      expect(storedWallet?.activeAccount).toEqual(account1)
+
+      // Modify the stored wallet state
+      storedWallet!.accounts[0].name = 'Modified Name'
+
+      // Check that the original wallet state is unchanged
+      expect(walletState).toEqual(originalWalletState)
+    })
   })
 
   describe('removeWallet', () => {
@@ -339,6 +376,47 @@ describe('Mutations', () => {
 
       // Active account should be set to first account in new accounts list (account2)
       expect(store.state.wallets[walletId]?.activeAccount).toEqual(account2)
+    })
+
+    it('should create new object references when setting accounts', () => {
+      const walletId = WalletId.DEFLY
+      const account1 = {
+        name: 'Defly Wallet 1',
+        address: 'address1'
+      }
+      const account2 = {
+        name: 'Defly Wallet 2',
+        address: 'address2'
+      }
+      const walletState = {
+        accounts: [account1],
+        activeAccount: account1
+      }
+
+      addWallet(store, { walletId, wallet: walletState })
+
+      const newAccounts = [account1, account2]
+      const originalNewAccounts = [...newAccounts]
+
+      setAccounts(store, { walletId, accounts: newAccounts })
+
+      const storedWallet = store.state.wallets[walletId]
+
+      // Check that new object references were created
+      expect(storedWallet?.accounts).not.toBe(newAccounts)
+      expect(storedWallet?.accounts[0]).not.toBe(account1)
+      expect(storedWallet?.accounts[1]).not.toBe(account2)
+      expect(storedWallet?.activeAccount).not.toBe(account1)
+
+      // Check that the content is still correct
+      expect(storedWallet?.accounts).toEqual([account1, account2])
+      expect(storedWallet?.activeAccount).toEqual(account1)
+
+      // Modify the stored accounts
+      storedWallet!.accounts[0].name = 'Modified Name'
+
+      // Check that the original new accounts array is unchanged
+      expect(newAccounts).toEqual(originalNewAccounts)
     })
   })
 
