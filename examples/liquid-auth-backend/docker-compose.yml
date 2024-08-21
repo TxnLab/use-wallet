@@ -15,14 +15,28 @@ services:
     image: node:22
     working_dir: /app
     volumes:
-      - ../../:/app # Mount the project directory to /app
-    #command: sh -c "tail -f /dev/null" 
-    command: sh -c "npm install -g vite && cd examples/vanilla-ts && vite preview --port 5173 " 
+    - ../../:/app # Mount the project directory to /app
+    command: >
+      sh -c "
+      npm install -g pnpm &&
+      rm -rf .pnpm-store &&
+      echo 'about to install on top level' &&
+      pnpm install --loglevel debug --reporter ndjson &&
+      if [ $? -ne 0 ]; then echo 'Top level pnpm install failed'; exit 1; fi &&
+      cd packages/use-wallet &&
+      echo 'about to install in use-wallet' &&
+      pnpm install --loglevel debug --reporter ndjson &&
+      if [ $? -ne 0 ]; then echo 'use-wallet pnpm install failed'; exit 1; fi &&
+      cd ../../examples/vanilla-ts &&
+      echo 'about to install in vanilla-ts' &&
+      pnpm install --loglevel debug --reporter ndjson &&
+      if [ $? -ne 0 ]; then echo 'vanilla-ts pnpm install failed'; exit 1; fi &&
+      pnpm run dev
+      "
     ports:
-      - "8080:5173"
+      - "5173:8080"
     depends_on:
       - liquid-auth
-    #command: sh -c "npm install -g && pnpm install && cd examples/vanilla-ts && pnpm install && pnpm run dev" 
 
   ngrok:
     image: ngrok/ngrok:latest
