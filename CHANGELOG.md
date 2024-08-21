@@ -1,3 +1,9 @@
+## [3.1.5](https://github.com/txnlab/use-wallet/compare/v3.1.4...v3.1.5) (2024-08-21)
+
+### Bug Fixes
+
+- **Core:** Immutable state updates in store mutation functions ([#220](https://github.com/txnlab/use-wallet/pull/220)) ([22421d4](https://github.com/txnlab/use-wallet/commit/22421d4951454bf62357d8872942b5dca933b958))
+
 ## [3.1.4](https://github.com/txnlab/use-wallet/compare/v3.1.3...v3.1.4) (2024-08-19)
 
 ### Bug Fixes
