@@ -1,7 +1,7 @@
+import { Algodv2 } from 'algosdk'
 import { NetworkId, isValidNetworkId } from 'src/network'
 import { WalletId, type WalletAccount } from 'src/wallets'
 import type { Store } from '@tanstack/store'
-import { Algodv2 } from 'algosdk'
 
 export type WalletState = {
   accounts: WalletAccount[]
