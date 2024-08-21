@@ -218,6 +218,73 @@ describe('Mutations', () => {
       setActiveAccount(store, { walletId: WalletId.DEFLY, address: 'foo' })
       expect(store.state.wallets[walletId]?.activeAccount).toEqual(account1)
     })
+
+    it('should not modify other accounts when setting active account', () => {
+      const walletId = WalletId.DEFLY
+      const account1 = {
+        name: 'Defly Wallet 1',
+        address: 'address1'
+      }
+      const account2 = {
+        name: 'Defly Wallet 2',
+        address: 'address2'
+      }
+      const walletState = {
+        accounts: [account1, account2],
+        activeAccount: account1
+      }
+
+      addWallet(store, { walletId, wallet: walletState })
+      expect(store.state.wallets[walletId]?.accounts).toEqual([account1, account2])
+      expect(store.state.wallets[walletId]?.activeAccount).toEqual(account1)
+
+      setActiveAccount(store, { walletId, address: account2.address })
+
+      // Check that active account has changed
+      expect(store.state.wallets[walletId]?.activeAccount).toEqual(account2)
+
+      // Check that accounts array is unchanged
+      expect(store.state.wallets[walletId]?.accounts).toEqual([account1, account2])
+
+      // Verify that the first account in the array is still account1
+      expect(store.state.wallets[walletId]?.accounts[0]).toEqual(account1)
+    })
+
+    it('should create new object references for active account and accounts array', () => {
+      const walletId = WalletId.DEFLY
+      const account1 = {
+        name: 'Defly Wallet 1',
+        address: 'address1'
+      }
+      const account2 = {
+        name: 'Defly Wallet 2',
+        address: 'address2'
+      }
+      const walletState = {
+        accounts: [account1, account2],
+        activeAccount: account1
+      }
+
+      addWallet(store, { walletId, wallet: walletState })
+      const originalWallet = store.state.wallets[walletId]
+      const originalAccounts = originalWallet?.accounts
+      const originalActiveAccount = originalWallet?.activeAccount
+
+      setActiveAccount(store, { walletId, address: account2.address })
+
+      const updatedWallet = store.state.wallets[walletId]
+      const updatedAccounts = updatedWallet?.accounts
+      const updatedActiveAccount = updatedWallet?.activeAccount
+
+      // Check that new object references were created
+      expect(updatedWallet).not.toBe(originalWallet)
+      expect(updatedAccounts).not.toBe(originalAccounts)
+      expect(updatedActiveAccount).not.toBe(originalActiveAccount)
+
+      // Check that the content is still correct
+      expect(updatedAccounts).toEqual([account1, account2])
+      expect(updatedActiveAccount).toEqual(account2)
+    })
   })
 
   describe('setAccounts', () => {

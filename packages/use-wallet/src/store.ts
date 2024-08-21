@@ -75,24 +75,30 @@ export function setActiveAccount(
   store.setState((state) => {
     const wallet = state.wallets[walletId]
     if (!wallet) {
-      return state
-    }
-    const activeAccount = wallet.accounts.find((a) => a.address === address)
-    if (!activeAccount) {
+      console.warn(`Wallet with id "${walletId}" not found`)
       return state
     }
 
-    const newWallets = {
+    const newActiveAccount = wallet.accounts.find((a) => a.address === address)
+    if (!newActiveAccount) {
+      console.warn(`Account with address ${address} not found in wallet "${walletId}"`)
+      return state
+    }
+
+    const updatedWallet = {
+      ...wallet,
+      accounts: wallet.accounts.map((account) => ({ ...account })),
+      activeAccount: { ...newActiveAccount }
+    }
+
+    const updatedWallets = {
       ...state.wallets,
-      [walletId]: {
-        ...wallet,
-        activeAccount
-      }
+      [walletId]: updatedWallet
     }
 
     return {
       ...state,
-      wallets: newWallets
+      wallets: updatedWallets
     }
   })
 }
