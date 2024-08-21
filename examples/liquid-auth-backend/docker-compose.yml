@@ -1,0 +1,79 @@
+services:
+  liquid-auth:
+    image: ghcr.io/algorandfoundation/liquid-auth:develop
+    platform: linux/amd64
+    restart: no
+    env_file:
+      - .env.docker
+    ports:
+      - "5174:5173"
+    depends_on:
+      - redis
+      - mongo
+
+  frontend:
+    image: node:22
+    working_dir: /app
+    volumes:
+      - ../../:/app # Mount the project directory to /app
+    #command: sh -c "tail -f /dev/null" 
+    command: sh -c "npm install -g vite && cd examples/vanilla-ts && vite preview --port 5173 " 
+    ports:
+      - "8080:5173"
+    depends_on:
+      - liquid-auth
+    #command: sh -c "npm install -g && pnpm install && cd examples/vanilla-ts && pnpm install && pnpm run dev" 
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    restart: no
+    command:
+      - "start"
+      - "--all"
+      - "--config"
+      - "/etc/ngrok.yml"
+    volumes:
+      - ./ngrok.yml:/etc/ngrok.yml
+    ports:
+      - 4040:4040
+    depends_on:
+      - frontend
+
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+  mongo:
+    image: mongo:7.0
+    restart: no
+    environment:
+      - MONGO_INITDB_DATABASE=${DB_NAME:-fido}
+      - MONGO_INITDB_ROOT_USERNAME=${DB_USERNAME:-algorand}
+      - MONGO_INITDB_ROOT_PASSWORD=${DB_PASSWORD:-algorand}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo:/data/db
+
+  turn:
+    image: coturn/coturn
+    restart: no
+    deploy:
+      replicas: 0
+    depends_on:
+      - mongo
+    ports:
+      - "3478:3478"
+      - "3478:3478/udp"
+      - "5349:5349"
+      - "5349:5349/udp"
+    command:
+      - "--no-auth"
+      - "--mongo-userdb"
+      - "mongodb://${DB_USERNAME:-algorand}:${DB_PASSWORD:-algorand}@mongo:27017/${DB_NAME:-coturn}?authSource=admin&retryWrites=true&w=majority"
+      - "--redis-userdb"
+      - "ip=redis dbname=0"
+volumes:
+  mongo:
