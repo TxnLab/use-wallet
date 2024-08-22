@@ -21,6 +21,7 @@ The Liquid Auth backend is composed of the following components:
 Refer to the `docker-compose.yaml` file for the specific images and additional specification.
 
 Additionally, the following services:
+
 - Frontend: An Nginx server that runs the Frontend part, e.g. by serving static files produced by the vanilla-ts example, as well as routing API calls to the NestJS API server.
 
 ## Setup
@@ -105,13 +106,21 @@ By default we set `FRONTEND_BUILD_FOLDER=../vanilla-ts/dist`, i.e. the vanilla-t
 
 The key thing is to ensure that Nginx has static files to serve.
 
-### 5. Spin up the backend services
+### 5. Spin up the services
 
 Run `docker-compose up -d` from this directory.
 
 This will start up the docker services and detach the output (logs) from the terminal window.
 
-#### Platform Error
+Navigate to your static domain. You should be met with the frontend, e.g. examples/vanilla-ts. Additionally, navigate to `<static domain>/auth/session` and check that you get a valid JSON response (with user being set or simply being null) to confirm that the API server is running.
+
+## Troubleshooting
+
+#### Ngrok & VPNs
+
+Ngrok does not play well with VPNs. Remember to disable it or you will see an error when visiting your
+
+#### Platfomr Error
 
 You might get the following error:
 
