@@ -20,6 +20,10 @@ The Liquid Auth backend is composed of the following components:
 
 Refer to the `docker-compose.yaml` file for the specific images and additional specification.
 
+Additionally, the following services:
+- Frontend: runs the Frontend part, e.g. the vanilla-ts example, using http-server from the build/dist folder.
+- Nginx: routes requests between the Frontend (`/`  ) and NestJs API server (e.g., `/auth/session`)
+
 ## Setup
 
 ### 1. Install Docker
@@ -71,6 +75,10 @@ ORIGIN=https://<NGROK_STATIC_DOMAIN>
 
 ANDROID_SHA256HASH=47:CC:4E:EE:B9:50:59:A5:8B:E0:19:45:CA:0A:6D:59:16:F9:A9:C2:96:75:F8:F3:64:86:92:46:2B:7D:5D:5C
 ANDROID_PACKAGENAME=foundation.algorand.demo
+
+# FRONTEND
+EXAMPLE_FRONTEND_PATH=../vanilla-ts/
+EXAMPLE_FRONTEND_BUILD_FOLDER=dist
 ```
 
 For example it might look like this:
@@ -92,37 +100,17 @@ tunnels:
     domain: <NGROK_STATIC_DOMAIN>
 ```
 
-### 4. Update Vite config
-
-Ngrok is meant to expose your frontend, but we want the frontend to also be able to redirect paths to the backend API.
-
-Using the `use-wallet/examples/vanilla-ts` example, add the following to `use-wallet/examples/vanilla-ts/vite.config.ts`
-
-```typescript
-import { defineConfig } from 'vite'
-
-const DEFAULT_PROXY_URL = 'http://localhost:5174'
-const DEFAULT_WSS_PROXY_URL = 'ws://localhost:5174'
-
-export default defineConfig({
-  // [existing config] ,
-  server: {
-    proxy: {
-      '^/auth/.*': process.env.PROXY_URL || DEFAULT_PROXY_URL,
-      '^/.well-known/.*': process.env.PROXY_URL || DEFAULT_PROXY_URL,
-      '^/connect/.*': process.env.PROXY_URL || DEFAULT_PROXY_URL,
-      '^/attestation/.*': process.env.PROXY_URL || DEFAULT_PROXY_URL,
-      '^/assertion/.*': process.env.PROXY_URL || DEFAULT_PROXY_URL,
-      '/socket.io': {
-        target: process.env.WSS_PROXY_SERVER || DEFAULT_WSS_PROXY_URL,
-        ws: true
-      }
-    }
-  }
-})
-```
-
 We are assuming that the Liquid Auth service gets to run on port 5174.
+
+### 4. Build the static files
+
+Follow the instructions to build the frontend example of your choice.
+
+E.g., build `packages/use-wallet` and then build `examples/vanilla-ts`.
+
+By default we set `EXAMPLE_FRONTEND_PATH=../vanilla-ts/` and `EXAMPLE_FRONTEND_BUILD_FOLDER=dist`, i.e. the vanilla-ts example, but you are free to change the path and build-folder name in the .env.docker file.
+
+The key thing is to ensure that the http-server has static files to serve.
 
 ### 5. Spin up the backend services
 

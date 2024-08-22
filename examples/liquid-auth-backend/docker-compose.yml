@@ -6,36 +6,36 @@ services:
     env_file:
       - .env.docker
     ports:
-      - "5174:5173"
+      - "5173:5173"
     depends_on:
       - redis
       - mongo
 
   frontend:
-    image: node:22
+    image: node:latest
     working_dir: /app
+    env_file:
+      - .env.docker
     volumes:
-    - ../../:/app # Mount the project directory to /app
+      - ${FRONTEND_FOLDER_PATH}:/app
     command: >
       sh -c "
-      npm install -g pnpm &&
-      rm -rf .pnpm-store &&
-      echo 'about to install on top level' &&
-      pnpm install --loglevel debug --reporter ndjson &&
-      if [ $? -ne 0 ]; then echo 'Top level pnpm install failed'; exit 1; fi &&
-      cd packages/use-wallet &&
-      echo 'about to install in use-wallet' &&
-      pnpm install --loglevel debug --reporter ndjson &&
-      if [ $? -ne 0 ]; then echo 'use-wallet pnpm install failed'; exit 1; fi &&
-      cd ../../examples/vanilla-ts &&
-      echo 'about to install in vanilla-ts' &&
-      pnpm install --loglevel debug --reporter ndjson &&
-      if [ $? -ne 0 ]; then echo 'vanilla-ts pnpm install failed'; exit 1; fi &&
-      pnpm run dev
+      npm install http-server -g &&
+      http-server ${FRONTEND_BUILD_FOLDER} -p 8080
       "
     ports:
-      - "5173:8080"
+      - "8080:8080"
     depends_on:
+      - liquid-auth
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
       - liquid-auth
 
   ngrok:
