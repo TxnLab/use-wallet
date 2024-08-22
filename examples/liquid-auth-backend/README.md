@@ -21,8 +21,7 @@ The Liquid Auth backend is composed of the following components:
 Refer to the `docker-compose.yaml` file for the specific images and additional specification.
 
 Additionally, the following services:
-- Frontend: runs the Frontend part, e.g. the vanilla-ts example, using http-server from the build/dist folder.
-- Nginx: routes requests between the Frontend (`/`  ) and NestJs API server (e.g., `/auth/session`)
+- Frontend: An Nginx server that runs the Frontend part, e.g. by serving static files produced by the vanilla-ts example, as well as routing API calls to the NestJS API server.
 
 ## Setup
 
@@ -75,10 +74,6 @@ ORIGIN=https://<NGROK_STATIC_DOMAIN>
 
 ANDROID_SHA256HASH=47:CC:4E:EE:B9:50:59:A5:8B:E0:19:45:CA:0A:6D:59:16:F9:A9:C2:96:75:F8:F3:64:86:92:46:2B:7D:5D:5C
 ANDROID_PACKAGENAME=foundation.algorand.demo
-
-# FRONTEND
-EXAMPLE_FRONTEND_PATH=../vanilla-ts/
-EXAMPLE_FRONTEND_BUILD_FOLDER=dist
 ```
 
 For example it might look like this:
@@ -95,12 +90,10 @@ version: 2
 authtoken: <NGROK_AUTH_TOKEN>
 tunnels:
   website:
-    addr: frontend:8080
+    addr: frontend:80
     proto: http
     domain: <NGROK_STATIC_DOMAIN>
 ```
-
-We are assuming that the Liquid Auth service gets to run on port 5174.
 
 ### 4. Build the static files
 
@@ -108,9 +101,9 @@ Follow the instructions to build the frontend example of your choice.
 
 E.g., build `packages/use-wallet` and then build `examples/vanilla-ts`.
 
-By default we set `EXAMPLE_FRONTEND_PATH=../vanilla-ts/` and `EXAMPLE_FRONTEND_BUILD_FOLDER=dist`, i.e. the vanilla-ts example, but you are free to change the path and build-folder name in the .env.docker file.
+By default we set `FRONTEND_BUILD_FOLDER=../vanilla-ts/dist`, i.e. the vanilla-ts example, but you are free to change the path to the build-folder name in the docker-compose folder, or set the env variable explicitly.
 
-The key thing is to ensure that the http-server has static files to serve.
+The key thing is to ensure that Nginx has static files to serve.
 
 ### 5. Spin up the backend services
 

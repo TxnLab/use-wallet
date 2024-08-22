@@ -12,30 +12,13 @@ services:
       - mongo
 
   frontend:
-    image: node:latest
-    working_dir: /app
-    env_file:
-      - .env.docker
-    volumes:
-      - ${FRONTEND_FOLDER_PATH}:/app
-    command: >
-      sh -c "
-      npm install http-server -g &&
-      http-server ${FRONTEND_BUILD_FOLDER} -p 8080
-      "
-    ports:
-      - "8080:8080"
-    depends_on:
-      - liquid-auth
-
-  nginx:
     image: nginx:latest
     volumes:
+      - ${FRONTEND_BUILD_FOLDER:-../vanilla-ts/dist}:/usr/share/nginx/html:ro
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
     ports:
       - "80:80"
     depends_on:
-      - frontend
       - liquid-auth
 
   ngrok:
@@ -75,7 +58,7 @@ services:
     image: coturn/coturn
     restart: no
     deploy:
-      replicas: 0
+      replicas: 0 # Not in use, relying instead on Nodely's TURN server
     depends_on:
       - mongo
     ports:
