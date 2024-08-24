@@ -527,7 +527,8 @@ describe('useWallet', () => {
     // Set active network to mainnet
     mockStore.setState((state) => ({
       ...state,
-      activeNetwork: NetworkId.MAINNET
+      activeNetwork: NetworkId.MAINNET,
+      algodClient: new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud/')
     }))
 
     expect(screen.getByTestId('active-network')).toHaveTextContent(NetworkId.MAINNET)

@@ -49,7 +49,8 @@ export function useWallet() {
 
     manager.store.setState((state) => ({
       ...state,
-      activeNetwork: networkId
+      activeNetwork: networkId,
+      algodClient: newClient
     }))
 
     console.info(`[Vue] ✅ Active network set to ${networkId}.`)
