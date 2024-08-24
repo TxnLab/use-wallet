@@ -11,6 +11,41 @@ export type LiquidOptions = {
   // TODO: RTC_CONFIGURATION should be configurable, and not hard-coded to Nodely's TURN servers
 }
 
+
+// Liquid Auth API JSON types
+interface PassKeyCredential {
+  device: string;
+  publicKey: string;
+  credId: string;
+  prevCounter: number;
+}
+
+interface LiquidAuthUser {
+  id: string;
+  wallet: string;
+  credentials: PassKeyCredential[];
+}
+
+interface Cookie {
+  originalMaxAge: number | null;
+  expires: Date | null;
+  secure: boolean;
+  httpOnly: boolean;
+  path: string;
+}
+
+interface LiquidAuthSession {
+  cookie: Cookie;
+  wallet: string;
+}
+
+interface LiquidAuthAPIJSON {
+  user: LiquidAuthUser;
+  session: LiquidAuthSession;
+}
+
+
+
 // TODO: get an SVG for a proper icon
 const ICON = `<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
@@ -36,6 +71,7 @@ export class LiquidWallet extends BaseWallet{
   private RTC_CONFIGURATION: RTCConfiguration
   private modal: LiquidAuthModal | undefined
   private dataChannel: RTCDataChannel | undefined
+  private linkedBool: boolean = false
 
   constructor({
     id,
@@ -93,29 +129,88 @@ export class LiquidWallet extends BaseWallet{
     icon: ICON
   }
 
-  public connect(_args?: Record<string, any>): Promise<WalletAccount[]> {
+  
+
+  // Method to handle link message and update linked state
+  async onLinkMessage(message: any) {
+    if (message.wallet) {
+      const data = await this.checkSession()
+      if (data?.user?.wallet === message.wallet) {
+        // Confirm that the message sent over the wire is the same as what /auth/session returns
+        console.log('Session data:', data);
+          console.log('Wallet linked:', message.wallet);
+          this.linkedBool = true
+          return
+      }
+      throw new Error('Remote wallet address and /auth/session wallet address do not match')
+    }
+    throw new Error('Wallet field not part of link message')
+  }
+    
+
+/**
+ * Check if a session exists on the /auth/session endpoint
+ * @returns 
+ */
+async checkSession(): Promise<LiquidAuthAPIJSON | null> {
+  console.log("check session inside!");
+  try {
+    const response = await fetch(`${window.origin}/auth/session`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log('Session data:', data);
+      return data; // Directly return the parsed JSON data
+    } else {
+      console.log('No session found');
+      return null;
+    }
+  } catch (error) {
+    console.error('Error querying session:', error);
+    return null;
+  }
+}
+
+  public async connect(_args?: Record<string, any>): Promise<WalletAccount[]> {
     const requestId = SignalClient.generateRequestId();
     const altRequestId = requestId;
   
     if (!this.modal) {
-      this.modal = new LiquidAuthModal(this.client, this.RTC_CONFIGURATION, requestId, altRequestId);
+      this.modal = new LiquidAuthModal(this, this.client, this.RTC_CONFIGURATION, requestId, altRequestId);
       
       // Append the modal to the document body
       document.body.appendChild(this.modal);
     }
   
     this.modal.show();
-    this.dataChannel = this.modal.dataChannel
+    //this.dataChannel = this.modal.dataChannel
 
-    // how to receive the accounts?
-    // send a request for the account addresses?
+    // Function to wait until linkedBool is true
+    const waitForLinkedBool = (): Promise<void> => {
+      return new Promise((resolve) => {
+        const checkLinkedBool = () => {
+          if (this.linkedBool) {
+            resolve();
+          } else {
+            setTimeout(checkLinkedBool, 100); // Check every 100ms
+          }
+        };
+        checkLinkedBool();
+      });
+    };
 
-    //TODO: make use of fetch(`${window.origin}/auth/session`).then(r=>r.json())
-    //      instead of relying on the link-message 
-    const account = this.modal.address
+    await waitForLinkedBool();
+
+    const sessionData  = await this.checkSession();
+    const account = sessionData?.user?.wallet;
 
     if (!account) {
-      throw new Error('No accounts found!')
+      throw new Error('No accounts found!');
     }
 
     const walletAccounts: WalletAccount[] = [{
@@ -126,16 +221,16 @@ export class LiquidWallet extends BaseWallet{
     const walletState: WalletState = {
       accounts: walletAccounts,
       activeAccount: walletAccounts[0]
-    }
+    };
 
     addWallet(this.store, {
       walletId: this.id,
       wallet: walletState
-    })
+    });
 
-    console.info(`[${this.metadata.name}] ✅ Connected.`, walletState)
-    return Promise.resolve(walletAccounts)
-  
+    console.info(`[${this.metadata.name}] ✅ Connected.`, walletState);
+    this.modal.hide();
+    return Promise.resolve(walletAccounts);
   }
   
   public disconnect(): Promise<void> {
@@ -170,28 +265,28 @@ export class LiquidWallet extends BaseWallet{
   }
 }
   
-  /* ----------- UI Component ----------- */
+/* ----------- UI Component ----------- */
 
 class LiquidAuthModal extends HTMLElement {
-  localIdElement!: HTMLElement
-  modalElement!: HTMLElement
-  closeButton!: HTMLElement
-  requestId: string
-  altRequestId: string
-  client: SignalClient
-  RTC_CONFIGURATION: RTCConfiguration
-  dataChannel!: RTCDataChannel
-  address: algosdk.Address | undefined
+  parentProvider: LiquidWallet;
+  localIdElement!: HTMLElement;
+  modalElement!: HTMLElement;
+  closeButton!: HTMLElement;
+  requestId: string;
+  altRequestId: string;
+  client: SignalClient;
+  RTC_CONFIGURATION: RTCConfiguration;
 
-  constructor(client: SignalClient, RTC_CONFIGURATION: RTCConfiguration, requestId: string, altRequestId: string) {
+  constructor(parentProvider: LiquidWallet, client: SignalClient, RTC_CONFIGURATION: RTCConfiguration, requestId: string, altRequestId: string) {
     super();
     this.attachShadow({ mode: "open" });
-  
+
+    this.parentProvider = parentProvider
     this.client = client;
     this.RTC_CONFIGURATION = RTC_CONFIGURATION;
     this.requestId = requestId;
     this.altRequestId = altRequestId;
-  
+
     if (this.shadowRoot) {
       const styleSheet = document.createElement("style");
       styleSheet.textContent = `
@@ -229,7 +324,7 @@ class LiquidAuthModal extends HTMLElement {
           color: black;
         }
       `;
-  
+
       const liquidAuthModal = document.createElement("template");
       liquidAuthModal.innerHTML = `
         <div class="liquid-auth-modal hidden">
@@ -245,199 +340,85 @@ class LiquidAuthModal extends HTMLElement {
                   <h2>Local ID: ${this.requestId}</h2>
                 </hgroup> 
                 <button id="start">Start</button>
-                <button id="toggle">Switch</button>
               </div>
-              <div class="answer hidden">
-                <h1>Answer Client</h1>    
-                <label for="alt-request">Remote ID:</label>
-                <input id="alt-request" value="${this.altRequestId}"/>
-                <button id="attestation">Sign In</button>
-              </div>
-            </div>
-            <div class="message-container hidden">
-              <h1>Messages</h1>
-              <div class="messages"></div>
-              <input type="text" id="message" />
-              <button id="send-message">Send</button>
             </div>
           </div>
         </div>
       `;
-  
+
       this.shadowRoot.append(
         liquidAuthModal.content.cloneNode(true),
         styleSheet
       );
-  
+
       this.localIdElement = this.shadowRoot.querySelector('.liquid-auth-modal h2') as HTMLElement;
       this.modalElement = this.shadowRoot.querySelector('.liquid-auth-modal') as HTMLElement;
       this.closeButton = this.shadowRoot.querySelector('.close-button') as HTMLElement;
-  
+
       this.closeButton.addEventListener('click', () => {
         this.hide();
       });
-  
+
       const startButton = this.shadowRoot.querySelector('#start') as HTMLButtonElement;
       startButton.addEventListener('click', () => this.handleOfferClient());
-  
-      const toggleButton = this.shadowRoot.querySelector('#toggle') as HTMLButtonElement;
-      toggleButton.addEventListener('click', () => this.toggle());
-  
-      const attestationButton = this.shadowRoot.querySelector('#attestation') as HTMLButtonElement;
-      attestationButton.addEventListener('click', () => this.handleSignChallenge());
-  
-      const sendMessageButton = this.shadowRoot.querySelector('#send-message') as HTMLButtonElement;
-      sendMessageButton.addEventListener('click', () => this.sendMessage());
+
     }
   }
 
-  /**
-   * Check if a session exists
-   * @returns 
-   */
-  async checkSession() {
-    try {
-      const response = await fetch(`${window.origin}/auth/session`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Session data:', data);
-        return data;
-      } else {
-        console.log('No session found');
-        return null;
-      }
-    } catch (error) {
-      console.error('Error querying session:', error);
-      return null;
-    }
-  }
-
-    /**
-   * Send a Message to the remote client
-   */
-   sendMessage() {
-    const messages = document.querySelector('.messages') as HTMLDivElement
-    const message = document.querySelector('#message') as HTMLInputElement
-    this.dataChannel.send(message.value)
-    messages.innerHTML += `<p class="local-message">${message.value}</p>`
-    message.value = ''
-  }
   /**
   * Handle the data channel
-  * @param dataChannel
+  * @param _dataChannel
   */
-   handleDataChannel(dataChannel: RTCDataChannel) {
-    this.dataChannel = dataChannel
-    const messagesContainer = document.querySelector('.message-container') as HTMLDivElement
-    messagesContainer.classList.remove('hidden')
-    const messages = document.querySelector('.messages') as HTMLDivElement
-    this.dataChannel.onmessage = (e) => {
-        messages.innerHTML += `<p class="remote-message">${e.data}</p>`
-    }
+  handleDataChannel(_dataChannel: RTCDataChannel) {
+    //this.dataChannel = dataChannel;
+    console.log("hello");
   }
+
   /**
   * Create a peer connection, wait for an offer and send an answer to the remote client
   */
   async handleOfferClient() {
     const qrLinkElement = this.shadowRoot!.querySelector('#qr-link') as HTMLAnchorElement;
-  
+
     if (qrLinkElement) {
       qrLinkElement.href = 'https://github.com/algorandfoundation/liquid-auth-js';
-  
+
       // Peer to the remote client and await their offer
       console.log('requestId', this.requestId);
       this.client.peer(this.requestId, 'offer', this.RTC_CONFIGURATION).then(this.handleDataChannel);
-  
       // Once the link message is received by the remote wallet, hide the offer
       this.client.on('link-message', (message) => {
-        const parsedMessage = JSON.parse(message);
+        // Pass along to the parent provider that the link message has been received
+        this.parentProvider.onLinkMessage(message)
 
-        // TODO: rely on /auth/session instead
-        this.address = parsedMessage.get("wallet")
-
-        console.log("hide offer");
         const offerElement = this.shadowRoot!.querySelector('.offer') as HTMLElement;
         if (offerElement) {
           offerElement.classList.add('hidden');
         }
+
       });
-  
+
       // Update the render
       const image = this.shadowRoot!.querySelector('#liquid-qr-code') as HTMLImageElement;
       if (image) {
-        console.log(image);
         image.src = await this.client.qrCode();
         image.classList.remove('hidden');
       }
-  
+
       const deepLink = this.shadowRoot!.querySelector('#qr-link') as HTMLAnchorElement;
       if (deepLink) {
         deepLink.href = this.client.deepLink(this.requestId);
       }
-  
+
       const startButton = this.shadowRoot!.querySelector('#start') as HTMLButtonElement;
       if (startButton) {
         startButton.classList.add('hidden');
-      }
-  
-      const toggleButton = this.shadowRoot!.querySelector('#toggle') as HTMLButtonElement;
-      if (toggleButton) {
-        toggleButton.classList.add('hidden');
       }
     } else {
       console.error('QR link element not found');
     }
   }
 
-  async handleSignChallenge() {
-    console.log('Not implemented');
-  }
-
-  // /**
-  // * Sign the challenge and send the offer to the remote client
-  // *
-  // * This is mainly for extension wallets or other browser-based wallets, they must sign the challenge
-  // * before they can peer with the remote client.
-  // */
-  // async handleSignChallenge() {
-  //   // Sign in to the service with a new credential
-  //   await this.client.attestation(async (challenge: Uint8Array) => ({
-  //       requestId: parseFloat(this.altRequestId),
-  //       origin: window.origin,
-  //       type: 'algorand',
-  //       address: testAccount.addr,
-  //       signature: toBase64URL(nacl.sign.detached(challenge, testAccount.sk)),
-  //       device: 'Demo Web Wallet'
-  //   }))
-  //   // TODO: sign in with an existing credential
-  //   //await client.assertion()
-
-  //   document.querySelector('.answer')!.classList.add('hidden')
-
-  //   // Create the Peer Connection and await the remote client's answer
-  //   this.client.peer(this.altRequestId, 'answer', this.RTC_CONFIGURATION).then(this.handleDataChannel)
-  // }
- // UI Functions
- toggle() {
-    const offerElement = this.shadowRoot!.querySelector('.offer');
-    const answerElement = this.shadowRoot!.querySelector('.answer');
-
-    if (offerElement && answerElement) {
-      offerElement.classList.toggle('hidden');
-      answerElement.classList.toggle('hidden');
-    } else {
-      console.error('Offer or answer element not found');
-    }
-  }
-  handleAlternativeRequestId() {
-    this.altRequestId = document.querySelector('input')!.value
-  }
 
   show() {
     this.localIdElement.textContent = `Local ID: ${this.requestId}`;
@@ -452,4 +433,3 @@ class LiquidAuthModal extends HTMLElement {
 }
 
 customElements.define('liquid-auth-modal', LiquidAuthModal);
-
