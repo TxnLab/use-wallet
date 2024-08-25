@@ -69,7 +69,7 @@ export class LiquidWallet extends BaseWallet{
   private options: LiquidOptions
   private client: SignalClient
   private RTC_CONFIGURATION: RTCConfiguration
-  private modal: LiquidAuthModal | undefined
+  private modal: LiquidAuthModal | undefined | null
   private dataChannel: RTCDataChannel | undefined
   private linkedBool: boolean = false
 
@@ -128,8 +128,6 @@ export class LiquidWallet extends BaseWallet{
     name: 'Liquid',
     icon: ICON
   }
-
-  
 
   // Method to handle link message and update linked state
   async onLinkMessage(message: any) {
@@ -232,14 +230,58 @@ async checkSession(): Promise<LiquidAuthAPIJSON | null> {
     this.modal.hide();
     return Promise.resolve(walletAccounts);
   }
-  
-  public disconnect(): Promise<void> {
+
+  async logOutSession(): Promise<boolean> {
+    console.log("log out session inside!");
+    try {
+        const response = await fetch(`${window.origin}/auth/logout`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.status === 302) {
+            console.log('Successfully logged out and redirected.');
+            return true;
+        } else {
+            console.log('Failed to log out.');
+            return false;
+        }
+    } catch (error) {
+        console.error('Error logging out:', error);
+        return false;
+    }
+  }
+
+  public async disconnect(): Promise<void> {
+    // Reset the state variable
+    this.linkedBool = false;
+
+    // built in BaseWallet method that clears active wallet
+    this.onDisconnect();
+
+    if (this.modal) {
+      // Remove any event listeners to prevent memory leaks
+      this.modal.cleanUp;
+
+      // Set the modal reference to null
+      this.modal = null;
+    }
+    
+    // Kills socket etc connections
     this.client.close();
 
-    // clean up
-    /// clean up the modal, removing it from append
-    /// reset the variables and state
-    throw new Error('Method not implemented.');
+    const successfulLogout = await this.logOutSession();
+
+    if (successfulLogout) {
+      console.info(`[${this.metadata.name}] ✅ Disconnected.`);
+    } else {
+      console.error(`[${this.metadata.name}] ❌ Failed to disconnect.`);
+      throw Error('Failed to disconnect');
+    }
+
+
   }
   
   public resumeSession(): Promise<void> {
@@ -276,12 +318,13 @@ class LiquidAuthModal extends HTMLElement {
   altRequestId: string;
   client: SignalClient;
   RTC_CONFIGURATION: RTCConfiguration;
+  eventListeners: { element: HTMLElement, type: string, listener: EventListenerOrEventListenerObject }[] = [];
 
   constructor(parentProvider: LiquidWallet, client: SignalClient, RTC_CONFIGURATION: RTCConfiguration, requestId: string, altRequestId: string) {
     super();
     this.attachShadow({ mode: "open" });
 
-    this.parentProvider = parentProvider
+    this.parentProvider = parentProvider;
     this.client = client;
     this.RTC_CONFIGURATION = RTC_CONFIGURATION;
     this.requestId = requestId;
@@ -355,50 +398,39 @@ class LiquidAuthModal extends HTMLElement {
       this.modalElement = this.shadowRoot.querySelector('.liquid-auth-modal') as HTMLElement;
       this.closeButton = this.shadowRoot.querySelector('.close-button') as HTMLElement;
 
-      this.closeButton.addEventListener('click', () => {
-        this.hide();
-      });
+      const hideListener = () => this.hide();
+      this.closeButton.addEventListener('click', hideListener);
+      this.eventListeners.push({ element: this.closeButton, type: 'click', listener: hideListener });
 
       const startButton = this.shadowRoot.querySelector('#start') as HTMLButtonElement;
-      startButton.addEventListener('click', () => this.handleOfferClient());
-
+      const startListener = () => this.handleOfferClient();
+      startButton.addEventListener('click', startListener);
+      this.eventListeners.push({ element: startButton, type: 'click', listener: startListener });
     }
   }
 
-  /**
-  * Handle the data channel
-  * @param _dataChannel
-  */
   handleDataChannel(_dataChannel: RTCDataChannel) {
-    //this.dataChannel = dataChannel;
     console.log("hello");
   }
 
-  /**
-  * Create a peer connection, wait for an offer and send an answer to the remote client
-  */
   async handleOfferClient() {
     const qrLinkElement = this.shadowRoot!.querySelector('#qr-link') as HTMLAnchorElement;
 
     if (qrLinkElement) {
       qrLinkElement.href = 'https://github.com/algorandfoundation/liquid-auth-js';
 
-      // Peer to the remote client and await their offer
       console.log('requestId', this.requestId);
       this.client.peer(this.requestId, 'offer', this.RTC_CONFIGURATION).then(this.handleDataChannel);
-      // Once the link message is received by the remote wallet, hide the offer
+
       this.client.on('link-message', (message) => {
-        // Pass along to the parent provider that the link message has been received
-        this.parentProvider.onLinkMessage(message)
+        this.parentProvider.onLinkMessage(message);
 
         const offerElement = this.shadowRoot!.querySelector('.offer') as HTMLElement;
         if (offerElement) {
           offerElement.classList.add('hidden');
         }
-
       });
 
-      // Update the render
       const image = this.shadowRoot!.querySelector('#liquid-qr-code') as HTMLImageElement;
       if (image) {
         image.src = await this.client.qrCode();
@@ -419,6 +451,17 @@ class LiquidAuthModal extends HTMLElement {
     }
   }
 
+  public cleanUp() {
+    // Remove all event listeners to prevent memory leaks
+    this.eventListeners.forEach(({ element, type, listener }) => {
+      element.removeEventListener(type, listener);
+    });
+    this.eventListeners = [];
+
+    // Remove the modal from the DOM
+    document.body.removeChild(this);
+  }
+
 
   show() {
     this.localIdElement.textContent = `Local ID: ${this.requestId}`;
@@ -427,9 +470,7 @@ class LiquidAuthModal extends HTMLElement {
 
   hide() {
     this.modalElement.classList.add('hidden');
-    // Fallback: Directly set display to none
     this.modalElement.style.display = 'none';
   }
 }
-
 customElements.define('liquid-auth-modal', LiquidAuthModal);
