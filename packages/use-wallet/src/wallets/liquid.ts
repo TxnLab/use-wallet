@@ -129,6 +129,10 @@ export class LiquidWallet extends BaseWallet{
     icon: ICON
   }
 
+  public setDataChannel(dc: RTCDataChannel) {
+    this.dataChannel = dc
+  }
+
   // Method to handle link message and update linked state
   async onLinkMessage(message: any) {
     if (message.wallet) {
@@ -151,7 +155,6 @@ export class LiquidWallet extends BaseWallet{
  * @returns 
  */
 async checkSession(): Promise<LiquidAuthAPIJSON | null> {
-  console.log("check session inside!");
   try {
     const response = await fetch(`${window.origin}/auth/session`, {
       method: 'GET',
@@ -232,7 +235,6 @@ async checkSession(): Promise<LiquidAuthAPIJSON | null> {
   }
 
   async logOutSession(): Promise<boolean> {
-    console.log("log out session inside!");
     try {
         const response = await fetch(`${window.origin}/auth/logout`, {
             method: 'GET',
@@ -240,12 +242,20 @@ async checkSession(): Promise<LiquidAuthAPIJSON | null> {
                 'Content-Type': 'application/json'
             }
         });
+        if (response.status === 302 || response.status === 200) {
+          // Perform the checkSession call
+          const sessionStatus = await this.checkSession();
 
-        if (response.status === 302) {
-            console.log('Successfully logged out and redirected.');
-            return true;
+          // Verify that the user is set to null
+          if (sessionStatus?.user === null) {
+            console.log('Successfully logged.');
+            return true
+          } else {
+            console.error('Logout failed: User is still logged in.');
+            return false;
+          }
         } else {
-            console.log('Failed to log out.');
+            console.log('Failed to log out, received code: ', response.status);
             return false;
         }
     } catch (error) {
@@ -284,8 +294,10 @@ async checkSession(): Promise<LiquidAuthAPIJSON | null> {
 
   }
   
+  // Liquid Auth in its current form does not allow for session resumption
+  // A new session must be created each time a user shuts down their browser.
   public resumeSession(): Promise<void> {
-    throw new Error('Method not implemented.');
+    return this.disconnect()
   }
   
   public signTransactions<T extends algosdk.Transaction[] | Uint8Array[]>(
@@ -294,16 +306,23 @@ async checkSession(): Promise<LiquidAuthAPIJSON | null> {
   ): Promise<(Uint8Array | null)[]> {
 
   // trick should be here: https://github.com/algorandfoundation/liquid-auth-android/blob/dbbd796b19c050399bb88552bb529fd135957bc9/demo/src/main/java/foundation/algorand/demo/AnswerActivity.kt#L494
-  
+  // with algo-models: https://github.com/algorandfoundation/liquid-auth-android/pull/20/files#diff-ad0fe0ca3a1c05cd934dadda2fcc2e7f09cef3b0580ce9a03ecacf0b0c656e6cR497
   // send the transaction bytes with the data channel, using "type": "transaction"
   // receive the signed transaction bytes with the data channel, using "type": "transaction-signature"
 
-  const transactionBytesJson = JSON.stringify(_txnGroup)
-  this.dataChannel!.send('transaction')
+  //_txnGroup
+  const msgToApp = {
+    type: "transaction",
+    txn: _txnGroup[0]
+  }
+  console.log(msgToApp)
 
-  // long term needs to be an authentication process, so that MITM attacks cannot replace the transaction bytes
+  // const transactionBytesJson = JSON.stringify(_txnGroup[0])
+  //const transactionBytesJson = JSON.stringify(_txnGroup)
+  this.dataChannel!.send(JSON.stringify(msgToApp))
 
-    throw new Error('Method not implemented.');
+
+  throw new Error('Method not implemented.');
   }
 }
   
@@ -409,8 +428,12 @@ class LiquidAuthModal extends HTMLElement {
     }
   }
 
-  handleDataChannel(_dataChannel: RTCDataChannel) {
+  handleDataChannel = (_dataChannel: RTCDataChannel) => {
     console.log("hello");
+    _dataChannel.onmessage = (e) => {
+        console.log('Received message:', e.data);
+    }
+    this.parentProvider.setDataChannel(_dataChannel);
   }
 
   async handleOfferClient() {
