@@ -1,9 +1,11 @@
 import { BaseWallet } from 'src/wallets/base'
 import { WalletAccount, WalletConstructor, WalletId } from './types'
 import { SignalClient } from '@algorandfoundation/liquid-client'
-import algosdk from 'algosdk'
+import {Transaction, decodeUnsignedTransaction,   waitForConfirmation, makePaymentTxnWithSuggestedParamsFromObject, encodeUnsignedTransaction} from 'algosdk'
 import { Store } from '@tanstack/store'
 import { addWallet, State, WalletState } from 'src/store'
+import { IARC0001Transaction, ResponseMessage,  Results, toSignTransactionsParamsRequestMessage, RequestMessageBuilder, SignTransactionsParamsBuilder, toBase64URL, fromBase64Url } from '@algorandfoundation/provider'
+import { decode, encode } from 'cbor-x'
 
 export type LiquidOptions = {
   RTC_config_username: string,
@@ -299,32 +301,77 @@ async checkSession(): Promise<LiquidAuthAPIJSON | null> {
   public resumeSession(): Promise<void> {
     return this.disconnect()
   }
+
+
+
+  ////////////////
+  attachEncodedSignature(address: string, txn: string, signature: string){
+    return decodeUnsignedTransaction(fromBase64Url(txn))
+      .attachSignature(address, fromBase64Url(signature));
+  }
+  attachSignedTransactionsFromResult(address: string, result: Results, txns: IARC0001Transaction[]){
+    let stxns = [];
+    for(let i = 0; i < txns.length; i++){
+      stxns.push(this.attachEncodedSignature(address, txns[i].txn, result.stxns[i]!!))
+    }
+    return stxns
+  }
   
-  public signTransactions<T extends algosdk.Transaction[] | Uint8Array[]>(
+  fromResult(result: string): ResponseMessage {
+    return decode(fromBase64Url(result)) as ResponseMessage
+  }
+  
+  public async signTransactions<T extends Transaction[] | Uint8Array[]>(
     _txnGroup: T | T[],
     _indexesToSign?: number[]
   ): Promise<(Uint8Array | null)[]> {
 
-  // trick should be here: https://github.com/algorandfoundation/liquid-auth-android/blob/dbbd796b19c050399bb88552bb529fd135957bc9/demo/src/main/java/foundation/algorand/demo/AnswerActivity.kt#L494
-  // with algo-models: https://github.com/algorandfoundation/liquid-auth-android/pull/20/files#diff-ad0fe0ca3a1c05cd934dadda2fcc2e7f09cef3b0580ce9a03ecacf0b0c656e6cR497
-  // send the transaction bytes with the data channel, using "type": "transaction"
-  // receive the signed transaction bytes with the data channel, using "type": "transaction-signature"
+  const messageId = SignalClient.generateRequestId() // just used to generate a random unique id
+  const providerId = "02657eaf-be17-4efc-b0a4-19d654b2448e" // just a string to identify the provider
 
-  //_txnGroup
-  const msgToApp = {
-    type: "transaction",
-    txn: _txnGroup[0]
+  console.log("generatedt message id:", messageId)
+
+  if (!this.dataChannel) {
+    throw new Error('Data channel not set');
   }
-  console.log(msgToApp)
 
-  // const transactionBytesJson = JSON.stringify(_txnGroup[0])
-  //const transactionBytesJson = JSON.stringify(_txnGroup)
-  this.dataChannel!.send(JSON.stringify(msgToApp))
+  // Prepare the Data Channel for responses
+  const awaitResponse = (): Promise<(Uint8Array | null)[]> => new Promise((resolve, reject) => {
+    if (this.dataChannel) {
+      this.dataChannel.onmessage = async (evt: { data: string }) => {
 
+        const message = decode(fromBase64Url(evt.data));
+        // Handle message types and create response
 
-  throw new Error('Method not implemented.');
-  }
-}
+        console.log("message:", message);
+        if (message.reference === 'arc0027:sign_transactions:response') {
+          // Make sure it's the appropriate message we are attaching the signature to
+          if (message.requestId !== messageId) return;
+
+          const encodedSignatures = message.result.stxns;
+
+          // Attach Signature Example:
+          const transactionsToSend = (_txnGroup as Transaction[]).map((txn, idx) => {
+            return txn.attachSignature(this.activeAddress!, fromBase64Url(encodedSignatures[idx]));
+          });
+
+          resolve(transactionsToSend);
+        }
+    };
+  }});
+
+  const encodedStr = toSignTransactionsParamsRequestMessage(
+    messageId,
+    providerId,
+    _txnGroup.map((txn) => ({ txn: toBase64URL(encodeUnsignedTransaction(txn as Transaction)) }))
+  );
+
+  // Send the Request Message
+  this.dataChannel.send(encodedStr);
+
+  // Await the message response
+  return await awaitResponse();
+}}
   
 /* ----------- UI Component ----------- */
 
@@ -497,3 +544,4 @@ class LiquidAuthModal extends HTMLElement {
   }
 }
 customElements.define('liquid-auth-modal', LiquidAuthModal);
+
