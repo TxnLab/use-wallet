@@ -1,3 +1,9 @@
+## [3.1.6](https://github.com/txnlab/use-wallet/compare/v3.1.5...v3.1.6) (2024-08-29)
+
+### Bug Fixes
+
+- **Core:** Initialize manager with active network from persisted state ([#221](https://github.com/txnlab/use-wallet/pull/221)) ([2ff796b](https://github.com/txnlab/use-wallet/commit/2ff796b74c1e16927ce3739ff5980ef655c4e08a))
+
 ## [3.1.5](https://github.com/txnlab/use-wallet/compare/v3.1.4...v3.1.5) (2024-08-21)
 
 ### Bug Fixes
