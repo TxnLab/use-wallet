@@ -40,7 +40,17 @@ export class WalletManager {
   public _clients: Map<WalletId, BaseWallet> = new Map()
 
   public networkConfig: NetworkConfigMap
-  public algodClient: algosdk.Algodv2
+
+  public get algodClient(): algosdk.Algodv2 {
+    return this.store.state.algodClient
+  }
+
+  public set algodClient(algodClient: algosdk.Algodv2) {
+    this.store.setState((state) => ({
+      ...state,
+      algodClient
+    }))
+  }
 
   public store: Store<State>
   public subscribe: (callback: (state: State) => void) => () => void
@@ -50,6 +60,11 @@ export class WalletManager {
       ...defaultState,
       activeNetwork: network
     }
+
+    this.networkConfig = this.initNetworkConfig(network, algod)
+    initialState.algodClient = this.createAlgodClient(
+      this.networkConfig[initialState.activeNetwork]
+    )
 
     this.store = new Store<State>(initialState, {
       onUpdate: () => this.savePersistedState()
@@ -65,9 +80,6 @@ export class WalletManager {
       return unsubscribe
     }
 
-    this.networkConfig = this.initNetworkConfig(network, algod)
-    this.algodClient = this.createAlgodClient(this.networkConfig[initialState.activeNetwork])
-
     this.initializeWallets(wallets)
   }
 
@@ -79,7 +91,7 @@ export class WalletManager {
       if (serializedState === null) {
         return null
       }
-      const parsedState = JSON.parse(serializedState)
+      const parsedState = JSON.parse(serializedState) as Omit<State, 'algodClient'>
       if (!isValidState(parsedState)) {
         console.warn('[Store] Parsed state:', parsedState)
         throw new Error('Persisted state is invalid')
@@ -93,7 +105,8 @@ export class WalletManager {
 
   private savePersistedState(): void {
     try {
-      const state = this.store.state
+      const state = { ...this.store.state } as any
+      delete state.algodClient
       const serializedState = JSON.stringify(state)
       StorageAdapter.setItem(LOCAL_STORAGE_KEY, serializedState)
     } catch (error) {
@@ -205,7 +218,7 @@ export class WalletManager {
   }
 
   private createAlgodClient(config: AlgodConfig): algosdk.Algodv2 {
-    console.info(`[Manager] Creating Algodv2 client for ${this.activeNetwork}...`)
+    if (this.store) console.info(`[Manager] Creating Algodv2 client for ${this.activeNetwork}...`)
     const { token = '', baseServer, port = '', headers = {} } = config
     return new algosdk.Algodv2(token, baseServer, port, headers)
   }
@@ -219,8 +232,8 @@ export class WalletManager {
       return
     }
 
-    setActiveNetwork(this.store, { networkId })
-    this.algodClient = this.createAlgodClient(this.networkConfig[networkId])
+    const algodClient = this.createAlgodClient(this.networkConfig[networkId])
+    setActiveNetwork(this.store, { networkId }, algodClient)
 
     console.info(`[Manager] ✅ Active network set to ${networkId}.`)
   }

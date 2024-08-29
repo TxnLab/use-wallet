@@ -303,11 +303,10 @@ describe('WalletManager', () => {
 
   describe('savePersistedState', () => {
     it('saves state to local storage', async () => {
-      const stateToSave: State = {
+      const stateToSave: Omit<State, 'algodClient'> = {
         wallets: {},
         activeWallet: null,
-        activeNetwork: NetworkId.MAINNET,
-        algodClient: new Algodv2('', 'https://testnet-api.algonode.cloud/')
+        activeNetwork: NetworkId.MAINNET
       }
 
       const manager = new WalletManager({
