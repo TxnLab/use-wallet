@@ -426,8 +426,7 @@ describe('Mutations', () => {
       expect(store.state.activeNetwork).toBe(NetworkId.TESTNET)
 
       const networkId = NetworkId.MAINNET
-      const algodClient = new Algodv2('', 'https://mainnet-api.algonode.cloud/')
-      setActiveNetwork(store, { networkId }, algodClient)
+      setActiveNetwork(store, { networkId })
       expect(store.state.activeNetwork).toBe(networkId)
     })
   })

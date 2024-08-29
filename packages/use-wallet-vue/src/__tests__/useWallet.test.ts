@@ -301,8 +301,7 @@ describe('useWallet', () => {
       mockSetAlgodClient(newAlgodClient)
       mockWalletManager.store.setState((state) => ({
         ...state,
-        activeNetwork: networkId,
-        algodClient: newAlgodClient
+        activeNetwork: networkId
       }))
     }
 

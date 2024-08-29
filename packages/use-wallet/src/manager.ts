@@ -46,12 +46,9 @@ export class WalletManager {
   public subscribe: (callback: (state: State) => void) => () => void
 
   constructor({ wallets = [], network = NetworkId.TESTNET, algod = {} }: WalletManagerConfig = {}) {
-    this.networkConfig = this.initNetworkConfig(network, algod)
-
     const initialState = this.loadPersistedState() || {
       ...defaultState,
-      activeNetwork: network,
-      algodClient: this.createAlgodClient(this.networkConfig[network])
+      activeNetwork: network
     }
 
     this.store = new Store<State>(initialState, {
@@ -68,6 +65,7 @@ export class WalletManager {
       return unsubscribe
     }
 
+    this.networkConfig = this.initNetworkConfig(network, algod)
     this.algodClient = this.createAlgodClient(this.networkConfig[initialState.activeNetwork])
 
     this.initializeWallets(wallets)
@@ -207,7 +205,7 @@ export class WalletManager {
   }
 
   private createAlgodClient(config: AlgodConfig): algosdk.Algodv2 {
-    if (this.store) console.info(`[Manager] Creating Algodv2 client for ${this.activeNetwork}...`)
+    console.info(`[Manager] Creating Algodv2 client for ${this.activeNetwork}...`)
     const { token = '', baseServer, port = '', headers = {} } = config
     return new algosdk.Algodv2(token, baseServer, port, headers)
   }
@@ -221,8 +219,8 @@ export class WalletManager {
       return
     }
 
+    setActiveNetwork(this.store, { networkId })
     this.algodClient = this.createAlgodClient(this.networkConfig[networkId])
-    setActiveNetwork(this.store, { networkId }, this.algodClient)
 
     console.info(`[Manager] ✅ Active network set to ${networkId}.`)
   }

@@ -50,8 +50,7 @@ export const useWallet = () => {
 
     manager.store.setState((state) => ({
       ...state,
-      activeNetwork: networkId,
-      algodClient: newClient
+      activeNetwork: networkId
     }))
 
     console.info(`[React] ✅ Active network set to ${networkId}.`)

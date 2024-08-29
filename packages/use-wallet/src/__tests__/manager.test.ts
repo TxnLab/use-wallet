@@ -307,7 +307,7 @@ describe('WalletManager', () => {
         wallets: {},
         activeWallet: null,
         activeNetwork: NetworkId.MAINNET,
-        algodClient: new Algodv2('', 'https://mainnet-api.algonode.cloud/')
+        algodClient: new Algodv2('', 'https://testnet-api.algonode.cloud/')
       }
 
       const manager = new WalletManager({
