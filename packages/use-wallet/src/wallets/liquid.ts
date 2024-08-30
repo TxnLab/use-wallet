@@ -1,11 +1,11 @@
 import { BaseWallet } from 'src/wallets/base'
 import { WalletAccount, WalletConstructor, WalletId } from './types'
 import { SignalClient } from '@algorandfoundation/liquid-client'
-import {Transaction, decodeUnsignedTransaction,   waitForConfirmation, makePaymentTxnWithSuggestedParamsFromObject, encodeUnsignedTransaction} from 'algosdk'
+import {Transaction, encodeUnsignedTransaction} from 'algosdk'
 import { Store } from '@tanstack/store'
 import { addWallet, State, WalletState } from 'src/store'
-import { IARC0001Transaction, ResponseMessage,  Results, toSignTransactionsParamsRequestMessage, RequestMessageBuilder, SignTransactionsParamsBuilder, toBase64URL, fromBase64Url } from '@algorandfoundation/provider'
-import { decode, encode } from 'cbor-x'
+import { toSignTransactionsParamsRequestMessage, toBase64URL, fromBase64Url } from '@algorandfoundation/provider'
+import { decode } from 'cbor-x'
 
 export type LiquidOptions = {
   RTC_config_username: string,
@@ -302,25 +302,6 @@ async checkSession(): Promise<LiquidAuthAPIJSON | null> {
     return this.disconnect()
   }
 
-
-
-  ////////////////
-  attachEncodedSignature(address: string, txn: string, signature: string){
-    return decodeUnsignedTransaction(fromBase64Url(txn))
-      .attachSignature(address, fromBase64Url(signature));
-  }
-  attachSignedTransactionsFromResult(address: string, result: Results, txns: IARC0001Transaction[]){
-    let stxns = [];
-    for(let i = 0; i < txns.length; i++){
-      stxns.push(this.attachEncodedSignature(address, txns[i].txn, result.stxns[i]!!))
-    }
-    return stxns
-  }
-  
-  fromResult(result: string): ResponseMessage {
-    return decode(fromBase64Url(result)) as ResponseMessage
-  }
-  
   public async signTransactions<T extends Transaction[] | Uint8Array[]>(
     _txnGroup: T | T[],
     _indexesToSign?: number[]
@@ -329,21 +310,19 @@ async checkSession(): Promise<LiquidAuthAPIJSON | null> {
   const messageId = SignalClient.generateRequestId() // just used to generate a random unique id
   const providerId = "02657eaf-be17-4efc-b0a4-19d654b2448e" // just a string to identify the provider
 
-  console.log("generatedt message id:", messageId)
-
   if (!this.dataChannel) {
-    throw new Error('Data channel not set');
+    throw new Error('Data channel not set yet!');
   }
 
   // Prepare the Data Channel for responses
-  const awaitResponse = (): Promise<(Uint8Array | null)[]> => new Promise((resolve, reject) => {
+  const awaitResponse = (): Promise<(Uint8Array | null)[]> => new Promise((resolve) => {
     if (this.dataChannel) {
       this.dataChannel.onmessage = async (evt: { data: string }) => {
 
         const message = decode(fromBase64Url(evt.data));
         // Handle message types and create response
 
-        console.log("message:", message);
+        console.log("Received message:", message);
         if (message.reference === 'arc0027:sign_transactions:response') {
           // Make sure it's the appropriate message we are attaching the signature to
           if (message.requestId !== messageId) return;
@@ -372,7 +351,7 @@ async checkSession(): Promise<LiquidAuthAPIJSON | null> {
   // Await the message response
   return await awaitResponse();
 }}
-  
+
 /* ----------- UI Component ----------- */
 
 class LiquidAuthModal extends HTMLElement {
@@ -476,7 +455,6 @@ class LiquidAuthModal extends HTMLElement {
   }
 
   handleDataChannel = (_dataChannel: RTCDataChannel) => {
-    console.log("hello");
     _dataChannel.onmessage = (e) => {
         console.log('Received message:', e.data);
     }
@@ -488,8 +466,6 @@ class LiquidAuthModal extends HTMLElement {
 
     if (qrLinkElement) {
       qrLinkElement.href = 'https://github.com/algorandfoundation/liquid-auth-js';
-
-      console.log('requestId', this.requestId);
       this.client.peer(this.requestId, 'offer', this.RTC_CONFIGURATION).then(this.handleDataChannel);
 
       this.client.on('link-message', (message) => {
