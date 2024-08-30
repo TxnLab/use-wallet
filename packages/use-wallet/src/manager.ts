@@ -36,35 +36,30 @@ export interface WalletManagerConfig {
   algod?: NetworkConfig
 }
 
+export type PersistedState = Omit<State, 'algodClient'>
+
 export class WalletManager {
   public _clients: Map<WalletId, BaseWallet> = new Map()
 
   public networkConfig: NetworkConfigMap
 
-  public get algodClient(): algosdk.Algodv2 {
-    return this.store.state.algodClient
-  }
-
-  public set algodClient(algodClient: algosdk.Algodv2) {
-    this.store.setState((state) => ({
-      ...state,
-      algodClient
-    }))
-  }
-
   public store: Store<State>
   public subscribe: (callback: (state: State) => void) => () => void
 
   constructor({ wallets = [], network = NetworkId.TESTNET, algod = {} }: WalletManagerConfig = {}) {
-    const initialState = this.loadPersistedState() || {
-      ...defaultState,
-      activeNetwork: network
-    }
-
     this.networkConfig = this.initNetworkConfig(network, algod)
-    initialState.algodClient = this.createAlgodClient(
-      this.networkConfig[initialState.activeNetwork]
-    )
+
+    const persistedState = this.loadPersistedState()
+    const initialState: State = persistedState
+      ? {
+          ...persistedState,
+          algodClient: this.createAlgodClient(this.networkConfig[persistedState.activeNetwork])
+        }
+      : {
+          ...defaultState,
+          activeNetwork: network,
+          algodClient: this.createAlgodClient(this.networkConfig[network])
+        }
 
     this.store = new Store<State>(initialState, {
       onUpdate: () => this.savePersistedState()
@@ -85,18 +80,29 @@ export class WalletManager {
 
   // ---------- Store ------------------------------------------------- //
 
-  private loadPersistedState(): State | null {
+  public get algodClient(): algosdk.Algodv2 {
+    return this.store.state.algodClient
+  }
+
+  public set algodClient(algodClient: algosdk.Algodv2) {
+    this.store.setState((state) => ({
+      ...state,
+      algodClient
+    }))
+  }
+
+  private loadPersistedState(): PersistedState | null {
     try {
       const serializedState = StorageAdapter.getItem(LOCAL_STORAGE_KEY)
       if (serializedState === null) {
         return null
       }
-      const parsedState = JSON.parse(serializedState) as Omit<State, 'algodClient'>
+      const parsedState = JSON.parse(serializedState)
       if (!isValidState(parsedState)) {
         console.warn('[Store] Parsed state:', parsedState)
         throw new Error('Persisted state is invalid')
       }
-      return parsedState as State
+      return parsedState as PersistedState
     } catch (error: any) {
       console.error(`[Store] Could not load state from local storage: ${error.message}`)
       return null
@@ -105,9 +111,9 @@ export class WalletManager {
 
   private savePersistedState(): void {
     try {
-      const state = { ...this.store.state } as any
-      delete state.algodClient
-      const serializedState = JSON.stringify(state)
+      const { wallets, activeWallet, activeNetwork } = this.store.state
+      const persistedState: PersistedState = { wallets, activeWallet, activeNetwork }
+      const serializedState = JSON.stringify(persistedState)
       StorageAdapter.setItem(LOCAL_STORAGE_KEY, serializedState)
     } catch (error) {
       console.error('[Store] Could not save state to local storage:', error)
@@ -233,7 +239,7 @@ export class WalletManager {
     }
 
     const algodClient = this.createAlgodClient(this.networkConfig[networkId])
-    setActiveNetwork(this.store, { networkId }, algodClient)
+    setActiveNetwork(this.store, { networkId, algodClient })
 
     console.info(`[Manager] ✅ Active network set to ${networkId}.`)
   }
