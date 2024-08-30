@@ -209,7 +209,7 @@ export class KibisisWallet extends BaseWallet {
       )
 
       const module = await import('@agoralabs-sh/avm-web-provider')
-      this.avmWebProviderSDK = module.default ? module.default.avmWebProviderSDK : module.avmWebProviderSDK
+      this.avmWebProviderSDK = module.default ? module.default : module
       
       if (!this.avmWebProviderSDK) {
         throw new Error(
