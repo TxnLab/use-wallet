@@ -1,3 +1,21 @@
+## [3.1.6](https://github.com/txnlab/use-wallet/compare/v3.1.5...v3.1.6) (2024-08-29)
+
+### Bug Fixes
+
+- **Core:** Initialize manager with active network from persisted state ([#221](https://github.com/txnlab/use-wallet/pull/221)) ([2ff796b](https://github.com/txnlab/use-wallet/commit/2ff796b74c1e16927ce3739ff5980ef655c4e08a))
+
+## [3.1.5](https://github.com/txnlab/use-wallet/compare/v3.1.4...v3.1.5) (2024-08-21)
+
+### Bug Fixes
+
+- **Core:** Immutable state updates in store mutation functions ([#220](https://github.com/txnlab/use-wallet/pull/220)) ([22421d4](https://github.com/txnlab/use-wallet/commit/22421d4951454bf62357d8872942b5dca933b958))
+
+## [3.1.4](https://github.com/txnlab/use-wallet/compare/v3.1.3...v3.1.4) (2024-08-19)
+
+### Bug Fixes
+
+- **WalletConnect:** Handle untyped byte arrays returned by sign request ([#218](https://github.com/txnlab/use-wallet/pull/218)) ([9a39164](https://github.com/txnlab/use-wallet/commit/9a39164c5e58fa2673f52297f04ab72180c53b51))
+
 ## [3.1.3](https://github.com/txnlab/use-wallet/compare/v3.1.2...v3.1.3) (2024-08-10)
 
 ### Bug Fixes
