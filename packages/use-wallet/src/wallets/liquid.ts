@@ -1,20 +1,36 @@
-import { BaseWallet } from 'src/wallets/base'
-import { WalletAccount, WalletConstructor, WalletId } from './types'
-import { SignalClient } from '@algorandfoundation/liquid-client'
-import {Transaction, encodeUnsignedTransaction} from 'algosdk'
-import { Store } from '@tanstack/store'
-import { addWallet, State, WalletState } from 'src/store'
-import { toSignTransactionsParamsRequestMessage, toBase64URL, fromBase64Url } from '@algorandfoundation/provider'
-import { decode } from 'cbor-x'
+import { BaseWallet } from 'src/wallets/base';
+import { WalletAccount, WalletConstructor, WalletId } from './types';
+import { Store } from '@tanstack/store';
+import { addWallet, State, WalletState } from 'src/store';
+import { SignalClient } from '@algorandfoundation/liquid-client';
+import { decode } from 'cbor-x';
+import { fromBase64Url, toBase64URL, toSignTransactionsParamsRequestMessage } from '@algorandfoundation/provider';
+import { Transaction, encodeUnsignedTransaction } from 'algosdk';
 
-export type LiquidOptions = {
-  RTC_config_username: string,
-  RTC_config_credential: string,
-  // TODO: RTC_CONFIGURATION should be configurable, and not hard-coded to Nodely's TURN servers
+// TODO: get an SVG for a proper icon
+const ICON = `<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="249" height="249" viewBox="0 0 249 249" xml:space="preserve">
+<desc>Created with Fabric.js 3.6.6</desc>
+<defs>
+</defs>
+<g transform="matrix(2.52 0 0 2.52 124.74 124.74)"  >
+<circle style="stroke: rgb(0,0,0); stroke-width: 19; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"  cx="0" cy="0" r="40" />
+</g>
+<g transform="matrix(-1.16 -0.01 0.01 -0.97 125.63 187.7)"  >
+<path style="stroke: rgb(0,0,0); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(170,0,255); fill-rule: nonzero; opacity: 1;"  transform=" translate(-57.95, -28.98)" d="m 0 57.952755 l 0 0 c 0 -32.006424 25.946333 -57.952755 57.952755 -57.952755 c 32.006428 0 57.952755 25.946333 57.952755 57.952755 l -28.97638 0 c 0 -16.003212 -12.97316 -28.976377 -28.976376 -28.976377 c -16.003212 0 -28.976377 12.9731655 -28.976377 28.976377 z" stroke-linecap="round" />
+</g>
+<g transform="matrix(1.16 0 0 2.21 126.06 96.74)"  >
+<path style="stroke: rgb(255,4,233); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(170,0,255); fill-rule: nonzero; opacity: 1;"  transform=" translate(-57.95, -28.98)" d="m 0 57.952755 l 0 0 c 0 -32.006424 25.946333 -57.952755 57.952755 -57.952755 c 32.006428 0 57.952755 25.946333 57.952755 57.952755 l -28.97638 0 c 0 -16.003212 -12.97316 -28.976377 -28.976376 -28.976377 c -16.003212 0 -28.976377 12.9731655 -28.976377 28.976377 z" stroke-linecap="round" />
+</g>
+</svg>`
+
+
+export interface LiquidOptions {
+  RTC_config_username: string;
+  RTC_config_credential: string;
 }
 
-
-// Liquid Auth API JSON types
 interface PassKeyCredential {
   device: string;
   publicKey: string;
@@ -46,34 +62,10 @@ interface LiquidAuthAPIJSON {
   session: LiquidAuthSession;
 }
 
-
-
-// TODO: get an SVG for a proper icon
-const ICON = `<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="249" height="249" viewBox="0 0 249 249" xml:space="preserve">
-<desc>Created with Fabric.js 3.6.6</desc>
-<defs>
-</defs>
-<g transform="matrix(2.52 0 0 2.52 124.74 124.74)"  >
-<circle style="stroke: rgb(0,0,0); stroke-width: 19; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"  cx="0" cy="0" r="40" />
-</g>
-<g transform="matrix(-1.16 -0.01 0.01 -0.97 125.63 187.7)"  >
-<path style="stroke: rgb(0,0,0); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(170,0,255); fill-rule: nonzero; opacity: 1;"  transform=" translate(-57.95, -28.98)" d="m 0 57.952755 l 0 0 c 0 -32.006424 25.946333 -57.952755 57.952755 -57.952755 c 32.006428 0 57.952755 25.946333 57.952755 57.952755 l -28.97638 0 c 0 -16.003212 -12.97316 -28.976377 -28.976376 -28.976377 c -16.003212 0 -28.976377 12.9731655 -28.976377 28.976377 z" stroke-linecap="round" />
-</g>
-<g transform="matrix(1.16 0 0 2.21 126.06 96.74)"  >
-<path style="stroke: rgb(255,4,233); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(170,0,255); fill-rule: nonzero; opacity: 1;"  transform=" translate(-57.95, -28.98)" d="m 0 57.952755 l 0 0 c 0 -32.006424 25.946333 -57.952755 57.952755 -57.952755 c 32.006428 0 57.952755 25.946333 57.952755 57.952755 l -28.97638 0 c 0 -16.003212 -12.97316 -28.976377 -28.976376 -28.976377 c -16.003212 0 -28.976377 12.9731655 -28.976377 28.976377 z" stroke-linecap="round" />
-</g>
-</svg>`
-
-export class LiquidWallet extends BaseWallet{
-  protected store: Store<State>
-  private options: LiquidOptions
-  private client: SignalClient
-  private RTC_CONFIGURATION: RTCConfiguration
-  private modal: LiquidAuthModal | undefined | null
-  private dataChannel: RTCDataChannel | undefined
-  private linkedBool: boolean = false
+export class LiquidWallet extends BaseWallet {
+  protected store: Store<State>;
+  private authClient: LiquidAuthClient | undefined | null;
+  private options: LiquidOptions;
 
   constructor({
     id,
@@ -83,133 +75,26 @@ export class LiquidWallet extends BaseWallet{
     options,
     metadata = {},
   }: WalletConstructor<WalletId.LIQUID>) {
-    super({ id, metadata, getAlgodClient, store, subscribe })
+    super({ id, metadata, getAlgodClient, store, subscribe });
 
-    this.store = store
+    this.store = store;
     this.options = options ?? { RTC_config_username: 'username', RTC_config_credential: 'credential' }
-    this.client = new SignalClient(window.origin)
-    this.RTC_CONFIGURATION = {
-      iceServers: [
-          {
-              urls: [
-                  'stun:stun.l.google.com:19302',
-                  'stun:stun1.l.google.com:19302',
-                  'stun:stun2.l.google.com:19302',
-              ],
-          },
-          {
-              urls: [
-                  "turn:global.turn.nodely.network:80?transport=tcp",
-                  "turns:global.turn.nodely.network:443?transport=tcp",
-                  "turn:eu.turn.nodely.io:80?transport=tcp",
-                  "turns:eu.turn.nodely.io:443?transport=tcp",
-                  "turn:us.turn.nodely.io:80?transport=tcp",
-                  "turns:us.turn.nodely.io:443?transport=tcp",
-              ],
-              username: this.options.RTC_config_username,
-              credential: this.options.RTC_config_credential,
-          },
-          {
-              urls: [
-                  "turn:global.relay.metered.ca:80",
-                  "turn:global.relay.metered.ca:80?transport=tcp",
-                  "turn:global.relay.metered.ca:443",
-                  "turns:global.relay.metered.ca:443?transport=tcp"
-              ],
-              // default username and credential when the turn server doesn't
-              // use auth, the client still requires a value
-              username: this.options.RTC_config_username,
-              credential: this.options?.RTC_config_credential,
-          },
-      ],
-      iceCandidatePoolSize: 10,
-    }
+    this.authClient = new LiquidAuthClient(this.options);
   }
 
   static defaultMetadata = {
     name: 'Liquid',
     icon: ICON
-  }
-
-  public setDataChannel(dc: RTCDataChannel) {
-    this.dataChannel = dc
-  }
-
-  // Method to handle link message and update linked state
-  async onLinkMessage(message: any) {
-    if (message.wallet) {
-      const data = await this.checkSession()
-      if (data?.user?.wallet === message.wallet) {
-        // Confirm that the message sent over the wire is the same as what /auth/session returns
-        console.log('Session data:', data);
-          console.log('Wallet linked:', message.wallet);
-          this.linkedBool = true
-          return
-      }
-      throw new Error('Remote wallet address and /auth/session wallet address do not match')
-    }
-    throw new Error('Wallet field not part of link message')
-  }
-    
-
-/**
- * Check if a session exists on the /auth/session endpoint
- * @returns 
- */
-async checkSession(): Promise<LiquidAuthAPIJSON | null> {
-  try {
-    const response = await fetch(`${window.origin}/auth/session`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log('Session data:', data);
-      return data; // Directly return the parsed JSON data
-    } else {
-      console.log('No session found');
-      return null;
-    }
-  } catch (error) {
-    console.error('Error querying session:', error);
-    return null;
-  }
-}
+  };
 
   public async connect(_args?: Record<string, any>): Promise<WalletAccount[]> {
-    const requestId = SignalClient.generateRequestId();
-    const altRequestId = requestId;
-  
-    if (!this.modal) {
-      this.modal = new LiquidAuthModal(this, this.client, this.RTC_CONFIGURATION, requestId, altRequestId);
-      
-      // Append the modal to the document body
-      document.body.appendChild(this.modal);
+    if (!this.authClient) {
+      this.authClient = new LiquidAuthClient(this.options);
     }
-  
-    this.modal.show();
-    //this.dataChannel = this.modal.dataChannel
 
-    // Function to wait until linkedBool is true
-    const waitForLinkedBool = (): Promise<void> => {
-      return new Promise((resolve) => {
-        const checkLinkedBool = () => {
-          if (this.linkedBool) {
-            resolve();
-          } else {
-            setTimeout(checkLinkedBool, 100); // Check every 100ms
-          }
-        };
-        checkLinkedBool();
-      });
-    };
+    await this.authClient.connect();
 
-    await waitForLinkedBool();
-
-    const sessionData  = await this.checkSession();
+    const sessionData = await this.authClient.checkSession();
     const account = sessionData?.user?.wallet;
 
     if (!account) {
@@ -232,74 +117,23 @@ async checkSession(): Promise<LiquidAuthAPIJSON | null> {
     });
 
     console.info(`[${this.metadata.name}] ✅ Connected.`, walletState);
-    this.modal.hide();
+    this.authClient.hideModal();
     return Promise.resolve(walletAccounts);
   }
 
-  async logOutSession(): Promise<boolean> {
-    try {
-        const response = await fetch(`${window.origin}/auth/logout`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        if (response.status === 302 || response.status === 200) {
-          // Perform the checkSession call
-          const sessionStatus = await this.checkSession();
-
-          // Verify that the user is set to null
-          if (sessionStatus?.user === null) {
-            console.log('Successfully logged.');
-            return true
-          } else {
-            console.error('Logout failed: User is still logged in.');
-            return false;
-          }
-        } else {
-            console.log('Failed to log out, received code: ', response.status);
-            return false;
-        }
-    } catch (error) {
-        console.error('Error logging out:', error);
-        return false;
-    }
-  }
-
   public async disconnect(): Promise<void> {
-    // Reset the state variable
-    this.linkedBool = false;
+    if (!this.authClient) {
+      throw new Error('No auth client found to disconnect from');
+    }
 
-    // built in BaseWallet method that clears active wallet
+    await this.authClient.disconnect();
     this.onDisconnect();
-
-    if (this.modal) {
-      // Remove any event listeners to prevent memory leaks
-      this.modal.cleanUp;
-
-      // Set the modal reference to null
-      this.modal = null;
-    }
-    
-    // Kills socket etc connections
-    this.client.close();
-
-    const successfulLogout = await this.logOutSession();
-
-    if (successfulLogout) {
-      console.info(`[${this.metadata.name}] ✅ Disconnected.`);
-    } else {
-      console.error(`[${this.metadata.name}] ❌ Failed to disconnect.`);
-      throw Error('Failed to disconnect');
-    }
-
-
+    console.info(`[${this.metadata.name}] ✅ Disconnected.`);
+    this.authClient = null;
   }
-  
-  // Liquid Auth in its current form does not allow for session resumption
-  // A new session must be created each time a user shuts down their browser.
+
   public resumeSession(): Promise<void> {
-    return this.disconnect()
+    return this.disconnect();
   }
 
   public async signTransactions<T extends Transaction[] | Uint8Array[]>(
@@ -307,75 +141,216 @@ async checkSession(): Promise<LiquidAuthAPIJSON | null> {
     _indexesToSign?: number[]
   ): Promise<(Uint8Array | null)[]> {
 
-  const messageId = SignalClient.generateRequestId() // just used to generate a random unique id
-  const providerId = "02657eaf-be17-4efc-b0a4-19d654b2448e" // just a string to identify the provider
+    if (!this.activeAddress) {
+      throw new Error('No active account');
+    }
 
-  if (!this.dataChannel) {
-    throw new Error('Data channel not set yet!');
+    return this.authClient!.signTransactions(_txnGroup, this.activeAddress, _indexesToSign);
+  }
+}
+
+
+class LiquidAuthClient {
+  public client: SignalClient;
+  private options: LiquidOptions;
+  public RTC_CONFIGURATION: RTCConfiguration;
+  private dataChannel: RTCDataChannel | undefined;
+  public linkedBool: boolean = false;
+  private modalElement: HTMLElement | undefined | null;
+  private requestId: string | undefined;
+  private altRequestId: string | undefined;
+  private eventListeners: { element: HTMLElement, type: string, listener: EventListenerOrEventListenerObject }[] = [];
+
+  constructor(options: LiquidOptions) {
+    this.options = options;
+    this.client = new SignalClient(window.origin);
+    this.RTC_CONFIGURATION = {
+      iceServers: [
+        {
+          urls: [
+            'stun:stun.l.google.com:19302',
+            'stun:stun1.l.google.com:19302',
+            'stun:stun2.l.google.com:19302',
+          ],
+        },
+        {
+          urls: [
+            "turn:global.turn.nodely.network:80?transport=tcp",
+            "turns:global.turn.nodely.network:443?transport=tcp",
+            "turn:eu.turn.nodely.io:80?transport=tcp",
+            "turns:eu.turn.nodely.io:443?transport=tcp",
+            "turn:us.turn.nodely.io:80?transport=tcp",
+            "turns:us.turn.nodely.io:443?transport=tcp",
+          ],
+          username: this.options.RTC_config_username,
+          credential: this.options.RTC_config_credential,
+        },
+        {
+          urls: [
+            "turn:global.relay.metered.ca:80",
+            "turn:global.relay.metered.ca:80?transport=tcp",
+            "turn:global.relay.metered.ca:443",
+            "turns:global.relay.metered.ca:443?transport=tcp"
+          ],
+          username: this.options.RTC_config_username,
+          credential: this.options.RTC_config_credential,
+        },
+      ],
+      iceCandidatePoolSize: 10,
+    };
+  }
+  public async connect(): Promise<void> {
+    const requestId = SignalClient.generateRequestId();
+    const altRequestId = requestId;
+
+    this.showModal(requestId, altRequestId);
+    await this.waitForLinkedBool();
   }
 
-  // Prepare the Data Channel for responses
-  const awaitResponse = (): Promise<(Uint8Array | null)[]> => new Promise((resolve) => {
-    if (this.dataChannel) {
-      this.dataChannel.onmessage = async (evt: { data: string }) => {
+  public async disconnect(): Promise<void> {
+    this.linkedBool = false;
+    this.client.close();
+    const successfulLogout = await this.logOutSession();
+    this.cleanUp();
 
-        const message = decode(fromBase64Url(evt.data));
-        // Handle message types and create response
+    if (!successfulLogout) {
+      throw new Error('Failed to disconnect');
+    }
+  }
 
-        console.log("Received message:", message);
-        if (message.reference === 'arc0027:sign_transactions:response') {
-          // Make sure it's the appropriate message we are attaching the signature to
-          if (message.requestId !== messageId) return;
+  public setDataChannel(dc: RTCDataChannel) {
+    this.dataChannel = dc;
+  }
 
-          const encodedSignatures = message.result.stxns;
+  async onLinkMessage(message: any) {
+    if (message.wallet) {
+      const data = await this.checkSession();
+      if (data?.user?.wallet === message.wallet) {
+        console.log('Session data:', data);
+        console.log('Wallet linked:', message.wallet);
+        this.linkedBool = true;
+        return;
+      }
+      throw new Error('Remote wallet address and /auth/session wallet address do not match');
+    }
+    throw new Error('Wallet field not part of link message');
+  }
 
-          // Attach Signature Example:
-          const transactionsToSend = (_txnGroup as Transaction[]).map((txn, idx) => {
-            return txn.attachSignature(this.activeAddress!, fromBase64Url(encodedSignatures[idx]));
-          });
-
-          resolve(transactionsToSend);
+  async checkSession(): Promise<LiquidAuthAPIJSON | null> {
+    try {
+      const response = await fetch(`${window.origin}/auth/session`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
         }
-    };
-  }});
+      });
 
-  const encodedStr = toSignTransactionsParamsRequestMessage(
-    messageId,
-    providerId,
-    _txnGroup.map((txn) => ({ txn: toBase64URL(encodeUnsignedTransaction(txn as Transaction)) }))
-  );
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Session data:', data);
+        return data;
+      } else {
+        console.log('No session found');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error querying session:', error);
+      return null;
+    }
+  }
 
-  // Send the Request Message
-  this.dataChannel.send(encodedStr);
+  async logOutSession(): Promise<boolean> {
+    try {
+      const response = await fetch(`${window.origin}/auth/logout`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      if (response.status === 302 || response.status === 200) {
+        const sessionStatus = await this.checkSession();
+        if (sessionStatus?.user === null) {
+          console.log('Successfully logged.');
+          return true;
+        } else {
+          console.error('Logout failed: User is still logged in.');
+          return false;
+        }
+      } else {
+        console.log('Failed to log out, received code: ', response.status);
+        return false;
+      }
+    } catch (error) {
+      console.error('Error logging out:', error);
+      return false;
+    }
+  }
 
-  // Await the message response
-  return await awaitResponse();
-}}
+  async signTransactions<T extends Transaction[] | Uint8Array[]>(
+    txnGroup: T | T[],
+    activeAddress: string,
+    _indexesToSign?: number[],
+  ): Promise<(Uint8Array | null)[]> {
 
-/* ----------- UI Component ----------- */
+    const messageId = SignalClient.generateRequestId();
+    const providerId = "02657eaf-be17-4efc-b0a4-19d654b2448e";
 
-class LiquidAuthModal extends HTMLElement {
-  parentProvider: LiquidWallet;
-  localIdElement!: HTMLElement;
-  modalElement!: HTMLElement;
-  closeButton!: HTMLElement;
-  requestId: string;
-  altRequestId: string;
-  client: SignalClient;
-  RTC_CONFIGURATION: RTCConfiguration;
-  eventListeners: { element: HTMLElement, type: string, listener: EventListenerOrEventListenerObject }[] = [];
+    if (!this.dataChannel) {
+      throw new Error('Data channel not set yet!');
+    }
 
-  constructor(parentProvider: LiquidWallet, client: SignalClient, RTC_CONFIGURATION: RTCConfiguration, requestId: string, altRequestId: string) {
-    super();
-    this.attachShadow({ mode: "open" });
+    const awaitResponse = (): Promise<(Uint8Array | null)[]> => new Promise((resolve) => {
+      if (this.dataChannel) {
+        this.dataChannel.onmessage = async (evt: { data: string }) => {
+          const message = decode(fromBase64Url(evt.data));
+          console.log("Received message:", message);
+          if (message.reference === 'arc0027:sign_transactions:response') {
+            if (message.requestId !== messageId) return;
+            const encodedSignatures = message.result.stxns;
+            const transactionsToSend = (txnGroup as Transaction[]).map((txn, idx) => {
+              return txn.attachSignature(activeAddress, fromBase64Url(encodedSignatures[idx]));
+            });
+            resolve(transactionsToSend);
+          }
+        };
+      }
+    });
 
-    this.parentProvider = parentProvider;
-    this.client = client;
-    this.RTC_CONFIGURATION = RTC_CONFIGURATION;
+    const encodedStr = toSignTransactionsParamsRequestMessage(
+      messageId,
+      providerId,
+      txnGroup.map((txn) => ({ txn: toBase64URL(encodeUnsignedTransaction(txn as Transaction)) }))
+    );
+
+    this.dataChannel.send(encodedStr);
+    return await awaitResponse();
+  }
+
+  public showModal(requestId: string, altRequestId: string) {
     this.requestId = requestId;
     this.altRequestId = altRequestId;
 
-    if (this.shadowRoot) {
+    if (!this.modalElement) {
+      this.modalElement = document.createElement('div');
+      this.modalElement.classList.add('liquid-auth-modal', 'hidden');
+      this.modalElement.innerHTML = `
+        <div class="modal-content">
+          <button class="close-button">x</button>
+          <div class="call-session">
+            <div class="offer">
+              <a id="qr-link" href="https://github.com/algorandfoundation/liquid-auth-js" target="_blank">
+                <img id="liquid-qr-code" src="" class="logo hidden" alt="Liquid QR Code" />
+              </a>
+              <hgroup>
+                <h1>Offer Client</h1>
+                <h2>Local ID: ${this.requestId}</h2>
+              </hgroup> 
+              <button id="start">Start</button>
+            </div>
+          </div>
+        </div>
+      `;
+
       const styleSheet = document.createElement("style");
       styleSheet.textContent = `
         .hidden {
@@ -411,84 +386,72 @@ class LiquidAuthModal extends HTMLElement {
           cursor: pointer;
           color: black;
         }
+        #liquid-qr-code {
+        width: 300px;
+        height: 300px;
+      }
       `;
 
-      const liquidAuthModal = document.createElement("template");
-      liquidAuthModal.innerHTML = `
-        <div class="liquid-auth-modal hidden">
-          <div class="modal-content">
-            <button class="close-button">x</button>
-            <div class="call-session">
-              <div class="offer">
-                <a id="qr-link" href="https://github.com/algorandfoundation/liquid-auth-js" target="_blank">
-                  <img id="liquid-qr-code" src="" class="logo hidden" alt="Liquid QR Code" />
-                </a>
-                <hgroup>
-                  <h1>Offer Client</h1>
-                  <h2>Local ID: ${this.requestId}</h2>
-                </hgroup> 
-                <button id="start">Start</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
+      this.modalElement.appendChild(styleSheet);
+      document.body.appendChild(this.modalElement);
 
-      this.shadowRoot.append(
-        liquidAuthModal.content.cloneNode(true),
-        styleSheet
-      );
+      const closeButton = this.modalElement.querySelector('.close-button') as HTMLElement;
+      const hideListener = () => this.hideModal();
+      closeButton.addEventListener('click', hideListener);
+      this.eventListeners.push({ element: closeButton, type: 'click', listener: hideListener });
 
-      this.localIdElement = this.shadowRoot.querySelector('.liquid-auth-modal h2') as HTMLElement;
-      this.modalElement = this.shadowRoot.querySelector('.liquid-auth-modal') as HTMLElement;
-      this.closeButton = this.shadowRoot.querySelector('.close-button') as HTMLElement;
-
-      const hideListener = () => this.hide();
-      this.closeButton.addEventListener('click', hideListener);
-      this.eventListeners.push({ element: this.closeButton, type: 'click', listener: hideListener });
-
-      const startButton = this.shadowRoot.querySelector('#start') as HTMLButtonElement;
+      const startButton = this.modalElement.querySelector('#start') as HTMLButtonElement;
       const startListener = () => this.handleOfferClient();
       startButton.addEventListener('click', startListener);
       this.eventListeners.push({ element: startButton, type: 'click', listener: startListener });
     }
+
+    this.modalElement.querySelector('h2')!.textContent = `Local ID: ${this.requestId}`;
+    this.modalElement.classList.remove('hidden');
   }
 
-  handleDataChannel = (_dataChannel: RTCDataChannel) => {
+  public hideModal() {
+    if (this.modalElement) {
+      this.modalElement.classList.add('hidden');
+      this.modalElement.style.display = 'none';
+    }
+  }
+
+  private handleDataChannel = (_dataChannel: RTCDataChannel) => {
     _dataChannel.onmessage = (e) => {
         console.log('Received message:', e.data);
     }
-    this.parentProvider.setDataChannel(_dataChannel);
+    this.setDataChannel(_dataChannel);
   }
 
-  async handleOfferClient() {
-    const qrLinkElement = this.shadowRoot!.querySelector('#qr-link') as HTMLAnchorElement;
+  private async handleOfferClient() {
+    const qrLinkElement = this.modalElement!.querySelector('#qr-link') as HTMLAnchorElement;
 
     if (qrLinkElement) {
       qrLinkElement.href = 'https://github.com/algorandfoundation/liquid-auth-js';
-      this.client.peer(this.requestId, 'offer', this.RTC_CONFIGURATION).then(this.handleDataChannel);
+      this.client.peer(this.requestId!, 'offer', this.RTC_CONFIGURATION).then(this.handleDataChannel);
 
       this.client.on('link-message', (message) => {
-        this.parentProvider.onLinkMessage(message);
+        this.onLinkMessage(message);
 
-        const offerElement = this.shadowRoot!.querySelector('.offer') as HTMLElement;
+        const offerElement = this.modalElement!.querySelector('.offer') as HTMLElement;
         if (offerElement) {
           offerElement.classList.add('hidden');
         }
       });
 
-      const image = this.shadowRoot!.querySelector('#liquid-qr-code') as HTMLImageElement;
+      const image = this.modalElement!.querySelector('#liquid-qr-code') as HTMLImageElement;
       if (image) {
         image.src = await this.client.qrCode();
         image.classList.remove('hidden');
       }
 
-      const deepLink = this.shadowRoot!.querySelector('#qr-link') as HTMLAnchorElement;
+      const deepLink = this.modalElement!.querySelector('#qr-link') as HTMLAnchorElement;
       if (deepLink) {
-        deepLink.href = this.client.deepLink(this.requestId);
+        deepLink.href = this.client.deepLink(this.requestId!);
       }
 
-      const startButton = this.shadowRoot!.querySelector('#start') as HTMLButtonElement;
+      const startButton = this.modalElement!.querySelector('#start') as HTMLButtonElement;
       if (startButton) {
         startButton.classList.add('hidden');
       }
@@ -498,26 +461,26 @@ class LiquidAuthModal extends HTMLElement {
   }
 
   public cleanUp() {
-    // Remove all event listeners to prevent memory leaks
     this.eventListeners.forEach(({ element, type, listener }) => {
       element.removeEventListener(type, listener);
     });
     this.eventListeners = [];
-
-    // Remove the modal from the DOM
-    document.body.removeChild(this);
+    if (this.modalElement) {
+      document.body.removeChild(this.modalElement);
+      this.modalElement = null;
+    }
   }
 
-
-  show() {
-    this.localIdElement.textContent = `Local ID: ${this.requestId}`;
-    this.modalElement.classList.remove('hidden');
-  }
-
-  hide() {
-    this.modalElement.classList.add('hidden');
-    this.modalElement.style.display = 'none';
+  public async waitForLinkedBool(): Promise<void> {
+    return new Promise((resolve) => {
+      const checkLinkedBool = () => {
+        if (this.linkedBool) {
+          resolve();
+        } else {
+          setTimeout(checkLinkedBool, 100);
+        }
+      };
+      checkLinkedBool();
+    });
   }
 }
-customElements.define('liquid-auth-modal', LiquidAuthModal);
-
