@@ -18,9 +18,6 @@ const walletManager = new WalletManager({
       options: { siteName: 'Example Site' }
     },
     {
-      id: WalletId.LIQUID,
-    },
-    {
       id: WalletId.MAGIC,
       options: { apiKey: 'pk_live_D17FD8D89621B5F3' }
     }
