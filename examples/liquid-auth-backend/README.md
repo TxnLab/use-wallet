@@ -118,9 +118,9 @@ Navigate to your static domain. You should be met with the frontend, e.g. exampl
 
 #### Ngrok & VPNs
 
-Ngrok does not play well with VPNs. Remember to disable it or you will see an error when visiting your
+Ngrok sometimes does not play well with VPNs, so you might need to disable it.
 
-#### Platfomr Error
+#### Platform Error
 
 You might get the following error:
 

@@ -1,7 +1,6 @@
 services:
   liquid-auth:
     image: ghcr.io/algorandfoundation/liquid-auth:develop
-    platform: linux/amd64
     restart: no
     env_file:
       - .env.docker
