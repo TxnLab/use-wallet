@@ -143,10 +143,14 @@ export function setAccounts(
   })
 }
 
-export function setActiveNetwork(store: Store<State>, { networkId }: { networkId: NetworkId }) {
+export function setActiveNetwork(
+  store: Store<State>,
+  { networkId, algodClient }: { networkId: NetworkId; algodClient: Algodv2 }
+) {
   store.setState((state) => ({
     ...state,
-    activeNetwork: networkId
+    activeNetwork: networkId,
+    algodClient
   }))
 }
 
