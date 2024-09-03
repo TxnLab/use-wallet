@@ -1,3 +1,9 @@
+# [3.2.0](https://github.com/txnlab/use-wallet/compare/v3.1.6...v3.2.0) (2024-09-03)
+
+### Features
+
+- **Core:** Move algod client to store ([#224](https://github.com/txnlab/use-wallet/pull/224)) ([07e7273](https://github.com/txnlab/use-wallet/commit/07e7273452ab49a54353c4d686b6b7dd4dddfac8))
+
 ## [3.1.6](https://github.com/txnlab/use-wallet/compare/v3.1.5...v3.1.6) (2024-08-29)
 
 ### Bug Fixes
