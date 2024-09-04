@@ -8,10 +8,82 @@
   "baseBranches": ["main"],
   "schedule": "on the 1st day of the month",
   "ignorePaths": ["**/node_modules/**"],
-  "semanticCommitScope": "deps",
+  "minimumReleaseAge": "3 days",
   "packageRules": [
     {
       "matchCategories": ["node"],
+      "enabled": false
+    },
+    {
+      "groupName": "algosdk",
+      "matchPackageNames": ["algosdk"],
+      "matchUpdateTypes": ["patch", "minor"]
+    },
+    {
+      "groupName": "Tanstack Store",
+      "matchPackageNames": ["@tanstack/**"],
+      "matchUpdateTypes": ["patch", "minor"]
+    },
+    {
+      "groupName": "Wallet dependencies",
+      "matchPackageNames": [
+        "@agoralabs-sh/avm-web-provider",
+        "@blockshake/defly-connect",
+        "@magic-ext/algorand",
+        "magic-sdk",
+        "@perawallet/connect",
+        "lute-connect",
+        "walletconnect"
+      ],
+      "matchUpdateTypes": ["patch", "minor"],
+      "rangeStrategy": "bump"
+    },
+    {
+      "groupName": "React",
+      "matchSourceUrls": ["https://github.com/facebook/react"],
+      "matchUpdateTypes": ["patch", "minor"]
+    },
+    {
+      "groupName": "React type definitions",
+      "matchPackageNames": ["@types/react", "@types/react-dom"],
+      "matchUpdateTypes": ["patch", "minor"]
+    },
+    {
+      "groupName": "Vue dependencies",
+      "matchPackageNames": ["vue", "!@tanstack/vue-store"],
+      "matchUpdateTypes": ["patch", "minor"]
+    },
+    {
+      "groupName": "SolidJS dependencies",
+      "matchPackageNames": ["solid", "!@tanstack/solid-store"],
+      "matchUpdateTypes": ["patch", "minor"]
+    },
+    {
+      "groupName": "Type definitions",
+      "matchPackageNames": ["@types/**", "!@types/react", "!@types/react-dom"],
+      "matchUpdateTypes": ["patch", "minor"]
+    },
+    {
+      "groupName": "ESLint/Prettier",
+      "matchPackageNames": ["eslint", "prettier"],
+      "matchUpdateTypes": ["patch", "minor"]
+    },
+    {
+      "groupName": "Build tools",
+      "matchPackageNames": ["vite", "tsup", "webpack"],
+      "matchUpdateTypes": ["patch", "minor"]
+    },
+    {
+      "groupName": "Testing libraries",
+      "matchPackageNames": ["vitest", "testing-library"],
+      "matchUpdateTypes": ["patch", "minor"]
+    },
+    {
+      "groupName": "non-major dependencies",
+      "matchUpdateTypes": ["patch", "minor"]
+    },
+    {
+      "matchDepTypes": ["engines"],
       "enabled": false
     }
   ],
@@ -19,35 +91,6 @@
     "lockFileMaintenance": {
       "enabled": true,
       "schedule": "on the 2nd day of the month"
-    },
-    "minimumReleaseAge": "3 days",
-    "packageRules": [
-      {
-        "groupName": "algosdk",
-        "matchPackageNames": ["algosdk"],
-        "matchUpdateTypes": ["patch", "minor", "major"]
-      },
-      {
-        "groupName": "non-major dependencies",
-        "matchUpdateTypes": ["patch", "minor"],
-        "matchFileNames": ["package.json"]
-      },
-      {
-        "groupName": "non-major package dependencies",
-        "matchUpdateTypes": ["patch", "minor"],
-        "matchFileNames": ["packages/**"],
-        "matchPackageNames": ["!algosdk"]
-      },
-      {
-        "groupName": "non-major example dependencies",
-        "matchUpdateTypes": ["patch", "minor"],
-        "matchFileNames": ["examples/**"],
-        "matchPackageNames": ["!algosdk"]
-      },
-      {
-        "matchDepTypes": ["engines"],
-        "enabled": false
-      }
-    ]
+    }
   }
 }
