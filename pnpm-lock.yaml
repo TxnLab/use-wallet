@@ -13,7 +13,7 @@ importers:
         version: 6.5.0
       '@testing-library/react':
         specifier: 16.0.1
-        version: 16.0.1(@testing-library/dom@9.3.4)(@types/react-dom@18.3.0)(@types/react@18.3.5)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 16.0.1(@testing-library/dom@10.4.0)(@types/react-dom@18.3.0)(@types/react@18.3.5)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@typescript-eslint/eslint-plugin':
         specifier: 8.3.0
         version: 8.3.0(@typescript-eslint/parser@8.3.0(eslint@8.57.0)(typescript@5.4.3))(eslint@8.57.0)(typescript@5.4.3)
@@ -49,7 +49,7 @@ importers:
         version: 5.4.2(@types/node@20.11.30)(terser@5.31.3)
       vite-plugin-solid:
         specifier: 2.10.2
-        version: 2.10.2(@testing-library/jest-dom@6.5.0)(solid-js@1.8.16)(vite@5.4.2(@types/node@20.11.30)(terser@5.31.3))
+        version: 2.10.2(@testing-library/jest-dom@6.5.0)(solid-js@1.8.22)(vite@5.4.2(@types/node@20.11.30)(terser@5.31.3))
       vitest:
         specifier: 2.0.5
         version: 2.0.5(@types/node@20.11.30)(jsdom@25.0.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(terser@5.31.3)
@@ -450,7 +450,7 @@ importers:
         version: 2.0.11(algosdk@2.9.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       '@tanstack/solid-store':
         specifier: 0.5.5
-        version: 0.5.5(solid-js@1.8.16)
+        version: 0.5.5(solid-js@1.8.22)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../use-wallet
@@ -468,20 +468,20 @@ importers:
         version: 28.0.3
     devDependencies:
       '@solidjs/testing-library':
-        specifier: 0.8.7
-        version: 0.8.7(solid-js@1.8.16)
+        specifier: 0.8.9
+        version: 0.8.9(solid-js@1.8.22)
       algosdk:
         specifier: 2.9.0
         version: 2.9.0
       solid-js:
-        specifier: 1.8.16
-        version: 1.8.16
+        specifier: 1.8.22
+        version: 1.8.22
       tsup:
         specifier: 8.2.4
         version: 8.2.4(jiti@1.21.6)(postcss@8.4.44)(typescript@5.4.3)(yaml@2.4.5)
       tsup-preset-solid:
         specifier: 2.2.0
-        version: 2.2.0(esbuild@0.23.0)(solid-js@1.8.16)(tsup@8.2.4(jiti@1.21.6)(postcss@8.4.44)(typescript@5.4.3)(yaml@2.4.5))
+        version: 2.2.0(esbuild@0.23.0)(solid-js@1.8.22)(tsup@8.2.4(jiti@1.21.6)(postcss@8.4.44)(typescript@5.4.3)(yaml@2.4.5))
       typescript:
         specifier: 5.4.3
         version: 5.4.3
@@ -1818,8 +1818,8 @@ packages:
     resolution: {integrity: sha512-LtoMMhxAlorcGhmFYI+LhPgbPZCkgP6ra1YL604EeF6U98pLlQ3iWIGMdWSC+vWmPBWBNgmDBAhnAobLROJmwg==}
     engines: {node: '>=18'}
 
-  '@solidjs/testing-library@0.8.7':
-    resolution: {integrity: sha512-1Wl6Ewk+JyxQVzfG95KHa3H7hmCrdNcLigRgm0ih8fEBhbnVZakGoU2uizAWi5/8biwGwV9OQqW+bJO+nnJZ1Q==}
+  '@solidjs/testing-library@0.8.9':
+    resolution: {integrity: sha512-gcjTSHwzXqy8roTrDgHTasRkrUcWjVm/7T7wjUI5WNm2BdUTTi296CorTiIGQVFZg2BVYuwtJOzzNn71Y/QQfg==}
     engines: {node: '>= 14'}
     peerDependencies:
       '@solidjs/router': '>=0.9.0'
@@ -1911,9 +1911,9 @@ packages:
       '@vue/composition-api':
         optional: true
 
-  '@testing-library/dom@9.3.4':
-    resolution: {integrity: sha512-FlS4ZWlp97iiNWig0Muq8p+3rVDjRiYE+YKGbAqXOu9nwJFFOdL00kFpz42M+4huzYi86vAK1sOOfyOG45muIQ==}
-    engines: {node: '>=14'}
+  '@testing-library/dom@10.4.0':
+    resolution: {integrity: sha512-pemlzrSESWbdAloYml3bAJMEfNh1Z7EduzqPKprCH5S341frlpYnUEW0H72dLxa6IsYr+mPno20GiSm+h9dEdQ==}
+    engines: {node: '>=18'}
 
   '@testing-library/jest-dom@6.5.0':
     resolution: {integrity: sha512-xGGHpBXYSHUUr6XsKBfs85TWlYKpTc37cSBBVrXcib2MkHLboWlkClhWF37JKlDb9KEq3dHs+f2xR7XJEWGBxA==}
@@ -5511,6 +5511,9 @@ packages:
   solid-js@1.8.16:
     resolution: {integrity: sha512-rja94MNU9flF3qQRLNsu60QHKBDKBkVE1DldJZPIfn2ypIn3NV2WpSbGTQIvsyGPBo+9E2IMjwqnqpbgfWuzeg==}
 
+  solid-js@1.8.22:
+    resolution: {integrity: sha512-VBzN5j+9Y4rqIKEnK301aBk+S7fvFSTs9ljg+YEdFxjNjH0hkjXPiQRcws9tE5fUzMznSS6KToL5hwMfHDgpLA==}
+
   solid-refresh@0.6.3:
     resolution: {integrity: sha512-F3aPsX6hVw9ttm5LYlth8Q15x6MlI/J3Dn+o3EQyRTtTxidepSTwAYdozt01/YA+7ObcciagGEyXIopGZzQtbA==}
     peerDependencies:
@@ -7829,10 +7832,10 @@ snapshots:
 
   '@sindresorhus/merge-streams@2.3.0': {}
 
-  '@solidjs/testing-library@0.8.7(solid-js@1.8.16)':
+  '@solidjs/testing-library@0.8.9(solid-js@1.8.22)':
     dependencies:
-      '@testing-library/dom': 9.3.4
-      solid-js: 1.8.16
+      '@testing-library/dom': 10.4.0
+      solid-js: 1.8.22
 
   '@stablelib/aead@1.0.1': {}
 
@@ -7928,10 +7931,10 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
       use-sync-external-store: 1.2.2(react@18.3.1)
 
-  '@tanstack/solid-store@0.5.5(solid-js@1.8.16)':
+  '@tanstack/solid-store@0.5.5(solid-js@1.8.22)':
     dependencies:
       '@tanstack/store': 0.5.5
-      solid-js: 1.8.16
+      solid-js: 1.8.22
 
   '@tanstack/store@0.5.5': {}
 
@@ -7941,12 +7944,12 @@ snapshots:
       vue: 3.4.21(typescript@5.4.3)
       vue-demi: 0.14.10(vue@3.4.21(typescript@5.4.3))
 
-  '@testing-library/dom@9.3.4':
+  '@testing-library/dom@10.4.0':
     dependencies:
       '@babel/code-frame': 7.24.7
       '@babel/runtime': 7.24.8
       '@types/aria-query': 5.0.4
-      aria-query: 5.1.3
+      aria-query: 5.3.0
       chalk: 4.1.2
       dom-accessibility-api: 0.5.16
       lz-string: 1.5.0
@@ -7962,10 +7965,10 @@ snapshots:
       lodash: 4.17.21
       redent: 3.0.0
 
-  '@testing-library/react@16.0.1(@testing-library/dom@9.3.4)(@types/react-dom@18.3.0)(@types/react@18.3.5)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@testing-library/react@16.0.1(@testing-library/dom@10.4.0)(@types/react-dom@18.3.0)(@types/react@18.3.5)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@babel/runtime': 7.24.8
-      '@testing-library/dom': 9.3.4
+      '@testing-library/dom': 10.4.0
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
     optionalDependencies:
@@ -10059,13 +10062,13 @@ snapshots:
       d: 1.0.2
       ext: 1.7.0
 
-  esbuild-plugin-solid@0.5.0(esbuild@0.23.0)(solid-js@1.8.16):
+  esbuild-plugin-solid@0.5.0(esbuild@0.23.0)(solid-js@1.8.22):
     dependencies:
       '@babel/core': 7.24.9
       '@babel/preset-typescript': 7.24.7(@babel/core@7.24.9)
       babel-preset-solid: 1.8.18(@babel/core@7.24.9)
       esbuild: 0.23.0
-      solid-js: 1.8.16
+      solid-js: 1.8.22
     transitivePeerDependencies:
       - supports-color
 
@@ -12661,12 +12664,27 @@ snapshots:
       seroval: 1.1.0
       seroval-plugins: 1.1.0(seroval@1.1.0)
 
+  solid-js@1.8.22:
+    dependencies:
+      csstype: 3.1.3
+      seroval: 1.1.0
+      seroval-plugins: 1.1.0(seroval@1.1.0)
+
   solid-refresh@0.6.3(solid-js@1.8.16):
     dependencies:
       '@babel/generator': 7.24.10
       '@babel/helper-module-imports': 7.24.7
       '@babel/types': 7.24.9
       solid-js: 1.8.16
+    transitivePeerDependencies:
+      - supports-color
+
+  solid-refresh@0.6.3(solid-js@1.8.22):
+    dependencies:
+      '@babel/generator': 7.24.10
+      '@babel/helper-module-imports': 7.24.7
+      '@babel/types': 7.24.9
+      solid-js: 1.8.22
     transitivePeerDependencies:
       - supports-color
 
@@ -12975,9 +12993,9 @@ snapshots:
 
   tslib@2.6.3: {}
 
-  tsup-preset-solid@2.2.0(esbuild@0.23.0)(solid-js@1.8.16)(tsup@8.2.4(jiti@1.21.6)(postcss@8.4.44)(typescript@5.4.3)(yaml@2.4.5)):
+  tsup-preset-solid@2.2.0(esbuild@0.23.0)(solid-js@1.8.22)(tsup@8.2.4(jiti@1.21.6)(postcss@8.4.44)(typescript@5.4.3)(yaml@2.4.5)):
     dependencies:
-      esbuild-plugin-solid: 0.5.0(esbuild@0.23.0)(solid-js@1.8.16)
+      esbuild-plugin-solid: 0.5.0(esbuild@0.23.0)(solid-js@1.8.22)
       tsup: 8.2.4(jiti@1.21.6)(postcss@8.4.44)(typescript@5.4.3)(yaml@2.4.5)
     transitivePeerDependencies:
       - esbuild
@@ -13365,6 +13383,21 @@ snapshots:
       merge-anything: 5.1.7
       solid-js: 1.8.16
       solid-refresh: 0.6.3(solid-js@1.8.16)
+      vite: 5.4.2(@types/node@20.11.30)(terser@5.31.3)
+      vitefu: 0.2.5(vite@5.4.2(@types/node@20.11.30)(terser@5.31.3))
+    optionalDependencies:
+      '@testing-library/jest-dom': 6.5.0
+    transitivePeerDependencies:
+      - supports-color
+
+  vite-plugin-solid@2.10.2(@testing-library/jest-dom@6.5.0)(solid-js@1.8.22)(vite@5.4.2(@types/node@20.11.30)(terser@5.31.3)):
+    dependencies:
+      '@babel/core': 7.24.9
+      '@types/babel__core': 7.20.5
+      babel-preset-solid: 1.8.18(@babel/core@7.24.9)
+      merge-anything: 5.1.7
+      solid-js: 1.8.22
+      solid-refresh: 0.6.3(solid-js@1.8.22)
       vite: 5.4.2(@types/node@20.11.30)(terser@5.31.3)
       vitefu: 0.2.5(vite@5.4.2(@types/node@20.11.30)(terser@5.31.3))
     optionalDependencies:
