@@ -327,8 +327,8 @@ importers:
   packages/use-wallet:
     dependencies:
       '@tanstack/store':
-        specifier: 0.4.1
-        version: 0.4.1
+        specifier: 0.5.5
+        version: 0.5.5
     devDependencies:
       '@agoralabs-sh/avm-web-provider':
         specifier: 1.6.2
@@ -394,8 +394,8 @@ importers:
         specifier: ^2.0.11
         version: 2.0.11(algosdk@2.9.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       '@tanstack/react-store':
-        specifier: 0.4.1
-        version: 0.4.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+        specifier: 0.5.5
+        version: 0.5.5(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../use-wallet
@@ -449,8 +449,8 @@ importers:
         specifier: ^2.0.11
         version: 2.0.11(algosdk@2.9.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       '@tanstack/solid-store':
-        specifier: 0.4.1
-        version: 0.4.1(solid-js@1.8.16)
+        specifier: 0.5.5
+        version: 0.5.5(solid-js@1.8.16)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../use-wallet
@@ -501,8 +501,8 @@ importers:
         specifier: ^2.0.11
         version: 2.0.11(algosdk@2.9.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       '@tanstack/vue-store':
-        specifier: 0.4.1
-        version: 0.4.1(vue@3.4.21(typescript@5.4.3))
+        specifier: 0.5.5
+        version: 0.5.5(vue@3.4.21(typescript@5.4.3))
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../use-wallet
@@ -2023,22 +2023,22 @@ packages:
   '@swc/helpers@0.5.2':
     resolution: {integrity: sha512-E4KcWTpoLHqwPHLxidpOqQbcrZVgi0rsmmZXUle1jXmJfuIf/UWpczUJ7MZZ5tlxytgJXyp0w4PGkkeLiuIdZw==}
 
-  '@tanstack/react-store@0.4.1':
-    resolution: {integrity: sha512-cyriofh2I6dPOPJf2W0K+ON5q08ezevLTUhC1txiUnrJ9XFFFPr0X8CmGnXzucI2c0t0V6wYZc0GCz4zOAeptg==}
+  '@tanstack/react-store@0.5.5':
+    resolution: {integrity: sha512-1orYXGatBqXCYKuroFwV8Ll/6aDa5E3pU6RR4h7RvRk7TmxF1+zLCsWALZaeijXkySNMGmvawSbUXRypivg2XA==}
     peerDependencies:
       react: ^17.0.0 || ^18.0.0
       react-dom: ^17.0.0 || ^18.0.0
 
-  '@tanstack/solid-store@0.4.1':
-    resolution: {integrity: sha512-pxnABnOz6y+GrxFDMjPoNq8yqjuwBJVEcl4LPkS0FLFz3y3XzoBzUb3cd9zWQAebpIKJtUqfDOqWakkYlgiOsA==}
+  '@tanstack/solid-store@0.5.5':
+    resolution: {integrity: sha512-31UD/UQ7uNG/HRJ5KV12QsAoehmx8LB3oGITaJ2LjeMBY95DLB5elRqWTGj6EwwLKLOWFEGQIz6ksEYM9OIwMw==}
     peerDependencies:
       solid-js: ^1.6.0
 
-  '@tanstack/store@0.4.1':
-    resolution: {integrity: sha512-NvW3MomYSTzQK61AWdtWNIhWgszXFZDRgCNlvSDw/DBaoLqJIlZ0/gKLsditA8un/BGU1NR06+j0a/UNLgXA+Q==}
+  '@tanstack/store@0.5.5':
+    resolution: {integrity: sha512-EOSrgdDAJExbvRZEQ/Xhh9iZchXpMN+ga1Bnk8Nmygzs8TfiE6hbzThF+Pr2G19uHL6+DTDTHhJ8VQiOd7l4tA==}
 
-  '@tanstack/vue-store@0.4.1':
-    resolution: {integrity: sha512-/a0N8VgYvV7Vmpn6cDR8sWjDZEulOlULtaFtzGHpMP0rz+toX6dpMbQctOvz6Hw3RNY3HoTzmkGHUgyuZNJqMw==}
+  '@tanstack/vue-store@0.5.5':
+    resolution: {integrity: sha512-j+CDrxVhtQQNOjWzLmCqJeDwmmTAQGvEaNbLr1uPJ9rxJITodJtFNdBFj7l+Nd5o34v2ayEv64Ugh6+1BtuGNg==}
     peerDependencies:
       '@vue/composition-api': ^1.2.1
       vue: ^2.5.0 || ^3.0.0
@@ -6408,17 +6408,6 @@ packages:
       '@vue/composition-api':
         optional: true
 
-  vue-demi@0.14.7:
-    resolution: {integrity: sha512-EOG8KXDQNwkJILkx/gPcoL/7vH+hORoBaKgGe+6W7VFMvCYJfmF2dGbvgDroVnI8LU7/kTu8mbjRZGBU1z9NTA==}
-    engines: {node: '>=12'}
-    hasBin: true
-    peerDependencies:
-      '@vue/composition-api': ^1.0.0-rc.1
-      vue: ^3.0.0-0 || ^2.6.0
-    peerDependenciesMeta:
-      '@vue/composition-api':
-        optional: true
-
   vue-devtools-stub@0.1.0:
     resolution: {integrity: sha512-RutnB7X8c5hjq39NceArgXg28WZtZpGc3+J16ljMiYnFhKvd8hITxSWQSQ5bvldxMDU6gG5mkxl1MTQLXckVSQ==}
 
@@ -8151,25 +8140,25 @@ snapshots:
     dependencies:
       tslib: 2.6.3
 
-  '@tanstack/react-store@0.4.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
+  '@tanstack/react-store@0.5.5(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
-      '@tanstack/store': 0.4.1
+      '@tanstack/store': 0.5.5
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       use-sync-external-store: 1.2.2(react@18.2.0)
 
-  '@tanstack/solid-store@0.4.1(solid-js@1.8.16)':
+  '@tanstack/solid-store@0.5.5(solid-js@1.8.16)':
     dependencies:
-      '@tanstack/store': 0.4.1
+      '@tanstack/store': 0.5.5
       solid-js: 1.8.16
 
-  '@tanstack/store@0.4.1': {}
+  '@tanstack/store@0.5.5': {}
 
-  '@tanstack/vue-store@0.4.1(vue@3.4.21(typescript@5.4.3))':
+  '@tanstack/vue-store@0.5.5(vue@3.4.21(typescript@5.4.3))':
     dependencies:
-      '@tanstack/store': 0.4.1
+      '@tanstack/store': 0.5.5
       vue: 3.4.21(typescript@5.4.3)
-      vue-demi: 0.14.7(vue@3.4.21(typescript@5.4.3))
+      vue-demi: 0.14.10(vue@3.4.21(typescript@5.4.3))
 
   '@testing-library/dom@9.3.4':
     dependencies:
@@ -13702,13 +13691,13 @@ snapshots:
 
   vue-component-type-helpers@2.0.26: {}
 
+  vue-demi@0.14.10(vue@3.4.21(typescript@5.4.3)):
+    dependencies:
+      vue: 3.4.21(typescript@5.4.3)
+
   vue-demi@0.14.10(vue@3.4.32(typescript@5.4.3)):
     dependencies:
       vue: 3.4.32(typescript@5.4.3)
-
-  vue-demi@0.14.7(vue@3.4.21(typescript@5.4.3)):
-    dependencies:
-      vue: 3.4.21(typescript@5.4.3)
 
   vue-devtools-stub@0.1.0: {}
 

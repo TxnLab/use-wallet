@@ -37,7 +37,7 @@
     "dist"
   ],
   "dependencies": {
-    "@tanstack/store": "0.4.1"
+    "@tanstack/store": "0.5.5"
   },
   "devDependencies": {
     "@agoralabs-sh/avm-web-provider": "1.6.2",
