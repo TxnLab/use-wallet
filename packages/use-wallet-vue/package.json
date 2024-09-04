@@ -43,7 +43,7 @@
   },
   "devDependencies": {
     "algosdk": "2.9.0",
-    "tsup": "8.0.2",
+    "tsup": "8.2.4",
     "typescript": "5.4.3",
     "vue": "3.4.21"
   },

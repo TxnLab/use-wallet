@@ -68,7 +68,7 @@
     "@solidjs/testing-library": "0.8.7",
     "algosdk": "2.9.0",
     "solid-js": "1.8.16",
-    "tsup": "8.0.2",
+    "tsup": "8.2.4",
     "tsup-preset-solid": "2.2.0",
     "typescript": "5.4.3"
   },
