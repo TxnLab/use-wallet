@@ -61,16 +61,16 @@
     "dist"
   ],
   "dependencies": {
-    "@tanstack/solid-store": "0.4.1",
+    "@tanstack/solid-store": "0.5.5",
     "@txnlab/use-wallet": "workspace:*"
   },
   "devDependencies": {
-    "@solidjs/testing-library": "0.8.7",
+    "@solidjs/testing-library": "0.8.9",
     "algosdk": "2.9.0",
-    "solid-js": "1.8.16",
-    "tsup": "8.0.2",
+    "solid-js": "1.8.22",
+    "tsup": "8.2.4",
     "tsup-preset-solid": "2.2.0",
-    "typescript": "5.4.3"
+    "typescript": "5.5.4"
   },
   "peerDependencies": {
     "@blockshake/defly-connect": "^1.1.6",
