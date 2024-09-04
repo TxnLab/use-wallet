@@ -52,14 +52,14 @@
   },
   "peerDependencies": {
     "@blockshake/defly-connect": "^1.1.6",
-    "@magic-ext/algorand": "^23.0.2",
-    "@perawallet/connect-beta": "^2.0.11",
+    "@magic-ext/algorand": "^23.5.0",
+    "@perawallet/connect-beta": "^2.0.14",
     "@walletconnect/modal": "^2.6.2",
     "@perawallet/connect": "^1.3.4",
-    "@walletconnect/sign-client": "^2.10.2",
+    "@walletconnect/sign-client": "^2.15.2",
     "algosdk": "^2.7.0",
     "lute-connect": "^1.3.0",
-    "magic-sdk": "^28.0.3",
+    "magic-sdk": "^28.5.0",
     "react": "^17.0.0 || ^18.0.0",
     "react-dom": "^17.0.0 || ^18.0.0"
   },
