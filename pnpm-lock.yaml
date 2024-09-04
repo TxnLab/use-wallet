@@ -10,7 +10,7 @@ importers:
     devDependencies:
       '@testing-library/jest-dom':
         specifier: 6.4.2
-        version: 6.4.2(vitest@2.0.5(@types/node@20.11.30)(jsdom@24.0.0)(terser@5.31.3))
+        version: 6.4.2(vitest@2.0.5(@types/node@20.11.30)(jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(terser@5.31.3))
       '@testing-library/react':
         specifier: 14.2.2
         version: 14.2.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -49,10 +49,10 @@ importers:
         version: 5.2.6(@types/node@20.11.30)(terser@5.31.3)
       vite-plugin-solid:
         specifier: 2.10.2
-        version: 2.10.2(@testing-library/jest-dom@6.4.2(vitest@2.0.5(@types/node@20.11.30)(jsdom@24.0.0)(terser@5.31.3)))(solid-js@1.8.16)(vite@5.2.6(@types/node@20.11.30)(terser@5.31.3))
+        version: 2.10.2(@testing-library/jest-dom@6.4.2(vitest@2.0.5(@types/node@20.11.30)(jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(terser@5.31.3)))(solid-js@1.8.16)(vite@5.2.6(@types/node@20.11.30)(terser@5.31.3))
       vitest:
         specifier: 2.0.5
-        version: 2.0.5(@types/node@20.11.30)(jsdom@24.0.0)(terser@5.31.3)
+        version: 2.0.5(@types/node@20.11.30)(jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(terser@5.31.3)
       vue-demi:
         specifier: 0.14.7
         version: 0.14.7(vue@3.4.32(typescript@5.4.3))
@@ -61,10 +61,10 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.1.6
-        version: 1.1.6(algosdk@2.8.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
         specifier: ^1.3.4
-        version: 1.3.4(algosdk@2.8.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet-react':
         specifier: workspace:*
         version: link:../../packages/use-wallet-react
@@ -75,8 +75,8 @@ importers:
         specifier: ^2.10.2
         version: 2.11.3(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       algosdk:
-        specifier: 2.8.0
-        version: 2.8.0
+        specifier: 2.9.0
+        version: 2.9.0
       lute-connect:
         specifier: ^1.3.0
         version: 1.3.0
@@ -113,10 +113,10 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.1.6
-        version: 1.1.6(algosdk@2.8.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
         specifier: ^1.3.4
-        version: 1.3.4(algosdk@2.8.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../../packages/use-wallet
@@ -130,8 +130,8 @@ importers:
         specifier: ^2.10.2
         version: 2.11.3(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       algosdk:
-        specifier: 2.8.0
-        version: 2.8.0
+        specifier: 2.9.0
+        version: 2.9.0
       lute-connect:
         specifier: ^1.3.0
         version: 1.3.0
@@ -156,10 +156,10 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.1.6
-        version: 1.1.6(algosdk@2.8.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
         specifier: ^1.3.4
-        version: 1.3.4(algosdk@2.8.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet-react':
         specifier: workspace:*
         version: link:../../packages/use-wallet-react
@@ -170,8 +170,8 @@ importers:
         specifier: ^2.10.2
         version: 2.11.3(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       algosdk:
-        specifier: 2.8.0
-        version: 2.8.0
+        specifier: 2.9.0
+        version: 2.9.0
       lute-connect:
         specifier: ^1.3.0
         version: 1.3.0
@@ -217,10 +217,10 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.1.6
-        version: 1.1.6(algosdk@2.8.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
         specifier: ^1.3.4
-        version: 1.3.4(algosdk@2.8.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet-solid':
         specifier: workspace:*
         version: link:../../packages/use-wallet-solid
@@ -231,8 +231,8 @@ importers:
         specifier: ^2.10.2
         version: 2.11.3(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       algosdk:
-        specifier: 2.8.0
-        version: 2.8.0
+        specifier: 2.9.0
+        version: 2.9.0
       lute-connect:
         specifier: ^1.3.0
         version: 1.3.0
@@ -248,16 +248,16 @@ importers:
         version: 5.2.6(@types/node@20.11.30)(terser@5.31.3)
       vite-plugin-solid:
         specifier: ^2.8.2
-        version: 2.10.2(@testing-library/jest-dom@6.4.2(vitest@2.0.5(@types/node@20.11.30)(jsdom@24.0.0)(terser@5.31.3)))(solid-js@1.8.16)(vite@5.2.6(@types/node@20.11.30)(terser@5.31.3))
+        version: 2.10.2(@testing-library/jest-dom@6.4.2(vitest@2.0.5(@types/node@20.11.30)(jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(terser@5.31.3)))(solid-js@1.8.16)(vite@5.2.6(@types/node@20.11.30)(terser@5.31.3))
 
   examples/vanilla-ts:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.1.6
-        version: 1.1.6(algosdk@2.8.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
         specifier: ^1.3.4
-        version: 1.3.4(algosdk@2.8.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../../packages/use-wallet
@@ -268,8 +268,8 @@ importers:
         specifier: ^2.10.2
         version: 2.11.3(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       algosdk:
-        specifier: 2.8.0
-        version: 2.8.0
+        specifier: 2.9.0
+        version: 2.9.0
       lute-connect:
         specifier: ^1.3.0
         version: 1.3.0
@@ -288,10 +288,10 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.1.6
-        version: 1.1.6(algosdk@2.8.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
         specifier: ^1.3.4
-        version: 1.3.4(algosdk@2.8.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet-vue':
         specifier: workspace:*
         version: link:../../packages/use-wallet-vue
@@ -302,8 +302,8 @@ importers:
         specifier: ^2.10.2
         version: 2.11.3(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       algosdk:
-        specifier: 2.8.0
-        version: 2.8.0
+        specifier: 2.9.0
+        version: 2.9.0
       lute-connect:
         specifier: ^1.3.0
         version: 1.3.0
@@ -335,7 +335,7 @@ importers:
         version: 1.6.2
       '@blockshake/defly-connect':
         specifier: 1.1.6
-        version: 1.1.6(algosdk@2.8.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@magic-ext/algorand':
         specifier: 23.0.2
         version: 23.0.2
@@ -344,10 +344,10 @@ importers:
         version: 28.0.2(localforage@1.10.0)
       '@perawallet/connect':
         specifier: 1.3.4
-        version: 1.3.4(algosdk@2.8.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect-beta':
         specifier: 2.0.11
-        version: 2.0.11(algosdk@2.8.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
+        version: 2.0.11(algosdk@2.9.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       '@types/node':
         specifier: 20.11.30
         version: 20.11.30
@@ -364,8 +364,8 @@ importers:
         specifier: 2.11.3
         version: 2.11.3(ioredis@5.4.1)
       algosdk:
-        specifier: 2.8.0
-        version: 2.8.0
+        specifier: 2.9.0
+        version: 2.9.0
       lute-connect:
         specifier: 1.3.0
         version: 1.3.0
@@ -383,16 +383,16 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.1.6
-        version: 1.1.6(algosdk@2.8.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@magic-ext/algorand':
         specifier: ^23.0.2
         version: 23.0.2
       '@perawallet/connect':
         specifier: ^1.3.4
-        version: 1.3.4(algosdk@2.8.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect-beta':
         specifier: ^2.0.11
-        version: 2.0.11(algosdk@2.8.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
+        version: 2.0.11(algosdk@2.9.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       '@tanstack/react-store':
         specifier: 0.4.1
         version: 0.4.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -416,8 +416,8 @@ importers:
         specifier: 18.2.70
         version: 18.2.70
       algosdk:
-        specifier: 2.8.0
-        version: 2.8.0
+        specifier: 2.9.0
+        version: 2.9.0
       jsdom:
         specifier: 24.0.0
         version: 24.0.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -438,16 +438,16 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.1.6
-        version: 1.1.6(algosdk@2.8.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@magic-ext/algorand':
         specifier: ^23.0.2
         version: 23.0.2
       '@perawallet/connect':
         specifier: ^1.3.4
-        version: 1.3.4(algosdk@2.8.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect-beta':
         specifier: ^2.0.11
-        version: 2.0.11(algosdk@2.8.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
+        version: 2.0.11(algosdk@2.9.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       '@tanstack/solid-store':
         specifier: 0.4.1
         version: 0.4.1(solid-js@1.8.16)
@@ -471,8 +471,8 @@ importers:
         specifier: 0.8.7
         version: 0.8.7(solid-js@1.8.16)
       algosdk:
-        specifier: 2.8.0
-        version: 2.8.0
+        specifier: 2.9.0
+        version: 2.9.0
       solid-js:
         specifier: 1.8.16
         version: 1.8.16
@@ -490,16 +490,16 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.1.6
-        version: 1.1.6(algosdk@2.8.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@magic-ext/algorand':
         specifier: ^23.0.2
         version: 23.0.2
       '@perawallet/connect':
         specifier: ^1.3.4
-        version: 1.3.4(algosdk@2.8.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect-beta':
         specifier: ^2.0.11
-        version: 2.0.11(algosdk@2.8.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
+        version: 2.0.11(algosdk@2.9.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       '@tanstack/vue-store':
         specifier: 0.4.1
         version: 0.4.1(vue@3.4.21(typescript@5.4.3))
@@ -520,8 +520,8 @@ importers:
         version: 28.0.3
     devDependencies:
       algosdk:
-        specifier: 2.8.0
-        version: 2.8.0
+        specifier: 2.9.0
+        version: 2.9.0
       tsup:
         specifier: 8.0.2
         version: 8.0.2(postcss@8.4.39)(typescript@5.4.3)
@@ -2558,8 +2558,8 @@ packages:
     resolution: {integrity: sha512-F1tGh056XczEaEAqu7s+hlZUDWwOBT70Eq0lfMpBP2YguSQVyxRbprLq5rELXKQOyOaixTWYhMeMQMzP0U5FoQ==}
     engines: {node: '>= 10'}
 
-  algosdk@2.8.0:
-    resolution: {integrity: sha512-yjDH/VbQ689hxmn4PFbfXQrn4VZbYCGGzI/RD4ccA0yr55qT/TyAtR/dnq4XXX2pwCKNHbxOfantaJ5kTiwuMQ==}
+  algosdk@2.9.0:
+    resolution: {integrity: sha512-o0n0nLMbTX6SFQdMUk2/2sy50jmEmZk5OTPYSh2aAeP8DUPxrhjMPfwGsYNvaO+qk75MixC2eWpfA9vygCQ/Mg==}
     engines: {node: '>=18.0.0'}
 
   ansi-colors@4.1.3:
@@ -6897,11 +6897,11 @@ snapshots:
       '@babel/helper-validator-identifier': 7.24.7
       to-fast-properties: 2.0.0
 
-  '@blockshake/defly-connect@1.1.6(algosdk@2.8.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@blockshake/defly-connect@1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       '@walletconnect/client': 1.8.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@walletconnect/types': 1.8.0
-      algosdk: 2.8.0
+      algosdk: 2.9.0
       bowser: 2.11.0
       buffer: 6.0.3
       lottie-web: 5.12.2
@@ -7752,14 +7752,14 @@ snapshots:
 
   '@pedrouid/environment@1.0.1': {}
 
-  '@perawallet/connect-beta@2.0.11(algosdk@2.8.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)':
+  '@perawallet/connect-beta@2.0.11(algosdk@2.9.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)':
     dependencies:
       '@evanhahn/lottie-web-light': 5.8.1
       '@json-rpc-tools/utils': 1.7.6
       '@walletconnect/sign-client': 2.12.1(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       '@walletconnect/types': 2.12.1(ioredis@5.4.1)
       '@walletconnect/utils': 2.12.1(ioredis@5.4.1)
-      algosdk: 2.8.0
+      algosdk: 2.9.0
       bowser: 2.11.0
       buffer: 6.0.3
       qr-code-styling: 1.6.0-rc.1
@@ -7782,12 +7782,12 @@ snapshots:
       - uWebSockets.js
       - utf-8-validate
 
-  '@perawallet/connect@1.3.4(algosdk@2.8.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@perawallet/connect@1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       '@evanhahn/lottie-web-light': 5.8.1
       '@walletconnect/client': 1.8.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@walletconnect/types': 1.8.0
-      algosdk: 2.8.0
+      algosdk: 2.9.0
       bowser: 2.11.0
       buffer: 6.0.3
       qr-code-styling: 1.6.0-rc.1
@@ -8044,7 +8044,7 @@ snapshots:
       lz-string: 1.5.0
       pretty-format: 27.5.1
 
-  '@testing-library/jest-dom@6.4.2(vitest@2.0.5(@types/node@20.11.30)(jsdom@24.0.0)(terser@5.31.3))':
+  '@testing-library/jest-dom@6.4.2(vitest@2.0.5(@types/node@20.11.30)(jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(terser@5.31.3))':
     dependencies:
       '@adobe/css-tools': 4.4.0
       '@babel/runtime': 7.24.8
@@ -8055,7 +8055,7 @@ snapshots:
       lodash: 4.17.21
       redent: 3.0.0
     optionalDependencies:
-      vitest: 2.0.5(@types/node@20.11.30)(jsdom@24.0.0)(terser@5.31.3)
+      vitest: 2.0.5(@types/node@20.11.30)(jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(terser@5.31.3)
 
   '@testing-library/react@14.2.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
@@ -9145,7 +9145,7 @@ snapshots:
 
   algo-msgpack-with-bigint@2.1.1: {}
 
-  algosdk@2.8.0:
+  algosdk@2.9.0:
     dependencies:
       algo-msgpack-with-bigint: 2.1.1
       buffer: 6.0.3
@@ -11835,7 +11835,7 @@ snapshots:
       unenv: 1.10.0
       unimport: 3.9.0(rollup@4.18.1)
       unplugin: 1.11.0
-      unplugin-vue-router: 0.10.0(rollup@4.18.1)(vue-router@4.4.0(vue@3.4.32(typescript@5.4.3)))(vue@3.4.32(typescript@5.4.3))
+      unplugin-vue-router: 0.10.0(rollup@4.18.1)(vue-router@4.4.0(vue@3.4.21(typescript@5.4.3)))(vue@3.4.32(typescript@5.4.3))
       unstorage: 1.10.2(idb-keyval@6.2.1)(ioredis@5.4.1)
       untyped: 1.4.2
       vue: 3.4.32(typescript@5.4.3)
@@ -13189,7 +13189,7 @@ snapshots:
 
   universalify@2.0.1: {}
 
-  unplugin-vue-router@0.10.0(rollup@4.18.1)(vue-router@4.4.0(vue@3.4.32(typescript@5.4.3)))(vue@3.4.32(typescript@5.4.3)):
+  unplugin-vue-router@0.10.0(rollup@4.18.1)(vue-router@4.4.0(vue@3.4.21(typescript@5.4.3)))(vue@3.4.32(typescript@5.4.3)):
     dependencies:
       '@babel/types': 7.24.9
       '@rollup/pluginutils': 5.1.0(rollup@4.18.1)
@@ -13205,7 +13205,7 @@ snapshots:
       unplugin: 1.11.0
       yaml: 2.4.5
     optionalDependencies:
-      vue-router: 4.4.0(vue@3.4.32(typescript@5.4.3))
+      vue-router: 4.4.0(vue@3.4.21(typescript@5.4.3))
     transitivePeerDependencies:
       - rollup
       - vue
@@ -13398,7 +13398,7 @@ snapshots:
       - rollup
       - supports-color
 
-  vite-plugin-solid@2.10.2(@testing-library/jest-dom@6.4.2(vitest@2.0.5(@types/node@20.11.30)(jsdom@24.0.0)(terser@5.31.3)))(solid-js@1.8.16)(vite@5.2.6(@types/node@20.11.30)(terser@5.31.3)):
+  vite-plugin-solid@2.10.2(@testing-library/jest-dom@6.4.2(vitest@2.0.5(@types/node@20.11.30)(jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(terser@5.31.3)))(solid-js@1.8.16)(vite@5.2.6(@types/node@20.11.30)(terser@5.31.3)):
     dependencies:
       '@babel/core': 7.24.9
       '@types/babel__core': 7.20.5
@@ -13409,7 +13409,7 @@ snapshots:
       vite: 5.2.6(@types/node@20.11.30)(terser@5.31.3)
       vitefu: 0.2.5(vite@5.2.6(@types/node@20.11.30)(terser@5.31.3))
     optionalDependencies:
-      '@testing-library/jest-dom': 6.4.2(vitest@2.0.5(@types/node@20.11.30)(jsdom@24.0.0)(terser@5.31.3))
+      '@testing-library/jest-dom': 6.4.2(vitest@2.0.5(@types/node@20.11.30)(jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(terser@5.31.3))
     transitivePeerDependencies:
       - supports-color
 
@@ -13452,7 +13452,7 @@ snapshots:
     optionalDependencies:
       vite: 5.2.6(@types/node@20.11.30)(terser@5.31.3)
 
-  vitest@2.0.5(@types/node@20.11.30)(jsdom@24.0.0)(terser@5.31.3):
+  vitest@2.0.5(@types/node@20.11.30)(jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(terser@5.31.3):
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@vitest/expect': 2.0.5
