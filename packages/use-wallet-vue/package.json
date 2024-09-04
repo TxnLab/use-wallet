@@ -44,7 +44,7 @@
   "devDependencies": {
     "algosdk": "2.9.0",
     "tsup": "8.2.4",
-    "typescript": "5.4.3",
+    "typescript": "5.5.4",
     "vue": "3.4.21"
   },
   "peerDependencies": {
