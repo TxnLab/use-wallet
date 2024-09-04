@@ -9,9 +9,9 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@walletconnect/types": "2.11.3",
-    "typescript": "5.4.3",
-    "vite": "5.2.6"
+    "@walletconnect/types": "2.15.2",
+    "typescript": "5.5.4",
+    "vite": "5.4.2"
   },
   "dependencies": {
     "@blockshake/defly-connect": "^1.1.6",
