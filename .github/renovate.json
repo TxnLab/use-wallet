@@ -35,7 +35,6 @@
         "lute-connect",
         "walletconnect"
       ],
-      "matchUpdateTypes": ["patch", "minor"],
       "rangeStrategy": "bump"
     },
     {
