@@ -13,7 +13,7 @@ importers:
         version: 6.5.0
       '@testing-library/react':
         specifier: 16.0.1
-        version: 16.0.1(@testing-library/dom@9.3.4)(@types/react-dom@18.3.0)(@types/react@18.2.70)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+        version: 16.0.1(@testing-library/dom@9.3.4)(@types/react-dom@18.3.0)(@types/react@18.3.5)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@typescript-eslint/eslint-plugin':
         specifier: 8.3.0
         version: 8.3.0(@typescript-eslint/parser@8.3.0(eslint@8.57.0)(typescript@5.4.3))(eslint@8.57.0)(typescript@5.4.3)
@@ -70,7 +70,7 @@ importers:
         version: link:../../packages/use-wallet-react
       '@walletconnect/modal':
         specifier: ^2.6.2
-        version: 2.6.2(@types/react@18.2.70)(react@18.2.0)
+        version: 2.6.2(@types/react@18.3.5)(react@18.2.0)
       '@walletconnect/sign-client':
         specifier: ^2.10.2
         version: 2.11.3(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
@@ -94,8 +94,8 @@ importers:
         specifier: 20.11.30
         version: 20.11.30
       '@types/react':
-        specifier: 18.2.70
-        version: 18.2.70
+        specifier: 18.3.5
+        version: 18.3.5
       '@types/react-dom':
         specifier: 18.3.0
         version: 18.3.0
@@ -125,7 +125,7 @@ importers:
         version: link:../../packages/use-wallet-vue
       '@walletconnect/modal':
         specifier: ^2.6.2
-        version: 2.6.2(@types/react@18.2.70)(react@18.2.0)
+        version: 2.6.2(@types/react@18.3.5)(react@18.3.1)
       '@walletconnect/sign-client':
         specifier: ^2.10.2
         version: 2.11.3(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
@@ -165,7 +165,7 @@ importers:
         version: link:../../packages/use-wallet-react
       '@walletconnect/modal':
         specifier: ^2.6.2
-        version: 2.6.2(@types/react@18.2.70)(react@18.2.0)
+        version: 2.6.2(@types/react@18.3.5)(react@18.2.0)
       '@walletconnect/sign-client':
         specifier: ^2.10.2
         version: 2.11.3(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
@@ -183,8 +183,8 @@ importers:
         version: 18.2.0(react@18.2.0)
     devDependencies:
       '@types/react':
-        specifier: 18.2.70
-        version: 18.2.70
+        specifier: 18.3.5
+        version: 18.3.5
       '@types/react-dom':
         specifier: 18.3.0
         version: 18.3.0
@@ -226,7 +226,7 @@ importers:
         version: link:../../packages/use-wallet-solid
       '@walletconnect/modal':
         specifier: ^2.6.2
-        version: 2.6.2(@types/react@18.2.70)(react@18.2.0)
+        version: 2.6.2(@types/react@18.3.5)(react@18.3.1)
       '@walletconnect/sign-client':
         specifier: ^2.10.2
         version: 2.11.3(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
@@ -263,7 +263,7 @@ importers:
         version: link:../../packages/use-wallet
       '@walletconnect/modal':
         specifier: ^2.6.2
-        version: 2.6.2(@types/react@18.2.70)(react@18.2.0)
+        version: 2.6.2(@types/react@18.3.5)(react@18.3.1)
       '@walletconnect/sign-client':
         specifier: ^2.10.2
         version: 2.11.3(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
@@ -297,7 +297,7 @@ importers:
         version: link:../../packages/use-wallet-vue
       '@walletconnect/modal':
         specifier: ^2.6.2
-        version: 2.6.2(@types/react@18.2.70)(react@18.2.0)
+        version: 2.6.2(@types/react@18.3.5)(react@18.3.1)
       '@walletconnect/sign-client':
         specifier: ^2.10.2
         version: 2.11.3(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
@@ -353,10 +353,10 @@ importers:
         version: 20.11.30
       '@walletconnect/modal':
         specifier: 2.6.2
-        version: 2.6.2(@types/react@18.2.70)(react@18.2.0)
+        version: 2.6.2(@types/react@18.3.5)(react@18.3.1)
       '@walletconnect/modal-core':
         specifier: 2.6.2
-        version: 2.6.2(@types/react@18.2.70)(react@18.2.0)
+        version: 2.6.2(@types/react@18.3.5)(react@18.3.1)
       '@walletconnect/sign-client':
         specifier: 2.11.3
         version: 2.11.3(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
@@ -395,13 +395,13 @@ importers:
         version: 2.0.11(algosdk@2.9.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       '@tanstack/react-store':
         specifier: 0.5.5
-        version: 0.5.5(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+        version: 0.5.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../use-wallet
       '@walletconnect/modal':
         specifier: ^2.6.2
-        version: 2.6.2(@types/react@18.2.70)(react@18.2.0)
+        version: 2.6.2(@types/react@18.3.5)(react@18.3.1)
       '@walletconnect/sign-client':
         specifier: ^2.10.2
         version: 2.11.3(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
@@ -413,8 +413,8 @@ importers:
         version: 28.0.3
     devDependencies:
       '@types/react':
-        specifier: 18.2.70
-        version: 18.2.70
+        specifier: 18.3.5
+        version: 18.3.5
       algosdk:
         specifier: 2.9.0
         version: 2.9.0
@@ -422,11 +422,11 @@ importers:
         specifier: 25.0.0
         version: 25.0.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       react:
-        specifier: 18.2.0
-        version: 18.2.0
+        specifier: 18.3.1
+        version: 18.3.1
       react-dom:
-        specifier: 18.2.0
-        version: 18.2.0(react@18.2.0)
+        specifier: 18.3.1
+        version: 18.3.1(react@18.3.1)
       tsup:
         specifier: 8.2.4
         version: 8.2.4(jiti@1.21.6)(postcss@8.4.44)(typescript@5.4.3)(yaml@2.4.5)
@@ -456,7 +456,7 @@ importers:
         version: link:../use-wallet
       '@walletconnect/modal':
         specifier: ^2.6.2
-        version: 2.6.2(@types/react@18.2.70)(react@18.2.0)
+        version: 2.6.2(@types/react@18.3.5)(react@18.3.1)
       '@walletconnect/sign-client':
         specifier: ^2.10.2
         version: 2.11.3(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
@@ -508,7 +508,7 @@ importers:
         version: link:../use-wallet
       '@walletconnect/modal':
         specifier: ^2.6.2
-        version: 2.6.2(@types/react@18.2.70)(react@18.2.0)
+        version: 2.6.2(@types/react@18.3.5)(react@18.3.1)
       '@walletconnect/sign-client':
         specifier: ^2.10.2
         version: 2.11.3(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
@@ -1986,14 +1986,11 @@ packages:
   '@types/react-dom@18.3.0':
     resolution: {integrity: sha512-EhwApuTmMBmXuFOikhQLIBUn6uFg81SwLMOAUgodJF14SOBOCMdU04gDoYi0WOJJHD144TL32z4yDqCW3dnkQg==}
 
-  '@types/react@18.2.70':
-    resolution: {integrity: sha512-hjlM2hho2vqklPhopNkXkdkeq6Lv8WSZTpr7956zY+3WS5cfYUewtCzsJLsbW5dEv3lfSeQ4W14ZFeKC437JRQ==}
+  '@types/react@18.3.5':
+    resolution: {integrity: sha512-WeqMfGJLGuLCqHGYRGHxnKrXcTitc6L/nBUWfWPcTarG3t9PsquqUMuVeXZeca+mglY4Vo5GZjCi0A3Or2lnxA==}
 
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
-
-  '@types/scheduler@0.23.0':
-    resolution: {integrity: sha512-YIoDCTH3Af6XM5VuwGG/QL/CJqga1Zm3NkU3HZ4ZHK2fRMPYP1VczsTUqtsf43PH/iJNVlPHAo2oWX7BSdB2Hw==}
 
   '@types/secp256k1@4.0.6':
     resolution: {integrity: sha512-hHxJU6PAEUn0TP4S/ZOzuTUvJWuZ6eIKeNKb5RBpODvSl6hp1Wrw4s7ATY50rklRCScUDpHzVA/DQdSjJ3UoYQ==}
@@ -5214,6 +5211,11 @@ packages:
     peerDependencies:
       react: ^18.2.0
 
+  react-dom@18.3.1:
+    resolution: {integrity: sha512-5m4nQKp+rZRb09LNH59GM4BxTh9251/ylbKIbpe7TpGxfJ+9kv6BLkLBXIjjspbgbnIBNqlI23tRnTWT0snUIw==}
+    peerDependencies:
+      react: ^18.3.1
+
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
 
@@ -5226,6 +5228,10 @@ packages:
 
   react@18.2.0:
     resolution: {integrity: sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==}
+    engines: {node: '>=0.10.0'}
+
+  react@18.3.1:
+    resolution: {integrity: sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==}
     engines: {node: '>=0.10.0'}
 
   readable-stream@2.3.8:
@@ -7915,12 +7921,12 @@ snapshots:
       '@swc/counter': 0.1.3
       tslib: 2.6.3
 
-  '@tanstack/react-store@0.5.5(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
+  '@tanstack/react-store@0.5.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@tanstack/store': 0.5.5
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-      use-sync-external-store: 1.2.2(react@18.2.0)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      use-sync-external-store: 1.2.2(react@18.3.1)
 
   '@tanstack/solid-store@0.5.5(solid-js@1.8.16)':
     dependencies:
@@ -7956,14 +7962,14 @@ snapshots:
       lodash: 4.17.21
       redent: 3.0.0
 
-  '@testing-library/react@16.0.1(@testing-library/dom@9.3.4)(@types/react-dom@18.3.0)(@types/react@18.2.70)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
+  '@testing-library/react@16.0.1(@testing-library/dom@9.3.4)(@types/react-dom@18.3.0)(@types/react@18.3.5)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@babel/runtime': 7.24.8
       '@testing-library/dom': 9.3.4
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
     optionalDependencies:
-      '@types/react': 18.2.70
+      '@types/react': 18.3.5
       '@types/react-dom': 18.3.0
 
   '@trysound/sax@0.2.0': {}
@@ -8023,17 +8029,14 @@ snapshots:
 
   '@types/react-dom@18.3.0':
     dependencies:
-      '@types/react': 18.2.70
+      '@types/react': 18.3.5
 
-  '@types/react@18.2.70':
+  '@types/react@18.3.5':
     dependencies:
       '@types/prop-types': 15.7.12
-      '@types/scheduler': 0.23.0
       csstype: 3.1.3
 
   '@types/resolve@1.20.2': {}
-
-  '@types/scheduler@0.23.0': {}
 
   '@types/secp256k1@4.0.6':
     dependencies:
@@ -8736,16 +8739,23 @@ snapshots:
       '@walletconnect/safe-json': 1.0.2
       pino: 7.11.0
 
-  '@walletconnect/modal-core@2.6.2(@types/react@18.2.70)(react@18.2.0)':
+  '@walletconnect/modal-core@2.6.2(@types/react@18.3.5)(react@18.2.0)':
     dependencies:
-      valtio: 1.11.2(@types/react@18.2.70)(react@18.2.0)
+      valtio: 1.11.2(@types/react@18.3.5)(react@18.2.0)
     transitivePeerDependencies:
       - '@types/react'
       - react
 
-  '@walletconnect/modal-ui@2.6.2(@types/react@18.2.70)(react@18.2.0)':
+  '@walletconnect/modal-core@2.6.2(@types/react@18.3.5)(react@18.3.1)':
     dependencies:
-      '@walletconnect/modal-core': 2.6.2(@types/react@18.2.70)(react@18.2.0)
+      valtio: 1.11.2(@types/react@18.3.5)(react@18.3.1)
+    transitivePeerDependencies:
+      - '@types/react'
+      - react
+
+  '@walletconnect/modal-ui@2.6.2(@types/react@18.3.5)(react@18.2.0)':
+    dependencies:
+      '@walletconnect/modal-core': 2.6.2(@types/react@18.3.5)(react@18.2.0)
       lit: 2.8.0
       motion: 10.16.2
       qrcode: 1.5.3
@@ -8753,10 +8763,28 @@ snapshots:
       - '@types/react'
       - react
 
-  '@walletconnect/modal@2.6.2(@types/react@18.2.70)(react@18.2.0)':
+  '@walletconnect/modal-ui@2.6.2(@types/react@18.3.5)(react@18.3.1)':
     dependencies:
-      '@walletconnect/modal-core': 2.6.2(@types/react@18.2.70)(react@18.2.0)
-      '@walletconnect/modal-ui': 2.6.2(@types/react@18.2.70)(react@18.2.0)
+      '@walletconnect/modal-core': 2.6.2(@types/react@18.3.5)(react@18.3.1)
+      lit: 2.8.0
+      motion: 10.16.2
+      qrcode: 1.5.3
+    transitivePeerDependencies:
+      - '@types/react'
+      - react
+
+  '@walletconnect/modal@2.6.2(@types/react@18.3.5)(react@18.2.0)':
+    dependencies:
+      '@walletconnect/modal-core': 2.6.2(@types/react@18.3.5)(react@18.2.0)
+      '@walletconnect/modal-ui': 2.6.2(@types/react@18.3.5)(react@18.2.0)
+    transitivePeerDependencies:
+      - '@types/react'
+      - react
+
+  '@walletconnect/modal@2.6.2(@types/react@18.3.5)(react@18.3.1)':
+    dependencies:
+      '@walletconnect/modal-core': 2.6.2(@types/react@18.3.5)(react@18.3.1)
+      '@walletconnect/modal-ui': 2.6.2(@types/react@18.3.5)(react@18.3.1)
     transitivePeerDependencies:
       - '@types/react'
       - react
@@ -12275,6 +12303,12 @@ snapshots:
       react: 18.2.0
       scheduler: 0.23.2
 
+  react-dom@18.3.1(react@18.3.1):
+    dependencies:
+      loose-envify: 1.4.0
+      react: 18.3.1
+      scheduler: 0.23.2
+
   react-is@16.13.1: {}
 
   react-is@17.0.2: {}
@@ -12282,6 +12316,10 @@ snapshots:
   react-refresh@0.14.2: {}
 
   react@18.2.0:
+    dependencies:
+      loose-envify: 1.4.0
+
+  react@18.3.1:
     dependencies:
       loose-envify: 1.4.0
 
@@ -13194,9 +13232,13 @@ snapshots:
     dependencies:
       react: 18.2.0
 
-  use-sync-external-store@1.2.2(react@18.2.0):
+  use-sync-external-store@1.2.0(react@18.3.1):
     dependencies:
-      react: 18.2.0
+      react: 18.3.1
+
+  use-sync-external-store@1.2.2(react@18.3.1):
+    dependencies:
+      react: 18.3.1
 
   utf-8-validate@5.0.10:
     dependencies:
@@ -13218,13 +13260,21 @@ snapshots:
 
   validate-html-nesting@1.2.2: {}
 
-  valtio@1.11.2(@types/react@18.2.70)(react@18.2.0):
+  valtio@1.11.2(@types/react@18.3.5)(react@18.2.0):
     dependencies:
       proxy-compare: 2.5.1
       use-sync-external-store: 1.2.0(react@18.2.0)
     optionalDependencies:
-      '@types/react': 18.2.70
+      '@types/react': 18.3.5
       react: 18.2.0
+
+  valtio@1.11.2(@types/react@18.3.5)(react@18.3.1):
+    dependencies:
+      proxy-compare: 2.5.1
+      use-sync-external-store: 1.2.0(react@18.3.1)
+    optionalDependencies:
+      '@types/react': 18.3.5
+      react: 18.3.1
 
   vite-hot-client@0.2.3(vite@5.4.2(@types/node@20.11.30)(terser@5.31.3)):
     dependencies:
