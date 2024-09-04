@@ -11,22 +11,12 @@
   "minimumReleaseAge": "3 days",
   "packageRules": [
     {
-      "matchCategories": ["node"],
-      "enabled": false
-    },
-    {
-      "groupName": "algosdk",
-      "matchPackageNames": ["algosdk"],
-      "matchUpdateTypes": ["patch", "minor"]
-    },
-    {
-      "groupName": "Tanstack Store",
-      "matchPackageNames": ["@tanstack/**"],
+      "groupName": "non-major dependencies",
       "matchUpdateTypes": ["patch", "minor"]
     },
     {
       "groupName": "Wallet dependencies",
-      "matchPackageNames": [
+      "matchPackagePatterns": [
         "@agoralabs-sh/avm-web-provider",
         "@blockshake/defly-connect",
         "@magic-ext/algorand",
@@ -38,48 +28,62 @@
       "rangeStrategy": "bump"
     },
     {
+      "groupName": "Type definitions",
+      "matchPackageNames": ["@types/**"],
+      "matchUpdateTypes": ["patch", "minor"]
+    },
+    {
+      "groupName": "React dependencies",
+      "matchPackagePatterns": ["react"],
+      "matchUpdateTypes": ["patch", "minor"]
+    },
+    {
+      "groupName": "Vue dependencies",
+      "matchPackagePatterns": ["vue"],
+      "matchUpdateTypes": ["patch", "minor"]
+    },
+    {
+      "groupName": "SolidJS dependencies",
+      "matchPackagePatterns": ["solid"],
+      "matchUpdateTypes": ["patch", "minor"]
+    },
+    {
+      "groupName": "ESLint and Prettier",
+      "matchPackagePatterns": ["eslint", "prettier"],
+      "matchUpdateTypes": ["patch", "minor"]
+    },
+    {
+      "groupName": "Tanstack Store",
+      "matchPackageNames": ["@tanstack/**"],
+      "matchUpdateTypes": ["patch", "minor"]
+    },
+    {
       "groupName": "React",
       "matchSourceUrls": ["https://github.com/facebook/react"],
       "matchUpdateTypes": ["patch", "minor"]
     },
     {
-      "groupName": "React type definitions",
+      "groupName": "React",
       "matchPackageNames": ["@types/react", "@types/react-dom"],
       "matchUpdateTypes": ["patch", "minor"]
     },
     {
-      "groupName": "Vue dependencies",
-      "matchPackageNames": ["vue", "!@tanstack/vue-store"],
+      "groupName": "TypeScript",
+      "matchPackageNames": ["typescript"],
       "matchUpdateTypes": ["patch", "minor"]
     },
     {
-      "groupName": "SolidJS dependencies",
-      "matchPackageNames": ["solid", "!@tanstack/solid-store"],
+      "groupName": "algosdk",
+      "matchPackageNames": ["algosdk"],
       "matchUpdateTypes": ["patch", "minor"]
     },
     {
-      "groupName": "Type definitions",
-      "matchPackageNames": ["@types/**", "!@types/react", "!@types/react-dom"],
-      "matchUpdateTypes": ["patch", "minor"]
+      "matchCategories": ["node"],
+      "enabled": false
     },
     {
-      "groupName": "ESLint/Prettier",
-      "matchPackageNames": ["eslint", "prettier"],
-      "matchUpdateTypes": ["patch", "minor"]
-    },
-    {
-      "groupName": "Build tools",
-      "matchPackageNames": ["vite", "tsup", "webpack"],
-      "matchUpdateTypes": ["patch", "minor"]
-    },
-    {
-      "groupName": "Testing libraries",
-      "matchPackageNames": ["vitest", "testing-library"],
-      "matchUpdateTypes": ["patch", "minor"]
-    },
-    {
-      "groupName": "non-major dependencies",
-      "matchUpdateTypes": ["patch", "minor"]
+      "matchPackageNames": ["@types/node"],
+      "enabled": false
     },
     {
       "matchDepTypes": ["engines"],
