@@ -5,18 +5,8 @@
     "type": "git",
     "url": "https://github.com/txnlab/use-wallet.git"
   },
-  "packageManager": "pnpm@9.2.0",
+  "packageManager": "pnpm@9.9.0",
   "type": "module",
-  "workspaces": [
-    "packages/use-wallet",
-    "packages/use-wallet-react",
-    "packages/use-wallet-solid",
-    "packages/use-wallet-vue",
-    "examples/use-wallet-example-vanilla-ts",
-    "examples/use-wallet-example-react",
-    "examples/use-wallet-example-solid",
-    "examples/use-wallet-example-vue"
-  ],
   "scripts": {
     "build": "pnpm -r build",
     "build:packages": "pnpm -r --filter '@txnlab/*' build",
