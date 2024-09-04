@@ -39,7 +39,7 @@
       {
         "groupName": "non-major dependencies",
         "labels": ["examples"],
-        "matchFileNames": ["examples/**"],
+        "matchFileNames": ["examples/**/package.json"],
         "matchDepTypes": ["dependencies", "devDependencies"],
         "matchUpdateTypes": ["patch", "minor"],
         "semanticCommitScope": "examples"
