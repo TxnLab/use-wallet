@@ -12,6 +12,7 @@
   "packageRules": [
     {
       "groupName": "non-major dependencies",
+      "matchPackageNames": ["!typescript", "!algosdk"],
       "matchUpdateTypes": ["patch", "minor"]
     },
     {
@@ -28,54 +29,14 @@
       ]
     },
     {
-      "groupName": "Type definitions",
-      "matchPackageNames": ["@types/**"],
-      "matchUpdateTypes": ["patch", "minor"]
-    },
-    {
-      "groupName": "React dependencies",
-      "matchUpdateTypes": ["patch", "minor"],
-      "matchPackageNames": ["/react/"]
-    },
-    {
       "groupName": "Vue dependencies",
       "matchUpdateTypes": ["patch", "minor"],
       "matchPackageNames": ["/vue/"]
     },
     {
-      "groupName": "SolidJS dependencies",
-      "matchUpdateTypes": ["patch", "minor"],
-      "matchPackageNames": ["/solid/"]
-    },
-    {
       "groupName": "ESLint and Prettier",
       "matchUpdateTypes": ["patch", "minor"],
       "matchPackageNames": ["/eslint/", "/prettier/"]
-    },
-    {
-      "groupName": "Tanstack Store",
-      "matchPackageNames": ["@tanstack/**"],
-      "matchUpdateTypes": ["patch", "minor"]
-    },
-    {
-      "groupName": "React",
-      "matchSourceUrls": ["https://github.com/facebook/react"],
-      "matchUpdateTypes": ["patch", "minor"]
-    },
-    {
-      "groupName": "React",
-      "matchPackageNames": ["@types/react", "@types/react-dom"],
-      "matchUpdateTypes": ["patch", "minor"]
-    },
-    {
-      "groupName": "TypeScript",
-      "matchPackageNames": ["typescript"],
-      "matchUpdateTypes": ["patch", "minor"]
-    },
-    {
-      "groupName": "algosdk",
-      "matchPackageNames": ["algosdk"],
-      "matchUpdateTypes": ["patch", "minor"]
     },
     {
       "matchCategories": ["node"],
