@@ -16,5 +16,6 @@
     "./examples/solid-ts",
     "./examples/vanilla-ts",
     "./examples/vue-ts"
-  ]
+  ],
+  "typescript.tsdk": "./packages/use-wallet/node_modules/typescript/lib"
 }
