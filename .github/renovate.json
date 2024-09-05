@@ -1,14 +1,22 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:js-lib"],
+  "extends": [
+    "config:recommended",
+    ":pinAllExceptPeerDependencies",
+    ":semanticCommitTypeAll(chore)",
+    "schedule:weekly"
+  ],
   "dependencyDashboard": true,
   "configMigration": true,
   "timezone": "America/New_York",
   "assignees": ["drichar"],
   "baseBranches": ["main"],
-  "schedule": "on the 1st day of the month",
   "ignorePaths": ["**/node_modules/**"],
   "minimumReleaseAge": "3 days",
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": "before 4am on Tuesday"
+  },
   "packageRules": [
     {
       "groupName": "non-major dependencies",
@@ -29,16 +37,6 @@
       ]
     },
     {
-      "groupName": "Vue dependencies",
-      "matchUpdateTypes": ["patch", "minor"],
-      "matchPackageNames": ["/vue/"]
-    },
-    {
-      "groupName": "ESLint and Prettier",
-      "matchUpdateTypes": ["patch", "minor"],
-      "matchPackageNames": ["/eslint/", "/prettier/"]
-    },
-    {
       "matchCategories": ["node"],
       "enabled": false
     },
@@ -50,11 +48,5 @@
       "matchDepTypes": ["engines"],
       "enabled": false
     }
-  ],
-  "npm": {
-    "lockFileMaintenance": {
-      "enabled": true,
-      "schedule": "on the 2nd day of the month"
-    }
-  }
+  ]
 }
