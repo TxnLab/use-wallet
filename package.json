@@ -8,8 +8,9 @@
   "packageManager": "pnpm@9.9.0",
   "type": "module",
   "scripts": {
-    "build": "pnpm -r build",
+    "build": "pnpm build:packages && pnpm build:examples",
     "build:packages": "pnpm -r --filter '@txnlab/*' build",
+    "build:examples": "pnpm -r --filter 'use-wallet-example-*' build",
     "watch:all": "pnpm -r --filter '@txnlab/*' --parallel start",
     "dev:core": "pnpm --filter 'use-wallet-example-vanilla-ts' dev",
     "dev:react": "pnpm --filter 'use-wallet-example-react' dev",
