@@ -7,15 +7,15 @@ First off, thank you for considering contributing to `@txnlab/use-wallet`! It's 
 If you have found an issue with `@txnlab/use-wallet`, please follow these steps:
 
 - Provide a clear description of the issue, including the expected behavior and the actual behavior.
-- Provide the version of `@txnlab/use-wallet` you are using.
+- Provide the version of `@txnlab/use-wallet` you are using, the framework you are using, and any other relevant context about your environment.
 - Describe the exact steps which reproduce the problem in as much detail as possible.
-- Provide a link to your project's code or a minimal example that reproduces the issue.
+- To help triage and fix the issue quickly, please provide a minimal reproducible example.
 
-Following these guidelines helps maintainers and the community understand your report and reproduce the behavior, which is crucial for fixing the issue.
+Please ensure that the reproduction is as minimal as possible. For more information on how to create a minimal reproducible example, please refer to [this guide](https://stackoverflow.com/help/minimal-reproducible-example).
 
 ## Suggesting New Features
 
-This section guides you through submitting an enhancement suggestion for `@txnlab/use-wallet`, including completely new features and minor improvements to existing functionality.
+If you would like to suggest a new feature or enhancement for `@txnlab/use-wallet`, please follow these guidelines:
 
 - Use a clear and descriptive title for the issue to identify the suggestion.
 - Provide a step-by-step description of the suggested enhancement in as many details as possible.
@@ -48,6 +48,10 @@ If you want to contribute to `@txnlab/use-wallet`, please follow these steps to 
   ```
 
 - Implement your changes and tests to files in the `src/` directory and corresponding test files in the `src/__tests__/` directory.
+
+- Use the examples in the `examples/` directory to test your changes.
+
+<!-- TODO: Add scripts for running examples -->
 
 - Git stage your required changes and commit (see below commit guidelines).
 
