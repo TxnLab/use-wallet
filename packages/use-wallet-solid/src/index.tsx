@@ -94,8 +94,6 @@ export function useWallet() {
     const { token, baseServer, port, headers } = manager().networkConfig[networkId]
     const newClient = new algosdk.Algodv2(token, baseServer, port, headers)
 
-    manager().algodClient = newClient
-
     manager().store.setState((state) => ({
       ...state,
       activeNetwork: networkId,

@@ -301,7 +301,8 @@ describe('useWallet', () => {
       mockSetAlgodClient(newAlgodClient)
       mockWalletManager.store.setState((state) => ({
         ...state,
-        activeNetwork: networkId
+        activeNetwork: networkId,
+        algodClient: newAlgodClient
       }))
     }
 
@@ -375,7 +376,10 @@ describe('useWallet', () => {
       activeWallet: WalletId.DEFLY
     }))
 
-    await nextTick()
+    // Force a re-render of the component
+    await nextTick(() => {
+      wrapper.vm.$forceUpdate()
+    })
 
     expect(activeWallet.value?.id).toBe(WalletId.DEFLY)
     expect(activeAddress.value).toBe('address1')

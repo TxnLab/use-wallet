@@ -150,7 +150,8 @@ export class WalletConnect extends BaseWallet {
     try {
       doc = getDocumentOrThrow()
       loc = getLocationOrThrow()
-    } catch (e) {
+    } catch (error) {
+      console.warn(`[${this.metadata.name}] Error getting window metadata:`, error)
       return defaultMetadata
     }
 
