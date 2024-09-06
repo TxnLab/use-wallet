@@ -12,6 +12,7 @@
     "build:packages": "pnpm -r --filter '@txnlab/*' build",
     "build:examples": "pnpm -r --filter 'use-wallet-example-*' build",
     "watch": "pnpm -r --filter '@txnlab/*' --parallel start",
+    "dev": "pnpm run watch",
     "test": "pnpm -r --if-present test",
     "lint": "pnpm -r lint",
     "prettier": "prettier --check .",
