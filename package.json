@@ -12,16 +12,16 @@
     "build:packages": "pnpm -r --filter '@txnlab/*' build",
     "build:examples": "pnpm -r --filter 'use-wallet-example-*' build",
     "watch": "pnpm -r --filter '@txnlab/*' --parallel start",
-    "dev:core": "pnpm --filter 'use-wallet-example-vanilla-ts' dev",
-    "dev:react": "pnpm --filter 'use-wallet-example-react' dev",
-    "dev:solid": "pnpm --filter 'use-wallet-example-solid' dev",
-    "dev:vue": "pnpm --filter 'use-wallet-example-vue' dev",
-    "dev:nextjs": "pnpm --filter 'use-wallet-example-nextjs' dev",
-    "dev:nuxt": "pnpm --filter 'use-wallet-example-nuxt' dev",
     "test": "pnpm -r --if-present test",
     "lint": "pnpm -r lint",
     "prettier": "prettier --check .",
-    "typecheck": "pnpm -r typecheck"
+    "typecheck": "pnpm -r typecheck",
+    "example:ts": "pnpm --filter 'use-wallet-example-vanilla-ts' dev",
+    "example:react": "pnpm --filter 'use-wallet-example-react' dev",
+    "example:solid": "pnpm --filter 'use-wallet-example-solid' dev",
+    "example:vue": "pnpm --filter 'use-wallet-example-vue' dev",
+    "example:nextjs": "pnpm --filter 'use-wallet-example-nextjs' dev",
+    "example:nuxt": "pnpm --filter 'use-wallet-example-nuxt' dev"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "6.5.0",
