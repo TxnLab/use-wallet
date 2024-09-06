@@ -1,3 +1,12 @@
+## [3.2.1](https://github.com/txnlab/use-wallet/compare/v3.2.0...v3.2.1) (2024-09-05)
+
+### Other Changes
+
+- Update Renovate configuration to no longer ignore `examples/**` projects' dependencies
+- Update all dependencies to latest versions, including `algosdk` (v2.9.0), `@tanstack/store` (v0.5.5), and `typescript` (v5.5.4)
+- Improve dev/build process with new development scripts ([#253](https://github.com/txnlab/use-wallet/pull/253)) ([0c9f976](https://github.com/txnlab/use-wallet/commit/0c9f9762d6086045eed1e721dedab9dadffbe6bc))
+- Add CONTRIBUTING.md with contribution guidelines ([#254](https://github.com/txnlab/use-wallet/pull/254)) ([91ebc0b](https://github.com/txnlab/use-wallet/commit/91ebc0bc2baf79cc0d6996b94515ffa0cb3f32ce))
+
 # [3.2.0](https://github.com/txnlab/use-wallet/compare/v3.1.6...v3.2.0) (2024-09-03)
 
 ### Features
