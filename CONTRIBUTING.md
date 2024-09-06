@@ -11,6 +11,8 @@ If you have found an issue with `@txnlab/use-wallet`, please follow these steps:
 - Describe the exact steps which reproduce the problem in as much detail as possible.
 - To help triage and fix the issue quickly, please provide a minimal reproducible example.
 
+To create a shareable code example for web, you can use CodeSandbox (https://codesandbox.io/s/new) or Stackblitz (https://stackblitz.com/).
+
 Feel free to fork any of our CodeSandbox examples to reproduce your issue:
 
 | Package                    | Framework         | Example                                                |
