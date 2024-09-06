@@ -1,2 +1,5 @@
 // Define `self` to avoid ReferenceError in Node.js environment
-;(global as any).self = global
+// eslint-disable-next-line no-extra-semi
+;(() => {
+    (global as any).self = global
+  })();
