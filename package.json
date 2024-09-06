@@ -11,7 +11,7 @@
     "build": "pnpm build:packages && pnpm build:examples",
     "build:packages": "pnpm -r --filter '@txnlab/*' build",
     "build:examples": "pnpm -r --filter 'use-wallet-example-*' build",
-    "watch:all": "pnpm -r --filter '@txnlab/*' --parallel start",
+    "watch": "pnpm -r --filter '@txnlab/*' --parallel start",
     "dev:core": "pnpm --filter 'use-wallet-example-vanilla-ts' dev",
     "dev:react": "pnpm --filter 'use-wallet-example-react' dev",
     "dev:solid": "pnpm --filter 'use-wallet-example-solid' dev",
