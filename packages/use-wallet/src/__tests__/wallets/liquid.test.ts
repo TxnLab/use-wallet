@@ -1,11 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Store } from '@tanstack/store';
-import algosdk, { Transaction } from 'algosdk';
+import { Transaction } from 'algosdk';
 import { StorageAdapter } from 'src/storage';
 import { LOCAL_STORAGE_KEY, State, defaultState } from 'src/store';
 import { LiquidWallet } from 'src/wallets/liquid';
 import { WalletId } from 'src/wallets/types';
-import * as actions from 'src/store/actions'; // Import all actions
 
 // Mock storage adapter
 vi.mock('src/storage', () => ({
