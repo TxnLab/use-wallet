@@ -11,6 +11,17 @@ If you have found an issue with `@txnlab/use-wallet`, please follow these steps:
 - Describe the exact steps which reproduce the problem in as much detail as possible.
 - To help triage and fix the issue quickly, please provide a minimal reproducible example.
 
+Feel free to fork any of our CodeSandbox examples to reproduce your issue:
+
+| Package                    | Framework         | Example                                                |
+| -------------------------- | ----------------- | ------------------------------------------------------ |
+| `@txnlab/use-wallet`       | Vite (Vanilla TS) | https://codesandbox.io/p/devbox/vite-vanilla-ts-mxmghx |
+| `@txnlab/use-wallet-react` | Vite (React)      | https://codesandbox.io/p/devbox/vite-react-k55gr5      |
+| `@txnlab/use-wallet-solid` | Vite (Solid)      | https://codesandbox.io/p/devbox/vite-solid-w2gtz2      |
+| `@txnlab/use-wallet-vue`   | Vite (Vue)        | https://codesandbox.io/p/devbox/vite-vue-cznvls        |
+
+A public GitHub repository also works. 👌
+
 Please ensure that the reproduction is as minimal as possible. For more information on how to create a minimal reproducible example, please refer to [this guide](https://stackoverflow.com/help/minimal-reproducible-example).
 
 ## Suggesting New Features
