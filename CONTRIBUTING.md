@@ -47,15 +47,11 @@ If you want to contribute to `@txnlab/use-wallet`, please follow these steps to 
   pnpm build:packages
   ```
 
-- Implement your changes and tests to files in the `src/` directory and corresponding test files in the `src/__tests__/` directory.
+- Implement your changes and tests to files in the packages' `src/` directory and corresponding test files.
 
-- Use the examples in the `examples/` directory to test your changes.
+- Git stage your changes and commit (see commit guidelines below).
 
-<!-- TODO: Add scripts for running examples -->
-
-- Git stage your required changes and commit (see below commit guidelines).
-
-- Push your changes to your fork and submit a pull request.
+- Submit PR for review (see PR guidelines below).
 
 ### Running Examples
 
@@ -71,13 +67,16 @@ If you want to contribute to `@txnlab/use-wallet`, please follow these steps to 
   pnpm dev
   ```
 
-- After making changes to one of the packages, you can run the following command to rebuild packages:
+- Alternatively, from the root directory you can run one of the following commands to run an example:
 
   ```bash
-  pnpm build:packages
+  pnpm example:ts
+  pnpm example:react
+  pnpm example:solid
+  pnpm example:vue
+  pnpm example:nextjs
+  pnpm example:nuxt
   ```
-
-- Restart the example to see the changes.
 
 ## Git Commit Guidelines
 
@@ -172,10 +171,6 @@ being reverted.
 
   ```bash
   pnpm test
-  ```
-
-  ```bash
-  pnpm build
   ```
 
 - If possible/appropriate, create new tests that fail without your changes and pass with them.
