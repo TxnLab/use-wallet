@@ -10,7 +10,7 @@ export { LiquidOptions }
 
 export class LiquidWallet extends BaseWallet {
   protected store: Store<State>
-  private authClient: LiquidAuthClient | undefined | null
+  public authClient: LiquidAuthClient | undefined | null
   private options: LiquidOptions
 
   constructor({

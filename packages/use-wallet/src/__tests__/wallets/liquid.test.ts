@@ -66,7 +66,7 @@ describe('LiquidWallet', () => {
       getAlgodClient: {} as any,
       store,
       subscribe: vi.fn(),
-      options: { RTC_config_username: 'username', RTC_config_: 'credential' }
+      options: { RTC_config_username: 'username', RTC_config_credential: 'credential' }
     })
   })
 
