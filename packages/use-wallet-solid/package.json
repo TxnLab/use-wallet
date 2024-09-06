@@ -39,7 +39,7 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsup",
-    "start": "tsup src/index.ts --watch",
+    "start": "tsup src/index.tsx --watch",
     "test": "vitest",
     "test:watch": "vitest --watch",
     "lint": "eslint -c '../../.eslintrc.json' '**/*.{js,ts}'",
