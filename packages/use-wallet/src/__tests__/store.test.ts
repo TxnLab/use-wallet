@@ -1,4 +1,5 @@
 import { Store } from '@tanstack/store'
+import { Algodv2 } from 'algosdk'
 import { NetworkId } from 'src/network'
 import {
   State,
@@ -40,6 +41,43 @@ describe('Mutations', () => {
       const state = store.state
       expect(state.wallets[walletId]).toEqual(walletState)
       expect(state.activeWallet).toBe(walletId)
+    })
+
+    it('should create new object references when adding a wallet', () => {
+      const walletId = WalletId.DEFLY
+      const account1 = {
+        name: 'Defly Wallet 1',
+        address: 'address1'
+      }
+      const account2 = {
+        name: 'Defly Wallet 2',
+        address: 'address2'
+      }
+      const walletState = {
+        accounts: [account1, account2],
+        activeAccount: account1
+      }
+
+      const originalWalletState = { ...walletState }
+
+      addWallet(store, { walletId, wallet: walletState })
+
+      const storedWallet = store.state.wallets[walletId]
+
+      // Check that new object references were created
+      expect(storedWallet).not.toBe(walletState)
+      expect(storedWallet?.accounts).not.toBe(walletState.accounts)
+      expect(storedWallet?.activeAccount).not.toBe(walletState.activeAccount)
+
+      // Check that the content is still correct
+      expect(storedWallet?.accounts).toEqual([account1, account2])
+      expect(storedWallet?.activeAccount).toEqual(account1)
+
+      // Modify the stored wallet state
+      storedWallet!.accounts[0].name = 'Modified Name'
+
+      // Check that the original wallet state is unchanged
+      expect(walletState).toEqual(originalWalletState)
     })
   })
 
@@ -217,6 +255,73 @@ describe('Mutations', () => {
       setActiveAccount(store, { walletId: WalletId.DEFLY, address: 'foo' })
       expect(store.state.wallets[walletId]?.activeAccount).toEqual(account1)
     })
+
+    it('should not modify other accounts when setting active account', () => {
+      const walletId = WalletId.DEFLY
+      const account1 = {
+        name: 'Defly Wallet 1',
+        address: 'address1'
+      }
+      const account2 = {
+        name: 'Defly Wallet 2',
+        address: 'address2'
+      }
+      const walletState = {
+        accounts: [account1, account2],
+        activeAccount: account1
+      }
+
+      addWallet(store, { walletId, wallet: walletState })
+      expect(store.state.wallets[walletId]?.accounts).toEqual([account1, account2])
+      expect(store.state.wallets[walletId]?.activeAccount).toEqual(account1)
+
+      setActiveAccount(store, { walletId, address: account2.address })
+
+      // Check that active account has changed
+      expect(store.state.wallets[walletId]?.activeAccount).toEqual(account2)
+
+      // Check that accounts array is unchanged
+      expect(store.state.wallets[walletId]?.accounts).toEqual([account1, account2])
+
+      // Verify that the first account in the array is still account1
+      expect(store.state.wallets[walletId]?.accounts[0]).toEqual(account1)
+    })
+
+    it('should create new object references for active account and accounts array', () => {
+      const walletId = WalletId.DEFLY
+      const account1 = {
+        name: 'Defly Wallet 1',
+        address: 'address1'
+      }
+      const account2 = {
+        name: 'Defly Wallet 2',
+        address: 'address2'
+      }
+      const walletState = {
+        accounts: [account1, account2],
+        activeAccount: account1
+      }
+
+      addWallet(store, { walletId, wallet: walletState })
+      const originalWallet = store.state.wallets[walletId]
+      const originalAccounts = originalWallet?.accounts
+      const originalActiveAccount = originalWallet?.activeAccount
+
+      setActiveAccount(store, { walletId, address: account2.address })
+
+      const updatedWallet = store.state.wallets[walletId]
+      const updatedAccounts = updatedWallet?.accounts
+      const updatedActiveAccount = updatedWallet?.activeAccount
+
+      // Check that new object references were created
+      expect(updatedWallet).not.toBe(originalWallet)
+      expect(updatedAccounts).not.toBe(originalAccounts)
+      expect(updatedActiveAccount).not.toBe(originalActiveAccount)
+
+      // Check that the content is still correct
+      expect(updatedAccounts).toEqual([account1, account2])
+      expect(updatedActiveAccount).toEqual(account2)
+    })
   })
 
   describe('setAccounts', () => {
@@ -272,6 +377,47 @@ describe('Mutations', () => {
       // Active account should be set to first account in new accounts list (account2)
       expect(store.state.wallets[walletId]?.activeAccount).toEqual(account2)
     })
+
+    it('should create new object references when setting accounts', () => {
+      const walletId = WalletId.DEFLY
+      const account1 = {
+        name: 'Defly Wallet 1',
+        address: 'address1'
+      }
+      const account2 = {
+        name: 'Defly Wallet 2',
+        address: 'address2'
+      }
+      const walletState = {
+        accounts: [account1],
+        activeAccount: account1
+      }
+
+      addWallet(store, { walletId, wallet: walletState })
+
+      const newAccounts = [account1, account2]
+      const originalNewAccounts = [...newAccounts]
+
+      setAccounts(store, { walletId, accounts: newAccounts })
+
+      const storedWallet = store.state.wallets[walletId]
+
+      // Check that new object references were created
+      expect(storedWallet?.accounts).not.toBe(newAccounts)
+      expect(storedWallet?.accounts[0]).not.toBe(account1)
+      expect(storedWallet?.accounts[1]).not.toBe(account2)
+      expect(storedWallet?.activeAccount).not.toBe(account1)
+
+      // Check that the content is still correct
+      expect(storedWallet?.accounts).toEqual([account1, account2])
+      expect(storedWallet?.activeAccount).toEqual(account1)
+
+      // Modify the stored accounts
+      storedWallet!.accounts[0].name = 'Modified Name'
+
+      // Check that the original new accounts array is unchanged
+      expect(newAccounts).toEqual(originalNewAccounts)
+    })
   })
 
   describe('setActiveNetwork', () => {
@@ -280,7 +426,8 @@ describe('Mutations', () => {
       expect(store.state.activeNetwork).toBe(NetworkId.TESTNET)
 
       const networkId = NetworkId.MAINNET
-      setActiveNetwork(store, { networkId })
+      const algodClient = new Algodv2('', 'https://mainnet-api.algonode.cloud/')
+      setActiveNetwork(store, { networkId, algodClient })
       expect(store.state.activeNetwork).toBe(networkId)
     })
   })
@@ -408,7 +555,8 @@ describe('Type Guards', () => {
       const defaultState: State = {
         wallets: {},
         activeWallet: null,
-        activeNetwork: NetworkId.TESTNET
+        activeNetwork: NetworkId.TESTNET,
+        algodClient: new Algodv2('', 'https://testnet-api.algonode.cloud/')
       }
       expect(isValidState(defaultState)).toBe(true)
 
@@ -444,7 +592,8 @@ describe('Type Guards', () => {
           }
         },
         activeWallet: WalletId.DEFLY,
-        activeNetwork: NetworkId.TESTNET
+        activeNetwork: NetworkId.TESTNET,
+        algodClient: new Algodv2('', 'https://testnet-api.algonode.cloud/')
       }
       expect(isValidState(state)).toBe(true)
     })

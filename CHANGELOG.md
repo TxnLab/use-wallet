@@ -1,3 +1,60 @@
+## [3.2.1](https://github.com/txnlab/use-wallet/compare/v3.2.0...v3.2.1) (2024-09-05)
+
+### Other Changes
+
+- Update Renovate configuration to no longer ignore `examples/**` projects' dependencies
+- Update all dependencies to latest versions, including `algosdk` (v2.9.0), `@tanstack/store` (v0.5.5), and `typescript` (v5.5.4)
+- Improve dev/build process with new development scripts ([#253](https://github.com/txnlab/use-wallet/pull/253)) ([0c9f976](https://github.com/txnlab/use-wallet/commit/0c9f9762d6086045eed1e721dedab9dadffbe6bc))
+- Add CONTRIBUTING.md with contribution guidelines ([#254](https://github.com/txnlab/use-wallet/pull/254)) ([91ebc0b](https://github.com/txnlab/use-wallet/commit/91ebc0bc2baf79cc0d6996b94515ffa0cb3f32ce))
+
+# [3.2.0](https://github.com/txnlab/use-wallet/compare/v3.1.6...v3.2.0) (2024-09-03)
+
+### Features
+
+- **Core:** Move algod client to store ([#224](https://github.com/txnlab/use-wallet/pull/224)) ([07e7273](https://github.com/txnlab/use-wallet/commit/07e7273452ab49a54353c4d686b6b7dd4dddfac8))
+
+## [3.1.6](https://github.com/txnlab/use-wallet/compare/v3.1.5...v3.1.6) (2024-08-29)
+
+### Bug Fixes
+
+- **Core:** Initialize manager with active network from persisted state ([#221](https://github.com/txnlab/use-wallet/pull/221)) ([2ff796b](https://github.com/txnlab/use-wallet/commit/2ff796b74c1e16927ce3739ff5980ef655c4e08a))
+
+## [3.1.5](https://github.com/txnlab/use-wallet/compare/v3.1.4...v3.1.5) (2024-08-21)
+
+### Bug Fixes
+
+- **Core:** Immutable state updates in store mutation functions ([#220](https://github.com/txnlab/use-wallet/pull/220)) ([22421d4](https://github.com/txnlab/use-wallet/commit/22421d4951454bf62357d8872942b5dca933b958))
+
+## [3.1.4](https://github.com/txnlab/use-wallet/compare/v3.1.3...v3.1.4) (2024-08-19)
+
+### Bug Fixes
+
+- **WalletConnect:** Handle untyped byte arrays returned by sign request ([#218](https://github.com/txnlab/use-wallet/pull/218)) ([9a39164](https://github.com/txnlab/use-wallet/commit/9a39164c5e58fa2673f52297f04ab72180c53b51))
+
+## [3.1.3](https://github.com/txnlab/use-wallet/compare/v3.1.2...v3.1.3) (2024-08-10)
+
+### Bug Fixes
+
+- **Next.js Example:** Resolve Webpack "module not found" errors ([#212](https://github.com/txnlab/use-wallet/pull/212)) ([b0eea4d](https://github.com/txnlab/use-wallet/commit/b0eea4d89732e462e58e559a5a1f064932a77d10))
+
+## [3.1.2](https://github.com/txnlab/use-wallet/compare/v3.1.1...v3.1.2) (2024-08-09)
+
+### Bug Fixes
+
+- Revert "fix(core): fix Webpack static analysis issue with dynamic imports ([#211](https://github.com/txnlab/use-wallet/pull/211))" ([fc1529b](https://github.com/txnlab/use-wallet/commit/fc1529bc49edd1b70d13a57084000eeddbf00460))
+
+## [3.1.1](https://github.com/txnlab/use-wallet/compare/v3.1.0...v3.1.1) (2024-08-09)
+
+### Bug Fixes
+
+- **Core:** Fix Webpack static analysis issue with dynamic imports ([#211](https://github.com/txnlab/use-wallet/pull/211)) ([4f77fc3](https://github.com/txnlab/use-wallet/commit/4f77fc3c8f3ece643f3b9fcf68ab39804a7cc5fb))
+
+# [3.1.0](https://github.com/txnlab/use-wallet/compare/v3.0.0...v3.1.0) (2024-08-02)
+
+### Features
+
+- Reactive algodClient for SolidJS ([#204](https://github.com/txnlab/use-wallet/pull/204)) ([11ef688](https://github.com/txnlab/use-wallet/commit/11ef688efa724aa94e99232d60c55b2e2a9d41c8))
+
 # [3.0.0](https://github.com/TxnLab/use-wallet/releases/tag/v3.0.0) (2024-07-17)
 
 ### Summary

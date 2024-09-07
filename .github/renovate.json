@@ -1,53 +1,52 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:js-lib"],
+  "extends": [
+    "config:recommended",
+    ":pinAllExceptPeerDependencies",
+    ":semanticCommitTypeAll(chore)",
+    "schedule:weekly"
+  ],
   "dependencyDashboard": true,
   "configMigration": true,
   "timezone": "America/New_York",
   "assignees": ["drichar"],
   "baseBranches": ["main"],
-  "schedule": "on the 1st day of the month",
+  "ignorePaths": ["**/node_modules/**"],
+  "minimumReleaseAge": "3 days",
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": "before 4am on Tuesday"
+  },
   "packageRules": [
+    {
+      "groupName": "non-major dependencies",
+      "matchPackageNames": ["!typescript", "!algosdk"],
+      "matchUpdateTypes": ["patch", "minor"]
+    },
+    {
+      "groupName": "Wallet dependencies",
+      "rangeStrategy": "bump",
+      "matchPackageNames": [
+        "/@agoralabs-sh/avm-web-provider/",
+        "/@blockshake/defly-connect/",
+        "/@magic-ext/algorand/",
+        "/magic-sdk/",
+        "/@perawallet/connect/",
+        "/lute-connect/",
+        "/walletconnect/"
+      ]
+    },
     {
       "matchCategories": ["node"],
       "enabled": false
-    }
-  ],
-  "npm": {
-    "lockFileMaintenance": {
-      "enabled": true,
-      "schedule": "on the 2nd day of the month"
     },
-    "minimumReleaseAge": "3 days",
-    "packageRules": [
-      {
-        "groupName": "non-major dependencies",
-        "labels": ["packages"],
-        "matchFileNames": ["package.json", "packages/**"],
-        "matchDepTypes": ["dependencies", "devDependencies"],
-        "matchUpdateTypes": ["patch", "minor"],
-        "semanticCommitScope": "deps"
-      },
-      {
-        "groupName": "non-major peer dependencies",
-        "labels": ["packages"],
-        "matchFileNames": ["package.json", "packages/**"],
-        "matchDepTypes": ["optionalDependencies", "peerDependencies"],
-        "matchUpdateTypes": ["patch", "minor"],
-        "semanticCommitScope": "deps"
-      },
-      {
-        "groupName": "non-major dependencies",
-        "labels": ["examples"],
-        "matchFileNames": ["examples/**"],
-        "matchDepTypes": ["dependencies", "devDependencies"],
-        "matchUpdateTypes": ["patch", "minor"],
-        "semanticCommitScope": "examples"
-      },
-      {
-        "matchDepTypes": ["engines"],
-        "enabled": false
-      }
-    ]
-  }
+    {
+      "matchPackageNames": ["@types/node"],
+      "enabled": false
+    },
+    {
+      "matchDepTypes": ["engines"],
+      "enabled": false
+    }
+  ]
 }

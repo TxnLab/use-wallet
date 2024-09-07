@@ -40,7 +40,7 @@ type WalletConnectModalOptions = Pick<
 
 export type WalletConnectOptions = SignClientOptions & WalletConnectModalOptions
 
-export type SignTxnsResponse = Array<Uint8Array | string | null | undefined>
+export type SignTxnsResponse = Array<Uint8Array | number[] | string | null | undefined>
 
 export class SessionError extends Error {
   constructor(message: string) {
@@ -150,7 +150,8 @@ export class WalletConnect extends BaseWallet {
     try {
       doc = getDocumentOrThrow()
       loc = getLocationOrThrow()
-    } catch (e) {
+    } catch (error) {
+      console.warn(`[${this.metadata.name}] Error getting window metadata:`, error)
       return defaultMetadata
     }
 
@@ -518,10 +519,21 @@ export class WalletConnect extends BaseWallet {
         request
       })
 
-      // Filter out unsigned transactions, convert base64 strings to Uint8Array
+      // Filter out unsigned transactions, convert signed transactions to Uint8Array
       const signedTxns = signTxnsResult.reduce<Uint8Array[]>((acc, value) => {
         if (value) {
-          const signedTxn = typeof value === 'string' ? base64ToByteArray(value) : value
+          let signedTxn: Uint8Array
+          if (typeof value === 'string') {
+            signedTxn = base64ToByteArray(value)
+          } else if (value instanceof Uint8Array) {
+            signedTxn = value
+          } else if (Array.isArray(value)) {
+            signedTxn = new Uint8Array(value)
+          } else {
+            // Log unexpected types for debugging
+            console.warn(`[${this.metadata.name}] Unexpected type in signTxnsResult`, value)
+            signedTxn = new Uint8Array()
+          }
           acc.push(signedTxn)
         }
         return acc

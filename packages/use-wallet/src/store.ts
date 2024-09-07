@@ -1,3 +1,4 @@
+import { Algodv2 } from 'algosdk'
 import { NetworkId, isValidNetworkId } from 'src/network'
 import { WalletId, type WalletAccount } from 'src/wallets'
 import type { Store } from '@tanstack/store'
@@ -13,12 +14,14 @@ export interface State {
   wallets: WalletStateMap
   activeWallet: WalletId | null
   activeNetwork: NetworkId
+  algodClient: Algodv2
 }
 
 export const defaultState: State = {
   wallets: {},
   activeWallet: null,
-  activeNetwork: NetworkId.TESTNET
+  activeNetwork: NetworkId.TESTNET,
+  algodClient: new Algodv2('', 'https://testnet-api.algonode.cloud/')
 }
 
 export const LOCAL_STORAGE_KEY = '@txnlab/use-wallet:v3'
@@ -30,14 +33,17 @@ export function addWallet(
   { walletId, wallet }: { walletId: WalletId; wallet: WalletState }
 ) {
   store.setState((state) => {
-    const newWallets = {
+    const updatedWallets = {
       ...state.wallets,
-      [walletId]: wallet
+      [walletId]: {
+        accounts: wallet.accounts.map((account) => ({ ...account })),
+        activeAccount: wallet.activeAccount ? { ...wallet.activeAccount } : null
+      }
     }
 
     return {
       ...state,
-      wallets: newWallets,
+      wallets: updatedWallets,
       activeWallet: walletId
     }
   })
@@ -45,24 +51,22 @@ export function addWallet(
 
 export function removeWallet(store: Store<State>, { walletId }: { walletId: WalletId }) {
   store.setState((state) => {
-    const newWallets = { ...state.wallets }
-    delete newWallets[walletId]
+    const updatedWallets = { ...state.wallets }
+    delete updatedWallets[walletId]
 
     return {
       ...state,
-      wallets: newWallets,
+      wallets: updatedWallets,
       activeWallet: state.activeWallet === walletId ? null : state.activeWallet
     }
   })
 }
 
 export function setActiveWallet(store: Store<State>, { walletId }: { walletId: WalletId | null }) {
-  store.setState((state) => {
-    return {
-      ...state,
-      activeWallet: walletId
-    }
-  })
+  store.setState((state) => ({
+    ...state,
+    activeWallet: walletId
+  }))
 }
 
 export function setActiveAccount(
@@ -72,24 +76,30 @@ export function setActiveAccount(
   store.setState((state) => {
     const wallet = state.wallets[walletId]
     if (!wallet) {
-      return state
-    }
-    const activeAccount = wallet.accounts.find((a) => a.address === address)
-    if (!activeAccount) {
+      console.warn(`Wallet with id "${walletId}" not found`)
       return state
     }
 
-    const newWallets = {
+    const newActiveAccount = wallet.accounts.find((a) => a.address === address)
+    if (!newActiveAccount) {
+      console.warn(`Account with address ${address} not found in wallet "${walletId}"`)
+      return state
+    }
+
+    const updatedWallet = {
+      ...wallet,
+      accounts: wallet.accounts.map((account) => ({ ...account })),
+      activeAccount: { ...newActiveAccount }
+    }
+
+    const updatedWallets = {
       ...state.wallets,
-      [walletId]: {
-        ...wallet,
-        activeAccount
-      }
+      [walletId]: updatedWallet
     }
 
     return {
       ...state,
-      wallets: newWallets
+      wallets: updatedWallets
     }
   })
 }
@@ -101,42 +111,47 @@ export function setAccounts(
   store.setState((state) => {
     const wallet = state.wallets[walletId]
     if (!wallet) {
+      console.warn(`Wallet with id "${walletId}" not found`)
       return state
     }
 
-    // Check if `accounts` includes `wallet.activeAccount`
-    const isActiveAccountConnected = accounts.some(
+    const newAccounts = accounts.map((account) => ({ ...account }))
+
+    const isActiveAccountConnected = newAccounts.some(
       (account) => account.address === wallet.activeAccount?.address
     )
 
-    const activeAccount = isActiveAccountConnected ? wallet.activeAccount! : accounts[0] || null
+    const newActiveAccount = isActiveAccountConnected
+      ? { ...wallet.activeAccount! }
+      : newAccounts[0] || null
 
-    const newWallet = {
+    const updatedWallet = {
       ...wallet,
-      accounts,
-      activeAccount
+      accounts: newAccounts,
+      activeAccount: newActiveAccount
     }
 
-    // Create a new map with the updated wallet
-    const newWallets = {
+    const updatedWallets = {
       ...state.wallets,
-      [walletId]: newWallet
+      [walletId]: updatedWallet
     }
 
     return {
       ...state,
-      wallets: newWallets
+      wallets: updatedWallets
     }
   })
 }
 
-export function setActiveNetwork(store: Store<State>, { networkId }: { networkId: NetworkId }) {
-  store.setState((state) => {
-    return {
-      ...state,
-      activeNetwork: networkId
-    }
-  })
+export function setActiveNetwork(
+  store: Store<State>,
+  { networkId, algodClient }: { networkId: NetworkId; algodClient: Algodv2 }
+) {
+  store.setState((state) => ({
+    ...state,
+    activeNetwork: networkId,
+    algodClient
+  }))
 }
 
 // Type guards
