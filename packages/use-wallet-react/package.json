@@ -1,6 +1,7 @@
 {
   "name": "@biatec/avm-wallet-react",
   "version": "3.2.1",
+  "private": false,
   "description": "React library for integrating Algorand wallets into decentralized applications",
   "author": "Doug Richar <drichar@gmail.com>",
   "license": "MIT",

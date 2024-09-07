@@ -1,6 +1,6 @@
 {
   "name": "avm-wallet",
-  "private": true,
+  "private": false,
   "repository": {
     "type": "git",
     "url": "https://github.com/txnlab/avm-wallet.git"
