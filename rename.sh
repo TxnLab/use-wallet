@@ -19,6 +19,14 @@ sed -i -e 's~TxnLab Inc.~TxnLab Inc., Scholtz \& Company, jsa~g' -e 's~Scholtz \
 dir=$(pwd)
 echo $dir
 cd $dir && cd packages/use-wallet && pnpm link --global
-cd $dir && cd packages/use-wallet-vue && pnpm link avm-wallet
-cd $dir && cd packages/use-wallet-react && pnpm link avm-wallet
-cd $dir && cd packages/use-wallet-solid && pnpm link avm-wallet
+cd $dir && cd packages/use-wallet-vue && pnpm link avm-wallet && pnpm link --global
+cd $dir && cd packages/use-wallet-react && pnpm link avm-wallet  && pnpm link --global
+cd $dir && cd packages/use-wallet-solid && pnpm link avm-wallet  && pnpm link --global
+
+
+cd $dir && cd examples/nextjs && pnpm link avm-wallet
+cd $dir && cd examples/nuxt && pnpm link avm-wallet  && pnpm link avm-wallet-vue
+cd $dir && cd examples/react-ts && pnpm link avm-wallet-react
+cd $dir && cd examples/solid-ts && pnpm link avm-wallet-solid
+cd $dir && cd examples/vanilla-ts && pnpm link avm-wallet
+cd $dir && cd examples/vue-ts && pnpm link avm-wallet-vue

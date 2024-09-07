@@ -132,6 +132,12 @@ importers:
       algosdk:
         specifier: 2.9.0
         version: 2.9.0
+      avm-wallet:
+        specifier: ^3.2.1
+        version: link:../../packages/use-wallet
+      avm-wallet-vue:
+        specifier: ^3.2.1
+        version: link:../../packages/use-wallet-vue
       lute-connect:
         specifier: ^1.3.0
         version: 1.3.0
@@ -172,6 +178,9 @@ importers:
       algosdk:
         specifier: 2.9.0
         version: 2.9.0
+      avm-wallet-react:
+        specifier: ^3.2.1
+        version: link:../../packages/use-wallet-react
       lute-connect:
         specifier: ^1.3.0
         version: 1.3.0
@@ -233,6 +242,9 @@ importers:
       algosdk:
         specifier: 2.9.0
         version: 2.9.0
+      avm-wallet-solid:
+        specifier: ^3.2.1
+        version: link:../../packages/use-wallet-solid
       lute-connect:
         specifier: ^1.3.0
         version: 1.3.0
@@ -270,6 +282,9 @@ importers:
       algosdk:
         specifier: 2.9.0
         version: 2.9.0
+      avm-wallet:
+        specifier: ^3.2.1
+        version: link:../../packages/use-wallet
       lute-connect:
         specifier: ^1.3.0
         version: 1.3.0
@@ -304,6 +319,9 @@ importers:
       algosdk:
         specifier: 2.9.0
         version: 2.9.0
+      avm-wallet-vue:
+        specifier: ^3.2.1
+        version: link:../../packages/use-wallet-vue
       lute-connect:
         specifier: ^1.3.0
         version: 1.3.0
