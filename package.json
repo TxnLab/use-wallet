@@ -15,6 +15,7 @@
     "dev": "pnpm run watch",
     "test": "pnpm -r --if-present test",
     "lint": "pnpm -r lint",
+    "lint:fix": "pnpm -r lint --fix",
     "prettier": "prettier --check .",
     "typecheck": "pnpm -r typecheck",
     "example:ts": "pnpm --filter 'use-wallet-example-vanilla-ts' dev",
