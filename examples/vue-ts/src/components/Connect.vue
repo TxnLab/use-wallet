@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NetworkId, WalletId, useWallet, type Wallet } from '@biatec/avm-wallet-vue'
+import { NetworkId, WalletId, useWallet, type Wallet } from 'avm-wallet-vue'
 import algosdk from 'algosdk'
 import { ref } from 'vue'
 

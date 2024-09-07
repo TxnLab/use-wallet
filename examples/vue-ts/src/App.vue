@@ -11,7 +11,7 @@ import Connect from './components/Connect.vue'
       <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
     </a>
   </div>
-  <h1>@biatec/avm-wallet-vue</h1>
+  <h1>avm-wallet-vue</h1>
   <Connect />
 </template>
 

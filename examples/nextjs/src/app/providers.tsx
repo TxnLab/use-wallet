@@ -1,6 +1,6 @@
 'use client'
 
-import { NetworkId, WalletId, WalletManager, WalletProvider } from '@biatec/avm-wallet-react'
+import { NetworkId, WalletId, WalletManager, WalletProvider } from 'avm-wallet-react'
 
 const walletManager = new WalletManager({
   wallets: [

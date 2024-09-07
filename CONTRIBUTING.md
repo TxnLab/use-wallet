@@ -1,13 +1,13 @@
 # Contributing
 
-First off, thank you for considering contributing to `@biatec/avm-wallet`! It's people like you that make this project such a great tool for the Algorand community.
+First off, thank you for considering contributing to `avm-wallet`! It's people like you that make this project such a great tool for the Algorand community.
 
 ## Reporting Issues
 
-If you have found an issue with `@biatec/avm-wallet`, please follow these steps:
+If you have found an issue with `avm-wallet`, please follow these steps:
 
 - Provide a clear description of the issue, including the expected behavior and the actual behavior.
-- Provide the version of `@biatec/avm-wallet` you are using, the framework you are using, and any other relevant context about your environment.
+- Provide the version of `avm-wallet` you are using, the framework you are using, and any other relevant context about your environment.
 - Describe the exact steps which reproduce the problem in as much detail as possible.
 - To help triage and fix the issue quickly, please provide a minimal reproducible example.
 
@@ -17,10 +17,10 @@ Feel free to fork any of our CodeSandbox examples to reproduce your issue:
 
 | Package                    | Framework         | Example                                                |
 | -------------------------- | ----------------- | ------------------------------------------------------ |
-| `@biatec/avm-wallet`       | Vite (Vanilla TS) | https://codesandbox.io/p/devbox/vite-vanilla-ts-mxmghx |
-| `@biatec/avm-wallet-react` | Vite (React)      | https://codesandbox.io/p/devbox/vite-react-k55gr5      |
-| `@biatec/avm-wallet-solid` | Vite (Solid)      | https://codesandbox.io/p/devbox/vite-solid-w2gtz2      |
-| `@biatec/avm-wallet-vue`   | Vite (Vue)        | https://codesandbox.io/p/devbox/vite-vue-cznvls        |
+| `avm-wallet`       | Vite (Vanilla TS) | https://codesandbox.io/p/devbox/vite-vanilla-ts-mxmghx |
+| `avm-wallet-react` | Vite (React)      | https://codesandbox.io/p/devbox/vite-react-k55gr5      |
+| `avm-wallet-solid` | Vite (Solid)      | https://codesandbox.io/p/devbox/vite-solid-w2gtz2      |
+| `avm-wallet-vue`   | Vite (Vue)        | https://codesandbox.io/p/devbox/vite-vue-cznvls        |
 
 A public GitHub repository also works. 👌
 
@@ -28,15 +28,15 @@ Please ensure that the reproduction is as minimal as possible. For more informat
 
 ## Suggesting New Features
 
-If you would like to suggest a new feature or enhancement for `@biatec/avm-wallet`, please follow these guidelines:
+If you would like to suggest a new feature or enhancement for `avm-wallet`, please follow these guidelines:
 
 - Use a clear and descriptive title for the issue to identify the suggestion.
 - Provide a step-by-step description of the suggested enhancement in as many details as possible.
-- Provide specific examples to demonstrate the steps or point out the part of `@biatec/avm-wallet` where the enhancement could be implemented.
+- Provide specific examples to demonstrate the steps or point out the part of `avm-wallet` where the enhancement could be implemented.
 
 ## Development
 
-If you want to contribute to `@biatec/avm-wallet`, please follow these steps to get started:
+If you want to contribute to `avm-wallet`, please follow these steps to get started:
 
 - Fork the repository.
 - Clone the repository.
@@ -186,6 +186,6 @@ See the [GitBook documentation](https://txnlab.gitbook.io/avm-wallet/) for confi
 
 ## Contact
 
-If you have any questions, please join our [Discord server](https://discord.gg/7XcuMTfeZP). Discussion related to `@biatec/avm-wallet` takes place in the `#avm-wallet` channel.
+If you have any questions, please join our [Discord server](https://discord.gg/7XcuMTfeZP). Discussion related to `avm-wallet` takes place in the `#avm-wallet` channel.
 
-Thank you for contributing to `@biatec/avm-wallet`!
+Thank you for contributing to `avm-wallet`!

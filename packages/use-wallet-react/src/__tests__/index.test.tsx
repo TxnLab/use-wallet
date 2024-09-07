@@ -10,7 +10,7 @@ import {
   defaultState,
   type State,
   type WalletAccount
-} from '@biatec/avm-wallet'
+} from 'avm-wallet'
 import * as React from 'react'
 import { Wallet, WalletProvider, useWallet } from '../index'
 import algosdk from 'algosdk'
@@ -27,8 +27,8 @@ const mocks = vi.hoisted(() => {
   }
 })
 
-vi.mock('@biatec/avm-wallet', async (importOriginal) => {
-  const mod = await importOriginal<typeof import('@biatec/avm-wallet')>()
+vi.mock('avm-wallet', async (importOriginal) => {
+  const mod = await importOriginal<typeof import('avm-wallet')>()
   return {
     ...mod,
     DeflyWallet: class extends mod.BaseWallet {

@@ -1,5 +1,5 @@
 {
-  "name": "@biatec/avm-wallet-react",
+  "name": "avm-wallet-react",
   "version": "3.2.1",
   "private": false,
   "description": "React library for integrating Algorand wallets into decentralized applications",
@@ -39,7 +39,7 @@
     "dist"
   ],
   "dependencies": {
-    "@biatec/avm-wallet": "^3.2.1",
+    "avm-wallet": "^3.2.1",
     "@tanstack/react-store": "0.5.5"
   },
   "devDependencies": {

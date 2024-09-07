@@ -1,14 +1,14 @@
 import { defineComponent, h, inject } from 'vue'
 import { WalletManagerPlugin } from '../walletManagerPlugin'
-import { NetworkId, WalletManager, type WalletManagerConfig } from '@biatec/avm-wallet'
+import { NetworkId, WalletManager, type WalletManagerConfig } from 'avm-wallet'
 import algosdk from 'algosdk'
 import { mount } from '@vue/test-utils'
 import type { SetAlgodClient } from '../useWallet'
 
 const mockAlgodClient = new algosdk.Algodv2('mock-token', 'https://mock-server', '')
 
-vi.mock('@biatec/avm-wallet', async (importOriginal) => {
-  const module = await importOriginal<typeof import('@biatec/avm-wallet')>()
+vi.mock('avm-wallet', async (importOriginal) => {
+  const module = await importOriginal<typeof import('avm-wallet')>()
   return {
     ...module,
     WalletManager: vi.fn().mockImplementation(() => ({

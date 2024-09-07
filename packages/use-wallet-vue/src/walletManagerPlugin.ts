@@ -1,4 +1,4 @@
-import { WalletManager, type WalletManagerConfig } from '@biatec/avm-wallet'
+import { WalletManager, type WalletManagerConfig } from 'avm-wallet'
 import { ref } from 'vue'
 import type algosdk from 'algosdk'
 

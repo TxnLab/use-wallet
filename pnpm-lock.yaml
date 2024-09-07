@@ -408,6 +408,9 @@ importers:
       '@walletconnect/sign-client':
         specifier: ^2.15.2
         version: 2.15.2(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
+      avm-wallet:
+        specifier: ^3.2.1
+        version: link:../use-wallet
       lute-connect:
         specifier: ^1.3.0
         version: 1.3.0
@@ -466,6 +469,9 @@ importers:
       '@walletconnect/sign-client':
         specifier: ^2.15.2
         version: 2.15.2(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
+      avm-wallet:
+        specifier: ^3.2.1
+        version: link:../use-wallet
       lute-connect:
         specifier: ^1.3.0
         version: 1.3.0
@@ -521,6 +527,9 @@ importers:
       '@walletconnect/sign-client':
         specifier: ^2.15.2
         version: 2.15.2(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
+      avm-wallet:
+        specifier: ^3.2.1
+        version: link:../use-wallet
       lute-connect:
         specifier: ^1.3.0
         version: 1.3.0

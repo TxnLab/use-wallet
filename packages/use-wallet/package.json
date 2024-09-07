@@ -1,5 +1,5 @@
 {
-  "name": "@biatec/avm-wallet",
+  "name": "avm-wallet",
   "version": "3.2.1",
   "private": false,
   "description": "TypeScript library for integrating Algorand wallets into decentralized applications",

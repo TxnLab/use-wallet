@@ -1,6 +1,6 @@
 'use client'
 
-import { NetworkId, WalletId, useWallet, type Wallet } from '@biatec/avm-wallet-react'
+import { NetworkId, WalletId, useWallet, type Wallet } from 'avm-wallet-react'
 import algosdk from 'algosdk'
 import * as React from 'react'
 import styles from './Connect.module.css'

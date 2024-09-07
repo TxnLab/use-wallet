@@ -3,15 +3,15 @@
   "private": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/txnlab/avm-wallet.git"
+    "url": "https://github.com/scholtz/avm-wallet.git"
   },
   "packageManager": "pnpm@9.9.0",
   "type": "module",
   "scripts": {
     "build": "pnpm build:packages && pnpm build:examples",
-    "build:packages": "pnpm -r --filter '@biatec/*' build",
+    "build:packages": "pnpm -r --filter '*' build",
     "build:examples": "pnpm -r --filter 'avm-wallet-example-*' build",
-    "watch": "pnpm -r --filter '@biatec/*' --parallel start",
+    "watch": "pnpm -r --filter '*' --parallel start",
     "dev": "pnpm run watch",
     "test": "pnpm -r --if-present test",
     "lint": "pnpm -r lint",

@@ -16,7 +16,7 @@ export default function Home() {
           height={37}
           priority
         />
-        <h1 className={styles.heading}>@biatec/avm-wallet-react</h1>
+        <h1 className={styles.heading}>avm-wallet-react</h1>
         <Connect />
       </div>
     </main>

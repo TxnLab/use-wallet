@@ -4,7 +4,7 @@ import {
   WalletManager,
   type WalletAccount,
   type WalletMetadata
-} from '@biatec/avm-wallet'
+} from 'avm-wallet'
 import algosdk from 'algosdk'
 import { computed, inject, ref } from 'vue'
 

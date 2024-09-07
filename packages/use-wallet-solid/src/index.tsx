@@ -8,9 +8,9 @@ import type {
   WalletManager,
   WalletMetadata,
   WalletState
-} from '@biatec/avm-wallet'
+} from 'avm-wallet'
 
-export * from '@biatec/avm-wallet'
+export * from 'avm-wallet'
 
 interface WalletProviderProps {
   manager: WalletManager

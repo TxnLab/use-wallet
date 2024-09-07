@@ -1,5 +1,5 @@
 {
-  "name": "@biatec/avm-wallet-solid",
+  "name": "avm-wallet-solid",
   "version": "3.2.1",
   "private": false,
   "description": "Solid.js library for integrating Algorand wallets into decentralized applications",
@@ -62,7 +62,7 @@
     "dist"
   ],
   "dependencies": {
-    "@biatec/avm-wallet": "^3.2.1",
+    "avm-wallet": "^3.2.1",
     "@tanstack/solid-store": "0.5.5"
   },
   "devDependencies": {

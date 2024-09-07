@@ -1,4 +1,4 @@
-import { NetworkId, WalletId, WalletManager, WalletProvider } from '@biatec/avm-wallet-solid'
+import { NetworkId, WalletId, WalletManager, WalletProvider } from 'avm-wallet-solid'
 import { Connect } from './Connect'
 import solidLogo from './assets/solid.svg'
 import viteLogo from '/vite.svg'
@@ -42,7 +42,7 @@ function App() {
           <img src={solidLogo} class="logo solid" alt="Solid logo" />
         </a>
       </div>
-      <h1>@biatec/avm-wallet-solid</h1>
+      <h1>avm-wallet-solid</h1>
       <Connect />
     </WalletProvider>
   )

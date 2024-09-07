@@ -37,7 +37,7 @@ useHead({
             ></path>
           </svg>
         </a>
-        <h1 class="heading text-black dark:text-white">@biatec/avm-wallet-vue</h1>
+        <h1 class="heading text-black dark:text-white">avm-wallet-vue</h1>
       </div>
 
       <ClientOnly>
