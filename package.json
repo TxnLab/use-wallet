@@ -1,29 +1,29 @@
 {
-  "name": "use-wallet",
+  "name": "avm-wallet",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/txnlab/use-wallet.git"
+    "url": "https://github.com/txnlab/avm-wallet.git"
   },
   "packageManager": "pnpm@9.9.0",
   "type": "module",
   "scripts": {
     "build": "pnpm build:packages && pnpm build:examples",
-    "build:packages": "pnpm -r --filter '@txnlab/*' build",
-    "build:examples": "pnpm -r --filter 'use-wallet-example-*' build",
-    "watch": "pnpm -r --filter '@txnlab/*' --parallel start",
+    "build:packages": "pnpm -r --filter '@biatec/*' build",
+    "build:examples": "pnpm -r --filter 'avm-wallet-example-*' build",
+    "watch": "pnpm -r --filter '@biatec/*' --parallel start",
     "dev": "pnpm run watch",
     "test": "pnpm -r --if-present test",
     "lint": "pnpm -r lint",
     "lint:fix": "pnpm -r lint --fix",
     "prettier": "prettier --check .",
     "typecheck": "pnpm -r typecheck",
-    "example:ts": "pnpm --filter 'use-wallet-example-vanilla-ts' dev",
-    "example:react": "pnpm --filter 'use-wallet-example-react' dev",
-    "example:solid": "pnpm --filter 'use-wallet-example-solid' dev",
-    "example:vue": "pnpm --filter 'use-wallet-example-vue' dev",
-    "example:nextjs": "pnpm --filter 'use-wallet-example-nextjs' dev",
-    "example:nuxt": "pnpm --filter 'use-wallet-example-nuxt' dev"
+    "example:ts": "pnpm --filter 'avm-wallet-example-vanilla-ts' dev",
+    "example:react": "pnpm --filter 'avm-wallet-example-react' dev",
+    "example:solid": "pnpm --filter 'avm-wallet-example-solid' dev",
+    "example:vue": "pnpm --filter 'avm-wallet-example-vue' dev",
+    "example:nextjs": "pnpm --filter 'avm-wallet-example-nextjs' dev",
+    "example:nuxt": "pnpm --filter 'avm-wallet-example-nuxt' dev"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "6.5.0",

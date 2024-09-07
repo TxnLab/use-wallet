@@ -24,7 +24,7 @@ export const defaultState: State = {
   algodClient: new Algodv2('', 'https://testnet-api.algonode.cloud/')
 }
 
-export const LOCAL_STORAGE_KEY = '@txnlab/use-wallet:v3'
+export const LOCAL_STORAGE_KEY = '@biatec/avm-wallet:v3'
 
 // State mutations
 

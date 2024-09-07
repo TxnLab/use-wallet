@@ -4,7 +4,7 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   plugins: [react()],
   test: {
-    name: 'use-wallet-react',
+    name: 'avm-wallet-react',
     dir: './src',
     watch: false,
     environment: 'jsdom',

@@ -5,7 +5,7 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 export default defineConfig({
   plugins: [vue(), vueJsx()],
   test: {
-    name: 'use-wallet-vue',
+    name: 'avm-wallet-vue',
     dir: './src',
     watch: false,
     environment: 'jsdom',

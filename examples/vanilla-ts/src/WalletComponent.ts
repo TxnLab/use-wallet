@@ -1,4 +1,4 @@
-import { BaseWallet, WalletId, WalletManager } from '@txnlab/use-wallet'
+import { BaseWallet, WalletId, WalletManager } from '@biatec/avm-wallet'
 import algosdk from 'algosdk'
 
 export class WalletComponent {

@@ -1,4 +1,4 @@
-import { useWallet, type BaseWallet, WalletId, NetworkId } from '@txnlab/use-wallet-solid'
+import { useWallet, type BaseWallet, WalletId, NetworkId } from '@biatec/avm-wallet-solid'
 import algosdk from 'algosdk'
 import { For, Show, createSignal } from 'solid-js'
 

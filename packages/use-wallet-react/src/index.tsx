@@ -1,9 +1,9 @@
 import { useStore } from '@tanstack/react-store'
-import { NetworkId, WalletAccount, WalletManager, WalletMetadata } from '@txnlab/use-wallet'
+import { NetworkId, WalletAccount, WalletManager, WalletMetadata } from '@biatec/avm-wallet'
 import algosdk from 'algosdk'
 import * as React from 'react'
 
-export * from '@txnlab/use-wallet'
+export * from '@biatec/avm-wallet'
 
 interface IWalletContext {
   manager: WalletManager

@@ -3,7 +3,7 @@ import { useHead } from '#imports'
 const props = defineProps({
   title: {
     type: String,
-    default: 'use-wallet | Nuxt'
+    default: 'avm-wallet | Nuxt'
   }
 })
 useHead({
@@ -37,7 +37,7 @@ useHead({
             ></path>
           </svg>
         </a>
-        <h1 class="heading text-black dark:text-white">@txnlab/use-wallet-vue</h1>
+        <h1 class="heading text-black dark:text-white">@biatec/avm-wallet-vue</h1>
       </div>
 
       <ClientOnly>

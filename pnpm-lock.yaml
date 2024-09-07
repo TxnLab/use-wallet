@@ -381,6 +381,9 @@ importers:
 
   packages/use-wallet-react:
     dependencies:
+      '@biatec/avm-wallet':
+        specifier: ^3.2.1
+        version: link:../use-wallet
       '@blockshake/defly-connect':
         specifier: ^1.1.6
         version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -436,6 +439,9 @@ importers:
 
   packages/use-wallet-solid:
     dependencies:
+      '@biatec/avm-wallet':
+        specifier: ^3.2.1
+        version: link:../use-wallet
       '@blockshake/defly-connect':
         specifier: ^1.1.6
         version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -488,6 +494,9 @@ importers:
 
   packages/use-wallet-vue:
     dependencies:
+      '@biatec/avm-wallet':
+        specifier: ^3.2.1
+        version: link:../use-wallet
       '@blockshake/defly-connect':
         specifier: ^1.1.6
         version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)

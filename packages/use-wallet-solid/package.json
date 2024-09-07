@@ -1,12 +1,12 @@
 {
-  "name": "@txnlab/use-wallet-solid",
+  "name": "@biatec/avm-wallet-solid",
   "version": "3.2.1",
   "description": "Solid.js library for integrating Algorand wallets into decentralized applications",
   "author": "Doug Richar <drichar@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/txnlab/use-wallet.git",
+    "url": "https://github.com/scholtz/avm-wallet.git",
     "directory": "packages/use-wallet-solid"
   },
   "type": "module",
@@ -61,8 +61,8 @@
     "dist"
   ],
   "dependencies": {
-    "@tanstack/solid-store": "0.5.5",
-    "@txnlab/use-wallet": "workspace:*"
+    "@biatec/avm-wallet": "^3.2.1",
+    "@tanstack/solid-store": "0.5.5"
   },
   "devDependencies": {
     "@solidjs/testing-library": "0.8.9",

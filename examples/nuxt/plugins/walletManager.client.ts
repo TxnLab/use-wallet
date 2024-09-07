@@ -1,4 +1,4 @@
-import { NetworkId, WalletId, WalletManagerPlugin } from '@txnlab/use-wallet-vue'
+import { NetworkId, WalletId, WalletManagerPlugin } from '@biatec/avm-wallet-vue'
 import { defineNuxtPlugin } from '#app'
 
 export default defineNuxtPlugin((nuxtApp) => {

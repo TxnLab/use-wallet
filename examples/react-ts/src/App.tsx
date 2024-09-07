@@ -1,4 +1,4 @@
-import { NetworkId, WalletId, WalletManager, WalletProvider } from '@txnlab/use-wallet-react'
+import { NetworkId, WalletId, WalletManager, WalletProvider } from '@biatec/avm-wallet-react'
 import { Connect } from './Connect'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
@@ -42,7 +42,7 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
-      <h1>@txnlab/use-wallet-react</h1>
+      <h1>@biatec/avm-wallet-react</h1>
       <Connect />
     </WalletProvider>
   )

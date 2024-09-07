@@ -1,4 +1,4 @@
-import { NetworkId, WalletId, WalletManagerPlugin } from '@txnlab/use-wallet-vue'
+import { NetworkId, WalletId, WalletManagerPlugin } from '@biatec/avm-wallet-vue'
 import { createApp } from 'vue'
 import './style.css'
 import App from './App.vue'

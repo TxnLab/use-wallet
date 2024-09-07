@@ -1,7 +1,7 @@
 import './style.css'
 import typescriptLogo from './typescript.svg'
 import viteLogo from '/vite.svg'
-import { NetworkId, WalletId, WalletManager } from '@txnlab/use-wallet'
+import { NetworkId, WalletId, WalletManager } from '@biatec/avm-wallet'
 import { ActiveNetwork } from './ActiveNetwork'
 import { WalletComponent } from './WalletComponent'
 
@@ -42,7 +42,7 @@ appDiv!.innerHTML = `
     <a href="https://www.typescriptlang.org/" target="_blank">
       <img src="${typescriptLogo}" class="logo vanilla" alt="TypeScript logo" />
     </a>
-    <h1>@txnlab/use-wallet</h1>
+    <h1>@biatec/avm-wallet</h1>
   </div>
 `
 
