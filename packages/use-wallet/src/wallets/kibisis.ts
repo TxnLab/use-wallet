@@ -1,21 +1,6 @@
-import algosdk from 'algosdk'
-import { WalletState, addWallet, setAccounts, type State } from 'src/store'
-import {
-  base64ToByteArray,
-  byteArrayToBase64,
-  compareAccounts,
-  flattenTxnGroup,
-  isSignedTxn,
-  isTransactionArray
-} from 'src/utils'
-import { BaseWallet } from 'src/wallets/base'
-import { WalletId, type WalletAccount, type WalletConstructor } from 'src/wallets/types'
+import { AVMProvider } from 'src/wallets/avm-web-provider'
+import { WalletId, type WalletConstructor } from 'src/wallets/types'
 import type AVMWebProviderSDK from '@agoralabs-sh/avm-web-provider'
-import type { Store } from '@tanstack/store'
-
-export function isAVMWebProviderSDKError(error: any): error is AVMWebProviderSDK.BaseARC0027Error {
-  return typeof error === 'object' && 'code' in error && 'message' in error
-}
 
 export const KIBISIS_AVM_WEB_PROVIDER_ID = 'f6d1c86b-4493-42fb-b88d-a62407b4cdf6'
 
@@ -27,11 +12,7 @@ export const ICON = `data:image/svg+xml;base64,${btoa(`
 </svg>
 `)}`
 
-export class KibisisWallet extends BaseWallet {
-  public avmWebClient: AVMWebProviderSDK.AVMWebClient | null = null
-  protected avmWebProviderSDK: typeof AVMWebProviderSDK | null = null
-  protected store: Store<State>
-
+export class KibisisWallet extends AVMProvider {
   constructor({
     id,
     store,
@@ -39,9 +20,14 @@ export class KibisisWallet extends BaseWallet {
     getAlgodClient,
     metadata = {}
   }: WalletConstructor<WalletId.KIBISIS>) {
-    super({ id, metadata, getAlgodClient, store, subscribe })
-
-    this.store = store
+    super({
+      id,
+      metadata,
+      getAlgodClient,
+      store,
+      subscribe,
+      providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+    })
   }
 
   static defaultMetadata = {
@@ -49,98 +35,19 @@ export class KibisisWallet extends BaseWallet {
     icon: ICON
   }
 
-  /**
-   * private functions
-   */
-
-  /**
-   * Calls the "disable" method on the provider. This method will timeout after 0.75 seconds.
-   * @returns {Promise<AVMWebProviderSDK.IDisableResult>} a promise that resolves to the result.
-   * @private
-   * @throws {MethodNotSupportedError} if the method is not supported for the configured network.
-   * @throws {MethodTimedOutError} if the method timed out by lack of response (>= 3 minutes).
-   * @throws {NetworkNotSupportedError} if the network is not supported for the configured network.
-   * @throws {UnknownError} if the response result is empty.
-   */
-  private async _disable(): Promise<AVMWebProviderSDK.IDisableResult> {
-    const {
-      ARC0027MethodEnum,
-      ARC0027MethodTimedOutError,
-      ARC0027UnknownError,
-      LOWER_REQUEST_TIMEOUT
-    } = this.avmWebProviderSDK || (await this._initializeAVMWebProviderSDK())
-    const avmWebClient = this.avmWebClient || (await this._initializeAVMWebClient())
-    const genesisHash = await this._getGenesisHash()
-
-    return new Promise<AVMWebProviderSDK.IDisableResult>((resolve, reject) => {
-      const timerId = window.setTimeout(() => {
-        // remove the listener
-        avmWebClient.removeListener(listenerId)
-
-        reject(
-          new ARC0027MethodTimedOutError({
-            method: ARC0027MethodEnum.Disable,
-            message: `no response from provider "${this.metadata.name}"`,
-            providerId: KIBISIS_AVM_WEB_PROVIDER_ID
-          })
-        )
-      }, LOWER_REQUEST_TIMEOUT)
-      const listenerId = avmWebClient.onDisable(({ error, method, result }) => {
-        // remove the listener, it is not needed
-        avmWebClient.removeListener(listenerId)
-
-        // remove the timeout
-        window.clearTimeout(timerId)
-
-        if (error) {
-          return reject(error)
-        }
-
-        if (!result) {
-          return reject(
-            new ARC0027UnknownError({
-              message: `received response, but "${method}" request details were empty for provider "${this.metadata.name}"`,
-              providerId: KIBISIS_AVM_WEB_PROVIDER_ID
-            })
-          )
-        }
-
-        return resolve(result)
-      })
-
-      // send the request
-      avmWebClient.disable({
-        genesisHash,
-        providerId: KIBISIS_AVM_WEB_PROVIDER_ID
-      })
-    })
-  }
-
-  /**
-   * Calls the "enable" method on the provider. This method will timeout after 3 minutes.
-   * @returns {Promise<AVMWebProviderSDK.IEnableResult>} a promise that resolves to the result.
-   * @private
-   * @throws {MethodCanceledError} if the method was cancelled by the user.
-   * @throws {MethodNotSupportedError} if the method is not supported for the configured network.
-   * @throws {MethodTimedOutError} if the method timed out by lack of response (>= 3 minutes).
-   * @throws {NetworkNotSupportedError} if the network is not supported for the configured network.
-   * @throws {UnknownError} if the response result is empty.
-   */
-  private async _enable(): Promise<AVMWebProviderSDK.IEnableResult> {
+  protected async _enable(): Promise<AVMWebProviderSDK.IEnableResult> {
     const {
       ARC0027MethodEnum,
       ARC0027MethodTimedOutError,
       ARC0027UnknownError,
       DEFAULT_REQUEST_TIMEOUT
-    } = this.avmWebProviderSDK || (await this._initializeAVMWebProviderSDK())
-    const avmWebClient = this.avmWebClient || (await this._initializeAVMWebClient())
+    } = await this._initializeAVMWebProviderSDK()
+    const avmWebClient = await this._initializeAVMWebClient()
     const genesisHash = await this._getGenesisHash()
 
     return new Promise<AVMWebProviderSDK.IEnableResult>((resolve, reject) => {
       const timerId = window.setTimeout(() => {
-        // remove the listener
         avmWebClient.removeListener(listenerId)
-
         reject(
           new ARC0027MethodTimedOutError({
             method: ARC0027MethodEnum.Enable,
@@ -150,10 +57,7 @@ export class KibisisWallet extends BaseWallet {
         )
       }, DEFAULT_REQUEST_TIMEOUT)
       const listenerId = avmWebClient.onEnable(({ error, method, result }) => {
-        // remove the listener, it is not needed
         avmWebClient.removeListener(listenerId)
-
-        // remove the timeout
         window.clearTimeout(timerId)
 
         if (error) {
@@ -172,7 +76,6 @@ export class KibisisWallet extends BaseWallet {
         return resolve(result)
       })
 
-      // send the request
       avmWebClient.enable({
         genesisHash,
         providerId: KIBISIS_AVM_WEB_PROVIDER_ID
@@ -180,70 +83,55 @@ export class KibisisWallet extends BaseWallet {
     })
   }
 
-  private async _getGenesisHash(): Promise<string> {
-    const algodClient = this.getAlgodClient()
-    const version = await algodClient.versionsCheck().do()
+  protected async _disable(): Promise<AVMWebProviderSDK.IDisableResult> {
+    const {
+      ARC0027MethodEnum,
+      ARC0027MethodTimedOutError,
+      ARC0027UnknownError,
+      LOWER_REQUEST_TIMEOUT
+    } = await this._initializeAVMWebProviderSDK()
+    const avmWebClient = await this._initializeAVMWebClient()
+    const genesisHash = await this._getGenesisHash()
 
-    return version.genesis_hash_b64
-  }
-
-  private async _initializeAVMWebClient(): Promise<AVMWebProviderSDK.AVMWebClient> {
-    const _functionName = '_initializeAVMWebClient'
-    const avmWebProviderSDK = this.avmWebProviderSDK || (await this._initializeAVMWebProviderSDK())
-
-    if (!this.avmWebClient) {
-      console.info(`[${KibisisWallet.name}]#${_functionName}: initializing new client...`)
-
-      this.avmWebClient = avmWebProviderSDK.AVMWebClient.init()
-    }
-
-    return this.avmWebClient
-  }
-
-  private async _initializeAVMWebProviderSDK(): Promise<typeof AVMWebProviderSDK> {
-    const _functionName = '_initializeAVMWebProviderSDK'
-
-    if (!this.avmWebProviderSDK) {
-      console.info(
-        `[${KibisisWallet.name}]#${_functionName}: initializing @agoralabs-sh/avm-web-provider...`
-      )
-
-      this.avmWebProviderSDK = await import('@agoralabs-sh/avm-web-provider')
-
-      if (!this.avmWebProviderSDK) {
-        throw new Error(
-          'failed to initialize, the @agoralabs-sh/avm-web-provider sdk was not provided'
+    return new Promise<AVMWebProviderSDK.IDisableResult>((resolve, reject) => {
+      const timerId = window.setTimeout(() => {
+        avmWebClient.removeListener(listenerId)
+        reject(
+          new ARC0027MethodTimedOutError({
+            method: ARC0027MethodEnum.Disable,
+            message: `no response from provider "${this.metadata.name}"`,
+            providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+          })
         )
-      }
-    }
+      }, LOWER_REQUEST_TIMEOUT)
+      const listenerId = avmWebClient.onDisable(({ error, method, result }) => {
+        avmWebClient.removeListener(listenerId)
+        window.clearTimeout(timerId)
 
-    return this.avmWebProviderSDK
+        if (error) {
+          return reject(error)
+        }
+
+        if (!result) {
+          return reject(
+            new ARC0027UnknownError({
+              message: `received response, but "${method}" request details were empty for provider "${this.metadata.name}"`,
+              providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+            })
+          )
+        }
+
+        return resolve(result)
+      })
+
+      avmWebClient.disable({
+        genesisHash,
+        providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+      })
+    })
   }
 
-  private _mapAVMWebProviderAccountToWalletAccounts(
-    accounts: AVMWebProviderSDK.IAccount[]
-  ): WalletAccount[] {
-    return accounts.map(({ address, name }, idx) => ({
-      name: name || `[${this.metadata.name}] Account ${idx + 1}`,
-      address
-    }))
-  }
-
-  /**
-   * Calls the "signTransactions" method to sign the supplied ARC-0001 transactions. This method will timeout after 3
-   * minutes.
-   * @returns {Promise<AVMWebProviderSDK.ISignTransactionsResult>} a promise that resolves to the result.
-   * @private
-   * @throws {InvalidInputError} if computed group ID for the txns does not match the assigned group ID.
-   * @throws {InvalidGroupIdError} if the unsigned txns is malformed or not conforming to ARC-0001.
-   * @throws {MethodCanceledError} if the method was cancelled by the user.
-   * @throws {MethodNotSupportedError} if the method is not supported for the configured network.
-   * @throws {MethodTimedOutError} if the method timed out by lack of response (>= 3 minutes).
-   * @throws {NetworkNotSupportedError} if the network is not supported for the configured network.
-   * @throws {UnauthorizedSignerError} if a signer in the request is not authorized by the provider.
-   * @throws {UnknownError} if the response result is empty.
-   */
-  private async _signTransactions(
+  protected async _signTransactions(
     txns: AVMWebProviderSDK.IARC0001Transaction[]
   ): Promise<AVMWebProviderSDK.ISignTransactionsResult> {
     const {
@@ -251,14 +139,12 @@ export class KibisisWallet extends BaseWallet {
       ARC0027MethodTimedOutError,
       ARC0027UnknownError,
       DEFAULT_REQUEST_TIMEOUT
-    } = this.avmWebProviderSDK || (await this._initializeAVMWebProviderSDK())
-    const avmWebClient = this.avmWebClient || (await this._initializeAVMWebClient())
+    } = await this._initializeAVMWebProviderSDK()
+    const avmWebClient = await this._initializeAVMWebClient()
 
     return new Promise<AVMWebProviderSDK.ISignTransactionsResult>((resolve, reject) => {
       const timerId = window.setTimeout(() => {
-        // remove the listener
         avmWebClient.removeListener(listenerId)
-
         reject(
           new ARC0027MethodTimedOutError({
             method: ARC0027MethodEnum.SignTransactions,
@@ -268,10 +154,7 @@ export class KibisisWallet extends BaseWallet {
         )
       }, DEFAULT_REQUEST_TIMEOUT)
       const listenerId = avmWebClient.onSignTransactions(({ error, method, result }) => {
-        // remove the listener, it is not needed
         avmWebClient.removeListener(listenerId)
-
-        // remove the timeout
         window.clearTimeout(timerId)
 
         if (error) {
@@ -290,212 +173,10 @@ export class KibisisWallet extends BaseWallet {
         return resolve(result)
       })
 
-      // send the request
       avmWebClient.signTransactions({
         txns,
         providerId: KIBISIS_AVM_WEB_PROVIDER_ID
       })
     })
-  }
-
-  /**
-   * public functions
-   */
-
-  public async connect(): Promise<WalletAccount[]> {
-    let result: AVMWebProviderSDK.IEnableResult
-
-    try {
-      console.info(`[${this.metadata.name}] Connecting...`)
-
-      result = await this._enable()
-
-      console.info(
-        `[${this.metadata.name}] Successfully connected on network "${result.genesisId}"`
-      )
-    } catch (error: any) {
-      console.error(
-        `[${this.metadata.name}] Error connecting: ` +
-          (isAVMWebProviderSDKError(error)
-            ? `${error.message} (code: ${error.code})`
-            : error.message)
-      )
-      throw error
-    }
-
-    const walletAccounts = this._mapAVMWebProviderAccountToWalletAccounts(result.accounts)
-
-    const walletState: WalletState = {
-      accounts: walletAccounts,
-      activeAccount: walletAccounts[0]
-    }
-
-    addWallet(this.store, {
-      walletId: this.id,
-      wallet: walletState
-    })
-
-    console.info(`[${this.metadata.name}] ✅ Connected.`, walletState)
-    return walletAccounts
-  }
-
-  public async disconnect(): Promise<void> {
-    try {
-      console.info(`[${this.metadata.name}] Disconnecting...`)
-      this.onDisconnect()
-
-      const result = await this._disable()
-
-      console.info(
-        `[${this.metadata.name}] Successfully disconnected${result.sessionIds && result.sessionIds.length ? ` sessions [${result.sessionIds.join(',')}]` : ''} on network "${result.genesisId}"`
-      )
-    } catch (error: any) {
-      console.error(
-        `[${this.metadata.name}] Error disconnecting: ` +
-          (isAVMWebProviderSDKError(error)
-            ? `${error.message} (code: ${error.code})`
-            : error.message)
-      )
-      throw error
-    }
-  }
-
-  public async resumeSession(): Promise<void> {
-    const state = this.store.state
-    const walletState = state.wallets[this.id]
-    let result: AVMWebProviderSDK.IEnableResult
-
-    if (!walletState) {
-      return
-    }
-
-    try {
-      console.info(`[${this.metadata.name}] Resuming session...`)
-
-      result = await this._enable()
-
-      if (result.accounts.length === 0) {
-        throw new Error(`No accounts found!`)
-      }
-
-      const walletAccounts = this._mapAVMWebProviderAccountToWalletAccounts(result.accounts)
-      const match = compareAccounts(walletAccounts, walletState.accounts)
-
-      if (!match) {
-        console.warn(`[${this.metadata.name}] Session accounts mismatch, updating accounts`, {
-          prev: walletState.accounts,
-          current: walletAccounts
-        })
-
-        setAccounts(this.store, {
-          walletId: this.id,
-          accounts: walletAccounts
-        })
-      }
-    } catch (error: any) {
-      console.error(
-        `[${this.metadata.name}] Error resuming session: ` +
-          (isAVMWebProviderSDKError(error)
-            ? `${error.message} (code: ${error.code})`
-            : error.message)
-      )
-      this.onDisconnect()
-      throw error
-    }
-  }
-
-  private processTxns(
-    txnGroup: algosdk.Transaction[],
-    indexesToSign?: number[]
-  ): AVMWebProviderSDK.IARC0001Transaction[] {
-    const txnsToSign: AVMWebProviderSDK.IARC0001Transaction[] = []
-
-    txnGroup.forEach((txn, index) => {
-      const isIndexMatch = !indexesToSign || indexesToSign.includes(index)
-      const signer = algosdk.encodeAddress(txn.from.publicKey)
-      const canSignTxn = this.addresses.includes(signer)
-
-      const txnString = byteArrayToBase64(txn.toByte())
-
-      if (isIndexMatch && canSignTxn) {
-        txnsToSign.push({ txn: txnString })
-      } else {
-        txnsToSign.push({ txn: txnString, signers: [] })
-      }
-    })
-
-    return txnsToSign
-  }
-
-  private processEncodedTxns(
-    txnGroup: Uint8Array[],
-    indexesToSign?: number[]
-  ): AVMWebProviderSDK.IARC0001Transaction[] {
-    const txnsToSign: AVMWebProviderSDK.IARC0001Transaction[] = []
-
-    txnGroup.forEach((txnBuffer, index) => {
-      const txnDecodeObj = algosdk.decodeObj(txnBuffer) as
-        | algosdk.EncodedTransaction
-        | algosdk.EncodedSignedTransaction
-
-      const isSigned = isSignedTxn(txnDecodeObj)
-
-      const txn: algosdk.Transaction = isSigned
-        ? algosdk.decodeSignedTransaction(txnBuffer).txn
-        : algosdk.decodeUnsignedTransaction(txnBuffer)
-
-      const isIndexMatch = !indexesToSign || indexesToSign.includes(index)
-      const signer = algosdk.encodeAddress(txn.from.publicKey)
-      const canSignTxn = !isSigned && this.addresses.includes(signer)
-
-      const txnString = byteArrayToBase64(txn.toByte())
-
-      if (isIndexMatch && canSignTxn) {
-        txnsToSign.push({ txn: txnString })
-      } else {
-        txnsToSign.push({ txn: txnString, signers: [] })
-      }
-    })
-
-    return txnsToSign
-  }
-
-  public signTransactions = async <T extends algosdk.Transaction[] | Uint8Array[]>(
-    txnGroup: T | T[],
-    indexesToSign?: number[]
-  ): Promise<(Uint8Array | null)[]> => {
-    try {
-      let txnsToSign: AVMWebProviderSDK.IARC0001Transaction[] = []
-
-      // Determine type and process transactions for signing
-      if (isTransactionArray(txnGroup)) {
-        const flatTxns: algosdk.Transaction[] = flattenTxnGroup(txnGroup)
-        txnsToSign = this.processTxns(flatTxns, indexesToSign)
-      } else {
-        const flatTxns: Uint8Array[] = flattenTxnGroup(txnGroup as Uint8Array[])
-        txnsToSign = this.processEncodedTxns(flatTxns, indexesToSign)
-      }
-
-      // Sign transactions
-      const signTxnsResult = await this._signTransactions(txnsToSign)
-
-      // Convert base64 to Uint8Array
-      const result = signTxnsResult.stxns.map((value) => {
-        if (value === null) {
-          return null
-        }
-        return base64ToByteArray(value)
-      })
-
-      return result
-    } catch (error: any) {
-      console.error(
-        `[${this.metadata.name}] error signing transactions: ` +
-          (isAVMWebProviderSDKError(error)
-            ? `${error.message} (code: ${error.code})`
-            : error.message)
-      )
-      throw error
-    }
   }
 }
