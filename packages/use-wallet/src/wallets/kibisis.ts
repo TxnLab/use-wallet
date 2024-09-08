@@ -210,13 +210,13 @@ export class KibisisWallet extends BaseWallet {
 
       const module = await import('@agoralabs-sh/avm-web-provider')
       this.avmWebProviderSDK = module.default ? module.default : module
-      
+
       if (!this.avmWebProviderSDK) {
         throw new Error(
           'failed to initialize, the @agoralabs-sh/avm-web-provider sdk was not provided'
         )
       }
-      
+
       if (!this.avmWebProviderSDK.AVMWebClient) {
         throw new Error(
           'failed to initialize, the @agoralabs-sh/avm-web-provider sdk was not provided. AVMWebClient missing'
