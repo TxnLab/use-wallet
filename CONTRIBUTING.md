@@ -13,14 +13,14 @@ If you have found an issue with `@txnlab/use-wallet`, please follow these steps:
 
 To create a shareable code example, you can use CodeSandbox (https://codesandbox.io/s/new) or Stackblitz (https://stackblitz.com/).
 
-Feel free to fork any of our CodeSandbox examples to reproduce your issue:
+Feel free to fork any of our examples to reproduce your issue:
 
-| Package                    | Framework         | Example                                                |
-| -------------------------- | ----------------- | ------------------------------------------------------ |
-| `@txnlab/use-wallet`       | Vite (Vanilla TS) | https://codesandbox.io/p/devbox/vite-vanilla-ts-mxmghx |
-| `@txnlab/use-wallet-react` | Vite (React)      | https://codesandbox.io/p/devbox/vite-react-k55gr5      |
-| `@txnlab/use-wallet-solid` | Vite (Solid)      | https://codesandbox.io/p/devbox/vite-solid-w2gtz2      |
-| `@txnlab/use-wallet-vue`   | Vite (Vue)        | https://codesandbox.io/p/devbox/vite-vue-cznvls        |
+| Package                    | Framework         | Examples                                                                                                                              |
+| -------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `@txnlab/use-wallet`       | Vite (Vanilla TS) | [CodeSandbox](https://codesandbox.io/p/devbox/vite-vanilla-ts-mxmghx) / [StackBlitz](https://stackblitz.com/edit/vitejs-vite-cfpybn)  |
+| `@txnlab/use-wallet-react` | Vite (React)      | [CodeSandbox](https://codesandbox.io/p/devbox/vite-react-k55gr5) / [StackBlitz](https://stackblitz.com/edit/vitejs-vite-tbsvrz)       |
+| `@txnlab/use-wallet-solid` | Vite (Solid)      | [CodeSandbox](https://codesandbox.io/p/devbox/vite-solid-w2gtz2) / [StackBlitz](https://stackblitz.com/edit/solidjs-templates-mnxg4m) |
+| `@txnlab/use-wallet-vue`   | Vite (Vue)        | [CodeSandbox](https://codesandbox.io/p/devbox/vite-vue-cznvls) / [StackBlitz](https://stackblitz.com/edit/vitejs-vite-mpwnm1)         |
 
 A public GitHub repository also works. 👌
 
