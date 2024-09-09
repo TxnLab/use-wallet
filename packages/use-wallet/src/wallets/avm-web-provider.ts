@@ -129,14 +129,20 @@ export abstract class AVMProvider extends BaseWallet {
     return txnsToSign
   }
 
-  // Abstract methods to be implemented by specific wallet providers
+  /**
+   * Abstract methods
+   * These methods must be implemented by specific wallet providers
+   */
   protected abstract _enable(): Promise<AVMWebProviderSDK.IEnableResult>
   protected abstract _disable(): Promise<AVMWebProviderSDK.IDisableResult>
   protected abstract _signTransactions(
     txns: AVMWebProviderSDK.IARC0001Transaction[]
   ): Promise<AVMWebProviderSDK.ISignTransactionsResult>
 
-  // Implement common methods
+  /**
+   * Common methods
+   * These methods can be overridden by specific wallet providers if needed
+   */
   public async connect(): Promise<WalletAccount[]> {
     try {
       console.info(`[${this.metadata.name}] Connecting...`)
