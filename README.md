@@ -7,7 +7,7 @@ A framework agnostic Algorand wallet integration library with reactive framework
 
 ## use-wallet fork
 
-This is fork of use-wallet intended to fix multiple issues found in it:
+This is fork of [use-wallet](https://github.com/TxnLab/use-wallet) intended to fix multiple issues found in it:
 
 - [Multiple AVM networks support](https://github.com/TxnLab/use-wallet/pull/222)
 - [Biatec wallet support](https://github.com/TxnLab/use-wallet/pull/202)
