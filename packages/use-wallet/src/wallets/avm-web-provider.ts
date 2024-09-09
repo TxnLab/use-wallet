@@ -30,7 +30,8 @@ export abstract class AVMProvider extends BaseWallet {
     if (!this.avmWebProviderSDK) {
       console.info(`[${this.constructor.name}] Initializing @agoralabs-sh/avm-web-provider...`)
 
-      this.avmWebProviderSDK = await import('@agoralabs-sh/avm-web-provider')
+      const module = await import('@agoralabs-sh/avm-web-provider')
+      this.avmWebProviderSDK = module.default ? module.default : module
 
       if (!this.avmWebProviderSDK) {
         throw new Error(
@@ -44,6 +45,10 @@ export abstract class AVMProvider extends BaseWallet {
 
   protected async _initializeAVMWebClient(): Promise<AVMWebProviderSDK.AVMWebClient> {
     const avmWebProviderSDK = await this._initializeAVMWebProviderSDK()
+
+    if (!avmWebProviderSDK.AVMWebClient) {
+      throw new Error('Failed to initialize, AVMWebClient not found')
+    }
 
     if (!this.avmWebClient) {
       console.info(`[${this.constructor.name}] Initializing new client...`)
