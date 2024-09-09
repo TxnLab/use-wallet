@@ -243,6 +243,7 @@ export abstract class AVMProvider extends BaseWallet {
     try {
       let txnsToSign: AVMWebProviderSDK.IARC0001Transaction[] = []
 
+      // Determine type and process transactions for signing
       if (isTransactionArray(txnGroup)) {
         const flatTxns: algosdk.Transaction[] = flattenTxnGroup(txnGroup)
         txnsToSign = this.processTxns(flatTxns, indexesToSign)
@@ -251,8 +252,10 @@ export abstract class AVMProvider extends BaseWallet {
         txnsToSign = this.processEncodedTxns(flatTxns, indexesToSign)
       }
 
+      // Sign transactions
       const signTxnsResult = await this._signTransactions(txnsToSign)
 
+      // Convert base64 to Uint8Array
       return signTxnsResult.stxns.map((value) => {
         if (value === null) {
           return null

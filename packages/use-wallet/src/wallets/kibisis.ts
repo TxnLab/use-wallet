@@ -35,6 +35,16 @@ export class KibisisWallet extends AVMProvider {
     icon: ICON
   }
 
+  /**
+   * Calls the "enable" method on the provider. This method will timeout after 3 minutes.
+   * @returns {Promise<AVMWebProviderSDK.IEnableResult>} a promise that resolves to the result.
+   * @protected
+   * @throws {MethodCanceledError} if the method was cancelled by the user.
+   * @throws {MethodNotSupportedError} if the method is not supported for the configured network.
+   * @throws {MethodTimedOutError} if the method timed out by lack of response (>= 3 minutes).
+   * @throws {NetworkNotSupportedError} if the network is not supported for the configured network.
+   * @throws {UnknownError} if the response result is empty.
+   */
   protected async _enable(): Promise<AVMWebProviderSDK.IEnableResult> {
     const {
       ARC0027MethodEnum,
@@ -47,6 +57,7 @@ export class KibisisWallet extends AVMProvider {
 
     return new Promise<AVMWebProviderSDK.IEnableResult>((resolve, reject) => {
       const timerId = window.setTimeout(() => {
+        // remove the listener
         avmWebClient.removeListener(listenerId)
         reject(
           new ARC0027MethodTimedOutError({
@@ -57,7 +68,10 @@ export class KibisisWallet extends AVMProvider {
         )
       }, DEFAULT_REQUEST_TIMEOUT)
       const listenerId = avmWebClient.onEnable(({ error, method, result }) => {
+        // remove the listener, it is not needed
         avmWebClient.removeListener(listenerId)
+
+        // remove the timeout
         window.clearTimeout(timerId)
 
         if (error) {
@@ -76,6 +90,7 @@ export class KibisisWallet extends AVMProvider {
         return resolve(result)
       })
 
+      // send the request
       avmWebClient.enable({
         genesisHash,
         providerId: KIBISIS_AVM_WEB_PROVIDER_ID
@@ -83,6 +98,15 @@ export class KibisisWallet extends AVMProvider {
     })
   }
 
+  /**
+   * Calls the "disable" method on the provider. This method will timeout after 0.75 seconds.
+   * @returns {Promise<AVMWebProviderSDK.IDisableResult>} a promise that resolves to the result.
+   * @protected
+   * @throws {MethodNotSupportedError} if the method is not supported for the configured network.
+   * @throws {MethodTimedOutError} if the method timed out by lack of response (>= 3 minutes).
+   * @throws {NetworkNotSupportedError} if the network is not supported for the configured network.
+   * @throws {UnknownError} if the response result is empty.
+   */
   protected async _disable(): Promise<AVMWebProviderSDK.IDisableResult> {
     const {
       ARC0027MethodEnum,
@@ -95,6 +119,7 @@ export class KibisisWallet extends AVMProvider {
 
     return new Promise<AVMWebProviderSDK.IDisableResult>((resolve, reject) => {
       const timerId = window.setTimeout(() => {
+        // remove the listener
         avmWebClient.removeListener(listenerId)
         reject(
           new ARC0027MethodTimedOutError({
@@ -105,7 +130,10 @@ export class KibisisWallet extends AVMProvider {
         )
       }, LOWER_REQUEST_TIMEOUT)
       const listenerId = avmWebClient.onDisable(({ error, method, result }) => {
+        // remove the listener, it is not needed
         avmWebClient.removeListener(listenerId)
+
+        // remove the timeout
         window.clearTimeout(timerId)
 
         if (error) {
@@ -124,6 +152,7 @@ export class KibisisWallet extends AVMProvider {
         return resolve(result)
       })
 
+      // send the request
       avmWebClient.disable({
         genesisHash,
         providerId: KIBISIS_AVM_WEB_PROVIDER_ID
@@ -131,6 +160,20 @@ export class KibisisWallet extends AVMProvider {
     })
   }
 
+  /**
+   * Calls the "signTransactions" method to sign the supplied ARC-0001 transactions. This method will timeout after 3
+   * minutes.
+   * @returns {Promise<AVMWebProviderSDK.ISignTransactionsResult>} a promise that resolves to the result.
+   * @protected
+   * @throws {InvalidInputError} if computed group ID for the txns does not match the assigned group ID.
+   * @throws {InvalidGroupIdError} if the unsigned txns is malformed or not conforming to ARC-0001.
+   * @throws {MethodCanceledError} if the method was cancelled by the user.
+   * @throws {MethodNotSupportedError} if the method is not supported for the configured network.
+   * @throws {MethodTimedOutError} if the method timed out by lack of response (>= 3 minutes).
+   * @throws {NetworkNotSupportedError} if the network is not supported for the configured network.
+   * @throws {UnauthorizedSignerError} if a signer in the request is not authorized by the provider.
+   * @throws {UnknownError} if the response result is empty.
+   */
   protected async _signTransactions(
     txns: AVMWebProviderSDK.IARC0001Transaction[]
   ): Promise<AVMWebProviderSDK.ISignTransactionsResult> {
@@ -144,6 +187,7 @@ export class KibisisWallet extends AVMProvider {
 
     return new Promise<AVMWebProviderSDK.ISignTransactionsResult>((resolve, reject) => {
       const timerId = window.setTimeout(() => {
+        // remove the listener
         avmWebClient.removeListener(listenerId)
         reject(
           new ARC0027MethodTimedOutError({
@@ -154,7 +198,10 @@ export class KibisisWallet extends AVMProvider {
         )
       }, DEFAULT_REQUEST_TIMEOUT)
       const listenerId = avmWebClient.onSignTransactions(({ error, method, result }) => {
+        // remove the listener, it is not needed
         avmWebClient.removeListener(listenerId)
+
+        // remove the timeout
         window.clearTimeout(timerId)
 
         if (error) {
@@ -173,6 +220,7 @@ export class KibisisWallet extends AVMProvider {
         return resolve(result)
       })
 
+      // send the request
       avmWebClient.signTransactions({
         txns,
         providerId: KIBISIS_AVM_WEB_PROVIDER_ID
