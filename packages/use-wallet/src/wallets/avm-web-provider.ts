@@ -1,3 +1,4 @@
+import algosdk from 'algosdk'
 import { WalletState, addWallet, setAccounts } from 'src/store'
 import {
   base64ToByteArray,
@@ -10,7 +11,6 @@ import {
 import { BaseWallet } from 'src/wallets/base'
 import { WalletId, type WalletAccount, type WalletConstructor } from 'src/wallets/types'
 import type AVMWebProviderSDK from '@agoralabs-sh/avm-web-provider'
-import algosdk from 'algosdk'
 
 export function isAVMWebProviderSDKError(error: any): error is AVMWebProviderSDK.BaseARC0027Error {
   return typeof error === 'object' && 'code' in error && 'message' in error
