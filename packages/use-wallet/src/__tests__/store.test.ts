@@ -426,7 +426,7 @@ describe('Mutations', () => {
       expect(store.state.activeNetwork).toBe(NetworkId.TESTNET)
 
       const networkId = NetworkId.MAINNET
-      const algodClient = new Algodv2('', 'https://mainnet-api.algonode.cloud/')
+      const algodClient = new Algodv2('', 'https://mainnet-api.4160.nodely.dev/')
       setActiveNetwork(store, { networkId, algodClient })
       expect(store.state.activeNetwork).toBe(networkId)
     })
@@ -556,7 +556,7 @@ describe('Type Guards', () => {
         wallets: {},
         activeWallet: null,
         activeNetwork: NetworkId.TESTNET,
-        algodClient: new Algodv2('', 'https://testnet-api.algonode.cloud/')
+        algodClient: new Algodv2('', 'https://testnet-api.4160.nodely.dev/')
       }
       expect(isValidState(defaultState)).toBe(true)
 
@@ -593,7 +593,7 @@ describe('Type Guards', () => {
         },
         activeWallet: WalletId.DEFLY,
         activeNetwork: NetworkId.TESTNET,
-        algodClient: new Algodv2('', 'https://testnet-api.algonode.cloud/')
+        algodClient: new Algodv2('', 'https://testnet-api.4160.nodely.dev/')
       }
       expect(isValidState(state)).toBe(true)
     })
