@@ -1,4 +1,4 @@
-import { Algodv2 } from 'algosdk'
+import algosdk from 'algosdk'
 import { NetworkId, isValidNetworkId } from 'src/network'
 import { WalletId, type WalletAccount } from 'src/wallets'
 import type { Store } from '@tanstack/store'
@@ -14,14 +14,14 @@ export interface State {
   wallets: WalletStateMap
   activeWallet: WalletId | null
   activeNetwork: NetworkId
-  algodClient: Algodv2
+  algodClient: algosdk.Algodv2
 }
 
 export const defaultState: State = {
   wallets: {},
   activeWallet: null,
   activeNetwork: NetworkId.TESTNET,
-  algodClient: new Algodv2('', 'https://testnet-api.4160.nodely.dev/')
+  algodClient: new algosdk.Algodv2('', 'https://testnet-api.4160.nodely.dev/')
 }
 
 export const LOCAL_STORAGE_KEY = '@txnlab/use-wallet:v3'
@@ -145,7 +145,7 @@ export function setAccounts(
 
 export function setActiveNetwork(
   store: Store<State>,
-  { networkId, algodClient }: { networkId: NetworkId; algodClient: Algodv2 }
+  { networkId, algodClient }: { networkId: NetworkId; algodClient: algosdk.Algodv2 }
 ) {
   store.setState((state) => ({
     ...state,
