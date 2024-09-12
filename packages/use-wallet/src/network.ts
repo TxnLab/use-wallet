@@ -78,6 +78,5 @@ export function createDefaultNetworkConfig(): NetworkConfigMap {
 export const caipChainId: Partial<Record<NetworkId, string>> = {
   [NetworkId.MAINNET]: 'algorand:wGHE2Pwdvd7S12BL5FaOP20EGYesN73k',
   [NetworkId.TESTNET]: 'algorand:SGO1GKSzyE7IEPItTxCByw9x8FmnrCDe',
-  [NetworkId.BETANET]: 'algorand:mFgazF-2uRS1tMiL9dsj01hJGySEmPN2',
-  [NetworkId.FNET]: 'algorand:kUt08LxeVAAGHnh4JoAoAMM9ql_hBwSo'
+  [NetworkId.BETANET]: 'algorand:mFgazF-2uRS1tMiL9dsj01hJGySEmPN2'
 }
