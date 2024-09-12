@@ -258,7 +258,7 @@ describe('WalletManager', () => {
         },
         activeWallet: WalletId.KIBISIS,
         activeNetwork: NetworkId.BETANET,
-        algodClient: new Algodv2('', 'https://betanet-api.algonode.cloud/')
+        algodClient: new Algodv2('', 'https://betanet-api.4160.nodely.dev/')
       }
     })
 
@@ -344,7 +344,7 @@ describe('WalletManager', () => {
         },
         activeWallet: WalletId.KIBISIS,
         activeNetwork: NetworkId.BETANET,
-        algodClient: new Algodv2('', 'https://betanet-api.algonode.cloud/')
+        algodClient: new Algodv2('', 'https://betanet-api.4160.nodely.dev/')
       }
     })
 

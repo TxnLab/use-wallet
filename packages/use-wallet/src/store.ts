@@ -21,7 +21,7 @@ export const defaultState: State = {
   wallets: {},
   activeWallet: null,
   activeNetwork: NetworkId.TESTNET,
-  algodClient: new Algodv2('', 'https://testnet-api.algonode.cloud/')
+  algodClient: new Algodv2('', 'https://testnet-api.4160.nodely.dev/')
 }
 
 export const LOCAL_STORAGE_KEY = '@txnlab/use-wallet:v3'

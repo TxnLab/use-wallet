@@ -4,6 +4,7 @@ export enum NetworkId {
   MAINNET = 'mainnet',
   TESTNET = 'testnet',
   BETANET = 'betanet',
+  FNET = 'fnet',
   LOCALNET = 'localnet'
 }
 
@@ -43,9 +44,10 @@ export function isNetworkConfigMap(config: NetworkConfig): config is NetworkConf
 export type NetworkConfig = Partial<AlgodConfig> | Partial<Record<NetworkId, Partial<AlgodConfig>>>
 
 export const nodeServerMap = {
-  [NetworkId.MAINNET]: 'https://mainnet-api.algonode.cloud',
-  [NetworkId.TESTNET]: 'https://testnet-api.algonode.cloud',
-  [NetworkId.BETANET]: 'https://betanet-api.algonode.cloud'
+  [NetworkId.MAINNET]: 'https://mainnet-api.4160.nodely.dev',
+  [NetworkId.TESTNET]: 'https://testnet-api.4160.nodely.dev',
+  [NetworkId.BETANET]: 'https://betanet-api.4160.nodely.dev',
+  [NetworkId.FNET]: 'https://fnet-api.4160.nodely.dev'
 }
 
 export function createDefaultNetworkConfig(): NetworkConfigMap {
