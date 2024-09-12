@@ -1,3 +1,10 @@
+# [3.3.0](https://github.com/txnlab/use-wallet/compare/v3.2.1...v3.3.0) (2024-09-11)
+
+### Features
+
+- Add fnet to list of valid networks and update nodely urls to new versions ([#258](https://github.com/txnlab/use-wallet/pull/258)) ([07e7273](https://github.com/txnlab/use-wallet/commit/8743101180b730b5fc809951b85df0c8e6c25f8c))
+- Update algosdk import to resolve CommonJS module issue ([#259](https://github.com/txnlab/use-wallet/pull/259)) ([8743101](https://github.com/txnlab/use-wallet/commit/daf738af4b67f9178b72cf1728a08b476fd34fcc))
+
 ## [3.2.1](https://github.com/txnlab/use-wallet/compare/v3.2.0...v3.2.1) (2024-09-05)
 
 ### Other Changes
