@@ -267,11 +267,11 @@ export class WalletConnect extends BaseWallet {
     const client = await SignClient.init(this.options)
 
     client.on('session_event', (args) => {
-      console.log(`[${this.metadata.name}] EVENT`, 'session_event', args)
+      console.info(`[${this.metadata.name}] EVENT`, 'session_event', args)
     })
 
     client.on('session_update', ({ topic, params }) => {
-      console.log(`[${this.metadata.name}] EVENT`, 'session_update', { topic, params })
+      console.info(`[${this.metadata.name}] EVENT`, 'session_update', { topic, params })
       const { namespaces } = params
       const session = client.session.get(topic)
       const updatedSession = { ...session, namespaces }
@@ -279,7 +279,7 @@ export class WalletConnect extends BaseWallet {
     })
 
     client.on('session_delete', () => {
-      console.log(`[${this.metadata.name}] EVENT`, 'session_delete')
+      console.info(`[${this.metadata.name}] EVENT`, 'session_delete')
       this.session = null
     })
 

@@ -44,7 +44,7 @@ vi.mock('@walletconnect/sign-client', () => {
 vi.spyOn(ModalCtrl, 'open').mockImplementation(() => Promise.resolve())
 vi.spyOn(ModalCtrl, 'close').mockImplementation(() => {})
 vi.spyOn(ModalCtrl, 'subscribe').mockImplementation((_callback: (state: any) => void) => {
-  return () => console.log('unsubscribe')
+  return () => {}
 })
 
 function createMockSession(accounts: string[] = []): SessionTypes.Struct {
