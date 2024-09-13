@@ -34,6 +34,9 @@ export interface WalletManagerConfig {
   wallets?: SupportedWallet[]
   network?: NetworkId
   algod?: NetworkConfig
+  options?: {
+    resetNetwork?: boolean
+  }
 }
 
 export type PersistedState = Omit<State, 'algodClient'>
@@ -46,27 +49,48 @@ export class WalletManager {
   public store: Store<State>
   public subscribe: (callback: (state: State) => void) => () => void
 
-  constructor({ wallets = [], network = NetworkId.TESTNET, algod = {} }: WalletManagerConfig = {}) {
+  public options: { resetNetwork: boolean }
+
+  constructor({
+    wallets = [],
+    network = NetworkId.TESTNET,
+    algod = {},
+    options = {}
+  }: WalletManagerConfig = {}) {
+    // Initialize network config
     this.networkConfig = this.initNetworkConfig(network, algod)
 
-    const persistedState = this.loadPersistedState()
-    const initialState: State = persistedState
-      ? {
-          ...persistedState,
-          algodClient: this.createAlgodClient(this.networkConfig[persistedState.activeNetwork])
-        }
-      : {
-          ...defaultState,
-          activeNetwork: network,
-          algodClient: this.createAlgodClient(this.networkConfig[network])
-        }
+    // Initialize options
+    this.options = { resetNetwork: options.resetNetwork || false }
 
+    // Load persisted state from local storage
+    const persistedState = this.loadPersistedState()
+
+    // Set active network
+    const activeNetwork = this.options.resetNetwork
+      ? network
+      : persistedState?.activeNetwork || network
+
+    // Create Algod client for active network
+    const algodClient = this.createAlgodClient(this.networkConfig[activeNetwork])
+
+    // Create initial state
+    const initialState: State = {
+      ...defaultState,
+      ...persistedState,
+      activeNetwork,
+      algodClient
+    }
+
+    // Create store
     this.store = new Store<State>(initialState, {
       onUpdate: () => this.savePersistedState()
     })
 
+    // Save persisted state immediately
     this.savePersistedState()
 
+    // Subscribe to store updates
     this.subscribe = (callback: (state: State) => void): (() => void) => {
       const unsubscribe = this.store.subscribe(() => {
         callback(this.store.state)
@@ -75,6 +99,7 @@ export class WalletManager {
       return unsubscribe
     }
 
+    // Initialize wallets
     this.initializeWallets(wallets)
   }
 

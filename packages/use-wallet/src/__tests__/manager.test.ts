@@ -466,4 +466,98 @@ describe('WalletManager', () => {
       expect(kibisisDisconnectMock).not.toHaveBeenCalled()
     })
   })
+
+  describe('options', () => {
+    describe('resetNetwork', () => {
+      let mockInitialState: State | null = null
+
+      beforeEach(() => {
+        vi.clearAllMocks()
+
+        vi.mocked(StorageAdapter.getItem).mockImplementation((key: string) => {
+          if (key === LOCAL_STORAGE_KEY && mockInitialState !== null) {
+            return JSON.stringify(mockInitialState)
+          }
+          return null
+        })
+
+        // Reset to null before each test
+        mockInitialState = null
+      })
+
+      it('uses the default network when resetNetwork is true, ignoring persisted state', () => {
+        mockInitialState = {
+          wallets: {},
+          activeWallet: null,
+          activeNetwork: NetworkId.MAINNET,
+          algodClient: new Algodv2('', 'https://mainnet-api.algonode.cloud')
+        }
+
+        const manager = new WalletManager({
+          wallets: [],
+          network: NetworkId.TESTNET,
+          options: { resetNetwork: true }
+        })
+
+        expect(manager.activeNetwork).toBe(NetworkId.TESTNET)
+      })
+
+      it('uses the persisted network when resetNetwork is false', () => {
+        mockInitialState = {
+          wallets: {},
+          activeWallet: null,
+          activeNetwork: NetworkId.MAINNET,
+          algodClient: new Algodv2('', 'https://mainnet-api.algonode.cloud')
+        }
+
+        const manager = new WalletManager({
+          wallets: [],
+          network: NetworkId.TESTNET,
+          options: { resetNetwork: false }
+        })
+
+        expect(manager.activeNetwork).toBe(NetworkId.MAINNET)
+      })
+
+      it('uses the default network when resetNetwork is false and no persisted state exists', () => {
+        const manager = new WalletManager({
+          wallets: [],
+          network: NetworkId.TESTNET,
+          options: { resetNetwork: false }
+        })
+
+        expect(manager.activeNetwork).toBe(NetworkId.TESTNET)
+      })
+
+      it('preserves wallet state when resetNetwork is true, only changing the network', () => {
+        mockInitialState = {
+          wallets: {
+            [WalletId.PERA]: {
+              accounts: [{ name: 'Account 1', address: 'address1' }],
+              activeAccount: { name: 'Account 1', address: 'address1' }
+            }
+          },
+          activeWallet: WalletId.PERA,
+          activeNetwork: NetworkId.MAINNET,
+          algodClient: new Algodv2('', 'https://mainnet-api.algonode.cloud')
+        }
+
+        const manager = new WalletManager({
+          wallets: [WalletId.PERA],
+          network: NetworkId.TESTNET,
+          options: { resetNetwork: true }
+        })
+
+        // Check that the network is forced to TESTNET
+        expect(manager.activeNetwork).toBe(NetworkId.TESTNET)
+
+        // Check that the wallet state is preserved
+        expect(manager.store.state.wallets[WalletId.PERA]).toEqual({
+          accounts: [{ name: 'Account 1', address: 'address1' }],
+          activeAccount: { name: 'Account 1', address: 'address1' }
+        })
+        expect(manager.store.state.activeWallet).toBe(WalletId.PERA)
+      })
+    })
+  })
 })
