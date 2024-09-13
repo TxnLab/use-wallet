@@ -1,3 +1,13 @@
+# [3.4.0](https://github.com/txnlab/use-wallet/compare/v3.3.0...v3.4.0) (2024-09-13)
+
+### Features
+
+- Add resetNetwork option to WalletManager ([#260](https://github.com/txnlab/use-wallet/pull/260)) ([70b8454](https://github.com/txnlab/use-wallet/commit/70b84549e12a589e8c9bc7632a4f9e1a07b14653))
+
+### Bug Fixes
+
+- Fix Kibisis init in Vue app ([#225](https://github.com/txnlab/use-wallet/pull/225)) ([470171f](https://github.com/txnlab/use-wallet/commit/470171f04f55d44a4d67f9965c1836febbc2dba3))
+
 # [3.3.0](https://github.com/txnlab/use-wallet/compare/v3.2.1...v3.3.0) (2024-09-11)
 
 ### Features
