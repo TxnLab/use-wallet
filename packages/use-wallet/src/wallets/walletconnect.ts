@@ -76,7 +76,8 @@ export class WalletConnect extends BaseWallet {
   }: WalletConstructor<WalletId.WALLETCONNECT>) {
     super({ id, metadata, getAlgodClient, store, subscribe })
     if (!options?.projectId) {
-      throw new Error(`[${this.metadata.name}] Missing required option: projectId`)
+      this.logger.error('Missing required option: projectId')
+      throw new Error('Missing required option: projectId')
     }
 
     const {
@@ -151,7 +152,7 @@ export class WalletConnect extends BaseWallet {
       doc = getDocumentOrThrow()
       loc = getLocationOrThrow()
     } catch (error) {
-      console.warn(`[${this.metadata.name}] Error getting window metadata:`, error)
+      this.logger.warn('Error getting window metadata:', error)
       return defaultMetadata
     }
 
@@ -262,16 +263,16 @@ export class WalletConnect extends BaseWallet {
   }
 
   private async initializeClient(): Promise<SignClient> {
-    console.info(`[${this.metadata.name}] Initializing client...`)
+    this.logger.info('Initializing client...')
     const SignClient = (await import('@walletconnect/sign-client')).SignClient
     const client = await SignClient.init(this.options)
 
     client.on('session_event', (args) => {
-      console.info(`[${this.metadata.name}] EVENT`, 'session_event', args)
+      this.logger.info('EVENT: session_event', args)
     })
 
     client.on('session_update', ({ topic, params }) => {
-      console.info(`[${this.metadata.name}] EVENT`, 'session_update', { topic, params })
+      this.logger.info('EVENT: session_update', { topic, params })
       const { namespaces } = params
       const session = client.session.get(topic)
       const updatedSession = { ...session, namespaces }
@@ -279,16 +280,17 @@ export class WalletConnect extends BaseWallet {
     })
 
     client.on('session_delete', () => {
-      console.info(`[${this.metadata.name}] EVENT`, 'session_delete')
+      this.logger.info('EVENT: session_delete')
       this.session = null
     })
 
     this.client = client
+    this.logger.info('Client initialized')
     return client
   }
 
   private async initializeModal(): Promise<WalletConnectModal> {
-    console.info(`[${this.metadata.name}] Initializing modal...`)
+    this.logger.info('Initializing modal...')
     const WalletConnectModal = (await import('@walletconnect/modal')).WalletConnectModal
     const modal = new WalletConnectModal({
       projectId: this.options.projectId,
@@ -296,11 +298,10 @@ export class WalletConnect extends BaseWallet {
       ...this.modalOptions
     })
 
-    modal.subscribeModal((state) =>
-      console.info(`[${this.metadata.name}] Modal ${state.open ? 'open' : 'closed'}`)
-    )
+    modal.subscribeModal((state) => this.logger.info(`Modal ${state.open ? 'open' : 'closed'}`))
 
     this.modal = modal
+    this.logger.info('Modal initialized')
     return modal
   }
 
@@ -308,6 +309,7 @@ export class WalletConnect extends BaseWallet {
     const caipAccounts = session.namespaces.algorand!.accounts
 
     if (!caipAccounts.length) {
+      this.logger.error('No accounts found!')
       throw new Error('No accounts found!')
     }
 
@@ -335,12 +337,12 @@ export class WalletConnect extends BaseWallet {
         wallet: newWalletState
       })
 
-      console.info(`[${this.metadata.name}] ✅ Connected.`, newWalletState)
+      this.logger.info('Connected', newWalletState)
     } else {
       const match = compareAccounts(walletAccounts, walletState.accounts)
 
       if (!match) {
-        console.warn(`[${this.metadata.name}] Session accounts mismatch, updating accounts`, {
+        this.logger.warn('Session accounts mismatch, updating accounts', {
           prev: walletState.accounts,
           current: walletAccounts
         })
@@ -356,7 +358,7 @@ export class WalletConnect extends BaseWallet {
   }
 
   public connect = async (): Promise<WalletAccount[]> => {
-    console.info(`[${this.metadata.name}] Connecting...`)
+    this.logger.info('Connecting...')
     try {
       const client = this.client || (await this.initializeClient())
       const modal = this.modal || (await this.initializeModal())
@@ -372,6 +374,7 @@ export class WalletConnect extends BaseWallet {
       const { uri, approval } = await client.connect({ requiredNamespaces })
 
       if (!uri) {
+        this.logger.error('No URI found')
         throw new Error('No URI found')
       }
 
@@ -380,14 +383,18 @@ export class WalletConnect extends BaseWallet {
       const session = await approval()
       const walletAccounts = this.onSessionConnected(session)
 
+      this.logger.info('Connected successfully')
       return walletAccounts
+    } catch (error: any) {
+      this.logger.error('Error connecting:', error.message)
+      throw error
     } finally {
       this.modal?.closeModal()
     }
   }
 
   public disconnect = async (): Promise<void> => {
-    console.info(`[${this.metadata.name}] Disconnecting...`)
+    this.logger.info('Disconnecting...')
     try {
       this.onDisconnect()
       if (this.client && this.session) {
@@ -399,9 +406,10 @@ export class WalletConnect extends BaseWallet {
           }
         })
       }
-      console.info(`[${this.metadata.name}] Disconnected.`)
+      this.logger.info('Disconnected')
     } catch (error: any) {
-      console.error(error)
+      this.logger.error('Error disconnecting:', error.message)
+      throw error
     }
   }
 
@@ -412,10 +420,11 @@ export class WalletConnect extends BaseWallet {
 
       // No session to resume
       if (!walletState) {
+        this.logger.info('No session to resume')
         return
       }
 
-      console.info(`[${this.metadata.name}] Resuming session...`)
+      this.logger.info('Resuming session...')
 
       const client = this.client || (await this.initializeClient())
 
@@ -424,8 +433,9 @@ export class WalletConnect extends BaseWallet {
         const restoredSession = client.session.get(client.session.keys[lastKeyIndex])
         this.onSessionConnected(restoredSession)
       }
+      this.logger.info('Session resumed successfully')
     } catch (error: any) {
-      console.error(`[${this.metadata.name}] Error resuming session: ${error.message}`)
+      this.logger.error('Error resuming session:', error.message)
       this.onDisconnect()
       throw error
     }
@@ -493,8 +503,11 @@ export class WalletConnect extends BaseWallet {
   ): Promise<(Uint8Array | null)[]> => {
     try {
       if (!this.session) {
-        throw new SessionError(`No session found!`)
+        this.logger.error('No session found!')
+        throw new SessionError('No session found!')
       }
+
+      this.logger.debug('Signing transactions...')
 
       let txnsToSign: WalletTransaction[] = []
 
@@ -531,7 +544,7 @@ export class WalletConnect extends BaseWallet {
             signedTxn = new Uint8Array(value)
           } else {
             // Log unexpected types for debugging
-            console.warn(`[${this.metadata.name}] Unexpected type in signTxnsResult`, value)
+            this.logger.warn('Unexpected type in signTxnsResult', value)
             signedTxn = new Uint8Array()
           }
           acc.push(signedTxn)
@@ -552,12 +565,10 @@ export class WalletConnect extends BaseWallet {
         return acc
       }, [])
 
+      this.logger.debug('Transactions signed successfully')
       return result
-    } catch (error) {
-      if (error instanceof SessionError) {
-        this.onDisconnect()
-      }
-      console.error(`[${this.metadata.name}] Error signing transactions:`, error)
+    } catch (error: any) {
+      this.logger.error('Error signing transactions:', error.message)
       throw error
     }
   }

@@ -1,3 +1,4 @@
+import { logger } from 'src/logger'
 import { setActiveWallet, setActiveAccount, removeWallet, type State } from 'src/store'
 import type { Store } from '@tanstack/store'
 import type algosdk from 'algosdk'
@@ -18,6 +19,8 @@ export abstract class BaseWallet {
 
   public subscribe: (callback: (state: State) => void) => () => void
 
+  protected logger: ReturnType<typeof logger.createScopedLogger>
+
   protected constructor({
     id,
     metadata,
@@ -32,6 +35,9 @@ export abstract class BaseWallet {
 
     const ctor = this.constructor as WalletConstructorType
     this.metadata = { ...ctor.defaultMetadata, ...metadata }
+
+    // Initialize logger with a scope based on the wallet ID
+    this.logger = logger.createScopedLogger(`Wallet:${this.id.toUpperCase()}`)
   }
 
   static defaultMetadata: WalletMetadata = { name: 'Base Wallet', icon: '' }
@@ -43,12 +49,12 @@ export abstract class BaseWallet {
   public abstract resumeSession(): Promise<void>
 
   public setActive = (): void => {
-    console.info(`[Wallet] Set active wallet: ${this.id}`)
+    this.logger.info(`Set active wallet: ${this.id}`)
     setActiveWallet(this.store, { walletId: this.id })
   }
 
   public setActiveAccount = (account: string): void => {
-    console.info(`[Wallet] Set active account: ${account}`)
+    this.logger.info(`Set active account: ${account}`)
     setActiveAccount(this.store, {
       walletId: this.id,
       address: account

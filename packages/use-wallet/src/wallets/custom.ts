@@ -43,7 +43,8 @@ export class CustomWallet extends BaseWallet {
   }: WalletConstructor<WalletId.CUSTOM>) {
     super({ id, metadata, getAlgodClient, store, subscribe })
     if (!options?.provider) {
-      throw new Error(`[${this.metadata.name}] Missing required option: provider`)
+      this.logger.error('Missing required option: provider')
+      throw new Error('Missing required option: provider')
     }
     this.provider = options.provider
     this.store = store
@@ -55,15 +56,17 @@ export class CustomWallet extends BaseWallet {
   }
 
   public connect = async (args?: Record<string, any>): Promise<WalletAccount[]> => {
-    console.info(`[${this.metadata.name}] Connecting...`)
+    this.logger.info('Connecting...')
     try {
       if (!this.provider.connect) {
-        throw new Error(`[${this.metadata.name}] Method not supported: connect`)
+        this.logger.error('Method not supported: connect')
+        throw new Error('Method not supported: connect')
       }
 
       const walletAccounts = await this.provider.connect(args)
 
       if (walletAccounts.length === 0) {
+        this.logger.error('No accounts found!')
         throw new Error('No accounts found!')
       }
 
@@ -79,16 +82,16 @@ export class CustomWallet extends BaseWallet {
         wallet: walletState
       })
 
-      console.info(`[${this.metadata.name}] ✅ Connected.`, walletState)
+      this.logger.info('✅ Connected.', walletState)
       return walletAccounts
     } catch (error: any) {
-      console.error(`[${this.metadata.name}] Error connecting:`, error.message || error)
+      this.logger.error('Error connecting:', error.message || error)
       throw error
     }
   }
 
   public disconnect = async (): Promise<void> => {
-    console.info(`[${this.metadata.name}] Disconnecting...`)
+    this.logger.info('Disconnecting...')
     this.onDisconnect()
     await this.provider.disconnect?.()
   }
@@ -100,10 +103,11 @@ export class CustomWallet extends BaseWallet {
 
       // No session to resume
       if (!walletState) {
+        this.logger.info('No session to resume')
         return
       }
 
-      console.info(`[${this.metadata.name}] Resuming session...`)
+      this.logger.info('Resuming session...')
 
       const result = await this.provider.resumeSession?.()
 
@@ -111,13 +115,14 @@ export class CustomWallet extends BaseWallet {
         const walletAccounts = result
 
         if (walletAccounts.length === 0) {
-          throw new Error(`[${this.metadata.name}] No accounts found!`)
+          this.logger.error('No accounts found!')
+          throw new Error('No accounts found!')
         }
 
         const match = compareAccounts(walletAccounts, walletState.accounts)
 
         if (!match) {
-          console.warn(`[${this.metadata.name}] Session accounts mismatch, updating accounts`, {
+          this.logger.warn('Session accounts mismatch, updating accounts', {
             prev: walletState.accounts,
             current: walletAccounts
           })
@@ -127,9 +132,9 @@ export class CustomWallet extends BaseWallet {
           })
         }
       }
-      console.info(`[${this.metadata.name}] Session resumed.`)
+      this.logger.info('Session resumed.')
     } catch (error: any) {
-      console.error(`[${this.metadata.name}] Error resuming session:`, error.message)
+      this.logger.error('Error resuming session:', error.message)
       throw error
     }
   }
@@ -139,8 +144,10 @@ export class CustomWallet extends BaseWallet {
     indexesToSign?: number[]
   ): Promise<(Uint8Array | null)[]> => {
     if (!this.provider.signTransactions) {
-      throw new Error(`[${this.metadata.name}] Method not supported: signTransactions`)
+      this.logger.error('Method not supported: signTransactions')
+      throw new Error('Method not supported: signTransactions')
     }
+    this.logger.debug('Signing transactions...')
     return await this.provider.signTransactions(txnGroup, indexesToSign)
   }
 
@@ -149,8 +156,10 @@ export class CustomWallet extends BaseWallet {
     indexesToSign: number[]
   ): Promise<Uint8Array[]> => {
     if (!this.provider.transactionSigner) {
-      throw new Error(`[${this.metadata.name}] Method not supported: transactionSigner`)
+      this.logger.error('Method not supported: transactionSigner')
+      throw new Error('Method not supported: transactionSigner')
     }
+    this.logger.debug('Transaction signer called...')
     return await this.provider.transactionSigner(txnGroup, indexesToSign)
   }
 }

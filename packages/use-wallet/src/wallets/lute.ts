@@ -42,7 +42,8 @@ export class LuteWallet extends BaseWallet {
   }: WalletConstructor<WalletId.LUTE>) {
     super({ id, metadata, getAlgodClient, store, subscribe })
     if (!options?.siteName) {
-      throw new Error('[LuteWallet] Missing required option: siteName')
+      this.logger.error('Missing required option: siteName')
+      throw new Error('Missing required option: siteName')
     }
     this.options = options
     this.store = store
@@ -54,12 +55,13 @@ export class LuteWallet extends BaseWallet {
   }
 
   private async initializeClient(): Promise<LuteConnect> {
-    console.info(`[${this.metadata.name}] Initializing client...`)
+    this.logger.info('Initializing client...')
     const module = await import('lute-connect')
     const LuteConnect = module.default
 
     const client = new LuteConnect(this.options.siteName as string)
     this.client = client
+    this.logger.info('Client initialized')
     return client
   }
 
@@ -72,12 +74,13 @@ export class LuteWallet extends BaseWallet {
   }
 
   public connect = async (): Promise<WalletAccount[]> => {
-    console.info(`[${this.metadata.name}] Connecting...`)
+    this.logger.info('Connecting...')
     const client = this.client || (await this.initializeClient())
     const genesisId = await this.getGenesisId()
     const accounts = await client.connect(genesisId)
 
     if (accounts.length === 0) {
+      this.logger.error('No accounts found!')
       throw new Error('No accounts found!')
     }
 
@@ -98,13 +101,13 @@ export class LuteWallet extends BaseWallet {
       wallet: walletState
     })
 
-    console.info(`[${this.metadata.name}] ✅ Connected.`, walletState)
+    this.logger.info('Connected successfully', walletState)
     return walletAccounts
   }
 
   public disconnect = async (): Promise<void> => {
     this.onDisconnect()
-    console.info(`[${this.metadata.name}] Disconnected.`)
+    this.logger.info('Disconnected')
   }
 
   public resumeSession = async (): Promise<void> => {
@@ -114,13 +117,15 @@ export class LuteWallet extends BaseWallet {
 
       // No session to resume
       if (!walletState) {
+        this.logger.info('No session to resume')
         return
       }
 
-      console.info(`[${this.metadata.name}] Resuming session...`)
+      this.logger.info('Resuming session...')
       await this.initializeClient()
+      this.logger.info('Session resumed successfully')
     } catch (error: any) {
-      console.error(`[${this.metadata.name}] Error resuming session: ${error.message}`)
+      this.logger.error('Error resuming session:', error.message)
       this.onDisconnect()
       throw error
     }
@@ -187,6 +192,7 @@ export class LuteWallet extends BaseWallet {
     indexesToSign?: number[]
   ): Promise<(Uint8Array | null)[]> => {
     try {
+      this.logger.debug('Signing transactions...')
       let txnsToSign: WalletTransaction[] = []
 
       // Determine type and process transactions for signing
@@ -203,11 +209,14 @@ export class LuteWallet extends BaseWallet {
       // Sign transactions
       const signTxnsResult = await client.signTxns(txnsToSign)
 
+      this.logger.debug('Transactions signed successfully')
       return signTxnsResult
     } catch (error) {
       if (isSignTxnsError(error)) {
+        this.logger.error('Error signing transactions:', error.message, `(code: ${error.code})`)
         throw new SignTxnsError(error.message, error.code)
       }
+      this.logger.error('Unknown error signing transactions:', error)
       throw error
     }
   }
