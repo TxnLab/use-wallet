@@ -1,4 +1,5 @@
 import algosdk from 'algosdk'
+import { logger } from 'src/logger'
 import { NetworkId, isValidNetworkId } from 'src/network'
 import { WalletId, type WalletAccount } from 'src/wallets'
 import type { Store } from '@tanstack/store'
@@ -76,13 +77,13 @@ export function setActiveAccount(
   store.setState((state) => {
     const wallet = state.wallets[walletId]
     if (!wallet) {
-      console.warn(`Wallet with id "${walletId}" not found`)
+      logger.warn(`Wallet with id "${walletId}" not found`)
       return state
     }
 
     const newActiveAccount = wallet.accounts.find((a) => a.address === address)
     if (!newActiveAccount) {
-      console.warn(`Account with address ${address} not found in wallet "${walletId}"`)
+      logger.warn(`Account with address ${address} not found in wallet "${walletId}"`)
       return state
     }
 
@@ -111,7 +112,7 @@ export function setAccounts(
   store.setState((state) => {
     const wallet = state.wallets[walletId]
     if (!wallet) {
-      console.warn(`Wallet with id "${walletId}" not found`)
+      logger.warn(`Wallet with id "${walletId}" not found`)
       return state
     }
 
