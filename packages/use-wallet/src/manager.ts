@@ -5,7 +5,6 @@ import {
   createDefaultNetworkConfig,
   isNetworkConfigMap,
   NetworkId,
-  type AlgodConfig,
   type NetworkConfig,
   type NetworkConfigMap
 } from 'src/network'
@@ -84,7 +83,7 @@ export class WalletManager {
       : persistedState?.activeNetwork || network
 
     // Create Algod client for active network
-    const algodClient = this.createAlgodClient(this.networkConfig[activeNetwork])
+    const algodClient = this.createAlgodClient(activeNetwork)
 
     // Create initial state
     const initialState: State = {
@@ -260,9 +259,9 @@ export class WalletManager {
     return networkConfig
   }
 
-  private createAlgodClient(config: AlgodConfig): algosdk.Algodv2 {
-    this.logger.info(`Creating Algodv2 client for ${this.activeNetwork}...`)
-    const { token = '', baseServer, port = '', headers = {} } = config
+  private createAlgodClient(networkId: NetworkId): algosdk.Algodv2 {
+    this.logger.info(`Creating Algodv2 client for ${networkId}...`)
+    const { token = '', baseServer, port = '', headers = {} } = this.networkConfig[networkId]
     return new algosdk.Algodv2(token, baseServer, port, headers)
   }
 
@@ -275,7 +274,7 @@ export class WalletManager {
       return
     }
 
-    const algodClient = this.createAlgodClient(this.networkConfig[networkId])
+    const algodClient = this.createAlgodClient(networkId)
     setActiveNetwork(this.store, { networkId, algodClient })
 
     this.logger.info(`✅ Active network set to ${networkId}.`)
