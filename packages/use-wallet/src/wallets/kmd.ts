@@ -224,7 +224,7 @@ export class KmdWallet extends BaseWallet {
     indexesToSign?: number[]
   ): Promise<(Uint8Array | null)[]> => {
     try {
-      this.logger.debug('Signing transactions...')
+      this.logger.debug('Signing transactions...', { txnGroup, indexesToSign })
       let txnsToSign: algosdk.Transaction[] = []
 
       // Determine type and process transactions for signing
@@ -242,15 +242,19 @@ export class KmdWallet extends BaseWallet {
 
       const client = this.client || (await this.initializeClient())
 
+      this.logger.debug('Sending processed transactions to wallet...', txnsToSign)
+
       // Sign transactions
       const signedTxns = await Promise.all(
         txnsToSign.map((txn) => client.signTransaction(token, password, txn))
       )
 
+      this.logger.debug('Received signed transactions from wallet', signedTxns)
+
       // Release token
       await this.releaseToken(token)
 
-      this.logger.debug('Transactions signed successfully')
+      this.logger.debug('Transactions signed successfully', signedTxns)
       return signedTxns
     } catch (error: any) {
       this.logger.error('Error signing transactions:', error.message)
@@ -259,7 +263,7 @@ export class KmdWallet extends BaseWallet {
   }
 
   private async fetchWalletId(): Promise<string> {
-    this.logger.debug('Fetching wallet data...')
+    this.logger.debug('Fetching wallet data...', { walletName: this.walletName })
     const client = this.client || (await this.initializeClient())
 
     const { wallets }: ListWalletsResponse = await client.listWallets()
@@ -271,12 +275,12 @@ export class KmdWallet extends BaseWallet {
     }
 
     this.walletId = wallet.id
-    this.logger.debug('Wallet data fetched successfully')
+    this.logger.debug('Wallet data fetched successfully', { walletId: this.walletId })
     return wallet.id
   }
 
   private async fetchToken(): Promise<string> {
-    this.logger.debug('Fetching token...')
+    this.logger.debug('Fetching token...', { walletId: this.walletId })
     const client = this.client || (await this.initializeClient())
 
     const walletId = this.walletId || (await this.fetchWalletId())
@@ -310,7 +314,7 @@ export class KmdWallet extends BaseWallet {
     this.logger.debug('Fetching accounts...')
     const client = this.client || (await this.initializeClient())
     const { addresses }: ListKeysResponse = await client.listKeys(token)
-    this.logger.debug('Accounts fetched successfully')
+    this.logger.debug('Accounts fetched successfully', { addresses })
     return addresses
   }
 }

@@ -210,7 +210,7 @@ export class PeraWallet extends BaseWallet {
     indexesToSign?: number[]
   ): Promise<(Uint8Array | null)[]> => {
     try {
-      this.logger.debug('Signing transactions...')
+      this.logger.debug('Signing transactions...', { txnGroup, indexesToSign })
       let txnsToSign: SignerTransaction[] = []
 
       // Determine type and process transactions for signing
@@ -224,8 +224,11 @@ export class PeraWallet extends BaseWallet {
 
       const client = this.client || (await this.initializeClient())
 
+      this.logger.debug('Sending processed transactions to wallet...', [txnsToSign])
+
       // Sign transactions
       const signedTxns = await client.signTransaction([txnsToSign])
+      this.logger.debug('Received signed transactions from wallet', signedTxns)
 
       // ARC-0001 - Return null for unsigned transactions
       const result = txnsToSign.reduce<(Uint8Array | null)[]>((acc, txn) => {
@@ -240,7 +243,7 @@ export class PeraWallet extends BaseWallet {
         return acc
       }, [])
 
-      this.logger.debug('Transactions signed successfully')
+      this.logger.debug('Transactions signed successfully', result)
       return result
     } catch (error: any) {
       this.logger.error('Error signing transactions:', error.message)

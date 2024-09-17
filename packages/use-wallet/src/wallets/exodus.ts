@@ -238,7 +238,7 @@ export class ExodusWallet extends BaseWallet {
     indexesToSign?: number[]
   ): Promise<(Uint8Array | null)[]> => {
     try {
-      this.logger.debug('Signing transactions...')
+      this.logger.debug('Signing transactions...', { txnGroup, indexesToSign })
       let txnsToSign: WalletTransaction[] = []
 
       // Determine type and process transactions for signing
@@ -252,8 +252,11 @@ export class ExodusWallet extends BaseWallet {
 
       const client = this.client || (await this.initializeClient())
 
+      this.logger.debug('Sending processed transactions to wallet...', txnsToSign)
+
       // Sign transactions
       const signTxnsResult = await client.signTxns(txnsToSign)
+      this.logger.debug('Received signed transactions from wallet', signTxnsResult)
 
       // Convert base64 to Uint8Array
       const result = signTxnsResult.map((value) => {
@@ -263,7 +266,7 @@ export class ExodusWallet extends BaseWallet {
         return base64ToByteArray(value)
       })
 
-      this.logger.debug('Transactions signed successfully')
+      this.logger.debug('Transactions signed successfully', result)
       return result
     } catch (error: any) {
       this.logger.error('Error signing transactions:', error.message)

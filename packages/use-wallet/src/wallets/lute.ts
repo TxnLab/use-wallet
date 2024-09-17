@@ -192,7 +192,7 @@ export class LuteWallet extends BaseWallet {
     indexesToSign?: number[]
   ): Promise<(Uint8Array | null)[]> => {
     try {
-      this.logger.debug('Signing transactions...')
+      this.logger.debug('Signing transactions...', { txnGroup, indexesToSign })
       let txnsToSign: WalletTransaction[] = []
 
       // Determine type and process transactions for signing
@@ -206,10 +206,12 @@ export class LuteWallet extends BaseWallet {
 
       const client = this.client || (await this.initializeClient())
 
+      this.logger.debug('Sending processed transactions to wallet...', txnsToSign)
+
       // Sign transactions
       const signTxnsResult = await client.signTxns(txnsToSign)
 
-      this.logger.debug('Transactions signed successfully')
+      this.logger.debug('Transactions signed successfully', signTxnsResult)
       return signTxnsResult
     } catch (error) {
       if (isSignTxnsError(error)) {

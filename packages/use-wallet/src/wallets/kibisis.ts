@@ -105,11 +105,11 @@ export class KibisisWallet extends BaseWallet {
           )
         }
 
-        this.logger.debug('Disable successful')
+        this.logger.debug('Disable successful', { result })
         return resolve(result)
       })
 
-      this.logger.debug('Sending disable request')
+      this.logger.debug('Sending disable request...', { genesisHash })
       avmWebClient.disable({
         genesisHash,
         providerId: KIBISIS_AVM_WEB_PROVIDER_ID
@@ -170,11 +170,11 @@ export class KibisisWallet extends BaseWallet {
           )
         }
 
-        this.logger.debug('Enable successful')
+        this.logger.debug('Enable successful', { result })
         return resolve(result)
       })
 
-      this.logger.debug('Sending enable request')
+      this.logger.debug('Sending enable request...', { genesisHash })
       avmWebClient.enable({
         genesisHash,
         providerId: KIBISIS_AVM_WEB_PROVIDER_ID
@@ -291,11 +291,11 @@ export class KibisisWallet extends BaseWallet {
           )
         }
 
-        this.logger.debug('Sign transactions successful')
+        this.logger.debug('Sign transactions successful', { result })
         return resolve(result)
       })
 
-      this.logger.debug('Sending sign transactions request')
+      this.logger.debug('Sending sign transactions request...', { txns })
       avmWebClient.signTransactions({
         txns,
         providerId: KIBISIS_AVM_WEB_PROVIDER_ID
@@ -462,7 +462,7 @@ export class KibisisWallet extends BaseWallet {
     indexesToSign?: number[]
   ): Promise<(Uint8Array | null)[]> => {
     try {
-      this.logger.debug('Signing transactions...')
+      this.logger.debug('Signing transactions...', { txnGroup, indexesToSign })
       let txnsToSign: AVMWebProviderSDK.IARC0001Transaction[] = []
 
       // Determine type and process transactions for signing
@@ -474,8 +474,11 @@ export class KibisisWallet extends BaseWallet {
         txnsToSign = this.processEncodedTxns(flatTxns, indexesToSign)
       }
 
+      this.logger.debug('Sending processed transactions to wallet...', txnsToSign)
+
       // Sign transactions
       const signTxnsResult = await this._signTransactions(txnsToSign)
+      this.logger.debug('Received signed transactions from wallet', signTxnsResult)
 
       // Convert base64 to Uint8Array
       const result = signTxnsResult.stxns.map((value) => {
@@ -485,7 +488,7 @@ export class KibisisWallet extends BaseWallet {
         return base64ToByteArray(value)
       })
 
-      this.logger.debug('Transactions signed successfully')
+      this.logger.debug('Transactions signed successfully', result)
       return result
     } catch (error: any) {
       this.logger.error(

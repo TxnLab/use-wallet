@@ -147,7 +147,7 @@ export class CustomWallet extends BaseWallet {
       this.logger.error('Method not supported: signTransactions')
       throw new Error('Method not supported: signTransactions')
     }
-    this.logger.debug('Signing transactions...')
+    this.logger.debug('Signing transactions...', { txnGroup, indexesToSign })
     return await this.provider.signTransactions(txnGroup, indexesToSign)
   }
 
@@ -159,7 +159,7 @@ export class CustomWallet extends BaseWallet {
       this.logger.error('Method not supported: transactionSigner')
       throw new Error('Method not supported: transactionSigner')
     }
-    this.logger.debug('Transaction signer called...')
+    this.logger.debug('Transaction signer called...', { txnGroup, indexesToSign })
     return await this.provider.transactionSigner(txnGroup, indexesToSign)
   }
 }

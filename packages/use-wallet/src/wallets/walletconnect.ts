@@ -507,7 +507,7 @@ export class WalletConnect extends BaseWallet {
         throw new SessionError('No session found!')
       }
 
-      this.logger.debug('Signing transactions...')
+      this.logger.debug('Signing transactions...', { txnGroup, indexesToSign })
 
       let txnsToSign: WalletTransaction[] = []
 
@@ -522,6 +522,8 @@ export class WalletConnect extends BaseWallet {
 
       const client = this.client || (await this.initializeClient())
 
+      this.logger.debug('Sending processed transactions to wallet...', [txnsToSign])
+
       // Format JSON-RPC request
       const request = formatJsonRpcRequest('algo_signTxn', [txnsToSign])
 
@@ -531,6 +533,8 @@ export class WalletConnect extends BaseWallet {
         topic: this.session.topic,
         request
       })
+
+      this.logger.debug('Received signed transactions from wallet', signTxnsResult)
 
       // Filter out unsigned transactions, convert signed transactions to Uint8Array
       const signedTxns = signTxnsResult.reduce<Uint8Array[]>((acc, value) => {
@@ -565,7 +569,7 @@ export class WalletConnect extends BaseWallet {
         return acc
       }, [])
 
-      this.logger.debug('Transactions signed successfully')
+      this.logger.debug('Transactions signed successfully', result)
       return result
     } catch (error: any) {
       this.logger.error('Error signing transactions:', error.message)
