@@ -2,12 +2,11 @@ export enum LogLevel {
   DEBUG,
   INFO,
   WARN,
-  ERROR,
-  NONE
+  ERROR
 }
 
 export class Logger {
-  private static instance: Logger
+  private static instance: Logger | null = null
   private level: LogLevel
   private isClient: boolean
 
@@ -68,6 +67,11 @@ export class Logger {
 
   public error(message: string, ...args: any[]): void {
     this.log(LogLevel.ERROR, undefined, message, ...args)
+  }
+
+  // For testing purposes
+  public setIsClient(isClient: boolean): void {
+    this.isClient = isClient
   }
 }
 
