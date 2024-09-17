@@ -1,4 +1,6 @@
 import { Store } from '@tanstack/store'
+import algosdk from 'algosdk'
+import { logger } from 'src/logger'
 import { NetworkId } from 'src/network'
 import { LOCAL_STORAGE_KEY, State, defaultState } from 'src/store'
 import { WalletManager } from 'src/manager'
@@ -8,7 +10,29 @@ import { DeflyWallet } from 'src/wallets/defly'
 import { KibisisWallet } from 'src/wallets/kibisis'
 import { WalletId } from 'src/wallets/types'
 import type { Mock } from 'vitest'
-import { Algodv2 } from 'algosdk'
+
+vi.mock('src/logger', () => {
+  const mockLogger = {
+    createScopedLogger: vi.fn().mockReturnValue({
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn()
+    })
+  }
+  return {
+    Logger: {
+      setLevel: vi.fn()
+    },
+    LogLevel: {
+      DEBUG: 0,
+      INFO: 1,
+      WARN: 2,
+      ERROR: 3
+    },
+    logger: mockLogger
+  }
+})
 
 // Mock storage adapter
 vi.mock('src/storage', () => ({
@@ -22,10 +46,20 @@ vi.mock('src/storage', () => ({
 vi.spyOn(console, 'info').mockImplementation(() => {})
 
 // Mock console.warn
-const mockConsoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+let mockLoggerWarn: Mock
+let mockLoggerError: Mock
 
-// Mock console.error
-const mockConsoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+beforeEach(() => {
+  vi.clearAllMocks()
+  mockLoggerWarn = vi.fn()
+  mockLoggerError = vi.fn()
+  vi.mocked(logger.createScopedLogger).mockReturnValue({
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: mockLoggerWarn,
+    error: mockLoggerError
+  })
+})
 
 vi.mock('src/wallets/defly', () => ({
   DeflyWallet: class DeflyWallet {
@@ -258,7 +292,7 @@ describe('WalletManager', () => {
         },
         activeWallet: WalletId.KIBISIS,
         activeNetwork: NetworkId.BETANET,
-        algodClient: new Algodv2('', 'https://betanet-api.4160.nodely.dev/')
+        algodClient: new algosdk.Algodv2('', 'https://betanet-api.4160.nodely.dev/')
       }
     })
 
@@ -285,16 +319,16 @@ describe('WalletManager', () => {
     })
 
     it('returns null and logs warning and error if persisted state is invalid', () => {
-      const invalidState = { foo: 'bar' }
-      // @ts-expect-error - Set invalid state
-      mockInitialState = invalidState
+      const invalidState = { invalid: 'state' }
+      vi.mocked(StorageAdapter.getItem).mockReturnValueOnce(JSON.stringify(invalidState))
 
       const manager = new WalletManager({
         wallets: [WalletId.DEFLY, WalletId.KIBISIS]
       })
-      expect(mockConsoleWarn).toHaveBeenCalledWith('[Store] Parsed state:', invalidState)
-      expect(mockConsoleError).toHaveBeenCalledWith(
-        '[Store] Could not load state from local storage: Persisted state is invalid'
+
+      expect(mockLoggerWarn).toHaveBeenCalledWith('Parsed state:', invalidState)
+      expect(mockLoggerError).toHaveBeenCalledWith(
+        'Could not load state from local storage: Persisted state is invalid'
       )
       // Store initializes with default state if null is returned
       expect(manager.store.state).toEqual(defaultState)
@@ -344,7 +378,7 @@ describe('WalletManager', () => {
         },
         activeWallet: WalletId.KIBISIS,
         activeNetwork: NetworkId.BETANET,
-        algodClient: new Algodv2('', 'https://betanet-api.4160.nodely.dev/')
+        algodClient: new algosdk.Algodv2('', 'https://betanet-api.4160.nodely.dev/')
       }
     })
 
@@ -490,7 +524,7 @@ describe('WalletManager', () => {
           wallets: {},
           activeWallet: null,
           activeNetwork: NetworkId.MAINNET,
-          algodClient: new Algodv2('', 'https://mainnet-api.algonode.cloud')
+          algodClient: new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud')
         }
 
         const manager = new WalletManager({
@@ -507,7 +541,7 @@ describe('WalletManager', () => {
           wallets: {},
           activeWallet: null,
           activeNetwork: NetworkId.MAINNET,
-          algodClient: new Algodv2('', 'https://mainnet-api.algonode.cloud')
+          algodClient: new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud')
         }
 
         const manager = new WalletManager({
@@ -539,7 +573,7 @@ describe('WalletManager', () => {
           },
           activeWallet: WalletId.PERA,
           activeNetwork: NetworkId.MAINNET,
-          algodClient: new Algodv2('', 'https://mainnet-api.algonode.cloud')
+          algodClient: new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud')
         }
 
         const manager = new WalletManager({
