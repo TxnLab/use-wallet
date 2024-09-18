@@ -16,8 +16,8 @@
     "algosdk": "2.9.0",
     "lute-connect": "^1.3.0",
     "next": "14.2.11",
-    "react": "^18",
-    "react-dom": "^18"
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
   },
   "devDependencies": {
     "@types/node": "20.11.30",
