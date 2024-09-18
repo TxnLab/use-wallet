@@ -1,3 +1,13 @@
+# [3.5.0](https://github.com/txnlab/use-wallet/compare/v3.4.0...v3.5.0) (2024-09-18)
+
+### Features
+
+- Implement configurable logging system ([#264](https://github.com/txnlab/use-wallet/pull/264)) ([4912e4e](https://github.com/txnlab/use-wallet/commit/4912e4ee9c601d57ea8c19fbce37aadb48fa8ae9))
+
+### Bug Fixes
+
+- Correct DEBUG log level handling in WalletManager ([#265](https://github.com/txnlab/use-wallet/pull/265)) ([53057b5](https://github.com/txnlab/use-wallet/commit/53057b545799f0041865d919a29c5940ffe9cf79))
+
 # [3.4.0](https://github.com/txnlab/use-wallet/compare/v3.3.0...v3.4.0) (2024-09-13)
 
 ### Features
