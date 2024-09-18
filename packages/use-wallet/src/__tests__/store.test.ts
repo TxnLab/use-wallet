@@ -17,6 +17,16 @@ import {
 } from 'src/store'
 import { WalletId } from 'src/wallets/types'
 
+// Mock the logger
+vi.mock('src/logger', () => ({
+  logger: {
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn()
+  }
+}))
+
 describe('Mutations', () => {
   let store: Store<State>
 
