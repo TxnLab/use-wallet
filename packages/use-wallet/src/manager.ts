@@ -30,27 +30,26 @@ import type {
   WalletOptions
 } from 'src/wallets/types'
 
+export interface WalletManagerOptions {
+  resetNetwork?: boolean
+  debug?: boolean
+  logLevel?: LogLevel
+}
+
 export interface WalletManagerConfig {
   wallets?: SupportedWallet[]
   network?: NetworkId
   algod?: NetworkConfig
-  options?: {
-    resetNetwork?: boolean
-    debug?: boolean
-    logLevel?: LogLevel
-  }
+  options?: WalletManagerOptions
 }
 
 export type PersistedState = Omit<State, 'algodClient'>
 
 export class WalletManager {
   public _clients: Map<WalletId, BaseWallet> = new Map()
-
   public networkConfig: NetworkConfigMap
-
   public store: Store<State>
   public subscribe: (callback: (state: State) => void) => () => void
-
   public options: { resetNetwork: boolean }
 
   private logger: ReturnType<typeof logger.createScopedLogger>
@@ -61,12 +60,15 @@ export class WalletManager {
     algod = {},
     options = {}
   }: WalletManagerConfig = {}) {
-    const logLevel = options.debug ? LogLevel.DEBUG : options.logLevel || LogLevel.WARN
+    // Initialize scoped logger
+    this.logger = this.initializeLogger(options)
 
-    Logger.setLevel(logLevel)
-    this.logger = logger.createScopedLogger('WalletManager')
-
-    this.logger.debug('Initializing WalletManager with options:', options)
+    this.logger.debug('Initializing WalletManager with config:', {
+      wallets,
+      network,
+      algod,
+      options
+    })
 
     // Initialize network config
     this.networkConfig = this.initNetworkConfig(network, algod)
@@ -112,6 +114,23 @@ export class WalletManager {
 
     // Initialize wallets
     this.initializeWallets(wallets)
+  }
+
+  // ---------- Logging ----------------------------------------------- //
+
+  private initializeLogger(
+    options: WalletManagerOptions
+  ): ReturnType<typeof logger.createScopedLogger> {
+    const logLevel = this.determineLogLevel(options)
+    Logger.setLevel(logLevel)
+    return logger.createScopedLogger('WalletManager')
+  }
+
+  private determineLogLevel(options: WalletManagerOptions): LogLevel {
+    if (options?.debug) {
+      return LogLevel.DEBUG
+    }
+    return options?.logLevel !== undefined ? options.logLevel : LogLevel.WARN
   }
 
   // ---------- Store ------------------------------------------------- //
