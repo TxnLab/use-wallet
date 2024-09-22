@@ -1,9 +1,23 @@
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
+import { logger } from 'src/logger'
 import { StorageAdapter } from 'src/storage'
 import { LOCAL_STORAGE_KEY, State, WalletState, defaultState } from 'src/store'
 import { PeraWallet } from 'src/wallets/pera'
 import { WalletId } from 'src/wallets/types'
+import type { Mock } from 'vitest'
+
+// Mock logger
+vi.mock('src/logger', () => ({
+  logger: {
+    createScopedLogger: vi.fn().mockReturnValue({
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn()
+    })
+  }
+}))
 
 // Mock storage adapter
 vi.mock('src/storage', () => ({
@@ -12,10 +26,6 @@ vi.mock('src/storage', () => ({
     setItem: vi.fn()
   }
 }))
-
-// Spy/suppress console output
-vi.spyOn(console, 'info').mockImplementation(() => {}) // @todo: remove when debug logger is implemented
-vi.spyOn(console, 'warn').mockImplementation(() => {})
 
 const mockPeraWallet = {
   connect: vi.fn(),
@@ -50,6 +60,12 @@ describe('PeraWallet', () => {
   let wallet: PeraWallet
   let store: Store<State>
   let mockInitialState: State | null = null
+  let mockLogger: {
+    debug: Mock
+    info: Mock
+    warn: Mock
+    error: Mock
+  }
 
   const account1 = {
     name: 'Pera Account 1',
@@ -75,6 +91,14 @@ describe('PeraWallet', () => {
         mockInitialState = JSON.parse(value)
       }
     })
+
+    mockLogger = {
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn()
+    }
+    vi.mocked(logger.createScopedLogger).mockReturnValue(mockLogger)
 
     store = new Store<State>(defaultState)
     wallet = createWalletWithStore(store)
@@ -222,13 +246,10 @@ describe('PeraWallet', () => {
 
       await wallet.resumeSession()
 
-      expect(console.warn).toHaveBeenCalledWith(
-        '[Pera] Session accounts mismatch, updating accounts',
-        {
-          prev: prevWalletState.accounts,
-          current: newWalletState.accounts
-        }
-      )
+      expect(mockLogger.warn).toHaveBeenCalledWith('Session accounts mismatch, updating accounts', {
+        prev: prevWalletState.accounts,
+        current: newWalletState.accounts
+      })
       expect(store.state.wallets[WalletId.PERA]).toEqual(newWalletState)
     })
 

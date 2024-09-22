@@ -4,9 +4,8 @@ export enum NetworkId {
   MAINNET = 'mainnet',
   TESTNET = 'testnet',
   BETANET = 'betanet',
-  LOCALNET = 'localnet',
-  VOITEST = 'voitest',
-  ARAMIDMAIN = 'aramidmain'
+  FNET = 'fnet',
+  LOCALNET = 'localnet'
 }
 
 export function isValidNetworkId(networkId: any): networkId is NetworkId {
@@ -45,11 +44,10 @@ export function isNetworkConfigMap(config: NetworkConfig): config is NetworkConf
 export type NetworkConfig = Partial<AlgodConfig> | Partial<Record<NetworkId, Partial<AlgodConfig>>>
 
 export const nodeServerMap = {
-  [NetworkId.MAINNET]: 'https://mainnet-api.algonode.cloud',
-  [NetworkId.TESTNET]: 'https://testnet-api.algonode.cloud',
-  [NetworkId.BETANET]: 'https://betanet-api.algonode.cloud',
-  [NetworkId.VOITEST]: 'https://testnet-api.voi.nodly.io',
-  [NetworkId.ARAMIDMAIN]: 'https://algod.aramidmain.a-wallet.net'
+  [NetworkId.MAINNET]: 'https://mainnet-api.4160.nodely.dev',
+  [NetworkId.TESTNET]: 'https://testnet-api.4160.nodely.dev',
+  [NetworkId.BETANET]: 'https://betanet-api.4160.nodely.dev',
+  [NetworkId.FNET]: 'https://fnet-api.4160.nodely.dev'
 }
 
 export function createDefaultNetworkConfig(): NetworkConfigMap {
@@ -80,7 +78,5 @@ export function createDefaultNetworkConfig(): NetworkConfigMap {
 export const caipChainId: Partial<Record<NetworkId, string>> = {
   [NetworkId.MAINNET]: 'algorand:wGHE2Pwdvd7S12BL5FaOP20EGYesN73k',
   [NetworkId.TESTNET]: 'algorand:SGO1GKSzyE7IEPItTxCByw9x8FmnrCDe',
-  [NetworkId.BETANET]: 'algorand:mFgazF-2uRS1tMiL9dsj01hJGySEmPN2',
-  [NetworkId.VOITEST]: 'algorand:IXnoWtviVVJW5LGivNFc0Dq14V3kqaXu',
-  [NetworkId.ARAMIDMAIN]: 'algorand:PgeQVJJgx_LYKJfIEz7dbfNPuXmDyJ-O'
+  [NetworkId.BETANET]: 'algorand:mFgazF-2uRS1tMiL9dsj01hJGySEmPN2'
 }

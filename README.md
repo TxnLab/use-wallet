@@ -5,15 +5,15 @@
 
 A framework agnostic Algorand wallet integration library with reactive framework adapters for React, Vue, and Solid.js.
 
-## use-wallet fork
+## avm-wallet fork
 
-This is fork of [use-wallet](https://github.com/TxnLab/use-wallet) intended to fix multiple issues found in it:
+This is fork of [avm-wallet](https://github.com/TxnLab/avm-wallet) intended to fix multiple issues found in it:
 
-- [Multiple AVM networks support](https://github.com/TxnLab/use-wallet/pull/222)
-- [Biatec wallet support](https://github.com/TxnLab/use-wallet/pull/202)
-- [Bug in Kibisis wallet for vuejs](https://github.com/TxnLab/use-wallet/pull/225)
+- [Multiple AVM networks support](https://github.com/TxnLab/avm-wallet/pull/222)
+- [Biatec wallet support](https://github.com/TxnLab/avm-wallet/pull/202)
+- [Bug in Kibisis wallet for vuejs](https://github.com/TxnLab/avm-wallet/pull/225)
 
-Difference betwen `avm-wallet` and `use-wallet` is just the name of the import.
+Difference betwen `avm-wallet` and `avm-wallet` is just the name of the import.
 
 Example usage: https://github.com/AramidFinance/aramid-bridge-fe-vue/blob/c9e0bfe90122b7c8a9d56d2c2deac36f08098cd6/src/main.ts#L28
 
@@ -59,4 +59,6 @@ app.mount('#app')
 
 ### Visit [txnlab.gitbook.io/use-wallet](https://txnlab.gitbook.io/use-wallet) for docs, guides, and examples!
 
-### [Become a sponsor!](https://github.com/sponsors/TxnLab/)
+### [Become a sponsor for TxnLab!](https://github.com/sponsors/TxnLab/)
+
+### [Become a sponsor for Scholtz!](https://github.com/sponsors/scholtz/)

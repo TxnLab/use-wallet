@@ -17,6 +17,16 @@ import {
 } from 'src/store'
 import { WalletId } from 'src/wallets/types'
 
+// Mock the logger
+vi.mock('src/logger', () => ({
+  logger: {
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn()
+  }
+}))
+
 describe('Mutations', () => {
   let store: Store<State>
 
@@ -426,7 +436,7 @@ describe('Mutations', () => {
       expect(store.state.activeNetwork).toBe(NetworkId.TESTNET)
 
       const networkId = NetworkId.MAINNET
-      const algodClient = new Algodv2('', 'https://mainnet-api.algonode.cloud/')
+      const algodClient = new Algodv2('', 'https://mainnet-api.4160.nodely.dev/')
       setActiveNetwork(store, { networkId, algodClient })
       expect(store.state.activeNetwork).toBe(networkId)
     })
@@ -556,7 +566,7 @@ describe('Type Guards', () => {
         wallets: {},
         activeWallet: null,
         activeNetwork: NetworkId.TESTNET,
-        algodClient: new Algodv2('', 'https://testnet-api.algonode.cloud/')
+        algodClient: new Algodv2('', 'https://testnet-api.4160.nodely.dev/')
       }
       expect(isValidState(defaultState)).toBe(true)
 
@@ -593,7 +603,7 @@ describe('Type Guards', () => {
         },
         activeWallet: WalletId.DEFLY,
         activeNetwork: NetworkId.TESTNET,
-        algodClient: new Algodv2('', 'https://testnet-api.algonode.cloud/')
+        algodClient: new Algodv2('', 'https://testnet-api.4160.nodely.dev/')
       }
       expect(isValidState(state)).toBe(true)
     })

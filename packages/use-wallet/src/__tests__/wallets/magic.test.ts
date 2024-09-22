@@ -1,10 +1,24 @@
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
+import { logger } from 'src/logger'
 import { StorageAdapter } from 'src/storage'
 import { LOCAL_STORAGE_KEY, State, WalletState, defaultState } from 'src/store'
 import { base64ToByteArray, byteArrayToBase64 } from 'src/utils'
 import { MagicAuth } from 'src/wallets/magic'
 import { WalletId } from 'src/wallets/types'
+import type { Mock } from 'vitest'
+
+// Mock logger
+vi.mock('src/logger', () => ({
+  logger: {
+    createScopedLogger: vi.fn().mockReturnValue({
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn()
+    })
+  }
+}))
 
 // Mock storage adapter
 vi.mock('src/storage', () => ({
@@ -13,10 +27,6 @@ vi.mock('src/storage', () => ({
     setItem: vi.fn()
   }
 }))
-
-// Spy/suppress console output
-vi.spyOn(console, 'info').mockImplementation(() => {}) // @todo: remove when debug logger is implemented
-vi.spyOn(console, 'warn').mockImplementation(() => {})
 
 const mockMagicClient = {
   auth: {
@@ -55,6 +65,12 @@ describe('MagicAuth', () => {
   let wallet: MagicAuth
   let store: Store<State>
   let mockInitialState: State | null = null
+  let mockLogger: {
+    debug: Mock
+    info: Mock
+    warn: Mock
+    error: Mock
+  }
 
   const email = 'test@example.com'
   const publicAddress = 'mockAddress'
@@ -79,6 +95,14 @@ describe('MagicAuth', () => {
         mockInitialState = JSON.parse(value)
       }
     })
+
+    mockLogger = {
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn()
+    }
+    vi.mocked(logger.createScopedLogger).mockReturnValue(mockLogger)
 
     store = new Store<State>(defaultState)
     wallet = createWalletWithStore(store)
@@ -266,13 +290,10 @@ describe('MagicAuth', () => {
       })
       await wallet.resumeSession()
 
-      expect(console.warn).toHaveBeenCalledWith(
-        '[Magic] Session account mismatch, updating account',
-        {
-          prev: prevAccount,
-          current: newAccount
-        }
-      )
+      expect(mockLogger.warn).toHaveBeenCalledWith('Session account mismatch, updating account', {
+        prev: prevAccount,
+        current: newAccount
+      })
 
       expect(store.state.wallets[WalletId.MAGIC]).toEqual({
         accounts: [newAccount],

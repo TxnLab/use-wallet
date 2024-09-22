@@ -1,10 +1,5 @@
 import { useStore } from '@tanstack/vue-store'
-import {
-  NetworkId,
-  WalletManager,
-  type WalletAccount,
-  type WalletMetadata
-} from 'avm-wallet'
+import { NetworkId, WalletManager, type WalletAccount, type WalletMetadata } from 'avm-wallet'
 import algosdk from 'algosdk'
 import { computed, inject, ref } from 'vue'
 

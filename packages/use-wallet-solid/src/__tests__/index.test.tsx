@@ -191,7 +191,7 @@ describe('useWallet', () => {
       wallets: {},
       activeWallet: null,
       activeNetwork: NetworkId.TESTNET,
-      algodClient: new algosdk.Algodv2('', 'https://testnet-api.algonode.cloud/')
+      algodClient: new algosdk.Algodv2('', 'https://testnet-api.4160.nodely.dev/')
     }
 
     mockStore = new Store<State>(defaultState)
@@ -398,7 +398,7 @@ describe('useWallet', () => {
       </WalletProvider>
     ))
 
-    const newAlgodClient = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud/', '')
+    const newAlgodClient = new algosdk.Algodv2('', 'https://mainnet-api.4160.nodely.dev/', '')
 
     mockWalletManager.setActiveNetwork = async (networkId: NetworkId) => {
       mockSetAlgodClient(newAlgodClient)

@@ -1,15 +1,29 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
+import { logger } from 'src/logger'
 import { NetworkId } from 'src/network'
 import { StorageAdapter } from 'src/storage'
 import { LOCAL_STORAGE_KEY, State, defaultState } from 'src/store'
 import { LOCAL_STORAGE_MNEMONIC_KEY, MnemonicWallet } from 'src/wallets/mnemonic'
 import { WalletId } from 'src/wallets/types'
+import type { Mock } from 'vitest'
 
 const ACCOUNT_MNEMONIC =
   'sugar bronze century excuse animal jacket what rail biology symbol want craft annual soul increase question army win execute slim girl chief exhaust abstract wink'
 const TEST_ADDRESS = '3F3FPW6ZQQYD6JDC7FKKQHNGVVUIBIZOUI5WPSJEHBRABZDRN6LOTBMFEY'
+
+// Mock logger
+vi.mock('src/logger', () => ({
+  logger: {
+    createScopedLogger: vi.fn().mockReturnValue({
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn()
+    })
+  }
+}))
 
 // Mock storage adapter
 vi.mock('src/storage', () => ({
@@ -18,10 +32,6 @@ vi.mock('src/storage', () => ({
     setItem: vi.fn()
   }
 }))
-
-// Spy/suppress console output
-vi.spyOn(console, 'info').mockImplementation(() => {}) // @todo: remove when debug logger is implemented
-vi.spyOn(console, 'warn').mockImplementation(() => {})
 
 function createWalletWithStore(store: Store<State>): MnemonicWallet {
   return new MnemonicWallet({
@@ -37,6 +47,12 @@ describe('MnemonicWallet', () => {
   let wallet: MnemonicWallet
   let store: Store<State>
   let mockInitialState: State | null = null
+  let mockLogger: {
+    debug: Mock
+    info: Mock
+    warn: Mock
+    error: Mock
+  }
 
   const account1 = {
     name: 'Mnemonic Account',
@@ -73,6 +89,14 @@ describe('MnemonicWallet', () => {
         mockInitialState = JSON.parse(value)
       }
     })
+
+    mockLogger = {
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn()
+    }
+    vi.mocked(logger.createScopedLogger).mockReturnValue(mockLogger)
 
     store = new Store<State>(defaultState)
     wallet = createWalletWithStore(store)

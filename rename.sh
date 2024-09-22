@@ -16,17 +16,5 @@ sed -i -e 's~@biatec/~~g' -e 's~gitbook.io/avm-wallet~gitbook.io/use-wallet~g' R
 sed -i -e 's~@biatec/~~g' CONTRIBUTING.md
 
 sed -i -e 's~TxnLab Inc.~TxnLab Inc., Scholtz \& Company, jsa~g' -e 's~Scholtz \& Company, jsa, Scholtz \& Company, jsa~Scholtz \& Company, jsa~g' LICENSE.md
-dir=$(pwd)
-echo $dir
-cd $dir && cd packages/use-wallet && pnpm link --global
-cd $dir && cd packages/use-wallet-vue && pnpm link avm-wallet && pnpm link --global
-cd $dir && cd packages/use-wallet-react && pnpm link avm-wallet  && pnpm link --global
-cd $dir && cd packages/use-wallet-solid && pnpm link avm-wallet  && pnpm link --global
 
-
-cd $dir && cd examples/nextjs && pnpm link avm-wallet
-cd $dir && cd examples/nuxt && pnpm link avm-wallet  && pnpm link avm-wallet-vue
-cd $dir && cd examples/react-ts && pnpm link avm-wallet-react
-cd $dir && cd examples/solid-ts && pnpm link avm-wallet-solid
-cd $dir && cd examples/vanilla-ts && pnpm link avm-wallet
-cd $dir && cd examples/vue-ts && pnpm link avm-wallet-vue
+find examples -type f -name "*" -print0 | xargs -0 sed -i -e "s~avm-wallet-example~example-avm-wallet~g"
