@@ -1,5 +1,5 @@
 {
-  "name": "avm-wallet-example-vanilla-ts",
+  "name": "example-avm-wallet-vanilla-ts",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -19,7 +19,7 @@
     "@walletconnect/modal": "^2.6.2",
     "@walletconnect/sign-client": "^2.16.1",
     "algosdk": "2.9.0",
-    "avm-wallet": "^3.2.1",
+    "avm-wallet": "workspace:*",
     "lute-connect": "^1.3.0"
   }
 }

@@ -1,13 +1,13 @@
 # Contributing
 
-First off, thank you for considering contributing to `@txnlab/use-wallet`! It's people like you that make this project such a great tool for the Algorand community.
+First off, thank you for considering contributing to `avm-wallet`! It's people like you that make this project such a great tool for the Algorand community.
 
 ## Reporting Issues
 
-If you have found an issue with `@txnlab/use-wallet`, please follow these steps:
+If you have found an issue with `avm-wallet`, please follow these steps:
 
 - Provide a clear description of the issue, including the expected behavior and the actual behavior.
-- Provide the version of `@txnlab/use-wallet` you are using, the framework you are using, and any other relevant context about your environment.
+- Provide the version of `avm-wallet` you are using, the framework you are using, and any other relevant context about your environment.
 - Describe the exact steps which reproduce the problem in as much detail as possible.
 - To help triage and fix the issue quickly, please provide a minimal reproducible example.
 
@@ -17,10 +17,10 @@ Feel free to fork any of our examples to reproduce your issue:
 
 | Package                    | Framework         | Examples                                                                                                                              |
 | -------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `@txnlab/use-wallet`       | Vite (Vanilla TS) | [CodeSandbox](https://codesandbox.io/p/devbox/vite-vanilla-ts-mxmghx) / [StackBlitz](https://stackblitz.com/edit/vitejs-vite-cfpybn)  |
-| `@txnlab/use-wallet-react` | Vite (React)      | [CodeSandbox](https://codesandbox.io/p/devbox/vite-react-k55gr5) / [StackBlitz](https://stackblitz.com/edit/vitejs-vite-tbsvrz)       |
-| `@txnlab/use-wallet-solid` | Vite (Solid)      | [CodeSandbox](https://codesandbox.io/p/devbox/vite-solid-w2gtz2) / [StackBlitz](https://stackblitz.com/edit/solidjs-templates-mnxg4m) |
-| `@txnlab/use-wallet-vue`   | Vite (Vue)        | [CodeSandbox](https://codesandbox.io/p/devbox/vite-vue-cznvls) / [StackBlitz](https://stackblitz.com/edit/vitejs-vite-mpwnm1)         |
+| `avm-wallet`       | Vite (Vanilla TS) | [CodeSandbox](https://codesandbox.io/p/devbox/vite-vanilla-ts-mxmghx) / [StackBlitz](https://stackblitz.com/edit/vitejs-vite-cfpybn)  |
+| `avm-wallet-react` | Vite (React)      | [CodeSandbox](https://codesandbox.io/p/devbox/vite-react-k55gr5) / [StackBlitz](https://stackblitz.com/edit/vitejs-vite-tbsvrz)       |
+| `avm-wallet-solid` | Vite (Solid)      | [CodeSandbox](https://codesandbox.io/p/devbox/vite-solid-w2gtz2) / [StackBlitz](https://stackblitz.com/edit/solidjs-templates-mnxg4m) |
+| `avm-wallet-vue`   | Vite (Vue)        | [CodeSandbox](https://codesandbox.io/p/devbox/vite-vue-cznvls) / [StackBlitz](https://stackblitz.com/edit/vitejs-vite-mpwnm1)         |
 
 A public GitHub repository also works. 👌
 
@@ -28,15 +28,15 @@ Please ensure that the reproduction is as minimal as possible. For more informat
 
 ## Suggesting New Features
 
-If you would like to suggest a new feature or enhancement for `@txnlab/use-wallet`, please follow these guidelines:
+If you would like to suggest a new feature or enhancement for `avm-wallet`, please follow these guidelines:
 
 - Use a clear and descriptive title for the issue to identify the suggestion.
 - Provide a step-by-step description of the suggested enhancement in as many details as possible.
-- Provide specific examples to demonstrate the steps or point out the part of `@txnlab/use-wallet` where the enhancement could be implemented.
+- Provide specific examples to demonstrate the steps or point out the part of `avm-wallet` where the enhancement could be implemented.
 
 ## Development
 
-If you want to contribute to `@txnlab/use-wallet`, please follow these steps to get started:
+If you want to contribute to `avm-wallet`, please follow these steps to get started:
 
 - Fork the repository.
 - Clone the repository.
@@ -93,7 +93,7 @@ If you want to contribute to `@txnlab/use-wallet`, please follow these steps to 
 
 ## Git Commit Guidelines
 
-`TxnLab/use-wallet` is using [Angular Commit Message Conventions](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#-git-commit-guidelines).
+`TxnLab/avm-wallet` is using [Angular Commit Message Conventions](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#-git-commit-guidelines).
 
 We have very precise rules over how our git commit messages can be formatted. This leads to **more readable messages** that are easy to follow when looking through the **project history**.
 
@@ -182,10 +182,10 @@ If the commit reverts a previous commit, it should begin with `revert: `, follow
 
 ## Documentation
 
-See the [GitBook documentation](https://txnlab.gitbook.io/use-wallet/) for configuration and usage details, including guides for supported frameworks. For documentation issues and feature requests, please [open an issue](https://github.com/txnlab/use-wallet/issues/new/choose).
+See the [GitBook documentation](https://txnlab.gitbook.io/avm-wallet/) for configuration and usage details, including guides for supported frameworks. For documentation issues and feature requests, please [open an issue](https://github.com/txnlab/avm-wallet/issues/new/choose).
 
 ## Contact
 
-If you have any questions, please join our [Discord server](https://discord.gg/7XcuMTfeZP). Discussion related to `@txnlab/use-wallet` takes place in the `#use-wallet` channel.
+If you have any questions, please join our [Discord server](https://discord.gg/7XcuMTfeZP). Discussion related to `avm-wallet` takes place in the `#avm-wallet` channel.
 
-Thank you for contributing to `@txnlab/use-wallet`!
+Thank you for contributing to `avm-wallet`!

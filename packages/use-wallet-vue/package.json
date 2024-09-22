@@ -1,5 +1,5 @@
 {
-  "name": "@txnlab/use-wallet-vue",
+  "name": "avm-wallet-vue",
   "version": "3.5.0",
   "description": "Vue library for integrating Algorand wallets into decentralized applications",
   "author": "Doug Richar <drichar@gmail.com>",
@@ -38,8 +38,8 @@
     "dist"
   ],
   "dependencies": {
-    "avm-wallet": "^3.2.1",
-    "@tanstack/vue-store": "0.5.5"
+    "@tanstack/vue-store": "0.5.5",
+    "avm-wallet": "workspace:*"
   },
   "devDependencies": {
     "algosdk": "2.9.0",

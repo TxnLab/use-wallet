@@ -1,12 +1,12 @@
 {
-  "name": "@txnlab/use-wallet",
+  "name": "avm-wallet",
   "version": "3.5.0",
   "description": "TypeScript library for integrating Algorand wallets into decentralized applications",
   "author": "Doug Richar <drichar@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/txnlab/use-wallet.git",
+    "url": "https://github.com/scholtz/avm-wallet.git",
     "directory": "packages/use-wallet"
   },
   "type": "module",
