@@ -1,35 +1,34 @@
 {
-  "name": "avm-wallet",
-  "private": false,
+  "name": "use-wallet",
+  "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/scholtz/avm-wallet.git"
+    "url": "https://github.com/txnlab/use-wallet.git"
   },
-  "packageManager": "pnpm@9.9.0",
+  "packageManager": "pnpm@9.10.0",
   "type": "module",
   "scripts": {
     "build": "pnpm build:packages && pnpm build:examples",
-    "build:packages": "pnpm -r --filter '*' build",
-    "build:examples": "pnpm -r --filter 'avm-wallet-example-*' build",
-    "watch": "pnpm -r --filter '*' --parallel start",
+    "build:packages": "pnpm -r --filter '@txnlab/*' build",
+    "build:examples": "pnpm -r --filter 'use-wallet-example-*' build",
+    "watch": "pnpm -r --filter '@txnlab/*' --parallel start",
     "dev": "pnpm run watch",
     "test": "pnpm -r --if-present test",
     "lint": "pnpm -r lint",
-    "lint:fix": "pnpm -r lint --fix",
     "prettier": "prettier --check .",
     "typecheck": "pnpm -r typecheck",
-    "example:ts": "pnpm --filter 'avm-wallet-example-vanilla-ts' dev",
-    "example:react": "pnpm --filter 'avm-wallet-example-react' dev",
-    "example:solid": "pnpm --filter 'avm-wallet-example-solid' dev",
-    "example:vue": "pnpm --filter 'avm-wallet-example-vue' dev",
-    "example:nextjs": "pnpm --filter 'avm-wallet-example-nextjs' dev",
-    "example:nuxt": "pnpm --filter 'avm-wallet-example-nuxt' dev"
+    "example:ts": "pnpm --filter 'use-wallet-example-vanilla-ts' dev",
+    "example:react": "pnpm --filter 'use-wallet-example-react' dev",
+    "example:solid": "pnpm --filter 'use-wallet-example-solid' dev",
+    "example:vue": "pnpm --filter 'use-wallet-example-vue' dev",
+    "example:nextjs": "pnpm --filter 'use-wallet-example-nextjs' dev",
+    "example:nuxt": "pnpm --filter 'use-wallet-example-nuxt' dev"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "6.5.0",
     "@testing-library/react": "16.0.1",
-    "@typescript-eslint/eslint-plugin": "8.3.0",
-    "@typescript-eslint/parser": "8.3.0",
+    "@typescript-eslint/eslint-plugin": "8.5.0",
+    "@typescript-eslint/parser": "8.5.0",
     "@vitejs/plugin-react": "4.3.1",
     "@vitejs/plugin-vue": "5.1.3",
     "@vitejs/plugin-vue-jsx": "4.0.1",
@@ -38,9 +37,9 @@
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-prettier": "5.2.1",
     "prettier": "3.3.3",
-    "vite": "5.4.2",
+    "vite": "5.4.5",
     "vite-plugin-solid": "2.10.2",
-    "vitest": "2.0.5",
+    "vitest": "2.1.1",
     "vue-demi": "0.14.10"
   }
 }

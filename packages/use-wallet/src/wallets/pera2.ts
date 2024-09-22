@@ -47,7 +47,8 @@ export class PeraWallet extends BaseWallet {
   }: WalletConstructor<WalletId.PERA2>) {
     super({ id, metadata, getAlgodClient, store, subscribe })
     if (!options?.projectId) {
-      throw new Error(`[${this.metadata.name}] Missing required option: projectId`)
+      this.logger.error('Missing required option: projectId')
+      throw new Error('Missing required option: projectId')
     }
     this.options = options
     this.store = store
@@ -59,7 +60,7 @@ export class PeraWallet extends BaseWallet {
   }
 
   private async initializeClient(): Promise<PeraWalletConnect> {
-    console.info(`[${this.metadata.name}] Initializing client...`)
+    this.logger.info('Initializing client...')
     const module = await import('@perawallet/connect-beta')
 
     const PeraWalletConnect = module.PeraWalletConnect || module.default.PeraWalletConnect
@@ -67,15 +68,17 @@ export class PeraWallet extends BaseWallet {
     const client = new PeraWalletConnect(this.options)
     client.client?.on('session_delete', this.onDisconnect)
     this.client = client
+    this.logger.info('Client initialized')
     return client
   }
 
   public connect = async (): Promise<WalletAccount[]> => {
-    console.info(`[${this.metadata.name}] Connecting...`)
+    this.logger.info('Connecting...')
     const client = this.client || (await this.initializeClient())
     const accounts = await client.connect()
 
     if (accounts.length === 0) {
+      this.logger.error('No accounts found!')
       throw new Error('No accounts found!')
     }
 
@@ -96,16 +99,16 @@ export class PeraWallet extends BaseWallet {
       wallet: walletState
     })
 
-    console.info(`[${this.metadata.name}] ✅ Connected.`, walletState)
+    this.logger.info('Connected successfully', walletState)
     return walletAccounts
   }
 
   public disconnect = async (): Promise<void> => {
-    console.info(`[${this.metadata.name}] Disconnecting...`)
+    this.logger.info('Disconnecting...')
     this.onDisconnect()
     const client = this.client || (await this.initializeClient())
     await client.disconnect()
-    console.info(`[${this.metadata.name}] Disconnected.`)
+    this.logger.info('Disconnected')
   }
 
   public resumeSession = async (): Promise<void> => {
@@ -115,15 +118,17 @@ export class PeraWallet extends BaseWallet {
 
       // No session to resume
       if (!walletState) {
+        this.logger.info('No session to resume')
         return
       }
 
-      console.info(`[${this.metadata.name}] Resuming session...`)
+      this.logger.info('Resuming session...')
 
       const client = this.client || (await this.initializeClient())
       const accounts = await client.reconnectSession()
 
       if (accounts.length === 0) {
+        this.logger.error('No accounts found!')
         throw new Error('No accounts found!')
       }
 
@@ -135,7 +140,7 @@ export class PeraWallet extends BaseWallet {
       const match = compareAccounts(walletAccounts, walletState.accounts)
 
       if (!match) {
-        console.warn(`[${this.metadata.name}] Session accounts mismatch, updating accounts`, {
+        this.logger.warn('Session accounts mismatch, updating accounts', {
           prev: walletState.accounts,
           current: walletAccounts
         })
@@ -144,8 +149,9 @@ export class PeraWallet extends BaseWallet {
           accounts: walletAccounts
         })
       }
+      this.logger.info('Session resumed successfully')
     } catch (error: any) {
-      console.error(`[${this.metadata.name}] Error resuming session: ${error.message}`)
+      this.logger.error('Error resuming session:', error.message)
       this.onDisconnect()
       throw error
     }
@@ -207,35 +213,45 @@ export class PeraWallet extends BaseWallet {
     txnGroup: T | T[],
     indexesToSign?: number[]
   ): Promise<(Uint8Array | null)[]> => {
-    let txnsToSign: SignerTransaction[] = []
+    try {
+      this.logger.debug('Signing transactions...', { txnGroup, indexesToSign })
+      let txnsToSign: SignerTransaction[] = []
 
-    // Determine type and process transactions for signing
-    if (isTransactionArray(txnGroup)) {
-      const flatTxns: algosdk.Transaction[] = flattenTxnGroup(txnGroup)
-      txnsToSign = this.processTxns(flatTxns, indexesToSign)
-    } else {
-      const flatTxns: Uint8Array[] = flattenTxnGroup(txnGroup as Uint8Array[])
-      txnsToSign = this.processEncodedTxns(flatTxns, indexesToSign)
-    }
-
-    const client = this.client || (await this.initializeClient())
-
-    // Sign transactions
-    const signedTxns = await client.signTransaction([txnsToSign])
-
-    // ARC-0001 - Return null for unsigned transactions
-    const result = txnsToSign.reduce<(Uint8Array | null)[]>((acc, txn) => {
-      if (txn.signers && txn.signers.length == 0) {
-        acc.push(null)
+      // Determine type and process transactions for signing
+      if (isTransactionArray(txnGroup)) {
+        const flatTxns: algosdk.Transaction[] = flattenTxnGroup(txnGroup)
+        txnsToSign = this.processTxns(flatTxns, indexesToSign)
       } else {
-        const signedTxn = signedTxns.shift()
-        if (signedTxn) {
-          acc.push(signedTxn)
-        }
+        const flatTxns: Uint8Array[] = flattenTxnGroup(txnGroup as Uint8Array[])
+        txnsToSign = this.processEncodedTxns(flatTxns, indexesToSign)
       }
-      return acc
-    }, [])
 
-    return result
+      const client = this.client || (await this.initializeClient())
+
+      this.logger.debug('Sending processed transactions to wallet...', [txnsToSign])
+
+      // Sign transactions
+      const signedTxns = await client.signTransaction([txnsToSign])
+      this.logger.debug('Received signed transactions from wallet', signedTxns)
+
+      // ARC-0001 - Return null for unsigned transactions
+      const result = txnsToSign.reduce<(Uint8Array | null)[]>((acc, txn) => {
+        if (txn.signers && txn.signers.length == 0) {
+          acc.push(null)
+        } else {
+          const signedTxn = signedTxns.shift()
+          if (signedTxn) {
+            acc.push(signedTxn)
+          }
+        }
+        return acc
+      }, [])
+
+      this.logger.debug('Transactions signed successfully', result)
+      return result
+    } catch (error: any) {
+      this.logger.error('Error signing transactions:', error.message)
+      throw error
+    }
   }
 }

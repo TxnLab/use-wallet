@@ -9,7 +9,7 @@ import {
   WalletId,
   type State,
   type WalletAccount
-} from 'avm-wallet'
+} from '@txnlab/use-wallet'
 import { For, Show, createSignal } from 'solid-js'
 import { Wallet, WalletProvider, useWallet, useWalletManager } from '../index'
 import algosdk from 'algosdk'
@@ -26,8 +26,8 @@ const mocks = vi.hoisted(() => {
   }
 })
 
-vi.mock('avm-wallet', async (importOriginal) => {
-  const mod = await importOriginal<typeof import('avm-wallet')>()
+vi.mock('@txnlab/use-wallet', async (importOriginal) => {
+  const mod = await importOriginal<typeof import('@txnlab/use-wallet')>()
   return {
     ...mod,
     DeflyWallet: class extends mod.BaseWallet {
@@ -191,7 +191,7 @@ describe('useWallet', () => {
       wallets: {},
       activeWallet: null,
       activeNetwork: NetworkId.TESTNET,
-      algodClient: new algosdk.Algodv2('', 'https://testnet-api.algonode.cloud/')
+      algodClient: new algosdk.Algodv2('', 'https://testnet-api.4160.nodely.dev/')
     }
 
     mockStore = new Store<State>(defaultState)
@@ -398,7 +398,7 @@ describe('useWallet', () => {
       </WalletProvider>
     ))
 
-    const newAlgodClient = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud/', '')
+    const newAlgodClient = new algosdk.Algodv2('', 'https://mainnet-api.4160.nodely.dev/', '')
 
     mockWalletManager.setActiveNetwork = async (networkId: NetworkId) => {
       mockSetAlgodClient(newAlgodClient)

@@ -9,11 +9,25 @@ import {
 } from '@agoralabs-sh/avm-web-provider'
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
+import { logger } from 'src/logger'
 import { StorageAdapter } from 'src/storage'
 import { defaultState, LOCAL_STORAGE_KEY, State } from 'src/store'
 import { WalletId } from 'src/wallets'
 import { KibisisWallet, KIBISIS_AVM_WEB_PROVIDER_ID } from 'src/wallets/kibisis'
 import { base64ToByteArray, byteArrayToBase64 } from 'src/utils'
+import type { Mock } from 'vitest'
+
+// Mock logger
+vi.mock('src/logger', () => ({
+  logger: {
+    createScopedLogger: vi.fn().mockReturnValue({
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn()
+    })
+  }
+}))
 
 // Mock storage adapter
 vi.mock('src/storage', () => ({
@@ -22,11 +36,6 @@ vi.mock('src/storage', () => ({
     setItem: vi.fn()
   }
 }))
-
-// Spy/suppress console output
-vi.spyOn(console, 'info').mockImplementation(() => {}) // @todo: remove when debug logger is implemented
-vi.spyOn(console, 'warn').mockImplementation(() => {})
-vi.spyOn(console, 'error').mockImplementation(() => {})
 
 // Constants
 const TESTNET_GENESIS_HASH = 'SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI='
@@ -69,6 +78,12 @@ describe('KibisisWallet', () => {
   let wallet: KibisisWallet
   let store: Store<State>
   let mockInitialState: State | null = null
+  let mockLogger: {
+    debug: Mock
+    info: Mock
+    warn: Mock
+    error: Mock
+  }
 
   const account1 = {
     name: 'Kibisis Account 1',
@@ -94,6 +109,15 @@ describe('KibisisWallet', () => {
         mockInitialState = JSON.parse(value)
       }
     })
+
+    mockLogger = {
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn()
+    }
+    vi.mocked(logger.createScopedLogger).mockReturnValue(mockLogger)
+
     vi.spyOn(KibisisWallet.prototype, '_disable')
       .mockReset()
       .mockImplementation(() =>
@@ -159,8 +183,9 @@ describe('KibisisWallet', () => {
       expect(wallet.isConnected).toBe(false)
 
       // Error message logged
-      expect(console.error).toHaveBeenCalledWith(
-        `[${KibisisWallet.defaultMetadata.name}] Error connecting: ${error.message} (code: ${error.code})`
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        `Error connecting:`,
+        `${error.message} (code: ${error.code})`
       )
 
       // Store not updated

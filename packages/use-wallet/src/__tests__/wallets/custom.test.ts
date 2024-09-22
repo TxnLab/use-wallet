@@ -1,8 +1,22 @@
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
+import { logger } from 'src/logger'
 import { StorageAdapter } from 'src/storage'
 import { LOCAL_STORAGE_KEY, State, defaultState } from 'src/store'
 import { CustomProvider, CustomWallet, WalletId } from 'src/wallets'
+import type { Mock } from 'vitest'
+
+// Mock logger
+vi.mock('src/logger', () => ({
+  logger: {
+    createScopedLogger: vi.fn().mockReturnValue({
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn()
+    })
+  }
+}))
 
 // Mock storage adapter
 vi.mock('src/storage', () => ({
@@ -11,10 +25,6 @@ vi.mock('src/storage', () => ({
     setItem: vi.fn()
   }
 }))
-
-// Spy/suppress console output
-vi.spyOn(console, 'info').mockImplementation(() => {})
-vi.spyOn(console, 'warn').mockImplementation(() => {})
 
 // Mock a custom provider
 class MockProvider implements CustomProvider {
@@ -48,6 +58,12 @@ describe('CustomWallet', () => {
   let wallet: CustomWallet
   let store: Store<State>
   let mockInitialState: State | null = null
+  let mockLogger: {
+    debug: Mock
+    info: Mock
+    warn: Mock
+    error: Mock
+  }
 
   const account1 = {
     name: 'Account 1',
@@ -74,6 +90,14 @@ describe('CustomWallet', () => {
       }
     })
 
+    mockLogger = {
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn()
+    }
+    vi.mocked(logger.createScopedLogger).mockReturnValue(mockLogger)
+
     store = new Store<State>(defaultState)
     wallet = createWalletWithStore(store)
   })
@@ -96,7 +120,7 @@ describe('CustomWallet', () => {
             store,
             subscribe: vi.fn()
           })
-      ).toThrowError('[Custom] Missing required option: provider')
+      ).toThrowError('Missing required option: provider')
     })
   })
 
@@ -143,7 +167,7 @@ describe('CustomWallet', () => {
         subscribe: vi.fn()
       })
 
-      await expect(wallet.connect()).rejects.toThrowError('[Custom] Method not supported: connect')
+      await expect(wallet.connect()).rejects.toThrowError('Method not supported: connect')
     })
   })
 
@@ -305,7 +329,7 @@ describe('CustomWallet', () => {
       })
 
       await expect(wallet.signTransactions(txnGroup, indexesToSign)).rejects.toThrowError(
-        '[Custom] Method not supported: signTransactions'
+        'Method not supported: signTransactions'
       )
     })
   })
@@ -349,7 +373,7 @@ describe('CustomWallet', () => {
       })
 
       await expect(wallet.transactionSigner(txnGroup, indexesToSign)).rejects.toThrowError(
-        '[Custom] Method not supported: transactionSigner'
+        'Method not supported: transactionSigner'
       )
     })
   })

@@ -1,3 +1,30 @@
+# [3.5.0](https://github.com/txnlab/use-wallet/compare/v3.4.0...v3.5.0) (2024-09-18)
+
+### Features
+
+- Implement configurable logging system ([#264](https://github.com/txnlab/use-wallet/pull/264)) ([4912e4e](https://github.com/txnlab/use-wallet/commit/4912e4ee9c601d57ea8c19fbce37aadb48fa8ae9))
+
+### Bug Fixes
+
+- Correct DEBUG log level handling in WalletManager ([#265](https://github.com/txnlab/use-wallet/pull/265)) ([53057b5](https://github.com/txnlab/use-wallet/commit/53057b545799f0041865d919a29c5940ffe9cf79))
+
+# [3.4.0](https://github.com/txnlab/use-wallet/compare/v3.3.0...v3.4.0) (2024-09-13)
+
+### Features
+
+- Add resetNetwork option to WalletManager ([#260](https://github.com/txnlab/use-wallet/pull/260)) ([70b8454](https://github.com/txnlab/use-wallet/commit/70b84549e12a589e8c9bc7632a4f9e1a07b14653))
+
+### Bug Fixes
+
+- Fix Kibisis init in Vue app ([#225](https://github.com/txnlab/use-wallet/pull/225)) ([470171f](https://github.com/txnlab/use-wallet/commit/470171f04f55d44a4d67f9965c1836febbc2dba3))
+
+# [3.3.0](https://github.com/txnlab/use-wallet/compare/v3.2.1...v3.3.0) (2024-09-11)
+
+### Features
+
+- Add fnet to list of valid networks and update nodely urls to new versions ([#258](https://github.com/txnlab/use-wallet/pull/258)) ([07e7273](https://github.com/txnlab/use-wallet/commit/8743101180b730b5fc809951b85df0c8e6c25f8c))
+- Update algosdk import to resolve CommonJS module issue ([#259](https://github.com/txnlab/use-wallet/pull/259)) ([8743101](https://github.com/txnlab/use-wallet/commit/daf738af4b67f9178b72cf1728a08b476fd34fcc))
+
 ## [3.2.1](https://github.com/txnlab/use-wallet/compare/v3.2.0...v3.2.1) (2024-09-05)
 
 ### Other Changes
