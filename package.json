@@ -16,6 +16,7 @@
     "test": "pnpm -r --if-present test",
     "lint": "pnpm -r lint",
     "prettier": "prettier --check .",
+    "prettier:fix": "prettier --write .",
     "typecheck": "pnpm -r typecheck",
     "example:ts": "pnpm --filter 'avm-wallet-example-vanilla-ts' dev",
     "example:react": "pnpm --filter 'avm-wallet-example-react' dev",

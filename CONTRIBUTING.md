@@ -15,8 +15,8 @@ To create a shareable code example, you can use CodeSandbox (https://codesandbox
 
 Feel free to fork any of our examples to reproduce your issue:
 
-| Package                    | Framework         | Examples                                                                                                                              |
-| -------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Package            | Framework         | Examples                                                                                                                              |
+| ------------------ | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | `avm-wallet`       | Vite (Vanilla TS) | [CodeSandbox](https://codesandbox.io/p/devbox/vite-vanilla-ts-mxmghx) / [StackBlitz](https://stackblitz.com/edit/vitejs-vite-cfpybn)  |
 | `avm-wallet-react` | Vite (React)      | [CodeSandbox](https://codesandbox.io/p/devbox/vite-react-k55gr5) / [StackBlitz](https://stackblitz.com/edit/vitejs-vite-tbsvrz)       |
 | `avm-wallet-solid` | Vite (Solid)      | [CodeSandbox](https://codesandbox.io/p/devbox/vite-solid-w2gtz2) / [StackBlitz](https://stackblitz.com/edit/solidjs-templates-mnxg4m) |

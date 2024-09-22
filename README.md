@@ -60,4 +60,5 @@ app.mount('#app')
 ### Visit [txnlab.gitbook.io/use-wallet](https://txnlab.gitbook.io/use-wallet) for docs, guides, and examples!
 
 ### [Become a sponsor for TxnLab!](https://github.com/sponsors/TxnLab/)
+
 ### [Become a sponsor for Scholtz!](https://github.com/sponsors/scholtz/)

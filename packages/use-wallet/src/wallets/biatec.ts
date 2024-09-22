@@ -5,10 +5,8 @@ const ICON = `data:image/svg+xml;base64,${btoa(`
 `)}`
 
 export class BiatecWallet extends WalletConnect {
-
   static defaultMetadata = {
     name: 'BiatecWallet',
     icon: ICON
   }
-
 }
