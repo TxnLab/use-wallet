@@ -85,5 +85,5 @@ export const caipChainId: Partial<Record<NetworkId, string>> = {
   [NetworkId.BETANET]: 'algorand:mFgazF-2uRS1tMiL9dsj01hJGySEmPN2',
   [NetworkId.FNET]: 'algorand:kUt08LxeVAAGHnh4JoAoAMM9ql_hBwSo',
   [NetworkId.VOIMAIN]: 'algorand:r20fSQI8gWe_kFZziNonSPCXLwcQmH_n',
-  [NetworkId.ARAMIDMAIN]: 'algorand:PgeQVJJgx_LYKJfIEz7dbfNPuXmDyJ-O',
+  [NetworkId.ARAMIDMAIN]: 'algorand:PgeQVJJgx_LYKJfIEz7dbfNPuXmDyJ-O'
 }
