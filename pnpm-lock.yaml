@@ -78,8 +78,8 @@ importers:
         specifier: 2.9.0
         version: 2.9.0
       lute-connect:
-        specifier: ^1.3.0
-        version: 1.3.0
+        specifier: ^1.4.1
+        version: 1.4.1
       next:
         specifier: 14.2.11
         version: 14.2.11(@babel/core@7.25.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -133,8 +133,8 @@ importers:
         specifier: 2.9.0
         version: 2.9.0
       lute-connect:
-        specifier: ^1.3.0
-        version: 1.3.0
+        specifier: ^1.4.1
+        version: 1.4.1
       nuxt:
         specifier: 3.13.1
         version: 3.13.1(@parcel/watcher@2.4.1)(@types/node@20.11.30)(bufferutil@4.0.8)(eslint@8.57.0)(idb-keyval@6.2.1)(ioredis@5.4.1)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.21.3)(terser@5.33.0)(typescript@5.5.4)(utf-8-validate@5.0.10)(vite@5.4.5(@types/node@20.11.30)(terser@5.33.0))(vue-tsc@2.1.6(typescript@5.5.4))
@@ -173,8 +173,8 @@ importers:
         specifier: 2.9.0
         version: 2.9.0
       lute-connect:
-        specifier: ^1.3.0
-        version: 1.3.0
+        specifier: ^1.4.1
+        version: 1.4.1
       react:
         specifier: 18.3.1
         version: 18.3.1
@@ -234,8 +234,8 @@ importers:
         specifier: 2.9.0
         version: 2.9.0
       lute-connect:
-        specifier: ^1.3.0
-        version: 1.3.0
+        specifier: ^1.4.1
+        version: 1.4.1
       solid-js:
         specifier: 1.8.22
         version: 1.8.22
@@ -271,8 +271,8 @@ importers:
         specifier: 2.9.0
         version: 2.9.0
       lute-connect:
-        specifier: ^1.3.0
-        version: 1.3.0
+        specifier: ^1.4.1
+        version: 1.4.1
     devDependencies:
       '@walletconnect/types':
         specifier: 2.16.1
@@ -305,8 +305,8 @@ importers:
         specifier: 2.9.0
         version: 2.9.0
       lute-connect:
-        specifier: ^1.3.0
-        version: 1.3.0
+        specifier: ^1.4.1
+        version: 1.4.1
       vue:
         specifier: 3.5.5
         version: 3.5.5(typescript@5.5.4)
@@ -406,8 +406,8 @@ importers:
         specifier: ^2.16.1
         version: 2.16.1(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       lute-connect:
-        specifier: ^1.3.0
-        version: 1.3.0
+        specifier: ^1.4.1
+        version: 1.4.1
       magic-sdk:
         specifier: ^28.6.0
         version: 28.6.0
@@ -461,8 +461,8 @@ importers:
         specifier: ^2.16.1
         version: 2.16.1(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       lute-connect:
-        specifier: ^1.3.0
-        version: 1.3.0
+        specifier: ^1.4.1
+        version: 1.4.1
       magic-sdk:
         specifier: ^28.6.0
         version: 28.6.0
@@ -513,8 +513,8 @@ importers:
         specifier: ^2.16.1
         version: 2.16.1(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       lute-connect:
-        specifier: ^1.3.0
-        version: 1.3.0
+        specifier: ^1.4.1
+        version: 1.4.1
       magic-sdk:
         specifier: ^28.6.0
         version: 28.6.0
@@ -4308,6 +4308,9 @@ packages:
 
   lute-connect@1.3.0:
     resolution: {integrity: sha512-l8Evm1nub5NjXlUYNfsMerWBQU6BgA3cXsJ+RNVg0jRChkzpc8jhi/dkZzYIZeHIrhn3Reb7Fb5ysY0EqwrFWA==}
+
+  lute-connect@1.4.1:
+    resolution: {integrity: sha512-mOiu0NzXR4Ep8w8xBBVX3naoM9/VMPudZZWrtRS6pk+g83czfzmoMwlsuzUltC/t+UrNFlSP8xKp2M9bmYtf8Q==}
 
   lz-string@1.5.0:
     resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
@@ -9945,8 +9948,8 @@ snapshots:
       '@typescript-eslint/parser': 7.2.0(eslint@8.57.0)(typescript@5.5.4)
       eslint: 8.57.0
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.6.3(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0))(eslint@8.57.0)
-      eslint-plugin-import: 2.30.0(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0)
+      eslint-import-resolver-typescript: 3.6.3(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0)(eslint@8.57.0)
+      eslint-plugin-import: 2.30.0(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.0)
       eslint-plugin-jsx-a11y: 6.10.0(eslint@8.57.0)
       eslint-plugin-react: 7.36.1(eslint@8.57.0)
       eslint-plugin-react-hooks: 4.6.2(eslint@8.57.0)
@@ -9969,37 +9972,37 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0))(eslint@8.57.0):
+  eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0)(eslint@8.57.0):
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
       debug: 4.3.7
       enhanced-resolve: 5.17.1
       eslint: 8.57.0
-      eslint-module-utils: 2.11.0(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0)
+      eslint-module-utils: 2.11.0(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0)(eslint@8.57.0))(eslint@8.57.0)
       fast-glob: 3.3.2
       get-tsconfig: 4.8.1
       is-bun-module: 1.2.1
       is-glob: 4.0.3
     optionalDependencies:
-      eslint-plugin-import: 2.30.0(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0)
+      eslint-plugin-import: 2.30.0(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.0)
     transitivePeerDependencies:
       - '@typescript-eslint/parser'
       - eslint-import-resolver-node
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-module-utils@2.11.0(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0):
+  eslint-module-utils@2.11.0(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0)(eslint@8.57.0))(eslint@8.57.0):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
       '@typescript-eslint/parser': 7.2.0(eslint@8.57.0)(typescript@5.5.4)
       eslint: 8.57.0
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.6.3(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0))(eslint@8.57.0)
+      eslint-import-resolver-typescript: 3.6.3(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0)(eslint@8.57.0)
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.30.0(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0):
+  eslint-plugin-import@2.30.0(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.0):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.8
@@ -10010,7 +10013,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.57.0
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.11.0(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0)
+      eslint-module-utils: 2.11.0(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0)(eslint@8.57.0))(eslint@8.57.0)
       hasown: 2.0.2
       is-core-module: 2.15.1
       is-glob: 4.0.3
@@ -11139,6 +11142,8 @@ snapshots:
       yallist: 3.1.1
 
   lute-connect@1.3.0: {}
+
+  lute-connect@1.4.1: {}
 
   lz-string@1.5.0: {}
 
