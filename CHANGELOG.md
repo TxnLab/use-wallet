@@ -1,3 +1,14 @@
+# [3.6.0](https://github.com/txnlab/use-wallet/compare/v3.5.0...v3.6.0) (2024-09-24)
+
+### Features
+
+- **Networks:** Add voimain, aramidmain, fix caip10 fnet ([#267](https://github.com/txnlab/use-wallet/pull/267)) ([fa55713](https://github.com/txnlab/use-wallet/commit/fa5571345ba2cf84ba5bd1c96558641181e6b4a7))
+- **Wallets:** Add Biatec Wallet ([#255](https://github.com/txnlab/use-wallet/pull/255)) ([c1e8849](https://github.com/txnlab/use-wallet/commit/c1e8849aef424a95a0e52b97da6f9a239f3fcafe))
+
+### Bug Fixes
+
+- **Wallets:** Correct disconnect handling for Pera and Defly ([#272](https://github.com/txnlab/use-wallet/pull/272)) ([caa7f48](https://github.com/txnlab/use-wallet/commit/caa7f48b326961bce8ce3a026929f2950ce9e000))
+
 # [3.5.0](https://github.com/txnlab/use-wallet/compare/v3.4.0...v3.5.0) (2024-09-18)
 
 ### Features
