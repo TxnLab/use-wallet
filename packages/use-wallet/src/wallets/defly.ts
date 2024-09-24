@@ -57,7 +57,6 @@ export class DeflyWallet extends BaseWallet {
       : module.DeflyWalletConnect
 
     const client = new DeflyWalletConnect(this.options)
-    client.connector?.on('disconnect', this.onDisconnect)
     this.client = client
     this.logger.info('Client initialized')
     return client
@@ -67,6 +66,9 @@ export class DeflyWallet extends BaseWallet {
     this.logger.info('Connecting...')
     const client = this.client || (await this.initializeClient())
     const accounts = await client.connect()
+
+    // Listen for disconnect event
+    client.connector?.on('disconnect', this.onDisconnect)
 
     if (accounts.length === 0) {
       this.logger.error('No accounts found!')
