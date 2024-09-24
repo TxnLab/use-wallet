@@ -5,7 +5,9 @@ export enum NetworkId {
   TESTNET = 'testnet',
   BETANET = 'betanet',
   FNET = 'fnet',
-  LOCALNET = 'localnet'
+  LOCALNET = 'localnet',
+  VOIMAIN = 'voimain',
+  ARAMIDMAIN = 'aramidmain'
 }
 
 export function isValidNetworkId(networkId: any): networkId is NetworkId {
@@ -47,7 +49,9 @@ export const nodeServerMap = {
   [NetworkId.MAINNET]: 'https://mainnet-api.4160.nodely.dev',
   [NetworkId.TESTNET]: 'https://testnet-api.4160.nodely.dev',
   [NetworkId.BETANET]: 'https://betanet-api.4160.nodely.dev',
-  [NetworkId.FNET]: 'https://fnet-api.4160.nodely.dev'
+  [NetworkId.FNET]: 'https://fnet-api.4160.nodely.dev',
+  [NetworkId.VOIMAIN]: 'https://mainnet-api.voi.nodely.dev',
+  [NetworkId.ARAMIDMAIN]: 'https://algod.aramidmain.a-wallet.net'
 }
 
 export function createDefaultNetworkConfig(): NetworkConfigMap {
@@ -78,5 +82,8 @@ export function createDefaultNetworkConfig(): NetworkConfigMap {
 export const caipChainId: Partial<Record<NetworkId, string>> = {
   [NetworkId.MAINNET]: 'algorand:wGHE2Pwdvd7S12BL5FaOP20EGYesN73k',
   [NetworkId.TESTNET]: 'algorand:SGO1GKSzyE7IEPItTxCByw9x8FmnrCDe',
-  [NetworkId.BETANET]: 'algorand:mFgazF-2uRS1tMiL9dsj01hJGySEmPN2'
+  [NetworkId.BETANET]: 'algorand:mFgazF-2uRS1tMiL9dsj01hJGySEmPN2',
+  [NetworkId.FNET]: 'algorand:kUt08LxeVAAGHnh4JoAoAMM9ql_hBwSo',
+  [NetworkId.VOIMAIN]: 'algorand:r20fSQI8gWe_kFZziNonSPCXLwcQmH_n',
+  [NetworkId.ARAMIDMAIN]: 'algorand:PgeQVJJgx_LYKJfIEz7dbfNPuXmDyJ-O'
 }
