@@ -19,8 +19,8 @@
     "@walletconnect/sign-client": "^2.16.1",
     "algosdk": "2.9.0",
     "lute-connect": "^1.4.1",
-    "nuxt": "3.13.1",
-    "vue": "3.5.5",
+    "nuxt": "3.13.2",
+    "vue": "3.5.7",
     "vue-router": "4.4.5"
   },
   "devDependencies": {
