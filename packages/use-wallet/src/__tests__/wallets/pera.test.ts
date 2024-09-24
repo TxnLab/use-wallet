@@ -32,7 +32,10 @@ const mockPeraWallet = {
   reconnectSession: vi.fn(),
   disconnect: vi.fn(),
   signTransaction: vi.fn(),
-  signData: vi.fn()
+  connector: {
+    on: vi.fn(),
+    off: vi.fn()
+  }
 }
 
 vi.mock('@perawallet/connect', async (importOriginal) => {
@@ -47,13 +50,18 @@ vi.mock('@perawallet/connect', async (importOriginal) => {
 })
 
 function createWalletWithStore(store: Store<State>): PeraWallet {
-  return new PeraWallet({
+  const wallet = new PeraWallet({
     id: WalletId.PERA,
     metadata: {},
     getAlgodClient: () => ({}) as any,
     store,
     subscribe: vi.fn()
   })
+
+  // @ts-expect-error - Mocking the private client property
+  wallet.client = mockPeraWallet
+
+  return wallet
 }
 
 describe('PeraWallet', () => {
@@ -138,6 +146,14 @@ describe('PeraWallet', () => {
       expect(store.state.wallets[WalletId.PERA]).toBeUndefined()
       expect(wallet.isConnected).toBe(false)
     })
+
+    it('should register disconnect event listener after successful connection', async () => {
+      mockPeraWallet.connect.mockResolvedValueOnce([account1.address, account2.address])
+
+      await wallet.connect()
+
+      expect(mockPeraWallet.connector.on).toHaveBeenCalledWith('disconnect', expect.any(Function))
+    })
   })
 
   describe('disconnect', () => {
@@ -163,6 +179,25 @@ describe('PeraWallet', () => {
       // Should still update store/state
       expect(store.state.wallets[WalletId.PERA]).toBeUndefined()
       expect(wallet.isConnected).toBe(false)
+    })
+  })
+
+  describe('disconnect event', () => {
+    it('should handle disconnect event and update store', async () => {
+      mockPeraWallet.connect.mockResolvedValueOnce([account1.address, account2.address])
+      await wallet.connect()
+
+      const disconnectHandler = mockPeraWallet.connector.on.mock.calls.find(
+        (call) => call[0] === 'disconnect'
+      )?.[1] as (() => void) | undefined
+
+      expect(disconnectHandler).toBeDefined()
+
+      if (disconnectHandler) {
+        disconnectHandler()
+      }
+
+      expect(store.state.wallets[WalletId.PERA]).toBeUndefined()
     })
   })
 

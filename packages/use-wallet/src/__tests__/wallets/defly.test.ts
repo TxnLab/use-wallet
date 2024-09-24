@@ -31,7 +31,11 @@ const mockDeflyWallet = {
   connect: vi.fn(),
   reconnectSession: vi.fn(),
   disconnect: vi.fn(),
-  signTransaction: vi.fn()
+  signTransaction: vi.fn(),
+  connector: {
+    on: vi.fn(),
+    off: vi.fn()
+  }
 }
 
 vi.mock('@blockshake/defly-connect', async (importOriginal) => {
@@ -46,13 +50,18 @@ vi.mock('@blockshake/defly-connect', async (importOriginal) => {
 })
 
 function createWalletWithStore(store: Store<State>): DeflyWallet {
-  return new DeflyWallet({
+  const wallet = new DeflyWallet({
     id: WalletId.DEFLY,
     metadata: {},
-    getAlgodClient: {} as any,
+    getAlgodClient: () => ({}) as any,
     store,
     subscribe: vi.fn()
   })
+
+  // @ts-expect-error - Mocking the private client property
+  wallet.client = mockDeflyWallet
+
+  return wallet
 }
 
 describe('DeflyWallet', () => {
@@ -137,6 +146,14 @@ describe('DeflyWallet', () => {
       expect(store.state.wallets[WalletId.DEFLY]).toBeUndefined()
       expect(wallet.isConnected).toBe(false)
     })
+
+    it('should register disconnect event listener after successful connection', async () => {
+      mockDeflyWallet.connect.mockResolvedValueOnce([account1.address, account2.address])
+
+      await wallet.connect()
+
+      expect(mockDeflyWallet.connector.on).toHaveBeenCalledWith('disconnect', expect.any(Function))
+    })
   })
 
   describe('disconnect', () => {
@@ -162,6 +179,25 @@ describe('DeflyWallet', () => {
       // Should still update store/state
       expect(store.state.wallets[WalletId.DEFLY]).toBeUndefined()
       expect(wallet.isConnected).toBe(false)
+    })
+  })
+
+  describe('disconnect event', () => {
+    it('should handle disconnect event and update store', async () => {
+      mockDeflyWallet.connect.mockResolvedValueOnce([account1.address, account2.address])
+      await wallet.connect()
+
+      const disconnectHandler = mockDeflyWallet.connector.on.mock.calls.find(
+        (call) => call[0] === 'disconnect'
+      )?.[1] as (() => void) | undefined
+
+      expect(disconnectHandler).toBeDefined()
+
+      if (disconnectHandler) {
+        disconnectHandler()
+      }
+
+      expect(store.state.wallets[WalletId.DEFLY]).toBeUndefined()
     })
   })
 
