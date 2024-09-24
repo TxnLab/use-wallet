@@ -126,7 +126,8 @@ export abstract class BaseWallet {
 
   // ---------- Protected Methods ------------------------------------- //
 
-  protected onDisconnect(): void {
+  protected onDisconnect = (): void => {
+    this.logger.debug(`Removing wallet from store...`)
     removeWallet(this.store, { walletId: this.id })
   }
 }

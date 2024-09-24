@@ -32,7 +32,10 @@ const mockPeraWallet = {
   reconnectSession: vi.fn(),
   disconnect: vi.fn(),
   signTransaction: vi.fn(),
-  signData: vi.fn()
+  client: {
+    on: vi.fn(),
+    off: vi.fn()
+  }
 }
 
 vi.mock('@perawallet/connect-beta', () => {
@@ -42,8 +45,8 @@ vi.mock('@perawallet/connect-beta', () => {
 })
 
 function createWalletWithStore(store: Store<State>): PeraWallet {
-  return new PeraWallet({
-    id: WalletId.PERA,
+  const wallet = new PeraWallet({
+    id: WalletId.PERA2,
     options: {
       projectId: 'mockProjectId'
     },
@@ -52,6 +55,11 @@ function createWalletWithStore(store: Store<State>): PeraWallet {
     store,
     subscribe: vi.fn()
   })
+
+  // @ts-expect-error - Mocking the private client property
+  wallet.client = mockPeraWallet
+
+  return wallet
 }
 
 describe('PeraWallet', () => {
@@ -115,7 +123,7 @@ describe('PeraWallet', () => {
 
       expect(wallet.isConnected).toBe(true)
       expect(accounts).toEqual([account1, account2])
-      expect(store.state.wallets[WalletId.PERA]).toEqual({
+      expect(store.state.wallets[WalletId.PERA2]).toEqual({
         accounts: [account1, account2],
         activeAccount: account1
       })
@@ -125,7 +133,7 @@ describe('PeraWallet', () => {
       mockPeraWallet.connect.mockRejectedValueOnce(new Error('Auth error'))
 
       await expect(wallet.connect()).rejects.toThrow('Auth error')
-      expect(store.state.wallets[WalletId.PERA]).toBeUndefined()
+      expect(store.state.wallets[WalletId.PERA2]).toBeUndefined()
       expect(wallet.isConnected).toBe(false)
     })
 
@@ -133,8 +141,16 @@ describe('PeraWallet', () => {
       mockPeraWallet.connect.mockImplementation(() => Promise.resolve([]))
 
       await expect(wallet.connect()).rejects.toThrow('No accounts found!')
-      expect(store.state.wallets[WalletId.PERA]).toBeUndefined()
+      expect(store.state.wallets[WalletId.PERA2]).toBeUndefined()
       expect(wallet.isConnected).toBe(false)
+    })
+
+    it('should register session_delete event listener after successful connection', async () => {
+      mockPeraWallet.connect.mockResolvedValueOnce([account1.address, account2.address])
+
+      await wallet.connect()
+
+      expect(mockPeraWallet.client.on).toHaveBeenCalledWith('session_delete', expect.any(Function))
     })
   })
 
@@ -146,7 +162,7 @@ describe('PeraWallet', () => {
       await wallet.disconnect()
 
       expect(mockPeraWallet.disconnect).toHaveBeenCalled()
-      expect(store.state.wallets[WalletId.PERA]).toBeUndefined()
+      expect(store.state.wallets[WalletId.PERA2]).toBeUndefined()
       expect(wallet.isConnected).toBe(false)
     })
 
@@ -159,8 +175,27 @@ describe('PeraWallet', () => {
       await expect(wallet.disconnect()).rejects.toThrow('Disconnect error')
 
       // Should still update store/state
-      expect(store.state.wallets[WalletId.PERA]).toBeUndefined()
+      expect(store.state.wallets[WalletId.PERA2]).toBeUndefined()
       expect(wallet.isConnected).toBe(false)
+    })
+  })
+
+  describe('session_delete event', () => {
+    it('should handle session_delete event and update store', async () => {
+      mockPeraWallet.connect.mockResolvedValueOnce([account1.address, account2.address])
+      await wallet.connect()
+
+      const sessionDeleteHandler = mockPeraWallet.client.on.mock.calls.find(
+        (call) => call[0] === 'session_delete'
+      )?.[1] as (() => void) | undefined
+
+      expect(sessionDeleteHandler).toBeDefined()
+
+      if (sessionDeleteHandler) {
+        sessionDeleteHandler()
+      }
+
+      expect(store.state.wallets[WalletId.PERA2]).toBeUndefined()
     })
   })
 
@@ -181,7 +216,7 @@ describe('PeraWallet', () => {
       store = new Store<State>({
         ...defaultState,
         wallets: {
-          [WalletId.PERA]: walletState
+          [WalletId.PERA2]: walletState
         }
       })
 
@@ -192,7 +227,7 @@ describe('PeraWallet', () => {
       await wallet.resumeSession()
 
       expect(mockPeraWallet.reconnectSession).toHaveBeenCalled()
-      expect(store.state.wallets[WalletId.PERA]).toEqual(walletState)
+      expect(store.state.wallets[WalletId.PERA2]).toEqual(walletState)
       expect(wallet.isConnected).toBe(true)
     })
 
@@ -218,7 +253,7 @@ describe('PeraWallet', () => {
       store = new Store<State>({
         ...defaultState,
         wallets: {
-          [WalletId.PERA]: prevWalletState
+          [WalletId.PERA2]: prevWalletState
         }
       })
 
@@ -248,7 +283,7 @@ describe('PeraWallet', () => {
         prev: prevWalletState.accounts,
         current: newWalletState.accounts
       })
-      expect(store.state.wallets[WalletId.PERA]).toEqual(newWalletState)
+      expect(store.state.wallets[WalletId.PERA2]).toEqual(newWalletState)
     })
 
     it('should throw an error and disconnect if reconnectSession fails', async () => {
@@ -260,7 +295,7 @@ describe('PeraWallet', () => {
       store = new Store<State>({
         ...defaultState,
         wallets: {
-          [WalletId.PERA]: walletState
+          [WalletId.PERA2]: walletState
         }
       })
 
@@ -269,7 +304,7 @@ describe('PeraWallet', () => {
       mockPeraWallet.reconnectSession.mockRejectedValueOnce(new Error('Reconnect error'))
 
       await expect(wallet.resumeSession()).rejects.toThrow('Reconnect error')
-      expect(store.state.wallets[WalletId.PERA]).toBeUndefined()
+      expect(store.state.wallets[WalletId.PERA2]).toBeUndefined()
       expect(wallet.isConnected).toBe(false)
     })
 
@@ -282,7 +317,7 @@ describe('PeraWallet', () => {
       store = new Store<State>({
         ...defaultState,
         wallets: {
-          [WalletId.PERA]: walletState
+          [WalletId.PERA2]: walletState
         }
       })
 
@@ -291,7 +326,7 @@ describe('PeraWallet', () => {
       mockPeraWallet.reconnectSession.mockImplementation(() => Promise.resolve([]))
 
       await expect(wallet.resumeSession()).rejects.toThrow('No accounts found!')
-      expect(store.state.wallets[WalletId.PERA]).toBeUndefined()
+      expect(store.state.wallets[WalletId.PERA2]).toBeUndefined()
       expect(wallet.isConnected).toBe(false)
     })
   })

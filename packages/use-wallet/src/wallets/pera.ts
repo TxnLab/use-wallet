@@ -62,7 +62,6 @@ export class PeraWallet extends BaseWallet {
       : module.PeraWalletConnect
 
     const client = new PeraWalletConnect(this.options)
-    client.connector?.on('disconnect', this.onDisconnect)
     this.client = client
     this.logger.info('Client initialized')
     return client
@@ -72,6 +71,9 @@ export class PeraWallet extends BaseWallet {
     this.logger.info('Connecting...')
     const client = this.client || (await this.initializeClient())
     const accounts = await client.connect()
+
+    // Listen for disconnect event
+    client.connector?.on('disconnect', this.onDisconnect)
 
     if (accounts.length === 0) {
       this.logger.error('No accounts found!')
