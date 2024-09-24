@@ -32,7 +32,10 @@ const mockPeraWallet = {
   reconnectSession: vi.fn(),
   disconnect: vi.fn(),
   signTransaction: vi.fn(),
-  signData: vi.fn()
+  client: {
+    on: vi.fn(),
+    off: vi.fn()
+  }
 }
 
 vi.mock('@perawallet/connect-beta', () => {
@@ -42,7 +45,7 @@ vi.mock('@perawallet/connect-beta', () => {
 })
 
 function createWalletWithStore(store: Store<State>): PeraWallet {
-  return new PeraWallet({
+  const wallet = new PeraWallet({
     id: WalletId.PERA2,
     options: {
       projectId: 'mockProjectId'
@@ -52,6 +55,11 @@ function createWalletWithStore(store: Store<State>): PeraWallet {
     store,
     subscribe: vi.fn()
   })
+
+  // @ts-expect-error - Mocking the private client property
+  wallet.client = mockPeraWallet
+
+  return wallet
 }
 
 describe('PeraWallet', () => {
@@ -136,6 +144,14 @@ describe('PeraWallet', () => {
       expect(store.state.wallets[WalletId.PERA2]).toBeUndefined()
       expect(wallet.isConnected).toBe(false)
     })
+
+    it('should register session_delete event listener after successful connection', async () => {
+      mockPeraWallet.connect.mockResolvedValueOnce([account1.address, account2.address])
+
+      await wallet.connect()
+
+      expect(mockPeraWallet.client.on).toHaveBeenCalledWith('session_delete', expect.any(Function))
+    })
   })
 
   describe('disconnect', () => {
@@ -161,6 +177,25 @@ describe('PeraWallet', () => {
       // Should still update store/state
       expect(store.state.wallets[WalletId.PERA2]).toBeUndefined()
       expect(wallet.isConnected).toBe(false)
+    })
+  })
+
+  describe('session_delete event', () => {
+    it('should handle session_delete event and update store', async () => {
+      mockPeraWallet.connect.mockResolvedValueOnce([account1.address, account2.address])
+      await wallet.connect()
+
+      const sessionDeleteHandler = mockPeraWallet.client.on.mock.calls.find(
+        (call) => call[0] === 'session_delete'
+      )?.[1] as (() => void) | undefined
+
+      expect(sessionDeleteHandler).toBeDefined()
+
+      if (sessionDeleteHandler) {
+        sessionDeleteHandler()
+      }
+
+      expect(store.state.wallets[WalletId.PERA2]).toBeUndefined()
     })
   })
 
