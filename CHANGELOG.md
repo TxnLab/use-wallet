@@ -1,3 +1,9 @@
+## [3.6.1](https://github.com/txnlab/use-wallet/compare/v3.6.0...v3.6.1) (2024-09-25)
+
+### Test Updates
+
+- **Lute:** Update mocking for lute-connect v1.4.1 compatibility ([#273](https://github.com/txnlab/use-wallet/pull/273)) ([77f1a37](https://github.com/txnlab/use-wallet/commit/77f1a373b0640657fd41c3b80d06f9881cd81341))
+
 # [3.6.0](https://github.com/txnlab/use-wallet/compare/v3.5.0...v3.6.0) (2024-09-24)
 
 ### Features
