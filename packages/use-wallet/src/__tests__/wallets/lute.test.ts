@@ -28,18 +28,21 @@ vi.mock('src/storage', () => ({
   }
 }))
 
-const mockLuteConnect = {
-  connect: vi.fn(),
-  signTxns: vi.fn()
-}
-
-vi.mock('lute-connect', async (importOriginal) => {
-  const module = await importOriginal<typeof import('lute-connect')>()
+// Mock lute-connect
+vi.mock('lute-connect', () => {
   return {
-    ...module,
-    default: vi.fn(() => mockLuteConnect)
+    default: vi.fn().mockImplementation(() => ({
+      connect: vi.fn(),
+      signTxns: vi.fn(),
+      siteName: 'Mock Site',
+      forceWeb: false,
+      isExtensionInstalled: vi.fn().mockResolvedValue(true)
+    }))
   }
 })
+
+// Import the mocked module
+import LuteConnect from 'lute-connect'
 
 function createWalletWithStore(store: Store<State>): LuteWallet {
   return new LuteWallet({
@@ -59,6 +62,14 @@ function createWalletWithStore(store: Store<State>): LuteWallet {
   })
 }
 
+interface MockLuteConnect {
+  connect: Mock
+  signTxns: Mock
+  siteName: string
+  forceWeb: boolean
+  isExtensionInstalled: () => Promise<boolean>
+}
+
 describe('LuteWallet', () => {
   let wallet: LuteWallet
   let store: Store<State>
@@ -69,6 +80,7 @@ describe('LuteWallet', () => {
     warn: Mock
     error: Mock
   }
+  let mockLuteConnect: MockLuteConnect
 
   const account1 = {
     name: 'Lute Account 1',
@@ -81,6 +93,18 @@ describe('LuteWallet', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+
+    // Create a mock instance of LuteConnect
+    mockLuteConnect = {
+      connect: vi.fn(),
+      signTxns: vi.fn(),
+      siteName: 'Mock Site',
+      forceWeb: false,
+      isExtensionInstalled: vi.fn().mockResolvedValue(true)
+    }
+
+    // Reset the mock implementation for LuteConnect
+    vi.mocked(LuteConnect).mockImplementation(() => mockLuteConnect)
 
     vi.mocked(StorageAdapter.getItem).mockImplementation((key: string) => {
       if (key === LOCAL_STORAGE_KEY && mockInitialState !== null) {
@@ -114,10 +138,12 @@ describe('LuteWallet', () => {
 
   describe('connect', () => {
     it('should initialize client, return accounts, and update store', async () => {
-      mockLuteConnect.connect.mockResolvedValueOnce([account1.address, account2.address])
+      const mockConnect = vi.fn().mockResolvedValue([account1.address, account2.address])
+      vi.mocked(mockLuteConnect.connect).mockImplementation(mockConnect)
 
       const accounts = await wallet.connect()
 
+      expect(mockConnect).toHaveBeenCalled()
       expect(wallet.isConnected).toBe(true)
       expect(accounts).toEqual([account1, account2])
       expect(store.state.wallets[WalletId.LUTE]).toEqual({
@@ -127,7 +153,8 @@ describe('LuteWallet', () => {
     })
 
     it('should throw an error if connection fails', async () => {
-      mockLuteConnect.connect.mockRejectedValueOnce(new Error('Auth error'))
+      const mockConnect = vi.fn().mockRejectedValue(new Error('Auth error'))
+      vi.mocked(mockLuteConnect.connect).mockImplementation(mockConnect)
 
       await expect(wallet.connect()).rejects.toThrow('Auth error')
       expect(store.state.wallets[WalletId.LUTE]).toBeUndefined()
@@ -135,7 +162,8 @@ describe('LuteWallet', () => {
     })
 
     it('should throw an error if an empty array is returned', async () => {
-      mockLuteConnect.connect.mockImplementation(() => Promise.resolve([]))
+      const mockConnect = vi.fn().mockResolvedValue([])
+      vi.mocked(mockLuteConnect.connect).mockImplementation(mockConnect)
 
       await expect(wallet.connect()).rejects.toThrow('No accounts found!')
       expect(store.state.wallets[WalletId.LUTE]).toBeUndefined()
@@ -145,13 +173,14 @@ describe('LuteWallet', () => {
 
   describe('disconnect', () => {
     it('should disconnect client and remove wallet from store', async () => {
-      mockLuteConnect.connect.mockResolvedValueOnce(['mockAddress'])
+      const mockConnect = vi.fn().mockResolvedValue(['mockAddress'])
+      vi.mocked(mockLuteConnect.connect).mockImplementation(mockConnect)
 
       await wallet.connect()
       await wallet.disconnect()
 
       expect(wallet.isConnected).toBe(false)
-      expect(store.state.wallets[WalletId.DEFLY]).toBeUndefined()
+      expect(store.state.wallets[WalletId.LUTE]).toBeUndefined()
     })
   })
 
@@ -209,25 +238,22 @@ describe('LuteWallet', () => {
     const txn4 = new algosdk.Transaction({ ...txnParams, amount: 4000 })
 
     beforeEach(async () => {
-      // Mock two connected accounts
-      mockLuteConnect.connect.mockResolvedValueOnce([connectedAcct1, connectedAcct2])
-
-      const mockSignedTxn = new Uint8Array(0)
-      mockLuteConnect.signTxns.mockResolvedValue([mockSignedTxn])
+      const mockConnect = vi.fn().mockResolvedValue([connectedAcct1, connectedAcct2])
+      vi.mocked(mockLuteConnect.connect).mockImplementation(mockConnect)
 
       await wallet.connect()
     })
 
     describe('signTransactions', () => {
       it('should re-throw SignTxnsError to the consuming application', async () => {
-        const signTxnsError = {
+        const mockSignTxns = vi.fn().mockRejectedValue({
           message: 'User Rejected Request',
           code: 4001
-        }
+        })
+        vi.mocked(mockLuteConnect.signTxns).mockImplementation(mockSignTxns)
 
-        mockLuteConnect.signTxns.mockRejectedValueOnce(signTxnsError)
         await expect(wallet.signTransactions([txn1])).rejects.toThrow(
-          new SignTxnsError(signTxnsError.message, signTxnsError.code)
+          new SignTxnsError('User Rejected Request', 4001)
         )
       })
 
@@ -315,12 +341,10 @@ describe('LuteWallet', () => {
         const indexesToSign = [0, 1, 3]
 
         // Mock signTxns to return "signed" (not really) encoded transactions or null
-        mockLuteConnect.signTxns.mockResolvedValueOnce([
-          gtxn1.toByte(),
-          gtxn2.toByte(),
-          null,
-          gtxn4.toByte()
-        ])
+        const mockSignTxns = vi
+          .fn()
+          .mockResolvedValue([gtxn1.toByte(), gtxn2.toByte(), null, gtxn4.toByte()])
+        vi.mocked(mockLuteConnect.signTxns).mockImplementation(mockSignTxns)
 
         await expect(wallet.signTransactions(txnGroup, indexesToSign)).resolves.toEqual([
           gtxn1.toByte(),
@@ -378,11 +402,15 @@ describe('LuteWallet', () => {
         const txnGroup = algosdk.assignGroupID([txn1, txn2])
         const indexesToSign = [1]
 
-        const signTransactionsSpy = vi.spyOn(wallet, 'signTransactions')
+        const mockSignedTxns = [null, new Uint8Array([1, 2, 3])]
+        const signTransactionsSpy = vi
+          .spyOn(wallet, 'signTransactions')
+          .mockResolvedValue(mockSignedTxns)
 
-        await wallet.transactionSigner(txnGroup, indexesToSign)
+        const result = await wallet.transactionSigner(txnGroup, indexesToSign)
 
         expect(signTransactionsSpy).toHaveBeenCalledWith(txnGroup, indexesToSign)
+        expect(result).toEqual([new Uint8Array([1, 2, 3])])
       })
     })
   })
