@@ -23,7 +23,8 @@ vi.mock('src/logger', () => ({
 vi.mock('src/storage', () => ({
   StorageAdapter: {
     getItem: vi.fn(),
-    setItem: vi.fn()
+    setItem: vi.fn(),
+    removeItem: vi.fn()
   }
 }))
 

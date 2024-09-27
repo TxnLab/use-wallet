@@ -23,7 +23,8 @@ vi.mock('src/logger', () => ({
 vi.mock('src/storage', () => ({
   StorageAdapter: {
     getItem: vi.fn(),
-    setItem: vi.fn()
+    setItem: vi.fn(),
+    removeItem: vi.fn()
   }
 }))
 
@@ -87,9 +88,14 @@ describe('PeraWallet', () => {
   beforeEach(() => {
     vi.clearAllMocks()
 
+    let mockWalletConnectData: string | null = null
+
     vi.mocked(StorageAdapter.getItem).mockImplementation((key: string) => {
       if (key === LOCAL_STORAGE_KEY && mockInitialState !== null) {
         return JSON.stringify(mockInitialState)
+      }
+      if (key === 'walletconnect') {
+        return mockWalletConnectData
       }
       return null
     })
@@ -97,6 +103,15 @@ describe('PeraWallet', () => {
     vi.mocked(StorageAdapter.setItem).mockImplementation((key: string, value: string) => {
       if (key === LOCAL_STORAGE_KEY) {
         mockInitialState = JSON.parse(value)
+      }
+      if (key.startsWith('walletconnect-')) {
+        mockWalletConnectData = value
+      }
+    })
+
+    vi.mocked(StorageAdapter.removeItem).mockImplementation((key: string) => {
+      if (key === 'walletconnect') {
+        mockWalletConnectData = null
       }
     })
 
@@ -154,6 +169,29 @@ describe('PeraWallet', () => {
 
       expect(mockPeraWallet.connector.on).toHaveBeenCalledWith('disconnect', expect.any(Function))
     })
+
+    it('should backup WalletConnect session when connecting and another wallet is active', async () => {
+      const mockWalletConnectData = 'mockWalletConnectData'
+      vi.mocked(StorageAdapter.getItem).mockReturnValueOnce(mockWalletConnectData)
+      mockPeraWallet.connect.mockResolvedValueOnce([account1.address])
+
+      // Set Defly as the active wallet
+      store.setState((state) => ({
+        ...state,
+        activeWallet: WalletId.DEFLY
+      }))
+
+      const manageWalletConnectSessionSpy = vi.spyOn(wallet, 'manageWalletConnectSession' as any)
+
+      await wallet.connect()
+
+      expect(manageWalletConnectSessionSpy).toHaveBeenCalledWith('backup', WalletId.DEFLY)
+      expect(StorageAdapter.getItem).toHaveBeenCalledWith('walletconnect')
+      expect(StorageAdapter.setItem).toHaveBeenCalledWith(
+        `walletconnect-${WalletId.DEFLY}`,
+        mockWalletConnectData
+      )
+    })
   })
 
   describe('disconnect', () => {
@@ -168,6 +206,87 @@ describe('PeraWallet', () => {
       expect(wallet.isConnected).toBe(false)
     })
 
+    it('should backup and restore active wallet session when disconnecting non-active wallet', async () => {
+      const mockWalletConnectData = 'mockWalletConnectData'
+      vi.mocked(StorageAdapter.getItem).mockReturnValueOnce(mockWalletConnectData)
+      mockPeraWallet.connect.mockResolvedValueOnce([account1.address])
+      await wallet.connect()
+
+      // Set Defly as the active wallet
+      store.setState((state) => ({
+        ...state,
+        activeWallet: WalletId.DEFLY
+      }))
+
+      const manageWalletConnectSessionSpy = vi.spyOn(wallet, 'manageWalletConnectSession' as any)
+
+      await wallet.disconnect()
+
+      expect(manageWalletConnectSessionSpy).toHaveBeenCalledWith('backup', WalletId.DEFLY)
+      expect(mockPeraWallet.disconnect).toHaveBeenCalled()
+      expect(manageWalletConnectSessionSpy).toHaveBeenCalledWith('restore', WalletId.DEFLY)
+      expect(store.state.wallets[WalletId.PERA]).toBeUndefined()
+    })
+
+    it('should not backup or restore session when disconnecting active wallet', async () => {
+      mockPeraWallet.connect.mockResolvedValueOnce([account1.address])
+      await wallet.connect()
+
+      // Set Pera as the active wallet
+      store.setState((state) => ({
+        ...state,
+        activeWallet: WalletId.PERA
+      }))
+
+      const manageWalletConnectSessionSpy = vi.spyOn(wallet, 'manageWalletConnectSession' as any)
+
+      await wallet.disconnect()
+
+      expect(manageWalletConnectSessionSpy).not.toHaveBeenCalled()
+      expect(mockPeraWallet.disconnect).toHaveBeenCalled()
+      expect(store.state.wallets[WalletId.PERA]).toBeUndefined()
+    })
+
+    it('should backup active wallet, restore inactive wallet, disconnect, and restore active wallet when disconnecting an inactive wallet', async () => {
+      mockPeraWallet.connect.mockResolvedValueOnce([account1.address])
+      await wallet.connect()
+
+      // Set Defly as the active wallet
+      store.setState((state) => ({
+        ...state,
+        activeWallet: WalletId.DEFLY
+      }))
+
+      const manageWalletConnectSessionSpy = vi.spyOn(wallet, 'manageWalletConnectSession' as any)
+
+      await wallet.disconnect()
+
+      expect(manageWalletConnectSessionSpy).toHaveBeenCalledWith('backup', WalletId.DEFLY)
+      expect(manageWalletConnectSessionSpy).toHaveBeenCalledWith('restore', WalletId.PERA)
+      expect(mockPeraWallet.disconnect).toHaveBeenCalled()
+      expect(manageWalletConnectSessionSpy).toHaveBeenCalledWith('restore', WalletId.DEFLY)
+      expect(store.state.wallets[WalletId.PERA]).toBeUndefined()
+    })
+
+    it('should not remove backup when disconnecting the active wallet', async () => {
+      mockPeraWallet.connect.mockResolvedValueOnce([account1.address])
+      await wallet.connect()
+
+      // Set Pera as the active wallet
+      store.setState((state) => ({
+        ...state,
+        activeWallet: WalletId.PERA
+      }))
+
+      const manageWalletConnectSessionSpy = vi.spyOn(wallet, 'manageWalletConnectSession' as any)
+
+      await wallet.disconnect()
+
+      expect(manageWalletConnectSessionSpy).not.toHaveBeenCalled()
+      expect(mockPeraWallet.disconnect).toHaveBeenCalled()
+      expect(store.state.wallets[WalletId.PERA]).toBeUndefined()
+    })
+
     it('should throw an error if client.disconnect fails', async () => {
       mockPeraWallet.connect.mockResolvedValueOnce([account1.address])
       mockPeraWallet.disconnect.mockRejectedValueOnce(new Error('Disconnect error'))
@@ -176,9 +295,8 @@ describe('PeraWallet', () => {
 
       await expect(wallet.disconnect()).rejects.toThrow('Disconnect error')
 
-      // Should still update store/state
-      expect(store.state.wallets[WalletId.PERA]).toBeUndefined()
-      expect(wallet.isConnected).toBe(false)
+      expect(store.state.wallets[WalletId.PERA]).toBeDefined()
+      expect(wallet.isConnected).toBe(true)
     })
   })
 
@@ -330,6 +448,94 @@ describe('PeraWallet', () => {
       await expect(wallet.resumeSession()).rejects.toThrow('No accounts found!')
       expect(store.state.wallets[WalletId.PERA]).toBeUndefined()
       expect(wallet.isConnected).toBe(false)
+    })
+  })
+
+  describe('setActive', () => {
+    it('should set the wallet as active', async () => {
+      const mockWalletConnectData = 'mockWalletConnectData'
+      vi.mocked(StorageAdapter.getItem).mockReturnValueOnce(mockWalletConnectData)
+      mockPeraWallet.connect.mockResolvedValueOnce([account1.address])
+
+      await wallet.connect()
+      wallet.setActive()
+
+      expect(store.state.activeWallet).toBe(WalletId.PERA)
+      expect(StorageAdapter.setItem).toHaveBeenCalledWith('walletconnect', mockWalletConnectData)
+      expect(StorageAdapter.removeItem).toHaveBeenCalledWith(`walletconnect-${WalletId.PERA}`)
+    })
+
+    it('should backup current active wallet session and restore Pera session when setting active', async () => {
+      const mockWalletConnectData = 'mockWalletConnectData'
+      vi.mocked(StorageAdapter.getItem).mockReturnValueOnce(mockWalletConnectData)
+
+      store.setState((state) => ({
+        ...state,
+        activeWallet: WalletId.DEFLY,
+        wallets: {
+          ...state.wallets,
+          [WalletId.DEFLY]: { accounts: [account1], activeAccount: account1 },
+          [WalletId.PERA]: { accounts: [account2], activeAccount: account2 }
+        }
+      }))
+
+      const manageWalletConnectSessionSpy = vi.spyOn(wallet, 'manageWalletConnectSession' as any)
+
+      wallet.setActive()
+
+      expect(manageWalletConnectSessionSpy).toHaveBeenCalledWith('backup', WalletId.DEFLY)
+      expect(manageWalletConnectSessionSpy).toHaveBeenCalledWith('restore')
+      expect(store.state.activeWallet).toBe(WalletId.PERA)
+    })
+  })
+
+  describe('manageWalletConnectSession', () => {
+    it('should backup WalletConnect session', async () => {
+      const mockWalletConnectData = 'mockWalletConnectData'
+      vi.mocked(StorageAdapter.getItem).mockReturnValueOnce(mockWalletConnectData)
+
+      // @ts-expect-error - Accessing private method for testing
+      wallet.manageWalletConnectSession('backup', WalletId.DEFLY)
+
+      expect(StorageAdapter.getItem).toHaveBeenCalledWith('walletconnect')
+      expect(StorageAdapter.setItem).toHaveBeenCalledWith(
+        `walletconnect-${WalletId.DEFLY}`,
+        mockWalletConnectData
+      )
+    })
+
+    it('should not backup WalletConnect session if no data exists', async () => {
+      vi.mocked(StorageAdapter.getItem).mockReturnValueOnce(null)
+
+      // @ts-expect-error - Accessing private method for testing
+      wallet.manageWalletConnectSession('backup', WalletId.DEFLY)
+
+      expect(StorageAdapter.getItem).toHaveBeenCalledWith('walletconnect')
+      expect(StorageAdapter.setItem).not.toHaveBeenCalled()
+      expect(StorageAdapter.removeItem).not.toHaveBeenCalled()
+    })
+
+    it('should restore WalletConnect session', () => {
+      const mockWalletConnectData = 'mockWalletConnectData'
+      vi.mocked(StorageAdapter.getItem).mockReturnValueOnce(mockWalletConnectData)
+
+      // @ts-expect-error - Accessing private method for testing
+      wallet.manageWalletConnectSession('restore')
+
+      expect(StorageAdapter.getItem).toHaveBeenCalledWith(`walletconnect-${WalletId.PERA}`)
+      expect(StorageAdapter.setItem).toHaveBeenCalledWith('walletconnect', mockWalletConnectData)
+      expect(StorageAdapter.removeItem).toHaveBeenCalledWith(`walletconnect-${WalletId.PERA}`)
+    })
+
+    it('should not restore WalletConnect session if no backup exists', () => {
+      vi.mocked(StorageAdapter.getItem).mockReturnValueOnce(null)
+
+      // @ts-expect-error - Accessing private method for testing
+      wallet.manageWalletConnectSession('restore')
+
+      expect(StorageAdapter.getItem).toHaveBeenCalledWith(`walletconnect-${WalletId.PERA}`)
+      expect(StorageAdapter.setItem).not.toHaveBeenCalled()
+      expect(StorageAdapter.removeItem).not.toHaveBeenCalled()
     })
   })
 
