@@ -10,7 +10,6 @@ import type {
   WalletConstructor,
   WalletId
 } from 'src/wallets/types'
-import { StorageAdapter } from 'src/storage'
 
 export interface PeraWalletConnectOptions {
   bridge?: string
@@ -68,30 +67,12 @@ export class PeraWallet extends BaseWallet {
     return client
   }
 
-  private manageWalletConnectSession(action: 'backup' | 'restore'): void {
-    if (action === 'backup') {
-      const data = StorageAdapter.getItem('walletconnect')
-      if (data) {
-        const currentActiveWallet = this.store.state.activeWallet
-        if (currentActiveWallet && currentActiveWallet !== this.id) {
-          StorageAdapter.setItem(`walletconnect-${currentActiveWallet}`, data)
-          StorageAdapter.removeItem('walletconnect')
-          this.logger.debug(`Backed up WalletConnect session for ${currentActiveWallet}`)
-        }
-      }
-    } else if (action === 'restore') {
-      const data = StorageAdapter.getItem(`walletconnect-${this.id}`)
-      if (data) {
-        StorageAdapter.setItem('walletconnect', data)
-        StorageAdapter.removeItem(`walletconnect-${this.id}`)
-        this.logger.debug(`Restored WalletConnect session for ${this.id}`)
-      }
-    }
-  }
-
   public connect = async (): Promise<WalletAccount[]> => {
     this.logger.info('Connecting...')
-    this.manageWalletConnectSession('backup')
+    const currentActiveWallet = this.store.state.activeWallet
+    if (currentActiveWallet && currentActiveWallet !== this.id) {
+      this.manageWalletConnectSession('backup', currentActiveWallet)
+    }
     const client = this.client || (await this.initializeClient())
     const accounts = await client.connect()
 
@@ -126,15 +107,30 @@ export class PeraWallet extends BaseWallet {
 
   public disconnect = async (): Promise<void> => {
     this.logger.info('Disconnecting...')
-    this.onDisconnect()
     const client = this.client || (await this.initializeClient())
-    await client.disconnect()
+
+    const currentActiveWallet = this.store.state.activeWallet
+    if (currentActiveWallet && currentActiveWallet !== this.id) {
+      this.manageWalletConnectSession('backup', currentActiveWallet)
+      this.manageWalletConnectSession('restore', this.id)
+      await client.disconnect()
+      // Wait for the disconnect to complete (race condition)
+      await new Promise((resolve) => setTimeout(resolve, 500))
+      this.manageWalletConnectSession('restore', currentActiveWallet)
+    } else {
+      await client.disconnect()
+    }
+
+    this.onDisconnect()
     this.logger.info('Disconnected')
   }
 
   public setActive = (): void => {
     this.logger.info(`Set active wallet: ${this.id}`)
-    this.manageWalletConnectSession('backup')
+    const currentActiveWallet = this.store.state.activeWallet
+    if (currentActiveWallet && currentActiveWallet !== this.id) {
+      this.manageWalletConnectSession('backup', currentActiveWallet)
+    }
     this.manageWalletConnectSession('restore')
     setActiveWallet(this.store, { walletId: this.id })
   }

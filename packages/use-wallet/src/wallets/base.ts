@@ -1,4 +1,5 @@
 import { logger } from 'src/logger'
+import { StorageAdapter } from 'src/storage'
 import { setActiveWallet, setActiveAccount, removeWallet, type State } from 'src/store'
 import type { Store } from '@tanstack/store'
 import type algosdk from 'algosdk'
@@ -129,5 +130,27 @@ export abstract class BaseWallet {
   protected onDisconnect = (): void => {
     this.logger.debug(`Removing wallet from store...`)
     removeWallet(this.store, { walletId: this.id })
+  }
+
+  protected manageWalletConnectSession = (
+    action: 'backup' | 'restore',
+    targetWalletId?: WalletId
+  ): void => {
+    const walletId = targetWalletId || this.id
+    if (action === 'backup') {
+      const data = StorageAdapter.getItem('walletconnect')
+      if (data) {
+        StorageAdapter.setItem(`walletconnect-${walletId}`, data)
+        StorageAdapter.removeItem('walletconnect')
+        this.logger.debug(`Backed up WalletConnect session for ${walletId}`)
+      }
+    } else if (action === 'restore') {
+      const data = StorageAdapter.getItem(`walletconnect-${walletId}`)
+      if (data) {
+        StorageAdapter.setItem('walletconnect', data)
+        StorageAdapter.removeItem(`walletconnect-${walletId}`)
+        this.logger.debug(`Restored WalletConnect session for ${walletId}`)
+      }
+    }
   }
 }
