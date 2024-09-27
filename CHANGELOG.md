@@ -1,3 +1,9 @@
+# [3.7.0](https://github.com/txnlab/use-wallet/compare/v3.6.1...v3.7.0) (2024-09-27)
+
+### Features
+
+- **Wallets:** Add WalletConnect v1 session management ([#275](https://github.com/txnlab/use-wallet/pull/275)) ([484b2b5](https://github.com/txnlab/use-wallet/commit/484b2b59e53ce187b40ed5d285dcc2577d4be55e))
+
 ## [3.6.1](https://github.com/txnlab/use-wallet/compare/v3.6.0...v3.6.1) (2024-09-25)
 
 ### Test Updates
