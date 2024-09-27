@@ -1,5 +1,5 @@
 import algosdk from 'algosdk'
-import { WalletState, addWallet, setAccounts, type State } from 'src/store'
+import { WalletState, addWallet, setAccounts, setActiveWallet, type State } from 'src/store'
 import { compareAccounts, flattenTxnGroup, isSignedTxn, isTransactionArray } from 'src/utils'
 import { BaseWallet } from 'src/wallets/base'
 import type { DeflyWalletConnect } from '@blockshake/defly-connect'
@@ -10,6 +10,7 @@ import type {
   WalletConstructor,
   WalletId
 } from 'src/wallets/types'
+import { StorageAdapter } from 'src/storage'
 
 export interface DeflyWalletConnectOptions {
   bridge?: string
@@ -62,8 +63,30 @@ export class DeflyWallet extends BaseWallet {
     return client
   }
 
+  private manageWalletConnectSession(action: 'backup' | 'restore'): void {
+    if (action === 'backup') {
+      const data = StorageAdapter.getItem('walletconnect')
+      if (data) {
+        const currentActiveWallet = this.store.state.activeWallet
+        if (currentActiveWallet && currentActiveWallet !== this.id) {
+          StorageAdapter.setItem(`walletconnect-${currentActiveWallet}`, data)
+          StorageAdapter.removeItem('walletconnect')
+          this.logger.debug(`Backed up WalletConnect session for ${currentActiveWallet}`)
+        }
+      }
+    } else if (action === 'restore') {
+      const data = StorageAdapter.getItem(`walletconnect-${this.id}`)
+      if (data) {
+        StorageAdapter.setItem('walletconnect', data)
+        StorageAdapter.removeItem(`walletconnect-${this.id}`)
+        this.logger.debug(`Restored WalletConnect session for ${this.id}`)
+      }
+    }
+  }
+
   public connect = async (): Promise<WalletAccount[]> => {
     this.logger.info('Connecting...')
+    this.manageWalletConnectSession('backup')
     const client = this.client || (await this.initializeClient())
     const accounts = await client.connect()
 
@@ -102,6 +125,13 @@ export class DeflyWallet extends BaseWallet {
     const client = this.client || (await this.initializeClient())
     await client.disconnect()
     this.logger.info('Disconnected.')
+  }
+
+  public setActive = (): void => {
+    this.logger.info(`Set active wallet: ${this.id}`)
+    this.manageWalletConnectSession('backup')
+    this.manageWalletConnectSession('restore')
+    setActiveWallet(this.store, { walletId: this.id })
   }
 
   public resumeSession = async (): Promise<void> => {

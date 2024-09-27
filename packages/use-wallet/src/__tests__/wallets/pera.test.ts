@@ -23,7 +23,8 @@ vi.mock('src/logger', () => ({
 vi.mock('src/storage', () => ({
   StorageAdapter: {
     getItem: vi.fn(),
-    setItem: vi.fn()
+    setItem: vi.fn(),
+    removeItem: vi.fn()
   }
 }))
 
@@ -87,9 +88,14 @@ describe('PeraWallet', () => {
   beforeEach(() => {
     vi.clearAllMocks()
 
+    let mockWalletConnectData: string | null = null
+
     vi.mocked(StorageAdapter.getItem).mockImplementation((key: string) => {
       if (key === LOCAL_STORAGE_KEY && mockInitialState !== null) {
         return JSON.stringify(mockInitialState)
+      }
+      if (key === 'walletconnect') {
+        return mockWalletConnectData
       }
       return null
     })
@@ -97,6 +103,15 @@ describe('PeraWallet', () => {
     vi.mocked(StorageAdapter.setItem).mockImplementation((key: string, value: string) => {
       if (key === LOCAL_STORAGE_KEY) {
         mockInitialState = JSON.parse(value)
+      }
+      if (key.startsWith('walletconnect-')) {
+        mockWalletConnectData = value
+      }
+    })
+
+    vi.mocked(StorageAdapter.removeItem).mockImplementation((key: string) => {
+      if (key === 'walletconnect') {
+        mockWalletConnectData = null
       }
     })
 
@@ -198,6 +213,99 @@ describe('PeraWallet', () => {
       }
 
       expect(store.state.wallets[WalletId.PERA]).toBeUndefined()
+    })
+  })
+
+  describe('manageWalletConnectSession', () => {
+    it('should backup WalletConnect session when connecting', async () => {
+      const mockWalletConnectData = 'mockWalletConnectData'
+      vi.mocked(StorageAdapter.getItem).mockReturnValueOnce(mockWalletConnectData)
+      mockPeraWallet.connect.mockResolvedValueOnce([account1.address])
+
+      // Set Defly as the active wallet
+      store.setState((state) => ({
+        ...state,
+        activeWallet: WalletId.DEFLY
+      }))
+
+      const manageWalletConnectSessionSpy = vi.spyOn(wallet, 'manageWalletConnectSession' as any)
+
+      await wallet.connect()
+
+      expect(manageWalletConnectSessionSpy).toHaveBeenCalledWith('backup')
+      expect(StorageAdapter.getItem).toHaveBeenCalledWith('walletconnect')
+      expect(StorageAdapter.setItem).toHaveBeenCalledWith(
+        `walletconnect-${WalletId.DEFLY}`,
+        mockWalletConnectData
+      )
+      expect(StorageAdapter.removeItem).toHaveBeenCalledWith('walletconnect')
+    })
+
+    it('should not backup WalletConnect session if no data exists', async () => {
+      vi.mocked(StorageAdapter.getItem).mockReturnValueOnce(null)
+      mockPeraWallet.connect.mockResolvedValueOnce([account1.address])
+
+      await wallet.connect()
+
+      expect(StorageAdapter.getItem).toHaveBeenCalledWith('walletconnect')
+      expect(StorageAdapter.setItem).not.toHaveBeenCalled()
+      expect(StorageAdapter.removeItem).not.toHaveBeenCalled()
+    })
+
+    it('should not backup WalletConnect session when Pera is already active', async () => {
+      const mockWalletConnectData = 'mockWalletConnectData'
+      vi.mocked(StorageAdapter.getItem).mockReturnValueOnce(mockWalletConnectData)
+      mockPeraWallet.connect.mockResolvedValueOnce([account1.address])
+
+      // Set Pera as the active wallet
+      store.setState((state) => ({
+        ...state,
+        activeWallet: WalletId.PERA
+      }))
+
+      const manageWalletConnectSessionSpy = vi.spyOn(wallet, 'manageWalletConnectSession' as any)
+
+      await wallet.connect()
+
+      expect(manageWalletConnectSessionSpy).toHaveBeenCalledWith('backup')
+      expect(StorageAdapter.getItem).toHaveBeenCalledWith('walletconnect')
+      expect(StorageAdapter.setItem).not.toHaveBeenCalled()
+      expect(StorageAdapter.removeItem).not.toHaveBeenCalled()
+    })
+
+    it('should restore WalletConnect session when setting active', async () => {
+      const mockWalletConnectData = 'mockWalletConnectData'
+      vi.mocked(StorageAdapter.getItem).mockReturnValueOnce(mockWalletConnectData)
+
+      store.setState((state) => ({
+        ...state,
+        activeWallet: WalletId.DEFLY,
+        wallets: {
+          ...state.wallets,
+          [WalletId.DEFLY]: { accounts: [account1], activeAccount: account1 },
+          [WalletId.PERA]: { accounts: [account2], activeAccount: account2 }
+        }
+      }))
+
+      wallet.setActive()
+
+      expect(StorageAdapter.getItem).toHaveBeenCalledWith('walletconnect')
+      expect(StorageAdapter.setItem).toHaveBeenCalledWith(
+        `walletconnect-${WalletId.DEFLY}`,
+        mockWalletConnectData
+      )
+      expect(StorageAdapter.removeItem).toHaveBeenCalledWith('walletconnect')
+      expect(store.state.activeWallet).toBe(WalletId.PERA)
+    })
+
+    it('should not restore WalletConnect session if no backup exists', () => {
+      vi.mocked(StorageAdapter.getItem).mockReturnValueOnce(null)
+
+      wallet.setActive()
+
+      expect(StorageAdapter.getItem).toHaveBeenCalledWith(`walletconnect-${WalletId.PERA}`)
+      expect(StorageAdapter.setItem).not.toHaveBeenCalled()
+      expect(StorageAdapter.removeItem).not.toHaveBeenCalled()
     })
   })
 
