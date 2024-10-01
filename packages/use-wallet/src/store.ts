@@ -1,7 +1,7 @@
 import algosdk from 'algosdk'
 import { logger } from 'src/logger'
 import { NetworkId, isValidNetworkId } from 'src/network'
-import { WalletId, type WalletAccount } from 'src/wallets'
+import { WalletId, type WalletAccount } from 'src/wallets/types'
 import type { Store } from '@tanstack/store'
 
 export type WalletState = {
