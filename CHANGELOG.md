@@ -1,3 +1,10 @@
+## [3.7.1](https://github.com/txnlab/use-wallet/compare/v3.7.0...v3.7.1) (2024-10-01)
+
+### Fixes
+
+- **Scripts:** Replace single quotes w/ escaped double quotes ([#278](https://github.com/txnlab/use-wallet/pull/278)) ([b3451d7](https://github.com/txnlab/use-wallet/commit/b3451d7b6c9e8cfa3c73f8aca3c2da7e4e96e595))
+- **Core:** Remove circular import in store.ts & MnemonicWallet ([#279](https://github.com/txnlab/use-wallet/pull/279)) ([d3f2764](https://github.com/txnlab/use-wallet/commit/d3f27645a2eb7f9396471d4e5e1e110957cc5bb3))
+
 # [3.7.0](https://github.com/txnlab/use-wallet/compare/v3.6.1...v3.7.0) (2024-09-27)
 
 ### Features
