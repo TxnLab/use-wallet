@@ -5,8 +5,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint -c '../../.eslintrc.json' '**/*.{js,ts}'",
-    "prettier": "prettier --check '**/*.{js,ts}'",
+    "lint": "eslint -c \"../../.eslintrc.json\" \"**/*.{js,ts}\"",
+    "prettier": "prettier --check \"**/*.{js,ts}\"",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

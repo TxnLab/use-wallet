@@ -5,7 +5,7 @@
     "dev": "vite",
     "preview": "vite preview",
     "build": "vue-tsc && vite build",
-    "lint": "eslint -c '../../.eslintrc.json' '**/*.{js,ts}'",
+    "lint": "eslint -c \"../../.eslintrc.json\" \"**/*.{js,ts}\"",
     "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {
