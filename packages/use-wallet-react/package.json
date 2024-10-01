@@ -42,9 +42,9 @@
     "@txnlab/use-wallet": "workspace:*"
   },
   "devDependencies": {
-    "@types/react": "18.3.8",
+    "@types/react": "18.3.10",
     "algosdk": "2.9.0",
-    "jsdom": "25.0.0",
+    "jsdom": "25.0.1",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "tsup": "8.3.0",

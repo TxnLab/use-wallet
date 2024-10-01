@@ -65,9 +65,9 @@
     "@txnlab/use-wallet": "workspace:*"
   },
   "devDependencies": {
-    "@solidjs/testing-library": "0.8.9",
+    "@solidjs/testing-library": "0.8.10",
     "algosdk": "2.9.0",
-    "solid-js": "1.8.22",
+    "solid-js": "1.9.1",
     "tsup": "8.3.0",
     "tsup-preset-solid": "2.2.0",
     "typescript": "5.6.2"
