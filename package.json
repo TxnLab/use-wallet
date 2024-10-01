@@ -27,8 +27,8 @@
   "devDependencies": {
     "@testing-library/jest-dom": "6.5.0",
     "@testing-library/react": "16.0.1",
-    "@typescript-eslint/eslint-plugin": "8.6.0",
-    "@typescript-eslint/parser": "8.6.0",
+    "@typescript-eslint/eslint-plugin": "8.7.0",
+    "@typescript-eslint/parser": "8.7.0",
     "@vitejs/plugin-react": "4.3.1",
     "@vitejs/plugin-vue": "5.1.4",
     "@vitejs/plugin-vue-jsx": "4.0.1",
@@ -37,7 +37,7 @@
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-prettier": "5.2.1",
     "prettier": "3.3.3",
-    "vite": "5.4.7",
+    "vite": "5.4.8",
     "vite-plugin-solid": "2.10.2",
     "vitest": "2.1.1",
     "vue-demi": "0.14.10"
