@@ -21,7 +21,8 @@
     {
       "groupName": "non-major dependencies",
       "matchPackageNames": ["!typescript", "!algosdk"],
-      "matchUpdateTypes": ["patch", "minor"]
+      "matchUpdateTypes": ["patch", "minor"],
+      "matchDepTypes": ["dependencies", "devDependencies", "action"]
     },
     {
       "groupName": "Wallet dependencies",

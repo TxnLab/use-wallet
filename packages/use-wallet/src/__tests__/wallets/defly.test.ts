@@ -1,27 +1,42 @@
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
+import { logger } from 'src/logger'
 import { StorageAdapter } from 'src/storage'
 import { LOCAL_STORAGE_KEY, State, WalletState, defaultState } from 'src/store'
 import { DeflyWallet } from 'src/wallets/defly'
 import { WalletId } from 'src/wallets/types'
+import type { Mock } from 'vitest'
+
+// Mock logger
+vi.mock('src/logger', () => ({
+  logger: {
+    createScopedLogger: vi.fn().mockReturnValue({
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn()
+    })
+  }
+}))
 
 // Mock storage adapter
 vi.mock('src/storage', () => ({
   StorageAdapter: {
     getItem: vi.fn(),
-    setItem: vi.fn()
+    setItem: vi.fn(),
+    removeItem: vi.fn()
   }
 }))
-
-// Spy/suppress console output
-vi.spyOn(console, 'info').mockImplementation(() => {}) // @todo: remove when debug logger is implemented
-vi.spyOn(console, 'warn').mockImplementation(() => {})
 
 const mockDeflyWallet = {
   connect: vi.fn(),
   reconnectSession: vi.fn(),
   disconnect: vi.fn(),
-  signTransaction: vi.fn()
+  signTransaction: vi.fn(),
+  connector: {
+    on: vi.fn(),
+    off: vi.fn()
+  }
 }
 
 vi.mock('@blockshake/defly-connect', async (importOriginal) => {
@@ -36,19 +51,30 @@ vi.mock('@blockshake/defly-connect', async (importOriginal) => {
 })
 
 function createWalletWithStore(store: Store<State>): DeflyWallet {
-  return new DeflyWallet({
+  const wallet = new DeflyWallet({
     id: WalletId.DEFLY,
     metadata: {},
-    getAlgodClient: {} as any,
+    getAlgodClient: () => ({}) as any,
     store,
     subscribe: vi.fn()
   })
+
+  // @ts-expect-error - Mocking the private client property
+  wallet.client = mockDeflyWallet
+
+  return wallet
 }
 
 describe('DeflyWallet', () => {
   let wallet: DeflyWallet
   let store: Store<State>
   let mockInitialState: State | null = null
+  let mockLogger: {
+    debug: Mock
+    info: Mock
+    warn: Mock
+    error: Mock
+  }
 
   const account1 = {
     name: 'Defly Account 1',
@@ -62,9 +88,14 @@ describe('DeflyWallet', () => {
   beforeEach(() => {
     vi.clearAllMocks()
 
+    let mockWalletConnectData: string | null = null
+
     vi.mocked(StorageAdapter.getItem).mockImplementation((key: string) => {
       if (key === LOCAL_STORAGE_KEY && mockInitialState !== null) {
         return JSON.stringify(mockInitialState)
+      }
+      if (key === 'walletconnect') {
+        return mockWalletConnectData
       }
       return null
     })
@@ -73,7 +104,24 @@ describe('DeflyWallet', () => {
       if (key === LOCAL_STORAGE_KEY) {
         mockInitialState = JSON.parse(value)
       }
+      if (key.startsWith('walletconnect-')) {
+        mockWalletConnectData = value
+      }
     })
+
+    vi.mocked(StorageAdapter.removeItem).mockImplementation((key: string) => {
+      if (key === 'walletconnect') {
+        mockWalletConnectData = null
+      }
+    })
+
+    mockLogger = {
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn()
+    }
+    vi.mocked(logger.createScopedLogger).mockReturnValue(mockLogger)
 
     store = new Store<State>(defaultState)
     wallet = createWalletWithStore(store)
@@ -113,6 +161,37 @@ describe('DeflyWallet', () => {
       expect(store.state.wallets[WalletId.DEFLY]).toBeUndefined()
       expect(wallet.isConnected).toBe(false)
     })
+
+    it('should register disconnect event listener after successful connection', async () => {
+      mockDeflyWallet.connect.mockResolvedValueOnce([account1.address, account2.address])
+
+      await wallet.connect()
+
+      expect(mockDeflyWallet.connector.on).toHaveBeenCalledWith('disconnect', expect.any(Function))
+    })
+
+    it('should backup WalletConnect session when connecting and another wallet is active', async () => {
+      const mockWalletConnectData = 'mockWalletConnectData'
+      vi.mocked(StorageAdapter.getItem).mockReturnValueOnce(mockWalletConnectData)
+      mockDeflyWallet.connect.mockResolvedValueOnce([account1.address])
+
+      // Set Pera as the active wallet
+      store.setState((state) => ({
+        ...state,
+        activeWallet: WalletId.PERA
+      }))
+
+      const manageWalletConnectSessionSpy = vi.spyOn(wallet, 'manageWalletConnectSession' as any)
+
+      await wallet.connect()
+
+      expect(manageWalletConnectSessionSpy).toHaveBeenCalledWith('backup', WalletId.PERA)
+      expect(StorageAdapter.getItem).toHaveBeenCalledWith('walletconnect')
+      expect(StorageAdapter.setItem).toHaveBeenCalledWith(
+        `walletconnect-${WalletId.PERA}`,
+        mockWalletConnectData
+      )
+    })
   })
 
   describe('disconnect', () => {
@@ -127,6 +206,87 @@ describe('DeflyWallet', () => {
       expect(wallet.isConnected).toBe(false)
     })
 
+    it('should backup and restore active wallet session when disconnecting non-active wallet', async () => {
+      const mockWalletConnectData = 'mockWalletConnectData'
+      vi.mocked(StorageAdapter.getItem).mockReturnValueOnce(mockWalletConnectData)
+      mockDeflyWallet.connect.mockResolvedValueOnce([account1.address])
+      await wallet.connect()
+
+      // Set Pera as the active wallet
+      store.setState((state) => ({
+        ...state,
+        activeWallet: WalletId.PERA
+      }))
+
+      const manageWalletConnectSessionSpy = vi.spyOn(wallet, 'manageWalletConnectSession' as any)
+
+      await wallet.disconnect()
+
+      expect(manageWalletConnectSessionSpy).toHaveBeenCalledWith('backup', WalletId.PERA)
+      expect(mockDeflyWallet.disconnect).toHaveBeenCalled()
+      expect(manageWalletConnectSessionSpy).toHaveBeenCalledWith('restore', WalletId.PERA)
+      expect(store.state.wallets[WalletId.DEFLY]).toBeUndefined()
+    })
+
+    it('should not backup or restore session when disconnecting active wallet', async () => {
+      mockDeflyWallet.connect.mockResolvedValueOnce([account1.address])
+      await wallet.connect()
+
+      // Set Defly as the active wallet
+      store.setState((state) => ({
+        ...state,
+        activeWallet: WalletId.DEFLY
+      }))
+
+      const manageWalletConnectSessionSpy = vi.spyOn(wallet, 'manageWalletConnectSession' as any)
+
+      await wallet.disconnect()
+
+      expect(manageWalletConnectSessionSpy).not.toHaveBeenCalled()
+      expect(mockDeflyWallet.disconnect).toHaveBeenCalled()
+      expect(store.state.wallets[WalletId.DEFLY]).toBeUndefined()
+    })
+
+    it('should backup active wallet, restore inactive wallet, disconnect, and restore active wallet when disconnecting an inactive wallet', async () => {
+      mockDeflyWallet.connect.mockResolvedValueOnce([account1.address])
+      await wallet.connect()
+
+      // Set Pera as the active wallet
+      store.setState((state) => ({
+        ...state,
+        activeWallet: WalletId.PERA
+      }))
+
+      const manageWalletConnectSessionSpy = vi.spyOn(wallet, 'manageWalletConnectSession' as any)
+
+      await wallet.disconnect()
+
+      expect(manageWalletConnectSessionSpy).toHaveBeenCalledWith('backup', WalletId.PERA)
+      expect(manageWalletConnectSessionSpy).toHaveBeenCalledWith('restore', WalletId.DEFLY)
+      expect(mockDeflyWallet.disconnect).toHaveBeenCalled()
+      expect(manageWalletConnectSessionSpy).toHaveBeenCalledWith('restore', WalletId.PERA)
+      expect(store.state.wallets[WalletId.DEFLY]).toBeUndefined()
+    })
+
+    it('should not remove backup when disconnecting the active wallet', async () => {
+      mockDeflyWallet.connect.mockResolvedValueOnce([account1.address])
+      await wallet.connect()
+
+      // Set Defly as the active wallet
+      store.setState((state) => ({
+        ...state,
+        activeWallet: WalletId.DEFLY
+      }))
+
+      const manageWalletConnectSessionSpy = vi.spyOn(wallet, 'manageWalletConnectSession' as any)
+
+      await wallet.disconnect()
+
+      expect(manageWalletConnectSessionSpy).not.toHaveBeenCalled()
+      expect(mockDeflyWallet.disconnect).toHaveBeenCalled()
+      expect(store.state.wallets[WalletId.DEFLY]).toBeUndefined()
+    })
+
     it('should throw an error if client.disconnect fails', async () => {
       mockDeflyWallet.connect.mockResolvedValueOnce([account1.address])
       mockDeflyWallet.disconnect.mockRejectedValueOnce(new Error('Disconnect error'))
@@ -135,9 +295,27 @@ describe('DeflyWallet', () => {
 
       await expect(wallet.disconnect()).rejects.toThrow('Disconnect error')
 
-      // Should still update store/state
+      expect(store.state.wallets[WalletId.DEFLY]).toBeDefined()
+      expect(wallet.isConnected).toBe(true)
+    })
+  })
+
+  describe('disconnect event', () => {
+    it('should handle disconnect event and update store', async () => {
+      mockDeflyWallet.connect.mockResolvedValueOnce([account1.address, account2.address])
+      await wallet.connect()
+
+      const disconnectHandler = mockDeflyWallet.connector.on.mock.calls.find(
+        (call) => call[0] === 'disconnect'
+      )?.[1] as (() => void) | undefined
+
+      expect(disconnectHandler).toBeDefined()
+
+      if (disconnectHandler) {
+        disconnectHandler()
+      }
+
       expect(store.state.wallets[WalletId.DEFLY]).toBeUndefined()
-      expect(wallet.isConnected).toBe(false)
     })
   })
 
@@ -221,13 +399,10 @@ describe('DeflyWallet', () => {
 
       await wallet.resumeSession()
 
-      expect(console.warn).toHaveBeenCalledWith(
-        '[Defly] Session accounts mismatch, updating accounts',
-        {
-          prev: prevWalletState.accounts,
-          current: newWalletState.accounts
-        }
-      )
+      expect(mockLogger.warn).toHaveBeenCalledWith('Session accounts mismatch, updating accounts', {
+        prev: prevWalletState.accounts,
+        current: newWalletState.accounts
+      })
       expect(store.state.wallets[WalletId.DEFLY]).toEqual(newWalletState)
     })
 
@@ -273,6 +448,94 @@ describe('DeflyWallet', () => {
       await expect(wallet.resumeSession()).rejects.toThrow('No accounts found!')
       expect(store.state.wallets[WalletId.DEFLY]).toBeUndefined()
       expect(wallet.isConnected).toBe(false)
+    })
+  })
+
+  describe('setActive', () => {
+    it('should set the wallet as active', async () => {
+      const mockWalletConnectData = 'mockWalletConnectData'
+      vi.mocked(StorageAdapter.getItem).mockReturnValueOnce(mockWalletConnectData)
+      mockDeflyWallet.connect.mockResolvedValueOnce([account1.address])
+
+      await wallet.connect()
+      wallet.setActive()
+
+      expect(store.state.activeWallet).toBe(WalletId.DEFLY)
+      expect(StorageAdapter.setItem).toHaveBeenCalledWith('walletconnect', mockWalletConnectData)
+      expect(StorageAdapter.removeItem).toHaveBeenCalledWith(`walletconnect-${WalletId.DEFLY}`)
+    })
+
+    it('should backup current active wallet session and restore Pera session when setting active', async () => {
+      const mockWalletConnectData = 'mockWalletConnectData'
+      vi.mocked(StorageAdapter.getItem).mockReturnValueOnce(mockWalletConnectData)
+
+      store.setState((state) => ({
+        ...state,
+        activeWallet: WalletId.PERA,
+        wallets: {
+          ...state.wallets,
+          [WalletId.DEFLY]: { accounts: [account1], activeAccount: account1 },
+          [WalletId.PERA]: { accounts: [account2], activeAccount: account2 }
+        }
+      }))
+
+      const manageWalletConnectSessionSpy = vi.spyOn(wallet, 'manageWalletConnectSession' as any)
+
+      wallet.setActive()
+
+      expect(manageWalletConnectSessionSpy).toHaveBeenCalledWith('backup', WalletId.PERA)
+      expect(manageWalletConnectSessionSpy).toHaveBeenCalledWith('restore')
+      expect(store.state.activeWallet).toBe(WalletId.DEFLY)
+    })
+  })
+
+  describe('manageWalletConnectSession', () => {
+    it('should backup WalletConnect session', async () => {
+      const mockWalletConnectData = 'mockWalletConnectData'
+      vi.mocked(StorageAdapter.getItem).mockReturnValueOnce(mockWalletConnectData)
+
+      // @ts-expect-error - Accessing protected method for testing
+      wallet.manageWalletConnectSession('backup', WalletId.PERA)
+
+      expect(StorageAdapter.getItem).toHaveBeenCalledWith('walletconnect')
+      expect(StorageAdapter.setItem).toHaveBeenCalledWith(
+        `walletconnect-${WalletId.PERA}`,
+        mockWalletConnectData
+      )
+    })
+
+    it('should not backup WalletConnect session if no data exists', async () => {
+      vi.mocked(StorageAdapter.getItem).mockReturnValueOnce(null)
+
+      // @ts-expect-error - Accessing protected method for testing
+      wallet.manageWalletConnectSession('backup', WalletId.PERA)
+
+      expect(StorageAdapter.getItem).toHaveBeenCalledWith('walletconnect')
+      expect(StorageAdapter.setItem).not.toHaveBeenCalled()
+      expect(StorageAdapter.removeItem).not.toHaveBeenCalled()
+    })
+
+    it('should restore WalletConnect session', () => {
+      const mockWalletConnectData = 'mockWalletConnectData'
+      vi.mocked(StorageAdapter.getItem).mockReturnValueOnce(mockWalletConnectData)
+
+      // @ts-expect-error - Accessing protected method for testing
+      wallet.manageWalletConnectSession('restore')
+
+      expect(StorageAdapter.getItem).toHaveBeenCalledWith(`walletconnect-${WalletId.DEFLY}`)
+      expect(StorageAdapter.setItem).toHaveBeenCalledWith('walletconnect', mockWalletConnectData)
+      expect(StorageAdapter.removeItem).toHaveBeenCalledWith(`walletconnect-${WalletId.DEFLY}`)
+    })
+
+    it('should not restore WalletConnect session if no backup exists', () => {
+      vi.mocked(StorageAdapter.getItem).mockReturnValueOnce(null)
+
+      // @ts-expect-error - Accessing protected method for testing
+      wallet.manageWalletConnectSession('restore')
+
+      expect(StorageAdapter.getItem).toHaveBeenCalledWith(`walletconnect-${WalletId.DEFLY}`)
+      expect(StorageAdapter.setItem).not.toHaveBeenCalled()
+      expect(StorageAdapter.removeItem).not.toHaveBeenCalled()
     })
   })
 

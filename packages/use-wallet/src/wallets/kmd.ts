@@ -93,54 +93,61 @@ export class KmdWallet extends BaseWallet {
   }
 
   private async initializeClient(): Promise<algosdk.Kmd> {
-    console.info(`[${this.metadata.name}] Initializing client...`)
+    this.logger.info('Initializing client...')
     const { token, baseServer, port } = this.options
     const client = new algosdk.Kmd(token, baseServer, port)
     this.client = client
+    this.logger.info('Client initialized')
     return client
   }
 
   public connect = async (): Promise<WalletAccount[]> => {
-    console.info(`[${this.metadata.name}] Connecting...`)
+    this.logger.info('Connecting...')
     if (!this.client) {
       await this.initializeClient()
     }
 
-    // Get token and fetch accounts
-    const token = await this.fetchToken()
-    const accounts = await this.fetchAccounts(token)
+    try {
+      // Get token and fetch accounts
+      const token = await this.fetchToken()
+      const accounts = await this.fetchAccounts(token)
 
-    if (accounts.length === 0) {
-      throw new Error('No accounts found!')
+      if (accounts.length === 0) {
+        throw new Error('No accounts found!')
+      }
+
+      const walletAccounts = accounts.map((address: string, idx: number) => ({
+        name: `${this.metadata.name} Account ${idx + 1}`,
+        address
+      }))
+
+      const activeAccount = walletAccounts[0]
+
+      const walletState: WalletState = {
+        accounts: walletAccounts,
+        activeAccount
+      }
+
+      addWallet(this.store, {
+        walletId: this.id,
+        wallet: walletState
+      })
+
+      // Release token
+      await this.releaseToken(token)
+
+      this.logger.info('✅ Connected.', walletState)
+      return walletAccounts
+    } catch (error: any) {
+      this.logger.error('Error connecting:', error.message)
+      throw error
     }
-
-    const walletAccounts = accounts.map((address: string, idx: number) => ({
-      name: `${this.metadata.name} Account ${idx + 1}`,
-      address
-    }))
-
-    const activeAccount = walletAccounts[0]
-
-    const walletState: WalletState = {
-      accounts: walletAccounts,
-      activeAccount
-    }
-
-    addWallet(this.store, {
-      walletId: this.id,
-      wallet: walletState
-    })
-
-    // Release token
-    await this.releaseToken(token)
-
-    console.info(`[${this.metadata.name}] ✅ Connected.`, walletState)
-    return walletAccounts
   }
 
   public disconnect = async (): Promise<void> => {
+    this.logger.info('Disconnecting...')
     this.onDisconnect()
-    console.info(`[${this.metadata.name}] Disconnected.`)
+    this.logger.info('Disconnected.')
   }
 
   public resumeSession = async (): Promise<void> => {
@@ -150,13 +157,15 @@ export class KmdWallet extends BaseWallet {
 
       // No session to resume
       if (!walletState) {
+        this.logger.info('No session to resume')
         return
       }
 
-      console.info(`[${this.metadata.name}] Resuming session...`)
+      this.logger.info('Resuming session...')
       await this.initializeClient()
+      this.logger.info('Session resumed')
     } catch (error: any) {
-      console.error(`[${this.metadata.name}] Error resuming session: ${error.message}`)
+      this.logger.error('Error resuming session:', error.message)
       this.onDisconnect()
       throw error
     }
@@ -214,51 +223,64 @@ export class KmdWallet extends BaseWallet {
     txnGroup: T | T[],
     indexesToSign?: number[]
   ): Promise<(Uint8Array | null)[]> => {
-    let txnsToSign: algosdk.Transaction[] = []
+    try {
+      this.logger.debug('Signing transactions...', { txnGroup, indexesToSign })
+      let txnsToSign: algosdk.Transaction[] = []
 
-    // Determine type and process transactions for signing
-    if (isTransactionArray(txnGroup)) {
-      const flatTxns: algosdk.Transaction[] = flattenTxnGroup(txnGroup)
-      txnsToSign = this.processTxns(flatTxns, indexesToSign)
-    } else {
-      const flatTxns: Uint8Array[] = flattenTxnGroup(txnGroup as Uint8Array[])
-      txnsToSign = this.processEncodedTxns(flatTxns, indexesToSign)
+      // Determine type and process transactions for signing
+      if (isTransactionArray(txnGroup)) {
+        const flatTxns: algosdk.Transaction[] = flattenTxnGroup(txnGroup)
+        txnsToSign = this.processTxns(flatTxns, indexesToSign)
+      } else {
+        const flatTxns: Uint8Array[] = flattenTxnGroup(txnGroup as Uint8Array[])
+        txnsToSign = this.processEncodedTxns(flatTxns, indexesToSign)
+      }
+
+      // Get token and password
+      const token = await this.fetchToken()
+      const password = this.getPassword()
+
+      const client = this.client || (await this.initializeClient())
+
+      this.logger.debug('Sending processed transactions to wallet...', txnsToSign)
+
+      // Sign transactions
+      const signedTxns = await Promise.all(
+        txnsToSign.map((txn) => client.signTransaction(token, password, txn))
+      )
+
+      this.logger.debug('Received signed transactions from wallet', signedTxns)
+
+      // Release token
+      await this.releaseToken(token)
+
+      this.logger.debug('Transactions signed successfully', signedTxns)
+      return signedTxns
+    } catch (error: any) {
+      this.logger.error('Error signing transactions:', error.message)
+      throw error
     }
-
-    // Get token and password
-    const token = await this.fetchToken()
-    const password = this.getPassword()
-
-    const client = this.client || (await this.initializeClient())
-
-    // Sign transactions
-    const signedTxns = await Promise.all(
-      txnsToSign.map((txn) => client.signTransaction(token, password, txn))
-    )
-
-    // Release token
-    await this.releaseToken(token)
-
-    return signedTxns
   }
 
   private async fetchWalletId(): Promise<string> {
-    console.info(`[${this.metadata.name}] Fetching wallet data...`)
+    this.logger.debug('Fetching wallet data...', { walletName: this.walletName })
     const client = this.client || (await this.initializeClient())
 
     const { wallets }: ListWalletsResponse = await client.listWallets()
     const wallet = wallets.find((wallet: KmdWalletRecord) => wallet.name === this.walletName)
 
     if (!wallet) {
+      this.logger.error(`Wallet "${this.walletName}" not found!`)
       throw new Error(`Wallet "${this.walletName}" not found!`)
     }
 
     this.walletId = wallet.id
+    this.logger.debug('Wallet data fetched successfully', { walletId: this.walletId })
     return wallet.id
   }
 
   private async fetchToken(): Promise<string> {
-    console.info(`[${this.metadata.name}] Fetching token...`)
+    this.logger.debug('Fetching token...', { walletId: this.walletId })
     const client = this.client || (await this.initializeClient())
 
     const walletId = this.walletId || (await this.fetchWalletId())
@@ -268,13 +290,15 @@ export class KmdWallet extends BaseWallet {
       walletId,
       password
     )
+    this.logger.debug('Token fetched successfully')
     return wallet_handle_token
   }
 
   private async releaseToken(token: string): Promise<void> {
-    console.info(`[${this.metadata.name}] Releasing token...`)
+    this.logger.debug('Releasing token...')
     const client = this.client || (await this.initializeClient())
     await client.releaseWalletHandle(token)
+    this.logger.debug('Token released successfully')
   }
 
   private getPassword(): string {
@@ -287,9 +311,10 @@ export class KmdWallet extends BaseWallet {
   }
 
   private async fetchAccounts(token: string): Promise<string[]> {
-    console.info(`[${this.metadata.name}] Fetching accounts...`)
+    this.logger.debug('Fetching accounts...')
     const client = this.client || (await this.initializeClient())
     const { addresses }: ListKeysResponse = await client.listKeys(token)
+    this.logger.debug('Accounts fetched successfully', { addresses })
     return addresses
   }
 }

@@ -1,10 +1,10 @@
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
+import { Logger, LogLevel, logger } from 'src/logger'
 import {
   createDefaultNetworkConfig,
   isNetworkConfigMap,
   NetworkId,
-  type AlgodConfig,
   type NetworkConfig,
   type NetworkConfigMap
 } from 'src/network'
@@ -30,43 +30,80 @@ import type {
   WalletOptions
 } from 'src/wallets/types'
 
+export interface WalletManagerOptions {
+  resetNetwork?: boolean
+  debug?: boolean
+  logLevel?: LogLevel
+}
+
 export interface WalletManagerConfig {
   wallets?: SupportedWallet[]
   network?: NetworkId
   algod?: NetworkConfig
+  options?: WalletManagerOptions
 }
 
 export type PersistedState = Omit<State, 'algodClient'>
 
 export class WalletManager {
   public _clients: Map<WalletId, BaseWallet> = new Map()
-
   public networkConfig: NetworkConfigMap
-
   public store: Store<State>
   public subscribe: (callback: (state: State) => void) => () => void
+  public options: { resetNetwork: boolean }
 
-  constructor({ wallets = [], network = NetworkId.TESTNET, algod = {} }: WalletManagerConfig = {}) {
+  private logger: ReturnType<typeof logger.createScopedLogger>
+
+  constructor({
+    wallets = [],
+    network = NetworkId.TESTNET,
+    algod = {},
+    options = {}
+  }: WalletManagerConfig = {}) {
+    // Initialize scoped logger
+    this.logger = this.initializeLogger(options)
+
+    this.logger.debug('Initializing WalletManager with config:', {
+      wallets,
+      network,
+      algod,
+      options
+    })
+
+    // Initialize network config
     this.networkConfig = this.initNetworkConfig(network, algod)
 
-    const persistedState = this.loadPersistedState()
-    const initialState: State = persistedState
-      ? {
-          ...persistedState,
-          algodClient: this.createAlgodClient(this.networkConfig[persistedState.activeNetwork])
-        }
-      : {
-          ...defaultState,
-          activeNetwork: network,
-          algodClient: this.createAlgodClient(this.networkConfig[network])
-        }
+    // Initialize options
+    this.options = { resetNetwork: options.resetNetwork || false }
 
+    // Load persisted state from local storage
+    const persistedState = this.loadPersistedState()
+
+    // Set active network
+    const activeNetwork = this.options.resetNetwork
+      ? network
+      : persistedState?.activeNetwork || network
+
+    // Create Algod client for active network
+    const algodClient = this.createAlgodClient(activeNetwork)
+
+    // Create initial state
+    const initialState: State = {
+      ...defaultState,
+      ...persistedState,
+      activeNetwork,
+      algodClient
+    }
+
+    // Create store
     this.store = new Store<State>(initialState, {
       onUpdate: () => this.savePersistedState()
     })
 
+    // Save persisted state immediately
     this.savePersistedState()
 
+    // Subscribe to store updates
     this.subscribe = (callback: (state: State) => void): (() => void) => {
       const unsubscribe = this.store.subscribe(() => {
         callback(this.store.state)
@@ -75,7 +112,25 @@ export class WalletManager {
       return unsubscribe
     }
 
+    // Initialize wallets
     this.initializeWallets(wallets)
+  }
+
+  // ---------- Logging ----------------------------------------------- //
+
+  private initializeLogger(
+    options: WalletManagerOptions
+  ): ReturnType<typeof logger.createScopedLogger> {
+    const logLevel = this.determineLogLevel(options)
+    Logger.setLevel(logLevel)
+    return logger.createScopedLogger('WalletManager')
+  }
+
+  private determineLogLevel(options: WalletManagerOptions): LogLevel {
+    if (options?.debug) {
+      return LogLevel.DEBUG
+    }
+    return options?.logLevel !== undefined ? options.logLevel : LogLevel.WARN
   }
 
   // ---------- Store ------------------------------------------------- //
@@ -99,12 +154,12 @@ export class WalletManager {
       }
       const parsedState = JSON.parse(serializedState)
       if (!isValidState(parsedState)) {
-        console.warn('[Store] Parsed state:', parsedState)
+        this.logger.warn('Parsed state:', parsedState)
         throw new Error('Persisted state is invalid')
       }
       return parsedState as PersistedState
     } catch (error: any) {
-      console.error(`[Store] Could not load state from local storage: ${error.message}`)
+      this.logger.error(`Could not load state from local storage: ${error.message}`)
       return null
     }
   }
@@ -116,7 +171,7 @@ export class WalletManager {
       const serializedState = JSON.stringify(persistedState)
       StorageAdapter.setItem(LOCAL_STORAGE_KEY, serializedState)
     } catch (error) {
-      console.error('[Store] Could not save state to local storage:', error)
+      this.logger.error('Could not save state to local storage:', error)
     }
   }
 
@@ -125,7 +180,7 @@ export class WalletManager {
   private initializeWallets<T extends keyof WalletConfigMap>(
     walletsConfig: Array<T | WalletIdConfig<T>>
   ) {
-    console.info('[Manager] Initializing wallets...')
+    this.logger.info('Initializing wallets...')
 
     for (const walletConfig of walletsConfig) {
       let walletId: T
@@ -146,7 +201,7 @@ export class WalletManager {
       const walletMap = createWalletMap()
       const WalletClass = walletMap[walletId]
       if (!WalletClass) {
-        console.error(`[Manager] Wallet not found: ${walletId}`)
+        this.logger.error(`Wallet not found: ${walletId}`)
         continue
       }
 
@@ -161,7 +216,7 @@ export class WalletManager {
       })
 
       this._clients.set(walletId, walletInstance)
-      console.info(`[Manager] ✅ Initialized ${walletId}`)
+      this.logger.info(`✅ Initialized ${walletId}`)
     }
 
     const state = this.store.state
@@ -170,14 +225,14 @@ export class WalletManager {
     const connectedWallets = Object.keys(state.wallets) as WalletId[]
     for (const walletId of connectedWallets) {
       if (!this._clients.has(walletId)) {
-        console.warn(`[Manager] Connected wallet not found: ${walletId}`)
+        this.logger.warn(`Connected wallet not found: ${walletId}`)
         removeWallet(this.store, { walletId })
       }
     }
 
     // Check if active wallet is still valid
     if (state.activeWallet && !this._clients.has(state.activeWallet)) {
-      console.warn(`[Manager] Active wallet not found: ${state.activeWallet}`)
+      this.logger.warn(`Active wallet not found: ${state.activeWallet}`)
       setActiveWallet(this.store, { walletId: null })
     }
   }
@@ -206,7 +261,7 @@ export class WalletManager {
   // ---------- Network ----------------------------------------------- //
 
   private initNetworkConfig(network: NetworkId, config: NetworkConfig): NetworkConfigMap {
-    console.info('[Manager] Initializing network...')
+    this.logger.info('Initializing network...')
 
     let networkConfig = createDefaultNetworkConfig()
 
@@ -218,14 +273,14 @@ export class WalletManager {
       networkConfig[network] = deepMerge(networkConfig[network], config)
     }
 
-    console.info('[Manager] Algodv2 config:', networkConfig)
+    this.logger.debug('Algodv2 config:', networkConfig)
 
     return networkConfig
   }
 
-  private createAlgodClient(config: AlgodConfig): algosdk.Algodv2 {
-    if (this.store) console.info(`[Manager] Creating Algodv2 client for ${this.activeNetwork}...`)
-    const { token = '', baseServer, port = '', headers = {} } = config
+  private createAlgodClient(networkId: NetworkId): algosdk.Algodv2 {
+    this.logger.info(`Creating Algodv2 client for ${networkId}...`)
+    const { token = '', baseServer, port = '', headers = {} } = this.networkConfig[networkId]
     return new algosdk.Algodv2(token, baseServer, port, headers)
   }
 
@@ -238,10 +293,10 @@ export class WalletManager {
       return
     }
 
-    const algodClient = this.createAlgodClient(this.networkConfig[networkId])
+    const algodClient = this.createAlgodClient(networkId)
     setActiveNetwork(this.store, { networkId, algodClient })
 
-    console.info(`[Manager] ✅ Active network set to ${networkId}.`)
+    this.logger.info(`✅ Active network set to ${networkId}.`)
   }
 
   public get activeNetwork(): NetworkId {
@@ -292,14 +347,16 @@ export class WalletManager {
 
   public get signTransactions(): BaseWallet['signTransactions'] {
     if (!this.activeWallet) {
-      throw new Error('[Manager] No active wallet found!')
+      this.logger.error('No active wallet found!')
+      throw new Error('No active wallet found!')
     }
     return this.activeWallet.signTransactions
   }
 
   public get transactionSigner(): algosdk.TransactionSigner {
     if (!this.activeWallet) {
-      throw new Error('[Manager] No active wallet found!')
+      this.logger.error('No active wallet found!')
+      throw new Error('No active wallet found!')
     }
     return this.activeWallet.transactionSigner
   }

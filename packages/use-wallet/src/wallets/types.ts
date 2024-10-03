@@ -13,11 +13,13 @@ import {
   type PeraWalletConnectOptions as PeraWalletConnectBetaOptions
 } from './pera2'
 import { WalletConnect, type WalletConnectOptions } from './walletconnect'
+import { BiatecWallet } from './biatec'
 import type { Store } from '@tanstack/store'
 import type algosdk from 'algosdk'
 import type { State } from 'src/store'
 
 export enum WalletId {
+  BIATEC = 'biatec',
   DEFLY = 'defly',
   CUSTOM = 'custom',
   EXODUS = 'exodus',
@@ -33,6 +35,7 @@ export enum WalletId {
 }
 
 export type WalletMap = {
+  [WalletId.BIATEC]: typeof BiatecWallet
   [WalletId.CUSTOM]: typeof CustomWallet
   [WalletId.DEFLY]: typeof DeflyWallet
   [WalletId.EXODUS]: typeof ExodusWallet
@@ -48,6 +51,7 @@ export type WalletMap = {
 }
 
 export type WalletOptionsMap = {
+  [WalletId.BIATEC]: WalletConnectOptions
   [WalletId.CUSTOM]: CustomWalletOptions
   [WalletId.DEFLY]: DeflyWalletConnectOptions
   [WalletId.EXODUS]: ExodusOptions

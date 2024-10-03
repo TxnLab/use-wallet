@@ -1,6 +1,7 @@
 import { Store } from '@tanstack/store'
 import { ModalCtrl } from '@walletconnect/modal-core'
 import algosdk from 'algosdk'
+import { logger } from 'src/logger'
 import { NetworkId, caipChainId } from 'src/network'
 import { StorageAdapter } from 'src/storage'
 import { LOCAL_STORAGE_KEY, State, WalletState, defaultState } from 'src/store'
@@ -8,18 +9,28 @@ import { base64ToByteArray, byteArrayToBase64 } from 'src/utils'
 import { WalletConnect } from 'src/wallets/walletconnect'
 import { WalletId, WalletTransaction } from 'src/wallets/types'
 import { SessionTypes } from '@walletconnect/types'
+import type { Mock } from 'vitest'
+
+// Mock logger
+vi.mock('src/logger', () => ({
+  logger: {
+    createScopedLogger: vi.fn().mockReturnValue({
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn()
+    })
+  }
+}))
 
 // Mock storage adapter
 vi.mock('src/storage', () => ({
   StorageAdapter: {
     getItem: vi.fn(),
-    setItem: vi.fn()
+    setItem: vi.fn(),
+    removeItem: vi.fn()
   }
 }))
-
-// Spy/suppress console output
-vi.spyOn(console, 'info').mockImplementation(() => {}) // @todo: remove when debug logger is implemented
-vi.spyOn(console, 'warn').mockImplementation(() => {})
 
 const mockSignClient = {
   on: vi.fn(),
@@ -44,7 +55,7 @@ vi.mock('@walletconnect/sign-client', () => {
 vi.spyOn(ModalCtrl, 'open').mockImplementation(() => Promise.resolve())
 vi.spyOn(ModalCtrl, 'close').mockImplementation(() => {})
 vi.spyOn(ModalCtrl, 'subscribe').mockImplementation((_callback: (state: any) => void) => {
-  return () => console.log('unsubscribe')
+  return () => {}
 })
 
 function createMockSession(accounts: string[] = []): SessionTypes.Struct {
@@ -114,6 +125,12 @@ describe('WalletConnect', () => {
   let wallet: WalletConnect
   let store: Store<State>
   let mockInitialState: State | null = null
+  let mockLogger: {
+    debug: Mock
+    info: Mock
+    warn: Mock
+    error: Mock
+  }
 
   const account1 = {
     name: 'WalletConnect Account 1',
@@ -139,6 +156,14 @@ describe('WalletConnect', () => {
         mockInitialState = JSON.parse(value)
       }
     })
+
+    mockLogger = {
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn()
+    }
+    vi.mocked(logger.createScopedLogger).mockReturnValue(mockLogger)
 
     store = new Store<State>(defaultState)
     wallet = createWalletWithStore(store)
@@ -294,13 +319,10 @@ describe('WalletConnect', () => {
 
       await wallet.resumeSession()
 
-      expect(console.warn).toHaveBeenCalledWith(
-        '[WalletConnect] Session accounts mismatch, updating accounts',
-        {
-          prev: prevWalletState.accounts,
-          current: newWalletState.accounts
-        }
-      )
+      expect(mockLogger.warn).toHaveBeenCalledWith('Session accounts mismatch, updating accounts', {
+        prev: prevWalletState.accounts,
+        current: newWalletState.accounts
+      })
       expect(store.state.wallets[WalletId.WALLETCONNECT]).toEqual(newWalletState)
     })
   })
