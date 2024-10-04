@@ -216,6 +216,27 @@ describe('WalletConnect', () => {
       expect(store.state.wallets[WalletId.WALLETCONNECT]).toBeUndefined()
       expect(wallet.isConnected).toBe(false)
     })
+
+    it('should use the active chain when connecting', async () => {
+      store.setState((state) => ({ ...state, activeNetwork: NetworkId.TESTNET }))
+      const mockSession = createMockSession([account1.address])
+      mockSignClient.connect.mockResolvedValueOnce({
+        uri: 'mock-uri',
+        approval: vi.fn().mockResolvedValue(mockSession)
+      })
+
+      await wallet.connect()
+
+      expect(mockSignClient.connect).toHaveBeenCalledWith(
+        expect.objectContaining({
+          requiredNamespaces: {
+            algorand: expect.objectContaining({
+              chains: [wallet.activeChainId]
+            })
+          }
+        })
+      )
+    })
   })
 
   describe('disconnect', () => {
@@ -353,7 +374,7 @@ describe('WalletConnect', () => {
 
     const expectedRpcRequest = (params: WalletTransaction[][]) => {
       return {
-        chainId: caipChainId[NetworkId.TESTNET],
+        chainId: wallet.activeChainId,
         topic: 'mock-topic',
         request: expect.objectContaining({
           jsonrpc: '2.0',
@@ -568,6 +589,25 @@ describe('WalletConnect', () => {
 
         expect(result).toEqual([txn1.toByte()])
       })
+
+      it('should use the active chain when signing transactions', async () => {
+        store.setState((state) => ({ ...state, activeNetwork: NetworkId.MAINNET }))
+        const mockSession = createMockSession([account1.address])
+        mockSignClient.connect.mockResolvedValueOnce({
+          uri: 'mock-uri',
+          approval: vi.fn().mockResolvedValue(mockSession)
+        })
+        await wallet.connect()
+
+        const txn = new algosdk.Transaction(txnParams)
+        await wallet.signTransactions([txn])
+
+        expect(mockSignClient.request).toHaveBeenCalledWith(
+          expect.objectContaining({
+            chainId: wallet.activeChainId
+          })
+        )
+      })
     })
 
     describe('transactionSigner', () => {
@@ -581,6 +621,27 @@ describe('WalletConnect', () => {
 
         expect(signTransactionsSpy).toHaveBeenCalledWith(txnGroup, indexesToSign)
       })
+    })
+  })
+
+  describe('activeChainId', () => {
+    it('should return the correct CAIP-2 chain ID for the active network', () => {
+      store.setState((state) => ({ ...state, activeNetwork: NetworkId.MAINNET }))
+      expect(wallet.activeChainId).toBe(caipChainId[NetworkId.MAINNET])
+
+      store.setState((state) => ({ ...state, activeNetwork: NetworkId.TESTNET }))
+      expect(wallet.activeChainId).toBe(caipChainId[NetworkId.TESTNET])
+
+      store.setState((state) => ({ ...state, activeNetwork: NetworkId.BETANET }))
+      expect(wallet.activeChainId).toBe(caipChainId[NetworkId.BETANET])
+    })
+
+    it('should log a warning and return an empty string if no CAIP-2 chain ID is found', () => {
+      store.setState((state) => ({ ...state, activeNetwork: 'invalid-network' as NetworkId }))
+      expect(wallet.activeChainId).toBe('')
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        'No CAIP-2 chain ID found for network: invalid-network'
+      )
     })
   })
 })
