@@ -62,8 +62,6 @@ export class WalletConnect extends BaseWallet {
   private modal: WalletConnectModal | null = null
   private modalOptions: WalletConnectModalOptions
   private session: SessionTypes.Struct | null = null
-  private chains: string[]
-
   protected store: Store<State>
 
   constructor({
@@ -99,7 +97,6 @@ export class WalletConnect extends BaseWallet {
     }
 
     this.modalOptions = modalOptions
-    this.chains = Object.values(caipChainId)
     this.store = store
   }
 
@@ -294,7 +291,6 @@ export class WalletConnect extends BaseWallet {
     const WalletConnectModal = (await import('@walletconnect/modal')).WalletConnectModal
     const modal = new WalletConnectModal({
       projectId: this.options.projectId,
-      chains: this.chains,
       ...this.modalOptions
     })
 
@@ -357,6 +353,15 @@ export class WalletConnect extends BaseWallet {
     return walletAccounts
   }
 
+  public get activeChainId(): string {
+    const chainId = caipChainId[this.activeNetwork]
+    if (!chainId) {
+      this.logger.warn(`No CAIP-2 chain ID found for network: ${this.activeNetwork}`)
+      return ''
+    }
+    return chainId
+  }
+
   public connect = async (): Promise<WalletAccount[]> => {
     this.logger.info('Connecting...')
     try {
@@ -365,7 +370,7 @@ export class WalletConnect extends BaseWallet {
 
       const requiredNamespaces = {
         algorand: {
-          chains: this.chains,
+          chains: [this.activeChainId],
           methods: ['algo_signTxn'],
           events: []
         }
@@ -529,7 +534,7 @@ export class WalletConnect extends BaseWallet {
 
       // Sign transactions
       const signTxnsResult = await client.request<SignTxnsResponse>({
-        chainId: caipChainId[this.activeNetwork]!,
+        chainId: this.activeChainId,
         topic: this.session.topic,
         request
       })
