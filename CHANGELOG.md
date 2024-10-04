@@ -1,3 +1,9 @@
+## [3.7.2](https://github.com/txnlab/use-wallet/compare/v3.7.1...v3.7.2) (2024-10-04)
+
+### Bug Fixes
+
+- **WalletConnect:** Use active network chain ID only ([#282](https://github.com/txnlab/use-wallet/pull/282)) ([eb433b9](https://github.com/txnlab/use-wallet/commit/eb433b90396cca5d0c1b146f34f1b549bc40aaa7))
+
 ## [3.7.1](https://github.com/txnlab/use-wallet/compare/v3.7.0...v3.7.1) (2024-10-01)
 
 ### Fixes
