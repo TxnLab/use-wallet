@@ -61,6 +61,10 @@ export class MnemonicWallet extends BaseWallet {
     StorageAdapter.setItem(LOCAL_STORAGE_MNEMONIC_KEY, mnemonic)
   }
 
+  private removeMnemonicFromStorage(): void {
+    StorageAdapter.removeItem(LOCAL_STORAGE_MNEMONIC_KEY)
+  }
+
   private checkMainnet(): void {
     try {
       const network = this.activeNetwork
@@ -127,6 +131,7 @@ export class MnemonicWallet extends BaseWallet {
     this.logger.info('Disconnecting...')
     this.onDisconnect()
     this.account = null
+    this.removeMnemonicFromStorage()
     this.logger.info('Disconnected')
   }
 
@@ -137,12 +142,28 @@ export class MnemonicWallet extends BaseWallet {
     const state = this.store.state
     const walletState = state.wallets[this.id]
 
-    // Don't resume session, disconnect instead
-    if (walletState) {
+    // No session to resume
+    if (!walletState) {
+      this.logger.info('No session to resume')
+      return
+    }
+
+    this.logger.info('Resuming session...')
+
+    // If persisting to storage is enabled, then resume session
+    if (this.options.persistToStorage) {
+      try {
+        this.initializeAccount()
+        this.logger.info('Session resumed successfully')
+      } catch (error: any) {
+        this.logger.error('Error resuming session:', error.message)
+        this.disconnect()
+        throw error
+      }
+    } else {
+      // Otherwise, do not resume session, disconnect instead
       this.logger.info('No session to resume, disconnecting...')
       this.disconnect()
-    } else {
-      this.logger.info('No session to resume')
     }
   }
 
