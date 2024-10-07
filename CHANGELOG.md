@@ -1,3 +1,9 @@
+## [3.7.3-docs](https://github.com/txnlab/use-wallet/compare/v3.7.2...v3.7.3-docs) (2024-10-07)
+
+### Other Changes
+
+- **Docs:** Integrate GitBook documentation ([#285](https://github.com/txnlab/use-wallet/pull/285)) ([d9d96e7](https://github.com/txnlab/use-wallet/commit/d9d96e7ed2946de5e0fdefb41d11c579f912c740))
+
 ## [3.7.2](https://github.com/txnlab/use-wallet/compare/v3.7.1...v3.7.2) (2024-10-04)
 
 ### Bug Fixes
