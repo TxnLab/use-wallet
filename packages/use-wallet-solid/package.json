@@ -66,7 +66,7 @@
   },
   "devDependencies": {
     "@solidjs/testing-library": "0.8.10",
-    "algosdk": "2.9.0",
+    "algosdk": "3.0.0",
     "solid-js": "1.9.1",
     "tsup": "8.3.0",
     "tsup-preset-solid": "2.2.0",
@@ -79,7 +79,7 @@
     "@perawallet/connect-beta": "^2.0.14",
     "@walletconnect/modal": "^2.6.2",
     "@walletconnect/sign-client": "^2.16.1",
-    "algosdk": "^2.7.0",
+    "algosdk": "^2.7.0 || ^3.0.0",
     "lute-connect": "^1.4.1",
     "magic-sdk": "^28.6.0"
   },

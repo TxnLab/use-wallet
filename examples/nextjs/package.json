@@ -13,7 +13,7 @@
     "@txnlab/use-wallet-react": "workspace:*",
     "@walletconnect/modal": "^2.6.2",
     "@walletconnect/sign-client": "^2.16.1",
-    "algosdk": "2.9.0",
+    "algosdk": "3.0.0",
     "lute-connect": "^1.4.1",
     "next": "14.2.13",
     "react": "18.3.1",

@@ -61,10 +61,10 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.1.6
-        version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.1.6(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
         specifier: ^1.3.4
-        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.3.4(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet-react':
         specifier: workspace:*
         version: link:../../packages/use-wallet-react
@@ -75,8 +75,8 @@ importers:
         specifier: ^2.16.1
         version: 2.16.1(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       algosdk:
-        specifier: 2.9.0
-        version: 2.9.0
+        specifier: 3.0.0
+        version: 3.0.0
       lute-connect:
         specifier: ^1.4.1
         version: 1.4.1
@@ -113,10 +113,10 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.1.6
-        version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.1.6(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
         specifier: ^1.3.4
-        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.3.4(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../../packages/use-wallet
@@ -130,8 +130,8 @@ importers:
         specifier: ^2.16.1
         version: 2.16.1(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       algosdk:
-        specifier: 2.9.0
-        version: 2.9.0
+        specifier: 3.0.0
+        version: 3.0.0
       lute-connect:
         specifier: ^1.4.1
         version: 1.4.1
@@ -156,10 +156,10 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.1.6
-        version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.1.6(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
         specifier: ^1.3.4
-        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.3.4(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet-react':
         specifier: workspace:*
         version: link:../../packages/use-wallet-react
@@ -170,8 +170,8 @@ importers:
         specifier: ^2.16.1
         version: 2.16.1(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       algosdk:
-        specifier: 2.9.0
-        version: 2.9.0
+        specifier: 3.0.0
+        version: 3.0.0
       lute-connect:
         specifier: ^1.4.1
         version: 1.4.1
@@ -217,10 +217,10 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.1.6
-        version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.1.6(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
         specifier: ^1.3.4
-        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.3.4(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet-solid':
         specifier: workspace:*
         version: link:../../packages/use-wallet-solid
@@ -231,8 +231,8 @@ importers:
         specifier: ^2.16.1
         version: 2.16.1(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       algosdk:
-        specifier: 2.9.0
-        version: 2.9.0
+        specifier: 3.0.0
+        version: 3.0.0
       lute-connect:
         specifier: ^1.4.1
         version: 1.4.1
@@ -254,10 +254,10 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.1.6
-        version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.1.6(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
         specifier: ^1.3.4
-        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.3.4(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../../packages/use-wallet
@@ -268,8 +268,8 @@ importers:
         specifier: ^2.16.1
         version: 2.16.1(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       algosdk:
-        specifier: 2.9.0
-        version: 2.9.0
+        specifier: 3.0.0
+        version: 3.0.0
       lute-connect:
         specifier: ^1.4.1
         version: 1.4.1
@@ -288,10 +288,10 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.1.6
-        version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.1.6(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
         specifier: ^1.3.4
-        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.3.4(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet-vue':
         specifier: workspace:*
         version: link:../../packages/use-wallet-vue
@@ -302,8 +302,8 @@ importers:
         specifier: ^2.16.1
         version: 2.16.1(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       algosdk:
-        specifier: 2.9.0
-        version: 2.9.0
+        specifier: 3.0.0
+        version: 3.0.0
       lute-connect:
         specifier: ^1.4.1
         version: 1.4.1
@@ -335,7 +335,7 @@ importers:
         version: 1.6.2
       '@blockshake/defly-connect':
         specifier: 1.1.6
-        version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.1.6(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@magic-ext/algorand':
         specifier: 23.6.0
         version: 23.6.0
@@ -344,10 +344,10 @@ importers:
         version: 28.6.0(localforage@1.10.0)
       '@perawallet/connect':
         specifier: 1.3.4
-        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.3.4(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect-beta':
         specifier: 2.0.14
-        version: 2.0.14(algosdk@2.9.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
+        version: 2.0.14(algosdk@3.0.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       '@types/node':
         specifier: 20.11.30
         version: 20.11.30
@@ -364,8 +364,8 @@ importers:
         specifier: 2.16.1
         version: 2.16.1(ioredis@5.4.1)
       algosdk:
-        specifier: 2.9.0
-        version: 2.9.0
+        specifier: 3.0.0
+        version: 3.0.0
       lute-connect:
         specifier: 1.4.1
         version: 1.4.1
@@ -383,16 +383,16 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.1.6
-        version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.1.6(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@magic-ext/algorand':
         specifier: ^23.6.0
         version: 23.6.0
       '@perawallet/connect':
         specifier: ^1.3.4
-        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.3.4(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect-beta':
         specifier: ^2.0.14
-        version: 2.0.14(algosdk@2.9.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
+        version: 2.0.14(algosdk@3.0.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       '@tanstack/react-store':
         specifier: 0.5.5
         version: 0.5.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -416,8 +416,8 @@ importers:
         specifier: 18.3.10
         version: 18.3.10
       algosdk:
-        specifier: 2.9.0
-        version: 2.9.0
+        specifier: 3.0.0
+        version: 3.0.0
       jsdom:
         specifier: 25.0.1
         version: 25.0.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -438,16 +438,16 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.1.6
-        version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.1.6(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@magic-ext/algorand':
         specifier: ^23.6.0
         version: 23.6.0
       '@perawallet/connect':
         specifier: ^1.3.4
-        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.3.4(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect-beta':
         specifier: ^2.0.14
-        version: 2.0.14(algosdk@2.9.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
+        version: 2.0.14(algosdk@3.0.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       '@tanstack/solid-store':
         specifier: 0.5.5
         version: 0.5.5(solid-js@1.9.1)
@@ -471,8 +471,8 @@ importers:
         specifier: 0.8.10
         version: 0.8.10(solid-js@1.9.1)
       algosdk:
-        specifier: 2.9.0
-        version: 2.9.0
+        specifier: 3.0.0
+        version: 3.0.0
       solid-js:
         specifier: 1.9.1
         version: 1.9.1
@@ -490,16 +490,16 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.1.6
-        version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.1.6(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@magic-ext/algorand':
         specifier: ^23.6.0
         version: 23.6.0
       '@perawallet/connect':
         specifier: ^1.3.4
-        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        version: 1.3.4(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect-beta':
         specifier: ^2.0.14
-        version: 2.0.14(algosdk@2.9.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
+        version: 2.0.14(algosdk@3.0.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       '@tanstack/vue-store':
         specifier: 0.5.5
         version: 0.5.5(vue@3.5.10(typescript@5.6.2))
@@ -520,8 +520,8 @@ importers:
         version: 28.6.0
     devDependencies:
       algosdk:
-        specifier: 2.9.0
-        version: 2.9.0
+        specifier: 3.0.0
+        version: 3.0.0
       tsup:
         specifier: 8.3.0
         version: 8.3.0(jiti@2.0.0)(postcss@8.4.47)(typescript@5.6.2)(yaml@2.5.1)
@@ -2300,12 +2300,12 @@ packages:
   ajv@6.12.6:
     resolution: {integrity: sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==}
 
-  algo-msgpack-with-bigint@2.1.1:
-    resolution: {integrity: sha512-F1tGh056XczEaEAqu7s+hlZUDWwOBT70Eq0lfMpBP2YguSQVyxRbprLq5rELXKQOyOaixTWYhMeMQMzP0U5FoQ==}
-    engines: {node: '>= 10'}
+  algorand-msgpack@1.1.0:
+    resolution: {integrity: sha512-08k7pBQnkaUB5p+jL7f1TRaUIlTSDE0cesFu1mD7llLao+1cAhtvvZmGE3OnisTd0xOn118QMw74SRqddqaYvw==}
+    engines: {node: '>= 14'}
 
-  algosdk@2.9.0:
-    resolution: {integrity: sha512-o0n0nLMbTX6SFQdMUk2/2sy50jmEmZk5OTPYSh2aAeP8DUPxrhjMPfwGsYNvaO+qk75MixC2eWpfA9vygCQ/Mg==}
+  algosdk@3.0.0:
+    resolution: {integrity: sha512-PIKZ/YvbBpCudduug4KSH1CY/pTotI7/ccbUIbXKtcI9Onevl+57E+K5X4ow4gsCdysZ8zVvSLdxuCcXvsmPOw==}
     engines: {node: '>=18.0.0'}
 
   ansi-colors@4.1.3:
@@ -3322,6 +3322,7 @@ packages:
   eslint@8.57.1:
     resolution: {integrity: sha512-ypowyDxpVSYpkXr9WPv2PAZCtNip1Mv5KTW0SCurXv/9iOpcrH9PaqUElksqEB6pChqHGDRCFTyrZlGhnLNGiA==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
 
   esniff@2.0.1:
@@ -6601,11 +6602,11 @@ snapshots:
       '@babel/helper-validator-identifier': 7.24.7
       to-fast-properties: 2.0.0
 
-  '@blockshake/defly-connect@1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@blockshake/defly-connect@1.1.6(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       '@walletconnect/client': 1.8.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@walletconnect/types': 1.8.0
-      algosdk: 2.9.0
+      algosdk: 3.0.0
       bowser: 2.11.0
       buffer: 6.0.3
       lottie-web: 5.12.2
@@ -7402,14 +7403,14 @@ snapshots:
 
   '@pedrouid/environment@1.0.1': {}
 
-  '@perawallet/connect-beta@2.0.14(algosdk@2.9.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)':
+  '@perawallet/connect-beta@2.0.14(algosdk@3.0.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)':
     dependencies:
       '@evanhahn/lottie-web-light': 5.8.1
       '@json-rpc-tools/utils': 1.7.6
       '@walletconnect/sign-client': 2.13.1(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       '@walletconnect/types': 2.13.1(ioredis@5.4.1)
       '@walletconnect/utils': 2.13.1(ioredis@5.4.1)
-      algosdk: 2.9.0
+      algosdk: 3.0.0
       bowser: 2.11.0
       buffer: 6.0.3
       qr-code-styling: 1.6.0-rc.1
@@ -7432,12 +7433,12 @@ snapshots:
       - uWebSockets.js
       - utf-8-validate
 
-  '@perawallet/connect@1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@perawallet/connect@1.3.4(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       '@evanhahn/lottie-web-light': 5.8.1
       '@walletconnect/client': 1.8.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@walletconnect/types': 1.8.0
-      algosdk: 2.9.0
+      algosdk: 3.0.0
       bowser: 2.11.0
       buffer: 6.0.3
       qr-code-styling: 1.6.0-rc.1
@@ -8639,12 +8640,11 @@ snapshots:
       json-schema-traverse: 0.4.1
       uri-js: 4.4.1
 
-  algo-msgpack-with-bigint@2.1.1: {}
+  algorand-msgpack@1.1.0: {}
 
-  algosdk@2.9.0:
+  algosdk@3.0.0:
     dependencies:
-      algo-msgpack-with-bigint: 2.1.1
-      buffer: 6.0.3
+      algorand-msgpack: 1.1.0
       hi-base32: 0.5.1
       js-sha256: 0.9.0
       js-sha3: 0.8.0
@@ -9741,8 +9741,8 @@ snapshots:
       '@typescript-eslint/parser': 8.7.0(eslint@8.57.1)(typescript@5.6.2)
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.6.3(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1))(eslint@8.57.1)
-      eslint-plugin-import: 2.30.0(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-import-resolver-typescript: 3.6.3(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0)(eslint@8.57.1)
+      eslint-plugin-import: 2.30.0(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1)
       eslint-plugin-jsx-a11y: 6.10.0(eslint@8.57.1)
       eslint-plugin-react: 7.37.0(eslint@8.57.1)
       eslint-plugin-react-hooks: 4.6.2(eslint@8.57.1)
@@ -9765,37 +9765,37 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1))(eslint@8.57.1):
+  eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0)(eslint@8.57.1):
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
       debug: 4.3.7
       enhanced-resolve: 5.17.1
       eslint: 8.57.1
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0)(eslint@8.57.1))(eslint@8.57.1)
       fast-glob: 3.3.2
       get-tsconfig: 4.8.1
       is-bun-module: 1.2.1
       is-glob: 4.0.3
     optionalDependencies:
-      eslint-plugin-import: 2.30.0(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-plugin-import: 2.30.0(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1)
     transitivePeerDependencies:
       - '@typescript-eslint/parser'
       - eslint-import-resolver-node
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1):
+  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0)(eslint@8.57.1))(eslint@8.57.1):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
       '@typescript-eslint/parser': 8.7.0(eslint@8.57.1)(typescript@5.6.2)
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.6.3(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-import-resolver-typescript: 3.6.3(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0)(eslint@8.57.1)
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.30.0(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1):
+  eslint-plugin-import@2.30.0(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.8
@@ -9806,7 +9806,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@8.7.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0)(eslint@8.57.1))(eslint@8.57.1)
       hasown: 2.0.2
       is-core-module: 2.15.1
       is-glob: 4.0.3
