@@ -4,7 +4,7 @@ import algosdk from 'algosdk'
 import { logger } from 'src/logger'
 import { NetworkId } from 'src/network'
 import { StorageAdapter } from 'src/storage'
-import { LOCAL_STORAGE_KEY, State, defaultState } from 'src/store'
+import { LOCAL_STORAGE_KEY, State, WalletState, defaultState } from 'src/store'
 import { LOCAL_STORAGE_MNEMONIC_KEY, MnemonicWallet } from 'src/wallets/mnemonic'
 import { WalletId } from 'src/wallets/types'
 import type { Mock } from 'vitest'
@@ -34,9 +34,10 @@ vi.mock('src/storage', () => ({
   }
 }))
 
-function createWalletWithStore(store: Store<State>): MnemonicWallet {
+function createWalletWithStore(store: Store<State>, persistToStorage = false): MnemonicWallet {
   return new MnemonicWallet({
     id: WalletId.MNEMONIC,
+    options: { persistToStorage },
     metadata: {},
     getAlgodClient: {} as any,
     store,
@@ -110,7 +111,9 @@ describe('MnemonicWallet', () => {
   })
 
   describe('connect', () => {
-    it('should initialize client, return account, and update store', async () => {
+    it('should initialize client, return account, load mnemonic from storage, and update store', async () => {
+      const storageGetItemSpy = vi.spyOn(StorageAdapter, 'getItem')
+
       const accounts = await wallet.connect()
 
       expect(wallet.isConnected).toBe(true)
@@ -119,6 +122,19 @@ describe('MnemonicWallet', () => {
         accounts: [account1],
         activeAccount: account1
       })
+      expect(storageGetItemSpy).toHaveBeenCalledWith(LOCAL_STORAGE_MNEMONIC_KEY)
+    })
+
+    it('should save mnemonic into storage if there is no mnemonic in storage and persisting to storage is enabled', async () => {
+      const storageSetItemSpy = vi.spyOn(StorageAdapter, 'setItem')
+      // Simulate no mnemonic in storage
+      vi.mocked(StorageAdapter.getItem).mockImplementation(() => null)
+      // Enable persisting to storage
+      wallet = createWalletWithStore(store, true)
+
+      await wallet.connect()
+
+      expect(storageSetItemSpy).toHaveBeenCalledWith(LOCAL_STORAGE_MNEMONIC_KEY, ACCOUNT_MNEMONIC)
     })
 
     it('should throw an error if active network is MainNet', async () => {
@@ -131,11 +147,15 @@ describe('MnemonicWallet', () => {
   })
 
   describe('disconnect', () => {
-    it('should disconnect client and remove wallet from store', async () => {
+    it('should disconnect client, remove mnemonic from storage, and remove wallet from store', async () => {
+      const storageRemoveItemSpy = vi.spyOn(StorageAdapter, 'removeItem')
+
       await wallet.connect()
       await wallet.disconnect()
+
       expect(wallet.isConnected).toBe(false)
       expect(store.state.wallets[WalletId.MNEMONIC]).toBeUndefined()
+      expect(storageRemoveItemSpy).toHaveBeenCalledOnce()
     })
   })
 
@@ -146,7 +166,7 @@ describe('MnemonicWallet', () => {
       expect(wallet.isConnected).toBe(false)
     })
 
-    it('should disconnect if session is found', async () => {
+    it('should disconnect if session is found and persisting to storage is disabled', async () => {
       store = new Store<State>({
         ...defaultState,
         wallets: {
@@ -160,6 +180,49 @@ describe('MnemonicWallet', () => {
       wallet = createWalletWithStore(store)
 
       await wallet.resumeSession()
+
+      expect(wallet.isConnected).toBe(false)
+      expect(store.state.wallets[WalletId.MNEMONIC]).toBeUndefined()
+    })
+
+    it('should resume session if session is found and persisting to storage is enabled', async () => {
+      const walletState: WalletState = {
+        accounts: [account1],
+        activeAccount: account1
+      }
+      store = new Store<State>({
+        ...defaultState,
+        wallets: {
+          [WalletId.MNEMONIC]: walletState
+        }
+      })
+      // Enable persisting to storage
+      wallet = createWalletWithStore(store, true)
+
+      await wallet.resumeSession()
+
+      expect(wallet.isConnected).toBe(true)
+      expect(store.state.wallets[WalletId.MNEMONIC]).toEqual(walletState)
+    })
+
+    it('should disconnect if resuming the session failed and persisting to storage is enabled', async () => {
+      // Set up a condition that would make the account (re)initialization fail
+      vi.mocked(StorageAdapter.getItem).mockImplementation(() => null) // No mnemonic in storage
+      global.prompt = vi.fn().mockReturnValue('') // Nothing entered into the mnemonic prompt
+
+      store = new Store<State>({
+        ...defaultState,
+        wallets: {
+          [WalletId.MNEMONIC]: {
+            accounts: [account1],
+            activeAccount: account1
+          }
+        }
+      })
+      // Enable persisting to storage
+      wallet = createWalletWithStore(store, true)
+
+      await expect(wallet.resumeSession()).rejects.toThrow('No mnemonic provided')
 
       expect(wallet.isConnected).toBe(false)
       expect(store.state.wallets[WalletId.MNEMONIC]).toBeUndefined()
