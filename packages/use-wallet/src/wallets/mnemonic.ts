@@ -226,6 +226,8 @@ export class MnemonicWallet extends BaseWallet {
       this.logger.debug('Signing transactions...', { txnGroup, indexesToSign })
       let txnsToSign: algosdk.Transaction[] = []
 
+      const account = this.account || this.initializeAccount()
+
       // Determine type and process transactions for signing
       if (isTransactionArray(txnGroup)) {
         const flatTxns: algosdk.Transaction[] = flattenTxnGroup(txnGroup)
@@ -236,7 +238,7 @@ export class MnemonicWallet extends BaseWallet {
       }
 
       // Sign transactions
-      const signedTxns = txnsToSign.map((txn) => txn.signTxn(this.account!.sk))
+      const signedTxns = txnsToSign.map((txn) => txn.signTxn(account.sk))
       this.logger.debug('Transactions signed successfully', { signedTxns })
       return signedTxns
     } catch (error: any) {
