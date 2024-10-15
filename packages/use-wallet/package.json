@@ -41,7 +41,7 @@
   },
   "devDependencies": {
     "@agoralabs-sh/avm-web-provider": "1.6.2",
-    "@algorandfoundation/liquid-auth-use-wallet-client": "1.0.0-canary.1",
+    "@algorandfoundation/liquid-auth-use-wallet-client": "1.1.0",
     "@blockshake/defly-connect": "1.1.6",
     "@magic-ext/algorand": "23.6.0",
     "@magic-sdk/provider": "28.6.0",
