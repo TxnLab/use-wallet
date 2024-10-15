@@ -5,7 +5,7 @@
     "type": "git",
     "url": "https://github.com/txnlab/use-wallet.git"
   },
-  "packageManager": "pnpm@9.11.0",
+  "packageManager": "pnpm@9.12.0",
   "type": "module",
   "scripts": {
     "build": "pnpm build:packages && pnpm build:examples",
@@ -27,9 +27,9 @@
   "devDependencies": {
     "@testing-library/jest-dom": "6.5.0",
     "@testing-library/react": "16.0.1",
-    "@typescript-eslint/eslint-plugin": "8.7.0",
-    "@typescript-eslint/parser": "8.7.0",
-    "@vitejs/plugin-react": "4.3.1",
+    "@typescript-eslint/eslint-plugin": "8.8.0",
+    "@typescript-eslint/parser": "8.8.0",
+    "@vitejs/plugin-react": "4.3.2",
     "@vitejs/plugin-vue": "5.1.4",
     "@vitejs/plugin-vue-jsx": "4.0.1",
     "@vue/test-utils": "2.4.6",
@@ -39,7 +39,7 @@
     "prettier": "3.3.3",
     "vite": "5.4.8",
     "vite-plugin-solid": "2.10.2",
-    "vitest": "2.1.1",
+    "vitest": "2.1.2",
     "vue-demi": "0.14.10"
   }
 }

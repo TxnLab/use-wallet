@@ -1,3 +1,25 @@
+# [3.8.0](https://github.com/txnlab/use-wallet/compare/v3.7.3-docs...v3.8.0) (2024-10-09)
+
+### Features
+
+- **Mnemonic:** Resume session when persisting to store ([#283](https://github.com/txnlab/use-wallet/pull/283)) ([88997e9](https://github.com/txnlab/use-wallet/commit/88997e950a04f45ff56af1fd4ab4dbd4cec4b39c))
+
+### Bug Fixes
+
+- **Wallets:** Limit WalletConnect backup to Defly and Pera ([#292](https://github.com/txnlab/use-wallet/pull/292)) ([61b2827](https://github.com/txnlab/use-wallet/commit/61b282717cc38d1f4d4756e58d94a619529831c1))
+
+## [3.7.3-docs](https://github.com/txnlab/use-wallet/compare/v3.7.2...v3.7.3-docs) (2024-10-07)
+
+### Documentation
+
+- Integrate GitBook documentation ([#285](https://github.com/txnlab/use-wallet/pull/285)) ([d9d96e7](https://github.com/txnlab/use-wallet/commit/d9d96e7ed2946de5e0fdefb41d11c579f912c740))
+
+## [3.7.2](https://github.com/txnlab/use-wallet/compare/v3.7.1...v3.7.2) (2024-10-04)
+
+### Bug Fixes
+
+- **WalletConnect:** Use active network chain ID only ([#282](https://github.com/txnlab/use-wallet/pull/282)) ([eb433b9](https://github.com/txnlab/use-wallet/commit/eb433b90396cca5d0c1b146f34f1b549bc40aaa7))
+
 ## [3.7.1](https://github.com/txnlab/use-wallet/compare/v3.7.0...v3.7.1) (2024-10-01)
 
 ### Fixes

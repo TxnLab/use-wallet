@@ -2,14 +2,10 @@ import algosdk from 'algosdk'
 import { WalletState, addWallet, setAccounts, setActiveWallet, type State } from 'src/store'
 import { compareAccounts, flattenTxnGroup, isSignedTxn, isTransactionArray } from 'src/utils'
 import { BaseWallet } from 'src/wallets/base'
+import { WalletId } from 'src/wallets/types'
 import type { PeraWalletConnect } from '@perawallet/connect'
 import type { Store } from '@tanstack/store'
-import type {
-  SignerTransaction,
-  WalletAccount,
-  WalletConstructor,
-  WalletId
-} from 'src/wallets/types'
+import type { SignerTransaction, WalletAccount, WalletConstructor } from 'src/wallets/types'
 
 export interface PeraWalletConnectOptions {
   bridge?: string
@@ -128,7 +124,7 @@ export class PeraWallet extends BaseWallet {
   public setActive = (): void => {
     this.logger.info(`Set active wallet: ${this.id}`)
     const currentActiveWallet = this.store.state.activeWallet
-    if (currentActiveWallet && currentActiveWallet !== this.id) {
+    if (currentActiveWallet && currentActiveWallet === WalletId.DEFLY) {
       this.manageWalletConnectSession('backup', currentActiveWallet)
     }
     this.manageWalletConnectSession('restore')
