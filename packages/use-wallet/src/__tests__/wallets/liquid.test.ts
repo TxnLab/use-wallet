@@ -1,10 +1,23 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach, Mock } from 'vitest'
 import { Store } from '@tanstack/store'
 import { Transaction } from 'algosdk'
+import { logger } from 'src/logger'
 import { StorageAdapter } from 'src/storage'
 import { LOCAL_STORAGE_KEY, State, defaultState } from 'src/store'
 import { LiquidWallet } from 'src/wallets/liquid'
 import { WalletId } from 'src/wallets/types'
+
+// Mock logger
+vi.mock('src/logger', () => ({
+  logger: {
+    createScopedLogger: vi.fn().mockReturnValue({
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn()
+    })
+  }
+}))
 
 // Mock storage adapter
 vi.mock('src/storage', () => ({
@@ -37,6 +50,12 @@ describe('LiquidWallet', () => {
   let wallet: LiquidWallet
   let store: Store<State>
   let mockInitialState: State | null = null
+  let mockLogger: {
+    debug: Mock
+    info: Mock
+    warn: Mock
+    error: Mock
+  }
 
   const account1 = {
     name: 'Liquid Account 1',
@@ -58,6 +77,14 @@ describe('LiquidWallet', () => {
         mockInitialState = JSON.parse(value)
       }
     })
+
+    mockLogger = {
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn()
+    }
+    vi.mocked(logger.createScopedLogger).mockReturnValue(mockLogger)
 
     store = new Store<State>(defaultState)
     wallet = new LiquidWallet({

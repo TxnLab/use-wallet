@@ -37,6 +37,7 @@ export class LiquidWallet extends BaseWallet {
   }
 
   public async connect(_args?: Record<string, any>): Promise<WalletAccount[]> {
+    this.logger.info('Connecting...')
     if (!this.authClient) {
       this.authClient = new LiquidAuthClient(this.options)
     }
@@ -47,6 +48,7 @@ export class LiquidWallet extends BaseWallet {
     const account = sessionData?.user?.wallet
 
     if (!account) {
+      this.logger.error('No accounts found!')
       throw new Error('No accounts found!')
     }
 
@@ -67,19 +69,21 @@ export class LiquidWallet extends BaseWallet {
       wallet: walletState
     })
 
-    console.info(`[${this.metadata.name}] ✅ Connected.`, walletState)
+    this.logger.info('Connected successfully', walletState)
     this.authClient.hideModal()
     return Promise.resolve(walletAccounts)
   }
 
   public async disconnect(): Promise<void> {
+    this.logger.info('Disconnecting...')
     if (!this.authClient) {
+      this.logger.error('No auth client found to disconnect from')
       throw new Error('No auth client found to disconnect from')
     }
 
     await this.authClient.disconnect()
     this.onDisconnect()
-    console.info(`[${this.metadata.name}] ✅ Disconnected.`)
+    this.logger.info('Disconnected.')
     this.authClient = null
   }
 
