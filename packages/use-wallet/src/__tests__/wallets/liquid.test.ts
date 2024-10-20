@@ -3,7 +3,7 @@ import { Store } from '@tanstack/store'
 import { Transaction } from 'algosdk'
 import { logger } from 'src/logger'
 import { StorageAdapter } from 'src/storage'
-import { LOCAL_STORAGE_KEY, State, defaultState } from 'src/store'
+import { LOCAL_STORAGE_KEY, State, WalletState, defaultState } from 'src/store'
 import { LiquidWallet } from 'src/wallets/liquid'
 import { WalletId } from 'src/wallets/types'
 
@@ -164,18 +164,37 @@ describe('LiquidWallet', () => {
     it('disconnect: should throw an error if no auth client is found', async () => {
       wallet.authClient = null
 
-      await expect(wallet.disconnect()).rejects.toThrowError(
-        'No auth client found to disconnect from'
-      )
+      await expect(wallet.disconnect()).rejects.toThrowError('No auth client to disconnect')
     })
   })
 
   describe('resumeSession', () => {
-    it('resumeSession: should call disconnect', async () => {
+    it('resumeSession: should call disconnect if wallet state exists', async () => {
+      const walletState: WalletState = {
+        accounts: [account1],
+        activeAccount: account1
+      }
+
+      store = new Store<State>({
+        ...defaultState,
+        wallets: {
+          [WalletId.LIQUID]: walletState
+        }
+      })
+
+      wallet = createWalletWithStore(store)
+
       const disconnectSpy = vi.spyOn(wallet, 'disconnect')
       await wallet.resumeSession()
 
       expect(disconnectSpy).toHaveBeenCalled()
+    })
+
+    it('resumeSession: should not call disconnect if no wallet state exists', async () => {
+      const disconnectSpy = vi.spyOn(wallet, 'disconnect')
+      await wallet.resumeSession()
+
+      expect(disconnectSpy).not.toHaveBeenCalled()
     })
   })
 
