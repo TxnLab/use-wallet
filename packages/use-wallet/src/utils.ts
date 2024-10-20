@@ -6,6 +6,7 @@ import { DeflyWallet } from './wallets/defly'
 import { ExodusWallet } from './wallets/exodus'
 import { KibisisWallet } from './wallets/kibisis'
 import { KmdWallet } from './wallets/kmd'
+import { LiquidWallet } from './wallets/liquid'
 import { LuteWallet } from './wallets/lute'
 import { MagicAuth } from './wallets/magic'
 import { MnemonicWallet } from './wallets/mnemonic'
@@ -21,6 +22,7 @@ export function createWalletMap(): WalletMap {
     [WalletId.EXODUS]: ExodusWallet,
     [WalletId.KIBISIS]: KibisisWallet,
     [WalletId.KMD]: KmdWallet,
+    [WalletId.LIQUID]: LiquidWallet,
     [WalletId.LUTE]: LuteWallet,
     [WalletId.MAGIC]: MagicAuth,
     [WalletId.MNEMONIC]: MnemonicWallet,

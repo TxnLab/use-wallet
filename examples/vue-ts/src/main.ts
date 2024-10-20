@@ -21,6 +21,9 @@ app.use(WalletManagerPlugin, {
     WalletId.KMD,
     WalletId.KIBISIS,
     {
+      id: WalletId.LIQUID
+    },
+    {
       id: WalletId.LUTE,
       options: { siteName: 'Example Site' }
     },

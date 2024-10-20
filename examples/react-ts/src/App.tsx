@@ -20,6 +20,9 @@ const walletManager = new WalletManager({
     WalletId.KMD,
     WalletId.KIBISIS,
     {
+      id: WalletId.LIQUID
+    },
+    {
       id: WalletId.LUTE,
       options: { siteName: 'Example Site' }
     },
