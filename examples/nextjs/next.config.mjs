@@ -15,6 +15,7 @@ const nextConfig = {
       config.resolve.fallback = {
         ...config.resolve.fallback,
         '@agoralabs-sh/avm-web-provider': false,
+        '@algorandfoundation/liquid-auth-use-wallet-client': false,
         '@blockshake/defly-connect': false,
         '@magic-ext/algorand': false,
         '@perawallet/connect': false,
