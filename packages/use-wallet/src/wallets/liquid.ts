@@ -61,7 +61,7 @@ export class LiquidWallet extends BaseWallet {
     return client
   }
 
-  public async connect(_args?: Record<string, any>): Promise<WalletAccount[]> {
+  public connect = async (_args?: Record<string, any>): Promise<WalletAccount[]> => {
     this.logger.info('Connecting...')
     const authClient = this.authClient || (await this.initializeClient())
 
@@ -97,7 +97,7 @@ export class LiquidWallet extends BaseWallet {
     return Promise.resolve(walletAccounts)
   }
 
-  public async disconnect(): Promise<void> {
+  public disconnect = async (): Promise<void> => {
     this.logger.info('Disconnecting...')
     if (!this.authClient) {
       this.logger.error('No auth client to disconnect')
@@ -110,7 +110,7 @@ export class LiquidWallet extends BaseWallet {
     this.authClient = null
   }
 
-  public async resumeSession(): Promise<void> {
+  public resumeSession = async (): Promise<void> => {
     try {
       const state = this.store.state
       const walletState = state.wallets[this.id]
@@ -128,10 +128,10 @@ export class LiquidWallet extends BaseWallet {
     }
   }
 
-  public async signTransactions<T extends Transaction[] | Uint8Array[]>(
+  public signTransactions = async <T extends Transaction[] | Uint8Array[]>(
     txnGroup: T | T[],
     indexesToSign?: number[]
-  ): Promise<(Uint8Array | null)[]> {
+  ): Promise<(Uint8Array | null)[]> => {
     try {
       if (!this.activeAddress) {
         throw new Error('No active account')
