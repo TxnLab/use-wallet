@@ -46,6 +46,20 @@ vi.mock('@algorandfoundation/liquid-auth-use-wallet-client', () => ({
   ICON: 'mockIcon'
 }))
 
+function createWalletWithStore(store: Store<State>): LiquidWallet {
+  return new LiquidWallet({
+    id: WalletId.LIQUID,
+    options: {
+      RTC_config_username: 'username',
+      RTC_config_credential: 'credential'
+    },
+    metadata: {},
+    getAlgodClient: () => ({}) as any,
+    store,
+    subscribe: vi.fn()
+  })
+}
+
 describe('LiquidWallet', () => {
   let wallet: LiquidWallet
   let store: Store<State>
@@ -87,14 +101,7 @@ describe('LiquidWallet', () => {
     vi.mocked(logger.createScopedLogger).mockReturnValue(mockLogger)
 
     store = new Store<State>(defaultState)
-    wallet = new LiquidWallet({
-      id: WalletId.LIQUID,
-      metadata: { name: 'Liquid' }, // Ensure metadata is correctly initialized
-      getAlgodClient: {} as any,
-      store,
-      subscribe: vi.fn(),
-      options: { RTC_config_username: 'username', RTC_config_credential: 'credential' }
-    })
+    wallet = createWalletWithStore(store)
   })
 
   afterEach(async () => {
