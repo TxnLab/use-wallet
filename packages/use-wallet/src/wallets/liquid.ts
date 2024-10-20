@@ -92,13 +92,20 @@ export class LiquidWallet extends BaseWallet {
   }
 
   public async signTransactions<T extends Transaction[] | Uint8Array[]>(
-    _txnGroup: T | T[],
-    _indexesToSign?: number[]
+    txnGroup: T | T[],
+    indexesToSign?: number[]
   ): Promise<(Uint8Array | null)[]> {
-    if (!this.activeAddress) {
-      throw new Error('No active account')
-    }
+    this.logger.debug('Signing transactions...', { txnGroup, indexesToSign })
 
-    return this.authClient!.signTransactions(_txnGroup, this.activeAddress, _indexesToSign)
+    try {
+      if (!this.activeAddress) {
+        throw new Error('No active account')
+      }
+
+      return this.authClient!.signTransactions(txnGroup, this.activeAddress, indexesToSign)
+    } catch (error) {
+      this.logger.error('Error signing transactions', error)
+      throw error
+    }
   }
 }
