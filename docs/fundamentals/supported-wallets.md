@@ -8,7 +8,7 @@ description: List of wallet providers currently supported by @txnlab/use-wallet
 
 Defly Wallet is a mobile-first Algorand wallet with advanced features for DeFi enthusiasts. It offers a user-friendly interface, portfolio tracking, and built-in swap functionality. Defly currently supports mobile connections via their iOS/Android apps, and will soon offer a browser extension wallet (currently in development), making it versatile for various dApp interactions.
 
-<figure><img src="../.gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
 
 {% embed url="https://defly.app/" %}
 
@@ -20,7 +20,7 @@ Defly Connect
 
 Pera Wallet, formerly known as Algorand Wallet, provides a secure and easy-to-use mobile interface for managing Algorand assets. Pera Explorer is a companion web-based block explorer for convenient transaction and account monitoring. The upcoming Pera Connect v2 library (currently in beta) will support WalletConnect v2, enhancing its integration capabilities with Algorand dApps across various platforms.
 
-<figure><img src="../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/image (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 {% embed url="https://perawallet.app/" %}
 
@@ -84,6 +84,24 @@ Magic Auth provides passwordless authentication for dApps, allowing users to log
 
 {% embed url="https://magic.link/docs/blockchains/other-chains/other/algorand" %}
 Magic Algorand Extension
+{% endembed %}
+
+## Liquid Auth (experimental)
+
+Liquid Auth is a self-hosted authentication service that provides a simple way to associate Passkeys to KeyPair(s) commonly found in cryptocurrencies. In addition to authentication, Liquid Auth provides a Peer to Peer signaling service. Not only can you authenticate users, but you can also establish secure connections between them.
+
+{% hint style="info" %}
+The Liquid Auth provider is currently experimental and subject to change in future releases. It requires users to have an Android device and developers to set up a [specific backend](https://github.com/TxnLab/use-wallet/blob/main/examples/liquid-auth-backend/README.md). For more info, please refer to the [documentation](https://liquidauth.com/guides/getting-started/).
+{% endhint %}
+
+<figure><img src="../.gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
+
+{% embed url="https://liquidauth.com/guides/getting-started/" %}
+Liquid Auth documentation
+{% endembed %}
+
+{% embed url="https://github.com/TxnLab/use-wallet/blob/main/examples/liquid-auth-backend/README.md" %}
+Liquid Auth backend README
 {% endembed %}
 
 ## Biatec
