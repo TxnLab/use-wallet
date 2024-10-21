@@ -1,3 +1,17 @@
+# [3.9.0](https://github.com/txnlab/use-wallet/compare/v3.8.0...v3.9.0) (2024-10-21)
+
+### Features
+
+- **Wallets:** Add Liquid Auth provider ([#215](https://github.com/txnlab/use-wallet/pull/215)) ([abf22d8](https://github.com/txnlab/use-wallet/commit/abf22d8b986c77a1d5d24c79a597a2ba3dc1af0d))
+
+### Bug Fixes
+
+- **Liquid:** Implement dynamic import for LiquidAuthClient ([#299](https://github.com/txnlab/use-wallet/pull/299)) ([7a97d94](https://github.com/txnlab/use-wallet/commit/7a97d94666080a42aac3abb318e70e10031d3319))
+
+### Documentation
+
+- Add Liquid Auth to supported wallets ([#304](https://github.com/txnlab/use-wallet/pull/304)) ([5049aaa](https://github.com/txnlab/use-wallet/commit/5049aaac895aed0dde192ab632698b01a5495441))
+
 # [3.8.0](https://github.com/txnlab/use-wallet/compare/v3.7.3-docs...v3.8.0) (2024-10-09)
 
 ### Features
