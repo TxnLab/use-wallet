@@ -18,11 +18,11 @@
     "@walletconnect/sign-client": "^2.17.0",
     "algosdk": "2.9.0",
     "lute-connect": "^1.4.1",
-    "solid-js": "1.9.1"
+    "solid-js": "1.9.2"
   },
   "devDependencies": {
     "typescript": "5.6.2",
-    "vite": "5.4.8",
+    "vite": "5.4.9",
     "vite-plugin-solid": "2.10.2"
   }
 }
