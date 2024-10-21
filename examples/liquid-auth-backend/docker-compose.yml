@@ -42,7 +42,7 @@ services:
       - '6379:6379'
 
   mongo:
-    image: mongo:7.0
+    image: mongo:8.0
     restart: no
     environment:
       - MONGO_INITDB_DATABASE=${DB_NAME:-fido}
