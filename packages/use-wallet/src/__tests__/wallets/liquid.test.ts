@@ -1,10 +1,23 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach, Mock } from 'vitest'
 import { Store } from '@tanstack/store'
 import { Transaction } from 'algosdk'
+import { logger } from 'src/logger'
 import { StorageAdapter } from 'src/storage'
-import { LOCAL_STORAGE_KEY, State, defaultState } from 'src/store'
+import { LOCAL_STORAGE_KEY, State, WalletState, defaultState } from 'src/store'
 import { LiquidWallet } from 'src/wallets/liquid'
 import { WalletId } from 'src/wallets/types'
+
+// Mock logger
+vi.mock('src/logger', () => ({
+  logger: {
+    createScopedLogger: vi.fn().mockReturnValue({
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn()
+    })
+  }
+}))
 
 // Mock storage adapter
 vi.mock('src/storage', () => ({
@@ -33,10 +46,30 @@ vi.mock('@algorandfoundation/liquid-auth-use-wallet-client', () => ({
   ICON: 'mockIcon'
 }))
 
+function createWalletWithStore(store: Store<State>): LiquidWallet {
+  return new LiquidWallet({
+    id: WalletId.LIQUID,
+    options: {
+      RTC_config_username: 'username',
+      RTC_config_credential: 'credential'
+    },
+    metadata: {},
+    getAlgodClient: () => ({}) as any,
+    store,
+    subscribe: vi.fn()
+  })
+}
+
 describe('LiquidWallet', () => {
   let wallet: LiquidWallet
   let store: Store<State>
   let mockInitialState: State | null = null
+  let mockLogger: {
+    debug: Mock
+    info: Mock
+    warn: Mock
+    error: Mock
+  }
 
   const account1 = {
     name: 'Liquid Account 1',
@@ -59,15 +92,16 @@ describe('LiquidWallet', () => {
       }
     })
 
+    mockLogger = {
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn()
+    }
+    vi.mocked(logger.createScopedLogger).mockReturnValue(mockLogger)
+
     store = new Store<State>(defaultState)
-    wallet = new LiquidWallet({
-      id: WalletId.LIQUID,
-      metadata: { name: 'Liquid' }, // Ensure metadata is correctly initialized
-      getAlgodClient: {} as any,
-      store,
-      subscribe: vi.fn(),
-      options: { RTC_config_username: 'username', RTC_config_credential: 'credential' }
-    })
+    wallet = createWalletWithStore(store)
   })
 
   afterEach(async () => {
@@ -130,18 +164,37 @@ describe('LiquidWallet', () => {
     it('disconnect: should throw an error if no auth client is found', async () => {
       wallet.authClient = null
 
-      await expect(wallet.disconnect()).rejects.toThrowError(
-        'No auth client found to disconnect from'
-      )
+      await expect(wallet.disconnect()).rejects.toThrowError('No auth client to disconnect')
     })
   })
 
   describe('resumeSession', () => {
-    it('resumeSession: should call disconnect', async () => {
+    it('resumeSession: should call disconnect if wallet state exists', async () => {
+      const walletState: WalletState = {
+        accounts: [account1],
+        activeAccount: account1
+      }
+
+      store = new Store<State>({
+        ...defaultState,
+        wallets: {
+          [WalletId.LIQUID]: walletState
+        }
+      })
+
+      wallet = createWalletWithStore(store)
+
       const disconnectSpy = vi.spyOn(wallet, 'disconnect')
       await wallet.resumeSession()
 
       expect(disconnectSpy).toHaveBeenCalled()
+    })
+
+    it('resumeSession: should not call disconnect if no wallet state exists', async () => {
+      const disconnectSpy = vi.spyOn(wallet, 'disconnect')
+      await wallet.resumeSession()
+
+      expect(disconnectSpy).not.toHaveBeenCalled()
     })
   })
 
