@@ -38,6 +38,12 @@
       ]
     },
     {
+      "groupName": "pnpm",
+      "matchPackageNames": ["pnpm"],
+      "matchDatasources": ["npm"],
+      "matchUpdateTypes": ["minor", "patch"]
+    },
+    {
       "matchCategories": ["node"],
       "enabled": false
     },
@@ -48,6 +54,22 @@
     {
       "matchDepTypes": ["engines"],
       "enabled": false
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": ["^package\\.json$"],
+      "matchStrings": ["\"packageManager\":\\s*\"pnpm@(?<currentValue>\\d+\\.\\d+\\.\\d+)\""],
+      "depNameTemplate": "pnpm",
+      "datasourceTemplate": "npm"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["^\\.github/workflows/[^/]+\\.ya?ml$"],
+      "matchStrings": ["\\s+version:\\s*(?<currentValue>\\d+\\.\\d+\\.\\d+)"],
+      "depNameTemplate": "pnpm",
+      "datasourceTemplate": "npm"
     }
   ]
 }
