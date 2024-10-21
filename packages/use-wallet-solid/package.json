@@ -74,14 +74,14 @@
   },
   "peerDependencies": {
     "@blockshake/defly-connect": "^1.1.6",
-    "@magic-ext/algorand": "^23.11.0",
-    "@perawallet/connect": "^1.3.4",
+    "@magic-ext/algorand": "^23.13.0",
+    "@perawallet/connect": "^1.3.5",
     "@perawallet/connect-beta": "^2.0.21",
     "@walletconnect/modal": "^2.7.0",
-    "@walletconnect/sign-client": "^2.17.0",
+    "@walletconnect/sign-client": "^2.17.1",
     "algosdk": "^2.7.0",
     "lute-connect": "^1.4.1",
-    "magic-sdk": "^28.11.0"
+    "magic-sdk": "^28.13.0"
   },
   "peerDependenciesMeta": {
     "@blockshake/defly-connect": {

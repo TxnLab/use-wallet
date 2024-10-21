@@ -63,8 +63,8 @@ importers:
         specifier: ^1.1.6
         version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
-        specifier: ^1.3.4
-        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.3.5
+        version: 1.3.5(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet-react':
         specifier: workspace:*
         version: link:../../packages/use-wallet-react
@@ -72,8 +72,8 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.11)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.17.0
-        version: 2.17.0(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
+        specifier: ^2.17.1
+        version: 2.17.1(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       algosdk:
         specifier: 2.9.0
         version: 2.9.0
@@ -118,8 +118,8 @@ importers:
         specifier: ^1.1.6
         version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
-        specifier: ^1.3.4
-        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.3.5
+        version: 1.3.5(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../../packages/use-wallet
@@ -130,8 +130,8 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.11)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.17.0
-        version: 2.17.0(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
+        specifier: ^2.17.1
+        version: 2.17.1(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       algosdk:
         specifier: 2.9.0
         version: 2.9.0
@@ -164,8 +164,8 @@ importers:
         specifier: ^1.1.6
         version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
-        specifier: ^1.3.4
-        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.3.5
+        version: 1.3.5(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet-react':
         specifier: workspace:*
         version: link:../../packages/use-wallet-react
@@ -173,8 +173,8 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.11)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.17.0
-        version: 2.17.0(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
+        specifier: ^2.17.1
+        version: 2.17.1(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       algosdk:
         specifier: 2.9.0
         version: 2.9.0
@@ -228,8 +228,8 @@ importers:
         specifier: ^1.1.6
         version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
-        specifier: ^1.3.4
-        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.3.5
+        version: 1.3.5(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet-solid':
         specifier: workspace:*
         version: link:../../packages/use-wallet-solid
@@ -237,8 +237,8 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.11)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.17.0
-        version: 2.17.0(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
+        specifier: ^2.17.1
+        version: 2.17.1(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       algosdk:
         specifier: 2.9.0
         version: 2.9.0
@@ -268,8 +268,8 @@ importers:
         specifier: ^1.1.6
         version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
-        specifier: ^1.3.4
-        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.3.5
+        version: 1.3.5(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../../packages/use-wallet
@@ -277,8 +277,8 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.11)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.17.0
-        version: 2.17.0(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
+        specifier: ^2.17.1
+        version: 2.17.1(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       algosdk:
         specifier: 2.9.0
         version: 2.9.0
@@ -287,8 +287,8 @@ importers:
         version: 1.4.1
     devDependencies:
       '@walletconnect/types':
-        specifier: 2.17.0
-        version: 2.17.0(ioredis@5.4.1)
+        specifier: 2.17.1
+        version: 2.17.1(ioredis@5.4.1)
       typescript:
         specifier: 5.6.2
         version: 5.6.2
@@ -305,8 +305,8 @@ importers:
         specifier: ^1.1.6
         version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
-        specifier: ^1.3.4
-        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.3.5
+        version: 1.3.5(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet-vue':
         specifier: workspace:*
         version: link:../../packages/use-wallet-vue
@@ -314,8 +314,8 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.11)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.17.0
-        version: 2.17.0(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
+        specifier: ^2.17.1
+        version: 2.17.1(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       algosdk:
         specifier: 2.9.0
         version: 2.9.0
@@ -355,14 +355,14 @@ importers:
         specifier: 1.1.6
         version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@magic-ext/algorand':
-        specifier: 23.11.0
-        version: 23.11.0
+        specifier: 23.13.0
+        version: 23.13.0
       '@magic-sdk/provider':
-        specifier: 28.11.0
-        version: 28.11.0(localforage@1.10.0)
+        specifier: 28.13.0
+        version: 28.13.0(localforage@1.10.0)
       '@perawallet/connect':
-        specifier: 1.3.4
-        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: 1.3.5
+        version: 1.3.5(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect-beta':
         specifier: 2.0.21
         version: 2.0.21(algosdk@2.9.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
@@ -376,11 +376,11 @@ importers:
         specifier: 2.7.0
         version: 2.7.0(@types/react@18.3.11)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: 2.17.0
-        version: 2.17.0(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
+        specifier: 2.17.1
+        version: 2.17.1(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       '@walletconnect/types':
-        specifier: 2.17.0
-        version: 2.17.0(ioredis@5.4.1)
+        specifier: 2.17.1
+        version: 2.17.1(ioredis@5.4.1)
       algosdk:
         specifier: 2.9.0
         version: 2.9.0
@@ -388,8 +388,8 @@ importers:
         specifier: 1.4.1
         version: 1.4.1
       magic-sdk:
-        specifier: 28.11.0
-        version: 28.11.0
+        specifier: 28.13.0
+        version: 28.13.0
       tsup:
         specifier: 8.3.0
         version: 8.3.0(jiti@1.21.6)(postcss@8.4.47)(typescript@5.6.2)(yaml@2.5.1)
@@ -403,11 +403,11 @@ importers:
         specifier: ^1.1.6
         version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@magic-ext/algorand':
-        specifier: ^23.11.0
-        version: 23.11.0
+        specifier: ^23.13.0
+        version: 23.13.0
       '@perawallet/connect':
-        specifier: ^1.3.4
-        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.3.5
+        version: 1.3.5(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect-beta':
         specifier: ^2.0.21
         version: 2.0.21(algosdk@2.9.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
@@ -421,14 +421,14 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.11)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.17.0
-        version: 2.17.0(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
+        specifier: ^2.17.1
+        version: 2.17.1(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       lute-connect:
         specifier: ^1.4.1
         version: 1.4.1
       magic-sdk:
-        specifier: ^28.11.0
-        version: 28.11.0
+        specifier: ^28.13.0
+        version: 28.13.0
     devDependencies:
       '@types/react':
         specifier: 18.3.11
@@ -458,11 +458,11 @@ importers:
         specifier: ^1.1.6
         version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@magic-ext/algorand':
-        specifier: ^23.11.0
-        version: 23.11.0
+        specifier: ^23.13.0
+        version: 23.13.0
       '@perawallet/connect':
-        specifier: ^1.3.4
-        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.3.5
+        version: 1.3.5(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect-beta':
         specifier: ^2.0.21
         version: 2.0.21(algosdk@2.9.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
@@ -476,14 +476,14 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.11)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.17.0
-        version: 2.17.0(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
+        specifier: ^2.17.1
+        version: 2.17.1(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       lute-connect:
         specifier: ^1.4.1
         version: 1.4.1
       magic-sdk:
-        specifier: ^28.11.0
-        version: 28.11.0
+        specifier: ^28.13.0
+        version: 28.13.0
     devDependencies:
       '@solidjs/testing-library':
         specifier: 0.8.10
@@ -510,11 +510,11 @@ importers:
         specifier: ^1.1.6
         version: 1.1.6(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@magic-ext/algorand':
-        specifier: ^23.11.0
-        version: 23.11.0
+        specifier: ^23.13.0
+        version: 23.13.0
       '@perawallet/connect':
-        specifier: ^1.3.4
-        version: 1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.3.5
+        version: 1.3.5(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect-beta':
         specifier: ^2.0.21
         version: 2.0.21(algosdk@2.9.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
@@ -528,14 +528,14 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.11)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.17.0
-        version: 2.17.0(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
+        specifier: ^2.17.1
+        version: 2.17.1(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       lute-connect:
         specifier: ^1.4.1
         version: 1.4.1
       magic-sdk:
-        specifier: ^28.11.0
-        version: 28.11.0
+        specifier: ^28.13.0
+        version: 28.13.0
     devDependencies:
       algosdk:
         specifier: 2.9.0
@@ -1245,8 +1245,17 @@ packages:
   '@ethereumjs/common@2.6.5':
     resolution: {integrity: sha512-lRyVQOeCDaIVtgfbowla32pzeDv2Obr8oR8Put5RdUBNRGr1VGPGQNGP6elWIpgK3YdpzqTOh4GyUGOureVeeA==}
 
+  '@ethersproject/abstract-provider@5.7.0':
+    resolution: {integrity: sha512-R41c9UkchKCpAqStMYUpdunjo3pkEvZC3FAwZn5S5MGbXoMQOHIdHItezTETxAO5bevtMApSyEhn9+CHcDsWBw==}
+
+  '@ethersproject/abstract-signer@5.7.0':
+    resolution: {integrity: sha512-a16V8bq1/Cz+TGCkE2OPMTOUDLS3grCpdjoJCYNnVBbdYEMSgKrU0+B90s8b6H+ByYTBZN7a3g76jdIJi7UfKQ==}
+
   '@ethersproject/address@5.7.0':
     resolution: {integrity: sha512-9wYhYt7aghVGo758POM5nqcOMaE168Q6aRLJZwUmiqSrAungkG74gSSeKEIR7ukixesdRZGPgVqme6vmxs1fkA==}
+
+  '@ethersproject/base64@5.7.0':
+    resolution: {integrity: sha512-Dr8tcHt2mEbsZr/mwTPIQAf3Ai0Bks/7gTw9dSqk1mQvhW3XvRlmDJr/4n+wg1JmCl16NZue17CDh8xb/vZ0sQ==}
 
   '@ethersproject/bignumber@5.7.0':
     resolution: {integrity: sha512-n1CAdIHRWjSucQO3MC1zPSVgV/6dy/fjL9pMrPP9peL+QxEg9wOsVqwD4+818B6LUEtaXzVHQiuivzRoxPxUGw==}
@@ -1257,11 +1266,17 @@ packages:
   '@ethersproject/constants@5.7.0':
     resolution: {integrity: sha512-DHI+y5dBNvkpYUMiRQyxRBYBefZkJfo70VUkUAsRjcPs47muV9evftfZ0PJVCXYbAiCgght0DtcF9srFQmIgWA==}
 
+  '@ethersproject/hash@5.7.0':
+    resolution: {integrity: sha512-qX5WrQfnah1EFnO5zJv1v46a8HW0+E5xuBBDTwMFZLuVTx0tbU2kkx15NqdjxecrLGatQN9FGQKpb1FKdHCt+g==}
+
   '@ethersproject/keccak256@5.7.0':
     resolution: {integrity: sha512-2UcPboeL/iW+pSg6vZ6ydF8tCnv3Iu/8tUmLLzWWGzxWKFFqOBQFLo6uLUv6BDrLgCDfN28RJ/wtByx+jZ4KBg==}
 
   '@ethersproject/logger@5.7.0':
     resolution: {integrity: sha512-0odtFdXu/XHtjQXJYA3u9G0G8btm0ND5Cu8M7i5vhEcE8/HmF4Lbdqanwyv4uQTr2tx6b7fQRmgLrsnpQlmnig==}
+
+  '@ethersproject/networks@5.7.1':
+    resolution: {integrity: sha512-n/MufjFYv3yFcUyfhnXotyDlNdFb7onmkSy8aQERi2PjNcnWQ66xXxa3XlS8nCcA8aJKJjIIMNJTC7tu80GwpQ==}
 
   '@ethersproject/properties@5.7.0':
     resolution: {integrity: sha512-J87jy8suntrAkIZtecpxEPxY//szqr1mlBaYlQ0r4RCaiD2hjheqF9s1LVE8vVuJCXisjIP+JgtK/Do54ej4Sw==}
@@ -1272,8 +1287,14 @@ packages:
   '@ethersproject/signing-key@5.7.0':
     resolution: {integrity: sha512-MZdy2nL3wO0u7gkB4nA/pEf8lu1TlFswPNmy8AiYkfKTdO6eXBJyUdmHO/ehm/htHw9K/qF8ujnTyUAD+Ry54Q==}
 
+  '@ethersproject/strings@5.7.0':
+    resolution: {integrity: sha512-/9nu+lj0YswRNSH0NXYqrh8775XNyEdUQAuf3f+SmOrnVewcJ5SBNAjF7lpgehKi4abvNNXyf+HX86czCdJ8Mg==}
+
   '@ethersproject/transactions@5.7.0':
     resolution: {integrity: sha512-kmcNicCp1lp8qanMTC3RIikGgoJ80ztTyvtsFvCYpSCfkjhD0jZ2LOrnbcuxuToLIUYYf+4XwD1rP+B/erDIhQ==}
+
+  '@ethersproject/web@5.7.1':
+    resolution: {integrity: sha512-Gueu8lSvyjBWL4cYsWsjh6MtMwM0+H4HvqFPZfB6dV8ctbP9zFAO73VG1cMWae0FLPCtz0peKPpZY8/ugJJX2w==}
 
   '@evanhahn/lottie-web-light@5.8.1':
     resolution: {integrity: sha512-U0G1tt3/UEYnyCNNslWPi1dB7X1xQ9aoSip+B3GTKO/Bns8yz/p39vBkRSN9d25nkbHuCsbjky2coQftj5YVKw==}
@@ -1343,22 +1364,22 @@ packages:
   '@lit/reactive-element@1.6.3':
     resolution: {integrity: sha512-QuTgnG52Poic7uM1AN5yJ09QMe0O28e10XzSvWDz02TJiiKee4stsiownEIadWm8nYzyDAyT+gKzUoZmiWQtsQ==}
 
-  '@magic-ext/algorand@23.11.0':
-    resolution: {integrity: sha512-3NrzM+SboVGo9OYMCwkMuqWL01TTwoKQuVVlpfLX5ls/2JmSieDoMzPVChNY/Uxs9qcvyb/0S3nlmF2TteamPw==}
+  '@magic-ext/algorand@23.13.0':
+    resolution: {integrity: sha512-ffve/8q/S5vfenzZJ8sApdgN85qgBOXpYhpGQmtt4ViXfHkJqOBUORulOXAhUMH9OiywYg+N4ZNPc5SY9kNw0g==}
 
-  '@magic-sdk/commons@24.12.0':
-    resolution: {integrity: sha512-Prg90Pspr+ECqRnY/wdI8kWH5tk3T7l01xAnzwGtIPtBjq+MAj5MltUzDSacNGz2sYMJy8CUJVopWc5bU+sukg==}
+  '@magic-sdk/commons@24.14.0':
+    resolution: {integrity: sha512-28OenhBAYrVKpT2HygiLqndiL0yTs2qkDoWm5eV+r+/2Yg/oq1KJuYhzxrV04Jb0OAU+Z3bmR8O9tDnGaj/7gw==}
     peerDependencies:
       '@magic-sdk/provider': '>=18.6.0'
       '@magic-sdk/types': '>=15.8.0'
 
-  '@magic-sdk/provider@28.11.0':
-    resolution: {integrity: sha512-JNrcIL3K/1pOIbpBIcGY2w+ptjFsGfRQuf2W8naKH2Ap6QFDM9iHXt7MjEPBvk2RJ1pz/Nqz+NdsS7InlK62JA==}
+  '@magic-sdk/provider@28.13.0':
+    resolution: {integrity: sha512-liGXEZ1Oc/u7j8/lKlAIdsTYSQy4RQgA0tTPqBrmQQBUGOMeDsOAbCf9iZNFUf/ntDOBpiqVr+W9+gNHPHMk6w==}
     peerDependencies:
       localforage: ^1.7.4
 
-  '@magic-sdk/types@24.10.0':
-    resolution: {integrity: sha512-Ct90pSXIOsRnzpaIYB5SJobv/MxXzV1+/+VXHvaXCNPz1+lMqueTYhEFTf7yBUPz2wvC0Ok4LRJ8JQnRh4Qo6Q==}
+  '@magic-sdk/types@24.12.0':
+    resolution: {integrity: sha512-z0IvxtTOYFjfwwo2lhh+8fEFEhAoRL/mJx2gmDIbJUMm0IwlB0M4Jm6q2b8v0UubnPllcptb/GxLHU3A69i1CQ==}
 
   '@mapbox/node-pre-gyp@1.0.11':
     resolution: {integrity: sha512-Yhlar6v9WQgUp/He7BdgzOz8lqMQ8sU+jkCq7Wx8Myc5YFJLbEe7lgui/V7G1qB1DJykHSGwreceSaD60Y0PUQ==}
@@ -1610,8 +1631,8 @@ packages:
     peerDependencies:
       algosdk: ^2.8.0
 
-  '@perawallet/connect@1.3.4':
-    resolution: {integrity: sha512-PRnD1YEXXoWjTlfWmZCGGHQWn7Zquxh44bXmEtluklq/kTkBOk5CToZWng1J/Ae9g0xMR85B1Y/xwnriFufcpA==}
+  '@perawallet/connect@1.3.5':
+    resolution: {integrity: sha512-JBaaS0tjipo3DcS2v5Q1lcQXqxYkVpKB3YiqV7okBnd1KQ54zcATvPwRXvpsbxttec1OpdHmkWymuTpxpx+2Ng==}
     peerDependencies:
       algosdk: ^2.1.0
 
@@ -2245,6 +2266,10 @@ packages:
     resolution: {integrity: sha512-On+uSaCfWdsMIQsECwWHZBmUXfrnqmv6B8SXRRuTJgd8tUpEvBkLQH4X7XkSm3zW6ozEkQTCagZ2ox2YPn3kbw==}
     engines: {node: '>=18'}
 
+  '@walletconnect/core@2.17.1':
+    resolution: {integrity: sha512-SMgJR5hEyEE/tENIuvlEb4aB9tmMXPzQ38Y61VgYBmwAFEhOHtpt8EDfnfRWqEhMyXuBXG4K70Yh8c67Yry+Xw==}
+    engines: {node: '>=18'}
+
   '@walletconnect/crypto@1.0.3':
     resolution: {integrity: sha512-+2jdORD7XQs76I2Odgr3wwrtyuLUXD/kprNVsjWRhhhdO9Mt6WqVzOPu0/t7OHSmgal8k7SoBQzUc5hu/8zL/g==}
 
@@ -2313,6 +2338,9 @@ packages:
   '@walletconnect/sign-client@2.17.0':
     resolution: {integrity: sha512-sErYwvSSHQolNXni47L3Bm10ptJc1s1YoJvJd34s5E9h9+d3rj7PrhbiW9X82deN+Dm5oA8X9tC4xty1yIBrVg==}
 
+  '@walletconnect/sign-client@2.17.1':
+    resolution: {integrity: sha512-6rLw6YNy0smslH9wrFTbNiYrGsL3DrOsS5FcuU4gIN6oh8pGYOFZ5FiSyTTroc5tngOk3/Sd7dlGY9S7O4nveg==}
+
   '@walletconnect/socket-transport@1.8.0':
     resolution: {integrity: sha512-5DyIyWrzHXTcVp0Vd93zJ5XMW61iDM6bcWT4p8DTRfFsOtW46JquruMhxOLeCOieM4D73kcr3U7WtyR4JUsGuQ==}
 
@@ -2326,11 +2354,17 @@ packages:
   '@walletconnect/types@2.17.0':
     resolution: {integrity: sha512-i1pn9URpvt9bcjRDkabuAmpA9K7mzyKoLJlbsAujRVX7pfaG7wur7u9Jz0bk1HxvuABL5LHNncTnVKSXKQ5jZA==}
 
+  '@walletconnect/types@2.17.1':
+    resolution: {integrity: sha512-aiUeBE3EZZTsZBv5Cju3D0PWAsZCMks1g3hzQs9oNtrbuLL6pKKU0/zpKwk4vGywszxPvC3U0tBCku9LLsH/0A==}
+
   '@walletconnect/utils@1.8.0':
     resolution: {integrity: sha512-zExzp8Mj1YiAIBfKNm5u622oNw44WOESzo6hj+Q3apSMIb0Jph9X3GDIdbZmvVZsNPxWDL7uodKgZcCInZv2vA==}
 
   '@walletconnect/utils@2.17.0':
     resolution: {integrity: sha512-1aeQvjwsXy4Yh9G6g2eGmXrEl+BzkNjHRdCrGdMYqFTFa8ROEJfTGsSH3pLsNDlOY94CoBUvJvM55q/PMoN/FQ==}
+
+  '@walletconnect/utils@2.17.1':
+    resolution: {integrity: sha512-KL7pPwq7qUC+zcTmvxGqIyYanfHgBQ+PFd0TEblg88jM7EjuDLhjyyjtkhyE/2q7QgR7OanIK7pCpilhWvBsBQ==}
 
   '@walletconnect/window-getters@1.0.0':
     resolution: {integrity: sha512-xB0SQsLaleIYIkSsl43vm8EwETpBzJ2gnzk7e0wMF3ktqiTGS6TFHxcprMl5R44KKh4tCcHCJwolMCaDSwtAaA==}
@@ -4332,8 +4366,8 @@ packages:
     resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
     hasBin: true
 
-  magic-sdk@28.11.0:
-    resolution: {integrity: sha512-e2LA9rmEQH/rvHuD5oivKAjh56wnnbcPul2NPe4I/Mscn3Mu7J5D9BIQjAPNyxliYsXpSy/3OA+hCI68tOIMmw==}
+  magic-sdk@28.13.0:
+    resolution: {integrity: sha512-2liYTPUNa8pzglwkCiupT8i9jK8O6uaRcg4VfsVpdcxKLl3ME4h2A4Iz4TxbIFngLHz0Z5nRfCZ35jTLPZzOIQ==}
 
   magic-string-ast@0.6.2:
     resolution: {integrity: sha512-oN3Bcd7ZVt+0VGEs7402qR/tjgjbM7kPlH/z7ufJnzTLVBzXJITRHOJiwMmmYMgZfdoWQsfQcY+iKlxiBppnMA==}
@@ -7048,6 +7082,24 @@ snapshots:
       crc-32: 1.2.2
       ethereumjs-util: 7.1.5
 
+  '@ethersproject/abstract-provider@5.7.0':
+    dependencies:
+      '@ethersproject/bignumber': 5.7.0
+      '@ethersproject/bytes': 5.7.0
+      '@ethersproject/logger': 5.7.0
+      '@ethersproject/networks': 5.7.1
+      '@ethersproject/properties': 5.7.0
+      '@ethersproject/transactions': 5.7.0
+      '@ethersproject/web': 5.7.1
+
+  '@ethersproject/abstract-signer@5.7.0':
+    dependencies:
+      '@ethersproject/abstract-provider': 5.7.0
+      '@ethersproject/bignumber': 5.7.0
+      '@ethersproject/bytes': 5.7.0
+      '@ethersproject/logger': 5.7.0
+      '@ethersproject/properties': 5.7.0
+
   '@ethersproject/address@5.7.0':
     dependencies:
       '@ethersproject/bignumber': 5.7.0
@@ -7055,6 +7107,10 @@ snapshots:
       '@ethersproject/keccak256': 5.7.0
       '@ethersproject/logger': 5.7.0
       '@ethersproject/rlp': 5.7.0
+
+  '@ethersproject/base64@5.7.0':
+    dependencies:
+      '@ethersproject/bytes': 5.7.0
 
   '@ethersproject/bignumber@5.7.0':
     dependencies:
@@ -7070,12 +7126,28 @@ snapshots:
     dependencies:
       '@ethersproject/bignumber': 5.7.0
 
+  '@ethersproject/hash@5.7.0':
+    dependencies:
+      '@ethersproject/abstract-signer': 5.7.0
+      '@ethersproject/address': 5.7.0
+      '@ethersproject/base64': 5.7.0
+      '@ethersproject/bignumber': 5.7.0
+      '@ethersproject/bytes': 5.7.0
+      '@ethersproject/keccak256': 5.7.0
+      '@ethersproject/logger': 5.7.0
+      '@ethersproject/properties': 5.7.0
+      '@ethersproject/strings': 5.7.0
+
   '@ethersproject/keccak256@5.7.0':
     dependencies:
       '@ethersproject/bytes': 5.7.0
       js-sha3: 0.8.0
 
   '@ethersproject/logger@5.7.0': {}
+
+  '@ethersproject/networks@5.7.1':
+    dependencies:
+      '@ethersproject/logger': 5.7.0
 
   '@ethersproject/properties@5.7.0':
     dependencies:
@@ -7095,6 +7167,12 @@ snapshots:
       elliptic: 6.5.4
       hash.js: 1.1.7
 
+  '@ethersproject/strings@5.7.0':
+    dependencies:
+      '@ethersproject/bytes': 5.7.0
+      '@ethersproject/constants': 5.7.0
+      '@ethersproject/logger': 5.7.0
+
   '@ethersproject/transactions@5.7.0':
     dependencies:
       '@ethersproject/address': 5.7.0
@@ -7106,6 +7184,14 @@ snapshots:
       '@ethersproject/properties': 5.7.0
       '@ethersproject/rlp': 5.7.0
       '@ethersproject/signing-key': 5.7.0
+
+  '@ethersproject/web@5.7.1':
+    dependencies:
+      '@ethersproject/base64': 5.7.0
+      '@ethersproject/bytes': 5.7.0
+      '@ethersproject/logger': 5.7.0
+      '@ethersproject/properties': 5.7.0
+      '@ethersproject/strings': 5.7.0
 
   '@evanhahn/lottie-web-light@5.8.1': {}
 
@@ -7179,23 +7265,23 @@ snapshots:
     dependencies:
       '@lit-labs/ssr-dom-shim': 1.2.1
 
-  '@magic-ext/algorand@23.11.0': {}
+  '@magic-ext/algorand@23.13.0': {}
 
-  '@magic-sdk/commons@24.12.0(@magic-sdk/provider@28.11.0(localforage@1.10.0))(@magic-sdk/types@24.10.0)':
+  '@magic-sdk/commons@24.14.0(@magic-sdk/provider@28.13.0(localforage@1.10.0))(@magic-sdk/types@24.12.0)':
     dependencies:
-      '@magic-sdk/provider': 28.11.0(localforage@1.10.0)
-      '@magic-sdk/types': 24.10.0
+      '@magic-sdk/provider': 28.13.0(localforage@1.10.0)
+      '@magic-sdk/types': 24.12.0
 
-  '@magic-sdk/provider@28.11.0(localforage@1.10.0)':
+  '@magic-sdk/provider@28.13.0(localforage@1.10.0)':
     dependencies:
-      '@magic-sdk/types': 24.10.0
+      '@magic-sdk/types': 24.12.0
       eventemitter3: 4.0.7
       localforage: 1.10.0
       web3-core: 1.5.2
     transitivePeerDependencies:
       - supports-color
 
-  '@magic-sdk/types@24.10.0': {}
+  '@magic-sdk/types@24.12.0': {}
 
   '@mapbox/node-pre-gyp@1.0.11':
     dependencies:
@@ -7619,7 +7705,7 @@ snapshots:
       - uWebSockets.js
       - utf-8-validate
 
-  '@perawallet/connect@1.3.4(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@perawallet/connect@1.3.5(algosdk@2.9.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       '@evanhahn/lottie-web-light': 5.8.1
       '@walletconnect/client': 1.8.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -8452,6 +8538,43 @@ snapshots:
       - uWebSockets.js
       - utf-8-validate
 
+  '@walletconnect/core@2.17.1(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)':
+    dependencies:
+      '@walletconnect/heartbeat': 1.2.2
+      '@walletconnect/jsonrpc-provider': 1.0.14
+      '@walletconnect/jsonrpc-types': 1.0.4
+      '@walletconnect/jsonrpc-utils': 1.0.8
+      '@walletconnect/jsonrpc-ws-connection': 1.0.14(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@walletconnect/keyvaluestorage': 1.1.1(ioredis@5.4.1)
+      '@walletconnect/logger': 2.1.2
+      '@walletconnect/relay-api': 1.0.11
+      '@walletconnect/relay-auth': 1.0.4
+      '@walletconnect/safe-json': 1.0.2
+      '@walletconnect/time': 1.0.2
+      '@walletconnect/types': 2.17.1(ioredis@5.4.1)
+      '@walletconnect/utils': 2.17.1(ioredis@5.4.1)
+      '@walletconnect/window-getters': 1.0.1
+      events: 3.3.0
+      lodash.isequal: 4.5.0
+      uint8arrays: 3.1.0
+    transitivePeerDependencies:
+      - '@azure/app-configuration'
+      - '@azure/cosmos'
+      - '@azure/data-tables'
+      - '@azure/identity'
+      - '@azure/keyvault-secrets'
+      - '@azure/storage-blob'
+      - '@capacitor/preferences'
+      - '@netlify/blobs'
+      - '@planetscale/database'
+      - '@react-native-async-storage/async-storage'
+      - '@upstash/redis'
+      - '@vercel/kv'
+      - bufferutil
+      - ioredis
+      - uWebSockets.js
+      - utf-8-validate
+
   '@walletconnect/crypto@1.0.3':
     dependencies:
       '@walletconnect/encoding': 1.0.2
@@ -8620,6 +8743,35 @@ snapshots:
       - uWebSockets.js
       - utf-8-validate
 
+  '@walletconnect/sign-client@2.17.1(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)':
+    dependencies:
+      '@walletconnect/core': 2.17.1(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
+      '@walletconnect/events': 1.0.1
+      '@walletconnect/heartbeat': 1.2.2
+      '@walletconnect/jsonrpc-utils': 1.0.8
+      '@walletconnect/logger': 2.1.2
+      '@walletconnect/time': 1.0.2
+      '@walletconnect/types': 2.17.1(ioredis@5.4.1)
+      '@walletconnect/utils': 2.17.1(ioredis@5.4.1)
+      events: 3.3.0
+    transitivePeerDependencies:
+      - '@azure/app-configuration'
+      - '@azure/cosmos'
+      - '@azure/data-tables'
+      - '@azure/identity'
+      - '@azure/keyvault-secrets'
+      - '@azure/storage-blob'
+      - '@capacitor/preferences'
+      - '@netlify/blobs'
+      - '@planetscale/database'
+      - '@react-native-async-storage/async-storage'
+      - '@upstash/redis'
+      - '@vercel/kv'
+      - bufferutil
+      - ioredis
+      - uWebSockets.js
+      - utf-8-validate
+
   '@walletconnect/socket-transport@1.8.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       '@walletconnect/types': 1.8.0
@@ -8636,6 +8788,30 @@ snapshots:
   '@walletconnect/types@1.8.0': {}
 
   '@walletconnect/types@2.17.0(ioredis@5.4.1)':
+    dependencies:
+      '@walletconnect/events': 1.0.1
+      '@walletconnect/heartbeat': 1.2.2
+      '@walletconnect/jsonrpc-types': 1.0.4
+      '@walletconnect/keyvaluestorage': 1.1.1(ioredis@5.4.1)
+      '@walletconnect/logger': 2.1.2
+      events: 3.3.0
+    transitivePeerDependencies:
+      - '@azure/app-configuration'
+      - '@azure/cosmos'
+      - '@azure/data-tables'
+      - '@azure/identity'
+      - '@azure/keyvault-secrets'
+      - '@azure/storage-blob'
+      - '@capacitor/preferences'
+      - '@netlify/blobs'
+      - '@planetscale/database'
+      - '@react-native-async-storage/async-storage'
+      - '@upstash/redis'
+      - '@vercel/kv'
+      - ioredis
+      - uWebSockets.js
+
+  '@walletconnect/types@2.17.1(ioredis@5.4.1)':
     dependencies:
       '@walletconnect/events': 1.0.1
       '@walletconnect/heartbeat': 1.2.2
@@ -8681,6 +8857,44 @@ snapshots:
       '@walletconnect/safe-json': 1.0.2
       '@walletconnect/time': 1.0.2
       '@walletconnect/types': 2.17.0(ioredis@5.4.1)
+      '@walletconnect/window-getters': 1.0.1
+      '@walletconnect/window-metadata': 1.0.1
+      detect-browser: 5.3.0
+      elliptic: 6.5.7
+      query-string: 7.1.3
+      uint8arrays: 3.1.0
+    transitivePeerDependencies:
+      - '@azure/app-configuration'
+      - '@azure/cosmos'
+      - '@azure/data-tables'
+      - '@azure/identity'
+      - '@azure/keyvault-secrets'
+      - '@azure/storage-blob'
+      - '@capacitor/preferences'
+      - '@netlify/blobs'
+      - '@planetscale/database'
+      - '@react-native-async-storage/async-storage'
+      - '@upstash/redis'
+      - '@vercel/kv'
+      - ioredis
+      - uWebSockets.js
+
+  '@walletconnect/utils@2.17.1(ioredis@5.4.1)':
+    dependencies:
+      '@ethersproject/hash': 5.7.0
+      '@ethersproject/transactions': 5.7.0
+      '@stablelib/chacha20poly1305': 1.0.1
+      '@stablelib/hkdf': 1.0.1
+      '@stablelib/random': 1.0.2
+      '@stablelib/sha256': 1.0.1
+      '@stablelib/x25519': 1.0.3
+      '@walletconnect/jsonrpc-utils': 1.0.8
+      '@walletconnect/keyvaluestorage': 1.1.1(ioredis@5.4.1)
+      '@walletconnect/relay-api': 1.0.11
+      '@walletconnect/relay-auth': 1.0.4
+      '@walletconnect/safe-json': 1.0.2
+      '@walletconnect/time': 1.0.2
+      '@walletconnect/types': 2.17.1(ioredis@5.4.1)
       '@walletconnect/window-getters': 1.0.1
       '@walletconnect/window-metadata': 1.0.1
       detect-browser: 5.3.0
@@ -9885,8 +10099,8 @@ snapshots:
       '@typescript-eslint/parser': 8.10.0(eslint@8.57.1)(typescript@5.6.2)
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.6.3(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1))(eslint@8.57.1)
-      eslint-plugin-import: 2.30.0(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-import-resolver-typescript: 3.6.3(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0)(eslint@8.57.1)
+      eslint-plugin-import: 2.30.0(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1)
       eslint-plugin-jsx-a11y: 6.10.0(eslint@8.57.1)
       eslint-plugin-react: 7.35.2(eslint@8.57.1)
       eslint-plugin-react-hooks: 4.6.2(eslint@8.57.1)
@@ -9909,37 +10123,37 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1))(eslint@8.57.1):
+  eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0)(eslint@8.57.1):
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
       debug: 4.3.7
       enhanced-resolve: 5.17.1
       eslint: 8.57.1
-      eslint-module-utils: 2.11.0(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-module-utils: 2.11.0(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1)
       fast-glob: 3.3.2
       get-tsconfig: 4.8.0
       is-bun-module: 1.1.0
       is-glob: 4.0.3
     optionalDependencies:
-      eslint-plugin-import: 2.30.0(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-plugin-import: 2.30.0(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1)
     transitivePeerDependencies:
       - '@typescript-eslint/parser'
       - eslint-import-resolver-node
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-module-utils@2.11.0(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1):
+  eslint-module-utils@2.11.0(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
       '@typescript-eslint/parser': 8.10.0(eslint@8.57.1)(typescript@5.6.2)
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.6.3(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-import-resolver-typescript: 3.6.3(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0)(eslint@8.57.1)
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.30.0(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1):
+  eslint-plugin-import@2.30.0(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.8
@@ -9950,7 +10164,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.11.0(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-module-utils: 2.11.0(@typescript-eslint/parser@8.10.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1)
       hasown: 2.0.2
       is-core-module: 2.15.1
       is-glob: 4.0.3
@@ -11070,11 +11284,11 @@ snapshots:
 
   lz-string@1.5.0: {}
 
-  magic-sdk@28.11.0:
+  magic-sdk@28.13.0:
     dependencies:
-      '@magic-sdk/commons': 24.12.0(@magic-sdk/provider@28.11.0(localforage@1.10.0))(@magic-sdk/types@24.10.0)
-      '@magic-sdk/provider': 28.11.0(localforage@1.10.0)
-      '@magic-sdk/types': 24.10.0
+      '@magic-sdk/commons': 24.14.0(@magic-sdk/provider@28.13.0(localforage@1.10.0))(@magic-sdk/types@24.12.0)
+      '@magic-sdk/provider': 28.13.0(localforage@1.10.0)
+      '@magic-sdk/types': 24.12.0
       localforage: 1.10.0
     transitivePeerDependencies:
       - supports-color
