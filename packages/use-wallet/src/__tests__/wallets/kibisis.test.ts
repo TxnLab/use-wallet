@@ -185,7 +185,7 @@ describe('KibisisWallet', () => {
 
       // Error message logged
       expect(mockLogger.error).toHaveBeenCalledWith(
-        `Error connecting:`,
+        `Error connecting: `,
         `${error.message} (code: ${error.code})`
       )
 
