@@ -12,4 +12,11 @@ export class StorageAdapter {
     }
     localStorage.setItem(key, value)
   }
+
+  static removeItem(key: string): void {
+    if (typeof window === 'undefined') {
+      return
+    }
+    localStorage.removeItem(key)
+  }
 }

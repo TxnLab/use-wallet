@@ -149,10 +149,11 @@ export class DeflyWebWallet extends AVMProvider {
           )
         }
 
+        this.logger.debug('Disable successful', { result })
         return resolve(result)
       })
 
-      // send the request
+      this.logger.debug('Sending disable request...', { genesisHash })
       avmWebClient.disable({
         genesisHash,
         providerId: DEFLY_WEB_PROVIDER_ID
@@ -217,10 +218,11 @@ export class DeflyWebWallet extends AVMProvider {
           )
         }
 
+        this.logger.debug('Sign transactions successful', { result })
         return resolve(result)
       })
 
-      // send the request
+      this.logger.debug('Sending sign transactions request...', { txns })
       avmWebClient.signTransactions({
         txns,
         providerId: DEFLY_WEB_PROVIDER_ID

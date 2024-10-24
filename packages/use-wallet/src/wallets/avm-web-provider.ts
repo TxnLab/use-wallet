@@ -28,16 +28,23 @@ export abstract class AVMProvider extends BaseWallet {
 
   protected async _initializeAVMWebProviderSDK(): Promise<typeof AVMWebProviderSDK> {
     if (!this.avmWebProviderSDK) {
-      console.info(`[${this.constructor.name}] Initializing @agoralabs-sh/avm-web-provider...`)
+      this.logger.info('Initializing @agoralabs-sh/avm-web-provider...')
 
       const module = await import('@agoralabs-sh/avm-web-provider')
       this.avmWebProviderSDK = module.default ? module.default : module
 
       if (!this.avmWebProviderSDK) {
         throw new Error(
-          'Failed to initialize, the @agoralabs-sh/avm-web-provider sdk was not provided'
+          'Failed to initialize, the @agoralabs-sh/avm-web-provider SDK was not provided'
         )
       }
+
+      if (!this.avmWebProviderSDK.AVMWebClient) {
+        throw new Error(
+          'Failed to initialize, AVMWebClient missing from @agoralabs-sh/avm-web-provider SDK'
+        )
+      }
+      this.logger.info('@agoralabs-sh/avm-web-provider SDK initialized')
     }
 
     return this.avmWebProviderSDK
@@ -51,8 +58,9 @@ export abstract class AVMProvider extends BaseWallet {
     }
 
     if (!this.avmWebClient) {
-      console.info(`[${this.constructor.name}] Initializing new client...`)
+      this.logger.info('Initializing new AVM Web Client...')
       this.avmWebClient = avmWebProviderSDK.AVMWebClient.init()
+      this.logger.info('AVM Web Client initialized')
     }
 
     return this.avmWebClient
@@ -145,13 +153,9 @@ export abstract class AVMProvider extends BaseWallet {
    */
   public async connect(): Promise<WalletAccount[]> {
     try {
-      console.info(`[${this.metadata.name}] Connecting...`)
-
+      this.logger.info('Connecting...')
       const result = await this._enable()
-
-      console.info(
-        `[${this.metadata.name}] Successfully connected on network "${result.genesisId}"`
-      )
+      this.logger.info(`Successfully connected on network "${result.genesisId}"`)
 
       const walletAccounts = this._mapAVMWebProviderAccountToWalletAccounts(result.accounts)
 
@@ -165,14 +169,12 @@ export abstract class AVMProvider extends BaseWallet {
         wallet: walletState
       })
 
-      console.info(`[${this.metadata.name}] ✅ Connected.`, walletState)
+      this.logger.info('✅ Connected.', walletState)
       return walletAccounts
     } catch (error: any) {
-      console.error(
-        `[${this.metadata.name}] Error connecting: ` +
-          (isAVMWebProviderSDKError(error)
-            ? `${error.message} (code: ${error.code})`
-            : error.message)
+      this.logger.error(
+        'Error connecting: ',
+        isAVMWebProviderSDKError(error) ? `${error.message} (code: ${error.code})` : error.message
       )
       throw error
     }
@@ -180,20 +182,18 @@ export abstract class AVMProvider extends BaseWallet {
 
   public async disconnect(): Promise<void> {
     try {
-      console.info(`[${this.metadata.name}] Disconnecting...`)
+      this.logger.info('Disconnecting...')
       this.onDisconnect()
 
       const result = await this._disable()
 
-      console.info(
-        `[${this.metadata.name}] Successfully disconnected${result.sessionIds && result.sessionIds.length ? ` sessions [${result.sessionIds.join(',')}]` : ''} on network "${result.genesisId}"`
+      this.logger.info(
+        `Successfully disconnected${result.sessionIds && result.sessionIds.length ? ` sessions [${result.sessionIds.join(',')}]` : ''} on network "${result.genesisId}"`
       )
     } catch (error: any) {
-      console.error(
-        `[${this.metadata.name}] Error disconnecting: ` +
-          (isAVMWebProviderSDKError(error)
-            ? `${error.message} (code: ${error.code})`
-            : error.message)
+      this.logger.error(
+        'Error disconnecting: ',
+        isAVMWebProviderSDKError(error) ? `${error.message} (code: ${error.code})` : error.message
       )
       throw error
     }
@@ -204,23 +204,24 @@ export abstract class AVMProvider extends BaseWallet {
     const walletState = state.wallets[this.id]
 
     if (!walletState) {
+      this.logger.info('No session to resume')
       return
     }
 
     try {
-      console.info(`[${this.metadata.name}] Resuming session...`)
+      this.logger.info('Resuming session...')
 
       const result = await this._enable()
 
       if (result.accounts.length === 0) {
-        throw new Error(`No accounts found!`)
+        throw new Error('No accounts found!')
       }
 
       const walletAccounts = this._mapAVMWebProviderAccountToWalletAccounts(result.accounts)
       const match = compareAccounts(walletAccounts, walletState.accounts)
 
       if (!match) {
-        console.warn(`[${this.metadata.name}] Session accounts mismatch, updating accounts`, {
+        this.logger.warn('Session accounts mismatch, updating accounts', {
           prev: walletState.accounts,
           current: walletAccounts
         })
@@ -230,12 +231,11 @@ export abstract class AVMProvider extends BaseWallet {
           accounts: walletAccounts
         })
       }
+      this.logger.info('Session resumed successfully')
     } catch (error: any) {
-      console.error(
-        `[${this.metadata.name}] Error resuming session: ` +
-          (isAVMWebProviderSDKError(error)
-            ? `${error.message} (code: ${error.code})`
-            : error.message)
+      this.logger.error(
+        'Error resuming session: ',
+        isAVMWebProviderSDKError(error) ? `${error.message} (code: ${error.code})` : error.message
       )
       this.onDisconnect()
       throw error
@@ -247,6 +247,7 @@ export abstract class AVMProvider extends BaseWallet {
     indexesToSign?: number[]
   ): Promise<(Uint8Array | null)[]> {
     try {
+      this.logger.debug('Signing transactions...', { txnGroup, indexesToSign })
       let txnsToSign: AVMWebProviderSDK.IARC0001Transaction[] = []
 
       // Determine type and process transactions for signing
@@ -258,22 +259,26 @@ export abstract class AVMProvider extends BaseWallet {
         txnsToSign = this.processEncodedTxns(flatTxns, indexesToSign)
       }
 
+      this.logger.debug('Sending processed transactions to wallet...', txnsToSign)
+
       // Sign transactions
       const signTxnsResult = await this._signTransactions(txnsToSign)
+      this.logger.debug('Received signed transactions from wallet', signTxnsResult)
 
       // Convert base64 to Uint8Array
-      return signTxnsResult.stxns.map((value) => {
+      const result = signTxnsResult.stxns.map((value) => {
         if (value === null) {
           return null
         }
         return base64ToByteArray(value)
       })
+
+      this.logger.debug('Transactions signed successfully', result)
+      return result
     } catch (error: any) {
-      console.error(
-        `[${this.metadata.name}] Error signing transactions: ` +
-          (isAVMWebProviderSDKError(error)
-            ? `${error.message} (code: ${error.code})`
-            : error.message)
+      this.logger.error(
+        'Error signing transactions: ',
+        isAVMWebProviderSDKError(error) ? `${error.message} (code: ${error.code})` : error.message
       )
       throw error
     }

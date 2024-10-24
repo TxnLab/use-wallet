@@ -4,6 +4,7 @@ import { DeflyWebWallet } from './defly-web'
 import { ExodusWallet, type ExodusOptions } from './exodus'
 import { KibisisWallet } from './kibisis'
 import { KmdWallet, type KmdOptions } from './kmd'
+import { LiquidOptions, LiquidWallet } from './liquid'
 import { LuteConnectOptions, LuteWallet } from './lute'
 import { MagicAuth, MagicAuthOptions } from './magic'
 import { MnemonicWallet, type MnemonicOptions } from './mnemonic'
@@ -13,17 +14,20 @@ import {
   type PeraWalletConnectOptions as PeraWalletConnectBetaOptions
 } from './pera2'
 import { WalletConnect, type WalletConnectOptions } from './walletconnect'
+import { BiatecWallet } from './biatec'
 import type { Store } from '@tanstack/store'
 import type algosdk from 'algosdk'
 import type { State } from 'src/store'
 
 export enum WalletId {
+  BIATEC = 'biatec',
   DEFLY = 'defly',
   DEFLY_WEB = 'defly-web',
   CUSTOM = 'custom',
   EXODUS = 'exodus',
   KIBISIS = 'kibisis',
   KMD = 'kmd',
+  LIQUID = 'liquid',
   LUTE = 'lute',
   MAGIC = 'magic',
   MNEMONIC = 'mnemonic',
@@ -33,12 +37,14 @@ export enum WalletId {
 }
 
 export type WalletMap = {
+  [WalletId.BIATEC]: typeof BiatecWallet
   [WalletId.CUSTOM]: typeof CustomWallet
   [WalletId.DEFLY]: typeof DeflyWallet
   [WalletId.DEFLY_WEB]: typeof DeflyWebWallet
   [WalletId.EXODUS]: typeof ExodusWallet
   [WalletId.KIBISIS]: typeof KibisisWallet
   [WalletId.KMD]: typeof KmdWallet
+  [WalletId.LIQUID]: typeof LiquidWallet
   [WalletId.LUTE]: typeof LuteWallet
   [WalletId.MAGIC]: typeof MagicAuth
   [WalletId.MNEMONIC]: typeof MnemonicWallet
@@ -48,12 +54,14 @@ export type WalletMap = {
 }
 
 export type WalletOptionsMap = {
+  [WalletId.BIATEC]: WalletConnectOptions
   [WalletId.CUSTOM]: CustomWalletOptions
   [WalletId.DEFLY]: DeflyWalletConnectOptions
   [WalletId.DEFLY_WEB]: Record<string, never>
   [WalletId.EXODUS]: ExodusOptions
   [WalletId.KIBISIS]: Record<string, never>
   [WalletId.KMD]: KmdOptions
+  [WalletId.LIQUID]: LiquidOptions
   [WalletId.LUTE]: LuteConnectOptions
   [WalletId.MAGIC]: MagicAuthOptions
   [WalletId.MNEMONIC]: MnemonicOptions

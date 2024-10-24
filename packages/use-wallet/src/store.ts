@@ -1,6 +1,7 @@
-import { Algodv2 } from 'algosdk'
+import algosdk from 'algosdk'
+import { logger } from 'src/logger'
 import { NetworkId, isValidNetworkId } from 'src/network'
-import { WalletId, type WalletAccount } from 'src/wallets'
+import { WalletId, type WalletAccount } from 'src/wallets/types'
 import type { Store } from '@tanstack/store'
 
 export type WalletState = {
@@ -14,14 +15,14 @@ export interface State {
   wallets: WalletStateMap
   activeWallet: WalletId | null
   activeNetwork: NetworkId
-  algodClient: Algodv2
+  algodClient: algosdk.Algodv2
 }
 
 export const defaultState: State = {
   wallets: {},
   activeWallet: null,
   activeNetwork: NetworkId.TESTNET,
-  algodClient: new Algodv2('', 'https://testnet-api.algonode.cloud/')
+  algodClient: new algosdk.Algodv2('', 'https://testnet-api.4160.nodely.dev/')
 }
 
 export const LOCAL_STORAGE_KEY = '@txnlab/use-wallet:v3'
@@ -76,13 +77,13 @@ export function setActiveAccount(
   store.setState((state) => {
     const wallet = state.wallets[walletId]
     if (!wallet) {
-      console.warn(`Wallet with id "${walletId}" not found`)
+      logger.warn(`Wallet with id "${walletId}" not found`)
       return state
     }
 
     const newActiveAccount = wallet.accounts.find((a) => a.address === address)
     if (!newActiveAccount) {
-      console.warn(`Account with address ${address} not found in wallet "${walletId}"`)
+      logger.warn(`Account with address ${address} not found in wallet "${walletId}"`)
       return state
     }
 
@@ -111,7 +112,7 @@ export function setAccounts(
   store.setState((state) => {
     const wallet = state.wallets[walletId]
     if (!wallet) {
-      console.warn(`Wallet with id "${walletId}" not found`)
+      logger.warn(`Wallet with id "${walletId}" not found`)
       return state
     }
 
@@ -145,7 +146,7 @@ export function setAccounts(
 
 export function setActiveNetwork(
   store: Store<State>,
-  { networkId, algodClient }: { networkId: NetworkId; algodClient: Algodv2 }
+  { networkId, algodClient }: { networkId: NetworkId; algodClient: algosdk.Algodv2 }
 ) {
   store.setState((state) => ({
     ...state,

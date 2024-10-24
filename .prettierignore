@@ -6,3 +6,4 @@
 **/.output
 pnpm-lock.yaml
 *.code-workspace
+docs/**

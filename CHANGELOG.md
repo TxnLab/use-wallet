@@ -1,3 +1,96 @@
+# [3.9.0](https://github.com/txnlab/use-wallet/compare/v3.8.0...v3.9.0) (2024-10-21)
+
+### Features
+
+- **Wallets:** Add Liquid Auth provider ([#215](https://github.com/txnlab/use-wallet/pull/215)) ([abf22d8](https://github.com/txnlab/use-wallet/commit/abf22d8b986c77a1d5d24c79a597a2ba3dc1af0d))
+
+### Bug Fixes
+
+- **Liquid:** Implement dynamic import for LiquidAuthClient ([#299](https://github.com/txnlab/use-wallet/pull/299)) ([7a97d94](https://github.com/txnlab/use-wallet/commit/7a97d94666080a42aac3abb318e70e10031d3319))
+
+### Documentation
+
+- Add Liquid Auth to supported wallets ([#304](https://github.com/txnlab/use-wallet/pull/304)) ([5049aaa](https://github.com/txnlab/use-wallet/commit/5049aaac895aed0dde192ab632698b01a5495441))
+
+# [3.8.0](https://github.com/txnlab/use-wallet/compare/v3.7.3-docs...v3.8.0) (2024-10-09)
+
+### Features
+
+- **Mnemonic:** Resume session when persisting to store ([#283](https://github.com/txnlab/use-wallet/pull/283)) ([88997e9](https://github.com/txnlab/use-wallet/commit/88997e950a04f45ff56af1fd4ab4dbd4cec4b39c))
+
+### Bug Fixes
+
+- **Wallets:** Limit WalletConnect backup to Defly and Pera ([#292](https://github.com/txnlab/use-wallet/pull/292)) ([61b2827](https://github.com/txnlab/use-wallet/commit/61b282717cc38d1f4d4756e58d94a619529831c1))
+
+## [3.7.3-docs](https://github.com/txnlab/use-wallet/compare/v3.7.2...v3.7.3-docs) (2024-10-07)
+
+### Documentation
+
+- Integrate GitBook documentation ([#285](https://github.com/txnlab/use-wallet/pull/285)) ([d9d96e7](https://github.com/txnlab/use-wallet/commit/d9d96e7ed2946de5e0fdefb41d11c579f912c740))
+
+## [3.7.2](https://github.com/txnlab/use-wallet/compare/v3.7.1...v3.7.2) (2024-10-04)
+
+### Bug Fixes
+
+- **WalletConnect:** Use active network chain ID only ([#282](https://github.com/txnlab/use-wallet/pull/282)) ([eb433b9](https://github.com/txnlab/use-wallet/commit/eb433b90396cca5d0c1b146f34f1b549bc40aaa7))
+
+## [3.7.1](https://github.com/txnlab/use-wallet/compare/v3.7.0...v3.7.1) (2024-10-01)
+
+### Fixes
+
+- **Scripts:** Replace single quotes w/ escaped double quotes ([#278](https://github.com/txnlab/use-wallet/pull/278)) ([b3451d7](https://github.com/txnlab/use-wallet/commit/b3451d7b6c9e8cfa3c73f8aca3c2da7e4e96e595))
+- **Core:** Remove circular import in store.ts & MnemonicWallet ([#279](https://github.com/txnlab/use-wallet/pull/279)) ([d3f2764](https://github.com/txnlab/use-wallet/commit/d3f27645a2eb7f9396471d4e5e1e110957cc5bb3))
+
+# [3.7.0](https://github.com/txnlab/use-wallet/compare/v3.6.1...v3.7.0) (2024-09-27)
+
+### Features
+
+- **Wallets:** Add WalletConnect v1 session management ([#275](https://github.com/txnlab/use-wallet/pull/275)) ([484b2b5](https://github.com/txnlab/use-wallet/commit/484b2b59e53ce187b40ed5d285dcc2577d4be55e))
+
+## [3.6.1](https://github.com/txnlab/use-wallet/compare/v3.6.0...v3.6.1) (2024-09-25)
+
+### Test Updates
+
+- **Lute:** Update mocking for lute-connect v1.4.1 compatibility ([#273](https://github.com/txnlab/use-wallet/pull/273)) ([77f1a37](https://github.com/txnlab/use-wallet/commit/77f1a373b0640657fd41c3b80d06f9881cd81341))
+
+# [3.6.0](https://github.com/txnlab/use-wallet/compare/v3.5.0...v3.6.0) (2024-09-24)
+
+### Features
+
+- **Networks:** Add voimain, aramidmain, fix caip10 fnet ([#267](https://github.com/txnlab/use-wallet/pull/267)) ([fa55713](https://github.com/txnlab/use-wallet/commit/fa5571345ba2cf84ba5bd1c96558641181e6b4a7))
+- **Wallets:** Add Biatec Wallet ([#255](https://github.com/txnlab/use-wallet/pull/255)) ([c1e8849](https://github.com/txnlab/use-wallet/commit/c1e8849aef424a95a0e52b97da6f9a239f3fcafe))
+
+### Bug Fixes
+
+- **Wallets:** Correct disconnect handling for Pera and Defly ([#272](https://github.com/txnlab/use-wallet/pull/272)) ([caa7f48](https://github.com/txnlab/use-wallet/commit/caa7f48b326961bce8ce3a026929f2950ce9e000))
+
+# [3.5.0](https://github.com/txnlab/use-wallet/compare/v3.4.0...v3.5.0) (2024-09-18)
+
+### Features
+
+- Implement configurable logging system ([#264](https://github.com/txnlab/use-wallet/pull/264)) ([4912e4e](https://github.com/txnlab/use-wallet/commit/4912e4ee9c601d57ea8c19fbce37aadb48fa8ae9))
+
+### Bug Fixes
+
+- Correct DEBUG log level handling in WalletManager ([#265](https://github.com/txnlab/use-wallet/pull/265)) ([53057b5](https://github.com/txnlab/use-wallet/commit/53057b545799f0041865d919a29c5940ffe9cf79))
+
+# [3.4.0](https://github.com/txnlab/use-wallet/compare/v3.3.0...v3.4.0) (2024-09-13)
+
+### Features
+
+- Add resetNetwork option to WalletManager ([#260](https://github.com/txnlab/use-wallet/pull/260)) ([70b8454](https://github.com/txnlab/use-wallet/commit/70b84549e12a589e8c9bc7632a4f9e1a07b14653))
+
+### Bug Fixes
+
+- Fix Kibisis init in Vue app ([#225](https://github.com/txnlab/use-wallet/pull/225)) ([470171f](https://github.com/txnlab/use-wallet/commit/470171f04f55d44a4d67f9965c1836febbc2dba3))
+
+# [3.3.0](https://github.com/txnlab/use-wallet/compare/v3.2.1...v3.3.0) (2024-09-11)
+
+### Features
+
+- Add fnet to list of valid networks and update nodely urls to new versions ([#258](https://github.com/txnlab/use-wallet/pull/258)) ([07e7273](https://github.com/txnlab/use-wallet/commit/8743101180b730b5fc809951b85df0c8e6c25f8c))
+- Update algosdk import to resolve CommonJS module issue ([#259](https://github.com/txnlab/use-wallet/pull/259)) ([8743101](https://github.com/txnlab/use-wallet/commit/daf738af4b67f9178b72cf1728a08b476fd34fcc))
+
 ## [3.2.1](https://github.com/txnlab/use-wallet/compare/v3.2.0...v3.2.1) (2024-09-05)
 
 ### Other Changes

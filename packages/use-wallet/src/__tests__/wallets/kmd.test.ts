@@ -1,21 +1,32 @@
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
+import { logger } from 'src/logger'
 import { StorageAdapter } from 'src/storage'
 import { LOCAL_STORAGE_KEY, State, WalletState, defaultState } from 'src/store'
 import { KmdWallet } from 'src/wallets/kmd'
 import { WalletId } from 'src/wallets/types'
+import type { Mock } from 'vitest'
+
+// Mock logger
+vi.mock('src/logger', () => ({
+  logger: {
+    createScopedLogger: vi.fn().mockReturnValue({
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn()
+    })
+  }
+}))
 
 // Mock storage adapter
 vi.mock('src/storage', () => ({
   StorageAdapter: {
     getItem: vi.fn(),
-    setItem: vi.fn()
+    setItem: vi.fn(),
+    removeItem: vi.fn()
   }
 }))
-
-// Spy/suppress console output
-vi.spyOn(console, 'info').mockImplementation(() => {}) // @todo: remove when debug logger is implemented
-vi.spyOn(console, 'warn').mockImplementation(() => {})
 
 const mockKmd = {
   listWallets: vi.fn(),
@@ -50,6 +61,12 @@ describe('KmdWallet', () => {
   let wallet: KmdWallet
   let store: Store<State>
   let mockInitialState: State | null = null
+  let mockLogger: {
+    debug: Mock
+    info: Mock
+    warn: Mock
+    error: Mock
+  }
 
   const account1 = {
     name: 'KMD Account 1',
@@ -79,6 +96,14 @@ describe('KmdWallet', () => {
         mockInitialState = JSON.parse(value)
       }
     })
+
+    mockLogger = {
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn()
+    }
+    vi.mocked(logger.createScopedLogger).mockReturnValue(mockLogger)
 
     store = new Store<State>(defaultState)
     wallet = createWalletWithStore(store)

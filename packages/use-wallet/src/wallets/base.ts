@@ -1,3 +1,5 @@
+import { logger } from 'src/logger'
+import { StorageAdapter } from 'src/storage'
 import { setActiveWallet, setActiveAccount, removeWallet, type State } from 'src/store'
 import type { Store } from '@tanstack/store'
 import type algosdk from 'algosdk'
@@ -18,6 +20,8 @@ export abstract class BaseWallet {
 
   public subscribe: (callback: (state: State) => void) => () => void
 
+  protected logger: ReturnType<typeof logger.createScopedLogger>
+
   protected constructor({
     id,
     metadata,
@@ -32,6 +36,9 @@ export abstract class BaseWallet {
 
     const ctor = this.constructor as WalletConstructorType
     this.metadata = { ...ctor.defaultMetadata, ...metadata }
+
+    // Initialize logger with a scope based on the wallet ID
+    this.logger = logger.createScopedLogger(`Wallet:${this.id.toUpperCase()}`)
   }
 
   static defaultMetadata: WalletMetadata = { name: 'Base Wallet', icon: '' }
@@ -43,12 +50,12 @@ export abstract class BaseWallet {
   public abstract resumeSession(): Promise<void>
 
   public setActive = (): void => {
-    console.info(`[Wallet] Set active wallet: ${this.id}`)
+    this.logger.info(`Set active wallet: ${this.id}`)
     setActiveWallet(this.store, { walletId: this.id })
   }
 
   public setActiveAccount = (account: string): void => {
-    console.info(`[Wallet] Set active account: ${account}`)
+    this.logger.info(`Set active account: ${account}`)
     setActiveAccount(this.store, {
       walletId: this.id,
       address: account
@@ -120,7 +127,30 @@ export abstract class BaseWallet {
 
   // ---------- Protected Methods ------------------------------------- //
 
-  protected onDisconnect(): void {
+  protected onDisconnect = (): void => {
+    this.logger.debug(`Removing wallet from store...`)
     removeWallet(this.store, { walletId: this.id })
+  }
+
+  protected manageWalletConnectSession = (
+    action: 'backup' | 'restore',
+    targetWalletId?: WalletId
+  ): void => {
+    const walletId = targetWalletId || this.id
+    if (action === 'backup') {
+      const data = StorageAdapter.getItem('walletconnect')
+      if (data) {
+        StorageAdapter.setItem(`walletconnect-${walletId}`, data)
+        StorageAdapter.removeItem('walletconnect')
+        this.logger.debug(`Backed up WalletConnect session for ${walletId}`)
+      }
+    } else if (action === 'restore') {
+      const data = StorageAdapter.getItem(`walletconnect-${walletId}`)
+      if (data) {
+        StorageAdapter.setItem('walletconnect', data)
+        StorageAdapter.removeItem(`walletconnect-${walletId}`)
+        this.logger.debug(`Restored WalletConnect session for ${walletId}`)
+      }
+    }
   }
 }

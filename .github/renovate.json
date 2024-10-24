@@ -11,7 +11,7 @@
   "timezone": "America/New_York",
   "assignees": ["drichar"],
   "baseBranches": ["main"],
-  "ignorePaths": ["**/node_modules/**"],
+  "ignorePaths": ["**/node_modules/**", "examples/liquid-auth-backend/docker-compose.yml"],
   "minimumReleaseAge": "3 days",
   "lockFileMaintenance": {
     "enabled": true,
@@ -21,13 +21,15 @@
     {
       "groupName": "non-major dependencies",
       "matchPackageNames": ["!typescript", "!algosdk"],
-      "matchUpdateTypes": ["patch", "minor"]
+      "matchUpdateTypes": ["patch", "minor"],
+      "matchDepTypes": ["dependencies", "devDependencies", "action"]
     },
     {
       "groupName": "Wallet dependencies",
       "rangeStrategy": "bump",
       "matchPackageNames": [
         "/@agoralabs-sh/avm-web-provider/",
+        "/@algorandfoundation/liquid-auth-use-wallet-client/",
         "/@blockshake/defly-connect/",
         "/@magic-ext/algorand/",
         "/magic-sdk/",
@@ -35,6 +37,12 @@
         "/lute-connect/",
         "/walletconnect/"
       ]
+    },
+    {
+      "groupName": "pnpm",
+      "matchPackageNames": ["pnpm"],
+      "matchDatasources": ["npm"],
+      "matchUpdateTypes": ["minor", "patch"]
     },
     {
       "matchCategories": ["node"],
@@ -47,6 +55,22 @@
     {
       "matchDepTypes": ["engines"],
       "enabled": false
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": ["^package\\.json$"],
+      "matchStrings": ["\"packageManager\":\\s*\"pnpm@(?<currentValue>\\d+\\.\\d+\\.\\d+)\""],
+      "depNameTemplate": "pnpm",
+      "datasourceTemplate": "npm"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["^\\.github/workflows/[^/]+\\.ya?ml$"],
+      "matchStrings": ["\\s+version:\\s*(?<currentValue>\\d+\\.\\d+\\.\\d+)"],
+      "depNameTemplate": "pnpm",
+      "datasourceTemplate": "npm"
     }
   ]
 }

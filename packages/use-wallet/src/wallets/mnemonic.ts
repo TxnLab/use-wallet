@@ -42,8 +42,8 @@ export class MnemonicWallet extends BaseWallet {
     this.store = store
 
     if (this.options.persistToStorage) {
-      console.warn(
-        `[${this.metadata.name}] Persisting mnemonics to storage is insecure. Any private key mnemonics used should never hold real Algos (i.e., on MainNet). Use with caution!`
+      this.logger.warn(
+        'Persisting mnemonics to storage is insecure. Any private key mnemonics used should never hold real Algos (i.e., on MainNet). Use with caution!'
       )
     }
   }
@@ -61,12 +61,16 @@ export class MnemonicWallet extends BaseWallet {
     StorageAdapter.setItem(LOCAL_STORAGE_MNEMONIC_KEY, mnemonic)
   }
 
+  private removeMnemonicFromStorage(): void {
+    StorageAdapter.removeItem(LOCAL_STORAGE_MNEMONIC_KEY)
+  }
+
   private checkMainnet(): void {
     try {
       const network = this.activeNetwork
       if (network === NetworkId.MAINNET) {
-        console.warn(
-          `[${this.metadata.name}] The Mnemonic wallet provider is insecure and intended for testing only. Any private key mnemonics used should never hold real Algos (i.e., on MainNet).`
+        this.logger.warn(
+          'The Mnemonic wallet provider is insecure and intended for testing only. Any private key mnemonics used should never hold real Algos (i.e., on MainNet).'
         )
         throw new Error('MainNet active network detected. Aborting.')
       }
@@ -82,11 +86,12 @@ export class MnemonicWallet extends BaseWallet {
       mnemonic = prompt('Enter 25-word mnemonic passphrase:')
       if (!mnemonic) {
         this.account = null
+        this.logger.error('No mnemonic provided')
         throw new Error('No mnemonic provided')
       }
 
       if (this.options.persistToStorage) {
-        console.warn(`[${this.metadata.name}] Mnemonic saved to localStorage.`)
+        this.logger.warn('Mnemonic saved to localStorage.')
         this.saveMnemonicToStorage(mnemonic)
       }
     }
@@ -100,7 +105,7 @@ export class MnemonicWallet extends BaseWallet {
     // Throw error if MainNet is active
     this.checkMainnet()
 
-    console.info(`[${this.metadata.name}] Connecting...`)
+    this.logger.info('Connecting...')
     const account = this.initializeAccount()
 
     const walletAccount = {
@@ -118,14 +123,16 @@ export class MnemonicWallet extends BaseWallet {
       wallet: walletState
     })
 
-    console.info(`[${this.metadata.name}] ✅ Connected.`, walletState)
+    this.logger.info('Connected successfully', walletState)
     return [walletAccount]
   }
 
   public disconnect = async (): Promise<void> => {
+    this.logger.info('Disconnecting...')
     this.onDisconnect()
     this.account = null
-    console.info(`[${this.metadata.name}] Disconnected.`)
+    this.removeMnemonicFromStorage()
+    this.logger.info('Disconnected')
   }
 
   public resumeSession = async (): Promise<void> => {
@@ -135,8 +142,27 @@ export class MnemonicWallet extends BaseWallet {
     const state = this.store.state
     const walletState = state.wallets[this.id]
 
-    // Don't resume session, disconnect instead
-    if (walletState) {
+    // No session to resume
+    if (!walletState) {
+      this.logger.info('No session to resume')
+      return
+    }
+
+    this.logger.info('Resuming session...')
+
+    // If persisting to storage is enabled, then resume session
+    if (this.options.persistToStorage) {
+      try {
+        this.initializeAccount()
+        this.logger.info('Session resumed successfully')
+      } catch (error: any) {
+        this.logger.error('Error resuming session:', error.message)
+        this.disconnect()
+        throw error
+      }
+    } else {
+      // Otherwise, do not resume session, disconnect instead
+      this.logger.info('No session to resume, disconnecting...')
       this.disconnect()
     }
   }
@@ -196,19 +222,26 @@ export class MnemonicWallet extends BaseWallet {
     // Throw error if MainNet is active
     this.checkMainnet()
 
-    let txnsToSign: algosdk.Transaction[] = []
+    try {
+      this.logger.debug('Signing transactions...', { txnGroup, indexesToSign })
+      let txnsToSign: algosdk.Transaction[] = []
 
-    // Determine type and process transactions for signing
-    if (isTransactionArray(txnGroup)) {
-      const flatTxns: algosdk.Transaction[] = flattenTxnGroup(txnGroup)
-      txnsToSign = this.processTxns(flatTxns, indexesToSign)
-    } else {
-      const flatTxns: Uint8Array[] = flattenTxnGroup(txnGroup as Uint8Array[])
-      txnsToSign = this.processEncodedTxns(flatTxns, indexesToSign)
+      // Determine type and process transactions for signing
+      if (isTransactionArray(txnGroup)) {
+        const flatTxns: algosdk.Transaction[] = flattenTxnGroup(txnGroup)
+        txnsToSign = this.processTxns(flatTxns, indexesToSign)
+      } else {
+        const flatTxns: Uint8Array[] = flattenTxnGroup(txnGroup as Uint8Array[])
+        txnsToSign = this.processEncodedTxns(flatTxns, indexesToSign)
+      }
+
+      // Sign transactions
+      const signedTxns = txnsToSign.map((txn) => txn.signTxn(this.account!.sk))
+      this.logger.debug('Transactions signed successfully', { signedTxns })
+      return signedTxns
+    } catch (error: any) {
+      this.logger.error('Error signing transactions:', error.message)
+      throw error
     }
-
-    // Sign transactions
-    const signedTxns = txnsToSign.map((txn) => txn.signTxn(this.account!.sk))
-    return signedTxns
   }
 }

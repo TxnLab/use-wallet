@@ -1,11 +1,13 @@
 import algosdk from 'algosdk'
 import { WalletId, type JsonRpcRequest, type WalletAccount, type WalletMap } from './wallets/types'
+import { BiatecWallet } from './wallets/biatec'
 import { CustomWallet } from './wallets/custom'
 import { DeflyWallet } from './wallets/defly'
 import { DeflyWebWallet } from './wallets/defly-web'
 import { ExodusWallet } from './wallets/exodus'
 import { KibisisWallet } from './wallets/kibisis'
 import { KmdWallet } from './wallets/kmd'
+import { LiquidWallet } from './wallets/liquid'
 import { LuteWallet } from './wallets/lute'
 import { MagicAuth } from './wallets/magic'
 import { MnemonicWallet } from './wallets/mnemonic'
@@ -15,12 +17,14 @@ import { WalletConnect } from './wallets/walletconnect'
 
 export function createWalletMap(): WalletMap {
   return {
+    [WalletId.BIATEC]: BiatecWallet,
     [WalletId.CUSTOM]: CustomWallet,
     [WalletId.DEFLY]: DeflyWallet,
     [WalletId.DEFLY_WEB]: DeflyWebWallet,
     [WalletId.EXODUS]: ExodusWallet,
     [WalletId.KIBISIS]: KibisisWallet,
     [WalletId.KMD]: KmdWallet,
+    [WalletId.LIQUID]: LiquidWallet,
     [WalletId.LUTE]: LuteWallet,
     [WalletId.MAGIC]: MagicAuth,
     [WalletId.MNEMONIC]: MnemonicWallet,
