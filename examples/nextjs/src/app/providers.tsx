@@ -5,6 +5,7 @@ import { NetworkId, WalletId, WalletManager, WalletProvider } from '@txnlab/use-
 const walletManager = new WalletManager({
   wallets: [
     WalletId.DEFLY,
+    WalletId.DEFLY_WEB,
     WalletId.EXODUS,
     WalletId.PERA,
     {
