@@ -1,5 +1,6 @@
 import { CustomWallet, CustomWalletOptions } from './custom'
 import { DeflyWallet, type DeflyWalletConnectOptions } from './defly'
+import { DeflyWebWallet } from './defly-web'
 import { ExodusWallet, type ExodusOptions } from './exodus'
 import { KibisisWallet } from './kibisis'
 import { KmdWallet, type KmdOptions } from './kmd'
@@ -21,6 +22,7 @@ import type { State } from 'src/store'
 export enum WalletId {
   BIATEC = 'biatec',
   DEFLY = 'defly',
+  DEFLY_WEB = 'defly-web',
   CUSTOM = 'custom',
   EXODUS = 'exodus',
   KIBISIS = 'kibisis',
@@ -38,6 +40,7 @@ export type WalletMap = {
   [WalletId.BIATEC]: typeof BiatecWallet
   [WalletId.CUSTOM]: typeof CustomWallet
   [WalletId.DEFLY]: typeof DeflyWallet
+  [WalletId.DEFLY_WEB]: typeof DeflyWebWallet
   [WalletId.EXODUS]: typeof ExodusWallet
   [WalletId.KIBISIS]: typeof KibisisWallet
   [WalletId.KMD]: typeof KmdWallet
@@ -54,6 +57,7 @@ export type WalletOptionsMap = {
   [WalletId.BIATEC]: WalletConnectOptions
   [WalletId.CUSTOM]: CustomWalletOptions
   [WalletId.DEFLY]: DeflyWalletConnectOptions
+  [WalletId.DEFLY_WEB]: Record<string, never>
   [WalletId.EXODUS]: ExodusOptions
   [WalletId.KIBISIS]: Record<string, never>
   [WalletId.KMD]: KmdOptions

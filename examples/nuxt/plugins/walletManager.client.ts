@@ -5,6 +5,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.use(WalletManagerPlugin, {
     wallets: [
       WalletId.DEFLY,
+      WalletId.DEFLY_WEB,
       WalletId.EXODUS,
       WalletId.PERA,
       {

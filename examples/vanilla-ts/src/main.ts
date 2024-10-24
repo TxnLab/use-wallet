@@ -8,6 +8,7 @@ import { WalletComponent } from './WalletComponent'
 const walletManager = new WalletManager({
   wallets: [
     WalletId.DEFLY,
+    WalletId.DEFLY_WEB,
     WalletId.EXODUS,
     WalletId.PERA,
     {

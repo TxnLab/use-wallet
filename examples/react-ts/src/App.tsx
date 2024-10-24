@@ -7,6 +7,7 @@ import './App.css'
 const walletManager = new WalletManager({
   wallets: [
     WalletId.DEFLY,
+    WalletId.DEFLY_WEB,
     WalletId.EXODUS,
     WalletId.PERA,
     {
