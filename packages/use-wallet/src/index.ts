@@ -3,4 +3,5 @@ export { WalletManager, WalletManagerConfig, WalletManagerOptions } from './mana
 export { NetworkId } from './network'
 export { State, WalletState, defaultState } from './store'
 export { StorageAdapter } from './storage'
+export { webpackFallback } from './webpack'
 export * from './wallets'
