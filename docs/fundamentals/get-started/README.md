@@ -59,11 +59,80 @@ npm install @txnlab/use-wallet
 
 Some wallets require additional packages to be installed. The following table lists wallet providers and their corresponding packages.
 
-| Wallet Provider | Package(s)                                           |
-| --------------- | ---------------------------------------------------- |
-| Defly Wallet    | `@blockshake/defly-connect`                          |
-| Pera Wallet     | `@perawallet/connect`                                |
-| WalletConnect   | `@walletconnect/sign-client`, `@walletconnect/modal` |
-| Lute Wallet     | `lute-connect`                                       |
-| Magic           | `magic-sdk`, `@magic-ext/algorand`                   |
-| Kibisis         | `@agoralabs-sh/avm-web-provider`                     |
+<table><thead><tr><th width="220">Wallet Provider</th><th>Package(s)</th></tr></thead><tbody><tr><td>Defly Wallet</td><td><code>@blockshake/defly-connect</code></td></tr><tr><td>Pera Wallet</td><td><code>@perawallet/connect</code></td></tr><tr><td>WalletConnect</td><td><code>@walletconnect/sign-client</code>, <code>@walletconnect/modal</code></td></tr><tr><td>Lute Wallet</td><td><code>lute-connect</code></td></tr><tr><td>Magic</td><td><code>magic-sdk</code>, <code>@magic-ext/algorand</code></td></tr><tr><td>Kibisis</td><td><code>@agoralabs-sh/avm-web-provider</code></td></tr><tr><td>Liquid Auth</td><td><code>@algorandfoundation/liquid-auth-use-wallet-client</code></td></tr></tbody></table>
+
+## Webpack config for Next.js
+
+When using `@txnlab/use-wallet-react` in a Next.js application, you may encounter "module not found" errors for optional dependencies of wallets you choose not to support. To resolve this, you can use the [`webpackFallback`](https://github.com/TxnLab/use-wallet/blob/main/packages/use-wallet/src/webpack.ts) export (added in [v3.10.0](https://github.com/TxnLab/use-wallet/releases/tag/v3.10.0))
+
+{% tabs %}
+{% tab title="next.config.ts" %}
+```typescript
+import type { NextConfig } from 'next'
+import { webpackFallback } from '@txnlab/use-wallet-react'
+ 
+const nextConfig: NextConfig = {
+  /* config options here */
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        ...webpackFallback
+      }
+    }
+    return config
+  }
+}
+ 
+export default nextConfig
+```
+{% endtab %}
+
+{% tab title="next.config.mjs" %}
+```javascript
+// @ts-check
+ 
+import { webpackFallback } from '@txnlab/use-wallet-react'
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  /* config options here */
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        ...webpackFallback
+      }
+    }
+    return config
+  }
+}
+ 
+export default nextConfig
+```
+{% endtab %}
+
+{% tab title="next.config.js" %}
+```javascript
+// @ts-check
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  /* config options here */
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        ...require('@txnlab/use-wallet-react').webpackFallback
+      }
+    }
+    return config
+  }
+}
+
+module.exports = nextConfig
+```
+{% endtab %}
+{% endtabs %}
+
+This configuration allows your Next.js app to build and run without these packages installed, enabling you to include only the wallet packages you need. The `webpackFallback` object is maintained within the `@txnlab/use-wallet` library and will be automatically updated when new optional dependencies are added.
