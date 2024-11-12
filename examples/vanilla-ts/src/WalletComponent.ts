@@ -41,8 +41,8 @@ export class WalletComponent {
       const suggestedParams = await this.manager.algodClient.getTransactionParams().do()
 
       const transaction = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
-        from: activeAddress,
-        to: activeAddress,
+        sender: activeAddress,
+        receiver: activeAddress,
         amount: 0,
         suggestedParams
       })

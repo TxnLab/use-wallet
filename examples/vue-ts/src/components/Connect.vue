@@ -37,8 +37,8 @@ const sendTransaction = async (wallet: Wallet) => {
     const suggestedParams = await algodClient.value.getTransactionParams().do()
 
     const transaction = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
-      from: wallet.activeAccount.address,
-      to: wallet.activeAccount.address,
+      sender: wallet.activeAccount.address,
+      receiver: wallet.activeAccount.address,
       amount: 0,
       suggestedParams
     })

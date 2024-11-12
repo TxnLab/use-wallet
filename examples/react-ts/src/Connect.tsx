@@ -50,8 +50,8 @@ export function Connect() {
       const suggestedParams = await algodClient.getTransactionParams().do()
 
       const transaction = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
-        from: activeAddress,
-        to: activeAddress,
+        sender: activeAddress,
+        receiver: activeAddress,
         amount: 0,
         suggestedParams
       })
