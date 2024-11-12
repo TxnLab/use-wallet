@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach, Mock } from 'vitest'
 import { Store } from '@tanstack/store'
-import { Transaction } from 'algosdk'
+import { Transaction, TransactionType } from 'algosdk'
 import { logger } from 'src/logger'
 import { StorageAdapter } from 'src/storage'
 import { LOCAL_STORAGE_KEY, State, WalletState, defaultState } from 'src/store'
@@ -202,10 +202,9 @@ describe('LiquidWallet', () => {
     const suggestedParams = {
       flatFee: false,
       fee: 0,
-      firstRound: 43564565,
-      lastRound: 43565565,
+      firstValid: 43564565,
+      lastValid: 43565565,
       genesisID: 'testnet-v1.0',
-      genesisHash: 'SGO1GKSzyE7IEPItTxCByx8FmnrCDexi9/cOUJOiI=',
       minFee: 1000
     }
 
@@ -213,10 +212,10 @@ describe('LiquidWallet', () => {
 
     const txnGroup = [
       new Transaction({
-        from: algoAddress,
-        to: algoAddress,
-        amount: 0,
-        suggestedParams
+        type: TransactionType.pay,
+        sender: algoAddress,
+        suggestedParams,
+        paymentParams: { receiver: algoAddress, amount: 0 }
       })
     ]
 

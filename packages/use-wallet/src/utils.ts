@@ -74,15 +74,29 @@ export function byteArrayToString(array: Uint8Array): string {
   return result
 }
 
-export function isSignedTxn(
-  txnDecodeObj: algosdk.EncodedTransaction | algosdk.EncodedSignedTransaction
-): txnDecodeObj is algosdk.EncodedSignedTransaction {
-  return (txnDecodeObj as algosdk.EncodedSignedTransaction).txn !== undefined
+export function isSignedTxn(txnObj: any): boolean {
+  if (!txnObj || typeof txnObj !== 'object') return false
+  if (!('sig' in txnObj && 'txn' in txnObj)) return false
+
+  // Verify sig is a Uint8Array
+  if (!(txnObj.sig instanceof Uint8Array)) return false
+
+  // Verify txn is an object
+  const txn = txnObj.txn
+  if (!txn || typeof txn !== 'object') return false
+
+  // Check for common transaction properties
+  const hasRequiredProps = 'type' in txn && 'snd' in txn
+
+  return hasRequiredProps
 }
 
 export function isTransaction(item: any): item is algosdk.Transaction {
   return (
-    item && typeof item === 'object' && 'genesisID' in item && typeof item.genesisID === 'string'
+    item &&
+    typeof item === 'object' &&
+    'sender' in item &&
+    (item.sender instanceof algosdk.Address || typeof item.sender === 'string')
   )
 }
 
