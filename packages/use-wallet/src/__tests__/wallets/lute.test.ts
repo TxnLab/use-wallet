@@ -55,7 +55,8 @@ function createWalletWithStore(store: Store<State>): LuteWallet {
     getAlgodClient: () =>
       ({
         genesis: () => ({
-          do: () => Promise.resolve({ id: 'mockGenesisID', network: 'mockGenesisNetwork' })
+          do: () =>
+            Promise.resolve(JSON.stringify({ id: 'mockGenesisID', network: 'mockGenesisNetwork' }))
         })
       }) as any,
     store,
@@ -222,21 +223,26 @@ describe('LuteWallet', () => {
     // Not connected account
     const notConnectedAcct = 'EW64GC6F24M7NDSC5R3ES4YUVE3ZXXNMARJHDCCCLIHZU6TBEOC7XRSBG4'
 
-    const txnParams = {
-      from: connectedAcct1,
-      to: connectedAcct2,
-      fee: 10,
-      firstRound: 51,
-      lastRound: 61,
-      genesisHash: 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=',
-      genesisID: 'mainnet-v1.0'
+    const makePayTxn = ({ amount = 1000, sender = connectedAcct1, receiver = connectedAcct2 }) => {
+      return new algosdk.Transaction({
+        type: algosdk.TransactionType.pay,
+        sender,
+        suggestedParams: {
+          fee: 0,
+          firstValid: 51,
+          lastValid: 61,
+          minFee: 1000,
+          genesisID: 'mainnet-v1.0'
+        },
+        paymentParams: { receiver, amount }
+      })
     }
 
     // Transactions used in tests
-    const txn1 = new algosdk.Transaction({ ...txnParams, amount: 1000 })
-    const txn2 = new algosdk.Transaction({ ...txnParams, amount: 2000 })
-    const txn3 = new algosdk.Transaction({ ...txnParams, amount: 3000 })
-    const txn4 = new algosdk.Transaction({ ...txnParams, amount: 4000 })
+    const txn1 = makePayTxn({ amount: 1000 })
+    const txn2 = makePayTxn({ amount: 2000 })
+    const txn3 = makePayTxn({ amount: 3000 })
+    const txn4 = makePayTxn({ amount: 4000 })
 
     beforeEach(async () => {
       const mockConnect = vi.fn().mockResolvedValue([connectedAcct1, connectedAcct2])
@@ -363,23 +369,9 @@ describe('LuteWallet', () => {
       })
 
       it('should only send transactions with connected signers for signature', async () => {
-        const canSignTxn1 = new algosdk.Transaction({
-          ...txnParams,
-          from: connectedAcct1,
-          amount: 1000
-        })
-
-        const cannotSignTxn2 = new algosdk.Transaction({
-          ...txnParams,
-          from: notConnectedAcct,
-          amount: 2000
-        })
-
-        const canSignTxn3 = new algosdk.Transaction({
-          ...txnParams,
-          from: connectedAcct2,
-          amount: 3000
-        })
+        const canSignTxn1 = makePayTxn({ sender: connectedAcct1, amount: 1000 })
+        const cannotSignTxn2 = makePayTxn({ sender: notConnectedAcct, amount: 2000 })
+        const canSignTxn3 = makePayTxn({ sender: connectedAcct2, amount: 3000 })
 
         // Signer for gtxn2 is not a connected account
         const [gtxn1, gtxn2, gtxn3] = algosdk.assignGroupID([

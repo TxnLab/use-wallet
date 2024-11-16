@@ -49,59 +49,60 @@ describe('compareAccounts', () => {
 
 describe('isSignedTxn', () => {
   const transaction = new algosdk.Transaction({
-    from: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-    to: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-    fee: 10,
-    amount: 847,
-    firstRound: 51,
-    lastRound: 61,
-    genesisHash: 'JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI=',
-    genesisID: 'testnet-v1.0'
+    type: algosdk.TransactionType.pay,
+    sender: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
+    suggestedParams: {
+      fee: 0,
+      firstValid: 51,
+      lastValid: 61,
+      minFee: 1000,
+      genesisID: 'mainnet-v1.0'
+    },
+    paymentParams: {
+      receiver: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
+      amount: 847
+    }
   })
 
-  const encodedTxn = {
-    amt: transaction.amount,
-    fee: transaction.fee,
-    fv: transaction.firstRound,
-    lv: transaction.lastRound,
-    snd: Buffer.from(transaction.from.publicKey),
-    type: 'pay',
-    gen: transaction.genesisID,
-    gh: transaction.genesisHash,
-    grp: Buffer.from(new Uint8Array(0))
-  }
+  const encodedTxn = algosdk.encodeMsgpack(transaction)
+  const decodedRawTxn = algosdk.msgpackRawDecode(encodedTxn)
 
-  const encodedSignedTxn = { txn: encodedTxn, sig: Buffer.from('sig') }
+  const txnObj = { txn: decodedRawTxn, sig: Buffer.from('sig') }
 
   it('should return true if the object is a signed transaction', () => {
-    expect(isSignedTxn(encodedSignedTxn)).toBe(true)
+    expect(isSignedTxn(txnObj)).toBe(true)
   })
 
   it('should return false if the object is not a signed transaction', () => {
-    expect(isSignedTxn(encodedTxn)).toBe(false)
+    expect(isSignedTxn(decodedRawTxn)).toBe(false)
   })
 })
 
 describe('isTransaction', () => {
   const transaction = new algosdk.Transaction({
-    from: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-    to: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-    fee: 10,
-    amount: 847,
-    firstRound: 51,
-    lastRound: 61,
-    genesisHash: 'JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI=',
-    genesisID: 'testnet-v1.0'
+    type: algosdk.TransactionType.pay,
+    sender: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
+    suggestedParams: {
+      fee: 0,
+      firstValid: 51,
+      lastValid: 61,
+      minFee: 1000,
+      genesisID: 'mainnet-v1.0'
+    },
+    paymentParams: {
+      receiver: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
+      amount: 847
+    }
   })
 
-  const uInt8Array = transaction.toByte()
+  const encodedTxn = algosdk.encodeMsgpack(transaction)
 
   it('should return true if the item is a Transaction', () => {
     expect(isTransaction(transaction)).toBe(true)
   })
 
   it('should return false if the item is a Uint8Array', () => {
-    expect(isTransaction(uInt8Array)).toBe(false)
+    expect(isTransaction(encodedTxn)).toBe(false)
   })
 
   it('should return false if the item is an object that is not a Transaction', () => {
@@ -113,23 +114,28 @@ describe('isTransaction', () => {
   })
 
   it('should return false if the item is an array of Uint8Arrays', () => {
-    expect(isTransaction([uInt8Array, uInt8Array])).toBe(false)
+    expect(isTransaction([encodedTxn, encodedTxn])).toBe(false)
   })
 })
 
 describe('isTransactionArray', () => {
   const transaction = new algosdk.Transaction({
-    from: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-    to: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-    fee: 10,
-    amount: 847,
-    firstRound: 51,
-    lastRound: 61,
-    genesisHash: 'JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI=',
-    genesisID: 'testnet-v1.0'
+    type: algosdk.TransactionType.pay,
+    sender: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
+    suggestedParams: {
+      fee: 0,
+      firstValid: 51,
+      lastValid: 61,
+      minFee: 1000,
+      genesisID: 'mainnet-v1.0'
+    },
+    paymentParams: {
+      receiver: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
+      amount: 847
+    }
   })
 
-  const uInt8Array = transaction.toByte()
+  const encodedTxn = algosdk.encodeMsgpack(transaction)
 
   it('should return true if the item is an array of transactions', () => {
     expect(isTransactionArray([transaction, transaction])).toBe(true)
@@ -144,39 +150,49 @@ describe('isTransactionArray', () => {
   })
 
   it('should return false if the item is a single Uint8Array', () => {
-    expect(isTransactionArray(uInt8Array)).toBe(false)
+    expect(isTransactionArray(encodedTxn)).toBe(false)
   })
 
   it('should return false if the item is an array of Uint8Arrays', () => {
-    expect(isTransactionArray([uInt8Array, uInt8Array])).toBe(false)
+    expect(isTransactionArray([encodedTxn, encodedTxn])).toBe(false)
   })
 
   it('should return false if the item is a nested array of Uint8Arrays', () => {
-    expect(isTransactionArray([[uInt8Array, uInt8Array], [uInt8Array]])).toBe(false)
+    expect(isTransactionArray([[encodedTxn, encodedTxn], [encodedTxn]])).toBe(false)
   })
 })
 
 describe('flattenTxnGroup', () => {
   const transaction1 = new algosdk.Transaction({
-    from: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-    to: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-    fee: 10,
-    amount: 847,
-    firstRound: 51,
-    lastRound: 61,
-    genesisHash: 'JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI=',
-    genesisID: 'testnet-v1.0'
+    type: algosdk.TransactionType.pay,
+    sender: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
+    suggestedParams: {
+      fee: 0,
+      firstValid: 51,
+      lastValid: 61,
+      minFee: 1000,
+      genesisID: 'mainnet-v1.0'
+    },
+    paymentParams: {
+      receiver: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
+      amount: 847
+    }
   })
 
   const transaction2 = new algosdk.Transaction({
-    from: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-    to: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-    fee: 15,
-    amount: 500,
-    firstRound: 100,
-    lastRound: 200,
-    genesisHash: 'JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI=',
-    genesisID: 'testnet-v1.0'
+    type: algosdk.TransactionType.pay,
+    sender: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
+    suggestedParams: {
+      fee: 0,
+      firstValid: 100,
+      lastValid: 200,
+      minFee: 1000,
+      genesisID: 'mainnet-v1.0'
+    },
+    paymentParams: {
+      receiver: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
+      amount: 500
+    }
   })
 
   const nestedTxnGroup = [[transaction1, transaction2], [transaction1]]
