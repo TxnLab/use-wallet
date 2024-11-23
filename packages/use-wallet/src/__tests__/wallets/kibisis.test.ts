@@ -10,6 +10,7 @@ import {
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
 import { logger } from 'src/logger'
+import { DEFAULT_NETWORKS } from 'src/network'
 import { StorageAdapter } from 'src/storage'
 import { defaultState, LOCAL_STORAGE_KEY, State } from 'src/store'
 import { WalletId } from 'src/wallets'
@@ -60,7 +61,8 @@ function createWalletWithStore(store: Store<State>): KibisisWallet {
         })
       }) as any,
     store,
-    subscribe: vi.fn()
+    subscribe: vi.fn(),
+    networks: DEFAULT_NETWORKS
   })
 }
 

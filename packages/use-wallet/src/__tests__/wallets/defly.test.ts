@@ -1,6 +1,7 @@
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
 import { logger } from 'src/logger'
+import { DEFAULT_NETWORKS } from 'src/network'
 import { StorageAdapter } from 'src/storage'
 import { LOCAL_STORAGE_KEY, State, WalletState, defaultState } from 'src/store'
 import { DeflyWallet } from 'src/wallets/defly'
@@ -56,7 +57,8 @@ function createWalletWithStore(store: Store<State>): DeflyWallet {
     metadata: {},
     getAlgodClient: () => ({}) as any,
     store,
-    subscribe: vi.fn()
+    subscribe: vi.fn(),
+    networks: DEFAULT_NETWORKS
   })
 
   // @ts-expect-error - Mocking the private client property

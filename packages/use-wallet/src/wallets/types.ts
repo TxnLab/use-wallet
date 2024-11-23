@@ -17,6 +17,7 @@ import { BiatecWallet } from './biatec'
 import type { Store } from '@tanstack/store'
 import type algosdk from 'algosdk'
 import type { State } from 'src/store'
+import type { NetworkConfig } from 'src/network'
 
 export enum WalletId {
   BIATEC = 'biatec',
@@ -100,6 +101,7 @@ export interface BaseWalletConstructor {
   getAlgodClient: () => algosdk.Algodv2
   store: Store<State>
   subscribe: (callback: (state: State) => void) => () => void
+  networks: Record<string, NetworkConfig>
 }
 
 export type WalletConstructor<T extends keyof WalletOptionsMap> = BaseWalletConstructor & {

@@ -1,6 +1,5 @@
 import algosdk from 'algosdk'
 import { logger } from 'src/logger'
-import { NetworkId, isValidNetworkId } from 'src/network'
 import { WalletId, type WalletAccount } from 'src/wallets/types'
 import type { Store } from '@tanstack/store'
 
@@ -14,14 +13,14 @@ export type WalletStateMap = Partial<Record<WalletId, WalletState>>
 export interface State {
   wallets: WalletStateMap
   activeWallet: WalletId | null
-  activeNetwork: NetworkId
+  activeNetwork: string
   algodClient: algosdk.Algodv2
 }
 
 export const defaultState: State = {
   wallets: {},
   activeWallet: null,
-  activeNetwork: NetworkId.TESTNET,
+  activeNetwork: 'testnet',
   algodClient: new algosdk.Algodv2('', 'https://testnet-api.4160.nodely.dev/')
 }
 
@@ -146,7 +145,7 @@ export function setAccounts(
 
 export function setActiveNetwork(
   store: Store<State>,
-  { networkId, algodClient }: { networkId: NetworkId; algodClient: algosdk.Algodv2 }
+  { networkId, algodClient }: { networkId: string; algodClient: algosdk.Algodv2 }
 ) {
   store.setState((state) => ({
     ...state,
@@ -187,7 +186,7 @@ export function isValidState(state: any): state is State {
     if (!isValidWalletId(walletId) || !isValidWalletState(wallet)) return false
   }
   if (state.activeWallet !== null && !isValidWalletId(state.activeWallet)) return false
-  if (!isValidNetworkId(state.activeNetwork)) return false
+  if (typeof state.activeNetwork !== 'string') return false
 
   return true
 }

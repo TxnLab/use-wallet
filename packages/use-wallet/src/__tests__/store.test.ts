@@ -1,6 +1,5 @@
 import { Store } from '@tanstack/store'
 import { Algodv2 } from 'algosdk'
-import { NetworkId } from 'src/network'
 import {
   State,
   addWallet,
@@ -432,10 +431,10 @@ describe('Mutations', () => {
 
   describe('setActiveNetwork', () => {
     it('should set the active network', () => {
-      // Default network is TESTNET
-      expect(store.state.activeNetwork).toBe(NetworkId.TESTNET)
+      // Default network is testnet
+      expect(store.state.activeNetwork).toBe('testnet')
 
-      const networkId = NetworkId.MAINNET
+      const networkId = 'mainnet'
       const algodClient = new Algodv2('', 'https://mainnet-api.4160.nodely.dev/')
       setActiveNetwork(store, { networkId, algodClient })
       expect(store.state.activeNetwork).toBe(networkId)
@@ -565,7 +564,7 @@ describe('Type Guards', () => {
       const defaultState: State = {
         wallets: {},
         activeWallet: null,
-        activeNetwork: NetworkId.TESTNET,
+        activeNetwork: 'testnet',
         algodClient: new Algodv2('', 'https://testnet-api.4160.nodely.dev/')
       }
       expect(isValidState(defaultState)).toBe(true)
@@ -602,7 +601,7 @@ describe('Type Guards', () => {
           }
         },
         activeWallet: WalletId.DEFLY,
-        activeNetwork: NetworkId.TESTNET,
+        activeNetwork: 'testnet',
         algodClient: new Algodv2('', 'https://testnet-api.4160.nodely.dev/')
       }
       expect(isValidState(state)).toBe(true)
@@ -615,14 +614,14 @@ describe('Type Guards', () => {
       expect(
         isValidState({
           activeWallet: WalletId.DEFLY,
-          activeNetwork: NetworkId.TESTNET
+          activeNetwork: 'testnet'
         })
       ).toBe(false)
 
       expect(
         isValidState({
           wallets: {},
-          activeNetwork: NetworkId.TESTNET
+          activeNetwork: 'testnet'
         })
       ).toBe(false)
 

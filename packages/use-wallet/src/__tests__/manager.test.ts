@@ -1,7 +1,7 @@
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
 import { logger } from 'src/logger'
-import { NetworkId } from 'src/network'
+import { NetworkConfigBuilder } from 'src/network'
 import { LOCAL_STORAGE_KEY, State, defaultState } from 'src/store'
 import { WalletManager } from 'src/manager'
 import { StorageAdapter } from 'src/storage'
@@ -105,7 +105,8 @@ const mockDeflyWallet = new DeflyWallet({
   metadata: { name: 'Defly', icon: 'icon' },
   getAlgodClient: () => ({}) as any,
   store: mockStore,
-  subscribe: vi.fn()
+  subscribe: vi.fn(),
+  networks: {}
 })
 
 const mockKibisisWallet = new KibisisWallet({
@@ -113,7 +114,8 @@ const mockKibisisWallet = new KibisisWallet({
   metadata: { name: 'Kibisis', icon: 'icon' },
   getAlgodClient: () => ({}) as any,
   store: mockStore,
-  subscribe: vi.fn()
+  subscribe: vi.fn(),
+  networks: {}
 })
 
 describe('WalletManager', () => {
@@ -134,42 +136,63 @@ describe('WalletManager', () => {
   })
 
   describe('constructor', () => {
-    it('initializes with default network and wallets', () => {
+    it('initializes with default networks', () => {
       const manager = new WalletManager({
         wallets: [WalletId.DEFLY, WalletId.KIBISIS]
       })
       expect(manager.wallets.length).toBe(2)
-      expect(manager.activeNetwork).toBe(NetworkId.TESTNET)
-      expect(manager.algodClient).toBeDefined()
+      expect(manager.activeNetwork).toBe('testnet')
+      expect(manager.networks).toHaveProperty('mainnet')
+      expect(manager.networks).toHaveProperty('testnet')
+      expect(manager.networks).toHaveProperty('betanet')
+      expect(manager.networks).toHaveProperty('fnet')
+      expect(manager.networks).toHaveProperty('localnet')
     })
 
-    it('initializes with custom network and wallets', () => {
+    it('initializes with custom network configurations', () => {
+      const networks = new NetworkConfigBuilder()
+        .mainnet({
+          token: 'custom-token',
+          baseServer: 'https://custom-server.com',
+          headers: { 'X-API-Key': 'key' }
+        })
+        .build()
+
       const manager = new WalletManager({
         wallets: [WalletId.DEFLY, WalletId.KIBISIS],
-        network: NetworkId.MAINNET
+        networks,
+        defaultNetwork: 'mainnet'
       })
-      expect(manager.wallets.length).toBe(2)
-      expect(manager.activeNetwork).toBe(NetworkId.MAINNET)
-      expect(manager.algodClient).toBeDefined()
+
+      expect(manager.activeNetwork).toBe('mainnet')
+      expect(manager.networks.mainnet.algod).toEqual({
+        token: 'custom-token',
+        baseServer: 'https://custom-server.com',
+        headers: { 'X-API-Key': 'key' }
+      })
     })
 
-    it('initializes with custom algod config', () => {
+    it('initializes with custom network', () => {
+      const networks = new NetworkConfigBuilder()
+        .addNetwork('custom', {
+          name: 'Custom Network',
+          algod: {
+            token: 'token',
+            baseServer: 'https://custom-network.com',
+            headers: {}
+          },
+          isTestnet: true
+        })
+        .build()
+
       const manager = new WalletManager({
         wallets: [WalletId.DEFLY, WalletId.KIBISIS],
-        network: NetworkId.LOCALNET,
-        algod: {
-          baseServer: 'http://localhost',
-          port: '1234',
-          token: '1234',
-          headers: {
-            'X-API-Key': '1234'
-          }
-        }
+        networks,
+        defaultNetwork: 'custom'
       })
 
-      expect(manager.wallets.length).toBe(2)
-      expect(manager.activeNetwork).toBe(NetworkId.LOCALNET)
-      expect(manager.algodClient).toBeDefined()
+      expect(manager.activeNetwork).toBe('custom')
+      expect(manager.networks.custom).toBeDefined()
     })
   })
 
@@ -238,14 +261,19 @@ describe('WalletManager', () => {
       const manager = new WalletManager({
         wallets: [WalletId.DEFLY, WalletId.KIBISIS]
       })
-      manager._clients = new Map<WalletId, BaseWallet>([
-        [WalletId.DEFLY, mockDeflyWallet],
-        [WalletId.KIBISIS, mockKibisisWallet]
-      ])
 
-      await manager.setActiveNetwork(NetworkId.MAINNET)
+      await manager.setActiveNetwork('mainnet')
+      expect(manager.activeNetwork).toBe('mainnet')
+    })
 
-      expect(manager.activeNetwork).toBe(NetworkId.MAINNET)
+    it('throws error for invalid network', async () => {
+      const manager = new WalletManager({
+        wallets: [WalletId.DEFLY, WalletId.KIBISIS]
+      })
+
+      await expect(manager.setActiveNetwork('invalid')).rejects.toThrow(
+        'Network "invalid" not found in network configuration'
+      )
     })
   })
 
@@ -258,13 +286,13 @@ describe('WalletManager', () => {
       const unsubscribe = manager.subscribe(callback)
 
       // Trigger a state change
-      await manager.setActiveNetwork(NetworkId.MAINNET)
+      await manager.setActiveNetwork('mainnet')
 
       expect(callback).toHaveBeenCalled()
 
       unsubscribe()
       // Trigger another state change
-      manager.setActiveNetwork(NetworkId.BETANET)
+      manager.setActiveNetwork('betanet')
 
       expect(callback).toHaveBeenCalledTimes(1) // Should not be called again
     })
@@ -279,10 +307,6 @@ describe('WalletManager', () => {
               {
                 name: 'Kibisis 1',
                 address: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q'
-              },
-              {
-                name: 'Kibisis 2',
-                address: 'N2C374IRX7HEX2YEQWJBTRSVRHRUV4ZSF76S54WV4COTHRUNYRCI47R3WU'
               }
             ],
             activeAccount: {
@@ -292,7 +316,7 @@ describe('WalletManager', () => {
           }
         },
         activeWallet: WalletId.KIBISIS,
-        activeNetwork: NetworkId.BETANET,
+        activeNetwork: 'betanet',
         algodClient: new algosdk.Algodv2('', 'https://betanet-api.4160.nodely.dev/')
       }
     })
@@ -303,7 +327,7 @@ describe('WalletManager', () => {
       })
       // expect(manager.store.state).toEqual(mockInitialState)
       expect(manager.activeWallet?.id).toBe(WalletId.KIBISIS)
-      expect(manager.activeNetwork).toBe(NetworkId.BETANET)
+      expect(manager.activeNetwork).toBe('betanet')
     })
 
     it('returns null if no persisted state', () => {
@@ -316,7 +340,7 @@ describe('WalletManager', () => {
       // Store initializes with default state if null is returned
       expect(manager.store.state).toEqual(defaultState)
       expect(manager.activeWallet).toBeNull()
-      expect(manager.activeNetwork).toBe(NetworkId.TESTNET)
+      expect(manager.activeNetwork).toBe('testnet')
     })
 
     it('returns null and logs warning and error if persisted state is invalid', () => {
@@ -341,13 +365,13 @@ describe('WalletManager', () => {
       const stateToSave: Omit<State, 'algodClient'> = {
         wallets: {},
         activeWallet: null,
-        activeNetwork: NetworkId.MAINNET
+        activeNetwork: 'mainnet'
       }
 
       const manager = new WalletManager({
         wallets: [WalletId.DEFLY, WalletId.KIBISIS]
       })
-      await manager.setActiveNetwork(NetworkId.MAINNET)
+      await manager.setActiveNetwork('mainnet')
 
       expect(vi.mocked(StorageAdapter.setItem)).toHaveBeenCalledWith(
         LOCAL_STORAGE_KEY,
@@ -365,10 +389,6 @@ describe('WalletManager', () => {
               {
                 name: 'Kibisis 1',
                 address: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q'
-              },
-              {
-                name: 'Kibisis 2',
-                address: 'N2C374IRX7HEX2YEQWJBTRSVRHRUV4ZSF76S54WV4COTHRUNYRCI47R3WU'
               }
             ],
             activeAccount: {
@@ -378,7 +398,7 @@ describe('WalletManager', () => {
           }
         },
         activeWallet: WalletId.KIBISIS,
-        activeNetwork: NetworkId.BETANET,
+        activeNetwork: 'betanet',
         algodClient: new algosdk.Algodv2('', 'https://betanet-api.4160.nodely.dev/')
       }
     })
@@ -403,10 +423,9 @@ describe('WalletManager', () => {
       const manager = new WalletManager({
         wallets: [WalletId.DEFLY, WalletId.KIBISIS]
       })
-      expect(manager.activeWalletAccounts?.length).toBe(2)
+      expect(manager.activeWalletAccounts?.length).toBe(1)
       expect(manager.activeWalletAddresses).toEqual([
-        '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-        'N2C374IRX7HEX2YEQWJBTRSVRHRUV4ZSF76S54WV4COTHRUNYRCI47R3WU'
+        '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q'
       ])
     })
 
@@ -524,44 +543,44 @@ describe('WalletManager', () => {
         mockInitialState = {
           wallets: {},
           activeWallet: null,
-          activeNetwork: NetworkId.MAINNET,
-          algodClient: new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud')
+          activeNetwork: 'mainnet',
+          algodClient: new algosdk.Algodv2('', 'https://mainnet-api.4160.nodely.dev')
         }
 
         const manager = new WalletManager({
           wallets: [],
-          network: NetworkId.TESTNET,
+          defaultNetwork: 'testnet',
           options: { resetNetwork: true }
         })
 
-        expect(manager.activeNetwork).toBe(NetworkId.TESTNET)
+        expect(manager.activeNetwork).toBe('testnet')
       })
 
       it('uses the persisted network when resetNetwork is false', () => {
         mockInitialState = {
           wallets: {},
           activeWallet: null,
-          activeNetwork: NetworkId.MAINNET,
-          algodClient: new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud')
+          activeNetwork: 'mainnet',
+          algodClient: new algosdk.Algodv2('', 'https://mainnet-api.4160.nodely.dev')
         }
 
         const manager = new WalletManager({
           wallets: [],
-          network: NetworkId.TESTNET,
+          defaultNetwork: 'testnet',
           options: { resetNetwork: false }
         })
 
-        expect(manager.activeNetwork).toBe(NetworkId.MAINNET)
+        expect(manager.activeNetwork).toBe('mainnet')
       })
 
       it('uses the default network when resetNetwork is false and no persisted state exists', () => {
         const manager = new WalletManager({
           wallets: [],
-          network: NetworkId.TESTNET,
+          defaultNetwork: 'testnet',
           options: { resetNetwork: false }
         })
 
-        expect(manager.activeNetwork).toBe(NetworkId.TESTNET)
+        expect(manager.activeNetwork).toBe('testnet')
       })
 
       it('preserves wallet state when resetNetwork is true, only changing the network', () => {
@@ -573,18 +592,18 @@ describe('WalletManager', () => {
             }
           },
           activeWallet: WalletId.PERA,
-          activeNetwork: NetworkId.MAINNET,
-          algodClient: new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud')
+          activeNetwork: 'mainnet',
+          algodClient: new algosdk.Algodv2('', 'https://mainnet-api.4160.nodely.dev')
         }
 
         const manager = new WalletManager({
           wallets: [WalletId.PERA],
-          network: NetworkId.TESTNET,
+          defaultNetwork: 'testnet',
           options: { resetNetwork: true }
         })
 
-        // Check that the network is forced to TESTNET
-        expect(manager.activeNetwork).toBe(NetworkId.TESTNET)
+        // Check that the network is forced to testnet
+        expect(manager.activeNetwork).toBe('testnet')
 
         // Check that the wallet state is preserved
         expect(manager.store.state.wallets[WalletId.PERA]).toEqual({

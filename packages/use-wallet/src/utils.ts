@@ -137,6 +137,7 @@ export function formatJsonRpcRequest<T = any>(method: string, params: T): JsonRp
   }
 }
 
+// @todo: remove
 export function deepMerge(target: any, source: any): any {
   const isObject = (obj: any) => obj && typeof obj === 'object'
 

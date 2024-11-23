@@ -44,6 +44,7 @@ vi.mock('lute-connect', () => {
 
 // Import the mocked module
 import LuteConnect from 'lute-connect'
+import { DEFAULT_NETWORKS } from 'src/network'
 
 function createWalletWithStore(store: Store<State>): LuteWallet {
   return new LuteWallet({
@@ -60,7 +61,8 @@ function createWalletWithStore(store: Store<State>): LuteWallet {
         })
       }) as any,
     store,
-    subscribe: vi.fn()
+    subscribe: vi.fn(),
+    networks: DEFAULT_NETWORKS
   })
 }
 

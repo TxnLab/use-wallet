@@ -1,5 +1,4 @@
 import algosdk from 'algosdk'
-import { caipChainId } from 'src/network'
 import { WalletState, addWallet, setAccounts, type State } from 'src/store'
 import {
   base64ToByteArray,
@@ -21,6 +20,7 @@ import type {
   WalletId,
   WalletTransaction
 } from 'src/wallets/types'
+import { NetworkConfig } from 'src/network'
 
 interface SignClientOptions {
   projectId: string
@@ -70,9 +70,10 @@ export class WalletConnect extends BaseWallet {
     subscribe,
     getAlgodClient,
     options,
-    metadata = {}
+    metadata = {},
+    networks
   }: WalletConstructor<WalletId.WALLETCONNECT>) {
-    super({ id, metadata, getAlgodClient, store, subscribe })
+    super({ id, metadata, getAlgodClient, store, subscribe, networks })
     if (!options?.projectId) {
       this.logger.error('Missing required option: projectId')
       throw new Error('Missing required option: projectId')
@@ -354,12 +355,17 @@ export class WalletConnect extends BaseWallet {
   }
 
   public get activeChainId(): string {
-    const chainId = caipChainId[this.activeNetwork]
-    if (!chainId) {
+    const network = this.networks[this.activeNetwork]
+    if (!network?.caipChainId) {
       this.logger.warn(`No CAIP-2 chain ID found for network: ${this.activeNetwork}`)
       return ''
     }
-    return chainId
+    return network.caipChainId
+  }
+
+  // Make networks accessible for testing
+  public get networkConfig(): Record<string, NetworkConfig> {
+    return this.networks
   }
 
   public connect = async (): Promise<WalletAccount[]> => {
