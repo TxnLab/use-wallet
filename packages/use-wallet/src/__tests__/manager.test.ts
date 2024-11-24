@@ -152,9 +152,11 @@ describe('WalletManager', () => {
     it('initializes with custom network configurations', () => {
       const networks = new NetworkConfigBuilder()
         .mainnet({
-          token: 'custom-token',
-          baseServer: 'https://custom-server.com',
-          headers: { 'X-API-Key': 'key' }
+          algod: {
+            token: 'custom-token',
+            baseServer: 'https://custom-server.com',
+            headers: { 'X-API-Key': 'key' }
+          }
         })
         .build()
 

@@ -34,9 +34,11 @@ describe('Network Configuration', () => {
     it('allows customizing default network algod config', () => {
       const networks = new NetworkConfigBuilder()
         .mainnet({
-          token: 'custom-token',
-          baseServer: 'custom-server',
-          headers: { 'X-API-Key': 'key' }
+          algod: {
+            token: 'custom-token',
+            baseServer: 'custom-server',
+            headers: { 'X-API-Key': 'key' }
+          }
         })
         .build()
 
@@ -85,7 +87,10 @@ describe('Network Configuration', () => {
     it('maintains all default networks when customizing one', () => {
       const networks = new NetworkConfigBuilder()
         .mainnet({
-          token: 'custom-token'
+          algod: {
+            token: 'custom-token',
+            baseServer: 'custom-server'
+          }
         })
         .build()
 
