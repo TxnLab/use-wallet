@@ -44,7 +44,8 @@ export const useWallet = () => {
 
     console.info(`[React] Creating Algodv2 client for ${networkId}...`)
 
-    const { token = '', baseServer, port = '', headers = {} } = manager.networkConfig[networkId]
+    const { algod } = manager.networkConfig[networkId]
+    const { token = '', baseServer, port = '', headers = {} } = algod
     const newClient = new algosdk.Algodv2(token, baseServer, port, headers)
     setAlgodClient(newClient)
 

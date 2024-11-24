@@ -34,7 +34,7 @@ describe('WalletManagerPlugin', () => {
   it('provides walletManager, algodClient, and setAlgodClient', () => {
     const options: WalletManagerConfig = {
       wallets: [],
-      network: NetworkId.TESTNET
+      defaultNetwork: NetworkId.TESTNET
     }
     const wrapper = mount(TestComponent, {
       global: {
@@ -52,7 +52,7 @@ describe('WalletManagerPlugin', () => {
   it('initializes with the correct algodClient', () => {
     const options: WalletManagerConfig = {
       wallets: [],
-      network: NetworkId.TESTNET
+      defaultNetwork: NetworkId.TESTNET
     }
     const wrapper = mount(TestComponent, {
       global: {
@@ -68,7 +68,7 @@ describe('WalletManagerPlugin', () => {
   it('setAlgodClient updates the reactive algodClient and manager.algodClient', () => {
     const options: WalletManagerConfig = {
       wallets: [],
-      network: NetworkId.TESTNET
+      defaultNetwork: NetworkId.TESTNET
     }
     const newAlgodClient = new algosdk.Algodv2('mock-token', 'https://mock-server', '')
 
@@ -91,7 +91,7 @@ describe('WalletManagerPlugin', () => {
   it('calls resumeSessions on the walletManager', () => {
     const options: WalletManagerConfig = {
       wallets: [],
-      network: NetworkId.TESTNET
+      defaultNetwork: NetworkId.TESTNET
     }
 
     const wrapper = mount(TestComponent, {

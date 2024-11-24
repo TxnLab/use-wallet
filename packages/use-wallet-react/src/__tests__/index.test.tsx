@@ -7,6 +7,7 @@ import {
   NetworkId,
   WalletManager,
   WalletId,
+  DEFAULT_NETWORKS,
   DEFAULT_STATE,
   type State,
   type WalletAccount
@@ -59,7 +60,8 @@ const mockDeflyWallet = new DeflyWallet({
   metadata: { name: 'Defly', icon: 'icon' },
   getAlgodClient: () => ({}) as any,
   store: mockStore,
-  subscribe: vi.fn()
+  subscribe: vi.fn(),
+  networks: DEFAULT_NETWORKS
 })
 
 const mockMagicAuth = new MagicAuth({
@@ -70,7 +72,8 @@ const mockMagicAuth = new MagicAuth({
   metadata: { name: 'Magic', icon: 'icon' },
   getAlgodClient: () => ({}) as any,
   store: mockStore,
-  subscribe: vi.fn()
+  subscribe: vi.fn(),
+  networks: DEFAULT_NETWORKS
 })
 
 describe('WalletProvider', () => {
@@ -148,7 +151,7 @@ describe('WalletProvider', () => {
 
     const walletManager = new WalletManager({
       wallets: [WalletId.DEFLY],
-      network: NetworkId.TESTNET
+      defaultNetwork: NetworkId.TESTNET
     })
 
     const TestComponent = () => {
@@ -167,7 +170,8 @@ describe('WalletProvider', () => {
     })
 
     expect(walletManager.store.state.activeNetwork).toBe(newNetwork)
-    const { token, baseServer, port, headers } = walletManager.networkConfig[newNetwork]
+    const { algod } = walletManager.networkConfig[newNetwork]
+    const { token, baseServer, port, headers } = algod
     expect(walletManager.algodClient).toEqual(new algosdk.Algodv2(token, baseServer, port, headers))
   })
 })
@@ -469,7 +473,8 @@ describe('useWallet', () => {
     })
 
     expect(result.current.activeNetwork).toBe(newNetwork)
-    const { token, baseServer, port, headers } = mockWalletManager.networkConfig[newNetwork]
+    const { algod } = mockWalletManager.networkConfig[newNetwork]
+    const { token, baseServer, port, headers } = algod
     expect(result.current.algodClient).toEqual(
       new algosdk.Algodv2(token, baseServer, port, headers)
     )

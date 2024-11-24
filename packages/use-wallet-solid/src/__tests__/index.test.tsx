@@ -7,6 +7,7 @@ import {
   NetworkId,
   WalletManager,
   WalletId,
+  DEFAULT_NETWORKS,
   DEFAULT_STATE,
   type State,
   type WalletAccount
@@ -195,7 +196,8 @@ describe('useWallet', () => {
       metadata: { name: 'Defly', icon: 'icon' },
       getAlgodClient: () => ({}) as any,
       store: mockStore,
-      subscribe: vi.fn()
+      subscribe: vi.fn(),
+      networks: DEFAULT_NETWORKS
     })
 
     mockMagicAuth = new MagicAuth({
@@ -203,7 +205,8 @@ describe('useWallet', () => {
       metadata: { name: 'Magic', icon: 'icon' },
       getAlgodClient: () => ({}) as any,
       store: mockStore,
-      subscribe: vi.fn()
+      subscribe: vi.fn(),
+      networks: DEFAULT_NETWORKS
     })
 
     mockWalletManager = new WalletManager()
@@ -394,7 +397,7 @@ describe('useWallet', () => {
 
     const newAlgodClient = new algosdk.Algodv2('', 'https://mainnet-api.4160.nodely.dev/', '')
 
-    mockWalletManager.setActiveNetwork = async (networkId: NetworkId) => {
+    mockWalletManager.setActiveNetwork = async (networkId: string) => {
       mockSetAlgodClient(newAlgodClient)
       mockWalletManager.store.setState((state) => ({
         ...state,
