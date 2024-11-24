@@ -78,51 +78,88 @@ export const DEFAULT_NETWORKS: Record<string, NetworkConfig> = {
   }
 }
 
+// Type for configuring default networks, excluding immutable identifiers
+export type DefaultNetworkConfig = Omit<
+  Partial<NetworkConfig>,
+  'genesisHash' | 'genesisId' | 'caipChainId'
+>
+
 export class NetworkConfigBuilder {
   private networks: Map<string, NetworkConfig>
 
   constructor() {
-    // Initialize with default networks
     this.networks = new Map(Object.entries(DEFAULT_NETWORKS))
   }
 
   // Methods to customize default networks
-  mainnet(config: Partial<AlgodConfig>) {
+  mainnet(config: DefaultNetworkConfig) {
     this.networks.set('mainnet', {
       ...DEFAULT_NETWORKS.mainnet,
-      algod: { ...DEFAULT_NETWORKS.mainnet.algod, ...config }
+      ...config,
+      genesisHash: DEFAULT_NETWORKS.mainnet.genesisHash!,
+      genesisId: DEFAULT_NETWORKS.mainnet.genesisId!,
+      caipChainId: DEFAULT_NETWORKS.mainnet.caipChainId!,
+      algod: {
+        ...DEFAULT_NETWORKS.mainnet.algod,
+        ...(config.algod || {})
+      }
     })
     return this
   }
 
-  testnet(config: Partial<AlgodConfig>) {
+  testnet(config: DefaultNetworkConfig) {
     this.networks.set('testnet', {
       ...DEFAULT_NETWORKS.testnet,
-      algod: { ...DEFAULT_NETWORKS.testnet.algod, ...config }
+      ...config,
+      genesisHash: DEFAULT_NETWORKS.testnet.genesisHash!,
+      genesisId: DEFAULT_NETWORKS.testnet.genesisId!,
+      caipChainId: DEFAULT_NETWORKS.testnet.caipChainId!,
+      algod: {
+        ...DEFAULT_NETWORKS.testnet.algod,
+        ...(config.algod || {})
+      }
     })
     return this
   }
 
-  betanet(config: Partial<AlgodConfig>) {
+  betanet(config: DefaultNetworkConfig) {
     this.networks.set('betanet', {
       ...DEFAULT_NETWORKS.betanet,
-      algod: { ...DEFAULT_NETWORKS.betanet.algod, ...config }
+      ...config,
+      genesisHash: DEFAULT_NETWORKS.betanet.genesisHash!,
+      genesisId: DEFAULT_NETWORKS.betanet.genesisId!,
+      caipChainId: DEFAULT_NETWORKS.betanet.caipChainId!,
+      algod: {
+        ...DEFAULT_NETWORKS.betanet.algod,
+        ...(config.algod || {})
+      }
     })
     return this
   }
 
-  fnet(config: Partial<AlgodConfig>) {
+  fnet(config: DefaultNetworkConfig) {
     this.networks.set('fnet', {
       ...DEFAULT_NETWORKS.fnet,
-      algod: { ...DEFAULT_NETWORKS.fnet.algod, ...config }
+      ...config,
+      genesisHash: DEFAULT_NETWORKS.fnet.genesisHash!,
+      genesisId: DEFAULT_NETWORKS.fnet.genesisId!,
+      caipChainId: DEFAULT_NETWORKS.fnet.caipChainId!,
+      algod: {
+        ...DEFAULT_NETWORKS.fnet.algod,
+        ...(config.algod || {})
+      }
     })
     return this
   }
 
-  localnet(config: Partial<AlgodConfig>) {
+  localnet(config: Partial<NetworkConfig>) {
     this.networks.set('localnet', {
       ...DEFAULT_NETWORKS.localnet,
-      algod: { ...DEFAULT_NETWORKS.localnet.algod, ...config }
+      ...config,
+      algod: {
+        ...DEFAULT_NETWORKS.localnet.algod,
+        ...(config.algod || {})
+      }
     })
     return this
   }
@@ -146,20 +183,42 @@ export class NetworkConfigBuilder {
 // Create a default builder with common presets
 export const createNetworkConfig = () => new NetworkConfigBuilder().build()
 
+// Check if the algod token is valid
+function isValidToken(
+  token: unknown
+): token is string | algosdk.AlgodTokenHeader | algosdk.CustomTokenHeader | algosdk.BaseHTTPClient {
+  if (typeof token === 'string') return true
+  if (typeof token !== 'object' || token === null) return false
+
+  // Check if it's an AlgodTokenHeader
+  if ('X-Algo-API-Token' in token && typeof token['X-Algo-API-Token'] === 'string') return true
+
+  // Check if it's a BaseHTTPClient
+  if ('get' in token && 'post' in token && 'delete' in token) return true
+
+  // Check if it's a CustomTokenHeader (object with string values)
+  return Object.values(token).every((value) => typeof value === 'string')
+}
+
 // Type guard for runtime validation
 export function isNetworkConfig(config: unknown): config is NetworkConfig {
   if (typeof config !== 'object' || config === null) return false
 
-  const { name, algod, isTestnet, genesisHash, genesisId } = config as NetworkConfig
+  const { name, algod, isTestnet, genesisHash, genesisId, caipChainId } = config as NetworkConfig
+
+  const isValidAlgod =
+    typeof algod === 'object' &&
+    algod !== null &&
+    isValidToken(algod.token) &&
+    typeof algod.baseServer === 'string'
 
   return (
     typeof name === 'string' &&
-    typeof algod === 'object' &&
-    typeof algod.token === 'string' &&
-    typeof algod.baseServer === 'string' &&
+    isValidAlgod &&
     (isTestnet === undefined || typeof isTestnet === 'boolean') &&
     (genesisHash === undefined || typeof genesisHash === 'string') &&
-    (genesisId === undefined || typeof genesisId === 'string')
+    (genesisId === undefined || typeof genesisId === 'string') &&
+    (caipChainId === undefined || typeof caipChainId === 'string')
   )
 }
 
