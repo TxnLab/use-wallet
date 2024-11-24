@@ -4,7 +4,7 @@ import algosdk from 'algosdk'
 import { logger } from 'src/logger'
 import { DEFAULT_NETWORKS } from 'src/network'
 import { StorageAdapter } from 'src/storage'
-import { LOCAL_STORAGE_KEY, State, WalletState, defaultState } from 'src/store'
+import { LOCAL_STORAGE_KEY, State, WalletState, DEFAULT_STATE } from 'src/store'
 import { LOCAL_STORAGE_MNEMONIC_KEY, MnemonicWallet } from 'src/wallets/mnemonic'
 import { WalletId } from 'src/wallets/types'
 import type { Mock } from 'vitest'
@@ -101,7 +101,7 @@ describe('MnemonicWallet', () => {
     }
     vi.mocked(logger.createScopedLogger).mockReturnValue(mockLogger)
 
-    store = new Store<State>(defaultState)
+    store = new Store<State>(DEFAULT_STATE)
     wallet = createWalletWithStore(store)
   })
 
@@ -169,7 +169,7 @@ describe('MnemonicWallet', () => {
 
     it('should disconnect if session is found and persisting to storage is disabled', async () => {
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.MNEMONIC]: {
             accounts: [account1],
@@ -192,7 +192,7 @@ describe('MnemonicWallet', () => {
         activeAccount: account1
       }
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.MNEMONIC]: walletState
         }
@@ -212,7 +212,7 @@ describe('MnemonicWallet', () => {
       global.prompt = vi.fn().mockReturnValue('') // Nothing entered into the mnemonic prompt
 
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.MNEMONIC]: {
             accounts: [account1],

@@ -7,6 +7,7 @@ import {
   NetworkId,
   WalletManager,
   WalletId,
+  DEFAULT_STATE,
   type State,
   type WalletAccount
 } from '@txnlab/use-wallet'
@@ -187,14 +188,7 @@ describe('useWallet', () => {
   beforeEach(() => {
     vi.clearAllMocks()
 
-    const defaultState = {
-      wallets: {},
-      activeWallet: null,
-      activeNetwork: NetworkId.TESTNET,
-      algodClient: new algosdk.Algodv2('', 'https://testnet-api.4160.nodely.dev/')
-    }
-
-    mockStore = new Store<State>(defaultState)
+    mockStore = new Store<State>(DEFAULT_STATE)
 
     mockDeflyWallet = new DeflyWallet({
       id: WalletId.DEFLY,

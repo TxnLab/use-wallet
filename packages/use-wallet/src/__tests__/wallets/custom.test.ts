@@ -3,7 +3,7 @@ import algosdk from 'algosdk'
 import { logger } from 'src/logger'
 import { DEFAULT_NETWORKS } from 'src/network'
 import { StorageAdapter } from 'src/storage'
-import { LOCAL_STORAGE_KEY, State, defaultState } from 'src/store'
+import { LOCAL_STORAGE_KEY, State, DEFAULT_STATE } from 'src/store'
 import { CustomProvider, CustomWallet, WalletId } from 'src/wallets'
 import type { Mock } from 'vitest'
 
@@ -101,7 +101,7 @@ describe('CustomWallet', () => {
     }
     vi.mocked(logger.createScopedLogger).mockReturnValue(mockLogger)
 
-    store = new Store<State>(defaultState)
+    store = new Store<State>(DEFAULT_STATE)
     wallet = createWalletWithStore(store)
   })
 
@@ -222,7 +222,7 @@ describe('CustomWallet', () => {
 
     it('should call provider.resumeSession if a session is found', async () => {
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.CUSTOM]: {
             accounts: [account1],
@@ -241,7 +241,7 @@ describe('CustomWallet', () => {
 
     it('should update the store if provider.resumeSession returns different account(s)', async () => {
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.CUSTOM]: {
             accounts: [account1],
@@ -265,7 +265,7 @@ describe('CustomWallet', () => {
 
     it('should still work if provider.resumeSession is not defined', async () => {
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.CUSTOM]: {
             accounts: [account1],

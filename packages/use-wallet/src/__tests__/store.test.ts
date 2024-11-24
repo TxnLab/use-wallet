@@ -3,7 +3,7 @@ import { Algodv2 } from 'algosdk'
 import {
   State,
   addWallet,
-  defaultState,
+  DEFAULT_STATE,
   removeWallet,
   setAccounts,
   setActiveAccount,
@@ -30,7 +30,7 @@ describe('Mutations', () => {
   let store: Store<State>
 
   beforeEach(() => {
-    store = new Store<State>(defaultState)
+    store = new Store<State>(DEFAULT_STATE)
   })
 
   describe('addWallet', () => {
@@ -93,7 +93,7 @@ describe('Mutations', () => {
   describe('removeWallet', () => {
     beforeEach(() => {
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.DEFLY]: {
             accounts: [
@@ -561,13 +561,13 @@ describe('Type Guards', () => {
 
   describe('isValidState', () => {
     it('returns true for a valid state', () => {
-      const defaultState: State = {
+      const DEFAULT_STATE: State = {
         wallets: {},
         activeWallet: null,
         activeNetwork: 'testnet',
         algodClient: new Algodv2('', 'https://testnet-api.4160.nodely.dev/')
       }
-      expect(isValidState(defaultState)).toBe(true)
+      expect(isValidState(DEFAULT_STATE)).toBe(true)
 
       const state: State = {
         wallets: {

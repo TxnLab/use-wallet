@@ -7,7 +7,7 @@ import {
   NetworkId,
   WalletManager,
   WalletId,
-  defaultState,
+  DEFAULT_STATE,
   type State,
   type WalletAccount
 } from '@txnlab/use-wallet'
@@ -69,7 +69,7 @@ vi.mock('vue', async (importOriginal) => {
   }
 })
 
-const mockStore = new Store<State>(defaultState)
+const mockStore = new Store<State>(DEFAULT_STATE)
 
 const mockDeflyWallet = new DeflyWallet({
   id: WalletId.DEFLY,
@@ -109,7 +109,7 @@ describe('useWallet', () => {
   beforeEach(() => {
     vi.clearAllMocks()
 
-    mockStore.setState(() => defaultState)
+    mockStore.setState(() => DEFAULT_STATE)
 
     mockWalletManager = new WalletManager()
     mockWallets = [

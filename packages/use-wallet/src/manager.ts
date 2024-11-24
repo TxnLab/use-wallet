@@ -4,7 +4,7 @@ import { Logger, LogLevel, logger } from 'src/logger'
 import { createNetworkConfig, isNetworkConfig, type NetworkConfig } from 'src/network'
 import { StorageAdapter } from 'src/storage'
 import {
-  defaultState,
+  DEFAULT_STATE,
   isValidState,
   LOCAL_STORAGE_KEY,
   removeWallet,
@@ -88,7 +88,7 @@ export class WalletManager {
 
     // Create initial state
     const initialState: State = {
-      ...defaultState,
+      ...DEFAULT_STATE,
       ...persistedState,
       activeNetwork,
       algodClient

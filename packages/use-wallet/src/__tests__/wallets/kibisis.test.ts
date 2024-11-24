@@ -12,7 +12,7 @@ import algosdk from 'algosdk'
 import { logger } from 'src/logger'
 import { DEFAULT_NETWORKS } from 'src/network'
 import { StorageAdapter } from 'src/storage'
-import { defaultState, LOCAL_STORAGE_KEY, State } from 'src/store'
+import { DEFAULT_STATE, LOCAL_STORAGE_KEY, State } from 'src/store'
 import { WalletId } from 'src/wallets'
 import { KibisisWallet, KIBISIS_AVM_WEB_PROVIDER_ID } from 'src/wallets/kibisis'
 import { base64ToByteArray, byteArrayToBase64 } from 'src/utils'
@@ -141,7 +141,7 @@ describe('KibisisWallet', () => {
         } as IEnableResult)
       )
 
-    store = new Store<State>(defaultState)
+    store = new Store<State>(DEFAULT_STATE)
     wallet = createWalletWithStore(store)
   })
 
@@ -221,7 +221,7 @@ describe('KibisisWallet', () => {
 
     it(`should call the client's _enable method if Kibisis wallet data is found in the store`, async () => {
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.KIBISIS]: {
             accounts: [account1],
@@ -239,7 +239,7 @@ describe('KibisisWallet', () => {
 
     it(`should not call the client's _enable method if Kibisis wallet data is not found in the store`, async () => {
       // No wallets in store
-      store = new Store<State>(defaultState)
+      store = new Store<State>(DEFAULT_STATE)
       wallet = createWalletWithStore(store)
 
       await wallet.resumeSession()
@@ -251,7 +251,7 @@ describe('KibisisWallet', () => {
     it('should update the store if accounts returned by the client do not match', async () => {
       // Store contains 'account1' and 'account2', with 'account1' as active
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.KIBISIS]: {
             accounts: [account1, account2],

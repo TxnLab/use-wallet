@@ -17,7 +17,7 @@ export interface State {
   algodClient: algosdk.Algodv2
 }
 
-export const defaultState: State = {
+export const DEFAULT_STATE: State = {
   wallets: {},
   activeWallet: null,
   activeNetwork: 'testnet',

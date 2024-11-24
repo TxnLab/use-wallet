@@ -4,7 +4,7 @@ import algosdk from 'algosdk'
 import { logger } from 'src/logger'
 import { DEFAULT_NETWORKS, NetworkConfig } from 'src/network'
 import { StorageAdapter } from 'src/storage'
-import { LOCAL_STORAGE_KEY, State, WalletState, defaultState } from 'src/store'
+import { LOCAL_STORAGE_KEY, State, WalletState, DEFAULT_STATE } from 'src/store'
 import { base64ToByteArray, byteArrayToBase64 } from 'src/utils'
 import { WalletConnect } from 'src/wallets/walletconnect'
 import { WalletId, WalletTransaction } from 'src/wallets/types'
@@ -165,7 +165,7 @@ describe('WalletConnect', () => {
     }
     vi.mocked(logger.createScopedLogger).mockReturnValue(mockLogger)
 
-    store = new Store<State>(defaultState)
+    store = new Store<State>(DEFAULT_STATE)
     wallet = createWalletWithStore(store)
   })
 
@@ -276,7 +276,7 @@ describe('WalletConnect', () => {
       }
 
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.WALLETCONNECT]: walletState
         }
@@ -317,7 +317,7 @@ describe('WalletConnect', () => {
       }
 
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.WALLETCONNECT]: prevWalletState
         }

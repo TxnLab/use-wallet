@@ -3,7 +3,7 @@ import { Store } from '@tanstack/store'
 import { Transaction, TransactionType } from 'algosdk'
 import { logger } from 'src/logger'
 import { StorageAdapter } from 'src/storage'
-import { LOCAL_STORAGE_KEY, State, WalletState, defaultState } from 'src/store'
+import { LOCAL_STORAGE_KEY, State, WalletState, DEFAULT_STATE } from 'src/store'
 import { LiquidWallet } from 'src/wallets/liquid'
 import { WalletId } from 'src/wallets/types'
 import { DEFAULT_NETWORKS } from 'src/network'
@@ -102,7 +102,7 @@ describe('LiquidWallet', () => {
     }
     vi.mocked(logger.createScopedLogger).mockReturnValue(mockLogger)
 
-    store = new Store<State>(defaultState)
+    store = new Store<State>(DEFAULT_STATE)
     wallet = createWalletWithStore(store)
   })
 
@@ -178,7 +178,7 @@ describe('LiquidWallet', () => {
       }
 
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.LIQUID]: walletState
         }

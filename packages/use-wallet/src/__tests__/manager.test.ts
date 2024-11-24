@@ -2,7 +2,7 @@ import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
 import { logger } from 'src/logger'
 import { NetworkConfigBuilder } from 'src/network'
-import { LOCAL_STORAGE_KEY, State, defaultState } from 'src/store'
+import { LOCAL_STORAGE_KEY, State, DEFAULT_STATE } from 'src/store'
 import { WalletManager } from 'src/manager'
 import { StorageAdapter } from 'src/storage'
 import { BaseWallet } from 'src/wallets/base'
@@ -98,7 +98,7 @@ vi.mock('src/wallets/kibisis', () => ({
   }
 }))
 
-const mockStore = new Store<State>(defaultState)
+const mockStore = new Store<State>(DEFAULT_STATE)
 
 const mockDeflyWallet = new DeflyWallet({
   id: WalletId.DEFLY,
@@ -338,7 +338,7 @@ describe('WalletManager', () => {
       })
 
       // Store initializes with default state if null is returned
-      expect(manager.store.state).toEqual(defaultState)
+      expect(manager.store.state).toEqual(DEFAULT_STATE)
       expect(manager.activeWallet).toBeNull()
       expect(manager.activeNetwork).toBe('testnet')
     })
@@ -356,7 +356,7 @@ describe('WalletManager', () => {
         'Could not load state from local storage: Persisted state is invalid'
       )
       // Store initializes with default state if null is returned
-      expect(manager.store.state).toEqual(defaultState)
+      expect(manager.store.state).toEqual(DEFAULT_STATE)
     })
   })
 

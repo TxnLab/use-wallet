@@ -2,7 +2,7 @@ import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
 import { logger } from 'src/logger'
 import { StorageAdapter } from 'src/storage'
-import { LOCAL_STORAGE_KEY, State, WalletState, defaultState } from 'src/store'
+import { LOCAL_STORAGE_KEY, State, WalletState, DEFAULT_STATE } from 'src/store'
 import { byteArrayToBase64 } from 'src/utils'
 import { LuteWallet } from 'src/wallets/lute'
 import { SignTxnsError, WalletId } from 'src/wallets/types'
@@ -131,7 +131,7 @@ describe('LuteWallet', () => {
     }
     vi.mocked(logger.createScopedLogger).mockReturnValue(mockLogger)
 
-    store = new Store<State>(defaultState)
+    store = new Store<State>(DEFAULT_STATE)
     wallet = createWalletWithStore(store)
   })
 
@@ -202,7 +202,7 @@ describe('LuteWallet', () => {
       }
 
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.LUTE]: walletState
         }

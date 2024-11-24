@@ -3,7 +3,7 @@ import algosdk from 'algosdk'
 import { logger } from 'src/logger'
 import { DEFAULT_NETWORKS } from 'src/network'
 import { StorageAdapter } from 'src/storage'
-import { LOCAL_STORAGE_KEY, State, WalletState, defaultState } from 'src/store'
+import { LOCAL_STORAGE_KEY, State, WalletState, DEFAULT_STATE } from 'src/store'
 import { PeraWallet } from 'src/wallets/pera2'
 import { WalletId } from 'src/wallets/types'
 import type { Mock } from 'vitest'
@@ -109,7 +109,7 @@ describe('PeraWallet', () => {
     }
     vi.mocked(logger.createScopedLogger).mockReturnValue(mockLogger)
 
-    store = new Store<State>(defaultState)
+    store = new Store<State>(DEFAULT_STATE)
     wallet = createWalletWithStore(store)
   })
 
@@ -217,7 +217,7 @@ describe('PeraWallet', () => {
       }
 
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.PERA2]: walletState
         }
@@ -254,7 +254,7 @@ describe('PeraWallet', () => {
       }
 
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.PERA2]: prevWalletState
         }
@@ -296,7 +296,7 @@ describe('PeraWallet', () => {
       }
 
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.PERA2]: walletState
         }
@@ -318,7 +318,7 @@ describe('PeraWallet', () => {
       }
 
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.PERA2]: walletState
         }
