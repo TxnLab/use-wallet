@@ -10,8 +10,9 @@ import {
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
 import { logger } from 'src/logger'
+import { DEFAULT_NETWORKS } from 'src/network'
 import { StorageAdapter } from 'src/storage'
-import { defaultState, LOCAL_STORAGE_KEY, State } from 'src/store'
+import { DEFAULT_STATE, LOCAL_STORAGE_KEY, State } from 'src/store'
 import { WalletId } from 'src/wallets'
 import { DeflyWebWallet, DEFLY_WEB_PROVIDER_ID } from 'src/wallets/defly-web'
 import { base64ToByteArray, byteArrayToBase64 } from 'src/utils'
@@ -60,7 +61,8 @@ function createWalletWithStore(store: Store<State>): DeflyWebWallet {
         })
       }) as any,
     store,
-    subscribe: vi.fn()
+    subscribe: vi.fn(),
+    networks: DEFAULT_NETWORKS
   })
 }
 
@@ -139,7 +141,7 @@ describe('DeflyWebWallet', () => {
         } as IEnableResult)
       )
 
-    store = new Store<State>(defaultState)
+    store = new Store<State>(DEFAULT_STATE)
     wallet = createWalletWithStore(store)
   })
 
@@ -219,7 +221,7 @@ describe('DeflyWebWallet', () => {
 
     it(`should call the client's _enable method if Defly Web wallet data is found in the store`, async () => {
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.DEFLY_WEB]: {
             accounts: [account1],
@@ -237,7 +239,7 @@ describe('DeflyWebWallet', () => {
 
     it(`should not call the client's _enable method if Defly Web wallet data is not found in the store`, async () => {
       // No wallets in store
-      store = new Store<State>(defaultState)
+      store = new Store<State>(DEFAULT_STATE)
       wallet = createWalletWithStore(store)
 
       await wallet.resumeSession()
@@ -249,7 +251,7 @@ describe('DeflyWebWallet', () => {
     it('should update the store if accounts returned by the client do not match', async () => {
       // Store contains 'account1' and 'account2', with 'account1' as active
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.DEFLY_WEB]: {
             accounts: [account1, account2],
@@ -284,21 +286,26 @@ describe('DeflyWebWallet', () => {
   })
 
   describe('signing transactions', () => {
-    const txnParams = {
-      from: ACCOUNT_1,
-      to: ACCOUNT_2,
-      fee: 10,
-      firstRound: 51,
-      lastRound: 61,
-      genesisHash: TESTNET_GENESIS_HASH,
-      genesisID: 'testnet-v1.0'
+    const makePayTxn = ({ amount = 1000, sender = ACCOUNT_1, receiver = ACCOUNT_2 }) => {
+      return new algosdk.Transaction({
+        type: algosdk.TransactionType.pay,
+        sender,
+        suggestedParams: {
+          fee: 0,
+          firstValid: 51,
+          lastValid: 61,
+          minFee: 1000,
+          genesisID: 'mainnet-v1.0'
+        },
+        paymentParams: { receiver, amount }
+      })
     }
 
     // Transactions used in tests
-    const txn1 = new algosdk.Transaction({ ...txnParams, amount: 1000 })
-    const txn2 = new algosdk.Transaction({ ...txnParams, amount: 2000 })
-    const txn3 = new algosdk.Transaction({ ...txnParams, amount: 3000 })
-    const txn4 = new algosdk.Transaction({ ...txnParams, amount: 4000 })
+    const txn1 = makePayTxn({ amount: 1000 })
+    const txn2 = makePayTxn({ amount: 2000 })
+    const txn3 = makePayTxn({ amount: 3000 })
+    const txn4 = makePayTxn({ amount: 4000 })
 
     // Mock signed transactions (base64 strings) returned by Kibisis
     const mockSignedTxns = [byteArrayToBase64(txn1.toByte())]
@@ -439,23 +446,12 @@ describe('DeflyWebWallet', () => {
       })
 
       it('should only send transactions with connected signers for signature', async () => {
-        const canSignTxn1 = new algosdk.Transaction({
-          ...txnParams,
-          from: ACCOUNT_1,
-          amount: 1000
-        })
+        // Not connected account
+        const notConnectedAcct = 'EW64GC6F24M7NDSC5R3ES4YUVE3ZXXNMARJHDCCCLIHZU6TBEOC7XRSBG4'
 
-        const cannotSignTxn2 = new algosdk.Transaction({
-          ...txnParams,
-          from: 'EW64GC6F24M7NDSC5R3ES4YUVE3ZXXNMARJHDCCCLIHZU6TBEOC7XRSBG4', // EW64GC is not connected
-          amount: 2000
-        })
-
-        const canSignTxn3 = new algosdk.Transaction({
-          ...txnParams,
-          from: ACCOUNT_2,
-          amount: 3000
-        })
+        const canSignTxn1 = makePayTxn({ sender: ACCOUNT_1, amount: 1000 })
+        const cannotSignTxn2 = makePayTxn({ sender: notConnectedAcct, amount: 2000 })
+        const canSignTxn3 = makePayTxn({ sender: ACCOUNT_2, amount: 3000 })
 
         // Signer for gtxn2 is not a connected account
         const [gtxn1, gtxn2, gtxn3] = algosdk.assignGroupID([

@@ -67,9 +67,16 @@ export abstract class AVMProvider extends BaseWallet {
   }
 
   protected async _getGenesisHash(): Promise<string> {
+    // First try to get from network config
+    const network = this.activeNetworkConfig
+    if (network.genesisHash) {
+      return network.genesisHash
+    }
+
+    // Fallback to API request
     const algodClient = this.getAlgodClient()
     const version = await algodClient.versionsCheck().do()
-    return version.genesis_hash_b64
+    return algosdk.bytesToBase64(version.genesisHashB64)
   }
 
   protected _mapAVMWebProviderAccountToWalletAccounts(
@@ -89,7 +96,7 @@ export abstract class AVMProvider extends BaseWallet {
 
     txnGroup.forEach((txn, index) => {
       const isIndexMatch = !indexesToSign || indexesToSign.includes(index)
-      const signer = algosdk.encodeAddress(txn.from.publicKey)
+      const signer = txn.sender.toString()
       const canSignTxn = this.addresses.includes(signer)
 
       const txnString = byteArrayToBase64(txn.toByte())
@@ -111,18 +118,15 @@ export abstract class AVMProvider extends BaseWallet {
     const txnsToSign: AVMWebProviderSDK.IARC0001Transaction[] = []
 
     txnGroup.forEach((txnBuffer, index) => {
-      const txnDecodeObj = algosdk.decodeObj(txnBuffer) as
-        | algosdk.EncodedTransaction
-        | algosdk.EncodedSignedTransaction
-
-      const isSigned = isSignedTxn(txnDecodeObj)
+      const decodedObj = algosdk.msgpackRawDecode(txnBuffer)
+      const isSigned = isSignedTxn(decodedObj)
 
       const txn: algosdk.Transaction = isSigned
         ? algosdk.decodeSignedTransaction(txnBuffer).txn
         : algosdk.decodeUnsignedTransaction(txnBuffer)
 
       const isIndexMatch = !indexesToSign || indexesToSign.includes(index)
-      const signer = algosdk.encodeAddress(txn.from.publicKey)
+      const signer = txn.sender.toString()
       const canSignTxn = !isSigned && this.addresses.includes(signer)
 
       const txnString = byteArrayToBase64(txn.toByte())
