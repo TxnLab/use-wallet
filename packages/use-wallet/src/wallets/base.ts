@@ -1,10 +1,10 @@
 import { logger } from 'src/logger'
+import { NetworkConfig } from 'src/network'
 import { StorageAdapter } from 'src/storage'
 import { setActiveWallet, setActiveAccount, removeWallet, type State } from 'src/store'
 import type { Store } from '@tanstack/store'
 import type algosdk from 'algosdk'
 import type { WalletAccount, WalletConstructor, WalletId, WalletMetadata } from 'src/wallets/types'
-import { NetworkConfig } from 'src/network'
 
 interface WalletConstructorType {
   new (...args: any[]): BaseWallet
@@ -126,6 +126,11 @@ export abstract class BaseWallet {
   public get isActive(): boolean {
     const state = this.store.state
     return state.activeWallet === this.id
+  }
+
+  // Make networks accessible for testing
+  public get networkConfig(): Record<string, NetworkConfig> {
+    return this.networks
   }
 
   protected get activeNetworkConfig(): NetworkConfig {

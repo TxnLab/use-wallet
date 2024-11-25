@@ -20,7 +20,6 @@ import type {
   WalletId,
   WalletTransaction
 } from 'src/wallets/types'
-import { NetworkConfig } from 'src/network'
 
 interface SignClientOptions {
   projectId: string
@@ -361,11 +360,6 @@ export class WalletConnect extends BaseWallet {
       return ''
     }
     return network.caipChainId
-  }
-
-  // Make networks accessible for testing
-  public get networkConfig(): Record<string, NetworkConfig> {
-    return this.networks
   }
 
   public connect = async (): Promise<WalletAccount[]> => {
