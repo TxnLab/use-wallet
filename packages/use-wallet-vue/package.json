@@ -17,7 +17,7 @@
   "scripts": {
     "build": "tsup",
     "start": "tsup src/index.ts --watch",
-    "test": "vitest",
+    "test": "vitest run",
     "test:watch": "vitest --watch",
     "lint": "eslint -c \"../../.eslintrc.json\" \"**/*.{js,ts}\"",
     "typecheck": "tsc --noEmit"
