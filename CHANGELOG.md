@@ -1,3 +1,13 @@
+# [3.10.0](https://github.com/txnlab/use-wallet/compare/v3.9.0...v3.10.0) (2024-10-25)
+
+### Features
+
+- **Webpack:** Add `webpackFallback` export to resolve optional wallet dependencies ([#307](https://github.com/txnlab/use-wallet/pull/307)) ([32baa7f](https://github.com/txnlab/use-wallet/commit/32baa7fbaf86418f2ad90a292a9a02b2c4f17fd0))
+
+### Documentation
+
+- Add Webpack configuration for Next.js ([#308](https://github.com/txnlab/use-wallet/pull/308)) ([ddb9c57](https://github.com/txnlab/use-wallet/commit/ddb9c5741cdb16fb8b9b553affc9f4dd40b1fe3c))
+
 # [3.9.0](https://github.com/txnlab/use-wallet/compare/v3.8.0...v3.9.0) (2024-10-21)
 
 ### Features
