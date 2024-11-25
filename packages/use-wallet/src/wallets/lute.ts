@@ -38,9 +38,10 @@ export class LuteWallet extends BaseWallet {
     subscribe,
     getAlgodClient,
     options,
-    metadata = {}
+    metadata = {},
+    networks
   }: WalletConstructor<WalletId.LUTE>) {
-    super({ id, metadata, getAlgodClient, store, subscribe })
+    super({ id, metadata, getAlgodClient, store, subscribe, networks })
     if (!options?.siteName) {
       this.logger.error('Missing required option: siteName')
       throw new Error('Missing required option: siteName')
@@ -66,14 +67,17 @@ export class LuteWallet extends BaseWallet {
   }
 
   private async getGenesisId(): Promise<string> {
+    const network = this.activeNetworkConfig
+    if (network.genesisId) {
+      return network.genesisId
+    }
+
     const algodClient = this.getAlgodClient()
     const genesisStr = await algodClient.genesis().do()
     const genesis = algosdk.parseJSON(genesisStr, {
       intDecoding: algosdk.IntDecoding.MIXED
     })
-    const genesisId = `${genesis.network}-${genesis.id}`
-
-    return genesisId
+    return `${genesis.network}-${genesis.id}`
   }
 
   public connect = async (): Promise<WalletAccount[]> => {

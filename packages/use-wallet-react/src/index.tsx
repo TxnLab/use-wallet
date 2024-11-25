@@ -1,5 +1,5 @@
 import { useStore } from '@tanstack/react-store'
-import { NetworkId, WalletAccount, WalletManager, WalletMetadata } from '@txnlab/use-wallet'
+import { WalletAccount, WalletManager, WalletMetadata } from '@txnlab/use-wallet'
 import algosdk from 'algosdk'
 import * as React from 'react'
 
@@ -37,14 +37,19 @@ export const useWallet = () => {
 
   const activeNetwork = useStore(manager.store, (state) => state.activeNetwork)
 
-  const setActiveNetwork = async (networkId: NetworkId): Promise<void> => {
+  const setActiveNetwork = async (networkId: string): Promise<void> => {
     if (networkId === activeNetwork) {
       return
     }
 
+    if (!manager.networkConfig[networkId]) {
+      throw new Error(`Network "${networkId}" not found in network configuration`)
+    }
+
     console.info(`[React] Creating Algodv2 client for ${networkId}...`)
 
-    const { token = '', baseServer, port = '', headers = {} } = manager.networkConfig[networkId]
+    const { algod } = manager.networkConfig[networkId]
+    const { token = '', baseServer, port = '', headers = {} } = algod
     const newClient = new algosdk.Algodv2(token, baseServer, port, headers)
     setAlgodClient(newClient)
 

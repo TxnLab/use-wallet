@@ -30,7 +30,7 @@ app.use(WalletManagerPlugin, {
       options: { apiKey: 'pk_live_D17FD8D89621B5F3' }
     }
   ],
-  network: NetworkId.TESTNET
+  defaultNetwork: NetworkId.TESTNET
 })
 
 app.mount('#app')

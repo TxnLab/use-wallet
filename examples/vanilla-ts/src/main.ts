@@ -30,7 +30,7 @@ const walletManager = new WalletManager({
       options: { apiKey: 'pk_live_D17FD8D89621B5F3' }
     }
   ],
-  network: NetworkId.TESTNET
+  defaultNetwork: NetworkId.TESTNET
 })
 
 const appDiv = document.querySelector<HTMLDivElement>('#app')

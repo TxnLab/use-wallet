@@ -1,5 +1,4 @@
 import algosdk from 'algosdk'
-import { NetworkId } from 'src/network'
 import { StorageAdapter } from 'src/storage'
 import { LOCAL_STORAGE_KEY, WalletState, addWallet, type State } from 'src/store'
 import { flattenTxnGroup, isSignedTxn, isTransactionArray } from 'src/utils'
@@ -32,9 +31,10 @@ export class MnemonicWallet extends BaseWallet {
     subscribe,
     getAlgodClient,
     options,
-    metadata = {}
+    metadata = {},
+    networks
   }: WalletConstructor<WalletId.MNEMONIC>) {
-    super({ id, metadata, getAlgodClient, store, subscribe })
+    super({ id, metadata, getAlgodClient, store, subscribe, networks })
 
     const { persistToStorage = false } = options || {}
     this.options = { persistToStorage }
@@ -67,12 +67,12 @@ export class MnemonicWallet extends BaseWallet {
 
   private checkMainnet(): void {
     try {
-      const network = this.activeNetwork
-      if (network === NetworkId.MAINNET) {
+      const network = this.activeNetworkConfig
+      if (!network.isTestnet) {
         this.logger.warn(
           'The Mnemonic wallet provider is insecure and intended for testing only. Any private key mnemonics used should never hold real Algos (i.e., on MainNet).'
         )
-        throw new Error('MainNet active network detected. Aborting.')
+        throw new Error('Production network detected. Aborting.')
       }
     } catch (error) {
       this.disconnect()

@@ -1,8 +1,9 @@
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
 import { logger } from 'src/logger'
+import { DEFAULT_NETWORKS } from 'src/network'
 import { StorageAdapter } from 'src/storage'
-import { LOCAL_STORAGE_KEY, State, WalletState, defaultState } from 'src/store'
+import { LOCAL_STORAGE_KEY, State, WalletState, DEFAULT_STATE } from 'src/store'
 import { base64ToByteArray, byteArrayToBase64 } from 'src/utils'
 import { Exodus, ExodusWallet } from 'src/wallets/exodus'
 import { WalletId } from 'src/wallets/types'
@@ -52,7 +53,8 @@ function createWalletWithStore(store: Store<State>): ExodusWallet {
     metadata: {},
     getAlgodClient: () => ({}) as any,
     store,
-    subscribe: vi.fn()
+    subscribe: vi.fn(),
+    networks: DEFAULT_NETWORKS
   })
 }
 
@@ -100,7 +102,7 @@ describe('ExodusWallet', () => {
     }
     vi.mocked(logger.createScopedLogger).mockReturnValue(mockLogger)
 
-    store = new Store<State>(defaultState)
+    store = new Store<State>(DEFAULT_STATE)
     wallet = createWalletWithStore(store)
   })
 
@@ -182,7 +184,7 @@ describe('ExodusWallet', () => {
       }
 
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.EXODUS]: walletState
         }
@@ -206,7 +208,7 @@ describe('ExodusWallet', () => {
       }
 
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.EXODUS]: walletState
         }

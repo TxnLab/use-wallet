@@ -38,10 +38,11 @@ export class CustomWallet extends BaseWallet {
     store,
     subscribe,
     getAlgodClient,
+    networks,
     options,
     metadata = {}
   }: WalletConstructor<WalletId.CUSTOM>) {
-    super({ id, metadata, getAlgodClient, store, subscribe })
+    super({ id, metadata, getAlgodClient, store, subscribe, networks })
     if (!options?.provider) {
       this.logger.error('Missing required option: provider')
       throw new Error('Missing required option: provider')

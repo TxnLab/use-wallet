@@ -7,7 +7,8 @@ import {
   NetworkId,
   WalletManager,
   WalletId,
-  defaultState,
+  DEFAULT_NETWORKS,
+  DEFAULT_STATE,
   type State,
   type WalletAccount
 } from '@txnlab/use-wallet'
@@ -52,14 +53,15 @@ vi.mock('@txnlab/use-wallet', async (importOriginal) => {
   }
 })
 
-const mockStore = new Store<State>(defaultState)
+const mockStore = new Store<State>(DEFAULT_STATE)
 
 const mockDeflyWallet = new DeflyWallet({
   id: WalletId.DEFLY,
   metadata: { name: 'Defly', icon: 'icon' },
   getAlgodClient: () => ({}) as any,
   store: mockStore,
-  subscribe: vi.fn()
+  subscribe: vi.fn(),
+  networks: DEFAULT_NETWORKS
 })
 
 const mockMagicAuth = new MagicAuth({
@@ -70,7 +72,8 @@ const mockMagicAuth = new MagicAuth({
   metadata: { name: 'Magic', icon: 'icon' },
   getAlgodClient: () => ({}) as any,
   store: mockStore,
-  subscribe: vi.fn()
+  subscribe: vi.fn(),
+  networks: DEFAULT_NETWORKS
 })
 
 describe('WalletProvider', () => {
@@ -148,7 +151,7 @@ describe('WalletProvider', () => {
 
     const walletManager = new WalletManager({
       wallets: [WalletId.DEFLY],
-      network: NetworkId.TESTNET
+      defaultNetwork: NetworkId.TESTNET
     })
 
     const TestComponent = () => {
@@ -167,7 +170,8 @@ describe('WalletProvider', () => {
     })
 
     expect(walletManager.store.state.activeNetwork).toBe(newNetwork)
-    const { token, baseServer, port, headers } = walletManager.networkConfig[newNetwork]
+    const { algod } = walletManager.networkConfig[newNetwork]
+    const { token, baseServer, port, headers } = algod
     expect(walletManager.algodClient).toEqual(new algosdk.Algodv2(token, baseServer, port, headers))
   })
 })
@@ -180,7 +184,7 @@ describe('useWallet', () => {
   beforeEach(() => {
     vi.clearAllMocks()
 
-    mockStore.setState(() => defaultState)
+    mockStore.setState(() => DEFAULT_STATE)
 
     mockWalletManager = new WalletManager()
     mockWallets = [
@@ -460,18 +464,49 @@ describe('useWallet', () => {
     expect(result.current.algodClient).toBe(newAlgodClient)
   })
 
-  it('calls setActiveNetwork correctly and updates algodClient', async () => {
-    const newNetwork = NetworkId.MAINNET
-    const { result } = renderHook(() => useWallet(), { wrapper })
+  describe('setActiveNetwork', () => {
+    it('calls setActiveNetwork correctly and updates algodClient', async () => {
+      const { result } = renderHook(() => useWallet(), { wrapper })
+      const newNetwork = NetworkId.MAINNET
 
-    await act(async () => {
-      await result.current.setActiveNetwork(newNetwork)
+      await act(async () => {
+        await result.current.setActiveNetwork(newNetwork)
+      })
+
+      expect(result.current.activeNetwork).toBe(newNetwork)
+      const { algod } = mockWalletManager.networkConfig[newNetwork]
+      const { token, baseServer, port, headers } = algod
+      expect(result.current.algodClient).toEqual(
+        new algosdk.Algodv2(token, baseServer, port, headers)
+      )
     })
 
-    expect(result.current.activeNetwork).toBe(newNetwork)
-    const { token, baseServer, port, headers } = mockWalletManager.networkConfig[newNetwork]
-    expect(result.current.algodClient).toEqual(
-      new algosdk.Algodv2(token, baseServer, port, headers)
-    )
+    it('throws error for invalid network', async () => {
+      const { result } = renderHook(() => useWallet(), { wrapper })
+
+      await expect(result.current.setActiveNetwork('invalid-network')).rejects.toThrow(
+        'Network "invalid-network" not found in network configuration'
+      )
+    })
+
+    it('allows setting custom network that exists in config', async () => {
+      const customNetwork = {
+        name: 'Custom Network',
+        algod: {
+          token: '',
+          baseServer: 'https://custom.network',
+          headers: {}
+        }
+      }
+
+      mockWalletManager.networkConfig['custom-net'] = customNetwork
+      const { result } = renderHook(() => useWallet(), { wrapper })
+
+      await act(async () => {
+        await result.current.setActiveNetwork('custom-net')
+      })
+
+      expect(result.current.activeNetwork).toBe('custom-net')
+    })
   })
 })

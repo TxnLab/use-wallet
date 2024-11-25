@@ -7,7 +7,8 @@ import {
   NetworkId,
   WalletManager,
   WalletId,
-  defaultState,
+  DEFAULT_NETWORKS,
+  DEFAULT_STATE,
   type State,
   type WalletAccount
 } from '@txnlab/use-wallet'
@@ -69,14 +70,15 @@ vi.mock('vue', async (importOriginal) => {
   }
 })
 
-const mockStore = new Store<State>(defaultState)
+const mockStore = new Store<State>(DEFAULT_STATE)
 
 const mockDeflyWallet = new DeflyWallet({
   id: WalletId.DEFLY,
   metadata: { name: 'Defly', icon: 'icon' },
   getAlgodClient: () => ({}) as any,
   store: mockStore,
-  subscribe: vi.fn()
+  subscribe: vi.fn(),
+  networks: DEFAULT_NETWORKS
 })
 
 const mockMagicAuth = new MagicAuth({
@@ -87,7 +89,8 @@ const mockMagicAuth = new MagicAuth({
   metadata: { name: 'Magic', icon: 'icon' },
   getAlgodClient: () => ({}) as any,
   store: mockStore,
-  subscribe: vi.fn()
+  subscribe: vi.fn(),
+  networks: DEFAULT_NETWORKS
 })
 
 const mockAlgodClient = ref(new algosdk.Algodv2('token', 'https://server', ''))
@@ -109,7 +112,7 @@ describe('useWallet', () => {
   beforeEach(() => {
     vi.clearAllMocks()
 
-    mockStore.setState(() => defaultState)
+    mockStore.setState(() => DEFAULT_STATE)
 
     mockWalletManager = new WalletManager()
     mockWallets = [
@@ -297,7 +300,7 @@ describe('useWallet', () => {
     // Default mainnet algod config
     const newAlgodClient = new algosdk.Algodv2('', 'https://mainnet-api.4160.nodely.dev/', '')
 
-    mockWalletManager.setActiveNetwork = async (networkId: NetworkId) => {
+    mockWalletManager.setActiveNetwork = async (networkId: string) => {
       mockSetAlgodClient(newAlgodClient)
       mockWalletManager.store.setState((state) => ({
         ...state,
@@ -387,5 +390,32 @@ describe('useWallet', () => {
     expect(wrapper.get('[data-testid="activeNetwork"]').text()).toBe(NetworkId.TESTNET)
     expect(wrapper.get('[data-testid="activeWallet"]').text()).toBe(WalletId.DEFLY)
     expect(wrapper.get('[data-testid="activeAddress"]').text()).toBe('address1')
+  })
+
+  describe('setActiveNetwork', () => {
+    it('throws error for invalid network', async () => {
+      const { setActiveNetwork } = useWallet()
+
+      await expect(setActiveNetwork('invalid-network')).rejects.toThrow(
+        'Network "invalid-network" not found in network configuration'
+      )
+    })
+
+    it('allows setting custom network that exists in config', async () => {
+      const customNetwork = {
+        name: 'Custom Network',
+        algod: {
+          token: '',
+          baseServer: 'https://custom.network',
+          headers: {}
+        }
+      }
+
+      mockWalletManager.networkConfig['custom-net'] = customNetwork
+      const { setActiveNetwork, activeNetwork } = useWallet()
+
+      await setActiveNetwork('custom-net')
+      expect(activeNetwork.value).toBe('custom-net')
+    })
   })
 })

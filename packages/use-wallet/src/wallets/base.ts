@@ -1,9 +1,9 @@
 import { logger } from 'src/logger'
+import { NetworkConfig } from 'src/network'
 import { StorageAdapter } from 'src/storage'
 import { setActiveWallet, setActiveAccount, removeWallet, type State } from 'src/store'
 import type { Store } from '@tanstack/store'
 import type algosdk from 'algosdk'
-import type { NetworkId } from 'src/network'
 import type { WalletAccount, WalletConstructor, WalletId, WalletMetadata } from 'src/wallets/types'
 
 interface WalletConstructorType {
@@ -14,6 +14,7 @@ interface WalletConstructorType {
 export abstract class BaseWallet {
   readonly id: WalletId
   readonly metadata: WalletMetadata
+  protected readonly networks: Record<string, NetworkConfig>
 
   protected store: Store<State>
   protected getAlgodClient: () => algosdk.Algodv2
@@ -27,12 +28,14 @@ export abstract class BaseWallet {
     metadata,
     store,
     subscribe,
-    getAlgodClient
+    getAlgodClient,
+    networks
   }: WalletConstructor<WalletId>) {
     this.id = id
     this.store = store
     this.subscribe = subscribe
     this.getAlgodClient = getAlgodClient
+    this.networks = networks
 
     const ctor = this.constructor as WalletConstructorType
     this.metadata = { ...ctor.defaultMetadata, ...metadata }
@@ -109,7 +112,7 @@ export abstract class BaseWallet {
     return this.activeAccount?.address ?? null
   }
 
-  public get activeNetwork(): NetworkId {
+  public get activeNetwork(): string {
     const state = this.store.state
     return state.activeNetwork
   }
@@ -123,6 +126,19 @@ export abstract class BaseWallet {
   public get isActive(): boolean {
     const state = this.store.state
     return state.activeWallet === this.id
+  }
+
+  // Make networks accessible for testing
+  public get networkConfig(): Record<string, NetworkConfig> {
+    return this.networks
+  }
+
+  protected get activeNetworkConfig(): NetworkConfig {
+    const config = this.networks[this.activeNetwork]
+    if (!config) {
+      throw new Error(`No configuration found for network: ${this.activeNetwork}`)
+    }
+    return config
   }
 
   // ---------- Protected Methods ------------------------------------- //

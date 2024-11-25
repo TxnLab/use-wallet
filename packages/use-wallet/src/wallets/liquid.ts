@@ -35,9 +35,10 @@ export class LiquidWallet extends BaseWallet {
     subscribe,
     getAlgodClient,
     options,
-    metadata = {}
+    metadata = {},
+    networks
   }: WalletConstructor<WalletId.LIQUID>) {
-    super({ id, metadata, getAlgodClient, store, subscribe })
+    super({ id, metadata, getAlgodClient, store, subscribe, networks })
 
     this.store = store
     this.options = options ?? {

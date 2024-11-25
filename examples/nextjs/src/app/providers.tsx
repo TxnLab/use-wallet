@@ -26,7 +26,7 @@ const walletManager = new WalletManager({
       options: { apiKey: 'pk_live_D17FD8D89621B5F3' }
     }
   ],
-  network: NetworkId.TESTNET
+  defaultNetwork: NetworkId.TESTNET
 })
 
 export function Providers({ children }: { children: React.ReactNode }) {

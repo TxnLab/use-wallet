@@ -2,9 +2,9 @@
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
 import { logger } from 'src/logger'
-import { NetworkId } from 'src/network'
+import { DEFAULT_NETWORKS } from 'src/network'
 import { StorageAdapter } from 'src/storage'
-import { LOCAL_STORAGE_KEY, State, WalletState, defaultState } from 'src/store'
+import { LOCAL_STORAGE_KEY, State, WalletState, DEFAULT_STATE } from 'src/store'
 import { LOCAL_STORAGE_MNEMONIC_KEY, MnemonicWallet } from 'src/wallets/mnemonic'
 import { WalletId } from 'src/wallets/types'
 import type { Mock } from 'vitest'
@@ -41,7 +41,8 @@ function createWalletWithStore(store: Store<State>, persistToStorage = false): M
     metadata: {},
     getAlgodClient: {} as any,
     store,
-    subscribe: vi.fn()
+    subscribe: vi.fn(),
+    networks: DEFAULT_NETWORKS
   })
 }
 
@@ -61,7 +62,7 @@ describe('MnemonicWallet', () => {
     address: TEST_ADDRESS
   }
 
-  const setActiveNetwork = (networkId: NetworkId) => {
+  const setActiveNetwork = (networkId: string) => {
     store.setState((state) => {
       return {
         ...state,
@@ -100,7 +101,7 @@ describe('MnemonicWallet', () => {
     }
     vi.mocked(logger.createScopedLogger).mockReturnValue(mockLogger)
 
-    store = new Store<State>(defaultState)
+    store = new Store<State>(DEFAULT_STATE)
     wallet = createWalletWithStore(store)
   })
 
@@ -138,9 +139,9 @@ describe('MnemonicWallet', () => {
     })
 
     it('should throw an error if active network is MainNet', async () => {
-      setActiveNetwork(NetworkId.MAINNET)
+      setActiveNetwork('mainnet')
 
-      await expect(wallet.connect()).rejects.toThrow('MainNet active network detected. Aborting.')
+      await expect(wallet.connect()).rejects.toThrow('Production network detected. Aborting.')
       expect(store.state.wallets[WalletId.MNEMONIC]).toBeUndefined()
       expect(wallet.isConnected).toBe(false)
     })
@@ -168,7 +169,7 @@ describe('MnemonicWallet', () => {
 
     it('should disconnect if session is found and persisting to storage is disabled', async () => {
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.MNEMONIC]: {
             accounts: [account1],
@@ -191,7 +192,7 @@ describe('MnemonicWallet', () => {
         activeAccount: account1
       }
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.MNEMONIC]: walletState
         }
@@ -211,7 +212,7 @@ describe('MnemonicWallet', () => {
       global.prompt = vi.fn().mockReturnValue('') // Nothing entered into the mnemonic prompt
 
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.MNEMONIC]: {
             accounts: [account1],
@@ -229,11 +230,9 @@ describe('MnemonicWallet', () => {
     })
 
     it('should throw an error if active network is MainNet', async () => {
-      setActiveNetwork(NetworkId.MAINNET)
+      setActiveNetwork('mainnet')
 
-      await expect(wallet.resumeSession()).rejects.toThrow(
-        'MainNet active network detected. Aborting.'
-      )
+      await expect(wallet.resumeSession()).rejects.toThrow('Production network detected. Aborting.')
       expect(store.state.wallets[WalletId.MNEMONIC]).toBeUndefined()
       expect(wallet.isConnected).toBe(false)
     })
@@ -333,10 +332,10 @@ describe('MnemonicWallet', () => {
       })
 
       it('should throw an error if active network is MainNet', async () => {
-        setActiveNetwork(NetworkId.MAINNET)
+        setActiveNetwork('mainnet')
 
         await expect(wallet.signTransactions([])).rejects.toThrow(
-          'MainNet active network detected. Aborting.'
+          'Production network detected. Aborting.'
         )
         expect(store.state.wallets[WalletId.MNEMONIC]).toBeUndefined()
         expect(wallet.isConnected).toBe(false)
@@ -356,10 +355,10 @@ describe('MnemonicWallet', () => {
       })
 
       it('should throw an error if active network is MainNet', async () => {
-        setActiveNetwork(NetworkId.MAINNET)
+        setActiveNetwork('mainnet')
 
         await expect(wallet.transactionSigner([], [])).rejects.toThrow(
-          'MainNet active network detected. Aborting.'
+          'Production network detected. Aborting.'
         )
         expect(store.state.wallets[WalletId.MNEMONIC]).toBeUndefined()
         expect(wallet.isConnected).toBe(false)

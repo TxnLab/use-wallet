@@ -43,9 +43,10 @@ export class PeraWallet extends BaseWallet {
     subscribe,
     getAlgodClient,
     options,
-    metadata = {}
+    metadata = {},
+    networks
   }: WalletConstructor<WalletId.PERA2>) {
-    super({ id, metadata, getAlgodClient, store, subscribe })
+    super({ id, metadata, getAlgodClient, store, subscribe, networks })
     if (!options?.projectId) {
       this.logger.error('Missing required option: projectId')
       throw new Error('Missing required option: projectId')

@@ -2,9 +2,9 @@ import { Store } from '@tanstack/store'
 import { ModalCtrl } from '@walletconnect/modal-core'
 import algosdk from 'algosdk'
 import { logger } from 'src/logger'
-import { NetworkId, caipChainId } from 'src/network'
+import { DEFAULT_NETWORKS, NetworkConfig } from 'src/network'
 import { StorageAdapter } from 'src/storage'
-import { LOCAL_STORAGE_KEY, State, WalletState, defaultState } from 'src/store'
+import { LOCAL_STORAGE_KEY, State, WalletState, DEFAULT_STATE } from 'src/store'
 import { base64ToByteArray, byteArrayToBase64 } from 'src/utils'
 import { WalletConnect } from 'src/wallets/walletconnect'
 import { WalletId, WalletTransaction } from 'src/wallets/types'
@@ -58,11 +58,14 @@ vi.spyOn(ModalCtrl, 'subscribe').mockImplementation((_callback: (state: any) => 
   return () => {}
 })
 
-function createMockSession(accounts: string[] = []): SessionTypes.Struct {
+function createMockSession(
+  accounts: string[] = [],
+  networks: Record<string, NetworkConfig>
+): SessionTypes.Struct {
   return {
     namespaces: {
       algorand: {
-        accounts: accounts.map((address) => `${caipChainId[NetworkId.TESTNET]}:${address}`),
+        accounts: accounts.map((address) => `${networks.testnet.caipChainId}:${address}`),
         methods: ['algo_signTxn'],
         events: []
       }
@@ -77,11 +80,7 @@ function createMockSession(accounts: string[] = []): SessionTypes.Struct {
     controller: '',
     requiredNamespaces: {
       algorand: {
-        chains: [
-          caipChainId[NetworkId.MAINNET]!,
-          caipChainId[NetworkId.TESTNET]!,
-          caipChainId[NetworkId.BETANET]!
-        ],
+        chains: [networks.testnet.caipChainId!],
         methods: ['algo_signTxn'],
         events: []
       }
@@ -117,7 +116,8 @@ function createWalletWithStore(store: Store<State>): WalletConnect {
     metadata: {},
     getAlgodClient: () => ({}) as any,
     store,
-    subscribe: vi.fn()
+    subscribe: vi.fn(),
+    networks: DEFAULT_NETWORKS
   })
 }
 
@@ -165,7 +165,7 @@ describe('WalletConnect', () => {
     }
     vi.mocked(logger.createScopedLogger).mockReturnValue(mockLogger)
 
-    store = new Store<State>(defaultState)
+    store = new Store<State>(DEFAULT_STATE)
     wallet = createWalletWithStore(store)
   })
 
@@ -176,7 +176,10 @@ describe('WalletConnect', () => {
 
   describe('connect', () => {
     it('should initialize client, return accounts, and update store', async () => {
-      const mockSession = createMockSession([account1.address, account2.address])
+      const mockSession = createMockSession(
+        [account1.address, account2.address],
+        wallet.networkConfig
+      )
       mockSignClient.connect.mockResolvedValueOnce({
         uri: 'mock-uri',
         approval: vi.fn().mockResolvedValue(mockSession)
@@ -193,7 +196,7 @@ describe('WalletConnect', () => {
     })
 
     it('should throw an error if no URI is returned', async () => {
-      const mockSession = createMockSession([])
+      const mockSession = createMockSession([], wallet.networkConfig)
       mockSignClient.connect.mockResolvedValueOnce({
         approval: vi.fn().mockResolvedValue(mockSession)
       })
@@ -205,7 +208,7 @@ describe('WalletConnect', () => {
     })
 
     it('should throw an error if an empty array is returned', async () => {
-      const mockSession = createMockSession([])
+      const mockSession = createMockSession([], wallet.networkConfig)
       mockSignClient.connect.mockResolvedValueOnce({
         uri: 'mock-uri',
         approval: vi.fn().mockResolvedValue(mockSession)
@@ -218,8 +221,8 @@ describe('WalletConnect', () => {
     })
 
     it('should use the active chain when connecting', async () => {
-      store.setState((state) => ({ ...state, activeNetwork: NetworkId.TESTNET }))
-      const mockSession = createMockSession([account1.address])
+      store.setState((state) => ({ ...state, activeNetwork: 'testnet' }))
+      const mockSession = createMockSession([account1.address], wallet.networkConfig)
       mockSignClient.connect.mockResolvedValueOnce({
         uri: 'mock-uri',
         approval: vi.fn().mockResolvedValue(mockSession)
@@ -241,7 +244,10 @@ describe('WalletConnect', () => {
 
   describe('disconnect', () => {
     it('should disconnect client and remove wallet from store', async () => {
-      const mockSession = createMockSession([account1.address, account2.address])
+      const mockSession = createMockSession(
+        [account1.address, account2.address],
+        wallet.networkConfig
+      )
       mockSignClient.connect.mockResolvedValueOnce({
         uri: 'mock-uri',
         approval: vi.fn().mockResolvedValue(mockSession)
@@ -270,7 +276,7 @@ describe('WalletConnect', () => {
       }
 
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.WALLETCONNECT]: walletState
         }
@@ -278,7 +284,7 @@ describe('WalletConnect', () => {
 
       wallet = createWalletWithStore(store)
 
-      const mockSession = createMockSession([account1.address])
+      const mockSession = createMockSession([account1.address], wallet.networkConfig)
       mockSignClient.session.get.mockImplementationOnce(() => mockSession)
 
       const mockSessionKey = 'mockSessionKey'
@@ -311,7 +317,7 @@ describe('WalletConnect', () => {
       }
 
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.WALLETCONNECT]: prevWalletState
         }
@@ -335,7 +341,7 @@ describe('WalletConnect', () => {
       }
 
       // Client only returns 'GD64YI' on reconnect
-      const mockSession = createMockSession(newAccounts)
+      const mockSession = createMockSession(newAccounts, wallet.networkConfig)
       mockSignClient.session.get.mockImplementationOnce(() => mockSession)
 
       await wallet.resumeSession()
@@ -391,7 +397,10 @@ describe('WalletConnect', () => {
 
     beforeEach(async () => {
       // Mock two connected accounts
-      const mockSession = createMockSession([account1.address, account2.address])
+      const mockSession = createMockSession(
+        [account1.address, account2.address],
+        wallet.networkConfig
+      )
       mockSignClient.connect.mockResolvedValueOnce({
         uri: 'mock-uri',
         approval: vi.fn().mockResolvedValue(mockSession)
@@ -582,8 +591,8 @@ describe('WalletConnect', () => {
       })
 
       it('should use the active chain when signing transactions', async () => {
-        store.setState((state) => ({ ...state, activeNetwork: NetworkId.MAINNET }))
-        const mockSession = createMockSession([account1.address])
+        store.setState((state) => ({ ...state, activeNetwork: 'mainnet' }))
+        const mockSession = createMockSession([account1.address], wallet.networkConfig)
         mockSignClient.connect.mockResolvedValueOnce({
           uri: 'mock-uri',
           approval: vi.fn().mockResolvedValue(mockSession)
@@ -617,18 +626,18 @@ describe('WalletConnect', () => {
 
   describe('activeChainId', () => {
     it('should return the correct CAIP-2 chain ID for the active network', () => {
-      store.setState((state) => ({ ...state, activeNetwork: NetworkId.MAINNET }))
-      expect(wallet.activeChainId).toBe(caipChainId[NetworkId.MAINNET])
+      store.setState((state) => ({ ...state, activeNetwork: 'mainnet' }))
+      expect(wallet.activeChainId).toBe(wallet.networkConfig.mainnet.caipChainId)
 
-      store.setState((state) => ({ ...state, activeNetwork: NetworkId.TESTNET }))
-      expect(wallet.activeChainId).toBe(caipChainId[NetworkId.TESTNET])
+      store.setState((state) => ({ ...state, activeNetwork: 'testnet' }))
+      expect(wallet.activeChainId).toBe(wallet.networkConfig.testnet.caipChainId)
 
-      store.setState((state) => ({ ...state, activeNetwork: NetworkId.BETANET }))
-      expect(wallet.activeChainId).toBe(caipChainId[NetworkId.BETANET])
+      store.setState((state) => ({ ...state, activeNetwork: 'betanet' }))
+      expect(wallet.activeChainId).toBe(wallet.networkConfig.betanet.caipChainId)
     })
 
     it('should log a warning and return an empty string if no CAIP-2 chain ID is found', () => {
-      store.setState((state) => ({ ...state, activeNetwork: 'invalid-network' as NetworkId }))
+      store.setState((state) => ({ ...state, activeNetwork: 'invalid-network' }))
       expect(wallet.activeChainId).toBe('')
       expect(mockLogger.warn).toHaveBeenCalledWith(
         'No CAIP-2 chain ID found for network: invalid-network'

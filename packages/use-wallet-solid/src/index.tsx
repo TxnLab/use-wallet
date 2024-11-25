@@ -2,7 +2,6 @@ import { useStore } from '@tanstack/solid-store'
 import algosdk from 'algosdk'
 import { JSX, createContext, createMemo, onMount, useContext } from 'solid-js'
 import type {
-  NetworkId,
   WalletAccount,
   WalletId,
   WalletManager,
@@ -84,14 +83,19 @@ export function useWallet() {
 
   const activeNetwork = useStore(manager().store, (state) => state.activeNetwork)
 
-  const setActiveNetwork = async (networkId: NetworkId): Promise<void> => {
-    if (activeNetwork() === networkId) {
+  const setActiveNetwork = async (networkId: string): Promise<void> => {
+    if (networkId === activeNetwork()) {
       return
+    }
+
+    if (!manager().networkConfig[networkId]) {
+      throw new Error(`Network "${networkId}" not found in network configuration`)
     }
 
     console.info(`[Solid] Creating Algodv2 client for ${networkId}...`)
 
-    const { token, baseServer, port, headers } = manager().networkConfig[networkId]
+    const { algod } = manager().networkConfig[networkId]
+    const { token, baseServer, port, headers } = algod
     const newClient = new algosdk.Algodv2(token, baseServer, port, headers)
 
     manager().store.setState((state) => ({

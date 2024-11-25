@@ -1,8 +1,9 @@
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
 import { logger } from 'src/logger'
+import { DEFAULT_NETWORKS } from 'src/network'
 import { StorageAdapter } from 'src/storage'
-import { LOCAL_STORAGE_KEY, State, WalletState, defaultState } from 'src/store'
+import { LOCAL_STORAGE_KEY, State, WalletState, DEFAULT_STATE } from 'src/store'
 import { DeflyWallet } from 'src/wallets/defly'
 import { WalletId } from 'src/wallets/types'
 import type { Mock } from 'vitest'
@@ -56,7 +57,8 @@ function createWalletWithStore(store: Store<State>): DeflyWallet {
     metadata: {},
     getAlgodClient: () => ({}) as any,
     store,
-    subscribe: vi.fn()
+    subscribe: vi.fn(),
+    networks: DEFAULT_NETWORKS
   })
 
   // @ts-expect-error - Mocking the private client property
@@ -123,7 +125,7 @@ describe('DeflyWallet', () => {
     }
     vi.mocked(logger.createScopedLogger).mockReturnValue(mockLogger)
 
-    store = new Store<State>(defaultState)
+    store = new Store<State>(DEFAULT_STATE)
     wallet = createWalletWithStore(store)
   })
 
@@ -334,7 +336,7 @@ describe('DeflyWallet', () => {
       }
 
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.DEFLY]: walletState
         }
@@ -371,7 +373,7 @@ describe('DeflyWallet', () => {
       }
 
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.DEFLY]: prevWalletState
         }
@@ -413,7 +415,7 @@ describe('DeflyWallet', () => {
       }
 
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.DEFLY]: walletState
         }
@@ -435,7 +437,7 @@ describe('DeflyWallet', () => {
       }
 
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.DEFLY]: walletState
         }

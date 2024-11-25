@@ -1,10 +1,5 @@
 import { useStore } from '@tanstack/vue-store'
-import {
-  NetworkId,
-  WalletManager,
-  type WalletAccount,
-  type WalletMetadata
-} from '@txnlab/use-wallet'
+import { WalletManager, type WalletAccount, type WalletMetadata } from '@txnlab/use-wallet'
 import algosdk from 'algosdk'
 import { computed, inject, ref } from 'vue'
 
@@ -36,14 +31,19 @@ export function useWallet() {
   }
 
   const activeNetwork = useStore(manager.store, (state) => state.activeNetwork)
-  const setActiveNetwork = async (networkId: NetworkId): Promise<void> => {
+  const setActiveNetwork = async (networkId: string): Promise<void> => {
     if (networkId === activeNetwork.value) {
       return
     }
 
+    if (!manager.networkConfig[networkId]) {
+      throw new Error(`Network "${networkId}" not found in network configuration`)
+    }
+
     console.info(`[Vue] Creating Algodv2 client for ${networkId}...`)
 
-    const { token, baseServer, port, headers } = manager.networkConfig[networkId]
+    const { algod } = manager.networkConfig[networkId]
+    const { token, baseServer, port, headers } = algod
     const newClient = new algosdk.Algodv2(token, baseServer, port, headers)
     setAlgodClient(newClient)
 

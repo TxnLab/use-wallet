@@ -1,8 +1,9 @@
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
 import { logger } from 'src/logger'
+import { DEFAULT_NETWORKS } from 'src/network'
 import { StorageAdapter } from 'src/storage'
-import { LOCAL_STORAGE_KEY, State, WalletState, defaultState } from 'src/store'
+import { LOCAL_STORAGE_KEY, State, WalletState, DEFAULT_STATE } from 'src/store'
 import { KmdWallet } from 'src/wallets/kmd'
 import { WalletId } from 'src/wallets/types'
 import type { Mock } from 'vitest'
@@ -53,7 +54,8 @@ function createWalletWithStore(store: Store<State>): KmdWallet {
     metadata: {},
     getAlgodClient: {} as any,
     store,
-    subscribe: vi.fn()
+    subscribe: vi.fn(),
+    networks: DEFAULT_NETWORKS
   })
 }
 
@@ -105,7 +107,7 @@ describe('KmdWallet', () => {
     }
     vi.mocked(logger.createScopedLogger).mockReturnValue(mockLogger)
 
-    store = new Store<State>(defaultState)
+    store = new Store<State>(DEFAULT_STATE)
     wallet = createWalletWithStore(store)
 
     // Password prompt
@@ -190,7 +192,7 @@ describe('KmdWallet', () => {
       }
 
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.KMD]: walletState
         }

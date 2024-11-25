@@ -37,9 +37,10 @@ export class KibisisWallet extends BaseWallet {
     store,
     subscribe,
     getAlgodClient,
-    metadata = {}
+    metadata = {},
+    networks
   }: WalletConstructor<WalletId.KIBISIS>) {
-    super({ id, metadata, getAlgodClient, store, subscribe })
+    super({ id, metadata, getAlgodClient, store, subscribe, networks })
 
     this.store = store
   }
@@ -183,9 +184,15 @@ export class KibisisWallet extends BaseWallet {
   }
 
   private async _getGenesisHash(): Promise<string> {
+    // First try to get from network config
+    const network = this.activeNetworkConfig
+    if (network.genesisHash) {
+      return network.genesisHash
+    }
+
+    // Fallback to API request
     const algodClient = this.getAlgodClient()
     const version = await algodClient.versionsCheck().do()
-
     return algosdk.bytesToBase64(version.genesisHashB64)
   }
 
