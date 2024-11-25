@@ -53,7 +53,7 @@ function createWalletWithStore(store: Store<State>): CustomWallet {
     getAlgodClient: {} as any,
     store,
     subscribe: vi.fn(),
-    networks: {}
+    networks: DEFAULT_NETWORKS
   })
 }
 
@@ -199,7 +199,7 @@ describe('CustomWallet', () => {
         getAlgodClient: {} as any,
         store,
         subscribe: vi.fn(),
-        networks: {}
+        networks: DEFAULT_NETWORKS
       })
 
       vi.mocked(mockProvider.connect).mockResolvedValueOnce([account1])
@@ -286,7 +286,7 @@ describe('CustomWallet', () => {
         getAlgodClient: {} as any,
         store,
         subscribe: vi.fn(),
-        networks: {}
+        networks: DEFAULT_NETWORKS
       })
 
       await wallet.resumeSession()
@@ -336,7 +336,7 @@ describe('CustomWallet', () => {
         getAlgodClient: {} as any,
         store,
         subscribe: vi.fn(),
-        networks: {}
+        networks: DEFAULT_NETWORKS
       })
 
       await expect(wallet.signTransactions(txnGroup, indexesToSign)).rejects.toThrowError(
