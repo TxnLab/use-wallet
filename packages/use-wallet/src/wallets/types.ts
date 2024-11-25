@@ -16,8 +16,8 @@ import { WalletConnect, type WalletConnectOptions } from './walletconnect'
 import { BiatecWallet } from './biatec'
 import type { Store } from '@tanstack/store'
 import type algosdk from 'algosdk'
-import type { State } from 'src/store'
 import type { NetworkConfig } from 'src/network'
+import type { State } from 'src/store'
 
 export enum WalletId {
   BIATEC = 'biatec',

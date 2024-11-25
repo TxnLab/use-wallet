@@ -1,6 +1,7 @@
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
 import { logger } from 'src/logger'
+import { DEFAULT_NETWORKS } from 'src/network'
 import { StorageAdapter } from 'src/storage'
 import { LOCAL_STORAGE_KEY, State, WalletState, DEFAULT_STATE } from 'src/store'
 import { byteArrayToBase64 } from 'src/utils'
@@ -44,7 +45,6 @@ vi.mock('lute-connect', () => {
 
 // Import the mocked module
 import LuteConnect from 'lute-connect'
-import { DEFAULT_NETWORKS } from 'src/network'
 
 function createWalletWithStore(store: Store<State>): LuteWallet {
   return new LuteWallet({
