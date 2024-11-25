@@ -391,4 +391,31 @@ describe('useWallet', () => {
     expect(wrapper.get('[data-testid="activeWallet"]').text()).toBe(WalletId.DEFLY)
     expect(wrapper.get('[data-testid="activeAddress"]').text()).toBe('address1')
   })
+
+  describe('setActiveNetwork', () => {
+    it('throws error for invalid network', async () => {
+      const { setActiveNetwork } = useWallet()
+
+      await expect(setActiveNetwork('invalid-network')).rejects.toThrow(
+        'Network "invalid-network" not found in network configuration'
+      )
+    })
+
+    it('allows setting custom network that exists in config', async () => {
+      const customNetwork = {
+        name: 'Custom Network',
+        algod: {
+          token: '',
+          baseServer: 'https://custom.network',
+          headers: {}
+        }
+      }
+
+      mockWalletManager.networkConfig['custom-net'] = customNetwork
+      const { setActiveNetwork, activeNetwork } = useWallet()
+
+      await setActiveNetwork('custom-net')
+      expect(activeNetwork.value).toBe('custom-net')
+    })
+  })
 })

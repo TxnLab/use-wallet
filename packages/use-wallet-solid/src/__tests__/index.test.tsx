@@ -11,7 +11,7 @@ import {
   type State,
   type WalletAccount
 } from '@txnlab/use-wallet'
-import { For, Show, createSignal } from 'solid-js'
+import { For, Show, createEffect, createSignal } from 'solid-js'
 import { Wallet, WalletProvider, useWallet, useWalletManager } from '../index'
 import algosdk from 'algosdk'
 
@@ -534,6 +534,73 @@ describe('useWallet', () => {
     }))
 
     expect(screen.getByTestId('active-network')).toHaveTextContent(NetworkId.MAINNET)
+  })
+
+  describe('setActiveNetwork', () => {
+    it('throws error for invalid network', async () => {
+      let error: Error | undefined
+
+      const TestComponent = () => {
+        const { setActiveNetwork } = useWallet()
+        return (
+          <button
+            onClick={async () => {
+              try {
+                await setActiveNetwork('invalid-network')
+              } catch (e) {
+                error = e as Error
+              }
+            }}
+          >
+            Test
+          </button>
+        )
+      }
+
+      render(() => (
+        <WalletProvider manager={mockWalletManager}>
+          <TestComponent />
+        </WalletProvider>
+      ))
+
+      const button = screen.getByText('Test')
+      fireEvent.click(button)
+
+      await waitFor(() => {
+        expect(error?.message).toBe('Network "invalid-network" not found in network configuration')
+      })
+    })
+
+    it('allows setting custom network that exists in config', async () => {
+      const customNetwork = {
+        name: 'Custom Network',
+        algod: {
+          token: '',
+          baseServer: 'https://custom.network',
+          headers: {}
+        }
+      }
+
+      mockWalletManager.networkConfig['custom-net'] = customNetwork
+
+      const TestComponent = () => {
+        const { setActiveNetwork, activeNetwork } = useWallet()
+        createEffect(() => {
+          setActiveNetwork('custom-net')
+        })
+        return <div data-testid="active-network">{activeNetwork()}</div>
+      }
+
+      render(() => (
+        <WalletProvider manager={mockWalletManager}>
+          <TestComponent />
+        </WalletProvider>
+      ))
+
+      await waitFor(() => {
+        expect(screen.getByTestId('active-network').textContent).toBe('custom-net')
+      })
+    })
   })
 })
 

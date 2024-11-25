@@ -464,19 +464,49 @@ describe('useWallet', () => {
     expect(result.current.algodClient).toBe(newAlgodClient)
   })
 
-  it('calls setActiveNetwork correctly and updates algodClient', async () => {
-    const newNetwork = NetworkId.MAINNET
-    const { result } = renderHook(() => useWallet(), { wrapper })
+  describe('setActiveNetwork', () => {
+    it('calls setActiveNetwork correctly and updates algodClient', async () => {
+      const { result } = renderHook(() => useWallet(), { wrapper })
+      const newNetwork = NetworkId.MAINNET
 
-    await act(async () => {
-      await result.current.setActiveNetwork(newNetwork)
+      await act(async () => {
+        await result.current.setActiveNetwork(newNetwork)
+      })
+
+      expect(result.current.activeNetwork).toBe(newNetwork)
+      const { algod } = mockWalletManager.networkConfig[newNetwork]
+      const { token, baseServer, port, headers } = algod
+      expect(result.current.algodClient).toEqual(
+        new algosdk.Algodv2(token, baseServer, port, headers)
+      )
     })
 
-    expect(result.current.activeNetwork).toBe(newNetwork)
-    const { algod } = mockWalletManager.networkConfig[newNetwork]
-    const { token, baseServer, port, headers } = algod
-    expect(result.current.algodClient).toEqual(
-      new algosdk.Algodv2(token, baseServer, port, headers)
-    )
+    it('throws error for invalid network', async () => {
+      const { result } = renderHook(() => useWallet(), { wrapper })
+
+      await expect(result.current.setActiveNetwork('invalid-network')).rejects.toThrow(
+        'Network "invalid-network" not found in network configuration'
+      )
+    })
+
+    it('allows setting custom network that exists in config', async () => {
+      const customNetwork = {
+        name: 'Custom Network',
+        algod: {
+          token: '',
+          baseServer: 'https://custom.network',
+          headers: {}
+        }
+      }
+
+      mockWalletManager.networkConfig['custom-net'] = customNetwork
+      const { result } = renderHook(() => useWallet(), { wrapper })
+
+      await act(async () => {
+        await result.current.setActiveNetwork('custom-net')
+      })
+
+      expect(result.current.activeNetwork).toBe('custom-net')
+    })
   })
 })
