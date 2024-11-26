@@ -1,8 +1,7 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import {
   ARC0027MethodCanceledError,
   ARC0027MethodEnum,
+  IARC0001Transaction,
   IDisableResult,
   IEnableResult,
   ISignTransactionsResult
@@ -16,7 +15,14 @@ import { DEFAULT_STATE, LOCAL_STORAGE_KEY, State } from 'src/store'
 import { WalletId } from 'src/wallets'
 import { KibisisWallet, KIBISIS_AVM_WEB_PROVIDER_ID } from 'src/wallets/kibisis'
 import { base64ToByteArray, byteArrayToBase64 } from 'src/utils'
-import type { Mock } from 'vitest'
+import type { Mock, MockInstance } from 'vitest'
+
+// Test utility type to expose protected members
+type TestableKibisisWallet = KibisisWallet & {
+  _signTransactions: (txns: IARC0001Transaction[]) => Promise<ISignTransactionsResult>
+  _enable: () => Promise<IEnableResult>
+  _disable: () => Promise<IDisableResult>
+}
 
 // Mock logger
 vi.mock('src/logger', () => ({
@@ -66,14 +72,17 @@ function createWalletWithStore(store: Store<State>): KibisisWallet {
   })
 }
 
-function mockSignTransactionsResponseOnce(stxns: (string | null)[]): void {
-  vi.spyOn(KibisisWallet.prototype, '_signTransactions')
+function mockSignTransactionsResponseOnce(
+  stxns: (string | null)[]
+): MockInstance<(txns: IARC0001Transaction[]) => Promise<ISignTransactionsResult>> {
+  return vi
+    .spyOn(KibisisWallet.prototype as TestableKibisisWallet, '_signTransactions')
     .mockReset()
     .mockImplementationOnce(() =>
       Promise.resolve({
         providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
         stxns
-      } as ISignTransactionsResult)
+      })
     )
 }
 
@@ -121,16 +130,16 @@ describe('KibisisWallet', () => {
     }
     vi.mocked(logger.createScopedLogger).mockReturnValue(mockLogger)
 
-    vi.spyOn(KibisisWallet.prototype, '_disable')
+    vi.spyOn(KibisisWallet.prototype as TestableKibisisWallet, '_disable')
       .mockReset()
       .mockImplementation(() =>
         Promise.resolve({
           genesisHash: TESTNET_GENESIS_HASH,
           genesisId: TESTNET_GENESIS_ID,
           providerId: KIBISIS_AVM_WEB_PROVIDER_ID
-        } as IDisableResult)
+        })
       )
-    vi.spyOn(KibisisWallet.prototype, '_enable')
+    vi.spyOn(KibisisWallet.prototype as TestableKibisisWallet, '_enable')
       .mockReset()
       .mockImplementation(() =>
         Promise.resolve({
@@ -138,7 +147,7 @@ describe('KibisisWallet', () => {
           genesisHash: TESTNET_GENESIS_HASH,
           genesisId: TESTNET_GENESIS_ID,
           providerId: KIBISIS_AVM_WEB_PROVIDER_ID
-        } as IEnableResult)
+        })
       )
 
     store = new Store<State>(DEFAULT_STATE)
@@ -175,7 +184,7 @@ describe('KibisisWallet', () => {
       })
 
       // Mock error response
-      vi.spyOn(KibisisWallet.prototype, '_enable')
+      vi.spyOn(KibisisWallet.prototype as TestableKibisisWallet, '_enable')
         .mockReset()
         .mockImplementationOnce(() => Promise.reject(error))
 
@@ -262,7 +271,7 @@ describe('KibisisWallet', () => {
       wallet = createWalletWithStore(store)
 
       // Client only returns 'account2' on reconnect, 'account1' is missing
-      vi.spyOn(KibisisWallet.prototype, '_enable')
+      vi.spyOn(KibisisWallet.prototype as TestableKibisisWallet, '_enable')
         .mockReset()
         .mockImplementation(() =>
           Promise.resolve({
@@ -311,13 +320,13 @@ describe('KibisisWallet', () => {
     const mockSignedTxns = [byteArrayToBase64(txn1.toByte())]
 
     beforeEach(async () => {
-      vi.spyOn(KibisisWallet.prototype, '_signTransactions')
+      vi.spyOn(KibisisWallet.prototype as TestableKibisisWallet, '_signTransactions')
         .mockReset()
         .mockImplementation(() =>
           Promise.resolve({
             providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
             stxns: mockSignedTxns
-          } as ISignTransactionsResult)
+          })
         )
 
       await wallet.connect()
@@ -341,7 +350,7 @@ describe('KibisisWallet', () => {
         })
 
         // Mock signTxns error response
-        vi.spyOn(KibisisWallet.prototype, '_signTransactions')
+        vi.spyOn(KibisisWallet.prototype as TestableKibisisWallet, '_signTransactions')
           .mockReset()
           .mockImplementationOnce(() => Promise.reject(error))
 
