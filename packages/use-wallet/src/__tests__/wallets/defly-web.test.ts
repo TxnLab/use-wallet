@@ -13,12 +13,12 @@ import { DEFAULT_NETWORKS } from 'src/network'
 import { StorageAdapter } from 'src/storage'
 import { DEFAULT_STATE, LOCAL_STORAGE_KEY, State } from 'src/store'
 import { WalletId } from 'src/wallets'
-import { KibisisWallet, KIBISIS_AVM_WEB_PROVIDER_ID } from 'src/wallets/kibisis'
+import { DeflyWebWallet, DEFLY_WEB_PROVIDER_ID } from 'src/wallets/defly-web'
 import { base64ToByteArray, byteArrayToBase64 } from 'src/utils'
 import type { Mock, MockInstance } from 'vitest'
 
 // Test utility type to expose protected members
-type TestableKibisisWallet = KibisisWallet & {
+type TestableDeflyWebWallet = DeflyWebWallet & {
   _signTransactions: (txns: IARC0001Transaction[]) => Promise<ISignTransactionsResult>
   _enable: () => Promise<IEnableResult>
   _disable: () => Promise<IDisableResult>
@@ -54,11 +54,11 @@ const ACCOUNT_2 = 'GD64YIY3TWGDMCNPP553DZPPR6LDUSFQOIJVFDPPXWEG3FVOJCCDBBHU5A'
 /**
  * Convenience function that initializes a wallet from a supplied store.
  * @param {Store<State>} store - a store to initialize the wallet with.
- * @returns {KibisisWallet} an initialized wallet.
+ * @returns {DeflyWebWallet} an initialized wallet.
  */
-function createWalletWithStore(store: Store<State>): KibisisWallet {
-  return new KibisisWallet({
-    id: WalletId.KIBISIS,
+function createWalletWithStore(store: Store<State>): DeflyWebWallet {
+  return new DeflyWebWallet({
+    id: WalletId.DEFLY_WEB,
     metadata: {},
     getAlgodClient: () =>
       ({
@@ -76,18 +76,18 @@ function mockSignTransactionsResponseOnce(
   stxns: (string | null)[]
 ): MockInstance<(txns: IARC0001Transaction[]) => Promise<ISignTransactionsResult>> {
   return vi
-    .spyOn(KibisisWallet.prototype as TestableKibisisWallet, '_signTransactions')
+    .spyOn(DeflyWebWallet.prototype as TestableDeflyWebWallet, '_signTransactions')
     .mockReset()
     .mockImplementationOnce(() =>
       Promise.resolve({
-        providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
+        providerId: DEFLY_WEB_PROVIDER_ID,
         stxns
       })
     )
 }
 
-describe('KibisisWallet', () => {
-  let wallet: KibisisWallet
+describe('DeflyWebWallet', () => {
+  let wallet: DeflyWebWallet
   let store: Store<State>
   let mockInitialState: State | null = null
   let mockLogger: {
@@ -98,11 +98,11 @@ describe('KibisisWallet', () => {
   }
 
   const account1 = {
-    name: 'Kibisis Account 1',
+    name: 'Defly Web Account 1',
     address: ACCOUNT_1
   }
   const account2 = {
-    name: 'Kibisis Account 2',
+    name: 'Defly Web Account 2',
     address: ACCOUNT_2
   }
 
@@ -130,23 +130,23 @@ describe('KibisisWallet', () => {
     }
     vi.mocked(logger.createScopedLogger).mockReturnValue(mockLogger)
 
-    vi.spyOn(KibisisWallet.prototype as TestableKibisisWallet, '_disable')
+    vi.spyOn(DeflyWebWallet.prototype as TestableDeflyWebWallet, '_disable')
       .mockReset()
       .mockImplementation(() =>
         Promise.resolve({
           genesisHash: TESTNET_GENESIS_HASH,
           genesisId: TESTNET_GENESIS_ID,
-          providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+          providerId: DEFLY_WEB_PROVIDER_ID
         })
       )
-    vi.spyOn(KibisisWallet.prototype as TestableKibisisWallet, '_enable')
+    vi.spyOn(DeflyWebWallet.prototype as TestableDeflyWebWallet, '_enable')
       .mockReset()
       .mockImplementation(() =>
         Promise.resolve({
           accounts: [account1, account2],
           genesisHash: TESTNET_GENESIS_HASH,
           genesisId: TESTNET_GENESIS_ID,
-          providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+          providerId: DEFLY_WEB_PROVIDER_ID
         })
       )
 
@@ -170,7 +170,7 @@ describe('KibisisWallet', () => {
       expect(accounts).toEqual([account1, account2])
 
       // Store updated
-      expect(store.state.wallets[WalletId.KIBISIS]).toEqual({
+      expect(store.state.wallets[WalletId.DEFLY_WEB]).toEqual({
         accounts: [account1, account2],
         activeAccount: account1
       })
@@ -180,11 +180,11 @@ describe('KibisisWallet', () => {
       const error = new ARC0027MethodCanceledError({
         message: `user dismissed action`,
         method: ARC0027MethodEnum.Enable,
-        providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+        providerId: DEFLY_WEB_PROVIDER_ID
       })
 
       // Mock error response
-      vi.spyOn(KibisisWallet.prototype as TestableKibisisWallet, '_enable')
+      vi.spyOn(DeflyWebWallet.prototype as TestableDeflyWebWallet, '_enable')
         .mockReset()
         .mockImplementationOnce(() => Promise.reject(error))
 
@@ -201,7 +201,7 @@ describe('KibisisWallet', () => {
       )
 
       // Store not updated
-      expect(store.state.wallets[WalletId.KIBISIS]).toBeUndefined()
+      expect(store.state.wallets[WalletId.DEFLY_WEB]).toBeUndefined()
     })
   })
 
@@ -211,13 +211,13 @@ describe('KibisisWallet', () => {
       await wallet.connect()
 
       expect(wallet.isConnected).toBe(true)
-      expect(store.state.wallets[WalletId.KIBISIS]).toBeDefined()
+      expect(store.state.wallets[WalletId.DEFLY_WEB]).toBeDefined()
 
       // Disconnect wallet
       await wallet.disconnect()
 
       expect(wallet.isConnected).toBe(false)
-      expect(store.state.wallets[WalletId.KIBISIS]).toBeUndefined()
+      expect(store.state.wallets[WalletId.DEFLY_WEB]).toBeUndefined()
     })
   })
 
@@ -228,11 +228,11 @@ describe('KibisisWallet', () => {
       expect(wallet.isConnected).toBe(false)
     })
 
-    it(`should call the client's _enable method if Kibisis wallet data is found in the store`, async () => {
+    it(`should call the client's _enable method if Defly Web wallet data is found in the store`, async () => {
       store = new Store<State>({
         ...DEFAULT_STATE,
         wallets: {
-          [WalletId.KIBISIS]: {
+          [WalletId.DEFLY_WEB]: {
             accounts: [account1],
             activeAccount: account1
           }
@@ -246,7 +246,7 @@ describe('KibisisWallet', () => {
       expect(wallet['_enable']).toHaveBeenCalled()
     })
 
-    it(`should not call the client's _enable method if Kibisis wallet data is not found in the store`, async () => {
+    it(`should not call the client's _enable method if Defly Web wallet data is not found in the store`, async () => {
       // No wallets in store
       store = new Store<State>(DEFAULT_STATE)
       wallet = createWalletWithStore(store)
@@ -262,7 +262,7 @@ describe('KibisisWallet', () => {
       store = new Store<State>({
         ...DEFAULT_STATE,
         wallets: {
-          [WalletId.KIBISIS]: {
+          [WalletId.DEFLY_WEB]: {
             accounts: [account1, account2],
             activeAccount: account1
           }
@@ -271,14 +271,14 @@ describe('KibisisWallet', () => {
       wallet = createWalletWithStore(store)
 
       // Client only returns 'account2' on reconnect, 'account1' is missing
-      vi.spyOn(KibisisWallet.prototype as TestableKibisisWallet, '_enable')
+      vi.spyOn(DeflyWebWallet.prototype as TestableDeflyWebWallet, '_enable')
         .mockReset()
         .mockImplementation(() =>
           Promise.resolve({
             accounts: [account2],
             genesisHash: TESTNET_GENESIS_HASH,
             genesisId: TESTNET_GENESIS_ID,
-            providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+            providerId: DEFLY_WEB_PROVIDER_ID
           })
         )
 
@@ -287,7 +287,7 @@ describe('KibisisWallet', () => {
       expect(wallet.isConnected).toBe(true)
       expect(wallet['_enable']).toHaveBeenCalled()
       // Store now only contains 'mockAddress2', which is set as active
-      expect(store.state.wallets[WalletId.KIBISIS]).toEqual({
+      expect(store.state.wallets[WalletId.DEFLY_WEB]).toEqual({
         accounts: [account2],
         activeAccount: account2
       })
@@ -320,11 +320,11 @@ describe('KibisisWallet', () => {
     const mockSignedTxns = [byteArrayToBase64(txn1.toByte())]
 
     beforeEach(async () => {
-      vi.spyOn(KibisisWallet.prototype as TestableKibisisWallet, '_signTransactions')
+      vi.spyOn(DeflyWebWallet.prototype as TestableDeflyWebWallet, '_signTransactions')
         .mockReset()
         .mockImplementation(() =>
           Promise.resolve({
-            providerId: KIBISIS_AVM_WEB_PROVIDER_ID,
+            providerId: DEFLY_WEB_PROVIDER_ID,
             stxns: mockSignedTxns
           })
         )
@@ -346,11 +346,11 @@ describe('KibisisWallet', () => {
         const error = new ARC0027MethodCanceledError({
           message: `user dismissed action`,
           method: ARC0027MethodEnum.SignTransactions,
-          providerId: KIBISIS_AVM_WEB_PROVIDER_ID
+          providerId: DEFLY_WEB_PROVIDER_ID
         })
 
         // Mock signTxns error response
-        vi.spyOn(KibisisWallet.prototype as TestableKibisisWallet, '_signTransactions')
+        vi.spyOn(DeflyWebWallet.prototype as TestableDeflyWebWallet, '_signTransactions')
           .mockReset()
           .mockImplementationOnce(() => Promise.reject(error))
 
@@ -362,7 +362,7 @@ describe('KibisisWallet', () => {
 
           // Error message logged
           expect(console.error).toHaveBeenCalledWith(
-            `[${KibisisWallet.defaultMetadata.name}] error signing transactions: ${error.message} (code: ${error.code})`
+            `[${DeflyWebWallet.defaultMetadata.name}] error signing transactions: ${error.message} (code: ${error.code})`
           )
         }
       })
