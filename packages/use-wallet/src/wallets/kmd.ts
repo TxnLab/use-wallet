@@ -60,7 +60,7 @@ export class KmdWallet extends BaseWallet {
   private options: KmdConstructor
   private walletName: string
   private walletId: string = ''
-  private password: string = ''
+  private password: string | null = null
 
   protected store: Store<State>
 
@@ -302,7 +302,7 @@ export class KmdWallet extends BaseWallet {
   }
 
   private getPassword(): string {
-    if (this.password) {
+    if (this.password !== null) {
       return this.password
     }
     const password = prompt('KMD password') || ''
