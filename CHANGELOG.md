@@ -1,3 +1,13 @@
+## [3.10.1](https://github.com/txnlab/use-wallet/compare/v3.10.0...v3.10.1) (2024-11-28)
+
+### Bug Fixes
+
+- **KMD:** Handle empty password correctly in getPassword ([#318](https://github.com/txnlab/use-wallet/pull/318)) ([4c2f5a8](https://github.com/txnlab/use-wallet/commit/4c2f5a89a8d753f62f9853ffed6ec84325fa79b4))
+
+### Test Coverage
+
+- **KMD:** Add tests for empty and null password handling ([#319](https://github.com/txnlab/use-wallet/pull/319)) ([55ce7ad](https://github.com/txnlab/use-wallet/commit/55ce7ad980f89eceee17dd00ef1861b0fbc66db8))
+
 # [3.10.0](https://github.com/txnlab/use-wallet/compare/v3.9.0...v3.10.0) (2024-10-25)
 
 ### Features
