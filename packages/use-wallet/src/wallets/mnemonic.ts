@@ -15,7 +15,6 @@ interface MnemonicConstructor {
 export type MnemonicOptions = Partial<Pick<MnemonicConstructor, 'promptForMnemonic'>> &
   Omit<MnemonicConstructor, 'promptForMnemonic'>
 
-
 export const LOCAL_STORAGE_MNEMONIC_KEY = `${LOCAL_STORAGE_KEY}_mnemonic`
 
 const ICON = `data:image/svg+xml;base64,${btoa(`
@@ -41,7 +40,10 @@ export class MnemonicWallet extends BaseWallet {
   }: WalletConstructor<WalletId.MNEMONIC>) {
     super({ id, metadata, getAlgodClient, store, subscribe })
 
-    const { persistToStorage = false, promptForMnemonic = () => Promise.resolve(prompt('Enter 25-word mnemonic passphrase:')) } = options || {}
+    const {
+      persistToStorage = false,
+      promptForMnemonic = () => Promise.resolve(prompt('Enter 25-word mnemonic passphrase:'))
+    } = options || {}
     this.options = { persistToStorage, promptForMnemonic }
 
     this.store = store

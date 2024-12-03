@@ -363,12 +363,16 @@ describe('MnemonicWallet', () => {
   })
 
   describe('custom prompt for mnemonic', () => {
-    const MOCK_ACCOUNT_MNEMONIC = 'just aim reveal time update elegant column reunion lazy ritual room unusual notice camera forward couple quantum gym laundry absurd drill pyramid tip able outdoor'
+    const MOCK_ACCOUNT_MNEMONIC =
+      'just aim reveal time update elegant column reunion lazy ritual room unusual notice camera forward couple quantum gym laundry absurd drill pyramid tip able outdoor'
 
     beforeEach(() => {
       wallet = new MnemonicWallet({
         id: WalletId.MNEMONIC,
-        options: { promptForMnemonic: () => Promise.resolve(MOCK_ACCOUNT_MNEMONIC), persistToStorage: true },
+        options: {
+          promptForMnemonic: () => Promise.resolve(MOCK_ACCOUNT_MNEMONIC),
+          persistToStorage: true
+        },
         metadata: {},
         getAlgodClient: {} as any,
         store,
@@ -384,7 +388,10 @@ describe('MnemonicWallet', () => {
       await wallet.connect()
 
       expect(global.prompt).toHaveBeenCalledTimes(0)
-      expect(storageSetItemSpy).toHaveBeenCalledWith(LOCAL_STORAGE_MNEMONIC_KEY, MOCK_ACCOUNT_MNEMONIC)
+      expect(storageSetItemSpy).toHaveBeenCalledWith(
+        LOCAL_STORAGE_MNEMONIC_KEY,
+        MOCK_ACCOUNT_MNEMONIC
+      )
     })
   })
 })

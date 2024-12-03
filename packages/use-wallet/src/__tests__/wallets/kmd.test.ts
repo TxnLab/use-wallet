@@ -428,7 +428,7 @@ describe('KmdWallet', () => {
 
     it('should handle null from cancelled prompt', async () => {
       // Mock prompt to return null (user cancelled)
-      global.prompt = vi.fn().mockReturnValue(null) 
+      global.prompt = vi.fn().mockReturnValue(null)
 
       mockKmd.listKeys.mockResolvedValueOnce({ addresses: [account1.address] })
       await wallet.connect()
