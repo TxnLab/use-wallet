@@ -11,7 +11,7 @@
   "devDependencies": {
     "@walletconnect/types": "2.17.1",
     "typescript": "5.6.3",
-    "vite": "5.4.9"
+    "vite": "5.4.11"
   },
   "dependencies": {
     "@algorandfoundation/liquid-auth-use-wallet-client": "1.1.0",
