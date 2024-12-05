@@ -2,7 +2,7 @@ import { defineConfig } from 'vitest/config'
 import solid from 'vite-plugin-solid'
 
 export default defineConfig({
-  plugins: [solid()],
+  plugins: [solid({ ssr: false })],
   test: {
     name: 'use-wallet-solid',
     dir: './src',
@@ -10,5 +10,8 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
     globals: true
+  },
+  resolve: {
+    conditions: ['development', 'browser']
   }
 })
