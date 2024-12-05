@@ -400,4 +400,59 @@ describe('KmdWallet', () => {
       })
     })
   })
+
+  describe('getPassword', () => {
+    it('should return empty string password when set', async () => {
+      // Mock prompt to return empty string
+      global.prompt = vi.fn().mockReturnValue('')
+
+      // First call to connect will set the empty password
+      mockKmd.listKeys.mockResolvedValueOnce({ addresses: [account1.address] })
+      await wallet.connect()
+
+      // Second call to connect should reuse the empty password
+      mockKmd.listKeys.mockResolvedValueOnce({ addresses: [account1.address] })
+      await wallet.connect()
+
+      // Prompt should only be called once
+      expect(global.prompt).toHaveBeenCalledTimes(1)
+      expect(mockKmd.initWalletHandle).toHaveBeenCalledWith(mockWallet.id, '')
+    })
+
+    it('should handle null from cancelled prompt', async () => {
+      // Mock prompt to return null (user cancelled)
+      global.prompt = vi.fn().mockReturnValue(null)
+
+      mockKmd.listKeys.mockResolvedValueOnce({ addresses: [account1.address] })
+      await wallet.connect()
+
+      expect(global.prompt).toHaveBeenCalledTimes(1)
+      expect(mockKmd.initWalletHandle).toHaveBeenCalledWith(mockWallet.id, '')
+    })
+  })
+
+  describe('custom prompt for password', () => {
+    const customPassword = 'customPassword'
+
+    beforeEach(() => {
+      wallet = new KmdWallet({
+        id: WalletId.KMD,
+        metadata: {},
+        getAlgodClient: {} as any,
+        store,
+        subscribe: vi.fn(),
+        options: {
+          promptForPassword: () => Promise.resolve(customPassword)
+        }
+      })
+    })
+
+    it('should return password from custom prompt', async () => {
+      mockKmd.listKeys.mockResolvedValueOnce({ addresses: [account1.address] })
+      await wallet.connect()
+
+      expect(global.prompt).toHaveBeenCalledTimes(0)
+      expect(mockKmd.initWalletHandle).toHaveBeenCalledWith(mockWallet.id, customPassword)
+    })
+  })
 })

@@ -365,4 +365,37 @@ describe('MnemonicWallet', () => {
       })
     })
   })
+
+  describe('custom prompt for mnemonic', () => {
+    const MOCK_ACCOUNT_MNEMONIC =
+      'just aim reveal time update elegant column reunion lazy ritual room unusual notice camera forward couple quantum gym laundry absurd drill pyramid tip able outdoor'
+
+    beforeEach(() => {
+      wallet = new MnemonicWallet({
+        id: WalletId.MNEMONIC,
+        options: {
+          promptForMnemonic: () => Promise.resolve(MOCK_ACCOUNT_MNEMONIC),
+          persistToStorage: true
+        },
+        metadata: {},
+        getAlgodClient: {} as any,
+        store,
+        subscribe: vi.fn()
+      })
+    })
+
+    it('should save mnemonic into storage', async () => {
+      const storageSetItemSpy = vi.spyOn(StorageAdapter, 'setItem')
+      // Simulate no mnemonic in storage
+      vi.mocked(StorageAdapter.getItem).mockImplementation(() => null)
+
+      await wallet.connect()
+
+      expect(global.prompt).toHaveBeenCalledTimes(0)
+      expect(storageSetItemSpy).toHaveBeenCalledWith(
+        LOCAL_STORAGE_MNEMONIC_KEY,
+        MOCK_ACCOUNT_MNEMONIC
+      )
+    })
+  })
 })

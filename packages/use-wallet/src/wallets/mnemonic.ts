@@ -6,9 +6,13 @@ import { BaseWallet } from 'src/wallets/base'
 import type { Store } from '@tanstack/store'
 import type { WalletAccount, WalletConstructor, WalletId } from 'src/wallets/types'
 
-export type MnemonicOptions = {
+interface MnemonicConstructor {
   persistToStorage?: boolean
+  promptForMnemonic: () => Promise<string | null>
 }
+
+export type MnemonicOptions = Partial<Pick<MnemonicConstructor, 'promptForMnemonic'>> &
+  Omit<MnemonicConstructor, 'promptForMnemonic'>
 
 export const LOCAL_STORAGE_MNEMONIC_KEY = `${LOCAL_STORAGE_KEY}_mnemonic`
 
@@ -21,7 +25,7 @@ const ICON = `data:image/svg+xml;base64,${btoa(`
 
 export class MnemonicWallet extends BaseWallet {
   private account: algosdk.Account | null = null
-  private options: MnemonicOptions
+  private options: MnemonicConstructor
 
   protected store: Store<State>
 
@@ -36,8 +40,11 @@ export class MnemonicWallet extends BaseWallet {
   }: WalletConstructor<WalletId.MNEMONIC>) {
     super({ id, metadata, getAlgodClient, store, subscribe, networks })
 
-    const { persistToStorage = false } = options || {}
-    this.options = { persistToStorage }
+    const {
+      persistToStorage = false,
+      promptForMnemonic = () => Promise.resolve(prompt('Enter 25-word mnemonic passphrase:'))
+    } = options || {}
+    this.options = { persistToStorage, promptForMnemonic }
 
     this.store = store
 
@@ -80,10 +87,10 @@ export class MnemonicWallet extends BaseWallet {
     }
   }
 
-  private initializeAccount(): algosdk.Account {
+  private async initializeAccount(): Promise<algosdk.Account> {
     let mnemonic = this.loadMnemonicFromStorage()
     if (!mnemonic) {
-      mnemonic = prompt('Enter 25-word mnemonic passphrase:')
+      mnemonic = await this.options.promptForMnemonic()
       if (!mnemonic) {
         this.account = null
         this.logger.error('No mnemonic provided')
@@ -106,7 +113,7 @@ export class MnemonicWallet extends BaseWallet {
     this.checkMainnet()
 
     this.logger.info('Connecting...')
-    const account = this.initializeAccount()
+    const account = await this.initializeAccount()
 
     const walletAccount = {
       name: `${this.metadata.name} Account`,
@@ -153,7 +160,7 @@ export class MnemonicWallet extends BaseWallet {
     // If persisting to storage is enabled, then resume session
     if (this.options.persistToStorage) {
       try {
-        this.initializeAccount()
+        await this.initializeAccount()
         this.logger.info('Session resumed successfully')
       } catch (error: any) {
         this.logger.error('Error resuming session:', error.message)

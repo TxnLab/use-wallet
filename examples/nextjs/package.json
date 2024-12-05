@@ -12,19 +12,19 @@
     "@perawallet/connect": "^1.3.5",
     "@txnlab/use-wallet-react": "workspace:*",
     "@walletconnect/modal": "^2.7.0",
-    "@walletconnect/sign-client": "^2.17.1",
+    "@walletconnect/sign-client": "^2.17.2",
     "algosdk": "3.0.0",
     "lute-connect": "^1.4.1",
-    "next": "14.2.15",
+    "next": "14.2.18",
     "react": "18.3.1",
     "react-dom": "18.3.1"
   },
   "devDependencies": {
     "@types/node": "20.11.30",
-    "@types/react": "18.3.11",
+    "@types/react": "18.3.12",
     "@types/react-dom": "18.3.1",
     "eslint": "8.57.1",
-    "eslint-config-next": "14.2.15",
+    "eslint-config-next": "14.2.18",
     "typescript": "5.6.3"
   }
 }

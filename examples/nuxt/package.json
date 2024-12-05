@@ -17,15 +17,15 @@
     "@txnlab/use-wallet": "workspace:*",
     "@txnlab/use-wallet-vue": "workspace:*",
     "@walletconnect/modal": "^2.7.0",
-    "@walletconnect/sign-client": "^2.17.1",
+    "@walletconnect/sign-client": "^2.17.2",
     "algosdk": "3.0.0",
     "lute-connect": "^1.4.1",
-    "nuxt": "3.13.2",
-    "vue": "3.5.12",
-    "vue-router": "4.4.5"
+    "nuxt": "3.14.1592",
+    "vue": "3.5.13",
+    "vue-router": "4.5.0"
   },
   "devDependencies": {
     "typescript": "5.6.3",
-    "vue-tsc": "2.1.6"
+    "vue-tsc": "2.1.10"
   }
 }
