@@ -37,7 +37,7 @@
     "dist"
   ],
   "dependencies": {
-    "@tanstack/store": "0.5.5"
+    "@tanstack/store": "0.6.0"
   },
   "devDependencies": {
     "@agoralabs-sh/avm-web-provider": "1.7.0",
@@ -55,7 +55,7 @@
     "algosdk": "2.9.0",
     "lute-connect": "1.4.1",
     "magic-sdk": "28.13.0",
-    "tsup": "8.3.0",
+    "tsup": "8.3.5",
     "typescript": "5.6.3"
   },
   "peerDependencies": {
