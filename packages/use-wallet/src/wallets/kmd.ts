@@ -10,10 +10,11 @@ interface KmdConstructor {
   baseServer?: string
   port?: string | number
   headers?: Record<string, string>
+  promptForPassword: () => Promise<string>
 }
 
-export type KmdOptions = Partial<Pick<KmdConstructor, 'token'>> &
-  Omit<KmdConstructor, 'token'> & {
+export type KmdOptions = Partial<Pick<KmdConstructor, 'token' | 'promptForPassword'>> &
+  Omit<KmdConstructor, 'token' | 'promptForPassword'> & {
     wallet?: string
   }
 
@@ -78,12 +79,12 @@ export class KmdWallet extends BaseWallet {
       token = 'a'.repeat(64),
       baseServer = 'http://127.0.0.1',
       port = 4002,
-      wallet = 'unencrypted-default-wallet'
+      wallet = 'unencrypted-default-wallet',
+      promptForPassword = () => Promise.resolve(prompt('KMD password') || '')
     } = options || {}
 
-    this.options = { token, baseServer, port }
+    this.options = { token, baseServer, port, promptForPassword }
     this.walletName = wallet
-
     this.store = store
   }
 
@@ -238,7 +239,7 @@ export class KmdWallet extends BaseWallet {
 
       // Get token and password
       const token = await this.fetchToken()
-      const password = this.getPassword()
+      const password = await this.getPassword()
 
       const client = this.client || (await this.initializeClient())
 
@@ -284,7 +285,7 @@ export class KmdWallet extends BaseWallet {
     const client = this.client || (await this.initializeClient())
 
     const walletId = this.walletId || (await this.fetchWalletId())
-    const password = this.getPassword()
+    const password = await this.getPassword()
 
     const { wallet_handle_token }: InitWalletHandleResponse = await client.initWalletHandle(
       walletId,
@@ -301,11 +302,11 @@ export class KmdWallet extends BaseWallet {
     this.logger.debug('Token released successfully')
   }
 
-  private getPassword(): string {
+  private async getPassword(): Promise<string> {
     if (this.password !== null) {
       return this.password
     }
-    const password = prompt('KMD password') || ''
+    const password = await this.options.promptForPassword()
     this.password = password
     return password
   }

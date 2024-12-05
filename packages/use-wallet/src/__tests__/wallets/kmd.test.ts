@@ -437,4 +437,29 @@ describe('KmdWallet', () => {
       expect(mockKmd.initWalletHandle).toHaveBeenCalledWith(mockWallet.id, '')
     })
   })
+
+  describe('custom prompt for password', () => {
+    const customPassword = 'customPassword'
+
+    beforeEach(() => {
+      wallet = new KmdWallet({
+        id: WalletId.KMD,
+        metadata: {},
+        getAlgodClient: {} as any,
+        store,
+        subscribe: vi.fn(),
+        options: {
+          promptForPassword: () => Promise.resolve(customPassword)
+        }
+      })
+    })
+
+    it('should return password from custom prompt', async () => {
+      mockKmd.listKeys.mockResolvedValueOnce({ addresses: [account1.address] })
+      await wallet.connect()
+
+      expect(global.prompt).toHaveBeenCalledTimes(0)
+      expect(mockKmd.initWalletHandle).toHaveBeenCalledWith(mockWallet.id, customPassword)
+    })
+  })
 })
