@@ -441,6 +441,7 @@ describe('KmdWallet', () => {
         getAlgodClient: {} as any,
         store,
         subscribe: vi.fn(),
+        networks: DEFAULT_NETWORKS,
         options: {
           promptForPassword: () => Promise.resolve(customPassword)
         }

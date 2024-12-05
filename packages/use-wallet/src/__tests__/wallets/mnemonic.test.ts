@@ -380,7 +380,8 @@ describe('MnemonicWallet', () => {
         metadata: {},
         getAlgodClient: {} as any,
         store,
-        subscribe: vi.fn()
+        subscribe: vi.fn(),
+        networks: DEFAULT_NETWORKS
       })
     })
 
