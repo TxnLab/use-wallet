@@ -54,17 +54,19 @@ export class PeraWallet extends BaseWallet {
     this.options = options
     this.store = store
 
-    const isPeraDiscover = window.navigator.userAgent.includes('pera')
+    if (typeof window !== 'undefined' && window.navigator) {
+      const isPeraDiscover = window.navigator.userAgent.includes('pera')
 
-    if (isPeraDiscover) {
-      this.logger.info('Pera Discover browser detected, auto connecting...')
-      void this.connect()
-        .then(() => {
-          this.logger.info('Auto-connect successful')
-        })
-        .catch((error) => {
-          this.logger.warn('Auto-connect failed:', error.message)
-        })
+      if (isPeraDiscover) {
+        this.logger.info('Pera Discover browser detected, auto connecting...')
+        void this.connect()
+          .then(() => {
+            this.logger.info('Auto-connect successful')
+          })
+          .catch((error) => {
+            this.logger.warn('Auto-connect failed:', error.message)
+          })
+      }
     }
   }
 
