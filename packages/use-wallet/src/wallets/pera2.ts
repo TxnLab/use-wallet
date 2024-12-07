@@ -119,6 +119,21 @@ export class PeraWallet extends BaseWallet {
       const state = this.store.state
       const walletState = state.wallets[this.id]
 
+      // Check for Pera Discover browser and auto-connect if no other wallet is active
+      if (typeof window !== 'undefined' && window.navigator) {
+        const isPeraDiscover = window.navigator.userAgent.includes('pera')
+        if (isPeraDiscover && !walletState && !state.activeWallet) {
+          this.logger.info('Pera Discover browser detected, attempting auto-connect...')
+          try {
+            await this.connect()
+            this.logger.info('Auto-connect successful')
+            return
+          } catch (error: any) {
+            this.logger.warn('Auto-connect failed:', error.message)
+          }
+        }
+      }
+
       // No session to resume
       if (!walletState) {
         this.logger.info('No session to resume')
