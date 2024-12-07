@@ -53,28 +53,11 @@ export class PeraWallet extends BaseWallet {
     }
     this.options = options
     this.store = store
-
-    if (typeof window !== 'undefined' && window.navigator) {
-      const isPeraDiscover = window.navigator.userAgent.includes('pera')
-      if (isPeraDiscover) {
-        void this.autoConnect()
-      }
-    }
   }
 
   static defaultMetadata = {
     name: 'Pera',
     icon: ICON
-  }
-
-  private async autoConnect(): Promise<void> {
-    this.logger.info('Pera Discover browser detected, auto connecting...')
-    try {
-      await this.connect()
-      this.logger.info('Auto-connect successful')
-    } catch (error: any) {
-      this.logger.warn('Auto-connect failed:', error.message)
-    }
   }
 
   private async initializeClient(): Promise<PeraWalletConnect> {
@@ -135,6 +118,21 @@ export class PeraWallet extends BaseWallet {
     try {
       const state = this.store.state
       const walletState = state.wallets[this.id]
+
+      // Check for Pera Discover browser and auto-connect if no other wallet is active
+      if (typeof window !== 'undefined' && window.navigator) {
+        const isPeraDiscover = window.navigator.userAgent.includes('pera')
+        if (isPeraDiscover && !walletState && !state.activeWallet) {
+          this.logger.info('Pera Discover browser detected, attempting auto-connect...')
+          try {
+            await this.connect()
+            this.logger.info('Auto-connect successful')
+            return
+          } catch (error: any) {
+            this.logger.warn('Auto-connect failed:', error.message)
+          }
+        }
+      }
 
       // No session to resume
       if (!walletState) {

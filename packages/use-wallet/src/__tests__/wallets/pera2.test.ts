@@ -332,52 +332,78 @@ describe('PeraWallet', () => {
       expect(store.state.wallets[WalletId.PERA2]).toBeUndefined()
       expect(wallet.isConnected).toBe(false)
     })
-  })
 
-  describe('autoConnect', () => {
-    let mockUserAgent: string
+    describe('auto-connect in Pera browser', () => {
+      let mockUserAgent: string
 
-    beforeEach(() => {
-      mockUserAgent = ''
-      vi.clearAllMocks()
+      beforeEach(() => {
+        mockUserAgent = ''
+        vi.clearAllMocks()
 
-      vi.stubGlobal('window', {
-        navigator: {
-          get userAgent() {
-            return mockUserAgent
+        vi.stubGlobal('window', {
+          navigator: {
+            get userAgent() {
+              return mockUserAgent
+            }
           }
-        }
+        })
       })
-    })
 
-    afterEach(() => {
-      vi.unstubAllGlobals()
-    })
+      afterEach(() => {
+        vi.unstubAllGlobals()
+      })
 
-    it('should attempt auto-connect in Pera browser', () => {
-      mockUserAgent = 'pera/1.0.0'
+      it('should attempt auto-connect in Pera browser when no session exists and no active wallet', async () => {
+        mockUserAgent = 'pera/1.0.0'
+        mockPeraWallet.connect.mockResolvedValueOnce([account1.address])
 
-      // Mock the private method before creating the wallet
-      vi.spyOn(PeraWallet.prototype as any, 'autoConnect')
-        .mockReset()
-        .mockImplementation(() => Promise.resolve())
+        await wallet.resumeSession()
 
-      createWalletWithStore(store)
+        expect(mockPeraWallet.connect).toHaveBeenCalled()
+        expect(store.state.wallets[WalletId.PERA2]).toBeDefined()
+        expect(mockLogger.info).toHaveBeenCalledWith('Auto-connect successful')
+      })
 
-      expect(PeraWallet.prototype['autoConnect']).toHaveBeenCalled()
-    })
+      it('should not attempt auto-connect if another wallet is active', async () => {
+        mockUserAgent = 'pera/1.0.0'
 
-    it('should not attempt auto-connect in other browsers', () => {
-      mockUserAgent = 'chrome/1.0.0'
+        // Set up another active wallet
+        store.setState((state) => ({
+          ...state,
+          activeWallet: WalletId.DEFLY,
+          wallets: {
+            [WalletId.DEFLY]: {
+              accounts: [account2],
+              activeAccount: account2
+            }
+          }
+        }))
 
-      // Mock the private method before creating the wallet
-      vi.spyOn(PeraWallet.prototype as any, 'autoConnect')
-        .mockReset()
-        .mockImplementation(() => Promise.resolve())
+        await wallet.resumeSession()
 
-      createWalletWithStore(store)
+        expect(mockPeraWallet.connect).not.toHaveBeenCalled()
+        expect(mockLogger.info).toHaveBeenCalledWith('No session to resume')
+      })
 
-      expect(PeraWallet.prototype['autoConnect']).not.toHaveBeenCalled()
+      it('should not attempt auto-connect in other browsers', async () => {
+        mockUserAgent = 'chrome/1.0.0'
+
+        await wallet.resumeSession()
+
+        expect(mockPeraWallet.connect).not.toHaveBeenCalled()
+        expect(mockLogger.info).toHaveBeenCalledWith('No session to resume')
+      })
+
+      it('should handle auto-connect failure gracefully', async () => {
+        mockUserAgent = 'pera/1.0.0'
+        mockPeraWallet.connect.mockRejectedValueOnce(new Error('Connect failed'))
+
+        await wallet.resumeSession()
+
+        expect(mockPeraWallet.connect).toHaveBeenCalled()
+        expect(mockLogger.warn).toHaveBeenCalledWith('Auto-connect failed:', 'Connect failed')
+        expect(store.state.wallets[WalletId.PERA2]).toBeUndefined()
+      })
     })
   })
 
