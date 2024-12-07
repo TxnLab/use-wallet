@@ -51,16 +51,6 @@ export class PeraWallet extends BaseWallet {
     icon: ICON
   }
 
-  private async autoConnect(): Promise<void> {
-    this.logger.info('Pera Discover browser detected, auto connecting...')
-    try {
-      await this.connect()
-      this.logger.info('Auto-connect successful')
-    } catch (error: any) {
-      this.logger.warn('Auto-connect failed:', error.message)
-    }
-  }
-
   private async initializeClient(): Promise<PeraWalletConnect> {
     this.logger.info('Initializing client...')
     const module = await import('@perawallet/connect')
