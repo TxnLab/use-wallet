@@ -334,6 +334,53 @@ describe('PeraWallet', () => {
     })
   })
 
+  describe('autoConnect', () => {
+    let mockUserAgent: string
+
+    beforeEach(() => {
+      mockUserAgent = ''
+      vi.clearAllMocks()
+
+      vi.stubGlobal('window', {
+        navigator: {
+          get userAgent() {
+            return mockUserAgent
+          }
+        }
+      })
+    })
+
+    afterEach(() => {
+      vi.unstubAllGlobals()
+    })
+
+    it('should attempt auto-connect in Pera browser', () => {
+      mockUserAgent = 'pera/1.0.0'
+
+      // Mock the private method before creating the wallet
+      vi.spyOn(PeraWallet.prototype as any, 'autoConnect')
+        .mockReset()
+        .mockImplementation(() => Promise.resolve())
+
+      createWalletWithStore(store)
+
+      expect(PeraWallet.prototype['autoConnect']).toHaveBeenCalled()
+    })
+
+    it('should not attempt auto-connect in other browsers', () => {
+      mockUserAgent = 'chrome/1.0.0'
+
+      // Mock the private method before creating the wallet
+      vi.spyOn(PeraWallet.prototype as any, 'autoConnect')
+        .mockReset()
+        .mockImplementation(() => Promise.resolve())
+
+      createWalletWithStore(store)
+
+      expect(PeraWallet.prototype['autoConnect']).not.toHaveBeenCalled()
+    })
+  })
+
   describe('signing transactions', () => {
     // Connected accounts
     const connectedAcct1 = '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q'
