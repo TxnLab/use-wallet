@@ -1,3 +1,9 @@
+## [4.0.0-beta.3](https://github.com/TxnLab/use-wallet/tree/v4.0.0-beta.2...v4.0.0-beta.3) (2024-12-07)
+
+### Features
+
+- **Pera:** Add auto-connect for Pera Discover browser ([#323](https://github.com/txnlab/use-wallet/pull/323)) ([4d04fb1](https://github.com/txnlab/use-wallet/commit/4d04fb1a789912a24b73f52a826aa62e54648656))
+
 ## [4.0.0-beta.2](https://github.com/TxnLab/use-wallet/tree/v4.0.0-beta.1...v4.0.0-beta.2) (2024-11-26)
 
 ### Features
