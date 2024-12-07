@@ -1,3 +1,9 @@
+# [3.11.0](https://github.com/txnlab/use-wallet/compare/v3.10.1...v3.11.0) (2024-12-05)
+
+### Features
+
+- Add custom password prompt for KMD and Mnemonic ([#322](https://github.com/txnlab/use-wallet/pull/322)) ([0cfbc6d](https://github.com/txnlab/use-wallet/commit/0cfbc6db2098d65b1aee899b39c136b6f708a05a))
+
 ## [3.10.1](https://github.com/txnlab/use-wallet/compare/v3.10.0...v3.10.1) (2024-11-28)
 
 ### Bug Fixes
