@@ -8,7 +8,8 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint": "eslint -c \"../../.eslintrc.json\" \"**/*.{js,ts}\"",
-    "typecheck": "npx nuxi typecheck"
+    "typecheck": "npx nuxi typecheck",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@algorandfoundation/liquid-auth-use-wallet-client": "1.1.0",

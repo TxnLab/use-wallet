@@ -130,7 +130,7 @@ KMD Documentation
 
 ## Mnemonic
 
-The Mnemonic wallet provider is a specialized tool designed for testing purposes, particularly for integration tests. It should only be used in a test environment for running automated tests that require wallet interactions. (Documentation coming soon)
+The Mnemonic wallet provider is a specialized tool designed for testing purposes, particularly for end-to-end and integration tests. It should only be used in a test environment for running automated tests that require wallet interactions. Refer to the [End-to-End Testing guide](../guides/end-to-end-testing.md) for more information about how to use the Mnemonic wallet provider for automated end-to-end testing.
 
 {% hint style="danger" %}
 **Warning:** The Mnemonic wallet provider is strictly for testing and development purposes. It will not function if the active network is set to MainNet. Any accounts used with the Mnemonic wallet should be considered insecure and should never hold MainNet ALGO or ASAs with any real value.
