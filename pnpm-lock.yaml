@@ -60,8 +60,8 @@ importers:
   examples/nextjs:
     dependencies:
       '@blockshake/defly-connect':
-        specifier: ^1.1.6
-        version: 1.1.6(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.2.0
+        version: 1.2.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
         specifier: ^1.3.5
         version: 1.3.5(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -115,8 +115,8 @@ importers:
         specifier: 1.1.0
         version: 1.1.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
-        specifier: ^1.1.6
-        version: 1.1.6(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.2.0
+        version: 1.2.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
         specifier: ^1.3.5
         version: 1.3.5(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -161,8 +161,8 @@ importers:
         specifier: 1.1.0
         version: 1.1.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
-        specifier: ^1.1.6
-        version: 1.1.6(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.2.0
+        version: 1.2.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
         specifier: ^1.3.5
         version: 1.3.5(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -225,8 +225,8 @@ importers:
         specifier: 1.1.0
         version: 1.1.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
-        specifier: ^1.1.6
-        version: 1.1.6(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.2.0
+        version: 1.2.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
         specifier: ^1.3.5
         version: 1.3.5(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -265,8 +265,8 @@ importers:
         specifier: 1.1.0
         version: 1.1.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
-        specifier: ^1.1.6
-        version: 1.1.6(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.2.0
+        version: 1.2.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
         specifier: ^1.3.5
         version: 1.3.5(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -302,8 +302,8 @@ importers:
         specifier: 1.1.0
         version: 1.1.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
-        specifier: ^1.1.6
-        version: 1.1.6(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.2.0
+        version: 1.2.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
         specifier: ^1.3.5
         version: 1.3.5(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -352,8 +352,8 @@ importers:
         specifier: 1.1.0
         version: 1.1.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
-        specifier: 1.1.6
-        version: 1.1.6(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: 1.2.0
+        version: 1.2.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@magic-ext/algorand':
         specifier: 23.18.0
         version: 23.18.0
@@ -400,8 +400,8 @@ importers:
   packages/use-wallet-react:
     dependencies:
       '@blockshake/defly-connect':
-        specifier: ^1.1.6
-        version: 1.1.6(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.2.0
+        version: 1.2.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@magic-ext/algorand':
         specifier: ^23.18.0
         version: 23.18.0
@@ -455,8 +455,8 @@ importers:
   packages/use-wallet-solid:
     dependencies:
       '@blockshake/defly-connect':
-        specifier: ^1.1.6
-        version: 1.1.6(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.2.0
+        version: 1.2.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@magic-ext/algorand':
         specifier: ^23.18.0
         version: 23.18.0
@@ -507,8 +507,8 @@ importers:
   packages/use-wallet-vue:
     dependencies:
       '@blockshake/defly-connect':
-        specifier: ^1.1.6
-        version: 1.1.6(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.2.0
+        version: 1.2.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@magic-ext/algorand':
         specifier: ^23.18.0
         version: 23.18.0
@@ -562,9 +562,9 @@ packages:
   '@algorandfoundation/liquid-auth-use-wallet-client@1.1.0':
     resolution: {integrity: sha512-pGTHq9RXT4qN81mF0TGcTl+EBvnOiYGI42BHkIHDF43StogM0ueFRh/qvO6ei+aYRxKaFogqfhgB1twm9afcuQ==}
 
-  '@algorandfoundation/liquid-client@https://codeload.github.com/algorandfoundation/liquid-auth-js/tar.gz/c89fe0f17c4d16ed17299d7f524f044a2687a680':
-    resolution: {tarball: https://codeload.github.com/algorandfoundation/liquid-auth-js/tar.gz/c89fe0f17c4d16ed17299d7f524f044a2687a680}
-    version: 0.0.1
+  '@algorandfoundation/liquid-client@https://codeload.github.com/algorandfoundation/liquid-auth-js/tar.gz/0958cb96627b5ead1ef5cfbdc4f47fe43a2e4908':
+    resolution: {tarball: https://codeload.github.com/algorandfoundation/liquid-auth-js/tar.gz/0958cb96627b5ead1ef5cfbdc4f47fe43a2e4908}
+    version: 1.0.0-canary.3
 
   '@algorandfoundation/provider@https://codeload.github.com/algorandfoundation/wallet-provider-ts/tar.gz/28c80f5b9e0259b8e83e65c65d802d8123de9046':
     resolution: {tarball: https://codeload.github.com/algorandfoundation/wallet-provider-ts/tar.gz/28c80f5b9e0259b8e83e65c65d802d8123de9046}
@@ -868,10 +868,10 @@ packages:
     resolution: {integrity: sha512-vN5p+1kl59GVKMvTHt55NzzmYVxprfJD+ql7U9NFIfKCBkYE55LYtS+WtPlaYOyzydrKI8Nezd+aZextrd+FMA==}
     engines: {node: '>=6.9.0'}
 
-  '@blockshake/defly-connect@1.1.6':
-    resolution: {integrity: sha512-pgibHfWjTkfyjQhRVKR2mnnG7Vv/oBJGowphrIwdF62TkElRspsCrv/GcasZ2ipw+Wrqp3cdsE1W7GU0ZjgPwg==}
+  '@blockshake/defly-connect@1.2.0':
+    resolution: {integrity: sha512-5XqasQ0ilRtSV2aMbFRZI+76U6VKVTsV9WLYr4OaZt1xObklc62A0B2Is2OEtBaI+CdU2DGCfZLM7L+rFC8DoQ==}
     peerDependencies:
-      algosdk: ^2.1.0
+      algosdk: ^3.0.0
 
   '@cbor-extract/cbor-extract-darwin-arm64@2.2.0':
     resolution: {integrity: sha512-P7swiOAdF7aSi0H+tHtHtr6zrpF3aAq/W9FXx5HektRvLTM2O89xCyXF3pk7pLc7QpaY7AoaE8UowVf9QBdh3w==}
@@ -1322,6 +1322,9 @@ packages:
 
   '@kwsites/promise-deferred@1.1.1':
     resolution: {integrity: sha512-GaHYm+c0O9MjZRu0ongGBRbinu8gVAMd2UZjji6jVmqKtZluZnptXGWhz1E8j8D2HJ3f/yMxKAUC0b+57wncIw==}
+
+  '@likecoin/qr-code-styling@1.6.6':
+    resolution: {integrity: sha512-RbGK/+20bJhFZR70r8MeDvfyz3W7U5zXpykSTYOYxZGyo6wC+Y4QnbUpL+YdAtzT2ZIFeCNOcRs2W2FNrKPoaA==}
 
   '@lit-labs/ssr-dom-shim@1.2.1':
     resolution: {integrity: sha512-wx4aBmgeGvFmOKucFKY+8VFJSYZxs9poN3SDNQFF6lT6NrQUnHiPB2PWz2sc4ieEcAaYYzN+1uWahEeTq2aRIQ==}
@@ -6727,7 +6730,7 @@ snapshots:
 
   '@algorandfoundation/liquid-auth-use-wallet-client@1.1.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@algorandfoundation/liquid-client': https://codeload.github.com/algorandfoundation/liquid-auth-js/tar.gz/c89fe0f17c4d16ed17299d7f524f044a2687a680(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@algorandfoundation/liquid-client': https://codeload.github.com/algorandfoundation/liquid-auth-js/tar.gz/0958cb96627b5ead1ef5cfbdc4f47fe43a2e4908(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@algorandfoundation/provider': https://codeload.github.com/algorandfoundation/wallet-provider-ts/tar.gz/28c80f5b9e0259b8e83e65c65d802d8123de9046
       algosdk: 2.9.0
       cbor-x: 1.6.0
@@ -6737,7 +6740,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@algorandfoundation/liquid-client@https://codeload.github.com/algorandfoundation/liquid-auth-js/tar.gz/c89fe0f17c4d16ed17299d7f524f044a2687a680(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@algorandfoundation/liquid-client@https://codeload.github.com/algorandfoundation/liquid-auth-js/tar.gz/0958cb96627b5ead1ef5cfbdc4f47fe43a2e4908(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       '@algorandfoundation/qr-code-styling': https://codeload.github.com/algorandfoundation/qr-code-styling/tar.gz/ce8541ee1cb3b0ab2acd9926f3092d4ab217e276
       canvas: 2.11.2
@@ -7174,15 +7177,15 @@ snapshots:
       '@babel/helper-string-parser': 7.25.9
       '@babel/helper-validator-identifier': 7.25.9
 
-  '@blockshake/defly-connect@1.1.6(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@blockshake/defly-connect@1.2.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
+      '@likecoin/qr-code-styling': 1.6.6
       '@walletconnect/client': 1.8.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@walletconnect/types': 1.8.0
       algosdk: 3.0.0
       bowser: 2.11.0
       buffer: 6.0.3
       lottie-web: 5.12.2
-      qr-code-styling: 1.6.0-rc.1
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -7556,6 +7559,10 @@ snapshots:
       - supports-color
 
   '@kwsites/promise-deferred@1.1.1': {}
+
+  '@likecoin/qr-code-styling@1.6.6':
+    dependencies:
+      qrcode-generator: 1.4.4
 
   '@lit-labs/ssr-dom-shim@1.2.1': {}
 
@@ -10470,7 +10477,7 @@ snapshots:
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 3.6.3(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint@8.57.1))(eslint@8.57.1)
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1)
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
       eslint-plugin-jsx-a11y: 6.10.1(eslint@8.57.1)
       eslint-plugin-react: 7.37.1(eslint@8.57.1)
       eslint-plugin-react-hooks: 5.0.0-canary-7118f5dd7-20230705(eslint@8.57.1)
@@ -10505,7 +10512,7 @@ snapshots:
       is-bun-module: 1.2.1
       is-glob: 4.0.3
     optionalDependencies:
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1)
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
     transitivePeerDependencies:
       - '@typescript-eslint/parser'
       - eslint-import-resolver-node
@@ -10523,7 +10530,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1):
+  eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.8

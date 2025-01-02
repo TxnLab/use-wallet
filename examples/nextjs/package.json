@@ -8,7 +8,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@blockshake/defly-connect": "^1.1.6",
+    "@blockshake/defly-connect": "^1.2.0",
     "@perawallet/connect": "^1.3.5",
     "@txnlab/use-wallet-react": "workspace:*",
     "@walletconnect/modal": "^2.7.0",
