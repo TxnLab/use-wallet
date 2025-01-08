@@ -12,7 +12,6 @@ import { LuteWallet } from './wallets/lute'
 import { MagicAuth } from './wallets/magic'
 import { MnemonicWallet } from './wallets/mnemonic'
 import { PeraWallet } from './wallets/pera'
-import { PeraWallet as PeraWalletBeta } from './wallets/pera2'
 import { WalletConnect } from './wallets/walletconnect'
 
 export function createWalletMap(): WalletMap {
@@ -29,7 +28,6 @@ export function createWalletMap(): WalletMap {
     [WalletId.MAGIC]: MagicAuth,
     [WalletId.MNEMONIC]: MnemonicWallet,
     [WalletId.PERA]: PeraWallet,
-    [WalletId.PERA2]: PeraWalletBeta,
     [WalletId.WALLETCONNECT]: WalletConnect
   }
 }

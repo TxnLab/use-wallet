@@ -11,7 +11,6 @@ export const webpackFallback = {
   '@blockshake/defly-connect': false,
   '@magic-ext/algorand': false,
   '@perawallet/connect': false,
-  '@perawallet/connect-beta': false,
   '@walletconnect/modal': false,
   '@walletconnect/sign-client': false,
   'lute-connect': false,
