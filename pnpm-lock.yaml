@@ -63,8 +63,8 @@ importers:
         specifier: ^1.2.0
         version: 1.2.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
-        specifier: ^1.3.5
-        version: 1.3.5(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.4.0
+        version: 1.4.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet-react':
         specifier: workspace:*
         version: link:../../packages/use-wallet-react
@@ -118,8 +118,8 @@ importers:
         specifier: ^1.2.0
         version: 1.2.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
-        specifier: ^1.3.5
-        version: 1.3.5(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.4.0
+        version: 1.4.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../../packages/use-wallet
@@ -164,8 +164,8 @@ importers:
         specifier: ^1.2.0
         version: 1.2.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
-        specifier: ^1.3.5
-        version: 1.3.5(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.4.0
+        version: 1.4.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet-react':
         specifier: workspace:*
         version: link:../../packages/use-wallet-react
@@ -228,8 +228,8 @@ importers:
         specifier: ^1.2.0
         version: 1.2.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
-        specifier: ^1.3.5
-        version: 1.3.5(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.4.0
+        version: 1.4.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet-solid':
         specifier: workspace:*
         version: link:../../packages/use-wallet-solid
@@ -268,8 +268,8 @@ importers:
         specifier: ^1.2.0
         version: 1.2.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
-        specifier: ^1.3.5
-        version: 1.3.5(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.4.0
+        version: 1.4.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../../packages/use-wallet
@@ -305,8 +305,8 @@ importers:
         specifier: ^1.2.0
         version: 1.2.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
-        specifier: ^1.3.5
-        version: 1.3.5(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.4.0
+        version: 1.4.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet-vue':
         specifier: workspace:*
         version: link:../../packages/use-wallet-vue
@@ -361,8 +361,8 @@ importers:
         specifier: 28.18.0
         version: 28.18.0(localforage@1.10.0)
       '@perawallet/connect':
-        specifier: 1.3.5
-        version: 1.3.5(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: 1.4.0
+        version: 1.4.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect-beta':
         specifier: 2.0.21
         version: 2.0.21(algosdk@3.0.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
@@ -406,8 +406,8 @@ importers:
         specifier: ^23.18.0
         version: 23.18.0
       '@perawallet/connect':
-        specifier: ^1.3.5
-        version: 1.3.5(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.4.0
+        version: 1.4.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect-beta':
         specifier: ^2.0.21
         version: 2.0.21(algosdk@3.0.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
@@ -461,8 +461,8 @@ importers:
         specifier: ^23.18.0
         version: 23.18.0
       '@perawallet/connect':
-        specifier: ^1.3.5
-        version: 1.3.5(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.4.0
+        version: 1.4.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect-beta':
         specifier: ^2.0.21
         version: 2.0.21(algosdk@3.0.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
@@ -513,8 +513,8 @@ importers:
         specifier: ^23.18.0
         version: 23.18.0
       '@perawallet/connect':
-        specifier: ^1.3.5
-        version: 1.3.5(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.4.0
+        version: 1.4.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect-beta':
         specifier: ^2.0.21
         version: 2.0.21(algosdk@3.0.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
@@ -1599,10 +1599,10 @@ packages:
     peerDependencies:
       algosdk: ^2.8.0
 
-  '@perawallet/connect@1.3.5':
-    resolution: {integrity: sha512-JBaaS0tjipo3DcS2v5Q1lcQXqxYkVpKB3YiqV7okBnd1KQ54zcATvPwRXvpsbxttec1OpdHmkWymuTpxpx+2Ng==}
+  '@perawallet/connect@1.4.0':
+    resolution: {integrity: sha512-ef6sQQWhCJ/fMe6VKOaSIaP4hpc2XufKJlv5A+kSHSoUD3NG0Me6R9oyDlxM7UcW/vTyWdg3lDEsPS92v+wBUA==}
     peerDependencies:
-      algosdk: ^2.1.0
+      algosdk: ^3.0.0
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -8005,7 +8005,7 @@ snapshots:
       - ioredis
       - utf-8-validate
 
-  '@perawallet/connect@1.3.5(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@perawallet/connect@1.4.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       '@evanhahn/lottie-web-light': 5.8.1
       '@walletconnect/client': 1.8.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
