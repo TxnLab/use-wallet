@@ -1,3 +1,9 @@
+## [3.11.1](https://github.com/txnlab/use-wallet/compare/v3.11.0...v3.11.1) (2024-12-18)
+
+### Bug Fixes
+
+- **Wallets:** Prevent WalletConnect v1 session data collision ([#329](https://github.com/txnlab/use-wallet/pull/329)) ([481da35](https://github.com/txnlab/use-wallet/commit/481da355a34242c5482fd0649af869792e0de1d6))
+
 # [3.11.0](https://github.com/txnlab/use-wallet/compare/v3.10.1...v3.11.0) (2024-12-05)
 
 ### Features
