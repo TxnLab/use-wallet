@@ -151,9 +151,5 @@ export const WalletProvider = ({ manager, children }: WalletProviderProps): JSX.
     }
   }, [manager])
 
-  return (
-    <WalletContext.Provider value={{ manager, algodClient, setAlgodClient }}>
-      {children}
-    </WalletContext.Provider>
-  )
+  return <WalletContext value={{ manager, algodClient, setAlgodClient }}>{children}</WalletContext>
 }
