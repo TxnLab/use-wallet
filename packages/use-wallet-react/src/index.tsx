@@ -127,7 +127,7 @@ interface WalletProviderProps {
   children: React.ReactNode
 }
 
-export const WalletProvider = ({ manager, children }: WalletProviderProps): JSX.Element => {
+export const WalletProvider = ({ manager, children }: WalletProviderProps): React.JSX.Element => {
   const [algodClient, setAlgodClient] = React.useState(manager.algodClient)
 
   React.useEffect(() => {
