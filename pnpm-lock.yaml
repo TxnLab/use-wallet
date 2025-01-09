@@ -12,8 +12,8 @@ importers:
         specifier: 6.6.3
         version: 6.6.3
       '@testing-library/react':
-        specifier: 16.0.1
-        version: 16.0.1(@testing-library/dom@10.4.0)(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 16.1.0
+        version: 16.1.0(@testing-library/dom@10.4.0)(@types/react-dom@19.0.0)(@types/react@19.0.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@typescript-eslint/eslint-plugin':
         specifier: 8.16.0
         version: 8.16.0(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint@8.57.1)(typescript@5.6.3)
@@ -128,7 +128,7 @@ importers:
         version: link:../../packages/use-wallet-vue
       '@walletconnect/modal':
         specifier: ^2.7.0
-        version: 2.7.0(@types/react@18.3.12)(react@18.3.1)
+        version: 2.7.0(@types/react@19.0.0)(react@19.0.0)
       '@walletconnect/sign-client':
         specifier: ^2.17.2
         version: 2.17.2(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
@@ -235,7 +235,7 @@ importers:
         version: link:../../packages/use-wallet-solid
       '@walletconnect/modal':
         specifier: ^2.7.0
-        version: 2.7.0(@types/react@18.3.12)(react@18.3.1)
+        version: 2.7.0(@types/react@19.0.0)(react@19.0.0)
       '@walletconnect/sign-client':
         specifier: ^2.17.2
         version: 2.17.2(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
@@ -275,7 +275,7 @@ importers:
         version: link:../../packages/use-wallet
       '@walletconnect/modal':
         specifier: ^2.7.0
-        version: 2.7.0(@types/react@18.3.12)(react@18.3.1)
+        version: 2.7.0(@types/react@19.0.0)(react@19.0.0)
       '@walletconnect/sign-client':
         specifier: ^2.17.2
         version: 2.17.2(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
@@ -312,7 +312,7 @@ importers:
         version: link:../../packages/use-wallet-vue
       '@walletconnect/modal':
         specifier: ^2.7.0
-        version: 2.7.0(@types/react@18.3.12)(react@18.3.1)
+        version: 2.7.0(@types/react@19.0.0)(react@19.0.0)
       '@walletconnect/sign-client':
         specifier: ^2.17.2
         version: 2.17.2(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
@@ -342,8 +342,8 @@ importers:
   packages/use-wallet:
     dependencies:
       '@tanstack/store':
-        specifier: 0.6.0
-        version: 0.6.0
+        specifier: 0.7.0
+        version: 0.7.0
     devDependencies:
       '@agoralabs-sh/avm-web-provider':
         specifier: 1.7.0
@@ -371,10 +371,10 @@ importers:
         version: 20.11.30
       '@walletconnect/modal':
         specifier: 2.7.0
-        version: 2.7.0(@types/react@18.3.12)(react@18.3.1)
+        version: 2.7.0(@types/react@19.0.0)(react@19.0.0)
       '@walletconnect/modal-core':
         specifier: 2.7.0
-        version: 2.7.0(@types/react@18.3.12)(react@18.3.1)
+        version: 2.7.0(@types/react@19.0.0)(react@19.0.0)
       '@walletconnect/sign-client':
         specifier: 2.17.2
         version: 2.17.2(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
@@ -412,14 +412,14 @@ importers:
         specifier: ^2.0.21
         version: 2.0.21(algosdk@2.9.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       '@tanstack/react-store':
-        specifier: 0.6.1
-        version: 0.6.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 0.7.0
+        version: 0.7.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../use-wallet
       '@walletconnect/modal':
         specifier: ^2.7.0
-        version: 2.7.0(@types/react@18.3.12)(react@18.3.1)
+        version: 2.7.0(@types/react@19.0.0)(react@19.0.0)
       '@walletconnect/sign-client':
         specifier: ^2.17.2
         version: 2.17.2(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
@@ -431,8 +431,11 @@ importers:
         version: 28.19.0
     devDependencies:
       '@types/react':
-        specifier: 18.3.12
-        version: 18.3.12
+        specifier: 19.0.0
+        version: 19.0.0
+      '@types/react-dom':
+        specifier: 19.0.0
+        version: 19.0.0
       algosdk:
         specifier: 2.9.0
         version: 2.9.0
@@ -440,11 +443,11 @@ importers:
         specifier: 25.0.1
         version: 25.0.1(bufferutil@4.0.8)(canvas@2.11.2)(utf-8-validate@5.0.10)
       react:
-        specifier: 18.3.1
-        version: 18.3.1
+        specifier: 19.0.0
+        version: 19.0.0
       react-dom:
-        specifier: 18.3.1
-        version: 18.3.1(react@18.3.1)
+        specifier: 19.0.0
+        version: 19.0.0(react@19.0.0)
       tsup:
         specifier: 8.3.5
         version: 8.3.5(jiti@2.4.1)(postcss@8.4.49)(typescript@5.6.3)(yaml@2.6.1)
@@ -467,14 +470,14 @@ importers:
         specifier: ^2.0.21
         version: 2.0.21(algosdk@2.9.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       '@tanstack/solid-store':
-        specifier: 0.6.0
-        version: 0.6.0(solid-js@1.9.3)
+        specifier: 0.7.0
+        version: 0.7.0(solid-js@1.9.3)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../use-wallet
       '@walletconnect/modal':
         specifier: ^2.7.0
-        version: 2.7.0(@types/react@18.3.12)(react@18.3.1)
+        version: 2.7.0(@types/react@19.0.0)(react@19.0.0)
       '@walletconnect/sign-client':
         specifier: ^2.17.2
         version: 2.17.2(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
@@ -519,14 +522,14 @@ importers:
         specifier: ^2.0.21
         version: 2.0.21(algosdk@2.9.0)(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
       '@tanstack/vue-store':
-        specifier: 0.6.0
-        version: 0.6.0(vue@3.5.13(typescript@5.6.3))
+        specifier: 0.7.0
+        version: 0.7.0(vue@3.5.13(typescript@5.6.3))
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../use-wallet
       '@walletconnect/modal':
         specifier: ^2.7.0
-        version: 2.7.0(@types/react@18.3.12)(react@18.3.1)
+        version: 2.7.0(@types/react@19.0.0)(react@19.0.0)
       '@walletconnect/sign-client':
         specifier: ^2.17.2
         version: 2.17.2(bufferutil@4.0.8)(ioredis@5.4.1)(utf-8-validate@5.0.10)
@@ -562,9 +565,9 @@ packages:
   '@algorandfoundation/liquid-auth-use-wallet-client@1.1.0':
     resolution: {integrity: sha512-pGTHq9RXT4qN81mF0TGcTl+EBvnOiYGI42BHkIHDF43StogM0ueFRh/qvO6ei+aYRxKaFogqfhgB1twm9afcuQ==}
 
-  '@algorandfoundation/liquid-client@https://codeload.github.com/algorandfoundation/liquid-auth-js/tar.gz/c89fe0f17c4d16ed17299d7f524f044a2687a680':
-    resolution: {tarball: https://codeload.github.com/algorandfoundation/liquid-auth-js/tar.gz/c89fe0f17c4d16ed17299d7f524f044a2687a680}
-    version: 0.0.1
+  '@algorandfoundation/liquid-client@https://codeload.github.com/algorandfoundation/liquid-auth-js/tar.gz/0958cb96627b5ead1ef5cfbdc4f47fe43a2e4908':
+    resolution: {tarball: https://codeload.github.com/algorandfoundation/liquid-auth-js/tar.gz/0958cb96627b5ead1ef5cfbdc4f47fe43a2e4908}
+    version: 1.0.0-canary.3
 
   '@algorandfoundation/provider@https://codeload.github.com/algorandfoundation/wallet-provider-ts/tar.gz/28c80f5b9e0259b8e83e65c65d802d8123de9046':
     resolution: {tarball: https://codeload.github.com/algorandfoundation/wallet-provider-ts/tar.gz/28c80f5b9e0259b8e83e65c65d802d8123de9046}
@@ -1754,22 +1757,22 @@ packages:
   '@swc/helpers@0.5.5':
     resolution: {integrity: sha512-KGYxvIOXcceOAbEk4bi/dVLEK9z8sZ0uBB3Il5b1rhfClSpcX0yfRO0KmTkqR2cnQDymwLB+25ZyMzICg/cm/A==}
 
-  '@tanstack/react-store@0.6.1':
-    resolution: {integrity: sha512-6gOopOpPp1cAXkEyTEv6tMbAywwFunvIdCKN/SpEiButUayjXU+Q5Sp5Y3hREN3VMR4OA5+RI5SPhhJoqP9e4w==}
+  '@tanstack/react-store@0.7.0':
+    resolution: {integrity: sha512-S/Rq17HaGOk+tQHV/yrePMnG1xbsKZIl/VsNWnNXt4XW+tTY8dTlvpJH2ZQ3GRALsusG5K6Q3unAGJ2pd9W/Ng==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
-  '@tanstack/solid-store@0.6.0':
-    resolution: {integrity: sha512-2lkalYD/au4PiMWm7Q26FiwLW3DO1xRACY7cPwKMud8rPFlB4tV7SNPq1j41/wtRayFCkR2MOe1+msW1TmMvYw==}
+  '@tanstack/solid-store@0.7.0':
+    resolution: {integrity: sha512-uDQYkUuH3MppitiduZLTEcItkTr8vEJ33jzp2rH2VvlNRMGbuU54GQcqf3dLIlTbZ1/Z2TtIBtBjjl+N/OhwRg==}
     peerDependencies:
       solid-js: ^1.6.0
 
-  '@tanstack/store@0.6.0':
-    resolution: {integrity: sha512-+m2OBglsjXcLmmKOX6/9v8BDOCtyxhMmZLsRUDswOOSdIIR9mvv6i0XNKsmTh3AlYU8c1mRcodC8/Vyf+69VlQ==}
+  '@tanstack/store@0.7.0':
+    resolution: {integrity: sha512-CNIhdoUsmD2NolYuaIs8VfWM467RK6oIBAW4nPEKZhg1smZ+/CwtCdpURgp7nxSqOaV9oKkzdWD80+bC66F/Jg==}
 
-  '@tanstack/vue-store@0.6.0':
-    resolution: {integrity: sha512-QcvBEOG2dPiFw06LqEk1ehL7ZY0CJS8AKlW7uqmFFFzVost+Oj1oiQne9hW+L6O8f0ZnwFlD9fA5a7pTum8YeQ==}
+  '@tanstack/vue-store@0.7.0':
+    resolution: {integrity: sha512-oLB/WuD26caR86rxLz39LvS5YdY0KIThJFEHIW/mXujC2+M/z3GxVZFJsZianAzr3tH56sZQ8kkq4NvwwsOBkQ==}
     peerDependencies:
       '@vue/composition-api': ^1.2.1
       vue: ^2.5.0 || ^3.0.0
@@ -1785,15 +1788,15 @@ packages:
     resolution: {integrity: sha512-IteBhl4XqYNkM54f4ejhLRJiZNqcSCoXUOG2CPK7qbD322KjQozM4kHQOfkG2oln9b9HTYqs+Sae8vBATubxxA==}
     engines: {node: '>=14', npm: '>=6', yarn: '>=1'}
 
-  '@testing-library/react@16.0.1':
-    resolution: {integrity: sha512-dSmwJVtJXmku+iocRhWOUFbrERC76TX2Mnf0ATODz8brzAZrMBbzLwQixlBSanZxR6LddK3eiwpSFZgDET1URg==}
+  '@testing-library/react@16.1.0':
+    resolution: {integrity: sha512-Q2ToPvg0KsVL0ohND9A3zLJWcOXXcO8IDu3fj11KhNt0UlCWyFyvnCIBkd12tidB2lkiVRG8VFqdhcqhqnAQtg==}
     engines: {node: '>=18'}
     peerDependencies:
       '@testing-library/dom': ^10.0.0
-      '@types/react': ^18.0.0
-      '@types/react-dom': ^18.0.0
-      react: ^18.0.0
-      react-dom: ^18.0.0
+      '@types/react': ^18.0.0 || ^19.0.0
+      '@types/react-dom': ^18.0.0 || ^19.0.0
+      react: ^18.0.0 || ^19.0.0
+      react-dom: ^18.0.0 || ^19.0.0
     peerDependenciesMeta:
       '@types/react':
         optional: true
@@ -1849,8 +1852,14 @@ packages:
   '@types/react-dom@18.3.1':
     resolution: {integrity: sha512-qW1Mfv8taImTthu4KoXgDfLuk4bydU6Q/TkADnDWWHwi4NX4BR+LWfTp2sVmTqRrsHvyDDTelgelxJ+SsejKKQ==}
 
+  '@types/react-dom@19.0.0':
+    resolution: {integrity: sha512-1KfiQKsH1o00p9m5ag12axHQSb3FOU9H20UTrujVSkNhuCrRHiQWFqgEnTNK5ZNfnzZv8UWrnXVqCmCF9fgY3w==}
+
   '@types/react@18.3.12':
     resolution: {integrity: sha512-D2wOSq/d6Agt28q7rSI3jhU7G6aiuzljDGZ2hTZHIkrTLUI+AF3WMeKkEZ9nN2fkBAlcktT6vcZjDFiIhMYEQw==}
+
+  '@types/react@19.0.0':
+    resolution: {integrity: sha512-MY3oPudxvMYyesqs/kW1Bh8y9VqSmf+tzqw3ae8a9DZW68pUe3zAdHeI1jc6iAysuRdACnVknHP8AhwD4/dxtg==}
 
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
@@ -5020,6 +5029,11 @@ packages:
     peerDependencies:
       react: ^18.3.1
 
+  react-dom@19.0.0:
+    resolution: {integrity: sha512-4GV5sHFG0e/0AD4X+ySy6UJd3jVl1iNsNHdpad0qhABJ11twS3TTBnseqsKurKcsNqCEFeGL3uLpVChpIO3QfQ==}
+    peerDependencies:
+      react: ^19.0.0
+
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
 
@@ -5032,6 +5046,10 @@ packages:
 
   react@18.3.1:
     resolution: {integrity: sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==}
+    engines: {node: '>=0.10.0'}
+
+  react@19.0.0:
+    resolution: {integrity: sha512-V8AVnmPIICiWpGfm6GLzCR/W5FXLchHop40W4nXBmdlEceh16rCN8O8LNWm5bh5XUX91fh7KpA+W0TgMKmgTpQ==}
     engines: {node: '>=0.10.0'}
 
   readable-stream@2.3.8:
@@ -5184,6 +5202,9 @@ packages:
 
   scheduler@0.23.2:
     resolution: {integrity: sha512-UOShsPwz7NrMUqhR6t0hWjFduvOzbtv7toDH1/hIrfRNIDBnnBWd0CwJTGvTpngVlmwGCdP9/Zl/tVrDqcuYzQ==}
+
+  scheduler@0.25.0:
+    resolution: {integrity: sha512-xFVuu11jh+xcO7JOAGJNOXld8/TcEHK/4CituBUeUb5hqxJLj9YuemAEuvm9gQ/+pgXYfbQuqAkiYu+u7YEsNA==}
 
   scrypt-js@3.0.1:
     resolution: {integrity: sha512-cdwTTnqPu0Hyvf5in5asVdZocVDTNRmR7XEcJuIzMjJeSHybHl7vpB66AzwTaIg6CLSbtjcxc8fqcySfnTkccA==}
@@ -5832,10 +5853,10 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
 
-  use-sync-external-store@1.2.2:
-    resolution: {integrity: sha512-PElTlVMwpblvbNqQ82d2n6RjStvdSoNe9FG28kNfz3WiXilJm4DdNkEzRhCZuIDwY8U08WVihhGR5iRqAwfDiw==}
+  use-sync-external-store@1.4.0:
+    resolution: {integrity: sha512-9WXSPC5fMv61vaupRkCKCxsPxBocVnwakBEkMIHHpkTTg6icbJtg6jzgtLDm4bl3cSHAca52rYWih0k4K3PfHw==}
     peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   utf-8-validate@5.0.10:
     resolution: {integrity: sha512-Z6czzLq4u8fPOyx7TU6X3dvUZVvoJmxSQ+IcrlmagKhilxlhZgxPK6C5Jqbkw1IDUmFTM+cz9QDnnLTwDz/2gQ==}
@@ -6393,7 +6414,7 @@ snapshots:
 
   '@algorandfoundation/liquid-auth-use-wallet-client@1.1.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@algorandfoundation/liquid-client': https://codeload.github.com/algorandfoundation/liquid-auth-js/tar.gz/c89fe0f17c4d16ed17299d7f524f044a2687a680(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@algorandfoundation/liquid-client': https://codeload.github.com/algorandfoundation/liquid-auth-js/tar.gz/0958cb96627b5ead1ef5cfbdc4f47fe43a2e4908(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@algorandfoundation/provider': https://codeload.github.com/algorandfoundation/wallet-provider-ts/tar.gz/28c80f5b9e0259b8e83e65c65d802d8123de9046
       algosdk: 2.9.0
       cbor-x: 1.6.0
@@ -6403,7 +6424,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@algorandfoundation/liquid-client@https://codeload.github.com/algorandfoundation/liquid-auth-js/tar.gz/c89fe0f17c4d16ed17299d7f524f044a2687a680(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@algorandfoundation/liquid-client@https://codeload.github.com/algorandfoundation/liquid-auth-js/tar.gz/0958cb96627b5ead1ef5cfbdc4f47fe43a2e4908(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       '@algorandfoundation/qr-code-styling': https://codeload.github.com/algorandfoundation/qr-code-styling/tar.gz/ce8541ee1cb3b0ab2acd9926f3092d4ab217e276
       canvas: 2.11.2
@@ -7747,23 +7768,23 @@ snapshots:
       '@swc/counter': 0.1.3
       tslib: 2.8.1
 
-  '@tanstack/react-store@0.6.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@tanstack/react-store@0.7.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
     dependencies:
-      '@tanstack/store': 0.6.0
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      use-sync-external-store: 1.2.2(react@18.3.1)
+      '@tanstack/store': 0.7.0
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
+      use-sync-external-store: 1.4.0(react@19.0.0)
 
-  '@tanstack/solid-store@0.6.0(solid-js@1.9.3)':
+  '@tanstack/solid-store@0.7.0(solid-js@1.9.3)':
     dependencies:
-      '@tanstack/store': 0.6.0
+      '@tanstack/store': 0.7.0
       solid-js: 1.9.3
 
-  '@tanstack/store@0.6.0': {}
+  '@tanstack/store@0.7.0': {}
 
-  '@tanstack/vue-store@0.6.0(vue@3.5.13(typescript@5.6.3))':
+  '@tanstack/vue-store@0.7.0(vue@3.5.13(typescript@5.6.3))':
     dependencies:
-      '@tanstack/store': 0.6.0
+      '@tanstack/store': 0.7.0
       vue: 3.5.13(typescript@5.6.3)
       vue-demi: 0.14.10(vue@3.5.13(typescript@5.6.3))
 
@@ -7788,15 +7809,15 @@ snapshots:
       lodash: 4.17.21
       redent: 3.0.0
 
-  '@testing-library/react@16.0.1(@testing-library/dom@10.4.0)(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@testing-library/react@16.1.0(@testing-library/dom@10.4.0)(@types/react-dom@19.0.0)(@types/react@19.0.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
     dependencies:
       '@babel/runtime': 7.26.0
       '@testing-library/dom': 10.4.0
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
     optionalDependencies:
-      '@types/react': 18.3.12
-      '@types/react-dom': 18.3.1
+      '@types/react': 19.0.0
+      '@types/react-dom': 19.0.0
 
   '@trysound/sax@0.2.0': {}
 
@@ -7855,9 +7876,17 @@ snapshots:
     dependencies:
       '@types/react': 18.3.12
 
+  '@types/react-dom@19.0.0':
+    dependencies:
+      '@types/react': 19.0.0
+
   '@types/react@18.3.12':
     dependencies:
       '@types/prop-types': 15.7.13
+      csstype: 3.1.3
+
+  '@types/react@19.0.0':
+    dependencies:
       csstype: 3.1.3
 
   '@types/resolve@1.20.2': {}
@@ -8436,9 +8465,26 @@ snapshots:
       - '@types/react'
       - react
 
+  '@walletconnect/modal-core@2.7.0(@types/react@19.0.0)(react@19.0.0)':
+    dependencies:
+      valtio: 1.11.2(@types/react@19.0.0)(react@19.0.0)
+    transitivePeerDependencies:
+      - '@types/react'
+      - react
+
   '@walletconnect/modal-ui@2.7.0(@types/react@18.3.12)(react@18.3.1)':
     dependencies:
       '@walletconnect/modal-core': 2.7.0(@types/react@18.3.12)(react@18.3.1)
+      lit: 2.8.0
+      motion: 10.16.2
+      qrcode: 1.5.3
+    transitivePeerDependencies:
+      - '@types/react'
+      - react
+
+  '@walletconnect/modal-ui@2.7.0(@types/react@19.0.0)(react@19.0.0)':
+    dependencies:
+      '@walletconnect/modal-core': 2.7.0(@types/react@19.0.0)(react@19.0.0)
       lit: 2.8.0
       motion: 10.16.2
       qrcode: 1.5.3
@@ -8450,6 +8496,14 @@ snapshots:
     dependencies:
       '@walletconnect/modal-core': 2.7.0(@types/react@18.3.12)(react@18.3.1)
       '@walletconnect/modal-ui': 2.7.0(@types/react@18.3.12)(react@18.3.1)
+    transitivePeerDependencies:
+      - '@types/react'
+      - react
+
+  '@walletconnect/modal@2.7.0(@types/react@19.0.0)(react@19.0.0)':
+    dependencies:
+      '@walletconnect/modal-core': 2.7.0(@types/react@19.0.0)(react@19.0.0)
+      '@walletconnect/modal-ui': 2.7.0(@types/react@19.0.0)(react@19.0.0)
     transitivePeerDependencies:
       - '@types/react'
       - react
@@ -9802,8 +9856,8 @@ snapshots:
       '@typescript-eslint/parser': 8.16.0(eslint@8.57.1)(typescript@5.6.3)
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.7.0(eslint-plugin-import@2.31.0)(eslint@8.57.1)
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-typescript@3.7.0)(eslint@8.57.1)
+      eslint-import-resolver-typescript: 3.7.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-typescript@3.7.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
       eslint-plugin-jsx-a11y: 6.10.2(eslint@8.57.1)
       eslint-plugin-react: 7.37.2(eslint@8.57.1)
       eslint-plugin-react-hooks: 5.0.0-canary-7118f5dd7-20230705(eslint@8.57.1)
@@ -9826,7 +9880,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@3.7.0(eslint-plugin-import@2.31.0)(eslint@8.57.1):
+  eslint-import-resolver-typescript@3.7.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint@8.57.1))(eslint@8.57.1):
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
       debug: 4.3.7(supports-color@9.4.0)
@@ -9838,22 +9892,22 @@ snapshots:
       is-glob: 4.0.3
       stable-hash: 0.0.4
     optionalDependencies:
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-typescript@3.7.0)(eslint@8.57.1)
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-typescript@3.7.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.7.0)(eslint@8.57.1):
+  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.7.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
       '@typescript-eslint/parser': 8.16.0(eslint@8.57.1)(typescript@5.6.3)
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.7.0(eslint-plugin-import@2.31.0)(eslint@8.57.1)
+      eslint-import-resolver-typescript: 3.7.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint@8.57.1))(eslint@8.57.1)
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-typescript@3.7.0)(eslint@8.57.1):
+  eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-typescript@3.7.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.8
@@ -9864,7 +9918,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.7.0)(eslint@8.57.1)
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.7.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.16.0(eslint@8.57.1)(typescript@5.6.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
       hasown: 2.0.2
       is-core-module: 2.15.1
       is-glob: 4.0.3
@@ -11940,6 +11994,11 @@ snapshots:
       react: 18.3.1
       scheduler: 0.23.2
 
+  react-dom@19.0.0(react@19.0.0):
+    dependencies:
+      react: 19.0.0
+      scheduler: 0.25.0
+
   react-is@16.13.1: {}
 
   react-is@17.0.2: {}
@@ -11949,6 +12008,8 @@ snapshots:
   react@18.3.1:
     dependencies:
       loose-envify: 1.4.0
+
+  react@19.0.0: {}
 
   readable-stream@2.3.8:
     dependencies:
@@ -12126,6 +12187,8 @@ snapshots:
   scheduler@0.23.2:
     dependencies:
       loose-envify: 1.4.0
+
+  scheduler@0.25.0: {}
 
   scrypt-js@3.0.1: {}
 
@@ -12851,9 +12914,13 @@ snapshots:
     dependencies:
       react: 18.3.1
 
-  use-sync-external-store@1.2.2(react@18.3.1):
+  use-sync-external-store@1.2.0(react@19.0.0):
     dependencies:
-      react: 18.3.1
+      react: 19.0.0
+
+  use-sync-external-store@1.4.0(react@19.0.0):
+    dependencies:
+      react: 19.0.0
 
   utf-8-validate@5.0.10:
     dependencies:
@@ -12884,6 +12951,14 @@ snapshots:
     optionalDependencies:
       '@types/react': 18.3.12
       react: 18.3.1
+
+  valtio@1.11.2(@types/react@19.0.0)(react@19.0.0):
+    dependencies:
+      proxy-compare: 2.5.1
+      use-sync-external-store: 1.2.0(react@19.0.0)
+    optionalDependencies:
+      '@types/react': 19.0.0
+      react: 19.0.0
 
   vite-hot-client@0.2.4(vite@5.4.11(@types/node@20.11.30)(terser@5.36.0)):
     dependencies:
