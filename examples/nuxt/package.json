@@ -12,8 +12,8 @@
   },
   "dependencies": {
     "@algorandfoundation/liquid-auth-use-wallet-client": "1.1.0",
-    "@blockshake/defly-connect": "^1.2.0",
-    "@perawallet/connect": "^1.4.0",
+    "@blockshake/defly-connect": "^1.2.1",
+    "@perawallet/connect": "^1.4.1",
     "@txnlab/use-wallet": "workspace:*",
     "@txnlab/use-wallet-vue": "workspace:*",
     "@walletconnect/modal": "^2.7.0",

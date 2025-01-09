@@ -40,14 +40,9 @@ const mockPeraWallet = {
   }
 }
 
-vi.mock('@perawallet/connect', async (importOriginal) => {
-  const module = await importOriginal<typeof import('@perawallet/connect')>()
+vi.mock('@perawallet/connect', async () => {
   return {
-    ...module,
-    default: {
-      ...module,
-      PeraWalletConnect: vi.fn(() => mockPeraWallet)
-    }
+    PeraWalletConnect: vi.fn(() => mockPeraWallet)
   }
 })
 

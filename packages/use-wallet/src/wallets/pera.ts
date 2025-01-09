@@ -53,11 +53,7 @@ export class PeraWallet extends BaseWallet {
 
   private async initializeClient(): Promise<PeraWalletConnect> {
     this.logger.info('Initializing client...')
-    const module = await import('@perawallet/connect')
-    const PeraWalletConnect = module.default
-      ? module.default.PeraWalletConnect
-      : module.PeraWalletConnect
-
+    const { PeraWalletConnect } = await import('@perawallet/connect')
     const client = new PeraWalletConnect(this.options)
     this.client = client
     this.logger.info('Client initialized')

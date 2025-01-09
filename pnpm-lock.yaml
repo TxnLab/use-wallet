@@ -60,11 +60,11 @@ importers:
   examples/nextjs:
     dependencies:
       '@blockshake/defly-connect':
-        specifier: ^1.2.0
-        version: 1.2.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.2.1
+        version: 1.2.1(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
-        specifier: ^1.4.0
-        version: 1.4.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.4.1
+        version: 1.4.1(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet-react':
         specifier: workspace:*
         version: link:../../packages/use-wallet-react
@@ -115,11 +115,11 @@ importers:
         specifier: 1.1.0
         version: 1.1.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
-        specifier: ^1.2.0
-        version: 1.2.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.2.1
+        version: 1.2.1(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
-        specifier: ^1.4.0
-        version: 1.4.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.4.1
+        version: 1.4.1(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../../packages/use-wallet
@@ -161,11 +161,11 @@ importers:
         specifier: 1.1.0
         version: 1.1.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
-        specifier: ^1.2.0
-        version: 1.2.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.2.1
+        version: 1.2.1(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
-        specifier: ^1.4.0
-        version: 1.4.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.4.1
+        version: 1.4.1(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet-react':
         specifier: workspace:*
         version: link:../../packages/use-wallet-react
@@ -225,11 +225,11 @@ importers:
         specifier: 1.1.0
         version: 1.1.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
-        specifier: ^1.2.0
-        version: 1.2.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.2.1
+        version: 1.2.1(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
-        specifier: ^1.4.0
-        version: 1.4.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.4.1
+        version: 1.4.1(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet-solid':
         specifier: workspace:*
         version: link:../../packages/use-wallet-solid
@@ -265,11 +265,11 @@ importers:
         specifier: 1.1.0
         version: 1.1.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
-        specifier: ^1.2.0
-        version: 1.2.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.2.1
+        version: 1.2.1(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
-        specifier: ^1.4.0
-        version: 1.4.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.4.1
+        version: 1.4.1(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../../packages/use-wallet
@@ -302,11 +302,11 @@ importers:
         specifier: 1.1.0
         version: 1.1.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
-        specifier: ^1.2.0
-        version: 1.2.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.2.1
+        version: 1.2.1(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@perawallet/connect':
-        specifier: ^1.4.0
-        version: 1.4.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.4.1
+        version: 1.4.1(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet-vue':
         specifier: workspace:*
         version: link:../../packages/use-wallet-vue
@@ -352,8 +352,8 @@ importers:
         specifier: 1.1.0
         version: 1.1.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
-        specifier: 1.2.0
-        version: 1.2.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: 1.2.1
+        version: 1.2.1(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@magic-ext/algorand':
         specifier: 23.18.0
         version: 23.18.0
@@ -361,8 +361,8 @@ importers:
         specifier: 28.18.0
         version: 28.18.0(localforage@1.10.0)
       '@perawallet/connect':
-        specifier: 1.4.0
-        version: 1.4.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: 1.4.1
+        version: 1.4.1(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@types/node':
         specifier: 20.11.30
         version: 20.11.30
@@ -397,14 +397,14 @@ importers:
   packages/use-wallet-react:
     dependencies:
       '@blockshake/defly-connect':
-        specifier: ^1.2.0
-        version: 1.2.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.2.1
+        version: 1.2.1(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@magic-ext/algorand':
         specifier: ^23.18.0
         version: 23.18.0
       '@perawallet/connect':
-        specifier: ^1.4.0
-        version: 1.4.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.4.1
+        version: 1.4.1(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@tanstack/react-store':
         specifier: 0.6.1
         version: 0.6.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -449,14 +449,14 @@ importers:
   packages/use-wallet-solid:
     dependencies:
       '@blockshake/defly-connect':
-        specifier: ^1.2.0
-        version: 1.2.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.2.1
+        version: 1.2.1(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@magic-ext/algorand':
         specifier: ^23.18.0
         version: 23.18.0
       '@perawallet/connect':
-        specifier: ^1.4.0
-        version: 1.4.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.4.1
+        version: 1.4.1(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@tanstack/solid-store':
         specifier: 0.6.0
         version: 0.6.0(solid-js@1.9.3)
@@ -498,14 +498,14 @@ importers:
   packages/use-wallet-vue:
     dependencies:
       '@blockshake/defly-connect':
-        specifier: ^1.2.0
-        version: 1.2.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.2.1
+        version: 1.2.1(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@magic-ext/algorand':
         specifier: ^23.18.0
         version: 23.18.0
       '@perawallet/connect':
-        specifier: ^1.4.0
-        version: 1.4.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^1.4.1
+        version: 1.4.1(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@tanstack/vue-store':
         specifier: 0.6.0
         version: 0.6.0(vue@3.5.13(typescript@5.6.3))
@@ -856,8 +856,8 @@ packages:
     resolution: {integrity: sha512-vN5p+1kl59GVKMvTHt55NzzmYVxprfJD+ql7U9NFIfKCBkYE55LYtS+WtPlaYOyzydrKI8Nezd+aZextrd+FMA==}
     engines: {node: '>=6.9.0'}
 
-  '@blockshake/defly-connect@1.2.0':
-    resolution: {integrity: sha512-5XqasQ0ilRtSV2aMbFRZI+76U6VKVTsV9WLYr4OaZt1xObklc62A0B2Is2OEtBaI+CdU2DGCfZLM7L+rFC8DoQ==}
+  '@blockshake/defly-connect@1.2.1':
+    resolution: {integrity: sha512-T9wAjPTFdc8iRiDzTqmeBRCIroWLgXmqZHwnpzuchjYZXXqbnj+zge+HS7UaNunpxGVjDUNK1ah7OR6hEqtJoQ==}
     peerDependencies:
       algosdk: ^3.0.0
 
@@ -1571,8 +1571,8 @@ packages:
     resolution: {integrity: sha512-HNjmfLQEVRZmHRET336f20H/8kOozUGwk7yajvsonjNxbj2wBTK1WsQuHkD5yYh9RxFGL2EyDHryOihOwUoKDA==}
     engines: {node: '>= 10.0.0'}
 
-  '@perawallet/connect@1.4.0':
-    resolution: {integrity: sha512-ef6sQQWhCJ/fMe6VKOaSIaP4hpc2XufKJlv5A+kSHSoUD3NG0Me6R9oyDlxM7UcW/vTyWdg3lDEsPS92v+wBUA==}
+  '@perawallet/connect@1.4.1':
+    resolution: {integrity: sha512-yXfpQ2SzblOBp0P2Xsneq4f0d1YsSuYrdpw2fSwivlTbc5a40hQfYiJMql+b3UdfSID/wcaPl9Vkb5cMSBxNwQ==}
     peerDependencies:
       algosdk: ^3.0.0
 
@@ -7136,7 +7136,7 @@ snapshots:
       '@babel/helper-string-parser': 7.25.9
       '@babel/helper-validator-identifier': 7.25.9
 
-  '@blockshake/defly-connect@1.2.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@blockshake/defly-connect@1.2.1(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       '@likecoin/qr-code-styling': 1.6.6
       '@walletconnect/client': 1.8.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -7925,7 +7925,7 @@ snapshots:
       '@parcel/watcher-win32-ia32': 2.4.1
       '@parcel/watcher-win32-x64': 2.4.1
 
-  '@perawallet/connect@1.4.0(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@perawallet/connect@1.4.1(algosdk@3.0.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       '@evanhahn/lottie-web-light': 5.8.1
       '@walletconnect/client': 1.8.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)

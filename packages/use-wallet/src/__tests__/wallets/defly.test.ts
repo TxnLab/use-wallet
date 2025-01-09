@@ -40,14 +40,9 @@ const mockDeflyWallet = {
   }
 }
 
-vi.mock('@blockshake/defly-connect', async (importOriginal) => {
-  const module = await importOriginal<typeof import('@blockshake/defly-connect')>()
+vi.mock('@blockshake/defly-connect', async () => {
   return {
-    ...module,
-    default: {
-      ...module,
-      DeflyWalletConnect: vi.fn(() => mockDeflyWallet)
-    }
+    DeflyWalletConnect: vi.fn(() => mockDeflyWallet)
   }
 })
 

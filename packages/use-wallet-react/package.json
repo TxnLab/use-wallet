@@ -51,10 +51,10 @@
     "typescript": "5.6.3"
   },
   "peerDependencies": {
-    "@blockshake/defly-connect": "^1.2.0",
+    "@blockshake/defly-connect": "^1.2.1",
     "@magic-ext/algorand": "^23.18.0",
     "@walletconnect/modal": "^2.7.0",
-    "@perawallet/connect": "^1.4.0",
+    "@perawallet/connect": "^1.4.1",
     "@walletconnect/sign-client": "^2.17.2",
     "algosdk": "^3.0.0",
     "lute-connect": "^1.4.1",

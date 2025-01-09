@@ -48,11 +48,7 @@ export class DeflyWallet extends BaseWallet {
 
   private async initializeClient(): Promise<DeflyWalletConnect> {
     this.logger.info('Initializing client...')
-    const module = await import('@blockshake/defly-connect')
-    const DeflyWalletConnect = module.default
-      ? module.default.DeflyWalletConnect
-      : module.DeflyWalletConnect
-
+    const { DeflyWalletConnect } = await import('@blockshake/defly-connect')
     const client = new DeflyWalletConnect(this.options)
     this.client = client
     this.logger.info('Client initialized')
