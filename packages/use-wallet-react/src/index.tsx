@@ -27,7 +27,7 @@ export interface Wallet {
 }
 
 export const useWallet = () => {
-  const context = React.useContext(WalletContext)
+  const context = React.use(WalletContext)
 
   if (!context) {
     throw new Error('useWallet must be used within the WalletProvider')
