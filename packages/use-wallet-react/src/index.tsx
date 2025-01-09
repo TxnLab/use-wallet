@@ -27,7 +27,7 @@ export interface Wallet {
 }
 
 export const useWallet = () => {
-  const context = React.useContext(WalletContext)
+  const context = React.use(WalletContext)
 
   if (!context) {
     throw new Error('useWallet must be used within the WalletProvider')
@@ -127,7 +127,7 @@ interface WalletProviderProps {
   children: React.ReactNode
 }
 
-export const WalletProvider = ({ manager, children }: WalletProviderProps): JSX.Element => {
+export const WalletProvider = ({ manager, children }: WalletProviderProps): React.JSX.Element => {
   const [algodClient, setAlgodClient] = React.useState(manager.algodClient)
 
   React.useEffect(() => {
@@ -151,9 +151,5 @@ export const WalletProvider = ({ manager, children }: WalletProviderProps): JSX.
     }
   }, [manager])
 
-  return (
-    <WalletContext.Provider value={{ manager, algodClient, setAlgodClient }}>
-      {children}
-    </WalletContext.Provider>
-  )
+  return <WalletContext value={{ manager, algodClient, setAlgodClient }}>{children}</WalletContext>
 }
