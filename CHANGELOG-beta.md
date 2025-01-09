@@ -1,3 +1,12 @@
+## [4.0.0-beta.4](https://github.com/TxnLab/use-wallet/tree/v4.0.0-beta.3...v4.0.0-beta.4) (2025-01-09)
+
+### Dependencies
+
+- Update `@blockshake/defly-connect` to v1.2.0 ([cd914bf](https://github.com/txnlab/use-wallet/commit/cd914bffd867fc1460031acdeb01b8ec45bd9af3))
+- Update `@perawallet/connect` to v1.4.0 ([dac46a2](https://github.com/txnlab/use-wallet/commit/dac46a2fea98ea348d8834362760863033b17482))
+- Remove `@perawallet/connect-beta` from dependencies ([9562ab4](https://github.com/txnlab/use-wallet/commit/9562ab4cbb3ea81d11a34241f6f58b79b8f35852))
+- Update `@perawallet/connect` to v1.4.1 and `@blockshake/defly-connect` to v1.2.1 ([b12d2e3](https://github.com/txnlab/use-wallet/commit/b12d2e317142919830b3f30f1094784dac5f068a))
+
 ## [4.0.0-beta.3](https://github.com/TxnLab/use-wallet/tree/v4.0.0-beta.2...v4.0.0-beta.3) (2024-12-07)
 
 ### Features
