@@ -6,7 +6,8 @@
     "preview": "vite preview",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@algorandfoundation/liquid-auth-use-wallet-client": "1.1.0",
