@@ -27,10 +27,10 @@
   "devDependencies": {
     "@playwright/test": "1.49.1",
     "@testing-library/jest-dom": "6.6.3",
-    "@testing-library/react": "16.0.1",
+    "@testing-library/react": "16.1.0",
     "@types/node": "20.11.30",
-    "@typescript-eslint/eslint-plugin": "8.16.0",
-    "@typescript-eslint/parser": "8.16.0",
+    "@typescript-eslint/eslint-plugin": "8.19.1",
+    "@typescript-eslint/parser": "8.19.1",
     "@vitejs/plugin-react": "4.3.4",
     "@vitejs/plugin-vue": "5.2.1",
     "@vitejs/plugin-vue-jsx": "4.1.1",
@@ -38,10 +38,10 @@
     "eslint": "8.57.1",
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-prettier": "5.2.1",
-    "prettier": "3.4.1",
-    "vite": "6.0.2",
+    "prettier": "3.4.2",
+    "vite": "6.0.7",
     "vite-plugin-solid": "2.11.0",
-    "vitest": "2.1.6",
+    "vitest": "2.1.8",
     "vue-demi": "0.14.10"
   }
 }
