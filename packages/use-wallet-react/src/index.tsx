@@ -7,6 +7,7 @@ export * from '@txnlab/use-wallet'
 
 interface IWalletContext {
   manager: WalletManager
+  isReconnecting: boolean
   algodClient: algosdk.Algodv2
   setAlgodClient: React.Dispatch<React.SetStateAction<algosdk.Algodv2>>
 }
@@ -33,7 +34,7 @@ export const useWallet = () => {
     throw new Error('useWallet must be used within the WalletProvider')
   }
 
-  const { manager, algodClient, setAlgodClient } = context
+  const { manager, isReconnecting, algodClient, setAlgodClient } = context
 
   const activeNetwork = useStore(manager.store, (state) => state.activeNetwork)
 
@@ -108,6 +109,7 @@ export const useWallet = () => {
 
   return {
     wallets,
+    isReconnecting,
     algodClient,
     activeNetwork,
     activeWallet,
@@ -129,6 +131,7 @@ interface WalletProviderProps {
 
 export const WalletProvider = ({ manager, children }: WalletProviderProps): JSX.Element => {
   const [algodClient, setAlgodClient] = React.useState(manager.algodClient)
+  const [isReconnecting, setIsReconnecting] = React.useState(true)
 
   React.useEffect(() => {
     manager.algodClient = algodClient
@@ -142,6 +145,8 @@ export const WalletProvider = ({ manager, children }: WalletProviderProps): JSX.
         await manager.resumeSessions()
       } catch (error) {
         console.error('Error resuming sessions:', error)
+      } finally {
+        setIsReconnecting(false)
       }
     }
 
@@ -152,7 +157,7 @@ export const WalletProvider = ({ manager, children }: WalletProviderProps): JSX.
   }, [manager])
 
   return (
-    <WalletContext.Provider value={{ manager, algodClient, setAlgodClient }}>
+    <WalletContext.Provider value={{ manager, isReconnecting, algodClient, setAlgodClient }}>
       {children}
     </WalletContext.Provider>
   )
