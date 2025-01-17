@@ -1,3 +1,27 @@
+# [3.12.0](https://github.com/txnlab/use-wallet/compare/v3.11.1...v3.12.0) (2024-01-17)
+
+### Features
+
+- **React:** Return `isReconnecting` from `useWallet` ([#330](https://github.com/txnlab/use-wallet/pull/330)) ([4e138ba](https://github.com/txnlab/use-wallet/commit/4e138ba4582bff940359a27fada31f78a0412b94))
+- Replace `isReconnecting` with unified `isReady` state ([#335](https://github.com/txnlab/use-wallet/pull/335)) ([fe252c9](https://github.com/txnlab/use-wallet/commit/fe252c93be2db252adb572e0c6d0aa52f2461601))
+
+### Test Updates
+
+- **E2E:** Add examples and docs for end-to-end testing ([#331](https://github.com/txnlab/use-wallet/pull/331)) ([b4d34b8](https://github.com/txnlab/use-wallet/commit/b4d34b804c65f9ff7c6b2893a3db3eb727080fa5))
+- **React:** Wrap state updates in `act()` with `async`/`await` ([#336](https://github.com/txnlab/use-wallet/pull/336)) ([6bcfc67](https://github.com/txnlab/use-wallet/commit/6bcfc673d7de32f59b359c91e41be74d78b4be34))
+
+## [3.11.1](https://github.com/txnlab/use-wallet/compare/v3.11.0...v3.11.1) (2024-12-18)
+
+### Bug Fixes
+
+- **Wallets:** Prevent WalletConnect v1 session data collision ([#329](https://github.com/txnlab/use-wallet/pull/329)) ([481da35](https://github.com/txnlab/use-wallet/commit/481da355a34242c5482fd0649af869792e0de1d6))
+
+# [3.11.0](https://github.com/txnlab/use-wallet/compare/v3.10.1...v3.11.0) (2024-12-05)
+
+### Features
+
+- Add custom password prompt for KMD and Mnemonic ([#322](https://github.com/txnlab/use-wallet/pull/322)) ([0cfbc6d](https://github.com/txnlab/use-wallet/commit/0cfbc6db2098d65b1aee899b39c136b6f708a05a))
+
 ## [3.10.1](https://github.com/txnlab/use-wallet/compare/v3.10.0...v3.10.1) (2024-11-28)
 
 ### Bug Fixes

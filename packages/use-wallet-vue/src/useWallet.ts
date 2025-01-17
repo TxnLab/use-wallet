@@ -30,6 +30,9 @@ export function useWallet() {
     throw new Error('Algod client or setter not properly installed')
   }
 
+  const managerStatus = useStore(manager.store, (state) => state.managerStatus)
+  const isReady = computed(() => managerStatus.value === 'ready')
+
   const activeNetwork = useStore(manager.store, (state) => state.activeNetwork)
   const setActiveNetwork = async (networkId: string): Promise<void> => {
     if (networkId === activeNetwork.value) {
@@ -124,6 +127,7 @@ export function useWallet() {
 
   return {
     wallets,
+    isReady,
     algodClient: computed(() => {
       if (!algodClient.value) {
         throw new Error('Algod client is undefined')

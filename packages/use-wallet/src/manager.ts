@@ -5,12 +5,14 @@ import { createNetworkConfig, isNetworkConfig, type NetworkConfig } from 'src/ne
 import { StorageAdapter } from 'src/storage'
 import {
   DEFAULT_STATE,
-  isValidState,
+  isValidPersistedState,
   LOCAL_STORAGE_KEY,
   removeWallet,
   setActiveNetwork,
   setActiveWallet,
-  type State
+  type State,
+  type ManagerStatus,
+  type PersistedState
 } from 'src/store'
 import { createWalletMap } from 'src/utils'
 import type { BaseWallet } from 'src/wallets/base'
@@ -36,8 +38,6 @@ export interface WalletManagerConfig {
   defaultNetwork?: string
   options?: WalletManagerOptions
 }
-
-export type PersistedState = Omit<State, 'algodClient'>
 
 export class WalletManager {
   public _clients: Map<WalletId, BaseWallet> = new Map()
@@ -152,11 +152,11 @@ export class WalletManager {
         return null
       }
       const parsedState = JSON.parse(serializedState)
-      if (!isValidState(parsedState)) {
+      if (!isValidPersistedState(parsedState)) {
         this.logger.warn('Parsed state:', parsedState)
         throw new Error('Persisted state is invalid')
       }
-      return parsedState as PersistedState
+      return parsedState
     } catch (error: any) {
       this.logger.error(`Could not load state from local storage: ${error.message}`)
       return null
@@ -172,6 +172,16 @@ export class WalletManager {
     } catch (error) {
       this.logger.error('Could not save state to local storage:', error)
     }
+  }
+
+  // ---------- Status ------------------------------------------------ //
+
+  public get status(): ManagerStatus {
+    return this.store.state.managerStatus
+  }
+
+  public get isReady(): boolean {
+    return this.store.state.managerStatus === 'ready'
   }
 
   // ---------- Wallets ----------------------------------------------- //
@@ -246,8 +256,15 @@ export class WalletManager {
   }
 
   public async resumeSessions(): Promise<void> {
-    const promises = this.wallets.map((wallet) => wallet?.resumeSession())
-    await Promise.all(promises)
+    try {
+      const promises = this.wallets.map((wallet) => wallet?.resumeSession())
+      await Promise.all(promises)
+    } finally {
+      this.store.setState((state) => ({
+        ...state,
+        managerStatus: 'ready'
+      }))
+    }
   }
 
   public async disconnect(): Promise<void> {

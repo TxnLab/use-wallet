@@ -446,6 +446,29 @@ describe('DeflyWallet', () => {
       expect(store.state.wallets[WalletId.DEFLY]).toBeUndefined()
       expect(wallet.isConnected).toBe(false)
     })
+
+    it('should skip reconnectSession if Pera is active', async () => {
+      const walletState: WalletState = {
+        accounts: [account1],
+        activeAccount: account1
+      }
+
+      store = new Store<State>({
+        ...defaultState,
+        activeWallet: WalletId.PERA,
+        wallets: {
+          [WalletId.DEFLY]: walletState
+        }
+      })
+
+      wallet = createWalletWithStore(store)
+
+      await wallet.resumeSession()
+
+      expect(mockLogger.info).toHaveBeenCalledWith('Skipping reconnectSession for Defly (inactive)')
+      expect(mockDeflyWallet.reconnectSession).not.toHaveBeenCalled()
+      expect(store.state.wallets[WalletId.DEFLY]).toEqual(walletState)
+    })
   })
 
   describe('setActive', () => {

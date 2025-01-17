@@ -317,11 +317,12 @@ describe('useWallet', () => {
   })
 
   it('integrates correctly with Vue component', async () => {
-    const { wallets, activeWallet, activeAddress, activeNetwork } = useWallet()
+    const { wallets, activeWallet, activeAddress, activeNetwork, isReady } = useWallet()
 
     const TestComponent = {
       template: `
         <div>
+          <div data-testid="is-ready">{{ isReady }}</div>
           <ul>
             <li v-for="wallet in wallets" :key="wallet.id" data-testid="wallet">
               {{ wallet.metadata.name }}
@@ -337,7 +338,8 @@ describe('useWallet', () => {
           wallets,
           activeWallet,
           activeAddress,
-          activeNetwork
+          activeNetwork,
+          isReady
         }
       }
     }
@@ -390,6 +392,61 @@ describe('useWallet', () => {
     expect(wrapper.get('[data-testid="activeNetwork"]').text()).toBe(NetworkId.TESTNET)
     expect(wrapper.get('[data-testid="activeWallet"]').text()).toBe(WalletId.DEFLY)
     expect(wrapper.get('[data-testid="activeAddress"]').text()).toBe('address1')
+  })
+
+  it('initializes with isReady false and updates when manager status changes', async () => {
+    const { isReady } = useWallet()
+
+    // Initially should not be ready
+    expect(isReady.value).toBe(false)
+
+    mockStore.setState((state) => ({
+      ...state,
+      managerStatus: 'ready'
+    }))
+
+    await nextTick()
+
+    expect(isReady.value).toBe(true)
+
+    // Change back to initializing (though this shouldn't happen in practice)
+    mockStore.setState((state) => ({
+      ...state,
+      managerStatus: 'initializing'
+    }))
+
+    await nextTick()
+
+    expect(isReady.value).toBe(false)
+  })
+
+  it('integrates isReady with Vue component', async () => {
+    const TestComponent = {
+      template: `
+        <div>
+          <div data-testid="is-ready">{{ isReady }}</div>
+        </div>
+      `,
+      setup() {
+        const { isReady } = useWallet()
+        return { isReady }
+      }
+    }
+
+    const wrapper = mount(TestComponent)
+
+    // Initially not ready
+    expect(wrapper.get('[data-testid="is-ready"]').text()).toBe('false')
+
+    mockStore.setState((state) => ({
+      ...state,
+      managerStatus: 'ready'
+    }))
+
+    await nextTick()
+
+    // Should show ready after status change
+    expect(wrapper.get('[data-testid="is-ready"]').text()).toBe('true')
   })
 
   describe('setActiveNetwork', () => {

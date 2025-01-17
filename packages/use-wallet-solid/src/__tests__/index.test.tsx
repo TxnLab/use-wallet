@@ -9,7 +9,8 @@ import {
   WalletId,
   DEFAULT_NETWORKS,
   type State,
-  type WalletAccount
+  type WalletAccount,
+  type ManagerStatus
 } from '@txnlab/use-wallet'
 import { For, Show, createEffect, createSignal } from 'solid-js'
 import { Wallet, WalletProvider, useWallet, useWalletManager } from '../index'
@@ -70,7 +71,8 @@ const TestComponent = () => {
     isWalletConnected,
     walletStore,
     wallets,
-    algodClient
+    algodClient,
+    isReady
   } = useWallet()
 
   const [magicEmail, setMagicEmail] = createSignal('')
@@ -84,6 +86,7 @@ const TestComponent = () => {
 
   return (
     <div>
+      <div data-testid="is-ready">{JSON.stringify(isReady())}</div>
       <div data-testid="active-account">{JSON.stringify(activeAccount())}</div>
       <div data-testid="active-address">{JSON.stringify(activeAddress())}</div>
       <div data-testid="active-network">{activeNetwork()}</div>
@@ -192,7 +195,8 @@ describe('useWallet', () => {
       wallets: {},
       activeWallet: null,
       activeNetwork: NetworkId.TESTNET,
-      algodClient: new algosdk.Algodv2('', 'https://testnet-api.4160.nodely.dev/')
+      algodClient: new algosdk.Algodv2('', 'https://testnet-api.4160.nodely.dev/'),
+      managerStatus: 'initializing' as ManagerStatus
     }
 
     mockStore = new Store<State>(defaultState)
@@ -534,6 +538,58 @@ describe('useWallet', () => {
     }))
 
     expect(screen.getByTestId('active-network')).toHaveTextContent(NetworkId.MAINNET)
+  })
+
+  it('initializes with isReady false and updates after resumeSessions', async () => {
+    render(() => (
+      <WalletProvider manager={mockWalletManager}>
+        <TestComponent />
+      </WalletProvider>
+    ))
+
+    // Initially should not be ready
+    expect(screen.getByTestId('is-ready')).toHaveTextContent('false')
+
+    // Simulate manager status change
+    mockStore.setState((state) => ({
+      ...state,
+      managerStatus: 'ready'
+    }))
+
+    // Should be ready after status change
+    await waitFor(() => {
+      expect(screen.getByTestId('is-ready')).toHaveTextContent('true')
+    })
+  })
+
+  it('updates isReady when manager status changes', async () => {
+    render(() => (
+      <WalletProvider manager={mockWalletManager}>
+        <TestComponent />
+      </WalletProvider>
+    ))
+
+    expect(screen.getByTestId('is-ready')).toHaveTextContent('false')
+
+    // Simulate manager status change
+    mockStore.setState((state) => ({
+      ...state,
+      managerStatus: 'ready'
+    }))
+
+    await waitFor(() => {
+      expect(screen.getByTestId('is-ready')).toHaveTextContent('true')
+    })
+
+    // Simulate manager status change back to initializing (though this shouldn't happen in practice)
+    mockStore.setState((state) => ({
+      ...state,
+      managerStatus: 'initializing'
+    }))
+
+    await waitFor(() => {
+      expect(screen.getByTestId('is-ready')).toHaveTextContent('false')
+    })
   })
 
   describe('setActiveNetwork', () => {

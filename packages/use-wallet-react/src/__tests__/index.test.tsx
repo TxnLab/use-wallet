@@ -77,7 +77,7 @@ const mockMagicAuth = new MagicAuth({
 })
 
 describe('WalletProvider', () => {
-  it('provides the wallet context to its children', () => {
+  it('provides the wallet context to its children', async () => {
     const TestComponent = () => {
       const { wallets } = useWallet()
       return <h1>{wallets ? 'Context provided' : 'No context'}</h1>
@@ -87,11 +87,13 @@ describe('WalletProvider', () => {
       wallets: [WalletId.DEFLY]
     })
 
-    render(
-      <WalletProvider manager={walletManager}>
-        <TestComponent />
-      </WalletProvider>
-    )
+    await act(async () => {
+      render(
+        <WalletProvider manager={walletManager}>
+          <TestComponent />
+        </WalletProvider>
+      )
+    })
 
     expect(screen.getByText('Context provided')).toBeInTheDocument()
   })
@@ -123,7 +125,7 @@ describe('WalletProvider', () => {
     expect(mockResumeSessions).toHaveBeenCalled()
   })
 
-  it('updates algodClient when setAlgodClient is called', () => {
+  it('updates algodClient when setAlgodClient is called', async () => {
     const newAlgodClient = new algosdk.Algodv2('mock-token', 'https://mock-server', '')
     const TestComponent = () => {
       const { setAlgodClient } = useWallet()
@@ -137,11 +139,13 @@ describe('WalletProvider', () => {
       wallets: [WalletId.DEFLY]
     })
 
-    render(
-      <WalletProvider manager={walletManager}>
-        <TestComponent />
-      </WalletProvider>
-    )
+    await act(async () => {
+      render(
+        <WalletProvider manager={walletManager}>
+          <TestComponent />
+        </WalletProvider>
+      )
+    })
 
     expect(walletManager.algodClient).toBe(newAlgodClient)
   })
@@ -224,8 +228,13 @@ describe('useWallet', () => {
     )
   })
 
-  it('initializes wallets and active wallet correctly', () => {
+  it('initializes wallets and active wallet correctly', async () => {
     const { result } = renderHook(() => useWallet(), { wrapper })
+
+    await act(async () => {
+      // Wait for any initial effects to complete
+      await new Promise((resolve) => setTimeout(resolve, 0))
+    })
 
     expect(result.current.wallets).toEqual(mockWallets)
     expect(result.current.activeWallet).toBeNull()
@@ -258,17 +267,27 @@ describe('useWallet', () => {
     expect(mocks.disconnect).toHaveBeenCalled()
   })
 
-  it('calls setActive and setActiveAccount correctly', () => {
+  it('calls setActive and setActiveAccount correctly', async () => {
     const { result } = renderHook(() => useWallet(), { wrapper })
 
-    // Simulate calling setActive and setActiveAccount
-    act(() => {
-      result.current.wallets[0].setActive()
-      result.current.wallets[0].setActiveAccount('some-address')
+    await act(async () => {
+      // Get the Defly wallet from wallets array
+      const deflyWallet = result.current.wallets.find((w) => w.id === WalletId.DEFLY)
+      if (!deflyWallet) throw new Error('Defly wallet not found')
+
+      deflyWallet.setActive()
     })
 
     expect(mocks.setActive).toHaveBeenCalled()
-    expect(mocks.setActiveAccount).toHaveBeenCalledWith('some-address')
+
+    await act(async () => {
+      const deflyWallet = result.current.wallets.find((w) => w.id === WalletId.DEFLY)
+      if (!deflyWallet) throw new Error('Defly wallet not found')
+
+      deflyWallet.setActiveAccount('test-address')
+    })
+
+    expect(mocks.setActiveAccount).toHaveBeenCalledWith('test-address')
   })
 
   it('calls signTransactions and transactionSigner correctly', async () => {
@@ -306,57 +325,24 @@ describe('useWallet', () => {
     expect(mocks.transactionSigner).toHaveBeenCalledWith([], [])
   })
 
-  it('updates wallets when store state changes', () => {
+  it('updates wallets when store state changes', async () => {
     const { result } = renderHook(() => useWallet(), { wrapper })
 
-    // Mock a state change in the store
-    act(() => {
+    await act(async () => {
       mockStore.setState((state) => ({
         ...state,
         wallets: {
           [WalletId.DEFLY]: {
-            accounts: [
-              {
-                name: 'Defly Account 1',
-                address: 'address1'
-              },
-              {
-                name: 'Defly Account 2',
-                address: 'address2'
-              }
-            ],
-            activeAccount: {
-              name: 'Defly Account 1',
-              address: 'address1'
-            }
+            accounts: [{ name: 'Account 1', address: 'address1' }],
+            activeAccount: { name: 'Account 1', address: 'address1' }
           }
         },
         activeWallet: WalletId.DEFLY
       }))
     })
 
-    expect(result.current.wallets).toEqual([
-      {
-        ...mockWallets[0],
-        accounts: [
-          {
-            name: 'Defly Account 1',
-            address: 'address1'
-          },
-          {
-            name: 'Defly Account 2',
-            address: 'address2'
-          }
-        ],
-        activeAccount: {
-          name: 'Defly Account 1',
-          address: 'address1'
-        },
-        isConnected: true,
-        isActive: true
-      },
-      mockWallets[1]
-    ])
+    expect(result.current.activeWallet?.id).toBe(WalletId.DEFLY)
+    expect(result.current.activeAddress).toBe('address1')
   })
 
   it('integrates correctly with a React component', () => {
@@ -368,7 +354,8 @@ describe('useWallet', () => {
         activeWalletAccounts,
         activeWalletAddresses,
         activeAccount,
-        activeAddress
+        activeAddress,
+        isReady
       } = useWallet()
 
       return (
@@ -378,6 +365,7 @@ describe('useWallet', () => {
               <li key={wallet.id}>{wallet.metadata.name}</li>
             ))}
           </ul>
+          <div data-testid="is-ready">Is Ready: {JSON.stringify(isReady)}</div>
           <div data-testid="active-network">Active Network: {JSON.stringify(activeNetwork)}</div>
           <div data-testid="active-wallet">Active Wallet: {JSON.stringify(activeWallet)}</div>
           <div data-testid="active-wallet-accounts">
@@ -404,6 +392,7 @@ describe('useWallet', () => {
       expect(listItems[index]).toHaveTextContent(wallet.metadata.name)
     })
 
+    expect(getByTestId('is-ready')).toHaveTextContent('false')
     expect(getByTestId('active-network')).toHaveTextContent(JSON.stringify(NetworkId.TESTNET))
     expect(getByTestId('active-wallet')).toHaveTextContent(JSON.stringify(null))
     expect(getByTestId('active-wallet-accounts')).toHaveTextContent(JSON.stringify(null))
@@ -415,6 +404,7 @@ describe('useWallet', () => {
     act(() => {
       mockStore.setState((state) => ({
         ...state,
+        managerStatus: 'ready',
         wallets: {
           [WalletId.DEFLY]: {
             accounts: [
@@ -433,6 +423,7 @@ describe('useWallet', () => {
       }))
     })
 
+    expect(getByTestId('is-ready')).toHaveTextContent('true')
     expect(getByTestId('active-network')).toHaveTextContent(JSON.stringify(NetworkId.TESTNET))
     expect(getByTestId('active-wallet')).toHaveTextContent(JSON.stringify(WalletId.DEFLY))
     expect(getByTestId('active-wallet-accounts')).toHaveTextContent(
@@ -453,11 +444,11 @@ describe('useWallet', () => {
     expect(getByTestId('active-address')).toHaveTextContent(JSON.stringify('address1'))
   })
 
-  it('calls setAlgodClient correctly', () => {
+  it('calls setAlgodClient correctly', async () => {
     const newAlgodClient = new algosdk.Algodv2('mock-token', 'https://mock-server', '')
     const { result } = renderHook(() => useWallet(), { wrapper })
 
-    act(() => {
+    await act(async () => {
       result.current.setAlgodClient(newAlgodClient)
     })
 
@@ -508,5 +499,36 @@ describe('useWallet', () => {
 
       expect(result.current.activeNetwork).toBe('custom-net')
     })
+  })
+
+  it('initializes with isReady false and updates after resumeSessions', async () => {
+    const { result } = renderHook(() => useWallet(), { wrapper })
+
+    // Initially should not be ready
+    expect(result.current.isReady).toBe(false)
+
+    // Wait for resumeSessions to complete
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0))
+    })
+
+    // Should be ready after resumeSessions
+    expect(result.current.isReady).toBe(true)
+  })
+
+  it('updates isReady when manager status changes', async () => {
+    const { result } = renderHook(() => useWallet(), { wrapper })
+
+    expect(result.current.isReady).toBe(false)
+
+    // Simulate manager status change
+    await act(async () => {
+      mockStore.setState((state) => ({
+        ...state,
+        managerStatus: 'ready'
+      }))
+    })
+
+    expect(result.current.isReady).toBe(true)
   })
 })

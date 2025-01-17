@@ -447,6 +447,29 @@ describe('PeraWallet', () => {
       expect(wallet.isConnected).toBe(false)
     })
 
+    it('should skip reconnectSession if Defly is active', async () => {
+      const walletState: WalletState = {
+        accounts: [account1],
+        activeAccount: account1
+      }
+
+      store = new Store<State>({
+        ...DEFAULT_STATE,
+        activeWallet: WalletId.DEFLY,
+        wallets: {
+          [WalletId.PERA]: walletState
+        }
+      })
+
+      wallet = createWalletWithStore(store)
+
+      await wallet.resumeSession()
+
+      expect(mockLogger.info).toHaveBeenCalledWith('Skipping reconnectSession for Pera (inactive)')
+      expect(mockPeraWallet.reconnectSession).not.toHaveBeenCalled()
+      expect(store.state.wallets[WalletId.PERA]).toEqual(walletState)
+    })
+
     describe('auto-connect in Pera browser', () => {
       let mockUserAgent: string
 

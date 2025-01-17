@@ -30,13 +30,15 @@
       "matchPackageNames": [
         "/@agoralabs-sh/avm-web-provider/",
         "/@algorandfoundation/liquid-auth-use-wallet-client/",
-        "/@blockshake/defly-connect/",
         "/@magic-ext/algorand/",
         "/magic-sdk/",
-        "/@perawallet/connect/",
         "/lute-connect/",
         "/walletconnect/"
       ]
+    },
+    {
+      "matchPackageNames": ["@blockshake/defly-connect", "@perawallet/connect"],
+      "enabled": false
     },
     {
       "groupName": "pnpm",

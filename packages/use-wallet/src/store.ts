@@ -10,19 +10,25 @@ export type WalletState = {
 
 export type WalletStateMap = Partial<Record<WalletId, WalletState>>
 
+export type ManagerStatus = 'initializing' | 'ready'
+
 export interface State {
   wallets: WalletStateMap
   activeWallet: WalletId | null
   activeNetwork: string
   algodClient: algosdk.Algodv2
+  managerStatus: ManagerStatus
 }
 
 export const DEFAULT_STATE: State = {
   wallets: {},
   activeWallet: null,
   activeNetwork: 'testnet',
-  algodClient: new algosdk.Algodv2('', 'https://testnet-api.4160.nodely.dev/')
+  algodClient: new algosdk.Algodv2('', 'https://testnet-api.4160.nodely.dev/'),
+  managerStatus: 'initializing'
 }
+
+export type PersistedState = Omit<State, 'algodClient' | 'managerStatus'>
 
 export const LOCAL_STORAGE_KEY = '@txnlab/use-wallet:v3'
 
@@ -179,7 +185,7 @@ export function isValidWalletState(wallet: any): wallet is WalletState {
   )
 }
 
-export function isValidState(state: any): state is State {
+export function isValidPersistedState(state: any): state is PersistedState {
   if (!state || typeof state !== 'object') return false
   if (typeof state.wallets !== 'object') return false
   for (const [walletId, wallet] of Object.entries(state.wallets)) {

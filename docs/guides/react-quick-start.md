@@ -49,7 +49,11 @@ Now, in any component, you can use the `useWallet` hook to access the wallet man
 import { useWallet } from '@txnlab/use-wallet-react'
 
 function WalletMenu() {
-  const { wallets, activeWallet, activeAccount } = useWallet()
+  const { wallets, activeWallet, activeAccount, isReady } = useWallet()
+
+  if (!isReady) {
+    return <div>Initializing wallet manager...</div>
+  }
 
   return (
     <div>
@@ -75,6 +79,8 @@ function WalletMenu() {
   )
 }
 ```
+
+The `isReady` state indicates whether the wallet manager has completed initialization. It starts as `false` during both SSR and initial client-side mounting. During the first mount, the `WalletProvider` automatically attempts to restore any previously connected wallet sessions. Once this process completes, `isReady` switches to `true`.
 
 ## Signing Transactions
 

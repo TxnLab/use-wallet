@@ -134,6 +134,12 @@ export class DeflyWallet extends BaseWallet {
         return
       }
 
+      // If Pera is active, skip reconnectSession for Defly
+      if (state.activeWallet === WalletId.PERA) {
+        this.logger.info('Skipping reconnectSession for Defly (inactive)')
+        return
+      }
+
       this.logger.info('Resuming session...')
 
       const client = this.client || (await this.initializeClient())
