@@ -10,11 +10,41 @@ import {
   DEFAULT_NETWORKS,
   type State,
   type WalletAccount,
-  type ManagerStatus
+  ManagerStatus
 } from '@txnlab/use-wallet'
-import { For, Show, createEffect, createSignal } from 'solid-js'
-import { Wallet, WalletProvider, useWallet, useWalletManager } from '../index'
 import algosdk from 'algosdk'
+import { For, Show, createEffect, createSignal } from 'solid-js'
+import { Wallet, WalletProvider, useWallet, useWalletManager, useNetwork } from '../index'
+
+// Create mock store with initial state
+const mockStore = new Store<State>({
+  activeNetwork: NetworkId.TESTNET,
+  activeWallet: null,
+  algodClient: new algosdk.Algodv2('', 'https://testnet-api.algonode.cloud', ''),
+  managerStatus: 'ready',
+  wallets: {}
+})
+
+// Create mock wallet manager
+const mockWalletManager = new WalletManager({
+  wallets: [WalletId.DEFLY]
+})
+
+// Mock the store getter to return our mockStore
+vi.spyOn(mockWalletManager, 'store', 'get').mockReturnValue(mockStore)
+
+// Reset state between tests
+beforeEach(() => {
+  vi.clearAllMocks()
+  mockStore.setState((state) => ({
+    ...state,
+    activeNetwork: NetworkId.TESTNET,
+    activeWallet: null,
+    algodClient: new algosdk.Algodv2('', 'https://testnet-api.algonode.cloud', ''),
+    managerStatus: 'ready',
+    wallets: {}
+  }))
+})
 
 const mocks = vi.hoisted(() => {
   return {
@@ -60,20 +90,19 @@ const TestComponent = () => {
   const {
     activeAccount,
     activeAddress,
-    activeNetwork,
     activeWallet,
     activeWalletAccounts,
     activeWalletAddresses,
     activeWalletId,
     activeWalletState,
-    setActiveNetwork,
     isWalletActive,
     isWalletConnected,
     walletStore,
     wallets,
-    algodClient,
     isReady
   } = useWallet()
+
+  const { activeNetwork, algodClient, setActiveNetwork } = useNetwork()
 
   const [magicEmail, setMagicEmail] = createSignal('')
 
@@ -178,12 +207,184 @@ const TestComponent = () => {
   )
 }
 
+describe('WalletProvider', () => {
+  it('provides the WalletManager to its children', () => {
+    const TestComponent = () => {
+      const manager = useWalletManager()
+      return <h1>{manager ? 'Manager provided' : 'No manager'}</h1>
+    }
+
+    const walletManager = new WalletManager({
+      wallets: [WalletId.DEFLY]
+    })
+
+    render(() => (
+      <WalletProvider manager={walletManager}>
+        <TestComponent />
+      </WalletProvider>
+    ))
+
+    expect(screen.getByText('Manager provided')).toBeInTheDocument()
+  })
+
+  it('throws an error when useWalletManager is used outside of WalletProvider', () => {
+    const TestComponent = () => {
+      try {
+        useWalletManager()
+        return <div>No error thrown</div>
+      } catch (error: any) {
+        return <div>{error.message}</div>
+      }
+    }
+
+    render(() => <TestComponent />)
+    expect(
+      screen.getByText('useWalletManager must be used within a WalletProvider')
+    ).toBeInTheDocument()
+  })
+
+  it('calls resumeSessions on mount', async () => {
+    const mockResumeSessions = vi.fn()
+    const fakeManager = { resumeSessions: mockResumeSessions }
+
+    render(() => (
+      <WalletProvider manager={fakeManager as any as WalletManager}>
+        <div />
+      </WalletProvider>
+    ))
+
+    expect(mockResumeSessions).toHaveBeenCalled()
+  })
+})
+
+describe('useNetwork', () => {
+  let mockSetAlgodClient: (client: algosdk.Algodv2) => void
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  let mockAlgodClient: algosdk.Algodv2
+
+  beforeEach(() => {
+    mockAlgodClient = new algosdk.Algodv2('', 'https://testnet-api.algonode.cloud', '')
+    mockSetAlgodClient = (client: algosdk.Algodv2) => {
+      mockStore.setState((state) => ({
+        ...state,
+        algodClient: client
+      }))
+    }
+  })
+
+  it('throws error for invalid network', async () => {
+    let error: Error | undefined
+
+    const TestComponent = () => {
+      const { setActiveNetwork } = useNetwork()
+      return (
+        <button
+          onClick={async () => {
+            try {
+              await setActiveNetwork('invalid-network')
+            } catch (e) {
+              error = e as Error
+            }
+          }}
+        >
+          Test
+        </button>
+      )
+    }
+
+    render(() => (
+      <WalletProvider manager={mockWalletManager}>
+        <TestComponent />
+      </WalletProvider>
+    ))
+
+    const button = screen.getByText('Test')
+    fireEvent.click(button)
+
+    await waitFor(() => {
+      expect(error?.message).toBe('Network "invalid-network" not found in network configuration')
+    })
+  })
+
+  it('allows setting custom network that exists in config', async () => {
+    const customNetwork = {
+      name: 'Custom Network',
+      algod: {
+        token: '',
+        baseServer: 'https://custom.network',
+        headers: {}
+      }
+    }
+
+    mockWalletManager.networkConfig['custom-net'] = customNetwork
+
+    const TestComponent = () => {
+      const { setActiveNetwork, activeNetwork } = useNetwork()
+      createEffect(() => {
+        setActiveNetwork('custom-net')
+      })
+      return <div data-testid="active-network">{activeNetwork()}</div>
+    }
+
+    render(() => (
+      <WalletProvider manager={mockWalletManager}>
+        <TestComponent />
+      </WalletProvider>
+    ))
+
+    await waitFor(() => {
+      expect(screen.getByTestId('active-network').textContent).toBe('custom-net')
+    })
+  })
+
+  it('updates algodClient when setActiveNetwork is called', async () => {
+    const TestComponent = () => {
+      const { setActiveNetwork, algodClient } = useNetwork()
+      return (
+        <div>
+          <div data-testid="algod-client">{JSON.stringify(algodClient())}</div>
+          <button
+            data-testid="set-active-network-btn"
+            onClick={() => setActiveNetwork(NetworkId.MAINNET)}
+          >
+            Set Active Network to Mainnet
+          </button>
+        </div>
+      )
+    }
+
+    render(() => (
+      <WalletProvider manager={mockWalletManager}>
+        <TestComponent />
+      </WalletProvider>
+    ))
+
+    const newAlgodClient = new algosdk.Algodv2('', 'https://mainnet-api.4160.nodely.dev/', '')
+
+    mockWalletManager.setActiveNetwork = async (networkId: string) => {
+      mockSetAlgodClient(newAlgodClient)
+      mockWalletManager.store.setState((state) => ({
+        ...state,
+        activeNetwork: networkId
+      }))
+    }
+
+    const setActiveNetworkButton = screen.getByTestId('set-active-network-btn')
+    fireEvent.click(setActiveNetworkButton)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('algod-client')).toHaveTextContent(JSON.stringify(newAlgodClient))
+    })
+  })
+})
+
 describe('useWallet', () => {
   let mockStore: Store<State, (cb: State) => State>
   let mockWalletManager: WalletManager
   let mockDeflyWallet: DeflyWallet
   let mockMagicAuth: MagicAuth
   let mockWallets: Wallet[]
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let mockSetAlgodClient: (client: algosdk.Algodv2) => void
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let mockAlgodClient: algosdk.Algodv2
@@ -363,67 +564,6 @@ describe('useWallet', () => {
     expect(mocks.setActiveAccount).toHaveBeenCalledWith(testAccount1.address)
   })
 
-  it('calls setActiveNetwork correctly', async () => {
-    render(() => (
-      <WalletProvider manager={mockWalletManager}>
-        <TestComponent />
-      </WalletProvider>
-    ))
-
-    expect(screen.getByTestId('active-network')).toHaveTextContent(NetworkId.TESTNET)
-
-    const setActiveNetworkButton = screen.getByTestId('set-active-network-btn')
-    fireEvent.click(setActiveNetworkButton)
-
-    await waitFor(() => {
-      expect(screen.getByTestId('active-network')).toHaveTextContent(NetworkId.MAINNET)
-    })
-  })
-
-  // it('reactively updates the algodClient', async () => {
-  //   render(() => (
-  //     <WalletProvider manager={mockWalletManager}>
-  //       <TestComponent />
-  //     </WalletProvider>
-  //   ))
-
-  //   const newAlgodClient = new algosdk.Algodv2('new-token', 'https://new-server', '')
-
-  //   const setAlgodClientButton = screen.getByTestId('set-algod-client-btn')
-  //   fireEvent.click(setAlgodClientButton)
-
-  //   // Wait for state update
-  //   await waitFor(() => {
-  //     expect(screen.getByTestId('algod-client')).toHaveTextContent(JSON.stringify(newAlgodClient))
-  //   })
-  // })
-
-  it('updates algodClient when setActiveNetwork is called', async () => {
-    render(() => (
-      <WalletProvider manager={mockWalletManager}>
-        <TestComponent />
-      </WalletProvider>
-    ))
-
-    const newAlgodClient = new algosdk.Algodv2('', 'https://mainnet-api.4160.nodely.dev/', '')
-
-    mockWalletManager.setActiveNetwork = async (networkId: string) => {
-      mockSetAlgodClient(newAlgodClient)
-      mockWalletManager.store.setState((state) => ({
-        ...state,
-        activeNetwork: networkId
-      }))
-    }
-
-    const setActiveNetworkButton = screen.getByTestId('set-active-network-btn')
-    fireEvent.click(setActiveNetworkButton)
-
-    // Wait for state update
-    await waitFor(() => {
-      expect(screen.getByTestId('algod-client')).toHaveTextContent(JSON.stringify(newAlgodClient))
-    })
-  })
-
   it('calls signTransactions and transactionSigner correctly', async () => {
     render(() => (
       <WalletProvider manager={mockWalletManager}>
@@ -590,122 +730,5 @@ describe('useWallet', () => {
     await waitFor(() => {
       expect(screen.getByTestId('is-ready')).toHaveTextContent('false')
     })
-  })
-
-  describe('setActiveNetwork', () => {
-    it('throws error for invalid network', async () => {
-      let error: Error | undefined
-
-      const TestComponent = () => {
-        const { setActiveNetwork } = useWallet()
-        return (
-          <button
-            onClick={async () => {
-              try {
-                await setActiveNetwork('invalid-network')
-              } catch (e) {
-                error = e as Error
-              }
-            }}
-          >
-            Test
-          </button>
-        )
-      }
-
-      render(() => (
-        <WalletProvider manager={mockWalletManager}>
-          <TestComponent />
-        </WalletProvider>
-      ))
-
-      const button = screen.getByText('Test')
-      fireEvent.click(button)
-
-      await waitFor(() => {
-        expect(error?.message).toBe('Network "invalid-network" not found in network configuration')
-      })
-    })
-
-    it('allows setting custom network that exists in config', async () => {
-      const customNetwork = {
-        name: 'Custom Network',
-        algod: {
-          token: '',
-          baseServer: 'https://custom.network',
-          headers: {}
-        }
-      }
-
-      mockWalletManager.networkConfig['custom-net'] = customNetwork
-
-      const TestComponent = () => {
-        const { setActiveNetwork, activeNetwork } = useWallet()
-        createEffect(() => {
-          setActiveNetwork('custom-net')
-        })
-        return <div data-testid="active-network">{activeNetwork()}</div>
-      }
-
-      render(() => (
-        <WalletProvider manager={mockWalletManager}>
-          <TestComponent />
-        </WalletProvider>
-      ))
-
-      await waitFor(() => {
-        expect(screen.getByTestId('active-network').textContent).toBe('custom-net')
-      })
-    })
-  })
-})
-
-describe('WalletProvider', () => {
-  it('provides the WalletManager to its children', () => {
-    const TestComponent = () => {
-      const manager = useWalletManager()
-      return <h1>{manager ? 'Manager provided' : 'No manager'}</h1>
-    }
-
-    const walletManager = new WalletManager({
-      wallets: [WalletId.DEFLY]
-    })
-
-    render(() => (
-      <WalletProvider manager={walletManager}>
-        <TestComponent />
-      </WalletProvider>
-    ))
-
-    expect(screen.getByText('Manager provided')).toBeInTheDocument()
-  })
-
-  it('throws an error when useWalletManager is used outside of WalletProvider', () => {
-    const TestComponent = () => {
-      try {
-        useWalletManager()
-        return <div>No error thrown</div>
-      } catch (error: any) {
-        return <div>{error.message}</div>
-      }
-    }
-
-    render(() => <TestComponent />)
-    expect(
-      screen.getByText('useWalletManager must be used within a WalletProvider')
-    ).toBeInTheDocument()
-  })
-
-  it('calls resumeSessions on mount', async () => {
-    const mockResumeSessions = vi.fn()
-    const fakeManager = { resumeSessions: mockResumeSessions }
-
-    render(() => (
-      <WalletProvider manager={fakeManager as any as WalletManager}>
-        <div />
-      </WalletProvider>
-    ))
-
-    expect(mockResumeSessions).toHaveBeenCalled()
   })
 })
