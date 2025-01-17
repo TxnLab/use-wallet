@@ -14,9 +14,18 @@ import {
 } from '@txnlab/use-wallet'
 import { mount } from '@vue/test-utils'
 import algosdk from 'algosdk'
-import { inject, nextTick, ref, type InjectionKey } from 'vue'
+import { inject, nextTick, type InjectionKey } from 'vue'
 import { useWallet, type Wallet } from '../useWallet'
 import type { Mock } from 'vitest'
+
+// Mock Vue's inject function
+vi.mock('vue', async (importOriginal) => {
+  const mod = await importOriginal<typeof import('vue')>()
+  return {
+    ...mod,
+    inject: vi.fn()
+  }
+})
 
 const mocks = vi.hoisted(() => {
   return {
@@ -55,62 +64,73 @@ vi.mock('@txnlab/use-wallet', async (importOriginal) => {
   }
 })
 
+let mockStore: Store<State>
 let mockWalletManager: WalletManager
+let mockDeflyWallet: DeflyWallet
+let mockMagicAuth: MagicAuth
 
-vi.mock('vue', async (importOriginal) => {
-  const mod = await importOriginal<typeof import('vue')>()
-  return {
-    ...mod,
-    inject: vi.fn((token: string | InjectionKey<unknown>) => {
-      if (token === 'walletManager') return mockWalletManager
-      if (token === 'setAlgodClient') return mockSetAlgodClient
-      if (token === 'algodClient') return ref(mockAlgodClient)
-      return null
-    })
-  }
-})
+const setupMocks = () => {
+  mockStore = new Store<State>({
+    activeNetwork: NetworkId.TESTNET,
+    activeWallet: null,
+    algodClient: new algosdk.Algodv2('', 'https://testnet-api.algonode.cloud', ''),
+    managerStatus: 'ready',
+    wallets: {}
+  })
 
-const mockStore = new Store<State>(DEFAULT_STATE)
+  mockWalletManager = new WalletManager({
+    wallets: [WalletId.DEFLY]
+  })
 
-const mockDeflyWallet = new DeflyWallet({
-  id: WalletId.DEFLY,
-  metadata: { name: 'Defly', icon: 'icon' },
-  getAlgodClient: () => ({}) as any,
-  store: mockStore,
-  subscribe: vi.fn(),
-  networks: DEFAULT_NETWORKS
-})
+  vi.spyOn(mockWalletManager, 'store', 'get').mockReturnValue(mockStore)
 
-const mockMagicAuth = new MagicAuth({
-  id: WalletId.MAGIC,
-  options: {
-    apiKey: 'api-key'
-  },
-  metadata: { name: 'Magic', icon: 'icon' },
-  getAlgodClient: () => ({}) as any,
-  store: mockStore,
-  subscribe: vi.fn(),
-  networks: DEFAULT_NETWORKS
-})
+  // Create mock wallets after store is initialized
+  mockDeflyWallet = new DeflyWallet({
+    id: WalletId.DEFLY,
+    metadata: { name: 'Defly', icon: 'icon' },
+    getAlgodClient: () => ({}) as any,
+    store: mockStore,
+    subscribe: vi.fn(),
+    networks: DEFAULT_NETWORKS
+  })
 
-const mockAlgodClient = ref(new algosdk.Algodv2('token', 'https://server', ''))
-
-const mockSetAlgodClient = (client: algosdk.Algodv2) => {
-  mockAlgodClient.value = client
+  mockMagicAuth = new MagicAuth({
+    id: WalletId.MAGIC,
+    options: {
+      apiKey: 'api-key'
+    },
+    metadata: { name: 'Magic', icon: 'icon' },
+    getAlgodClient: () => ({}) as any,
+    store: mockStore,
+    subscribe: vi.fn(),
+    networks: DEFAULT_NETWORKS
+  })
 }
+
+beforeEach(() => {
+  setupMocks()
+  vi.clearAllMocks()
+  mockStore.setState((state) => ({
+    ...state,
+    activeNetwork: NetworkId.TESTNET,
+    activeWallet: null,
+    algodClient: new algosdk.Algodv2('', 'https://testnet-api.algonode.cloud', ''),
+    managerStatus: 'ready',
+    wallets: {}
+  }))
+})
 
 describe('useWallet', () => {
   let mockWallets: Wallet[]
 
   const mockInjectImplementation = (token: string | InjectionKey<unknown>) => {
     if (token === 'walletManager') return mockWalletManager
-    if (token === 'setAlgodClient') return mockSetAlgodClient
-    if (token === 'algodClient') return mockAlgodClient
     return null
   }
 
   beforeEach(() => {
     vi.clearAllMocks()
+    ;(inject as Mock).mockImplementation(mockInjectImplementation)
 
     mockStore.setState(() => DEFAULT_STATE)
 
@@ -146,7 +166,6 @@ describe('useWallet', () => {
       [WalletId.MAGIC, mockMagicAuth]
     ])
     mockWalletManager.store = mockStore
-    ;(inject as Mock).mockImplementation(mockInjectImplementation)
   })
 
   it('throws an error if WalletManager is not installed', () => {
@@ -160,12 +179,11 @@ describe('useWallet', () => {
   })
 
   it('initializes wallets and active wallet correctly', () => {
-    const { wallets, activeWallet, activeAccount, activeNetwork } = useWallet()
+    const { wallets, activeWallet, activeAccount } = useWallet()
 
     expect(wallets.value).toEqual(mockWallets)
     expect(activeWallet.value).toBeNull()
     expect(activeAccount.value).toBeNull()
-    expect(activeNetwork.value).toBe(NetworkId.TESTNET)
   })
 
   it('correctly handles wallet connect/disconnect', async () => {
@@ -280,44 +298,8 @@ describe('useWallet', () => {
     ])
   })
 
-  it('reactively updates the algodClient', async () => {
-    const { algodClient, setAlgodClient } = useWallet()
-
-    const newAlgodClient = new algosdk.Algodv2('mock-token', 'https://mock-server', '')
-
-    setAlgodClient(newAlgodClient)
-
-    await nextTick()
-
-    expect(algodClient.value).toStrictEqual(newAlgodClient)
-  })
-
-  it('updates algodClient when setActiveNetwork is called', async () => {
-    const { setActiveNetwork, algodClient } = useWallet()
-
-    const newNetwork = NetworkId.MAINNET
-
-    // Default mainnet algod config
-    const newAlgodClient = new algosdk.Algodv2('', 'https://mainnet-api.4160.nodely.dev/', '')
-
-    mockWalletManager.setActiveNetwork = async (networkId: string) => {
-      mockSetAlgodClient(newAlgodClient)
-      mockWalletManager.store.setState((state) => ({
-        ...state,
-        activeNetwork: networkId,
-        algodClient: newAlgodClient
-      }))
-    }
-
-    setActiveNetwork(newNetwork)
-
-    await nextTick()
-
-    expect(algodClient.value).toStrictEqual(newAlgodClient)
-  })
-
   it('integrates correctly with Vue component', async () => {
-    const { wallets, activeWallet, activeAddress, activeNetwork, isReady } = useWallet()
+    const { wallets, activeWallet, activeAddress, isReady } = useWallet()
 
     const TestComponent = {
       template: `
@@ -328,7 +310,6 @@ describe('useWallet', () => {
               {{ wallet.metadata.name }}
             </li>
           </ul>
-          <div data-testid="activeNetwork">{{ activeNetwork }}</div>
           <div data-testid="activeWallet">{{ activeWallet?.id }}</div>
           <div data-testid="activeAddress">{{ activeAddress }}</div>
         </div>
@@ -338,7 +319,6 @@ describe('useWallet', () => {
           wallets,
           activeWallet,
           activeAddress,
-          activeNetwork,
           isReady
         }
       }
@@ -353,11 +333,9 @@ describe('useWallet', () => {
       expect(listItems[index].text()).toBe(wallet.metadata.name)
     })
 
-    expect(activeNetwork.value).toBe(NetworkId.TESTNET)
     expect(activeWallet.value).toBeNull()
     expect(activeAddress.value).toBeNull()
 
-    expect(wrapper.get('[data-testid="activeNetwork"]').text()).toBe(NetworkId.TESTNET)
     expect(wrapper.get('[data-testid="activeWallet"]').text()).toBe('')
     expect(wrapper.get('[data-testid="activeAddress"]').text()).toBe('')
 
@@ -389,7 +367,6 @@ describe('useWallet', () => {
     expect(activeWallet.value?.id).toBe(WalletId.DEFLY)
     expect(activeAddress.value).toBe('address1')
 
-    expect(wrapper.get('[data-testid="activeNetwork"]').text()).toBe(NetworkId.TESTNET)
     expect(wrapper.get('[data-testid="activeWallet"]').text()).toBe(WalletId.DEFLY)
     expect(wrapper.get('[data-testid="activeAddress"]').text()).toBe('address1')
   })
@@ -447,32 +424,5 @@ describe('useWallet', () => {
 
     // Should show ready after status change
     expect(wrapper.get('[data-testid="is-ready"]').text()).toBe('true')
-  })
-
-  describe('setActiveNetwork', () => {
-    it('throws error for invalid network', async () => {
-      const { setActiveNetwork } = useWallet()
-
-      await expect(setActiveNetwork('invalid-network')).rejects.toThrow(
-        'Network "invalid-network" not found in network configuration'
-      )
-    })
-
-    it('allows setting custom network that exists in config', async () => {
-      const customNetwork = {
-        name: 'Custom Network',
-        algod: {
-          token: '',
-          baseServer: 'https://custom.network',
-          headers: {}
-        }
-      }
-
-      mockWalletManager.networkConfig['custom-net'] = customNetwork
-      const { setActiveNetwork, activeNetwork } = useWallet()
-
-      await setActiveNetwork('custom-net')
-      expect(activeNetwork.value).toBe('custom-net')
-    })
   })
 })
