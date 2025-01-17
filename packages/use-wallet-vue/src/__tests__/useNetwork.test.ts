@@ -69,7 +69,6 @@ describe('useNetwork', () => {
 
   it('allows setting custom network that exists in config', async () => {
     const customNetwork = {
-      name: 'Custom Network',
       algod: {
         token: '',
         baseServer: 'https://custom.network',
