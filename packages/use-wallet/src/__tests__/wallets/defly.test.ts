@@ -454,7 +454,7 @@ describe('DeflyWallet', () => {
       }
 
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         activeWallet: WalletId.PERA,
         wallets: {
           [WalletId.DEFLY]: walletState
