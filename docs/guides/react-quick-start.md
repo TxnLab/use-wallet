@@ -49,10 +49,10 @@ Now, in any component, you can use the `useWallet` hook to access the wallet man
 import { useWallet } from '@txnlab/use-wallet-react'
 
 function WalletMenu() {
-  const { wallets, activeWallet, activeAccount, isReconnecting } = useWallet()
+  const { wallets, activeWallet, activeAccount, isReady } = useWallet()
 
-  if (isReconnecting) {
-    return <div>Reconnecting to wallet...</div>
+  if (!isReady) {
+    return <div>Initializing wallet manager...</div>
   }
 
   return (
@@ -80,7 +80,7 @@ function WalletMenu() {
 }
 ```
 
-The `isReconnecting` state is a boolean that helps manage wallet reconnection flows. It starts as `true` during both SSR and initial client-side mounting. During the first mount, the `WalletProvider` automatically attempts to restore any previously connected wallet sessions. Once this reconnection process completes - whether successful or not - `isReconnecting` switches to `false`.
+The `isReady` state indicates whether the wallet manager has completed initialization. It starts as `false` during both SSR and initial client-side mounting. During the first mount, the `WalletProvider` automatically attempts to restore any previously connected wallet sessions. Once this process completes, `isReady` switches to `true`.
 
 ## Signing Transactions
 
