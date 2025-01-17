@@ -137,4 +137,26 @@ describe('useNetwork', () => {
 
     expect(wrapper.get('[data-testid="activeNetwork"]').text()).toBe(NetworkId.MAINNET)
   })
+
+  it('provides updateNetworkAlgod function', () => {
+    const { updateNetworkAlgod } = useNetwork()
+    expect(typeof updateNetworkAlgod).toBe('function')
+  })
+
+  it('calls updateNetworkAlgod on the manager when updating network config', () => {
+    const networkId = NetworkId.TESTNET
+    const config = {
+      token: 'new-token',
+      baseServer: 'https://new-server.com',
+      port: '443'
+    }
+
+    const mockUpdateNetworkAlgod = vi.fn()
+    mockWalletManager.updateNetworkAlgod = mockUpdateNetworkAlgod
+
+    const { updateNetworkAlgod } = useNetwork()
+    updateNetworkAlgod(networkId, config)
+
+    expect(mockUpdateNetworkAlgod).toHaveBeenCalledWith(networkId, config)
+  })
 })

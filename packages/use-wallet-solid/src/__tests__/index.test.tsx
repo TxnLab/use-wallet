@@ -375,6 +375,53 @@ describe('useNetwork', () => {
       expect(screen.getByTestId('algod-client')).toHaveTextContent(JSON.stringify(newAlgodClient))
     })
   })
+
+  it('provides updateNetworkAlgod function', () => {
+    const TestComponent = () => {
+      const { updateNetworkAlgod } = useNetwork()
+      return <div data-testid="update-network-algod-type">{typeof updateNetworkAlgod}</div>
+    }
+
+    render(() => (
+      <WalletProvider manager={mockWalletManager}>
+        <TestComponent />
+      </WalletProvider>
+    ))
+
+    expect(screen.getByTestId('update-network-algod-type')).toHaveTextContent('function')
+  })
+
+  it('calls updateNetworkAlgod on the manager when updating network config', () => {
+    const networkId = NetworkId.TESTNET
+    const config = {
+      token: 'new-token',
+      baseServer: 'https://new-server.com',
+      port: '443'
+    }
+
+    const TestComponent = () => {
+      const { updateNetworkAlgod } = useNetwork()
+      return (
+        <button data-testid="update-btn" onClick={() => updateNetworkAlgod(networkId, config)}>
+          Update
+        </button>
+      )
+    }
+
+    const mockUpdateNetworkAlgod = vi.fn()
+    mockWalletManager.updateNetworkAlgod = mockUpdateNetworkAlgod
+
+    render(() => (
+      <WalletProvider manager={mockWalletManager}>
+        <TestComponent />
+      </WalletProvider>
+    ))
+
+    const updateButton = screen.getByTestId('update-btn')
+    fireEvent.click(updateButton)
+
+    expect(mockUpdateNetworkAlgod).toHaveBeenCalledWith(networkId, config)
+  })
 })
 
 describe('useWallet', () => {

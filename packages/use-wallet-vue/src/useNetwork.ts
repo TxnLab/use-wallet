@@ -1,5 +1,5 @@
 import { useStore } from '@tanstack/vue-store'
-import { WalletManager } from '@txnlab/use-wallet'
+import { WalletManager, type AlgodConfig } from '@txnlab/use-wallet'
 import algosdk from 'algosdk'
 import { computed, inject, ref } from 'vue'
 import type { SetAlgodClient } from './useWallet'
@@ -42,6 +42,10 @@ export function useNetwork() {
     console.info(`[Vue] ✅ Active network set to ${networkId}.`)
   }
 
+  const updateNetworkAlgod = (networkId: string, config: Partial<AlgodConfig>) => {
+    manager.updateNetworkAlgod(networkId, config)
+  }
+
   return {
     activeNetwork,
     networks: manager.networks,
@@ -51,6 +55,7 @@ export function useNetwork() {
       }
       return algodClient.value
     }),
-    setActiveNetwork
+    setActiveNetwork,
+    updateNetworkAlgod
   }
 }
