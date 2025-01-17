@@ -90,8 +90,12 @@ Magic Algorand Extension
 
 Liquid Auth is a self-hosted authentication service that provides a simple way to associate Passkeys to KeyPair(s) commonly found in cryptocurrencies, in accordance with the FIDO2 WebAuthn specification. In addition to authentication, Liquid Auth provides a Peer to Peer signaling service. Not only can you authenticate users, but you can also establish secure, WebRTC-based connections between a mobile wallet and a desktop dApp. Liquid Auth serves as an alternative to protocols where access is controlled or limited by centralized entities.
 
+{% hint style="warning" %}
+**Note:** Liquid Auth support is temporarily unavailable in v4.0.0 due to incompatibility with `algosdk` v3. It remains available in `@txnlab/use-wallet` v3 and will be reintroduced in a future v4 release once the Liquid Auth client has been updated to support `algosdk` v3.
+{% endhint %}
+
 {% hint style="info" %}
-The Liquid Auth provider is currently experimental and subject to change in future releases. It requires users to have an Android (v14+) device and developers to set up a [specific backend](https://github.com/TxnLab/use-wallet/blob/main/examples/liquid-auth-backend/README.md). For more info, please refer to the [documentation](https://liquidauth.com/guides/getting-started/).
+The Liquid Auth provider is experimental and subject to change. It requires users to have an Android (v14+) device and developers to set up a [specific backend](https://github.com/TxnLab/use-wallet/blob/v3/examples/liquid-auth-backend/README.md). For more info, please refer to the [documentation](https://liquidauth.com/guides/getting-started/).
 {% endhint %}
 
 <figure><img src="../.gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
@@ -100,7 +104,7 @@ The Liquid Auth provider is currently experimental and subject to change in futu
 Liquid Auth documentation
 {% endembed %}
 
-{% embed url="https://github.com/TxnLab/use-wallet/blob/main/examples/liquid-auth-backend/README.md" %}
+{% embed url="https://github.com/TxnLab/use-wallet/blob/v3/examples/liquid-auth-backend/README.md" %}
 Liquid Auth backend README
 {% endembed %}
 

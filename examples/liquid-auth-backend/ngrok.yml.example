@@ -1,7 +1,0 @@
-version: 2
-authtoken: <NGROK_AUTH_TOKEN>
-tunnels:
-  website:
-    addr: frontend:80
-    proto: http
-    domain: <NGROK_STATIC_DOMAIN>

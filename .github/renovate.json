@@ -11,7 +11,7 @@
   "timezone": "America/New_York",
   "assignees": ["drichar"],
   "baseBranches": ["main"],
-  "ignorePaths": ["**/node_modules/**", "examples/liquid-auth-backend/docker-compose.yml"],
+  "ignorePaths": ["**/node_modules/**"],
   "minimumReleaseAge": "3 days",
   "lockFileMaintenance": {
     "enabled": true,
@@ -29,7 +29,6 @@
       "rangeStrategy": "bump",
       "matchPackageNames": [
         "/@agoralabs-sh/avm-web-provider/",
-        "/@algorandfoundation/liquid-auth-use-wallet-client/",
         "/@magic-ext/algorand/",
         "/magic-sdk/",
         "/lute-connect/",
