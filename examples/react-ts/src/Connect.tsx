@@ -1,16 +1,10 @@
-import { NetworkId, WalletId, useWallet, type Wallet } from '@txnlab/use-wallet-react'
+import { NetworkId, WalletId, useNetwork, useWallet, type Wallet } from '@txnlab/use-wallet-react'
 import algosdk from 'algosdk'
 import * as React from 'react'
 
 export function Connect() {
-  const {
-    algodClient,
-    activeAddress,
-    activeNetwork,
-    setActiveNetwork,
-    transactionSigner,
-    wallets
-  } = useWallet()
+  const { activeAddress, transactionSigner, wallets } = useWallet()
+  const { algodClient, activeNetwork, setActiveNetwork } = useNetwork()
 
   const [isSending, setIsSending] = React.useState(false)
   const [magicEmail, setMagicEmail] = React.useState('')

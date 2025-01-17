@@ -1,4 +1,10 @@
-import { useWallet, type BaseWallet, WalletId, NetworkId } from '@txnlab/use-wallet-solid'
+import {
+  useWallet,
+  WalletId,
+  NetworkId,
+  useNetwork,
+  type BaseWallet
+} from '@txnlab/use-wallet-solid'
 import algosdk from 'algosdk'
 import { For, Show, createSignal } from 'solid-js'
 
@@ -7,16 +13,14 @@ export function Connect() {
   const [magicEmail, setMagicEmail] = createSignal('')
 
   const {
-    algodClient,
     activeAddress,
-    activeNetwork,
-    setActiveNetwork,
     activeWalletId,
     isWalletActive,
     isWalletConnected,
     transactionSigner,
     wallets
   } = useWallet()
+  const { algodClient, activeNetwork, setActiveNetwork } = useNetwork()
 
   const isMagicLink = (wallet: BaseWallet) => wallet.id === WalletId.MAGIC
   const isEmailValid = () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(magicEmail())
