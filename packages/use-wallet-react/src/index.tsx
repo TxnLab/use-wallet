@@ -1,5 +1,5 @@
 import { useStore } from '@tanstack/react-store'
-import { WalletAccount, WalletManager, WalletMetadata } from '@txnlab/use-wallet'
+import { NetworkId, WalletAccount, WalletManager, WalletMetadata } from '@txnlab/use-wallet'
 import algosdk from 'algosdk'
 import * as React from 'react'
 
@@ -40,7 +40,7 @@ export const useWallet = () => {
 
   const activeNetwork = useStore(manager.store, (state) => state.activeNetwork)
 
-  const setActiveNetwork = async (networkId: string): Promise<void> => {
+  const setActiveNetwork = async (networkId: NetworkId | string): Promise<void> => {
     if (networkId === activeNetwork) {
       return
     }

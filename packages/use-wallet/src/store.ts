@@ -1,5 +1,6 @@
 import algosdk from 'algosdk'
 import { logger } from 'src/logger'
+import { NetworkId } from 'src/network'
 import { WalletId, type WalletAccount } from 'src/wallets/types'
 import type { Store } from '@tanstack/store'
 
@@ -151,7 +152,7 @@ export function setAccounts(
 
 export function setActiveNetwork(
   store: Store<State>,
-  { networkId, algodClient }: { networkId: string; algodClient: algosdk.Algodv2 }
+  { networkId, algodClient }: { networkId: NetworkId | string; algodClient: algosdk.Algodv2 }
 ) {
   store.setState((state) => ({
     ...state,

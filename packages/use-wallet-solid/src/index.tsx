@@ -2,6 +2,7 @@ import { useStore } from '@tanstack/solid-store'
 import algosdk from 'algosdk'
 import { JSX, createContext, createMemo, onMount, useContext } from 'solid-js'
 import type {
+  NetworkId,
   WalletAccount,
   WalletId,
   WalletManager,
@@ -78,7 +79,7 @@ export function useWallet() {
 
   const activeNetwork = useStore(manager().store, (state) => state.activeNetwork)
 
-  const setActiveNetwork = async (networkId: string): Promise<void> => {
+  const setActiveNetwork = async (networkId: NetworkId | string): Promise<void> => {
     if (networkId === activeNetwork()) {
       return
     }
