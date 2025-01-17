@@ -1,7 +1,7 @@
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
 import { Logger, LogLevel, logger } from 'src/logger'
-import { createNetworkConfig, isNetworkConfig, type NetworkConfig } from 'src/network'
+import { AlgodConfig, createNetworkConfig, isNetworkConfig, type NetworkConfig } from 'src/network'
 import { StorageAdapter } from 'src/storage'
 import {
   DEFAULT_STATE,
@@ -326,6 +326,37 @@ export class WalletManager {
     setActiveNetwork(this.store, { networkId, algodClient })
 
     this.logger.info(`✅ Active network set to ${networkId}`)
+  }
+
+  public updateNetworkAlgod(networkId: string, algodConfig: Partial<AlgodConfig>): void {
+    // Verify network exists
+    if (!this.networkConfig[networkId]) {
+      throw new Error(`Network "${networkId}" not found in network configuration`)
+    }
+
+    // Create new config merging existing with updates
+    const updatedConfig = {
+      ...this.networkConfig[networkId],
+      algod: {
+        ...this.networkConfig[networkId].algod,
+        ...algodConfig
+      }
+    }
+
+    // Validate the new configuration
+    if (!isNetworkConfig(updatedConfig)) {
+      throw new Error('Invalid network configuration')
+    }
+
+    // Update the network config
+    this.networkConfig[networkId] = updatedConfig
+
+    // If this is the active network, update the algod client
+    if (this.activeNetwork === networkId) {
+      this.algodClient = this.createAlgodClient(networkId)
+    }
+
+    this.logger.info(`✅ Updated algod configuration for ${networkId}`)
   }
 
   public get activeNetwork(): string {

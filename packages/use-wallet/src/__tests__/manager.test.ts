@@ -279,6 +279,106 @@ describe('WalletManager', () => {
     })
   })
 
+  describe('updateNetworkAlgod', () => {
+    it('updates algod configuration for a network', () => {
+      const manager = new WalletManager({
+        wallets: [WalletId.DEFLY, WalletId.KIBISIS]
+      })
+
+      const newConfig = {
+        token: 'new-token',
+        baseServer: 'https://new-server.com',
+        port: '443',
+        headers: { 'X-API-Key': 'new-key' }
+      }
+
+      manager.updateNetworkAlgod('mainnet', newConfig)
+
+      expect(manager.networks.mainnet.algod).toEqual(newConfig)
+    })
+
+    it('updates active algod client when modifying active network', () => {
+      const manager = new WalletManager({
+        wallets: [WalletId.DEFLY, WalletId.KIBISIS],
+        defaultNetwork: 'mainnet'
+      })
+
+      const initialClient = manager.algodClient
+      const newConfig = {
+        token: 'new-token',
+        baseServer: 'https://new-server.com'
+      }
+
+      manager.updateNetworkAlgod('mainnet', newConfig)
+
+      expect(manager.algodClient).not.toBe(initialClient)
+      expect(manager.networks.mainnet.algod.token).toBe('new-token')
+      expect(manager.networks.mainnet.algod.baseServer).toBe('https://new-server.com')
+    })
+
+    it('does not update algod client when modifying inactive network', () => {
+      const manager = new WalletManager({
+        wallets: [WalletId.DEFLY, WalletId.KIBISIS],
+        defaultNetwork: 'mainnet'
+      })
+
+      const initialClient = manager.algodClient
+      const newConfig = {
+        token: 'new-token',
+        baseServer: 'https://new-server.com'
+      }
+
+      manager.updateNetworkAlgod('testnet', newConfig)
+
+      expect(manager.algodClient).toBe(initialClient)
+      expect(manager.networks.testnet.algod.token).toBe('new-token')
+      expect(manager.networks.testnet.algod.baseServer).toBe('https://new-server.com')
+    })
+
+    it('throws error for non-existent network', () => {
+      const manager = new WalletManager({
+        wallets: [WalletId.DEFLY, WalletId.KIBISIS]
+      })
+
+      expect(() =>
+        manager.updateNetworkAlgod('invalid-network', {
+          token: 'new-token',
+          baseServer: 'https://new-server.com'
+        })
+      ).toThrow('Network "invalid-network" not found in network configuration')
+    })
+
+    it('throws error for invalid configuration', () => {
+      const manager = new WalletManager({
+        wallets: [WalletId.DEFLY, WalletId.KIBISIS]
+      })
+
+      expect(() =>
+        manager.updateNetworkAlgod('mainnet', {
+          token: 'new-token',
+          // @ts-expect-error Testing invalid config
+          baseServer: 123 // Invalid type for baseServer
+        })
+      ).toThrow('Invalid network configuration')
+    })
+
+    it('preserves existing configuration when partially updating', () => {
+      const manager = new WalletManager({
+        wallets: [WalletId.DEFLY, WalletId.KIBISIS]
+      })
+
+      const initialConfig = { ...manager.networks.mainnet.algod }
+      manager.updateNetworkAlgod('mainnet', {
+        token: 'new-token'
+      })
+
+      expect(manager.networks.mainnet.algod).toEqual({
+        ...initialConfig,
+        token: 'new-token'
+      })
+    })
+  })
+
   describe('subscribe', () => {
     it('adds and removes a subscriber', async () => {
       const manager = new WalletManager({
