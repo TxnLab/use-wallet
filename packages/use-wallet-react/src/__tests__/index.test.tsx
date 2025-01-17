@@ -12,9 +12,9 @@ import {
   type State,
   type WalletAccount
 } from '@txnlab/use-wallet'
-import * as React from 'react'
-import { Wallet, WalletProvider, useWallet } from '../index'
 import algosdk from 'algosdk'
+import * as React from 'react'
+import { Wallet, WalletProvider, useWallet, useNetwork } from '../index'
 
 const mocks = vi.hoisted(() => {
   return {
@@ -77,7 +77,7 @@ const mockMagicAuth = new MagicAuth({
 })
 
 describe('WalletProvider', () => {
-  it('provides the wallet context to its children', async () => {
+  it('provides context to child components', () => {
     const TestComponent = () => {
       const { wallets } = useWallet()
       return <h1>{wallets ? 'Context provided' : 'No context'}</h1>
@@ -87,32 +87,16 @@ describe('WalletProvider', () => {
       wallets: [WalletId.DEFLY]
     })
 
-    await act(async () => {
-      render(
-        <WalletProvider manager={walletManager}>
-          <TestComponent />
-        </WalletProvider>
-      )
-    })
+    render(
+      <WalletProvider manager={walletManager}>
+        <TestComponent />
+      </WalletProvider>
+    )
 
     expect(screen.getByText('Context provided')).toBeInTheDocument()
   })
 
-  it('throws an error when useWallet is used outside of WalletProvider', () => {
-    const TestComponent = () => {
-      try {
-        useWallet()
-        return <div>No error thrown</div>
-      } catch (error: any) {
-        return <div>{error.message}</div>
-      }
-    }
-
-    render(<TestComponent />)
-    expect(screen.getByText('useWallet must be used within the WalletProvider')).toBeInTheDocument()
-  })
-
-  it('calls resumeSessions on mount', async () => {
+  it('resumes sessions on mount', () => {
     const mockResumeSessions = vi.fn()
     const fakeManager = { resumeSessions: mockResumeSessions }
 
@@ -124,59 +108,146 @@ describe('WalletProvider', () => {
 
     expect(mockResumeSessions).toHaveBeenCalled()
   })
+})
 
-  it('updates algodClient when setAlgodClient is called', async () => {
-    const newAlgodClient = new algosdk.Algodv2('mock-token', 'https://mock-server', '')
+describe('useNetwork', () => {
+  let mockWalletManager: WalletManager
+  let wrapper: React.FC<{ children: React.ReactNode }>
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockStore.setState(() => DEFAULT_STATE)
+    mockWalletManager = new WalletManager()
+    mockWalletManager.store = mockStore
+
+    wrapper = ({ children }: { children: React.ReactNode }) => (
+      <WalletProvider manager={mockWalletManager}>{children}</WalletProvider>
+    )
+  })
+
+  it('throws an error when used outside of WalletProvider', () => {
     const TestComponent = () => {
-      const { setAlgodClient } = useWallet()
-      React.useEffect(() => {
-        setAlgodClient(newAlgodClient)
-      }, [setAlgodClient])
-      return null
+      try {
+        useNetwork()
+        return <div>No error thrown</div>
+      } catch (error: any) {
+        return <div>{error.message}</div>
+      }
     }
 
-    const walletManager = new WalletManager({
-      wallets: [WalletId.DEFLY]
-    })
+    render(<TestComponent />)
+    expect(
+      screen.getByText('useNetwork must be used within the WalletProvider')
+    ).toBeInTheDocument()
+  })
 
-    await act(async () => {
-      render(
-        <WalletProvider manager={walletManager}>
-          <TestComponent />
-        </WalletProvider>
-      )
-    })
+  it('provides network-related functionality', () => {
+    const { result } = renderHook(() => useNetwork(), { wrapper })
 
-    expect(walletManager.algodClient).toBe(newAlgodClient)
+    expect(result.current.activeNetwork).toBe(NetworkId.TESTNET)
+    expect(result.current.networks).toBeDefined()
+    expect(result.current.algodClient).toBeDefined()
+    expect(typeof result.current.setActiveNetwork).toBe('function')
+    expect(typeof result.current.updateNetworkAlgod).toBe('function')
   })
 
   it('updates activeNetwork and algodClient when setActiveNetwork is called', async () => {
     const newNetwork = NetworkId.MAINNET
 
-    const walletManager = new WalletManager({
-      wallets: [WalletId.DEFLY],
-      defaultNetwork: NetworkId.TESTNET
-    })
-
-    const TestComponent = () => {
-      const { setActiveNetwork } = useWallet()
-      return <button onClick={() => setActiveNetwork(newNetwork)}>Change Network</button>
-    }
-
-    render(
-      <WalletProvider manager={walletManager}>
-        <TestComponent />
-      </WalletProvider>
-    )
+    const { result } = renderHook(() => useNetwork(), { wrapper })
 
     await act(async () => {
-      screen.getByText('Change Network').click()
+      await result.current.setActiveNetwork(newNetwork)
     })
 
-    expect(walletManager.store.state.activeNetwork).toBe(newNetwork)
-    const { algod } = walletManager.networkConfig[newNetwork]
+    expect(mockWalletManager.store.state.activeNetwork).toBe(newNetwork)
+    const { algod } = mockWalletManager.networkConfig[newNetwork]
     const { token, baseServer, port, headers } = algod
-    expect(walletManager.algodClient).toEqual(new algosdk.Algodv2(token, baseServer, port, headers))
+    expect(mockWalletManager.algodClient).toEqual(
+      new algosdk.Algodv2(token, baseServer, port, headers)
+    )
+  })
+
+  it('calls updateNetworkAlgod on the manager when updating network config', () => {
+    const { result } = renderHook(() => useNetwork(), { wrapper })
+    const networkId = NetworkId.TESTNET
+    const config = { baseServer: 'https://new-server.com' }
+
+    result.current.updateNetworkAlgod(networkId, config)
+
+    expect(mockWalletManager.networkConfig[networkId].algod.baseServer).toBe(config.baseServer)
+  })
+
+  it('throws error when setting invalid network', async () => {
+    const { result } = renderHook(() => useNetwork(), { wrapper })
+    const invalidNetwork = 'invalid-network'
+
+    await expect(result.current.setActiveNetwork(invalidNetwork)).rejects.toThrow(
+      `Network "${invalidNetwork}" not found in network configuration`
+    )
+  })
+
+  it('allows setting custom network that exists in config', async () => {
+    const customNetwork = {
+      name: 'Custom Network',
+      algod: {
+        token: '',
+        baseServer: 'https://custom.network',
+        headers: {}
+      }
+    }
+
+    mockWalletManager.networkConfig['custom-net'] = customNetwork
+    const { result } = renderHook(() => useNetwork(), { wrapper })
+
+    await act(async () => {
+      await result.current.setActiveNetwork('custom-net')
+    })
+
+    expect(result.current.activeNetwork).toBe('custom-net')
+  })
+
+  it('initializes network correctly', async () => {
+    const { result } = renderHook(() => useNetwork(), { wrapper })
+
+    expect(result.current.activeNetwork).toBe(NetworkId.TESTNET)
+  })
+
+  it('updates algodClient when setAlgodClient is called', async () => {
+    const newAlgodClient = new algosdk.Algodv2('mock-token', 'https://mock-server', '')
+    const { result } = renderHook(() => useNetwork(), { wrapper })
+
+    await act(async () => {
+      result.current.setAlgodClient(newAlgodClient)
+    })
+
+    expect(result.current.algodClient).toBe(newAlgodClient)
+  })
+
+  describe('setActiveNetwork', () => {
+    it('calls setActiveNetwork correctly and updates algodClient', async () => {
+      const { result } = renderHook(() => useNetwork(), { wrapper })
+      const newNetwork = NetworkId.MAINNET
+
+      await act(async () => {
+        await result.current.setActiveNetwork(newNetwork)
+      })
+
+      expect(result.current.activeNetwork).toBe(newNetwork)
+      const { algod } = mockWalletManager.networkConfig[newNetwork]
+      const { token, baseServer, port, headers } = algod
+      expect(result.current.algodClient).toEqual(
+        new algosdk.Algodv2(token, baseServer, port, headers)
+      )
+    })
+
+    it('throws error for invalid network', async () => {
+      const { result } = renderHook(() => useNetwork(), { wrapper })
+
+      await expect(result.current.setActiveNetwork('invalid-network')).rejects.toThrow(
+        'Network "invalid-network" not found in network configuration'
+      )
+    })
   })
 })
 
@@ -228,6 +299,20 @@ describe('useWallet', () => {
     )
   })
 
+  it('throws an error when used outside of WalletProvider', () => {
+    const TestComponent = () => {
+      try {
+        useWallet()
+        return <div>No error thrown</div>
+      } catch (error: any) {
+        return <div>{error.message}</div>
+      }
+    }
+
+    render(<TestComponent />)
+    expect(screen.getByText('useWallet must be used within the WalletProvider')).toBeInTheDocument()
+  })
+
   it('initializes wallets and active wallet correctly', async () => {
     const { result } = renderHook(() => useWallet(), { wrapper })
 
@@ -239,7 +324,6 @@ describe('useWallet', () => {
     expect(result.current.wallets).toEqual(mockWallets)
     expect(result.current.activeWallet).toBeNull()
     expect(result.current.activeAccount).toBeNull()
-    expect(result.current.activeNetwork).toBe(NetworkId.TESTNET)
   })
 
   it('correctly handles wallet connect/disconnect', async () => {
@@ -349,7 +433,6 @@ describe('useWallet', () => {
     function TestComponent() {
       const {
         wallets,
-        activeNetwork,
         activeWallet,
         activeWalletAccounts,
         activeWalletAddresses,
@@ -357,6 +440,8 @@ describe('useWallet', () => {
         activeAddress,
         isReady
       } = useWallet()
+
+      const { activeNetwork } = useNetwork()
 
       return (
         <div>
@@ -444,63 +529,6 @@ describe('useWallet', () => {
     expect(getByTestId('active-address')).toHaveTextContent(JSON.stringify('address1'))
   })
 
-  it('calls setAlgodClient correctly', async () => {
-    const newAlgodClient = new algosdk.Algodv2('mock-token', 'https://mock-server', '')
-    const { result } = renderHook(() => useWallet(), { wrapper })
-
-    await act(async () => {
-      result.current.setAlgodClient(newAlgodClient)
-    })
-
-    expect(result.current.algodClient).toBe(newAlgodClient)
-  })
-
-  describe('setActiveNetwork', () => {
-    it('calls setActiveNetwork correctly and updates algodClient', async () => {
-      const { result } = renderHook(() => useWallet(), { wrapper })
-      const newNetwork = NetworkId.MAINNET
-
-      await act(async () => {
-        await result.current.setActiveNetwork(newNetwork)
-      })
-
-      expect(result.current.activeNetwork).toBe(newNetwork)
-      const { algod } = mockWalletManager.networkConfig[newNetwork]
-      const { token, baseServer, port, headers } = algod
-      expect(result.current.algodClient).toEqual(
-        new algosdk.Algodv2(token, baseServer, port, headers)
-      )
-    })
-
-    it('throws error for invalid network', async () => {
-      const { result } = renderHook(() => useWallet(), { wrapper })
-
-      await expect(result.current.setActiveNetwork('invalid-network')).rejects.toThrow(
-        'Network "invalid-network" not found in network configuration'
-      )
-    })
-
-    it('allows setting custom network that exists in config', async () => {
-      const customNetwork = {
-        name: 'Custom Network',
-        algod: {
-          token: '',
-          baseServer: 'https://custom.network',
-          headers: {}
-        }
-      }
-
-      mockWalletManager.networkConfig['custom-net'] = customNetwork
-      const { result } = renderHook(() => useWallet(), { wrapper })
-
-      await act(async () => {
-        await result.current.setActiveNetwork('custom-net')
-      })
-
-      expect(result.current.activeNetwork).toBe('custom-net')
-    })
-  })
-
   it('initializes with isReady false and updates after resumeSessions', async () => {
     const { result } = renderHook(() => useWallet(), { wrapper })
 
@@ -530,5 +558,14 @@ describe('useWallet', () => {
     })
 
     expect(result.current.isReady).toBe(true)
+  })
+
+  it('no longer returns network-related properties', () => {
+    const { result } = renderHook(() => useWallet(), { wrapper })
+
+    expect(result.current).not.toHaveProperty('activeNetwork')
+    expect(result.current).not.toHaveProperty('algodClient')
+    expect(result.current).not.toHaveProperty('setActiveNetwork')
+    expect(result.current).not.toHaveProperty('setAlgodClient')
   })
 })

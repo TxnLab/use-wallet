@@ -1,5 +1,11 @@
 import { useStore } from '@tanstack/react-store'
-import { WalletAccount, WalletManager, WalletMetadata } from '@txnlab/use-wallet'
+import {
+  WalletAccount,
+  WalletManager,
+  WalletMetadata,
+  AlgodConfig,
+  NetworkId
+} from '@txnlab/use-wallet'
 import algosdk from 'algosdk'
 import * as React from 'react'
 
@@ -13,34 +19,46 @@ interface IWalletContext {
 
 const WalletContext = React.createContext<IWalletContext | undefined>(undefined)
 
-export interface Wallet {
-  id: string
-  metadata: WalletMetadata
-  accounts: WalletAccount[]
-  activeAccount: WalletAccount | null
-  isConnected: boolean
-  isActive: boolean
-  connect: (args?: Record<string, any>) => Promise<WalletAccount[]>
-  disconnect: () => Promise<void>
-  setActive: () => void
-  setActiveAccount: (address: string) => void
+interface WalletProviderProps {
+  manager: WalletManager
+  children: React.ReactNode
 }
 
-export const useWallet = () => {
+export const WalletProvider = ({ manager, children }: WalletProviderProps): JSX.Element => {
+  const [algodClient, setAlgodClient] = React.useState(manager.algodClient)
+
+  React.useEffect(() => {
+    manager.algodClient = algodClient
+  }, [algodClient, manager])
+
+  const resumedRef = React.useRef(false)
+
+  React.useEffect(() => {
+    if (!resumedRef.current) {
+      manager.resumeSessions()
+      resumedRef.current = true
+    }
+  }, [manager])
+
+  return (
+    <WalletContext.Provider value={{ manager, algodClient, setAlgodClient }}>
+      {children}
+    </WalletContext.Provider>
+  )
+}
+
+export const useNetwork = () => {
   const context = React.useContext(WalletContext)
 
   if (!context) {
-    throw new Error('useWallet must be used within the WalletProvider')
+    throw new Error('useNetwork must be used within the WalletProvider')
   }
 
   const { manager, algodClient, setAlgodClient } = context
 
-  const managerStatus = useStore(manager.store, (state) => state.managerStatus)
-  const isReady = managerStatus === 'ready'
-
   const activeNetwork = useStore(manager.store, (state) => state.activeNetwork)
 
-  const setActiveNetwork = async (networkId: string): Promise<void> => {
+  const setActiveNetwork = async (networkId: NetworkId | string): Promise<void> => {
     if (networkId === activeNetwork) {
       return
     }
@@ -63,6 +81,45 @@ export const useWallet = () => {
 
     console.info(`[React] ✅ Active network set to ${networkId}.`)
   }
+
+  const updateNetworkAlgod = (networkId: string, config: Partial<AlgodConfig>): void => {
+    manager.updateNetworkAlgod(networkId, config)
+  }
+
+  return {
+    activeNetwork,
+    networks: manager.networks,
+    algodClient,
+    setAlgodClient,
+    setActiveNetwork,
+    updateNetworkAlgod
+  }
+}
+
+export interface Wallet {
+  id: string
+  metadata: WalletMetadata
+  accounts: WalletAccount[]
+  activeAccount: WalletAccount | null
+  isConnected: boolean
+  isActive: boolean
+  connect: (args?: Record<string, any>) => Promise<WalletAccount[]>
+  disconnect: () => Promise<void>
+  setActive: () => void
+  setActiveAccount: (address: string) => void
+}
+
+export const useWallet = () => {
+  const context = React.useContext(WalletContext)
+
+  if (!context) {
+    throw new Error('useWallet must be used within the WalletProvider')
+  }
+
+  const { manager } = context
+
+  const managerStatus = useStore(manager.store, (state) => state.managerStatus)
+  const isReady = managerStatus === 'ready'
 
   const walletStateMap = useStore(manager.store, (state) => state.wallets)
   const activeWalletId = useStore(manager.store, (state) => state.activeWallet)
@@ -117,44 +174,12 @@ export const useWallet = () => {
   return {
     wallets,
     isReady,
-    algodClient,
-    activeNetwork,
     activeWallet,
     activeWalletAccounts,
     activeWalletAddresses,
     activeAccount,
     activeAddress,
-    setActiveNetwork,
-    setAlgodClient,
     signTransactions,
     transactionSigner
   }
-}
-
-interface WalletProviderProps {
-  manager: WalletManager
-  children: React.ReactNode
-}
-
-export const WalletProvider = ({ manager, children }: WalletProviderProps): JSX.Element => {
-  const [algodClient, setAlgodClient] = React.useState(manager.algodClient)
-
-  React.useEffect(() => {
-    manager.algodClient = algodClient
-  }, [algodClient, manager])
-
-  const resumedRef = React.useRef(false)
-
-  React.useEffect(() => {
-    if (!resumedRef.current) {
-      manager.resumeSessions()
-      resumedRef.current = true
-    }
-  }, [manager])
-
-  return (
-    <WalletContext.Provider value={{ manager, algodClient, setAlgodClient }}>
-      {children}
-    </WalletContext.Provider>
-  )
 }
