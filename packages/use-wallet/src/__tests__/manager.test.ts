@@ -177,7 +177,6 @@ describe('WalletManager', () => {
     it('initializes with custom network', () => {
       const networks = new NetworkConfigBuilder()
         .addNetwork('custom', {
-          name: 'Custom Network',
           algod: {
             token: 'token',
             baseServer: 'https://custom-network.com',

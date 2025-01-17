@@ -1,10 +1,10 @@
 import { useStore } from '@tanstack/react-store'
 import {
-  WalletAccount,
+  NetworkId,
   WalletManager,
-  WalletMetadata,
-  AlgodConfig,
-  NetworkId
+  type AlgodConfig,
+  type WalletAccount,
+  type WalletMetadata
 } from '@txnlab/use-wallet'
 import algosdk from 'algosdk'
 import * as React from 'react'

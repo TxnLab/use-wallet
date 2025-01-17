@@ -1,15 +1,15 @@
 import { useStore } from '@tanstack/solid-store'
+import algosdk from 'algosdk'
 import { JSX, createContext, createMemo, onMount, useContext } from 'solid-js'
 import type {
+  AlgodConfig,
+  NetworkId,
   WalletAccount,
   WalletId,
   WalletManager,
   WalletMetadata,
-  WalletState,
-  NetworkId,
-  AlgodConfig
+  WalletState
 } from '@txnlab/use-wallet'
-import algosdk from 'algosdk'
 
 export * from '@txnlab/use-wallet'
 

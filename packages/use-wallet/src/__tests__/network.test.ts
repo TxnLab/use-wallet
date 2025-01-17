@@ -16,7 +16,6 @@ describe('Network Configuration', () => {
       const networks = createNetworkConfig()
 
       expect(networks.mainnet).toEqual({
-        name: 'MainNet',
         algod: {
           token: '',
           baseServer: 'https://mainnet-api.4160.nodely.dev',
@@ -48,13 +47,11 @@ describe('Network Configuration', () => {
         headers: { 'X-API-Key': 'key' }
       })
       // Other properties should remain unchanged
-      expect(networks.mainnet.name).toBe('MainNet')
       expect(networks.mainnet.isTestnet).toBe(false)
     })
 
     it('allows adding custom networks', () => {
       const customNetwork = {
-        name: 'Custom Network',
         algod: {
           token: 'token',
           baseServer: 'server',
@@ -75,7 +72,6 @@ describe('Network Configuration', () => {
 
       expect(() =>
         builder.addNetwork('mainnet', {
-          name: 'Custom MainNet',
           algod: {
             token: '',
             baseServer: ''
@@ -104,7 +100,6 @@ describe('Network Configuration', () => {
   describe('isNetworkConfig', () => {
     it('validates correct network configs', () => {
       const validConfig = {
-        name: 'Test Network',
         algod: {
           token: 'token',
           baseServer: 'server'
@@ -115,7 +110,6 @@ describe('Network Configuration', () => {
 
     it('validates network configs with optional properties', () => {
       const validConfig = {
-        name: 'Test Network',
         algod: {
           token: 'token',
           baseServer: 'server'
@@ -130,10 +124,8 @@ describe('Network Configuration', () => {
     it('rejects invalid network configs', () => {
       expect(isNetworkConfig(null)).toBe(false)
       expect(isNetworkConfig({})).toBe(false)
-      expect(isNetworkConfig({ name: 'Test' })).toBe(false)
       expect(
         isNetworkConfig({
-          name: 'Test',
           algod: { baseServer: 'server' }
         })
       ).toBe(false)
