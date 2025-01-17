@@ -1,7 +1,7 @@
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
 import { Logger, LogLevel, logger } from 'src/logger'
-import { createNetworkConfig, isNetworkConfig, type NetworkConfig } from 'src/network'
+import { createNetworkConfig, isNetworkConfig, NetworkId, type NetworkConfig } from 'src/network'
 import { StorageAdapter } from 'src/storage'
 import {
   DEFAULT_STATE,
@@ -313,7 +313,7 @@ export class WalletManager {
     return this.algodClient
   }
 
-  public setActiveNetwork = async (networkId: string): Promise<void> => {
+  public setActiveNetwork = async (networkId: NetworkId | string): Promise<void> => {
     if (this.activeNetwork === networkId) {
       return
     }

@@ -1,5 +1,10 @@
 import { useStore } from '@tanstack/vue-store'
-import { WalletManager, type WalletAccount, type WalletMetadata } from '@txnlab/use-wallet'
+import {
+  NetworkId,
+  WalletManager,
+  type WalletAccount,
+  type WalletMetadata
+} from '@txnlab/use-wallet'
 import algosdk from 'algosdk'
 import { computed, inject, ref } from 'vue'
 
@@ -34,7 +39,7 @@ export function useWallet() {
   const isReady = computed(() => managerStatus.value === 'ready')
 
   const activeNetwork = useStore(manager.store, (state) => state.activeNetwork)
-  const setActiveNetwork = async (networkId: string): Promise<void> => {
+  const setActiveNetwork = async (networkId: NetworkId | string): Promise<void> => {
     if (networkId === activeNetwork.value) {
       return
     }

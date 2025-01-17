@@ -8,7 +8,6 @@ export interface AlgodConfig {
 }
 
 export interface NetworkConfig {
-  name: string
   algod: AlgodConfig
   genesisHash?: string
   genesisId?: string
@@ -19,7 +18,6 @@ export interface NetworkConfig {
 // Default configurations
 export const DEFAULT_NETWORKS: Record<string, NetworkConfig> = {
   mainnet: {
-    name: 'MainNet',
     algod: {
       token: '',
       baseServer: 'https://mainnet-api.4160.nodely.dev',
@@ -31,7 +29,6 @@ export const DEFAULT_NETWORKS: Record<string, NetworkConfig> = {
     caipChainId: 'algorand:wGHE2Pwdvd7S12BL5FaOP20EGYesN73k'
   },
   testnet: {
-    name: 'TestNet',
     algod: {
       token: '',
       baseServer: 'https://testnet-api.4160.nodely.dev',
@@ -43,7 +40,6 @@ export const DEFAULT_NETWORKS: Record<string, NetworkConfig> = {
     caipChainId: 'algorand:SGO1GKSzyE7IEPItTxCByw9x8FmnrCDe'
   },
   betanet: {
-    name: 'BetaNet',
     algod: {
       token: '',
       baseServer: 'https://betanet-api.4160.nodely.dev',
@@ -55,7 +51,6 @@ export const DEFAULT_NETWORKS: Record<string, NetworkConfig> = {
     caipChainId: 'algorand:mFgazF-2uRS1tMiL9dsj01hJGySEmPN2'
   },
   fnet: {
-    name: 'FNet',
     algod: {
       token: '',
       baseServer: 'https://fnet-api.4160.nodely.dev',
@@ -67,7 +62,6 @@ export const DEFAULT_NETWORKS: Record<string, NetworkConfig> = {
     caipChainId: 'algorand:kUt08LxeVAAGHnh4JoAoAMM9ql_hBwSo'
   },
   localnet: {
-    name: 'LocalNet',
     algod: {
       token: 'a'.repeat(64),
       baseServer: 'http://localhost',
@@ -204,7 +198,7 @@ function isValidToken(
 export function isNetworkConfig(config: unknown): config is NetworkConfig {
   if (typeof config !== 'object' || config === null) return false
 
-  const { name, algod, isTestnet, genesisHash, genesisId, caipChainId } = config as NetworkConfig
+  const { algod, isTestnet, genesisHash, genesisId, caipChainId } = config as NetworkConfig
 
   const isValidAlgod =
     typeof algod === 'object' &&
@@ -213,7 +207,6 @@ export function isNetworkConfig(config: unknown): config is NetworkConfig {
     typeof algod.baseServer === 'string'
 
   return (
-    typeof name === 'string' &&
     isValidAlgod &&
     (isTestnet === undefined || typeof isTestnet === 'boolean') &&
     (genesisHash === undefined || typeof genesisHash === 'string') &&
