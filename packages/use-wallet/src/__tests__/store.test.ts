@@ -3,6 +3,7 @@ import { Algodv2 } from 'algosdk'
 import { NetworkId } from 'src/network'
 import {
   State,
+  PersistedState,
   addWallet,
   defaultState,
   removeWallet,
@@ -10,7 +11,7 @@ import {
   setActiveAccount,
   setActiveNetwork,
   setActiveWallet,
-  isValidState,
+  isValidPersistedState,
   isValidWalletAccount,
   isValidWalletId,
   isValidWalletState
@@ -560,17 +561,16 @@ describe('Type Guards', () => {
     })
   })
 
-  describe('isValidState', () => {
+  describe('isValidPersistedState', () => {
     it('returns true for a valid state', () => {
-      const defaultState: State = {
+      const defaultState: PersistedState = {
         wallets: {},
         activeWallet: null,
-        activeNetwork: NetworkId.TESTNET,
-        algodClient: new Algodv2('', 'https://testnet-api.4160.nodely.dev/')
+        activeNetwork: NetworkId.TESTNET
       }
-      expect(isValidState(defaultState)).toBe(true)
+      expect(isValidPersistedState(defaultState)).toBe(true)
 
-      const state: State = {
+      const state: PersistedState = {
         wallets: {
           [WalletId.DEFLY]: {
             accounts: [
@@ -602,32 +602,31 @@ describe('Type Guards', () => {
           }
         },
         activeWallet: WalletId.DEFLY,
-        activeNetwork: NetworkId.TESTNET,
-        algodClient: new Algodv2('', 'https://testnet-api.4160.nodely.dev/')
+        activeNetwork: NetworkId.TESTNET
       }
-      expect(isValidState(state)).toBe(true)
+      expect(isValidPersistedState(state)).toBe(true)
     })
 
     it('returns false for an invalid state', () => {
-      expect(isValidState('foo')).toBe(false)
-      expect(isValidState(null)).toBe(false)
+      expect(isValidPersistedState('foo')).toBe(false)
+      expect(isValidPersistedState(null)).toBe(false)
 
       expect(
-        isValidState({
+        isValidPersistedState({
           activeWallet: WalletId.DEFLY,
           activeNetwork: NetworkId.TESTNET
         })
       ).toBe(false)
 
       expect(
-        isValidState({
+        isValidPersistedState({
           wallets: {},
           activeNetwork: NetworkId.TESTNET
         })
       ).toBe(false)
 
       expect(
-        isValidState({
+        isValidPersistedState({
           wallets: {},
           activeWallet: WalletId.DEFLY
         })

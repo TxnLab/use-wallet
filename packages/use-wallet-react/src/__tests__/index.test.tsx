@@ -364,7 +364,8 @@ describe('useWallet', () => {
         activeWalletAccounts,
         activeWalletAddresses,
         activeAccount,
-        activeAddress
+        activeAddress,
+        isReady
       } = useWallet()
 
       return (
@@ -374,6 +375,7 @@ describe('useWallet', () => {
               <li key={wallet.id}>{wallet.metadata.name}</li>
             ))}
           </ul>
+          <div data-testid="is-ready">Is Ready: {JSON.stringify(isReady)}</div>
           <div data-testid="active-network">Active Network: {JSON.stringify(activeNetwork)}</div>
           <div data-testid="active-wallet">Active Wallet: {JSON.stringify(activeWallet)}</div>
           <div data-testid="active-wallet-accounts">
@@ -400,6 +402,7 @@ describe('useWallet', () => {
       expect(listItems[index]).toHaveTextContent(wallet.metadata.name)
     })
 
+    expect(getByTestId('is-ready')).toHaveTextContent('false')
     expect(getByTestId('active-network')).toHaveTextContent(JSON.stringify(NetworkId.TESTNET))
     expect(getByTestId('active-wallet')).toHaveTextContent(JSON.stringify(null))
     expect(getByTestId('active-wallet-accounts')).toHaveTextContent(JSON.stringify(null))
@@ -411,6 +414,7 @@ describe('useWallet', () => {
     act(() => {
       mockStore.setState((state) => ({
         ...state,
+        managerStatus: 'ready',
         wallets: {
           [WalletId.DEFLY]: {
             accounts: [
@@ -429,6 +433,7 @@ describe('useWallet', () => {
       }))
     })
 
+    expect(getByTestId('is-ready')).toHaveTextContent('true')
     expect(getByTestId('active-network')).toHaveTextContent(JSON.stringify(NetworkId.TESTNET))
     expect(getByTestId('active-wallet')).toHaveTextContent(JSON.stringify(WalletId.DEFLY))
     expect(getByTestId('active-wallet-accounts')).toHaveTextContent(
@@ -473,5 +478,36 @@ describe('useWallet', () => {
     expect(result.current.algodClient).toEqual(
       new algosdk.Algodv2(token, baseServer, port, headers)
     )
+  })
+
+  it('initializes with isReady false and updates after resumeSessions', async () => {
+    const { result } = renderHook(() => useWallet(), { wrapper })
+
+    // Initially should not be ready
+    expect(result.current.isReady).toBe(false)
+
+    // Wait for resumeSessions to complete
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0))
+    })
+
+    // Should be ready after resumeSessions
+    expect(result.current.isReady).toBe(true)
+  })
+
+  it('updates isReady when manager status changes', () => {
+    const { result } = renderHook(() => useWallet(), { wrapper })
+
+    expect(result.current.isReady).toBe(false)
+
+    // Simulate manager status change
+    act(() => {
+      mockStore.setState((state) => ({
+        ...state,
+        managerStatus: 'ready'
+      }))
+    })
+
+    expect(result.current.isReady).toBe(true)
   })
 })
