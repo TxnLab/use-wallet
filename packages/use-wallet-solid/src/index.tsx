@@ -73,6 +73,18 @@ export const useNetwork = () => {
 
   const updateNetworkAlgod = (networkId: string, config: Partial<AlgodConfig>): void => {
     manager().updateNetworkAlgod(networkId, config)
+
+    // If this is the active network, update the algodClient
+    if (networkId === activeNetwork()) {
+      const { algod } = manager().networkConfig[networkId]
+      const { token = '', baseServer, port = '', headers = {} } = algod
+      const newClient = new algosdk.Algodv2(token, baseServer, port, headers)
+
+      manager().store.setState((state) => ({
+        ...state,
+        algodClient: newClient
+      }))
+    }
   }
 
   return {

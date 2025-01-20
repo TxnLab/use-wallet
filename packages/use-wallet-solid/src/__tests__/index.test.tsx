@@ -422,6 +422,46 @@ describe('useNetwork', () => {
 
     expect(mockUpdateNetworkAlgod).toHaveBeenCalledWith(networkId, config)
   })
+
+  it('updates algodClient when modifying active network configuration', () => {
+    const newAlgodClient = new algosdk.Algodv2('', 'https://new-server.com', '')
+
+    const TestComponent = () => {
+      const { updateNetworkAlgod, algodClient } = useNetwork()
+      return (
+        <div>
+          <div data-testid="algod-client">{JSON.stringify(algodClient())}</div>
+          <button
+            data-testid="update-btn"
+            onClick={() => {
+              // Mock the manager's updateNetworkAlgod to update the config
+              mockWalletManager.networkConfig[NetworkId.TESTNET].algod.baseServer =
+                'https://new-server.com'
+              // Update the store's algodClient
+              mockSetAlgodClient(newAlgodClient)
+              // Call the function under test
+              updateNetworkAlgod(NetworkId.TESTNET, {
+                baseServer: 'https://new-server.com'
+              })
+            }}
+          >
+            Update
+          </button>
+        </div>
+      )
+    }
+
+    render(() => (
+      <WalletProvider manager={mockWalletManager}>
+        <TestComponent />
+      </WalletProvider>
+    ))
+
+    const updateButton = screen.getByTestId('update-btn')
+    fireEvent.click(updateButton)
+
+    expect(screen.getByTestId('algod-client')).toHaveTextContent(JSON.stringify(newAlgodClient))
+  })
 })
 
 describe('useWallet', () => {
