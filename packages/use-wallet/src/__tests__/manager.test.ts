@@ -378,6 +378,45 @@ describe('WalletManager', () => {
     })
   })
 
+  describe('activeNetworkConfig', () => {
+    it('returns the configuration for the active network', () => {
+      const manager = new WalletManager({
+        wallets: [WalletId.DEFLY],
+        defaultNetwork: 'mainnet'
+      })
+
+      expect(manager.activeNetworkConfig).toBe(manager.networks.mainnet)
+    })
+
+    it('updates when active network changes', async () => {
+      const manager = new WalletManager({
+        wallets: [WalletId.DEFLY],
+        defaultNetwork: 'mainnet'
+      })
+
+      const mainnetConfig = manager.activeNetworkConfig
+      await manager.setActiveNetwork('testnet')
+
+      expect(manager.activeNetworkConfig).toBe(manager.networks.testnet)
+      expect(manager.activeNetworkConfig).not.toBe(mainnetConfig)
+    })
+
+    it('updates when network configuration changes', () => {
+      const manager = new WalletManager({
+        wallets: [WalletId.DEFLY],
+        defaultNetwork: 'mainnet'
+      })
+
+      const newConfig = {
+        token: 'new-token',
+        baseServer: 'https://new-server.com'
+      }
+
+      manager.updateNetworkAlgod('mainnet', newConfig)
+      expect(manager.activeNetworkConfig.algod).toMatchObject(newConfig)
+    })
+  })
+
   describe('subscribe', () => {
     it('adds and removes a subscriber', async () => {
       const manager = new WalletManager({

@@ -373,6 +373,10 @@ export class WalletManager {
     return { ...this.networkConfig }
   }
 
+  public get activeNetworkConfig(): NetworkConfig {
+    return this.networkConfig[this.activeNetwork]
+  }
+
   // ---------- Active Wallet ----------------------------------------- //
 
   public get activeWallet(): BaseWallet | null {

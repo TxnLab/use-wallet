@@ -1,8 +1,14 @@
 import { Store } from '@tanstack/vue-store'
-import { NetworkId, WalletManager, WalletId, type State } from '@txnlab/use-wallet'
+import {
+  NetworkId,
+  WalletManager,
+  WalletId,
+  type AlgodConfig,
+  type State
+} from '@txnlab/use-wallet'
 import { mount } from '@vue/test-utils'
 import algosdk from 'algosdk'
-import { inject, nextTick, ref, type InjectionKey } from 'vue'
+import { computed, inject, nextTick, ref, type InjectionKey } from 'vue'
 import { useNetwork } from '../useNetwork'
 import type { Mock } from 'vitest'
 
@@ -158,5 +164,125 @@ describe('useNetwork', () => {
     updateNetworkAlgod(networkId, config)
 
     expect(mockUpdateNetworkAlgod).toHaveBeenCalledWith(networkId, config)
+  })
+
+  it('provides activeNetworkConfig through useNetwork', async () => {
+    const TestComponent = {
+      template: `
+        <div data-testid="active-network-config">{{ stringifiedConfig }}</div>
+      `,
+      setup() {
+        const { activeNetworkConfig } = useNetwork()
+        const stringifiedConfig = computed(() => JSON.stringify(activeNetworkConfig.value))
+        return { stringifiedConfig }
+      }
+    }
+
+    const wrapper = mount(TestComponent)
+    await nextTick()
+
+    const actual = JSON.parse(wrapper.get('[data-testid="active-network-config"]').text())
+    const expected = mockWalletManager.activeNetworkConfig
+    expect(actual).toEqual(expected)
+  })
+
+  it('updates activeNetworkConfig when switching networks', async () => {
+    // Set up initial network configs
+    mockWalletManager.networkConfig = {
+      [NetworkId.TESTNET]: {
+        algod: { baseServer: 'https://testnet-api.algonode.cloud', token: '' },
+        isTestnet: true,
+        genesisId: 'testnet-v1.0',
+        genesisHash: 'SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=',
+        caipChainId: 'algorand:SGO1GKSzyE7IEPItTxCByw9x8FmnrCDe'
+      },
+      [NetworkId.MAINNET]: {
+        algod: { baseServer: 'https://mainnet-api.algonode.cloud', token: '' },
+        isTestnet: false,
+        genesisId: 'mainnet-v1.0',
+        genesisHash: 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=',
+        caipChainId: 'algorand:wGHE2Pwdvd7S12BL5FaOP20EGYesN73k'
+      }
+    }
+
+    const TestComponent = {
+      template: `
+        <div data-testid="active-network-config">{{ stringifiedConfig }}</div>
+      `,
+      setup() {
+        const { activeNetworkConfig, setActiveNetwork } = useNetwork()
+        const stringifiedConfig = computed(() => JSON.stringify(activeNetworkConfig.value))
+        return { stringifiedConfig, setActiveNetwork }
+      }
+    }
+
+    const wrapper = mount(TestComponent)
+
+    const newClient = new algosdk.Algodv2(
+      '',
+      mockWalletManager.networkConfig[NetworkId.MAINNET].algod.baseServer,
+      ''
+    )
+
+    mockWalletManager.setActiveNetwork = async (networkId: string) => {
+      mockSetAlgodClient(newClient)
+      mockStore.setState((state) => ({
+        ...state,
+        activeNetwork: networkId,
+        algodClient: newClient
+      }))
+    }
+
+    const { setActiveNetwork } = useNetwork()
+    await setActiveNetwork(NetworkId.MAINNET)
+    await nextTick()
+
+    const actual = JSON.parse(wrapper.get('[data-testid="active-network-config"]').text())
+    expect(actual).toEqual(mockWalletManager.networkConfig[NetworkId.MAINNET])
+  })
+
+  it('updates activeNetworkConfig when updating network configuration', async () => {
+    mockWalletManager.networkConfig = {
+      [NetworkId.TESTNET]: {
+        algod: { baseServer: 'https://testnet-api.algonode.cloud', token: '' },
+        isTestnet: true,
+        genesisId: 'testnet-v1.0',
+        genesisHash: 'SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=',
+        caipChainId: 'algorand:SGO1GKSzyE7IEPItTxCByw9x8FmnrCDe'
+      }
+    }
+
+    const TestComponent = {
+      template: `
+        <div data-testid="active-network-config">{{ stringifiedConfig }}</div>
+      `,
+      setup() {
+        const { activeNetworkConfig, updateNetworkAlgod } = useNetwork()
+        const stringifiedConfig = computed(() => JSON.stringify(activeNetworkConfig.value))
+        return { stringifiedConfig, updateNetworkAlgod }
+      }
+    }
+
+    const wrapper = mount(TestComponent)
+    const networkId = NetworkId.TESTNET
+    const newConfig = { baseServer: 'https://new-server.com' }
+
+    mockWalletManager.updateNetworkAlgod = (id: string, config: Partial<AlgodConfig>) => {
+      mockWalletManager.networkConfig[id] = {
+        ...mockWalletManager.networkConfig[id],
+        algod: {
+          ...mockWalletManager.networkConfig[id].algod,
+          ...config
+        }
+      }
+      mockStore.setState((state) => ({ ...state }))
+    }
+
+    const { updateNetworkAlgod } = useNetwork()
+    updateNetworkAlgod(networkId, newConfig)
+    await nextTick()
+
+    const actual = JSON.parse(wrapper.get('[data-testid="active-network-config"]').text())
+    expect(actual.algod.baseServer).toBe(newConfig.baseServer)
   })
 })

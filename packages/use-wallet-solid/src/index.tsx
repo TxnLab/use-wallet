@@ -46,6 +46,7 @@ export const useNetwork = () => {
   const manager = createMemo(() => useWalletManager())
   const algodClient = useStore(manager().store, (state) => state.algodClient)
   const activeNetwork = useStore(manager().store, (state) => state.activeNetwork)
+  const activeNetworkConfig = createMemo(() => manager().networkConfig[activeNetwork()])
 
   const setActiveNetwork = async (networkId: NetworkId | string): Promise<void> => {
     if (networkId === activeNetwork()) {
@@ -61,6 +62,8 @@ export const useNetwork = () => {
     const { algod } = manager().networkConfig[networkId]
     const { token = '', baseServer, port = '', headers = {} } = algod
     const newClient = new algosdk.Algodv2(token, baseServer, port, headers)
+
+    await manager().setActiveNetwork(networkId)
 
     manager().store.setState((state) => ({
       ...state,
@@ -90,6 +93,7 @@ export const useNetwork = () => {
   return {
     activeNetwork,
     networks: manager().networks,
+    activeNetworkConfig,
     algodClient,
     setActiveNetwork,
     updateNetworkAlgod

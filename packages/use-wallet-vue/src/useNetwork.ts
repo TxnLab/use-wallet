@@ -18,6 +18,16 @@ export function useNetwork() {
 
   const activeNetwork = useStore(manager.store, (state) => state.activeNetwork)
 
+  // Create a reactive store for network config
+  const networkConfig = useStore(manager.store, (state) => ({
+    networks: { ...manager.networkConfig },
+    activeNetwork: state.activeNetwork
+  }))
+
+  const activeNetworkConfig = computed(
+    () => networkConfig.value.networks[networkConfig.value.activeNetwork]
+  )
+
   const setActiveNetwork = async (networkId: string): Promise<void> => {
     if (networkId === activeNetwork.value) {
       return
@@ -32,23 +42,29 @@ export function useNetwork() {
     const { algod } = manager.networkConfig[networkId]
     const { token = '', baseServer, port = '', headers = {} } = algod
     const newClient = new algosdk.Algodv2(token, baseServer, port, headers)
-    setAlgodClient(newClient)
 
-    manager.store.setState((state) => ({
-      ...state,
-      activeNetwork: networkId
-    }))
+    await manager.setActiveNetwork(networkId)
+    setAlgodClient(newClient)
 
     console.info(`[Vue] ✅ Active network set to ${networkId}.`)
   }
 
-  const updateNetworkAlgod = (networkId: string, config: Partial<AlgodConfig>) => {
+  const updateNetworkAlgod = (networkId: string, config: Partial<AlgodConfig>): void => {
     manager.updateNetworkAlgod(networkId, config)
+    manager.store.setState((state) => ({ ...state }))
+
+    if (networkId === activeNetwork.value) {
+      const { algod } = manager.networkConfig[networkId]
+      const { token = '', baseServer, port = '', headers = {} } = algod
+      const newClient = new algosdk.Algodv2(token, baseServer, port, headers)
+      setAlgodClient(newClient)
+    }
   }
 
   return {
     activeNetwork,
     networks: manager.networks,
+    activeNetworkConfig,
     algodClient: computed(() => {
       if (!algodClient.value) {
         throw new Error('Algod client is undefined')

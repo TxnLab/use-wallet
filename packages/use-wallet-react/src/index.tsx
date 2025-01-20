@@ -89,6 +89,7 @@ export const useNetwork = () => {
   return {
     activeNetwork,
     networks: manager.networks,
+    activeNetworkConfig: manager.activeNetworkConfig,
     algodClient,
     setAlgodClient,
     setActiveNetwork,

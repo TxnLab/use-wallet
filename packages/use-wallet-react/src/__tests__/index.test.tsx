@@ -146,6 +146,7 @@ describe('useNetwork', () => {
 
     expect(result.current.activeNetwork).toBe(NetworkId.TESTNET)
     expect(result.current.networks).toBeDefined()
+    expect(result.current.activeNetworkConfig).toBe(mockWalletManager.networks[NetworkId.TESTNET])
     expect(result.current.algodClient).toBeDefined()
     expect(typeof result.current.setActiveNetwork).toBe('function')
     expect(typeof result.current.updateNetworkAlgod).toBe('function')
@@ -221,6 +222,27 @@ describe('useNetwork', () => {
     })
 
     expect(result.current.algodClient).toBe(newAlgodClient)
+  })
+
+  it('updates activeNetworkConfig when switching networks', async () => {
+    const { result } = renderHook(() => useNetwork(), { wrapper })
+    const newNetwork = NetworkId.MAINNET
+
+    await act(async () => {
+      await result.current.setActiveNetwork(newNetwork)
+    })
+
+    expect(result.current.activeNetworkConfig).toBe(mockWalletManager.networks[newNetwork])
+  })
+
+  it('updates activeNetworkConfig when updating network configuration', async () => {
+    const { result } = renderHook(() => useNetwork(), { wrapper })
+    const networkId = NetworkId.TESTNET
+    const config = { baseServer: 'https://new-server.com' }
+
+    result.current.updateNetworkAlgod(networkId, config)
+
+    expect(mockWalletManager.activeNetworkConfig.algod.baseServer).toBe(config.baseServer)
   })
 
   describe('setActiveNetwork', () => {

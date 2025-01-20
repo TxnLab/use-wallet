@@ -462,6 +462,61 @@ describe('useNetwork', () => {
 
     expect(screen.getByTestId('algod-client')).toHaveTextContent(JSON.stringify(newAlgodClient))
   })
+
+  it('provides activeNetworkConfig through useNetwork', () => {
+    const TestComponent = () => {
+      const { activeNetworkConfig } = useNetwork()
+      return <div data-testid="active-network-config">{JSON.stringify(activeNetworkConfig())}</div>
+    }
+
+    render(() => (
+      <WalletProvider manager={mockWalletManager}>
+        <TestComponent />
+      </WalletProvider>
+    ))
+
+    expect(screen.getByTestId('active-network-config')).toHaveTextContent(
+      JSON.stringify(mockWalletManager.networkConfig[NetworkId.TESTNET])
+    )
+  })
+
+  it('updates activeNetworkConfig when switching networks', async () => {
+    const TestComponent = () => {
+      const { activeNetworkConfig, setActiveNetwork } = useNetwork()
+      return (
+        <div>
+          <div data-testid="active-network-config">{JSON.stringify(activeNetworkConfig())}</div>
+          <button
+            data-testid="set-active-network-btn"
+            onClick={() => setActiveNetwork(NetworkId.MAINNET)}
+          >
+            Set Active Network to Mainnet
+          </button>
+        </div>
+      )
+    }
+
+    render(() => (
+      <WalletProvider manager={mockWalletManager}>
+        <TestComponent />
+      </WalletProvider>
+    ))
+
+    const button = screen.getByTestId('set-active-network-btn')
+    fireEvent.click(button)
+
+    mockStore.setState((state) => ({
+      ...state,
+      activeNetwork: NetworkId.MAINNET,
+      algodClient: new algosdk.Algodv2('', 'https://mainnet-api.4160.nodely.dev/', '')
+    }))
+
+    await waitFor(() => {
+      expect(screen.getByTestId('active-network-config')).toHaveTextContent(
+        JSON.stringify(mockWalletManager.networkConfig[NetworkId.MAINNET])
+      )
+    })
+  })
 })
 
 describe('useWallet', () => {
