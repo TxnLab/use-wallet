@@ -22,7 +22,8 @@ const mockStore = new Store<State>({
   activeWallet: null,
   algodClient: new algosdk.Algodv2('', 'https://testnet-api.algonode.cloud', ''),
   managerStatus: 'ready',
-  wallets: {}
+  wallets: {},
+  customNetworkConfigs: {}
 })
 
 // Create mock wallet manager
@@ -42,7 +43,8 @@ beforeEach(() => {
     activeWallet: null,
     algodClient: new algosdk.Algodv2('', 'https://testnet-api.algonode.cloud', ''),
     managerStatus: 'ready',
-    wallets: {}
+    wallets: {},
+    customNetworkConfigs: {}
   }))
 })
 
@@ -538,7 +540,8 @@ describe('useWallet', () => {
       activeWallet: null,
       activeNetwork: NetworkId.TESTNET,
       algodClient: new algosdk.Algodv2('', 'https://testnet-api.4160.nodely.dev/'),
-      managerStatus: 'initializing' as ManagerStatus
+      managerStatus: 'initializing' as ManagerStatus,
+      customNetworkConfigs: {}
     }
 
     mockStore = new Store<State>(defaultState)

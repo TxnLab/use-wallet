@@ -1,6 +1,6 @@
 import algosdk from 'algosdk'
 import { logger } from 'src/logger'
-import { NetworkId } from 'src/network'
+import { NetworkConfig, NetworkId } from 'src/network'
 import { WalletId, type WalletAccount } from 'src/wallets/types'
 import type { Store } from '@tanstack/store'
 
@@ -19,6 +19,7 @@ export interface State {
   activeNetwork: string
   algodClient: algosdk.Algodv2
   managerStatus: ManagerStatus
+  customNetworkConfigs: Record<string, Partial<NetworkConfig>>
 }
 
 export const DEFAULT_STATE: State = {
@@ -26,7 +27,8 @@ export const DEFAULT_STATE: State = {
   activeWallet: null,
   activeNetwork: 'testnet',
   algodClient: new algosdk.Algodv2('', 'https://testnet-api.4160.nodely.dev/'),
-  managerStatus: 'initializing'
+  managerStatus: 'initializing',
+  customNetworkConfigs: {}
 }
 
 export type PersistedState = Omit<State, 'algodClient' | 'managerStatus'>
@@ -186,14 +188,14 @@ export function isValidWalletState(wallet: any): wallet is WalletState {
   )
 }
 
-export function isValidPersistedState(state: any): state is PersistedState {
-  if (!state || typeof state !== 'object') return false
-  if (typeof state.wallets !== 'object') return false
-  for (const [walletId, wallet] of Object.entries(state.wallets)) {
-    if (!isValidWalletId(walletId) || !isValidWalletState(wallet)) return false
-  }
-  if (state.activeWallet !== null && !isValidWalletId(state.activeWallet)) return false
-  if (typeof state.activeNetwork !== 'string') return false
-
-  return true
+export function isValidPersistedState(state: unknown): state is PersistedState {
+  return (
+    typeof state === 'object' &&
+    state !== null &&
+    'wallets' in state &&
+    'activeWallet' in state &&
+    'activeNetwork' in state &&
+    (!('customNetworkConfigs' in state) ||
+      (typeof state.customNetworkConfigs === 'object' && state.customNetworkConfigs !== null))
+  )
 }

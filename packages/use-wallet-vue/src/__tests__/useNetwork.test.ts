@@ -35,7 +35,8 @@ const setupMocks = () => {
     activeWallet: null,
     algodClient: new algosdk.Algodv2('', 'https://testnet-api.algonode.cloud', ''),
     managerStatus: 'ready',
-    wallets: {}
+    wallets: {},
+    customNetworkConfigs: {}
   })
 
   mockWalletManager = new WalletManager({

@@ -1,7 +1,7 @@
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
 import { logger } from 'src/logger'
-import { NetworkConfigBuilder } from 'src/network'
+import { createNetworkConfig, DEFAULT_NETWORKS, NetworkConfigBuilder } from 'src/network'
 import { LOCAL_STORAGE_KEY, PersistedState, State, DEFAULT_STATE } from 'src/store'
 import { WalletManager } from 'src/manager'
 import { StorageAdapter } from 'src/storage'
@@ -458,7 +458,8 @@ describe('WalletManager', () => {
         activeWallet: WalletId.KIBISIS,
         activeNetwork: 'betanet',
         algodClient: new algosdk.Algodv2('', 'https://betanet-api.4160.nodely.dev/'),
-        managerStatus: 'ready'
+        managerStatus: 'ready',
+        customNetworkConfigs: {}
       }
     })
 
@@ -503,21 +504,245 @@ describe('WalletManager', () => {
 
   describe('savePersistedState', () => {
     it('saves state to local storage', async () => {
-      const stateToSave: PersistedState = {
-        wallets: {},
-        activeWallet: null,
-        activeNetwork: 'mainnet'
-      }
-
       const manager = new WalletManager({
         wallets: [WalletId.DEFLY, WalletId.KIBISIS]
       })
       await manager.setActiveNetwork('mainnet')
 
+      const expectedState: PersistedState = {
+        wallets: {},
+        activeWallet: null,
+        activeNetwork: 'mainnet',
+        customNetworkConfigs: {}
+      }
+
       expect(vi.mocked(StorageAdapter.setItem)).toHaveBeenCalledWith(
         LOCAL_STORAGE_KEY,
-        JSON.stringify(stateToSave)
+        JSON.stringify(expectedState)
       )
+    })
+
+    it('persists custom network configurations', () => {
+      const manager = new WalletManager({
+        wallets: [WalletId.DEFLY]
+      })
+
+      const customAlgod = {
+        token: 'custom-token',
+        baseServer: 'https://custom-server.com',
+        headers: { 'X-API-Key': 'custom-key' },
+        port: '443'
+      }
+
+      manager.updateNetworkAlgod('mainnet', customAlgod)
+
+      // Verify the persisted state includes the custom network config
+      const expectedState: PersistedState = {
+        wallets: {},
+        activeWallet: null,
+        activeNetwork: 'testnet',
+        customNetworkConfigs: {
+          mainnet: {
+            algod: customAlgod
+          }
+        }
+      }
+
+      expect(vi.mocked(StorageAdapter.setItem)).toHaveBeenLastCalledWith(
+        LOCAL_STORAGE_KEY,
+        JSON.stringify(expectedState)
+      )
+    })
+
+    it('only persists modified network configurations', () => {
+      const manager = new WalletManager({
+        wallets: [WalletId.DEFLY]
+      })
+
+      // Get the default config for comparison
+      const defaultConfig = createNetworkConfig()
+
+      // Update only one property
+      manager.updateNetworkAlgod('mainnet', {
+        token: 'custom-token'
+      })
+
+      // The persisted state should only include the modified property
+      const expectedState: PersistedState = {
+        wallets: {},
+        activeWallet: null,
+        activeNetwork: 'testnet',
+        customNetworkConfigs: {
+          mainnet: {
+            algod: {
+              ...defaultConfig.mainnet.algod,
+              token: 'custom-token'
+            }
+          }
+        }
+      }
+
+      expect(vi.mocked(StorageAdapter.setItem)).toHaveBeenCalledWith(
+        LOCAL_STORAGE_KEY,
+        JSON.stringify(expectedState)
+      )
+    })
+
+    it('removes network from customNetworkConfigs when reset to default', () => {
+      const manager = new WalletManager({
+        wallets: [WalletId.DEFLY]
+      })
+
+      // Get the default config
+      const defaultConfig = createNetworkConfig()
+
+      // First modify the network
+      manager.updateNetworkAlgod('mainnet', {
+        token: 'custom-token'
+      })
+
+      // Then reset it back to default
+      manager.updateNetworkAlgod('mainnet', defaultConfig.mainnet.algod)
+
+      // The persisted state should not include mainnet in customNetworkConfigs
+      const expectedState: PersistedState = {
+        wallets: {},
+        activeWallet: null,
+        activeNetwork: 'testnet',
+        customNetworkConfigs: {}
+      }
+
+      expect(vi.mocked(StorageAdapter.setItem)).toHaveBeenLastCalledWith(
+        LOCAL_STORAGE_KEY,
+        JSON.stringify(expectedState)
+      )
+    })
+  })
+
+  describe('network configuration persistence', () => {
+    it('loads persisted network configurations on initialization', () => {
+      mockInitialState = {
+        wallets: {},
+        activeWallet: null,
+        activeNetwork: 'testnet',
+        algodClient: new algosdk.Algodv2('', 'https://testnet-api.4160.nodely.dev'),
+        managerStatus: 'ready',
+        customNetworkConfigs: {
+          mainnet: {
+            algod: {
+              token: 'persisted-token',
+              baseServer: 'https://mainnet-api.4160.nodely.dev',
+              headers: {},
+              port: ''
+            },
+            isTestnet: false,
+            genesisHash: 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=',
+            genesisId: 'mainnet-v1.0',
+            caipChainId: 'algorand:wGHE2Pwdvd7S12BL5FaOP20EGYesN73k'
+          }
+        }
+      }
+
+      const manager = new WalletManager({
+        wallets: [WalletId.DEFLY]
+      })
+
+      // Verify the custom config was loaded
+      expect(manager.networks.mainnet.algod).toEqual(
+        mockInitialState.customNetworkConfigs.mainnet.algod
+      )
+    })
+
+    it('merges persisted configurations with provided configurations', () => {
+      mockInitialState = {
+        wallets: {},
+        activeWallet: null,
+        activeNetwork: 'testnet',
+        algodClient: new algosdk.Algodv2('', 'https://testnet-api.4160.nodely.dev/'),
+        managerStatus: 'ready',
+        customNetworkConfigs: {
+          mainnet: {
+            algod: {
+              token: 'persisted-token',
+              baseServer: 'https://persisted-server.com',
+              headers: {},
+              port: ''
+            },
+            isTestnet: false,
+            genesisHash: 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=',
+            genesisId: 'mainnet-v1.0',
+            caipChainId: 'algorand:wGHE2Pwdvd7S12BL5FaOP20EGYesN73k'
+          }
+        }
+      }
+
+      // Provide configuration in constructor with different baseServer
+      const providedNetworks = {
+        mainnet: {
+          ...DEFAULT_NETWORKS.mainnet,
+          algod: {
+            ...DEFAULT_NETWORKS.mainnet.algod,
+            baseServer: 'https://provided-server.com'
+          }
+        },
+        testnet: DEFAULT_NETWORKS.testnet,
+        betanet: DEFAULT_NETWORKS.betanet,
+        fnet: DEFAULT_NETWORKS.fnet,
+        localnet: DEFAULT_NETWORKS.localnet
+      }
+
+      const manager = new WalletManager({
+        wallets: [WalletId.DEFLY],
+        networks: providedNetworks
+      })
+
+      // Verify the configs were merged correctly, with persisted taking precedence
+      expect(manager.networks.mainnet.algod).toEqual({
+        token: 'persisted-token',
+        baseServer: 'https://persisted-server.com',
+        headers: {},
+        port: ''
+      })
+    })
+
+    it('does not persist developer-provided configurations', () => {
+      // Provide custom configuration in constructor
+      const providedNetworks = {
+        mainnet: {
+          algod: {
+            ...DEFAULT_NETWORKS.mainnet.algod,
+            baseServer: 'https://custom-server.com'
+          }
+        }
+      }
+
+      const manager = new WalletManager({
+        networks: providedNetworks,
+        defaultNetwork: 'mainnet'
+      })
+
+      // Get the last persisted state
+      const lastCall = vi.mocked(StorageAdapter.setItem).mock.lastCall
+      const persistedState = JSON.parse(lastCall?.[1] || '{}')
+
+      // Verify that the developer's custom configuration wasn't persisted
+      expect(persistedState.customNetworkConfigs).toEqual({})
+
+      // Now update the network config through the manager
+      manager.updateNetworkAlgod('mainnet', {
+        baseServer: 'https://user-server.com'
+      })
+
+      // Get the updated persisted state
+      const updatedCall = vi.mocked(StorageAdapter.setItem).mock.lastCall
+      const updatedState = JSON.parse(updatedCall?.[1] || '{}')
+
+      // Verify that only the user's modification was persisted
+      expect(updatedState.customNetworkConfigs.mainnet.algod).toEqual({
+        token: '',
+        baseServer: 'https://user-server.com',
+        headers: {}
+      })
     })
   })
 
@@ -541,7 +766,8 @@ describe('WalletManager', () => {
         activeWallet: WalletId.KIBISIS,
         activeNetwork: 'betanet',
         algodClient: new algosdk.Algodv2('', 'https://betanet-api.4160.nodely.dev/'),
-        managerStatus: 'ready'
+        managerStatus: 'ready',
+        customNetworkConfigs: {}
       }
     })
 
@@ -735,7 +961,8 @@ describe('WalletManager', () => {
           activeWallet: null,
           activeNetwork: 'mainnet',
           algodClient: new algosdk.Algodv2('', 'https://mainnet-api.4160.nodely.dev'),
-          managerStatus: 'ready'
+          managerStatus: 'ready',
+          customNetworkConfigs: {}
         }
 
         const manager = new WalletManager({
@@ -753,7 +980,8 @@ describe('WalletManager', () => {
           activeWallet: null,
           activeNetwork: 'mainnet',
           algodClient: new algosdk.Algodv2('', 'https://mainnet-api.4160.nodely.dev'),
-          managerStatus: 'ready'
+          managerStatus: 'ready',
+          customNetworkConfigs: {}
         }
 
         const manager = new WalletManager({
@@ -786,7 +1014,8 @@ describe('WalletManager', () => {
           activeWallet: WalletId.PERA,
           activeNetwork: 'mainnet',
           algodClient: new algosdk.Algodv2('', 'https://mainnet-api.4160.nodely.dev'),
-          managerStatus: 'ready'
+          managerStatus: 'ready',
+          customNetworkConfigs: {}
         }
 
         const manager = new WalletManager({
