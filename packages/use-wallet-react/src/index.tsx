@@ -54,7 +54,7 @@ export const useNetwork = () => {
     throw new Error('useNetwork must be used within the WalletProvider')
   }
 
-  const { manager, algodClient, setAlgodClient } = context
+  const { manager, setAlgodClient } = context
 
   const activeNetwork = useStore(manager.store, (state) => state.activeNetwork)
 
@@ -108,8 +108,6 @@ export const useNetwork = () => {
     activeNetwork,
     networks: manager.networks,
     activeNetworkConfig: manager.activeNetworkConfig,
-    algodClient,
-    setAlgodClient,
     setActiveNetwork,
     updateNetworkAlgod,
     resetNetworkConfig
@@ -136,7 +134,7 @@ export const useWallet = () => {
     throw new Error('useWallet must be used within the WalletProvider')
   }
 
-  const { manager } = context
+  const { manager, algodClient, setAlgodClient } = context
 
   const managerStatus = useStore(manager.store, (state) => state.managerStatus)
   const isReady = managerStatus === 'ready'
@@ -194,6 +192,8 @@ export const useWallet = () => {
   return {
     wallets,
     isReady,
+    algodClient,
+    setAlgodClient,
     activeWallet,
     activeWalletAccounts,
     activeWalletAddresses,

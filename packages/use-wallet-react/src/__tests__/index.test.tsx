@@ -77,7 +77,7 @@ const mockMagicAuth = new MagicAuth({
 })
 
 describe('WalletProvider', () => {
-  it('provides context to child components', () => {
+  it('provides context to child components', async () => {
     const TestComponent = () => {
       const { wallets } = useWallet()
       return <h1>{wallets ? 'Context provided' : 'No context'}</h1>
@@ -87,11 +87,13 @@ describe('WalletProvider', () => {
       wallets: [WalletId.DEFLY]
     })
 
-    render(
-      <WalletProvider manager={walletManager}>
-        <TestComponent />
-      </WalletProvider>
-    )
+    await act(async () => {
+      render(
+        <WalletProvider manager={walletManager}>
+          <TestComponent />
+        </WalletProvider>
+      )
+    })
 
     expect(screen.getByText('Context provided')).toBeInTheDocument()
   })
@@ -147,7 +149,6 @@ describe('useNetwork', () => {
     expect(result.current.activeNetwork).toBe(NetworkId.TESTNET)
     expect(result.current.networks).toBeDefined()
     expect(result.current.activeNetworkConfig).toBe(mockWalletManager.networks[NetworkId.TESTNET])
-    expect(result.current.algodClient).toBeDefined()
     expect(typeof result.current.setActiveNetwork).toBe('function')
     expect(typeof result.current.updateNetworkAlgod).toBe('function')
   })
@@ -174,7 +175,9 @@ describe('useNetwork', () => {
     const networkId = NetworkId.TESTNET
     const config = { baseServer: 'https://new-server.com' }
 
-    result.current.updateNetworkAlgod(networkId, config)
+    act(() => {
+      result.current.updateNetworkAlgod(networkId, config)
+    })
 
     expect(mockWalletManager.networkConfig[networkId].algod.baseServer).toBe(config.baseServer)
   })
@@ -213,17 +216,6 @@ describe('useNetwork', () => {
     expect(result.current.activeNetwork).toBe(NetworkId.TESTNET)
   })
 
-  it('updates algodClient when setAlgodClient is called', async () => {
-    const newAlgodClient = new algosdk.Algodv2('mock-token', 'https://mock-server', '')
-    const { result } = renderHook(() => useNetwork(), { wrapper })
-
-    await act(async () => {
-      result.current.setAlgodClient(newAlgodClient)
-    })
-
-    expect(result.current.algodClient).toBe(newAlgodClient)
-  })
-
   it('updates activeNetworkConfig when switching networks', async () => {
     const { result } = renderHook(() => useNetwork(), { wrapper })
     const newNetwork = NetworkId.MAINNET
@@ -236,13 +228,25 @@ describe('useNetwork', () => {
   })
 
   it('updates activeNetworkConfig when updating network configuration', async () => {
-    const { result } = renderHook(() => useNetwork(), { wrapper })
+    // Combine hooks into a single component to ensure shared context
+    const useTestHooks = () => {
+      const network = useNetwork()
+      const wallet = useWallet()
+      return { network, wallet }
+    }
+
+    const { result } = renderHook(() => useTestHooks(), { wrapper })
+
     const networkId = NetworkId.TESTNET
     const config = { baseServer: 'https://new-server.com' }
+    const expectedClient = new algosdk.Algodv2('', 'https://new-server.com', '')
 
-    result.current.updateNetworkAlgod(networkId, config)
+    await act(async () => {
+      result.current.network.updateNetworkAlgod(networkId, config)
+    })
 
-    expect(mockWalletManager.activeNetworkConfig.algod.baseServer).toBe(config.baseServer)
+    expect(mockWalletManager.networkConfig[networkId].algod.baseServer).toBe(config.baseServer)
+    expect(result.current.wallet.algodClient).toEqual(expectedClient)
   })
 
   it('provides resetNetworkConfig functionality', () => {
@@ -259,11 +263,10 @@ describe('useNetwork', () => {
   })
 
   it('updates algodClient when resetting active network', () => {
-    // Set up mock manager with spy
     const createAlgodClientSpy = vi.spyOn(mockWalletManager as any, 'createAlgodClient')
     const { result } = renderHook(() => useNetwork(), { wrapper })
 
-    // First update the network config
+    // Modify the config
     act(() => {
       result.current.updateNetworkAlgod(NetworkId.TESTNET, {
         token: 'custom-token',
@@ -284,35 +287,46 @@ describe('useNetwork', () => {
   })
 
   it('updates algodClient when updating active network config', async () => {
-    const { result } = renderHook(() => useNetwork(), { wrapper })
+    const useTestHooks = () => {
+      const network = useNetwork()
+      const wallet = useWallet()
+      return { network, wallet }
+    }
+
+    const { result } = renderHook(() => useTestHooks(), { wrapper })
+
     const networkId = NetworkId.TESTNET
     const newConfig = { baseServer: 'https://new-server.com' }
     const expectedClient = new algosdk.Algodv2('', 'https://new-server.com', '')
 
-    act(() => {
-      result.current.updateNetworkAlgod(networkId, newConfig)
+    await act(async () => {
+      result.current.network.updateNetworkAlgod(networkId, newConfig)
     })
 
     expect(mockWalletManager.networkConfig[networkId].algod.baseServer).toBe(newConfig.baseServer)
-    expect(result.current.algodClient).toEqual(expectedClient)
+    expect(result.current.wallet.algodClient).toEqual(expectedClient)
   })
 
-  it('does not update algodClient when updating inactive network config', () => {
-    const { result } = renderHook(() => useNetwork(), { wrapper })
-    const initialClient = result.current.algodClient
+  it('does not update algodClient when updating inactive network config', async () => {
+    const { result: networkResult } = renderHook(() => useNetwork(), { wrapper })
+    const { result: walletResult } = renderHook(() => useWallet(), { wrapper })
+
+    const initialClient = walletResult.current.algodClient
     const networkId = NetworkId.MAINNET // Not the active network
     const newConfig = { baseServer: 'https://new-server.com' }
 
-    act(() => {
-      result.current.updateNetworkAlgod(networkId, newConfig)
+    await act(async () => {
+      networkResult.current.updateNetworkAlgod(networkId, newConfig)
     })
 
     expect(mockWalletManager.networkConfig[networkId].algod.baseServer).toBe(newConfig.baseServer)
-    expect(result.current.algodClient).toBe(initialClient)
+    expect(walletResult.current.algodClient).toBe(initialClient)
   })
 
-  it('updates algodClient when resetting active network config', () => {
-    const { result } = renderHook(() => useNetwork(), { wrapper })
+  it('updates algodClient when resetting active network config', async () => {
+    const { result: networkResult } = renderHook(() => useNetwork(), { wrapper })
+    const { result: walletResult } = renderHook(() => useWallet(), { wrapper })
+
     const networkId = NetworkId.TESTNET
     const defaultConfig = {
       algod: {
@@ -330,51 +344,65 @@ describe('useNetwork', () => {
       defaultConfig.algod.baseServer
     )
 
-    // First modify the config
-    act(() => {
-      result.current.updateNetworkAlgod(networkId, { baseServer: 'https://modified-server.com' })
+    // Modify the config
+    await act(async () => {
+      networkResult.current.updateNetworkAlgod(networkId, {
+        baseServer: 'https://modified-server.com'
+      })
     })
 
     // Then reset it
-    act(() => {
-      result.current.resetNetworkConfig(networkId)
+    await act(async () => {
+      networkResult.current.resetNetworkConfig(networkId)
     })
 
     expect(mockWalletManager.networkConfig[networkId]).toEqual(defaultConfig)
-    expect(result.current.algodClient).toEqual(expectedClient)
+    expect(walletResult.current.algodClient).toEqual(expectedClient)
   })
 
-  it('does not update algodClient when resetting inactive network config', () => {
-    const { result } = renderHook(() => useNetwork(), { wrapper })
-    const initialClient = result.current.algodClient
+  it('does not update algodClient when resetting inactive network config', async () => {
+    const { result: networkResult } = renderHook(() => useNetwork(), { wrapper })
+    const { result: walletResult } = renderHook(() => useWallet(), { wrapper })
+
+    const initialClient = walletResult.current.algodClient
     const networkId = NetworkId.MAINNET // Not the active network
 
-    // First modify the config
-    act(() => {
-      result.current.updateNetworkAlgod(networkId, { baseServer: 'https://modified-server.com' })
+    // Modify the config
+    await act(async () => {
+      networkResult.current.updateNetworkAlgod(networkId, {
+        baseServer: 'https://modified-server.com'
+      })
     })
 
     // Then reset it
-    act(() => {
-      result.current.resetNetworkConfig(networkId)
+    await act(async () => {
+      networkResult.current.resetNetworkConfig(networkId)
     })
 
-    expect(result.current.algodClient).toBe(initialClient)
+    expect(walletResult.current.algodClient).toBe(initialClient)
   })
 
   describe('setActiveNetwork', () => {
     it('calls setActiveNetwork correctly and updates algodClient', async () => {
-      const { result } = renderHook(() => useNetwork(), { wrapper })
+      // Combine hooks into a single component for shared context
+      const useTestHooks = () => {
+        const network = useNetwork()
+        const wallet = useWallet()
+        return { network, wallet }
+      }
+
+      const { result } = renderHook(() => useTestHooks(), { wrapper })
       const newNetwork = NetworkId.MAINNET
 
       await act(async () => {
-        await result.current.setActiveNetwork(newNetwork)
+        await result.current.network.setActiveNetwork(newNetwork)
       })
 
-      expect(result.current.activeNetwork).toBe(newNetwork)
+      expect(result.current.network.activeNetwork).toBe(newNetwork)
+
       const { algod } = mockWalletManager.networkConfig[newNetwork]
       const { token, baseServer, port, headers } = algod
-      expect(result.current.algodClient).toEqual(
+      expect(result.current.wallet.algodClient).toEqual(
         new algosdk.Algodv2(token, baseServer, port, headers)
       )
     })
@@ -567,7 +595,51 @@ describe('useWallet', () => {
     expect(result.current.activeAddress).toBe('address1')
   })
 
-  it('integrates correctly with a React component', () => {
+  it('initializes with isReady false and updates after resumeSessions', async () => {
+    const { result } = renderHook(() => useWallet(), { wrapper })
+    expect(result.current.isReady).toBe(false)
+
+    // Wait for resumeSessions to complete
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0))
+    })
+
+    expect(result.current.isReady).toBe(true)
+  })
+
+  it('updates isReady when manager status changes', async () => {
+    const { result } = renderHook(() => useWallet(), { wrapper })
+    expect(result.current.isReady).toBe(false)
+
+    // Simulate status change
+    await act(async () => {
+      mockStore.setState((state) => ({
+        ...state,
+        managerStatus: 'ready'
+      }))
+    })
+
+    expect(result.current.isReady).toBe(true)
+  })
+
+  it('updates algodClient when setAlgodClient is called', async () => {
+    const newAlgodClient = new algosdk.Algodv2('mock-token', 'https://mock-server', '')
+    const { result } = renderHook(() => useWallet(), { wrapper })
+
+    await act(async () => {
+      result.current.setAlgodClient(newAlgodClient)
+    })
+
+    expect(result.current.algodClient).toBe(newAlgodClient)
+  })
+
+  it('integrates correctly with a React component', async () => {
+    // Set loading state
+    mockStore.setState((state) => ({
+      ...state,
+      managerStatus: 'initializing'
+    }))
+
     function TestComponent() {
       const {
         wallets,
@@ -576,10 +648,14 @@ describe('useWallet', () => {
         activeWalletAddresses,
         activeAccount,
         activeAddress,
-        isReady
+        isReady,
+        algodClient
       } = useWallet()
-
       const { activeNetwork } = useNetwork()
+
+      if (!isReady) {
+        return <div data-testid="loading">Loading...</div>
+      }
 
       return (
         <div>
@@ -599,6 +675,7 @@ describe('useWallet', () => {
           </div>
           <div data-testid="active-account">Active Account: {JSON.stringify(activeAccount)}</div>
           <div data-testid="active-address">Active Address: {JSON.stringify(activeAddress)}</div>
+          <div data-testid="algod-client">Algod Client: {JSON.stringify(!!algodClient)}</div>
         </div>
       )
     }
@@ -609,22 +686,35 @@ describe('useWallet', () => {
       </WalletProvider>
     )
 
-    const listItems = getAllByRole('listitem')
+    // Verify loading state
+    expect(getByTestId('loading')).toHaveTextContent('Loading...')
 
+    // Set ready state
+    await act(async () => {
+      mockStore.setState((state) => ({
+        ...state,
+        managerStatus: 'ready'
+      }))
+    })
+
+    // Verify ready state
+    expect(getByTestId('is-ready')).toHaveTextContent('true')
+
+    const listItems = getAllByRole('listitem')
     mockWallets.forEach((wallet, index) => {
       expect(listItems[index]).toHaveTextContent(wallet.metadata.name)
     })
 
-    expect(getByTestId('is-ready')).toHaveTextContent('false')
     expect(getByTestId('active-network')).toHaveTextContent(JSON.stringify(NetworkId.TESTNET))
     expect(getByTestId('active-wallet')).toHaveTextContent(JSON.stringify(null))
     expect(getByTestId('active-wallet-accounts')).toHaveTextContent(JSON.stringify(null))
     expect(getByTestId('active-wallet-addresses')).toHaveTextContent(JSON.stringify(null))
     expect(getByTestId('active-account')).toHaveTextContent(JSON.stringify(null))
     expect(getByTestId('active-address')).toHaveTextContent(JSON.stringify(null))
+    expect(getByTestId('algod-client')).toHaveTextContent('true')
 
     // Mock a state change in the store
-    act(() => {
+    await act(async () => {
       mockStore.setState((state) => ({
         ...state,
         managerStatus: 'ready',
@@ -665,45 +755,6 @@ describe('useWallet', () => {
       })
     )
     expect(getByTestId('active-address')).toHaveTextContent(JSON.stringify('address1'))
-  })
-
-  it('initializes with isReady false and updates after resumeSessions', async () => {
-    const { result } = renderHook(() => useWallet(), { wrapper })
-
-    // Initially should not be ready
-    expect(result.current.isReady).toBe(false)
-
-    // Wait for resumeSessions to complete
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
-    })
-
-    // Should be ready after resumeSessions
-    expect(result.current.isReady).toBe(true)
-  })
-
-  it('updates isReady when manager status changes', async () => {
-    const { result } = renderHook(() => useWallet(), { wrapper })
-
-    expect(result.current.isReady).toBe(false)
-
-    // Simulate manager status change
-    await act(async () => {
-      mockStore.setState((state) => ({
-        ...state,
-        managerStatus: 'ready'
-      }))
-    })
-
-    expect(result.current.isReady).toBe(true)
-  })
-
-  it('no longer returns network-related properties', () => {
-    const { result } = renderHook(() => useWallet(), { wrapper })
-
-    expect(result.current).not.toHaveProperty('activeNetwork')
-    expect(result.current).not.toHaveProperty('algodClient')
-    expect(result.current).not.toHaveProperty('setActiveNetwork')
-    expect(result.current).not.toHaveProperty('setAlgodClient')
+    expect(getByTestId('algod-client')).toHaveTextContent('true')
   })
 })
