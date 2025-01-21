@@ -3,10 +3,10 @@ import { NetworkId, WalletId, useNetwork, useWallet, type Wallet } from '@txnlab
 import algosdk from 'algosdk'
 import { ref } from 'vue'
 
-const { transactionSigner, wallets: walletsRef } = useWallet()
+const { algodClient, transactionSigner, wallets: walletsRef } = useWallet()
 const wallets = computed(() => walletsRef.value)
 
-const { algodClient, activeNetwork, setActiveNetwork } = useNetwork()
+const { activeNetwork, setActiveNetwork } = useNetwork()
 
 const isSending = ref(false)
 const magicEmail = ref('')

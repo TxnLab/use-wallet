@@ -6,8 +6,8 @@ import * as React from 'react'
 import styles from './Connect.module.css'
 
 export function Connect() {
-  const { activeAddress, transactionSigner, wallets } = useWallet()
-  const { algodClient, activeNetwork, setActiveNetwork } = useNetwork()
+  const { algodClient, activeAddress, transactionSigner, wallets } = useWallet()
+  const { activeNetwork, setActiveNetwork } = useNetwork()
 
   const [isSending, setIsSending] = React.useState(false)
   const [magicEmail, setMagicEmail] = React.useState('')

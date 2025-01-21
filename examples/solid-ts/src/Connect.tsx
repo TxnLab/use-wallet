@@ -18,9 +18,11 @@ export function Connect() {
     isWalletActive,
     isWalletConnected,
     transactionSigner,
-    wallets
+    wallets,
+    algodClient
   } = useWallet()
-  const { algodClient, activeNetwork, setActiveNetwork } = useNetwork()
+
+  const { activeNetwork, setActiveNetwork } = useNetwork()
 
   const isMagicLink = (wallet: BaseWallet) => wallet.id === WalletId.MAGIC
   const isEmailValid = () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(magicEmail())
