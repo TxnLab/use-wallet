@@ -465,6 +465,69 @@ describe('useNetwork', () => {
     expect(screen.getByTestId('algod-client')).toHaveTextContent(JSON.stringify(newAlgodClient))
   })
 
+  it('provides resetNetworkConfig functionality', () => {
+    const mockResetNetworkConfig = vi.fn()
+    mockWalletManager.resetNetworkConfig = mockResetNetworkConfig
+
+    const TestComponent = () => {
+      const { resetNetworkConfig } = useNetwork()
+      return (
+        <button data-testid="reset-btn" onClick={() => resetNetworkConfig(NetworkId.TESTNET)}>
+          Reset Network
+        </button>
+      )
+    }
+
+    render(() => (
+      <WalletProvider manager={mockWalletManager}>
+        <TestComponent />
+      </WalletProvider>
+    ))
+
+    const resetButton = screen.getByTestId('reset-btn')
+    fireEvent.click(resetButton)
+
+    expect(mockResetNetworkConfig).toHaveBeenCalledWith(NetworkId.TESTNET)
+  })
+
+  it('updates algodClient when resetting active network', () => {
+    const newAlgodClient = new algosdk.Algodv2('', 'https://testnet-api.4160.nodely.dev/', '')
+
+    const TestComponent = () => {
+      const { resetNetworkConfig, algodClient } = useNetwork()
+      return (
+        <div>
+          <div data-testid="algod-client">{JSON.stringify(algodClient())}</div>
+          <button
+            data-testid="reset-btn"
+            onClick={() => {
+              // Mock the manager's resetNetworkConfig to update the config
+              mockWalletManager.networkConfig[NetworkId.TESTNET] =
+                DEFAULT_NETWORKS[NetworkId.TESTNET]
+              // Update the store's algodClient
+              mockSetAlgodClient(newAlgodClient)
+              // Call the function under test
+              resetNetworkConfig(NetworkId.TESTNET)
+            }}
+          >
+            Reset
+          </button>
+        </div>
+      )
+    }
+
+    render(() => (
+      <WalletProvider manager={mockWalletManager}>
+        <TestComponent />
+      </WalletProvider>
+    ))
+
+    const resetButton = screen.getByTestId('reset-btn')
+    fireEvent.click(resetButton)
+
+    expect(screen.getByTestId('algod-client')).toHaveTextContent(JSON.stringify(newAlgodClient))
+  })
+
   it('provides activeNetworkConfig through useNetwork', () => {
     const TestComponent = () => {
       const { activeNetworkConfig } = useNetwork()

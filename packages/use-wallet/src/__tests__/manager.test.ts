@@ -378,6 +378,80 @@ describe('WalletManager', () => {
     })
   })
 
+  describe('resetNetworkConfig', () => {
+    it('resets network configuration to base config', () => {
+      // Set up initial state with custom network config
+      mockInitialState = {
+        wallets: {},
+        activeWallet: null,
+        activeNetwork: 'testnet',
+        algodClient: new algosdk.Algodv2('', 'https://testnet-api.4160.nodely.dev'),
+        managerStatus: 'ready',
+        customNetworkConfigs: {
+          mainnet: {
+            algod: {
+              token: 'custom-token',
+              baseServer: 'https://custom-server.com'
+            }
+          }
+        }
+      }
+
+      const manager = new WalletManager({
+        networks: DEFAULT_NETWORKS
+      })
+
+      // Verify custom config is loaded
+      expect(manager.networks.mainnet.algod.token).toBe('custom-token')
+      expect(manager.networks.mainnet.algod.baseServer).toBe('https://custom-server.com')
+
+      // Reset the network config
+      manager.resetNetworkConfig('mainnet')
+
+      // Verify config is reset to base values
+      expect(manager.networks.mainnet).toEqual(DEFAULT_NETWORKS.mainnet)
+
+      // Verify persisted state is updated
+      const lastCall = vi.mocked(StorageAdapter.setItem).mock.lastCall
+      const persistedState = JSON.parse(lastCall?.[1] || '{}')
+      expect(persistedState.customNetworkConfigs.mainnet).toBeUndefined()
+    })
+
+    it('throws error when resetting non-existent network', () => {
+      const manager = new WalletManager()
+      expect(() => manager.resetNetworkConfig('invalid-network')).toThrow(
+        'Network "invalid-network" not found in network configuration'
+      )
+    })
+
+    it('updates algod client when resetting active network', () => {
+      // Set up initial state with custom mainnet config as active network
+      mockInitialState = {
+        wallets: {},
+        activeWallet: null,
+        activeNetwork: 'mainnet',
+        algodClient: new algosdk.Algodv2('', 'https://custom-server.com'),
+        managerStatus: 'ready',
+        customNetworkConfigs: {
+          mainnet: {
+            algod: {
+              token: 'custom-token',
+              baseServer: 'https://custom-server.com'
+            }
+          }
+        }
+      }
+
+      const manager = new WalletManager()
+      const createAlgodClientSpy = vi.spyOn(manager as any, 'createAlgodClient')
+
+      manager.resetNetworkConfig('mainnet')
+
+      expect(createAlgodClientSpy).toHaveBeenCalledWith('mainnet')
+      expect(manager.algodClient).toBeDefined()
+    })
+  })
+
   describe('activeNetworkConfig', () => {
     it('returns the configuration for the active network', () => {
       const manager = new WalletManager({

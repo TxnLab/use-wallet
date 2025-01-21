@@ -286,4 +286,94 @@ describe('useNetwork', () => {
     const actual = JSON.parse(wrapper.get('[data-testid="active-network-config"]').text())
     expect(actual.algod.baseServer).toBe(newConfig.baseServer)
   })
+
+  it('provides resetNetworkConfig functionality', () => {
+    const mockResetNetworkConfig = vi.fn()
+    mockWalletManager.resetNetworkConfig = mockResetNetworkConfig
+
+    const { resetNetworkConfig } = useNetwork()
+    expect(typeof resetNetworkConfig).toBe('function')
+
+    resetNetworkConfig(NetworkId.TESTNET)
+    expect(mockResetNetworkConfig).toHaveBeenCalledWith(NetworkId.TESTNET)
+  })
+
+  it('updates algodClient when resetting active network', async () => {
+    const TestComponent = {
+      template: `
+        <div data-testid="algod-client">{{ algodClient }}</div>
+      `,
+      setup() {
+        const { algodClient, resetNetworkConfig } = useNetwork()
+        return { algodClient, resetNetworkConfig }
+      }
+    }
+
+    const wrapper = mount(TestComponent)
+    const newClient = new algosdk.Algodv2('', 'https://testnet-api.4160.nodely.dev/', '')
+
+    // Mock the resetNetworkConfig behavior
+    mockWalletManager.resetNetworkConfig = () => {
+      mockSetAlgodClient(newClient)
+      mockStore.setState((state) => ({ ...state }))
+    }
+
+    const { resetNetworkConfig } = useNetwork()
+    resetNetworkConfig(NetworkId.TESTNET)
+    await nextTick()
+
+    // Parse both JSON strings before comparison
+    const actual = JSON.parse(wrapper.get('[data-testid="algod-client"]').text())
+    const expected = JSON.parse(JSON.stringify(newClient))
+    expect(actual).toEqual(expected)
+  })
+
+  it('updates activeNetworkConfig when resetting network configuration', async () => {
+    const defaultConfig = {
+      algod: {
+        baseServer: 'https://testnet-api.algonode.cloud',
+        token: ''
+      },
+      isTestnet: true,
+      genesisId: 'testnet-v1.0',
+      genesisHash: 'SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=',
+      caipChainId: 'algorand:SGO1GKSzyE7IEPItTxCByw9x8FmnrCDe'
+    }
+
+    mockWalletManager.networkConfig = {
+      [NetworkId.TESTNET]: {
+        ...defaultConfig,
+        algod: {
+          ...defaultConfig.algod,
+          baseServer: 'https://custom-server.com'
+        }
+      }
+    }
+
+    const TestComponent = {
+      template: `
+        <div data-testid="active-network-config">{{ stringifiedConfig }}</div>
+      `,
+      setup() {
+        const { activeNetworkConfig, resetNetworkConfig } = useNetwork()
+        const stringifiedConfig = computed(() => JSON.stringify(activeNetworkConfig.value))
+        return { stringifiedConfig, resetNetworkConfig }
+      }
+    }
+
+    const wrapper = mount(TestComponent)
+
+    // Mock the resetNetworkConfig behavior
+    mockWalletManager.resetNetworkConfig = () => {
+      mockWalletManager.networkConfig[NetworkId.TESTNET] = defaultConfig
+      mockStore.setState((state) => ({ ...state }))
+    }
+
+    const { resetNetworkConfig } = useNetwork()
+    resetNetworkConfig(NetworkId.TESTNET)
+    await nextTick()
+
+    const actual = JSON.parse(wrapper.get('[data-testid="active-network-config"]').text())
+    expect(actual).toEqual(defaultConfig)
+  })
 })

@@ -417,6 +417,32 @@ export class WalletManager {
     this.logger.info(`✅ Updated algod configuration for ${networkId}`)
   }
 
+  public resetNetworkConfig(networkId: string): void {
+    // Verify network exists
+    if (!this.baseNetworkConfig[networkId]) {
+      throw new Error(`Network "${networkId}" not found in network configuration`)
+    }
+
+    // Reset to base configuration
+    this.networkConfig[networkId] = { ...this.baseNetworkConfig[networkId] }
+
+    // If this is the active network, update the algod client
+    if (this.activeNetwork === networkId) {
+      this.algodClient = this.createAlgodClient(networkId)
+    }
+
+    // Load current persisted state
+    const persistedState = this.loadPersistedState()
+    if (persistedState?.customNetworkConfigs) {
+      // Remove the network's customizations
+      delete persistedState.customNetworkConfigs[networkId]
+      // Save the updated state
+      StorageAdapter.setItem(LOCAL_STORAGE_KEY, JSON.stringify(persistedState))
+    }
+
+    this.logger.info(`✅ Reset network configuration for ${networkId}`)
+  }
+
   public get activeNetwork(): string {
     return this.store.state.activeNetwork
   }

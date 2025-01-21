@@ -245,6 +245,44 @@ describe('useNetwork', () => {
     expect(mockWalletManager.activeNetworkConfig.algod.baseServer).toBe(config.baseServer)
   })
 
+  it('provides resetNetworkConfig functionality', () => {
+    const resetNetworkConfigSpy = vi.spyOn(mockWalletManager, 'resetNetworkConfig')
+    const { result } = renderHook(() => useNetwork(), { wrapper })
+
+    expect(typeof result.current.resetNetworkConfig).toBe('function')
+
+    act(() => {
+      result.current.resetNetworkConfig(NetworkId.TESTNET)
+    })
+
+    expect(resetNetworkConfigSpy).toHaveBeenCalledWith(NetworkId.TESTNET)
+  })
+
+  it('updates algodClient when resetting active network', () => {
+    // Set up mock manager with spy
+    const createAlgodClientSpy = vi.spyOn(mockWalletManager as any, 'createAlgodClient')
+    const { result } = renderHook(() => useNetwork(), { wrapper })
+
+    // First update the network config
+    act(() => {
+      result.current.updateNetworkAlgod(NetworkId.TESTNET, {
+        token: 'custom-token',
+        baseServer: 'https://custom-server.com'
+      })
+    })
+
+    // Clear previous calls
+    createAlgodClientSpy.mockClear()
+
+    // Then reset it
+    act(() => {
+      result.current.resetNetworkConfig(NetworkId.TESTNET)
+    })
+
+    // Verify new algod client was created
+    expect(createAlgodClientSpy).toHaveBeenCalledWith(NetworkId.TESTNET)
+  })
+
   describe('setActiveNetwork', () => {
     it('calls setActiveNetwork correctly and updates algodClient', async () => {
       const { result } = renderHook(() => useNetwork(), { wrapper })

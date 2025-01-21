@@ -61,6 +61,19 @@ export function useNetwork() {
     }
   }
 
+  const resetNetworkConfig = (networkId: string): void => {
+    manager.resetNetworkConfig(networkId)
+    manager.store.setState((state) => ({ ...state }))
+
+    // If this is the active network, update the algodClient
+    if (networkId === activeNetwork.value) {
+      const { algod } = manager.networkConfig[networkId]
+      const { token = '', baseServer, port = '', headers = {} } = algod
+      const newClient = new algosdk.Algodv2(token, baseServer, port, headers)
+      setAlgodClient(newClient)
+    }
+  }
+
   return {
     activeNetwork,
     networks: manager.networks,
@@ -72,6 +85,7 @@ export function useNetwork() {
       return algodClient.value
     }),
     setActiveNetwork,
-    updateNetworkAlgod
+    updateNetworkAlgod,
+    resetNetworkConfig
   }
 }

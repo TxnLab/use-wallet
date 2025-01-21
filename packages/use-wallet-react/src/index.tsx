@@ -86,6 +86,10 @@ export const useNetwork = () => {
     manager.updateNetworkAlgod(networkId, config)
   }
 
+  const resetNetworkConfig = (networkId: string): void => {
+    manager.resetNetworkConfig(networkId)
+  }
+
   return {
     activeNetwork,
     networks: manager.networks,
@@ -93,7 +97,8 @@ export const useNetwork = () => {
     algodClient,
     setAlgodClient,
     setActiveNetwork,
-    updateNetworkAlgod
+    updateNetworkAlgod,
+    resetNetworkConfig
   }
 }
 
