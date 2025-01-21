@@ -84,10 +84,24 @@ export const useNetwork = () => {
 
   const updateNetworkAlgod = (networkId: string, config: Partial<AlgodConfig>): void => {
     manager.updateNetworkAlgod(networkId, config)
+
+    if (networkId === activeNetwork) {
+      const { algod } = manager.networkConfig[networkId]
+      const { token = '', baseServer, port = '', headers = {} } = algod
+      const newClient = new algosdk.Algodv2(token, baseServer, port, headers)
+      setAlgodClient(newClient)
+    }
   }
 
   const resetNetworkConfig = (networkId: string): void => {
     manager.resetNetworkConfig(networkId)
+
+    if (networkId === activeNetwork) {
+      const { algod } = manager.networkConfig[networkId]
+      const { token = '', baseServer, port = '', headers = {} } = algod
+      const newClient = new algosdk.Algodv2(token, baseServer, port, headers)
+      setAlgodClient(newClient)
+    }
   }
 
   return {

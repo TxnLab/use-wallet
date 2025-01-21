@@ -283,6 +283,85 @@ describe('useNetwork', () => {
     expect(createAlgodClientSpy).toHaveBeenCalledWith(NetworkId.TESTNET)
   })
 
+  it('updates algodClient when updating active network config', async () => {
+    const { result } = renderHook(() => useNetwork(), { wrapper })
+    const networkId = NetworkId.TESTNET
+    const newConfig = { baseServer: 'https://new-server.com' }
+    const expectedClient = new algosdk.Algodv2('', 'https://new-server.com', '')
+
+    act(() => {
+      result.current.updateNetworkAlgod(networkId, newConfig)
+    })
+
+    expect(mockWalletManager.networkConfig[networkId].algod.baseServer).toBe(newConfig.baseServer)
+    expect(result.current.algodClient).toEqual(expectedClient)
+  })
+
+  it('does not update algodClient when updating inactive network config', () => {
+    const { result } = renderHook(() => useNetwork(), { wrapper })
+    const initialClient = result.current.algodClient
+    const networkId = NetworkId.MAINNET // Not the active network
+    const newConfig = { baseServer: 'https://new-server.com' }
+
+    act(() => {
+      result.current.updateNetworkAlgod(networkId, newConfig)
+    })
+
+    expect(mockWalletManager.networkConfig[networkId].algod.baseServer).toBe(newConfig.baseServer)
+    expect(result.current.algodClient).toBe(initialClient)
+  })
+
+  it('updates algodClient when resetting active network config', () => {
+    const { result } = renderHook(() => useNetwork(), { wrapper })
+    const networkId = NetworkId.TESTNET
+    const defaultConfig = {
+      algod: {
+        baseServer: 'https://testnet-api.4160.nodely.dev',
+        token: '',
+        headers: {}
+      },
+      isTestnet: true,
+      genesisHash: 'SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=',
+      genesisId: 'testnet-v1.0',
+      caipChainId: 'algorand:SGO1GKSzyE7IEPItTxCByw9x8FmnrCDe'
+    }
+    const expectedClient = new algosdk.Algodv2(
+      defaultConfig.algod.token,
+      defaultConfig.algod.baseServer
+    )
+
+    // First modify the config
+    act(() => {
+      result.current.updateNetworkAlgod(networkId, { baseServer: 'https://modified-server.com' })
+    })
+
+    // Then reset it
+    act(() => {
+      result.current.resetNetworkConfig(networkId)
+    })
+
+    expect(mockWalletManager.networkConfig[networkId]).toEqual(defaultConfig)
+    expect(result.current.algodClient).toEqual(expectedClient)
+  })
+
+  it('does not update algodClient when resetting inactive network config', () => {
+    const { result } = renderHook(() => useNetwork(), { wrapper })
+    const initialClient = result.current.algodClient
+    const networkId = NetworkId.MAINNET // Not the active network
+
+    // First modify the config
+    act(() => {
+      result.current.updateNetworkAlgod(networkId, { baseServer: 'https://modified-server.com' })
+    })
+
+    // Then reset it
+    act(() => {
+      result.current.resetNetworkConfig(networkId)
+    })
+
+    expect(result.current.algodClient).toBe(initialClient)
+  })
+
   describe('setActiveNetwork', () => {
     it('calls setActiveNetwork correctly and updates algodClient', async () => {
       const { result } = renderHook(() => useNetwork(), { wrapper })
