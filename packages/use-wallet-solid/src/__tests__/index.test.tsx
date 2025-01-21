@@ -101,10 +101,11 @@ const TestComponent = () => {
     isWalletConnected,
     walletStore,
     wallets,
-    isReady
+    isReady,
+    algodClient
   } = useWallet()
 
-  const { activeNetwork, algodClient, setActiveNetwork } = useNetwork()
+  const { activeNetwork, setActiveNetwork } = useNetwork()
 
   const [magicEmail, setMagicEmail] = createSignal('')
 
@@ -340,7 +341,8 @@ describe('useNetwork', () => {
 
   it('updates algodClient when setActiveNetwork is called', async () => {
     const TestComponent = () => {
-      const { setActiveNetwork, algodClient } = useNetwork()
+      const { setActiveNetwork } = useNetwork()
+      const { algodClient } = useWallet()
       return (
         <div>
           <div data-testid="algod-client">{JSON.stringify(algodClient())}</div>
@@ -429,19 +431,17 @@ describe('useNetwork', () => {
     const newAlgodClient = new algosdk.Algodv2('', 'https://new-server.com', '')
 
     const TestComponent = () => {
-      const { updateNetworkAlgod, algodClient } = useNetwork()
+      const { updateNetworkAlgod } = useNetwork()
+      const { algodClient } = useWallet()
       return (
         <div>
           <div data-testid="algod-client">{JSON.stringify(algodClient())}</div>
           <button
             data-testid="update-btn"
             onClick={() => {
-              // Mock the manager's updateNetworkAlgod to update the config
               mockWalletManager.networkConfig[NetworkId.TESTNET].algod.baseServer =
                 'https://new-server.com'
-              // Update the store's algodClient
               mockSetAlgodClient(newAlgodClient)
-              // Call the function under test
               updateNetworkAlgod(NetworkId.TESTNET, {
                 baseServer: 'https://new-server.com'
               })
@@ -494,7 +494,8 @@ describe('useNetwork', () => {
     const newAlgodClient = new algosdk.Algodv2('', 'https://testnet-api.4160.nodely.dev/', '')
 
     const TestComponent = () => {
-      const { resetNetworkConfig, algodClient } = useNetwork()
+      const { resetNetworkConfig } = useNetwork()
+      const { algodClient } = useWallet()
       return (
         <div>
           <div data-testid="algod-client">{JSON.stringify(algodClient())}</div>

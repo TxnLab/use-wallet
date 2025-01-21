@@ -44,7 +44,6 @@ export const useWalletManager = (): WalletManager => {
 
 export const useNetwork = () => {
   const manager = createMemo(() => useWalletManager())
-  const algodClient = useStore(manager().store, (state) => state.algodClient)
   const activeNetwork = useStore(manager().store, (state) => state.activeNetwork)
   const activeNetworkConfig = createMemo(() => manager().networkConfig[activeNetwork()])
 
@@ -110,7 +109,6 @@ export const useNetwork = () => {
     activeNetwork,
     networks: manager().networks,
     activeNetworkConfig,
-    algodClient,
     setActiveNetwork,
     updateNetworkAlgod,
     resetNetworkConfig
@@ -135,6 +133,7 @@ export const useWallet = () => {
 
   const managerStatus = useStore(manager().store, (state) => state.managerStatus)
   const isReady = createMemo(() => managerStatus() === 'ready')
+  const algodClient = useStore(manager().store, (state) => state.algodClient)
 
   const walletStore = useStore(manager().store, (state) => state.wallets)
   const walletState = (walletId: WalletId): WalletState | null => walletStore()[walletId] || null
@@ -175,6 +174,7 @@ export const useWallet = () => {
   return {
     wallets: manager().wallets,
     isReady,
+    algodClient,
     activeWallet,
     activeWalletAccounts,
     activeWalletAddresses,
