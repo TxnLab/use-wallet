@@ -154,4 +154,3 @@ const handleResetConfig = () => {
   gap: 0.5em;
 }
 </style>
-

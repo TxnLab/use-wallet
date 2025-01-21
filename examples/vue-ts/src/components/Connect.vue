@@ -160,4 +160,3 @@ const sendTransaction = async (wallet: Wallet) => {
   }
 }
 </style>
-
