@@ -107,7 +107,7 @@ export const useNetwork = () => {
 
   return {
     activeNetwork,
-    networks: manager().networks,
+    networks: () => manager().networks,
     activeNetworkConfig,
     setActiveNetwork,
     updateNetworkAlgod,
