@@ -1,5 +1,6 @@
 import { NetworkId, WalletId, WalletManager, WalletProvider } from '@txnlab/use-wallet-react'
 import { Connect } from './Connect'
+import { NetworkControls } from './NetworkControls'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
@@ -45,6 +46,7 @@ function App() {
         </a>
       </div>
       <h1>@txnlab/use-wallet-react</h1>
+      <NetworkControls />
       <Connect />
     </WalletProvider>
   )

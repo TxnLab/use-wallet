@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { NetworkId, WalletId, useNetwork, useWallet, type Wallet } from '@txnlab/use-wallet-vue'
+import { WalletId, useWallet, type Wallet } from '@txnlab/use-wallet-vue'
 import algosdk from 'algosdk'
 import { ref } from 'vue'
 
-const { transactionSigner, wallets } = useWallet()
-const { algodClient, activeNetwork, setActiveNetwork } = useNetwork()
+const { algodClient, transactionSigner, wallets } = useWallet()
 
 const isSending = ref(false)
 const magicEmail = ref('')
@@ -65,35 +64,6 @@ const sendTransaction = async (wallet: Wallet) => {
 
 <template>
   <div>
-    <div className="network-group">
-      <h4>
-        Current Network: <span className="active-network">{{ activeNetwork }}</span>
-      </h4>
-      <div className="network-buttons">
-        <button
-          type="button"
-          @click="() => setActiveNetwork(NetworkId.BETANET)"
-          :disabled="activeNetwork === NetworkId.BETANET"
-        >
-          Set to Betanet
-        </button>
-        <button
-          type="button"
-          @click="() => setActiveNetwork(NetworkId.TESTNET)"
-          :disabled="activeNetwork === NetworkId.TESTNET"
-        >
-          Set to Testnet
-        </button>
-        <button
-          type="button"
-          @click="() => setActiveNetwork(NetworkId.MAINNET)"
-          :disabled="activeNetwork === NetworkId.MAINNET"
-        >
-          Set to Mainnet
-        </button>
-      </div>
-    </div>
-
     <div v-for="wallet in wallets" :key="wallet.id" class="wallet-group">
       <h4>{{ wallet.metadata.name }} <span v-if="wallet.isActive">[active]</span></h4>
       <div class="wallet-buttons">
@@ -143,36 +113,6 @@ const sendTransaction = async (wallet: Wallet) => {
 </template>
 
 <style scoped>
-.network-group {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1em;
-  margin: 2em;
-  padding: 2em;
-  background-color: light-dark(rgba(0, 0, 0, 0.025), rgba(255, 255, 255, 0.025));
-  border-color: light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.1));
-  border-style: solid;
-  border-width: 1px;
-  border-radius: 8px;
-}
-
-.network-group h4 {
-  margin: 0;
-}
-
-.network-group .active-network {
-  text-transform: capitalize;
-}
-
-.network-buttons {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 0.5em;
-}
-
 .wallet-group {
   display: flex;
   flex-direction: column;
@@ -220,3 +160,4 @@ const sendTransaction = async (wallet: Wallet) => {
   }
 }
 </style>
+

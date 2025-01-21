@@ -119,3 +119,69 @@ select {
     border-color: #f9f9f9;
   }
 }
+
+.config-section {
+  width: 100%;
+  max-width: 500px;
+  margin-top: 1em;
+}
+
+.config-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  margin: 1em 0;
+  padding: 1em;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  text-align: left;
+}
+
+.form-group label {
+  font-size: 0.9em;
+  opacity: 0.8;
+}
+
+.current-config {
+  margin-top: 1em;
+  text-align: left;
+}
+
+.current-config h5 {
+  margin: 0 0 0.5em 0;
+  font-size: 0.9em;
+  opacity: 0.8;
+}
+
+.current-config pre {
+  padding: 1em;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  font-size: 0.9em;
+  overflow-x: auto;
+}
+
+.error-message {
+  margin-top: 1em;
+  padding: 0.5em 1em;
+  color: #ff4444;
+  background: rgba(255, 68, 68, 0.1);
+  border-radius: 4px;
+}
+
+@media (prefers-color-scheme: light) {
+  .config-form {
+    border-color: rgba(0, 0, 0, 0.1);
+  }
+
+  .form-group input,
+  .current-config pre {
+    background: rgba(0, 0, 0, 0.05);
+  }
+}
