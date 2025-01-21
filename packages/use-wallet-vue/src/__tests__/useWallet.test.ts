@@ -14,7 +14,7 @@ import {
 } from '@txnlab/use-wallet'
 import { mount } from '@vue/test-utils'
 import algosdk from 'algosdk'
-import { inject, nextTick, type InjectionKey } from 'vue'
+import { inject, nextTick, ref, type InjectionKey } from 'vue'
 import { useWallet, type Wallet } from '../useWallet'
 import type { Mock } from 'vitest'
 
@@ -68,6 +68,7 @@ let mockStore: Store<State>
 let mockWalletManager: WalletManager
 let mockDeflyWallet: DeflyWallet
 let mockMagicAuth: MagicAuth
+const mockAlgodClient = ref(new algosdk.Algodv2('', 'https://testnet-api.algonode.cloud', ''))
 
 const setupMocks = () => {
   mockStore = new Store<State>({
@@ -106,6 +107,11 @@ const setupMocks = () => {
     subscribe: vi.fn(),
     networks: DEFAULT_NETWORKS
   })
+  ;(inject as Mock).mockImplementation((token: string | InjectionKey<unknown>) => {
+    if (token === 'walletManager') return mockWalletManager
+    if (token === 'algodClient') return mockAlgodClient
+    return null
+  })
 }
 
 beforeEach(() => {
@@ -124,15 +130,8 @@ beforeEach(() => {
 describe('useWallet', () => {
   let mockWallets: Wallet[]
 
-  const mockInjectImplementation = (token: string | InjectionKey<unknown>) => {
-    if (token === 'walletManager') return mockWalletManager
-    return null
-  }
-
   beforeEach(() => {
     vi.clearAllMocks()
-    ;(inject as Mock).mockImplementation(mockInjectImplementation)
-
     mockStore.setState(() => DEFAULT_STATE)
 
     mockWalletManager = new WalletManager()

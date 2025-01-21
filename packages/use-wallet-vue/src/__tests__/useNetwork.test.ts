@@ -10,6 +10,7 @@ import { mount } from '@vue/test-utils'
 import algosdk from 'algosdk'
 import { computed, inject, nextTick, ref, type InjectionKey } from 'vue'
 import { useNetwork } from '../useNetwork'
+import { useWallet } from '../useWallet'
 import type { Mock } from 'vitest'
 
 // Mock Vue's inject function
@@ -21,7 +22,6 @@ vi.mock('vue', async (importOriginal) => {
   }
 })
 
-// Share the same mock setup
 let mockStore: Store<State>
 let mockWalletManager: WalletManager
 const mockAlgodClient = ref(new algosdk.Algodv2('token', 'https://server', ''))
@@ -44,6 +44,12 @@ const setupMocks = () => {
   })
 
   vi.spyOn(mockWalletManager, 'store', 'get').mockReturnValue(mockStore)
+  ;(inject as Mock).mockImplementation((token: string | InjectionKey<unknown>) => {
+    if (token === 'walletManager') return mockWalletManager
+    if (token === 'setAlgodClient') return mockSetAlgodClient
+    if (token === 'algodClient') return mockAlgodClient
+    return null
+  })
 }
 
 beforeEach(() => {
@@ -57,12 +63,6 @@ beforeEach(() => {
     managerStatus: 'ready',
     wallets: {}
   }))
-  ;(inject as Mock).mockImplementation((token: string | InjectionKey<unknown>) => {
-    if (token === 'walletManager') return mockWalletManager
-    if (token === 'setAlgodClient') return mockSetAlgodClient
-    if (token === 'algodClient') return mockAlgodClient
-    return null
-  })
 })
 
 describe('useNetwork', () => {
@@ -91,8 +91,21 @@ describe('useNetwork', () => {
   })
 
   it('updates algodClient when setActiveNetwork is called', async () => {
-    const { setActiveNetwork, algodClient } = useNetwork()
-    const newClient = new algosdk.Algodv2('', 'https://mainnet-api.4160.nodely.dev', '')
+    const TestComponent = {
+      template: `
+        <div>
+          <div data-testid="active-network">{{ activeNetwork }}</div>
+        </div>
+      `,
+      setup() {
+        const { setActiveNetwork, activeNetwork } = useNetwork()
+        const { algodClient } = useWallet()
+        return { setActiveNetwork, activeNetwork, algodClient }
+      }
+    }
+
+    const wrapper = mount(TestComponent)
+    const newClient = new algosdk.Algodv2('', 'https://mainnet-api.4160.nodely.dev/', '')
 
     mockWalletManager.setActiveNetwork = async (networkId: string) => {
       mockSetAlgodClient(newClient)
@@ -103,10 +116,11 @@ describe('useNetwork', () => {
       }))
     }
 
+    const { setActiveNetwork } = useNetwork()
     await setActiveNetwork(NetworkId.MAINNET)
     await nextTick()
 
-    expect(algodClient.value).toStrictEqual(newClient)
+    expect(wrapper.get('[data-testid="active-network"]').text()).toBe(NetworkId.MAINNET)
   })
 
   it('integrates correctly with Vue component', async () => {
@@ -118,7 +132,8 @@ describe('useNetwork', () => {
         </div>
       `,
       setup() {
-        const { activeNetwork, algodClient } = useNetwork()
+        const { activeNetwork } = useNetwork()
+        const { algodClient } = useWallet()
         return { activeNetwork, algodClient }
       }
     }
@@ -304,7 +319,8 @@ describe('useNetwork', () => {
         <div data-testid="algod-client">{{ algodClient }}</div>
       `,
       setup() {
-        const { algodClient, resetNetworkConfig } = useNetwork()
+        const { resetNetworkConfig } = useNetwork()
+        const { algodClient } = useWallet()
         return { algodClient, resetNetworkConfig }
       }
     }

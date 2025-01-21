@@ -78,12 +78,6 @@ export function useNetwork() {
     activeNetwork,
     networks: manager.networks,
     activeNetworkConfig,
-    algodClient: computed(() => {
-      if (!algodClient.value) {
-        throw new Error('Algod client is undefined')
-      }
-      return algodClient.value
-    }),
     setActiveNetwork,
     updateNetworkAlgod,
     resetNetworkConfig
