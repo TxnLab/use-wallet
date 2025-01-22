@@ -49,8 +49,8 @@ export function useNetwork() {
     console.info(`[Vue] ✅ Active network set to ${networkId}.`)
   }
 
-  const updateNetworkAlgod = (networkId: string, config: Partial<AlgodConfig>): void => {
-    manager.updateNetworkAlgod(networkId, config)
+  const updateAlgodConfig = (networkId: string, config: Partial<AlgodConfig>): void => {
+    manager.updateAlgodConfig(networkId, config)
     manager.store.setState((state) => ({ ...state }))
 
     // If this is the active network, update the algodClient
@@ -82,7 +82,7 @@ export function useNetwork() {
     networkConfig: manager.networkConfig,
     activeNetworkConfig,
     setActiveNetwork,
-    updateNetworkAlgod,
+    updateAlgodConfig,
     resetNetworkConfig
   }
 }

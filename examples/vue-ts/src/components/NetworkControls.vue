@@ -7,7 +7,7 @@ const {
   networkConfig,
   activeNetworkConfig,
   setActiveNetwork,
-  updateNetworkAlgod,
+  updateAlgodConfig,
   resetNetworkConfig
 } = useNetwork()
 
@@ -42,7 +42,7 @@ const handleConfigSubmit = async (event: Event) => {
   event.preventDefault()
   try {
     error.value = ''
-    updateNetworkAlgod(activeNetwork.value, {
+    updateAlgodConfig(activeNetwork.value, {
       baseServer: configForm.baseServer,
       port: configForm.port || undefined,
       token: configForm.token

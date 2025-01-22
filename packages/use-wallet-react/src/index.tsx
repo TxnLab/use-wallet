@@ -82,8 +82,8 @@ export const useNetwork = () => {
     console.info(`[React] ✅ Active network set to ${networkId}.`)
   }
 
-  const updateNetworkAlgod = (networkId: string, config: Partial<AlgodConfig>): void => {
-    manager.updateNetworkAlgod(networkId, config)
+  const updateAlgodConfig = (networkId: string, config: Partial<AlgodConfig>): void => {
+    manager.updateAlgodConfig(networkId, config)
 
     // If this is the active network, update the algodClient
     if (networkId === activeNetwork) {
@@ -113,7 +113,7 @@ export const useNetwork = () => {
     networkConfig: manager.networkConfig,
     activeNetworkConfig: manager.activeNetworkConfig,
     setActiveNetwork,
-    updateNetworkAlgod,
+    updateAlgodConfig,
     resetNetworkConfig
   }
 }

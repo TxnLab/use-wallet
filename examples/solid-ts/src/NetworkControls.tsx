@@ -7,7 +7,7 @@ export function NetworkControls() {
     networkConfig,
     activeNetworkConfig,
     setActiveNetwork,
-    updateNetworkAlgod,
+    updateAlgodConfig,
     resetNetworkConfig
   } = useNetwork()
 
@@ -47,7 +47,7 @@ export function NetworkControls() {
     try {
       setError('')
       const form = configForm()
-      updateNetworkAlgod(activeNetwork(), {
+      updateAlgodConfig(activeNetwork(), {
         baseServer: form.baseServer,
         port: form.port || undefined,
         token: form.token

@@ -377,7 +377,7 @@ export class WalletManager {
     this.logger.info(`✅ Active network set to ${networkId}`)
   }
 
-  public updateNetworkAlgod(networkId: string, algodConfig: Partial<AlgodConfig>): void {
+  public updateAlgodConfig(networkId: string, algodConfig: Partial<AlgodConfig>): void {
     // Verify network exists
     if (!this.networkConfig[networkId]) {
       throw new Error(`Network "${networkId}" not found in network configuration`)

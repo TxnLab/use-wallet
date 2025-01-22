@@ -7,7 +7,7 @@ export function NetworkControls() {
     networkConfig,
     activeNetworkConfig,
     setActiveNetwork,
-    updateNetworkAlgod,
+    updateAlgodConfig,
     resetNetworkConfig
   } = useNetwork()
 
@@ -46,7 +46,7 @@ export function NetworkControls() {
     event.preventDefault()
     try {
       setError('')
-      updateNetworkAlgod(activeNetwork, {
+      updateAlgodConfig(activeNetwork, {
         baseServer: configForm.baseServer,
         port: configForm.port || undefined,
         token: configForm.token

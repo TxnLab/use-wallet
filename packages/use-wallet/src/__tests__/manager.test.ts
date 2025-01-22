@@ -276,7 +276,7 @@ describe('WalletManager', () => {
     })
   })
 
-  describe('updateNetworkAlgod', () => {
+  describe('updateAlgodConfig', () => {
     it('updates algod configuration for a network', () => {
       const manager = new WalletManager({
         wallets: [WalletId.DEFLY, WalletId.KIBISIS]
@@ -289,7 +289,7 @@ describe('WalletManager', () => {
         headers: { 'X-API-Key': 'new-key' }
       }
 
-      manager.updateNetworkAlgod('mainnet', newConfig)
+      manager.updateAlgodConfig('mainnet', newConfig)
 
       expect(manager.networkConfig.mainnet.algod).toEqual(newConfig)
     })
@@ -306,7 +306,7 @@ describe('WalletManager', () => {
         baseServer: 'https://new-server.com'
       }
 
-      manager.updateNetworkAlgod('mainnet', newConfig)
+      manager.updateAlgodConfig('mainnet', newConfig)
 
       expect(manager.algodClient).not.toBe(initialClient)
       expect(manager.networkConfig.mainnet.algod.token).toBe('new-token')
@@ -325,7 +325,7 @@ describe('WalletManager', () => {
         baseServer: 'https://new-server.com'
       }
 
-      manager.updateNetworkAlgod('testnet', newConfig)
+      manager.updateAlgodConfig('testnet', newConfig)
 
       expect(manager.algodClient).toBe(initialClient)
       expect(manager.networkConfig.testnet.algod.token).toBe('new-token')
@@ -338,7 +338,7 @@ describe('WalletManager', () => {
       })
 
       expect(() =>
-        manager.updateNetworkAlgod('invalid-network', {
+        manager.updateAlgodConfig('invalid-network', {
           token: 'new-token',
           baseServer: 'https://new-server.com'
         })
@@ -351,7 +351,7 @@ describe('WalletManager', () => {
       })
 
       expect(() =>
-        manager.updateNetworkAlgod('mainnet', {
+        manager.updateAlgodConfig('mainnet', {
           token: 'new-token',
           // @ts-expect-error Testing invalid config
           baseServer: 123 // Invalid type for baseServer
@@ -365,7 +365,7 @@ describe('WalletManager', () => {
       })
 
       const initialConfig = { ...manager.networkConfig.mainnet.algod }
-      manager.updateNetworkAlgod('mainnet', {
+      manager.updateAlgodConfig('mainnet', {
         token: 'new-token'
       })
 
@@ -486,7 +486,7 @@ describe('WalletManager', () => {
         baseServer: 'https://new-server.com'
       }
 
-      manager.updateNetworkAlgod('mainnet', newConfig)
+      manager.updateAlgodConfig('mainnet', newConfig)
       expect(manager.activeNetworkConfig.algod).toMatchObject(newConfig)
     })
   })
@@ -609,7 +609,7 @@ describe('WalletManager', () => {
         port: '443'
       }
 
-      manager.updateNetworkAlgod('mainnet', customAlgod)
+      manager.updateAlgodConfig('mainnet', customAlgod)
 
       // Verify the persisted state includes the custom network config
       const expectedState: PersistedState = {
@@ -638,7 +638,7 @@ describe('WalletManager', () => {
       const defaultConfig = createNetworkConfig()
 
       // Update only one property
-      manager.updateNetworkAlgod('mainnet', {
+      manager.updateAlgodConfig('mainnet', {
         token: 'custom-token'
       })
 
@@ -672,12 +672,12 @@ describe('WalletManager', () => {
       const defaultConfig = createNetworkConfig()
 
       // First modify the network
-      manager.updateNetworkAlgod('mainnet', {
+      manager.updateAlgodConfig('mainnet', {
         token: 'custom-token'
       })
 
       // Then reset it back to default
-      manager.updateNetworkAlgod('mainnet', defaultConfig.mainnet.algod)
+      manager.updateAlgodConfig('mainnet', defaultConfig.mainnet.algod)
 
       // The persisted state should not include mainnet in customNetworkConfigs
       const expectedState: PersistedState = {
@@ -806,7 +806,7 @@ describe('WalletManager', () => {
       expect(persistedState.customNetworkConfigs).toEqual({})
 
       // Now update the network config through the manager
-      manager.updateNetworkAlgod('mainnet', {
+      manager.updateAlgodConfig('mainnet', {
         baseServer: 'https://user-server.com'
       })
 

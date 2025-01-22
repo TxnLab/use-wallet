@@ -164,12 +164,12 @@ describe('useNetwork', () => {
     expect(wrapper.get('[data-testid="activeNetwork"]').text()).toBe(NetworkId.MAINNET)
   })
 
-  it('provides updateNetworkAlgod function', () => {
-    const { updateNetworkAlgod } = useNetwork()
-    expect(typeof updateNetworkAlgod).toBe('function')
+  it('provides updateAlgodConfig function', () => {
+    const { updateAlgodConfig } = useNetwork()
+    expect(typeof updateAlgodConfig).toBe('function')
   })
 
-  it('calls updateNetworkAlgod on the manager when updating network config', () => {
+  it('calls updateAlgodConfig on the manager when updating network config', () => {
     const networkId = NetworkId.TESTNET
     const config = {
       token: 'new-token',
@@ -177,13 +177,13 @@ describe('useNetwork', () => {
       port: '443'
     }
 
-    const mockUpdateNetworkAlgod = vi.fn()
-    mockWalletManager.updateNetworkAlgod = mockUpdateNetworkAlgod
+    const mockUpdateAlgodConfig = vi.fn()
+    mockWalletManager.updateAlgodConfig = mockUpdateAlgodConfig
 
-    const { updateNetworkAlgod } = useNetwork()
-    updateNetworkAlgod(networkId, config)
+    const { updateAlgodConfig } = useNetwork()
+    updateAlgodConfig(networkId, config)
 
-    expect(mockUpdateNetworkAlgod).toHaveBeenCalledWith(networkId, config)
+    expect(mockUpdateAlgodConfig).toHaveBeenCalledWith(networkId, config)
   })
 
   it('provides activeNetworkConfig through useNetwork', async () => {
@@ -249,9 +249,9 @@ describe('useNetwork', () => {
         <div data-testid="active-network-config">{{ stringifiedConfig }}</div>
       `,
       setup() {
-        const { activeNetworkConfig, updateNetworkAlgod } = useNetwork()
+        const { activeNetworkConfig, updateAlgodConfig } = useNetwork()
         const stringifiedConfig = computed(() => JSON.stringify(activeNetworkConfig.value))
-        return { stringifiedConfig, updateNetworkAlgod }
+        return { stringifiedConfig, updateAlgodConfig }
       }
     }
 
@@ -259,7 +259,7 @@ describe('useNetwork', () => {
     const networkId = NetworkId.TESTNET
     const newConfig = { baseServer: 'https://new-server.com' }
 
-    mockWalletManager.updateNetworkAlgod = (id: string, config: Partial<AlgodConfig>) => {
+    mockWalletManager.updateAlgodConfig = (id: string, config: Partial<AlgodConfig>) => {
       mockWalletManager.networkConfig[id] = {
         ...mockWalletManager.networkConfig[id],
         algod: {
@@ -270,8 +270,8 @@ describe('useNetwork', () => {
       mockStore.setState((state) => ({ ...state }))
     }
 
-    const { updateNetworkAlgod } = useNetwork()
-    updateNetworkAlgod(networkId, newConfig)
+    const { updateAlgodConfig } = useNetwork()
+    updateAlgodConfig(networkId, newConfig)
     await nextTick()
 
     const actual = JSON.parse(wrapper.get('[data-testid="active-network-config"]').text())

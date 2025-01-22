@@ -382,10 +382,10 @@ describe('useNetwork', () => {
     })
   })
 
-  it('provides updateNetworkAlgod function', () => {
+  it('provides updateAlgodConfig function', () => {
     const TestComponent = () => {
-      const { updateNetworkAlgod } = useNetwork()
-      return <div data-testid="update-network-algod-type">{typeof updateNetworkAlgod}</div>
+      const { updateAlgodConfig } = useNetwork()
+      return <div data-testid="update-network-algod-type">{typeof updateAlgodConfig}</div>
     }
 
     render(() => (
@@ -397,7 +397,7 @@ describe('useNetwork', () => {
     expect(screen.getByTestId('update-network-algod-type')).toHaveTextContent('function')
   })
 
-  it('calls updateNetworkAlgod on the manager when updating network config', () => {
+  it('calls updateAlgodConfig on the manager when updating network config', () => {
     const networkId = NetworkId.TESTNET
     const config = {
       token: 'new-token',
@@ -406,16 +406,16 @@ describe('useNetwork', () => {
     }
 
     const TestComponent = () => {
-      const { updateNetworkAlgod } = useNetwork()
+      const { updateAlgodConfig } = useNetwork()
       return (
-        <button data-testid="update-btn" onClick={() => updateNetworkAlgod(networkId, config)}>
+        <button data-testid="update-btn" onClick={() => updateAlgodConfig(networkId, config)}>
           Update
         </button>
       )
     }
 
-    const mockUpdateNetworkAlgod = vi.fn()
-    mockWalletManager.updateNetworkAlgod = mockUpdateNetworkAlgod
+    const mockUpdateAlgodConfig = vi.fn()
+    mockWalletManager.updateAlgodConfig = mockUpdateAlgodConfig
 
     render(() => (
       <WalletProvider manager={mockWalletManager}>
@@ -426,14 +426,14 @@ describe('useNetwork', () => {
     const updateButton = screen.getByTestId('update-btn')
     fireEvent.click(updateButton)
 
-    expect(mockUpdateNetworkAlgod).toHaveBeenCalledWith(networkId, config)
+    expect(mockUpdateAlgodConfig).toHaveBeenCalledWith(networkId, config)
   })
 
   it('updates algodClient when modifying active network configuration', () => {
     const newAlgodClient = new algosdk.Algodv2('', 'https://new-server.com', '')
 
     const TestComponent = () => {
-      const { updateNetworkAlgod } = useNetwork()
+      const { updateAlgodConfig } = useNetwork()
       const { algodClient } = useWallet()
       return (
         <div>
@@ -444,7 +444,7 @@ describe('useNetwork', () => {
               mockWalletManager.networkConfig[NetworkId.TESTNET].algod.baseServer =
                 'https://new-server.com'
               mockSetAlgodClient(newAlgodClient)
-              updateNetworkAlgod(NetworkId.TESTNET, {
+              updateAlgodConfig(NetworkId.TESTNET, {
                 baseServer: 'https://new-server.com'
               })
             }}

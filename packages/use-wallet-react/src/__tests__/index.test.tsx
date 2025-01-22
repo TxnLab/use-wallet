@@ -149,7 +149,7 @@ describe('useNetwork', () => {
       mockWalletManager.networkConfig[NetworkId.TESTNET]
     )
     expect(typeof result.current.setActiveNetwork).toBe('function')
-    expect(typeof result.current.updateNetworkAlgod).toBe('function')
+    expect(typeof result.current.updateAlgodConfig).toBe('function')
   })
 
   it('updates activeNetwork and algodClient when setActiveNetwork is called', async () => {
@@ -169,13 +169,13 @@ describe('useNetwork', () => {
     )
   })
 
-  it('calls updateNetworkAlgod on the manager when updating network config', () => {
+  it('calls updateAlgodConfig on the manager when updating network config', () => {
     const { result } = renderHook(() => useNetwork(), { wrapper })
     const networkId = NetworkId.TESTNET
     const config = { baseServer: 'https://new-server.com' }
 
     act(() => {
-      result.current.updateNetworkAlgod(networkId, config)
+      result.current.updateAlgodConfig(networkId, config)
     })
 
     expect(mockWalletManager.networkConfig[networkId].algod.baseServer).toBe(config.baseServer)
@@ -241,7 +241,7 @@ describe('useNetwork', () => {
     const expectedClient = new algosdk.Algodv2('', 'https://new-server.com', '')
 
     await act(async () => {
-      result.current.network.updateNetworkAlgod(networkId, config)
+      result.current.network.updateAlgodConfig(networkId, config)
     })
 
     expect(mockWalletManager.networkConfig[networkId].algod.baseServer).toBe(config.baseServer)
@@ -267,7 +267,7 @@ describe('useNetwork', () => {
 
     // Modify the config
     act(() => {
-      result.current.updateNetworkAlgod(NetworkId.TESTNET, {
+      result.current.updateAlgodConfig(NetworkId.TESTNET, {
         token: 'custom-token',
         baseServer: 'https://custom-server.com'
       })
@@ -300,7 +300,7 @@ describe('useNetwork', () => {
     const expectedClient = new algosdk.Algodv2('', 'https://new-server.com', '')
 
     await act(async () => {
-      result.current.network.updateNetworkAlgod(networkId, newConfig)
+      result.current.network.updateAlgodConfig(networkId, newConfig)
     })
 
     expect(mockWalletManager.networkConfig[networkId].algod.baseServer).toBe(newConfig.baseServer)
@@ -316,7 +316,7 @@ describe('useNetwork', () => {
     const newConfig = { baseServer: 'https://new-server.com' }
 
     await act(async () => {
-      networkResult.current.updateNetworkAlgod(networkId, newConfig)
+      networkResult.current.updateAlgodConfig(networkId, newConfig)
     })
 
     expect(mockWalletManager.networkConfig[networkId].algod.baseServer).toBe(newConfig.baseServer)
@@ -346,7 +346,7 @@ describe('useNetwork', () => {
 
     // Modify the config
     await act(async () => {
-      networkResult.current.updateNetworkAlgod(networkId, {
+      networkResult.current.updateAlgodConfig(networkId, {
         baseServer: 'https://modified-server.com'
       })
     })
@@ -369,7 +369,7 @@ describe('useNetwork', () => {
 
     // Modify the config
     await act(async () => {
-      networkResult.current.updateNetworkAlgod(networkId, {
+      networkResult.current.updateAlgodConfig(networkId, {
         baseServer: 'https://modified-server.com'
       })
     })
