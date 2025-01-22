@@ -37,7 +37,7 @@ export function useNetwork() {
       throw new Error(`Network "${networkId}" not found in network configuration`)
     }
 
-    console.info(`[Vue] Creating Algodv2 client for ${networkId}...`)
+    console.info(`[Vue] Creating new Algodv2 client...`)
 
     const { algod } = manager.networkConfig[networkId]
     const { token = '', baseServer, port = '', headers = {} } = algod
@@ -53,7 +53,9 @@ export function useNetwork() {
     manager.updateNetworkAlgod(networkId, config)
     manager.store.setState((state) => ({ ...state }))
 
+    // If this is the active network, update the algodClient
     if (networkId === activeNetwork.value) {
+      console.info(`[Vue] Creating new Algodv2 client...`)
       const { algod } = manager.networkConfig[networkId]
       const { token = '', baseServer, port = '', headers = {} } = algod
       const newClient = new algosdk.Algodv2(token, baseServer, port, headers)
@@ -67,6 +69,7 @@ export function useNetwork() {
 
     // If this is the active network, update the algodClient
     if (networkId === activeNetwork.value) {
+      console.info(`[Vue] Creating new Algodv2 client...`)
       const { algod } = manager.networkConfig[networkId]
       const { token = '', baseServer, port = '', headers = {} } = algod
       const newClient = new algosdk.Algodv2(token, baseServer, port, headers)

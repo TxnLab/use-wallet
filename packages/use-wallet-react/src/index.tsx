@@ -67,7 +67,7 @@ export const useNetwork = () => {
       throw new Error(`Network "${networkId}" not found in network configuration`)
     }
 
-    console.info(`[React] Creating Algodv2 client for ${networkId}...`)
+    console.info(`[React] Creating new Algodv2 client...`)
 
     const { algod } = manager.networkConfig[networkId]
     const { token = '', baseServer, port = '', headers = {} } = algod
@@ -85,7 +85,9 @@ export const useNetwork = () => {
   const updateNetworkAlgod = (networkId: string, config: Partial<AlgodConfig>): void => {
     manager.updateNetworkAlgod(networkId, config)
 
+    // If this is the active network, update the algodClient
     if (networkId === activeNetwork) {
+      console.info(`[React] Creating new Algodv2 client...`)
       const { algod } = manager.networkConfig[networkId]
       const { token = '', baseServer, port = '', headers = {} } = algod
       const newClient = new algosdk.Algodv2(token, baseServer, port, headers)
@@ -96,7 +98,9 @@ export const useNetwork = () => {
   const resetNetworkConfig = (networkId: string): void => {
     manager.resetNetworkConfig(networkId)
 
+    // If this is the active network, update the algodClient
     if (networkId === activeNetwork) {
+      console.info(`[React] Creating new Algodv2 client...`)
       const { algod } = manager.networkConfig[networkId]
       const { token = '', baseServer, port = '', headers = {} } = algod
       const newClient = new algosdk.Algodv2(token, baseServer, port, headers)
