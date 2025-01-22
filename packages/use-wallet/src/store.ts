@@ -35,7 +35,7 @@ export const DEFAULT_STATE: State = {
 
 export type PersistedState = Omit<State, 'algodClient' | 'managerStatus' | 'networkConfig'>
 
-export const LOCAL_STORAGE_KEY = '@txnlab/use-wallet:v3'
+export const LOCAL_STORAGE_KEY = '@txnlab/use-wallet:v4'
 
 // State mutations
 
