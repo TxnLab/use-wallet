@@ -59,7 +59,7 @@ npm install @txnlab/use-wallet
 
 Some wallets require additional packages to be installed. The following table lists wallet providers and their corresponding packages.
 
-<table><thead><tr><th width="220">Wallet Provider</th><th>Package(s)</th></tr></thead><tbody><tr><td>Defly Wallet</td><td><code>@blockshake/defly-connect</code></td></tr><tr><td>Pera Wallet</td><td><code>@perawallet/connect</code></td></tr><tr><td>WalletConnect</td><td><code>@walletconnect/sign-client</code>, <code>@walletconnect/modal</code></td></tr><tr><td>Lute Wallet</td><td><code>lute-connect</code></td></tr><tr><td>Magic</td><td><code>magic-sdk</code>, <code>@magic-ext/algorand</code></td></tr><tr><td>Kibisis</td><td><code>@agoralabs-sh/avm-web-provider</code></td></tr></tbody></table>
+<table><thead><tr><th width="220">Wallet Provider</th><th>Package(s)</th></tr></thead><tbody><tr><td>Defly Wallet</td><td><code>@blockshake/defly-connect</code></td></tr><tr><td>Pera Wallet</td><td><code>@perawallet/connect</code></td></tr><tr><td>WalletConnect</td><td><code>@walletconnect/sign-client</code>, <code>@walletconnect/modal</code></td></tr><tr><td>Lute Wallet</td><td><code>lute-connect</code></td></tr><tr><td>Magic</td><td><code>magic-sdk</code>, <code>@magic-ext/algorand</code></td></tr><tr><td>Kibisis</td><td><code>@agoralabs-sh/avm-web-provider</code></td></tr><tr><td>Liquid Auth</td><td><code>@algorandfoundation/liquid-auth-use-wallet-client</code></td></tr></tbody></table>
 
 ## Webpack config for Next.js
 
