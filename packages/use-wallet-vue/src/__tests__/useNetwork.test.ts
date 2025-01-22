@@ -1,9 +1,9 @@
 import { Store } from '@tanstack/vue-store'
 import {
-  DEFAULT_NETWORKS,
   NetworkId,
   WalletManager,
   WalletId,
+  DEFAULT_NETWORK_CONFIG,
   type AlgodConfig,
   type State
 } from '@txnlab/use-wallet'
@@ -37,7 +37,7 @@ const setupMocks = () => {
     algodClient: new algosdk.Algodv2('', 'https://testnet-api.algonode.cloud', ''),
     managerStatus: 'ready',
     wallets: {},
-    networkConfig: DEFAULT_NETWORKS,
+    networkConfig: DEFAULT_NETWORK_CONFIG,
     customNetworkConfigs: {}
   })
 
@@ -63,7 +63,7 @@ beforeEach(() => {
     activeWallet: null,
     algodClient: new algosdk.Algodv2('', 'https://testnet-api.algonode.cloud', ''),
     managerStatus: 'ready',
-    networkConfig: { ...DEFAULT_NETWORKS },
+    networkConfig: { ...DEFAULT_NETWORK_CONFIG },
     customNetworkConfigs: {},
     wallets: {}
   }))
@@ -325,9 +325,9 @@ describe('useNetwork', () => {
       ...state,
       networkConfig: {
         [NetworkId.TESTNET]: {
-          ...DEFAULT_NETWORKS[NetworkId.TESTNET],
+          ...DEFAULT_NETWORK_CONFIG[NetworkId.TESTNET],
           algod: {
-            ...DEFAULT_NETWORKS[NetworkId.TESTNET].algod,
+            ...DEFAULT_NETWORK_CONFIG[NetworkId.TESTNET].algod,
             baseServer: 'https://custom-server.com'
           }
         }
@@ -349,7 +349,7 @@ describe('useNetwork', () => {
 
     // Mock the resetNetworkConfig behavior
     mockWalletManager.resetNetworkConfig = () => {
-      mockWalletManager.networkConfig[NetworkId.TESTNET] = DEFAULT_NETWORKS[NetworkId.TESTNET]
+      mockWalletManager.networkConfig[NetworkId.TESTNET] = DEFAULT_NETWORK_CONFIG[NetworkId.TESTNET]
       mockStore.setState((state) => ({ ...state }))
     }
 
@@ -358,6 +358,6 @@ describe('useNetwork', () => {
     await nextTick()
 
     const actual = JSON.parse(wrapper.get('[data-testid="active-network-config"]').text())
-    expect(actual).toEqual(DEFAULT_NETWORKS[NetworkId.TESTNET])
+    expect(actual).toEqual(DEFAULT_NETWORK_CONFIG[NetworkId.TESTNET])
   })
 })

@@ -7,7 +7,7 @@ import {
   NetworkId,
   WalletManager,
   WalletId,
-  DEFAULT_NETWORKS,
+  DEFAULT_NETWORK_CONFIG,
   DEFAULT_STATE,
   type State,
   type WalletAccount
@@ -78,7 +78,7 @@ const setupMocks = () => {
     managerStatus: 'ready',
     wallets: {},
     customNetworkConfigs: {},
-    networkConfig: DEFAULT_NETWORKS
+    networkConfig: DEFAULT_NETWORK_CONFIG
   })
 
   mockWalletManager = new WalletManager({

@@ -1,6 +1,6 @@
 import algosdk from 'algosdk'
 import { logger } from 'src/logger'
-import { DEFAULT_NETWORKS, NetworkConfig, NetworkId } from 'src/network'
+import { DEFAULT_NETWORK_CONFIG, NetworkConfig, NetworkId } from 'src/network'
 import { WalletId, type WalletAccount } from 'src/wallets/types'
 import type { Store } from '@tanstack/store'
 
@@ -29,7 +29,7 @@ export const DEFAULT_STATE: State = {
   activeNetwork: 'testnet',
   algodClient: new algosdk.Algodv2('', 'https://testnet-api.4160.nodely.dev/'),
   managerStatus: 'initializing',
-  networkConfig: DEFAULT_NETWORKS,
+  networkConfig: DEFAULT_NETWORK_CONFIG,
   customNetworkConfigs: {}
 }
 

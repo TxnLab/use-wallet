@@ -1,7 +1,7 @@
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
 import { logger } from 'src/logger'
-import { createNetworkConfig, DEFAULT_NETWORKS, NetworkConfigBuilder } from 'src/network'
+import { createNetworkConfig, DEFAULT_NETWORK_CONFIG, NetworkConfigBuilder } from 'src/network'
 import { LOCAL_STORAGE_KEY, PersistedState, State, DEFAULT_STATE } from 'src/store'
 import { WalletManager } from 'src/manager'
 import { StorageAdapter } from 'src/storage'
@@ -385,7 +385,7 @@ describe('WalletManager', () => {
         activeNetwork: 'testnet',
         algodClient: new algosdk.Algodv2('', 'https://testnet-api.4160.nodely.dev'),
         managerStatus: 'ready',
-        networkConfig: DEFAULT_NETWORKS,
+        networkConfig: DEFAULT_NETWORK_CONFIG,
         customNetworkConfigs: {
           mainnet: {
             algod: {
@@ -397,7 +397,7 @@ describe('WalletManager', () => {
       }
 
       const manager = new WalletManager({
-        networks: DEFAULT_NETWORKS
+        networks: DEFAULT_NETWORK_CONFIG
       })
 
       // Verify custom config is loaded
@@ -408,7 +408,7 @@ describe('WalletManager', () => {
       manager.resetNetworkConfig('mainnet')
 
       // Verify config is reset to base values
-      expect(manager.networkConfig.mainnet).toEqual(DEFAULT_NETWORKS.mainnet)
+      expect(manager.networkConfig.mainnet).toEqual(DEFAULT_NETWORK_CONFIG.mainnet)
 
       // Verify persisted state is updated
       const lastCall = vi.mocked(StorageAdapter.setItem).mock.lastCall
@@ -431,7 +431,7 @@ describe('WalletManager', () => {
         activeNetwork: 'mainnet',
         algodClient: new algosdk.Algodv2('', 'https://custom-server.com'),
         managerStatus: 'ready',
-        networkConfig: DEFAULT_NETWORKS,
+        networkConfig: DEFAULT_NETWORK_CONFIG,
         customNetworkConfigs: {
           mainnet: {
             algod: {
@@ -447,7 +447,7 @@ describe('WalletManager', () => {
 
       manager.resetNetworkConfig('mainnet')
 
-      expect(createAlgodClientSpy).toHaveBeenCalledWith(DEFAULT_NETWORKS.mainnet.algod)
+      expect(createAlgodClientSpy).toHaveBeenCalledWith(DEFAULT_NETWORK_CONFIG.mainnet.algod)
       expect(manager.algodClient).toBeDefined()
     })
   })
@@ -533,7 +533,7 @@ describe('WalletManager', () => {
         activeNetwork: 'betanet',
         algodClient: new algosdk.Algodv2('', 'https://betanet-api.4160.nodely.dev/'),
         managerStatus: 'ready',
-        networkConfig: DEFAULT_NETWORKS,
+        networkConfig: DEFAULT_NETWORK_CONFIG,
         customNetworkConfigs: {}
       }
     })
@@ -702,7 +702,7 @@ describe('WalletManager', () => {
         activeNetwork: 'testnet',
         algodClient: new algosdk.Algodv2('', 'https://testnet-api.4160.nodely.dev'),
         managerStatus: 'ready',
-        networkConfig: DEFAULT_NETWORKS,
+        networkConfig: DEFAULT_NETWORK_CONFIG,
         customNetworkConfigs: {
           mainnet: {
             algod: {
@@ -736,7 +736,7 @@ describe('WalletManager', () => {
         activeNetwork: 'testnet',
         algodClient: new algosdk.Algodv2('', 'https://testnet-api.4160.nodely.dev/'),
         managerStatus: 'ready',
-        networkConfig: DEFAULT_NETWORKS,
+        networkConfig: DEFAULT_NETWORK_CONFIG,
         customNetworkConfigs: {
           mainnet: {
             algod: {
@@ -756,16 +756,16 @@ describe('WalletManager', () => {
       // Provide configuration in constructor with different baseServer
       const providedNetworks = {
         mainnet: {
-          ...DEFAULT_NETWORKS.mainnet,
+          ...DEFAULT_NETWORK_CONFIG.mainnet,
           algod: {
-            ...DEFAULT_NETWORKS.mainnet.algod,
+            ...DEFAULT_NETWORK_CONFIG.mainnet.algod,
             baseServer: 'https://provided-server.com'
           }
         },
-        testnet: DEFAULT_NETWORKS.testnet,
-        betanet: DEFAULT_NETWORKS.betanet,
-        fnet: DEFAULT_NETWORKS.fnet,
-        localnet: DEFAULT_NETWORKS.localnet
+        testnet: DEFAULT_NETWORK_CONFIG.testnet,
+        betanet: DEFAULT_NETWORK_CONFIG.betanet,
+        fnet: DEFAULT_NETWORK_CONFIG.fnet,
+        localnet: DEFAULT_NETWORK_CONFIG.localnet
       }
 
       const manager = new WalletManager({
@@ -787,7 +787,7 @@ describe('WalletManager', () => {
       const providedNetworks = {
         mainnet: {
           algod: {
-            ...DEFAULT_NETWORKS.mainnet.algod,
+            ...DEFAULT_NETWORK_CONFIG.mainnet.algod,
             baseServer: 'https://custom-server.com'
           }
         }
@@ -844,7 +844,7 @@ describe('WalletManager', () => {
         activeNetwork: 'betanet',
         algodClient: new algosdk.Algodv2('', 'https://betanet-api.4160.nodely.dev/'),
         managerStatus: 'ready',
-        networkConfig: DEFAULT_NETWORKS,
+        networkConfig: DEFAULT_NETWORK_CONFIG,
         customNetworkConfigs: {}
       }
     })
@@ -1040,7 +1040,7 @@ describe('WalletManager', () => {
           activeNetwork: 'mainnet',
           algodClient: new algosdk.Algodv2('', 'https://mainnet-api.4160.nodely.dev'),
           managerStatus: 'ready',
-          networkConfig: DEFAULT_NETWORKS,
+          networkConfig: DEFAULT_NETWORK_CONFIG,
           customNetworkConfigs: {}
         }
 
@@ -1060,7 +1060,7 @@ describe('WalletManager', () => {
           activeNetwork: 'mainnet',
           algodClient: new algosdk.Algodv2('', 'https://mainnet-api.4160.nodely.dev'),
           managerStatus: 'ready',
-          networkConfig: DEFAULT_NETWORKS,
+          networkConfig: DEFAULT_NETWORK_CONFIG,
           customNetworkConfigs: {}
         }
 
@@ -1095,7 +1095,7 @@ describe('WalletManager', () => {
           activeNetwork: 'mainnet',
           algodClient: new algosdk.Algodv2('', 'https://mainnet-api.4160.nodely.dev'),
           managerStatus: 'ready',
-          networkConfig: DEFAULT_NETWORKS,
+          networkConfig: DEFAULT_NETWORK_CONFIG,
           customNetworkConfigs: {}
         }
 
