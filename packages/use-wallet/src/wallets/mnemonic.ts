@@ -35,10 +35,9 @@ export class MnemonicWallet extends BaseWallet {
     subscribe,
     getAlgodClient,
     options,
-    metadata = {},
-    networks
+    metadata = {}
   }: WalletConstructor<WalletId.MNEMONIC>) {
-    super({ id, metadata, getAlgodClient, store, subscribe, networks })
+    super({ id, metadata, getAlgodClient, store, subscribe })
 
     const {
       persistToStorage = false,

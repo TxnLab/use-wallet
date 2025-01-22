@@ -1,6 +1,6 @@
 import algosdk from 'algosdk'
 import { logger } from 'src/logger'
-import { NetworkConfig, NetworkId } from 'src/network'
+import { DEFAULT_NETWORKS, NetworkConfig, NetworkId } from 'src/network'
 import { WalletId, type WalletAccount } from 'src/wallets/types'
 import type { Store } from '@tanstack/store'
 
@@ -19,6 +19,7 @@ export interface State {
   activeNetwork: string
   algodClient: algosdk.Algodv2
   managerStatus: ManagerStatus
+  networkConfig: Record<string, NetworkConfig>
   customNetworkConfigs: Record<string, Partial<NetworkConfig>>
 }
 
@@ -28,10 +29,11 @@ export const DEFAULT_STATE: State = {
   activeNetwork: 'testnet',
   algodClient: new algosdk.Algodv2('', 'https://testnet-api.4160.nodely.dev/'),
   managerStatus: 'initializing',
+  networkConfig: DEFAULT_NETWORKS,
   customNetworkConfigs: {}
 }
 
-export type PersistedState = Omit<State, 'algodClient' | 'managerStatus'>
+export type PersistedState = Omit<State, 'algodClient' | 'managerStatus' | 'networkConfig'>
 
 export const LOCAL_STORAGE_KEY = '@txnlab/use-wallet:v3'
 

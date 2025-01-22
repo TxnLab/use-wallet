@@ -14,7 +14,6 @@ interface WalletConstructorType {
 export abstract class BaseWallet {
   readonly id: WalletId
   readonly metadata: WalletMetadata
-  protected readonly networks: Record<string, NetworkConfig>
 
   protected store: Store<State>
   protected getAlgodClient: () => algosdk.Algodv2
@@ -28,14 +27,12 @@ export abstract class BaseWallet {
     metadata,
     store,
     subscribe,
-    getAlgodClient,
-    networks
+    getAlgodClient
   }: WalletConstructor<WalletId>) {
     this.id = id
     this.store = store
     this.subscribe = subscribe
     this.getAlgodClient = getAlgodClient
-    this.networks = networks
 
     const ctor = this.constructor as WalletConstructorType
     this.metadata = { ...ctor.defaultMetadata, ...metadata }
@@ -128,17 +125,9 @@ export abstract class BaseWallet {
     return state.activeWallet === this.id
   }
 
-  // Make networks accessible for testing
-  public get networkConfig(): Record<string, NetworkConfig> {
-    return this.networks
-  }
-
-  protected get activeNetworkConfig(): NetworkConfig {
-    const config = this.networks[this.activeNetwork]
-    if (!config) {
-      throw new Error(`No configuration found for network: ${this.activeNetwork}`)
-    }
-    return config
+  public get activeNetworkConfig(): NetworkConfig {
+    const { networkConfig, activeNetwork } = this.store.state
+    return networkConfig[activeNetwork]
   }
 
   // ---------- Protected Methods ------------------------------------- //

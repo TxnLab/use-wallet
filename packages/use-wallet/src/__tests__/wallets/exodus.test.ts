@@ -1,7 +1,6 @@
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
 import { logger } from 'src/logger'
-import { DEFAULT_NETWORKS } from 'src/network'
 import { StorageAdapter } from 'src/storage'
 import { LOCAL_STORAGE_KEY, State, WalletState, DEFAULT_STATE } from 'src/store'
 import { base64ToByteArray, byteArrayToBase64 } from 'src/utils'
@@ -53,8 +52,7 @@ function createWalletWithStore(store: Store<State>): ExodusWallet {
     metadata: {},
     getAlgodClient: () => ({}) as any,
     store,
-    subscribe: vi.fn(),
-    networks: DEFAULT_NETWORKS
+    subscribe: vi.fn()
   })
 }
 

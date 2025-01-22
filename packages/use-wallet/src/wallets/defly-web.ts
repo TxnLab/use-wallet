@@ -18,8 +18,7 @@ export class DeflyWebWallet extends AVMProvider {
     store,
     subscribe,
     getAlgodClient,
-    metadata = {},
-    networks
+    metadata = {}
   }: WalletConstructor<WalletId.DEFLY_WEB>) {
     super({
       id,
@@ -27,7 +26,6 @@ export class DeflyWebWallet extends AVMProvider {
       getAlgodClient,
       store,
       subscribe,
-      networks,
       providerId: DEFLY_WEB_PROVIDER_ID
     })
   }

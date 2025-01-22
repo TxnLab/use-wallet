@@ -47,7 +47,6 @@ export interface WalletManagerConfig {
 
 export class WalletManager {
   public _clients: Map<WalletId, BaseWallet> = new Map()
-  public networkConfig: Record<string, NetworkConfig>
   private baseNetworkConfig: Record<string, NetworkConfig>
   public store: Store<State>
   public subscribe: (callback: (state: State) => void) => () => void
@@ -78,7 +77,7 @@ export class WalletManager {
     this.baseNetworkConfig = networks || createNetworkConfig()
 
     // Initialize network config
-    this.networkConfig = this.initNetworkConfig(this.baseNetworkConfig, persistedState)
+    const networkConfig = this.initNetworkConfig(this.baseNetworkConfig, persistedState)
 
     // Initialize options
     this.options = { resetNetwork: options.resetNetwork || false }
@@ -89,17 +88,18 @@ export class WalletManager {
       : persistedState?.activeNetwork || defaultNetwork
 
     // Validate active network exists in config
-    if (!this.networkConfig[activeNetwork]) {
+    if (!networkConfig[activeNetwork]) {
       throw new Error(`Network "${activeNetwork}" not found in network configuration`)
     }
 
     // Create Algod client for active network
-    const algodClient = this.createAlgodClient(activeNetwork)
+    const algodClient = this.createAlgodClient(networkConfig[activeNetwork].algod)
 
     // Create initial state
     const initialState: State = {
       ...DEFAULT_STATE,
       ...persistedState,
+      networkConfig,
       activeNetwork,
       algodClient
     }
@@ -175,7 +175,7 @@ export class WalletManager {
 
   private savePersistedState(): void {
     try {
-      const { wallets, activeWallet, activeNetwork } = this.store.state
+      const { wallets, activeWallet, activeNetwork, networkConfig } = this.store.state
       const persistedState: PersistedState = {
         wallets,
         activeWallet,
@@ -184,7 +184,7 @@ export class WalletManager {
       }
 
       // Compare current network config with base config to find user customizations
-      for (const [networkId, currentConfig] of Object.entries(this.networkConfig)) {
+      for (const [networkId, currentConfig] of Object.entries(networkConfig)) {
         const baseNetworkConfig = this.baseNetworkConfig[networkId]
         if (!baseNetworkConfig) continue
 
@@ -261,8 +261,7 @@ export class WalletManager {
         options: walletOptions as any,
         getAlgodClient: this.getAlgodClient,
         store: this.store,
-        subscribe: this.subscribe,
-        networks: this.networkConfig
+        subscribe: this.subscribe
       })
 
       this._clients.set(walletId, walletInstance)
@@ -352,15 +351,10 @@ export class WalletManager {
     return config
   }
 
-  private createAlgodClient(networkId: string): algosdk.Algodv2 {
-    this.logger.info(`Creating Algodv2 client for ${networkId}...`)
+  private createAlgodClient(config: AlgodConfig): algosdk.Algodv2 {
+    this.logger.info(`Creating new Algodv2 client...`)
 
-    const network = this.networkConfig[networkId]
-    if (!network) {
-      throw new Error(`Network "${networkId}" not found in network configuration`)
-    }
-
-    const { token = '', baseServer, port = '', headers = {} } = network.algod
+    const { token = '', baseServer, port = '', headers = {} } = config
     return new algosdk.Algodv2(token, baseServer, port, headers)
   }
 
@@ -377,7 +371,7 @@ export class WalletManager {
       throw new Error(`Network "${networkId}" not found in network configuration`)
     }
 
-    const algodClient = this.createAlgodClient(networkId)
+    const algodClient = this.createAlgodClient(this.networkConfig[networkId].algod)
     setActiveNetwork(this.store, { networkId, algodClient })
 
     this.logger.info(`✅ Active network set to ${networkId}`)
@@ -404,11 +398,17 @@ export class WalletManager {
     }
 
     // Update the network config
-    this.networkConfig[networkId] = updatedConfig
+    this.store.setState((state) => ({
+      ...state,
+      networkConfig: {
+        ...state.networkConfig,
+        [networkId]: updatedConfig
+      }
+    }))
 
     // If this is the active network, update the algod client
     if (this.activeNetwork === networkId) {
-      this.algodClient = this.createAlgodClient(networkId)
+      this.algodClient = this.createAlgodClient(updatedConfig.algod)
     }
 
     // Save the updated configuration
@@ -424,11 +424,17 @@ export class WalletManager {
     }
 
     // Reset to base configuration
-    this.networkConfig[networkId] = { ...this.baseNetworkConfig[networkId] }
+    this.store.setState((state) => ({
+      ...state,
+      networkConfig: {
+        ...state.networkConfig,
+        [networkId]: { ...this.baseNetworkConfig[networkId] }
+      }
+    }))
 
     // If this is the active network, update the algod client
     if (this.activeNetwork === networkId) {
-      this.algodClient = this.createAlgodClient(networkId)
+      this.algodClient = this.createAlgodClient(this.baseNetworkConfig[networkId].algod)
     }
 
     // Load current persisted state
@@ -447,12 +453,13 @@ export class WalletManager {
     return this.store.state.activeNetwork
   }
 
-  public get networks(): Record<string, NetworkConfig> {
-    return { ...this.networkConfig }
+  public get networkConfig(): Record<string, NetworkConfig> {
+    return this.store.state.networkConfig
   }
 
   public get activeNetworkConfig(): NetworkConfig {
-    return this.networkConfig[this.activeNetwork]
+    const { networkConfig, activeNetwork } = this.store.state
+    return networkConfig[activeNetwork]
   }
 
   // ---------- Active Wallet ----------------------------------------- //
