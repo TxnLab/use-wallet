@@ -2,7 +2,6 @@
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
 import { logger } from 'src/logger'
-import { DEFAULT_NETWORKS } from 'src/network'
 import { StorageAdapter } from 'src/storage'
 import { LOCAL_STORAGE_KEY, State, WalletState, DEFAULT_STATE } from 'src/store'
 import { LOCAL_STORAGE_MNEMONIC_KEY, MnemonicWallet } from 'src/wallets/mnemonic'
@@ -41,8 +40,7 @@ function createWalletWithStore(store: Store<State>, persistToStorage = false): M
     metadata: {},
     getAlgodClient: {} as any,
     store,
-    subscribe: vi.fn(),
-    networks: DEFAULT_NETWORKS
+    subscribe: vi.fn()
   })
 }
 
@@ -380,8 +378,7 @@ describe('MnemonicWallet', () => {
         metadata: {},
         getAlgodClient: {} as any,
         store,
-        subscribe: vi.fn(),
-        networks: DEFAULT_NETWORKS
+        subscribe: vi.fn()
       })
     })
 

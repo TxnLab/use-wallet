@@ -565,7 +565,8 @@ describe('Type Guards', () => {
       const defaultState: PersistedState = {
         wallets: {},
         activeWallet: null,
-        activeNetwork: 'testnet'
+        activeNetwork: 'testnet',
+        customNetworkConfigs: {}
       }
       expect(isValidPersistedState(defaultState)).toBe(true)
 
@@ -601,7 +602,8 @@ describe('Type Guards', () => {
           }
         },
         activeWallet: WalletId.DEFLY,
-        activeNetwork: 'testnet'
+        activeNetwork: 'testnet',
+        customNetworkConfigs: {}
       }
       expect(isValidPersistedState(state)).toBe(true)
     })

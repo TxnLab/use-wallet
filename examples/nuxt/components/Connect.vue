@@ -1,16 +1,13 @@
 <script setup lang="ts">
-import { NetworkId, WalletId, useWallet, type Wallet } from '@txnlab/use-wallet-vue'
+import { NetworkId, WalletId, useNetwork, useWallet, type Wallet } from '@txnlab/use-wallet-vue'
 import algosdk from 'algosdk'
 import { ref } from 'vue'
 
-const {
-  algodClient,
-  activeNetwork,
-  setActiveNetwork,
-  transactionSigner,
-  wallets: walletsRef
-} = useWallet()
+const { algodClient, transactionSigner, wallets: walletsRef } = useWallet()
 const wallets = computed(() => walletsRef.value)
+
+const { activeNetwork, setActiveNetwork } = useNetwork()
+
 const isSending = ref(false)
 const magicEmail = ref('')
 

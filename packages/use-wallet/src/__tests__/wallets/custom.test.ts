@@ -1,7 +1,6 @@
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
 import { logger } from 'src/logger'
-import { DEFAULT_NETWORKS } from 'src/network'
 import { StorageAdapter } from 'src/storage'
 import { LOCAL_STORAGE_KEY, State, DEFAULT_STATE } from 'src/store'
 import { CustomProvider, CustomWallet, WalletId } from 'src/wallets'
@@ -52,8 +51,7 @@ function createWalletWithStore(store: Store<State>): CustomWallet {
     },
     getAlgodClient: {} as any,
     store,
-    subscribe: vi.fn(),
-    networks: DEFAULT_NETWORKS
+    subscribe: vi.fn()
   })
 }
 
@@ -198,8 +196,7 @@ describe('CustomWallet', () => {
         metadata: {},
         getAlgodClient: {} as any,
         store,
-        subscribe: vi.fn(),
-        networks: DEFAULT_NETWORKS
+        subscribe: vi.fn()
       })
 
       vi.mocked(mockProvider.connect).mockResolvedValueOnce([account1])
@@ -285,8 +282,7 @@ describe('CustomWallet', () => {
         metadata: {},
         getAlgodClient: {} as any,
         store,
-        subscribe: vi.fn(),
-        networks: DEFAULT_NETWORKS
+        subscribe: vi.fn()
       })
 
       await wallet.resumeSession()
@@ -335,8 +331,7 @@ describe('CustomWallet', () => {
         metadata: {},
         getAlgodClient: {} as any,
         store,
-        subscribe: vi.fn(),
-        networks: DEFAULT_NETWORKS
+        subscribe: vi.fn()
       })
 
       await expect(wallet.signTransactions(txnGroup, indexesToSign)).rejects.toThrowError(
@@ -384,8 +379,7 @@ describe('CustomWallet', () => {
         metadata: {},
         getAlgodClient: {} as any,
         store,
-        subscribe: vi.fn(),
-        networks: DEFAULT_NETWORKS
+        subscribe: vi.fn()
       })
 
       await expect(wallet.transactionSigner(txnGroup, indexesToSign)).rejects.toThrowError(

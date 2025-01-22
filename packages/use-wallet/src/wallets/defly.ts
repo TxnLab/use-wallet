@@ -33,10 +33,9 @@ export class DeflyWallet extends BaseWallet {
     subscribe,
     getAlgodClient,
     options = {},
-    metadata = {},
-    networks
+    metadata = {}
   }: WalletConstructor<WalletId.DEFLY>) {
-    super({ id, metadata, getAlgodClient, store, subscribe, networks })
+    super({ id, metadata, getAlgodClient, store, subscribe })
     this.options = options
     this.store = store
   }

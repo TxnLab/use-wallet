@@ -1,5 +1,11 @@
 import { useStore } from '@tanstack/react-store'
-import { NetworkId, WalletAccount, WalletManager, WalletMetadata } from '@txnlab/use-wallet'
+import {
+  NetworkId,
+  WalletManager,
+  type AlgodConfig,
+  type WalletAccount,
+  type WalletMetadata
+} from '@txnlab/use-wallet'
 import algosdk from 'algosdk'
 import * as React from 'react'
 
@@ -12,6 +18,105 @@ interface IWalletContext {
 }
 
 const WalletContext = React.createContext<IWalletContext | undefined>(undefined)
+
+interface WalletProviderProps {
+  manager: WalletManager
+  children: React.ReactNode
+}
+
+export const WalletProvider = ({ manager, children }: WalletProviderProps): JSX.Element => {
+  const [algodClient, setAlgodClient] = React.useState(manager.algodClient)
+
+  React.useEffect(() => {
+    manager.algodClient = algodClient
+  }, [algodClient, manager])
+
+  const resumedRef = React.useRef(false)
+
+  React.useEffect(() => {
+    if (!resumedRef.current) {
+      manager.resumeSessions()
+      resumedRef.current = true
+    }
+  }, [manager])
+
+  return (
+    <WalletContext.Provider value={{ manager, algodClient, setAlgodClient }}>
+      {children}
+    </WalletContext.Provider>
+  )
+}
+
+export const useNetwork = () => {
+  const context = React.useContext(WalletContext)
+
+  if (!context) {
+    throw new Error('useNetwork must be used within the WalletProvider')
+  }
+
+  const { manager, setAlgodClient } = context
+
+  const activeNetwork = useStore(manager.store, (state) => state.activeNetwork)
+
+  const setActiveNetwork = async (networkId: NetworkId | string): Promise<void> => {
+    if (networkId === activeNetwork) {
+      return
+    }
+
+    if (!manager.networkConfig[networkId]) {
+      throw new Error(`Network "${networkId}" not found in network configuration`)
+    }
+
+    console.info(`[React] Creating new Algodv2 client...`)
+
+    const { algod } = manager.networkConfig[networkId]
+    const { token = '', baseServer, port = '', headers = {} } = algod
+    const newClient = new algosdk.Algodv2(token, baseServer, port, headers)
+    setAlgodClient(newClient)
+
+    manager.store.setState((state) => ({
+      ...state,
+      activeNetwork: networkId
+    }))
+
+    console.info(`[React] ✅ Active network set to ${networkId}.`)
+  }
+
+  const updateAlgodConfig = (networkId: string, config: Partial<AlgodConfig>): void => {
+    manager.updateAlgodConfig(networkId, config)
+
+    // If this is the active network, update the algodClient
+    if (networkId === activeNetwork) {
+      console.info(`[React] Creating new Algodv2 client...`)
+      const { algod } = manager.networkConfig[networkId]
+      const { token = '', baseServer, port = '', headers = {} } = algod
+      const newClient = new algosdk.Algodv2(token, baseServer, port, headers)
+      setAlgodClient(newClient)
+    }
+  }
+
+  const resetNetworkConfig = (networkId: string): void => {
+    manager.resetNetworkConfig(networkId)
+
+    // If this is the active network, update the algodClient
+    if (networkId === activeNetwork) {
+      console.info(`[React] Creating new Algodv2 client...`)
+      const { algod } = manager.networkConfig[networkId]
+      const { token = '', baseServer, port = '', headers = {} } = algod
+      const newClient = new algosdk.Algodv2(token, baseServer, port, headers)
+      setAlgodClient(newClient)
+    }
+  }
+
+  return {
+    activeNetwork,
+    networkConfig: manager.networkConfig,
+    activeNetworkConfig: manager.activeNetworkConfig,
+    setActiveNetwork,
+    updateAlgodConfig,
+    resetNetworkConfig
+  }
+}
 
 export interface Wallet {
   id: string
@@ -37,32 +142,6 @@ export const useWallet = () => {
 
   const managerStatus = useStore(manager.store, (state) => state.managerStatus)
   const isReady = managerStatus === 'ready'
-
-  const activeNetwork = useStore(manager.store, (state) => state.activeNetwork)
-
-  const setActiveNetwork = async (networkId: NetworkId | string): Promise<void> => {
-    if (networkId === activeNetwork) {
-      return
-    }
-
-    if (!manager.networkConfig[networkId]) {
-      throw new Error(`Network "${networkId}" not found in network configuration`)
-    }
-
-    console.info(`[React] Creating Algodv2 client for ${networkId}...`)
-
-    const { algod } = manager.networkConfig[networkId]
-    const { token = '', baseServer, port = '', headers = {} } = algod
-    const newClient = new algosdk.Algodv2(token, baseServer, port, headers)
-    setAlgodClient(newClient)
-
-    manager.store.setState((state) => ({
-      ...state,
-      activeNetwork: networkId
-    }))
-
-    console.info(`[React] ✅ Active network set to ${networkId}.`)
-  }
 
   const walletStateMap = useStore(manager.store, (state) => state.wallets)
   const activeWalletId = useStore(manager.store, (state) => state.activeWallet)
@@ -118,43 +197,13 @@ export const useWallet = () => {
     wallets,
     isReady,
     algodClient,
-    activeNetwork,
+    setAlgodClient,
     activeWallet,
     activeWalletAccounts,
     activeWalletAddresses,
     activeAccount,
     activeAddress,
-    setActiveNetwork,
-    setAlgodClient,
     signTransactions,
     transactionSigner
   }
-}
-
-interface WalletProviderProps {
-  manager: WalletManager
-  children: React.ReactNode
-}
-
-export const WalletProvider = ({ manager, children }: WalletProviderProps): JSX.Element => {
-  const [algodClient, setAlgodClient] = React.useState(manager.algodClient)
-
-  React.useEffect(() => {
-    manager.algodClient = algodClient
-  }, [algodClient, manager])
-
-  const resumedRef = React.useRef(false)
-
-  React.useEffect(() => {
-    if (!resumedRef.current) {
-      manager.resumeSessions()
-      resumedRef.current = true
-    }
-  }, [manager])
-
-  return (
-    <WalletContext.Provider value={{ manager, algodClient, setAlgodClient }}>
-      {children}
-    </WalletContext.Provider>
-  )
 }

@@ -16,7 +16,7 @@ export interface NetworkConfig {
 }
 
 // Default configurations
-export const DEFAULT_NETWORKS: Record<string, NetworkConfig> = {
+export const DEFAULT_NETWORK_CONFIG: Record<string, NetworkConfig> = {
   mainnet: {
     algod: {
       token: '',
@@ -82,19 +82,19 @@ export class NetworkConfigBuilder {
   private networks: Map<string, NetworkConfig>
 
   constructor() {
-    this.networks = new Map(Object.entries(DEFAULT_NETWORKS))
+    this.networks = new Map(Object.entries(DEFAULT_NETWORK_CONFIG))
   }
 
   // Methods to customize default networks
   mainnet(config: DefaultNetworkConfig) {
     this.networks.set('mainnet', {
-      ...DEFAULT_NETWORKS.mainnet,
+      ...DEFAULT_NETWORK_CONFIG.mainnet,
       ...config,
-      genesisHash: DEFAULT_NETWORKS.mainnet.genesisHash!,
-      genesisId: DEFAULT_NETWORKS.mainnet.genesisId!,
-      caipChainId: DEFAULT_NETWORKS.mainnet.caipChainId!,
+      genesisHash: DEFAULT_NETWORK_CONFIG.mainnet.genesisHash!,
+      genesisId: DEFAULT_NETWORK_CONFIG.mainnet.genesisId!,
+      caipChainId: DEFAULT_NETWORK_CONFIG.mainnet.caipChainId!,
       algod: {
-        ...DEFAULT_NETWORKS.mainnet.algod,
+        ...DEFAULT_NETWORK_CONFIG.mainnet.algod,
         ...(config.algod || {})
       }
     })
@@ -103,13 +103,13 @@ export class NetworkConfigBuilder {
 
   testnet(config: DefaultNetworkConfig) {
     this.networks.set('testnet', {
-      ...DEFAULT_NETWORKS.testnet,
+      ...DEFAULT_NETWORK_CONFIG.testnet,
       ...config,
-      genesisHash: DEFAULT_NETWORKS.testnet.genesisHash!,
-      genesisId: DEFAULT_NETWORKS.testnet.genesisId!,
-      caipChainId: DEFAULT_NETWORKS.testnet.caipChainId!,
+      genesisHash: DEFAULT_NETWORK_CONFIG.testnet.genesisHash!,
+      genesisId: DEFAULT_NETWORK_CONFIG.testnet.genesisId!,
+      caipChainId: DEFAULT_NETWORK_CONFIG.testnet.caipChainId!,
       algod: {
-        ...DEFAULT_NETWORKS.testnet.algod,
+        ...DEFAULT_NETWORK_CONFIG.testnet.algod,
         ...(config.algod || {})
       }
     })
@@ -118,13 +118,13 @@ export class NetworkConfigBuilder {
 
   betanet(config: DefaultNetworkConfig) {
     this.networks.set('betanet', {
-      ...DEFAULT_NETWORKS.betanet,
+      ...DEFAULT_NETWORK_CONFIG.betanet,
       ...config,
-      genesisHash: DEFAULT_NETWORKS.betanet.genesisHash!,
-      genesisId: DEFAULT_NETWORKS.betanet.genesisId!,
-      caipChainId: DEFAULT_NETWORKS.betanet.caipChainId!,
+      genesisHash: DEFAULT_NETWORK_CONFIG.betanet.genesisHash!,
+      genesisId: DEFAULT_NETWORK_CONFIG.betanet.genesisId!,
+      caipChainId: DEFAULT_NETWORK_CONFIG.betanet.caipChainId!,
       algod: {
-        ...DEFAULT_NETWORKS.betanet.algod,
+        ...DEFAULT_NETWORK_CONFIG.betanet.algod,
         ...(config.algod || {})
       }
     })
@@ -133,13 +133,13 @@ export class NetworkConfigBuilder {
 
   fnet(config: DefaultNetworkConfig) {
     this.networks.set('fnet', {
-      ...DEFAULT_NETWORKS.fnet,
+      ...DEFAULT_NETWORK_CONFIG.fnet,
       ...config,
-      genesisHash: DEFAULT_NETWORKS.fnet.genesisHash!,
-      genesisId: DEFAULT_NETWORKS.fnet.genesisId!,
-      caipChainId: DEFAULT_NETWORKS.fnet.caipChainId!,
+      genesisHash: DEFAULT_NETWORK_CONFIG.fnet.genesisHash!,
+      genesisId: DEFAULT_NETWORK_CONFIG.fnet.genesisId!,
+      caipChainId: DEFAULT_NETWORK_CONFIG.fnet.caipChainId!,
       algod: {
-        ...DEFAULT_NETWORKS.fnet.algod,
+        ...DEFAULT_NETWORK_CONFIG.fnet.algod,
         ...(config.algod || {})
       }
     })
@@ -148,10 +148,10 @@ export class NetworkConfigBuilder {
 
   localnet(config: Partial<NetworkConfig>) {
     this.networks.set('localnet', {
-      ...DEFAULT_NETWORKS.localnet,
+      ...DEFAULT_NETWORK_CONFIG.localnet,
       ...config,
       algod: {
-        ...DEFAULT_NETWORKS.localnet.algod,
+        ...DEFAULT_NETWORK_CONFIG.localnet.algod,
         ...(config.algod || {})
       }
     })
@@ -160,7 +160,7 @@ export class NetworkConfigBuilder {
 
   // Method to add custom networks (still needs full NetworkConfig)
   addNetwork(id: string, config: NetworkConfig) {
-    if (DEFAULT_NETWORKS[id]) {
+    if (DEFAULT_NETWORK_CONFIG[id]) {
       throw new Error(
         `Cannot add network with reserved id "${id}". Use the ${id}() method instead.`
       )

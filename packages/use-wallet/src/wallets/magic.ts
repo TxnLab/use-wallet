@@ -54,10 +54,9 @@ export class MagicAuth extends BaseWallet {
     subscribe,
     getAlgodClient,
     options,
-    metadata = {},
-    networks
+    metadata = {}
   }: WalletConstructor<WalletId.MAGIC>) {
-    super({ id, metadata, getAlgodClient, store, subscribe, networks })
+    super({ id, metadata, getAlgodClient, store, subscribe })
     if (!options?.apiKey) {
       this.logger.error('Missing required option: apiKey')
       throw new Error('Missing required option: apiKey')

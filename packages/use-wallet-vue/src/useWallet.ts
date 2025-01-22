@@ -1,10 +1,5 @@
 import { useStore } from '@tanstack/vue-store'
-import {
-  NetworkId,
-  WalletManager,
-  type WalletAccount,
-  type WalletMetadata
-} from '@txnlab/use-wallet'
+import { WalletManager, type WalletAccount, type WalletMetadata } from '@txnlab/use-wallet'
 import algosdk from 'algosdk'
 import { computed, inject, ref } from 'vue'
 
@@ -26,42 +21,16 @@ export type SetAlgodClient = (client: algosdk.Algodv2) => void
 export function useWallet() {
   const manager = inject<WalletManager>('walletManager')
   const algodClient = inject<ReturnType<typeof ref<algosdk.Algodv2>>>('algodClient')
-  const setAlgodClient = inject<SetAlgodClient>('setAlgodClient') as SetAlgodClient
 
   if (!manager) {
     throw new Error('WalletManager plugin is not properly installed')
   }
-  if (!algodClient || !setAlgodClient) {
-    throw new Error('Algod client or setter not properly installed')
+  if (!algodClient) {
+    throw new Error('Algod client not properly installed')
   }
 
   const managerStatus = useStore(manager.store, (state) => state.managerStatus)
   const isReady = computed(() => managerStatus.value === 'ready')
-
-  const activeNetwork = useStore(manager.store, (state) => state.activeNetwork)
-  const setActiveNetwork = async (networkId: NetworkId | string): Promise<void> => {
-    if (networkId === activeNetwork.value) {
-      return
-    }
-
-    if (!manager.networkConfig[networkId]) {
-      throw new Error(`Network "${networkId}" not found in network configuration`)
-    }
-
-    console.info(`[Vue] Creating Algodv2 client for ${networkId}...`)
-
-    const { algod } = manager.networkConfig[networkId]
-    const { token, baseServer, port, headers } = algod
-    const newClient = new algosdk.Algodv2(token, baseServer, port, headers)
-    setAlgodClient(newClient)
-
-    manager.store.setState((state) => ({
-      ...state,
-      activeNetwork: networkId
-    }))
-
-    console.info(`[Vue] ✅ Active network set to ${networkId}.`)
-  }
 
   const walletStateMap = useStore(manager.store, (state) => state.wallets)
   const activeWalletId = useStore(manager.store, (state) => state.activeWallet)
@@ -139,14 +108,11 @@ export function useWallet() {
       }
       return algodClient.value
     }),
-    activeNetwork,
     activeWallet,
     activeWalletAccounts,
     activeWalletAddresses,
     activeAccount,
     activeAddress,
-    setActiveNetwork,
-    setAlgodClient,
     signTransactions,
     transactionSigner
   }

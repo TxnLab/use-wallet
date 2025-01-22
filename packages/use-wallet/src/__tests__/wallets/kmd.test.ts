@@ -1,7 +1,6 @@
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
 import { logger } from 'src/logger'
-import { DEFAULT_NETWORKS } from 'src/network'
 import { StorageAdapter } from 'src/storage'
 import { LOCAL_STORAGE_KEY, State, WalletState, DEFAULT_STATE } from 'src/store'
 import { KmdWallet } from 'src/wallets/kmd'
@@ -54,8 +53,7 @@ function createWalletWithStore(store: Store<State>): KmdWallet {
     metadata: {},
     getAlgodClient: {} as any,
     store,
-    subscribe: vi.fn(),
-    networks: DEFAULT_NETWORKS
+    subscribe: vi.fn()
   })
 }
 
@@ -441,7 +439,6 @@ describe('KmdWallet', () => {
         getAlgodClient: {} as any,
         store,
         subscribe: vi.fn(),
-        networks: DEFAULT_NETWORKS,
         options: {
           promptForPassword: () => Promise.resolve(customPassword)
         }

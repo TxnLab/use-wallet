@@ -18,8 +18,7 @@ export class KibisisWallet extends AVMProvider {
     store,
     subscribe,
     getAlgodClient,
-    metadata = {},
-    networks
+    metadata = {}
   }: WalletConstructor<WalletId.KIBISIS>) {
     super({
       id,
@@ -27,7 +26,6 @@ export class KibisisWallet extends AVMProvider {
       getAlgodClient,
       store,
       subscribe,
-      networks,
       providerId: KIBISIS_AVM_WEB_PROVIDER_ID
     })
   }

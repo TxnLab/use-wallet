@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Connect from './components/Connect.vue'
+import NetworkControls from './components/NetworkControls.vue'
 </script>
 
 <template>
@@ -12,6 +13,7 @@ import Connect from './components/Connect.vue'
     </a>
   </div>
   <h1>@txnlab/use-wallet-vue</h1>
+  <NetworkControls />
   <Connect />
 </template>
 

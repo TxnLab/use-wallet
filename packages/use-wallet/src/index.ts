@@ -1,6 +1,6 @@
 export { LogLevel } from './logger'
 export { WalletManager, WalletManagerConfig, WalletManagerOptions } from './manager'
-export { NetworkId, DEFAULT_NETWORKS } from './network'
+export { AlgodConfig, NetworkConfig, NetworkId, DEFAULT_NETWORK_CONFIG } from './network'
 export { State, WalletState, ManagerStatus, DEFAULT_STATE } from './store'
 export { StorageAdapter } from './storage'
 export { webpackFallback } from './webpack'

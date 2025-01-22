@@ -69,10 +69,9 @@ export class WalletConnect extends BaseWallet {
     subscribe,
     getAlgodClient,
     options,
-    metadata = {},
-    networks
+    metadata = {}
   }: WalletConstructor<WalletId.WALLETCONNECT>) {
-    super({ id, metadata, getAlgodClient, store, subscribe, networks })
+    super({ id, metadata, getAlgodClient, store, subscribe })
     if (!options?.projectId) {
       this.logger.error('Missing required option: projectId')
       throw new Error('Missing required option: projectId')
@@ -354,7 +353,7 @@ export class WalletConnect extends BaseWallet {
   }
 
   public get activeChainId(): string {
-    const network = this.networks[this.activeNetwork]
+    const network = this.activeNetworkConfig
     if (!network?.caipChainId) {
       this.logger.warn(`No CAIP-2 chain ID found for network: ${this.activeNetwork}`)
       return ''
