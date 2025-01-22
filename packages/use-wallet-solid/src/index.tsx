@@ -45,7 +45,10 @@ export const useWalletManager = (): WalletManager => {
 export const useNetwork = () => {
   const manager = createMemo(() => useWalletManager())
   const activeNetwork = useStore(manager().store, (state) => state.activeNetwork)
-  const activeNetworkConfig = createMemo(() => manager().networkConfig[activeNetwork()])
+  const activeNetworkConfig = () => {
+    const store = useStore(manager().store)
+    return store().networkConfig[activeNetwork()]
+  }
 
   const setActiveNetwork = async (networkId: NetworkId | string): Promise<void> => {
     if (networkId === activeNetwork()) {
@@ -107,7 +110,7 @@ export const useNetwork = () => {
 
   return {
     activeNetwork,
-    networks: manager().networks,
+    networkConfig: () => manager().networkConfig,
     activeNetworkConfig,
     setActiveNetwork,
     updateNetworkAlgod,

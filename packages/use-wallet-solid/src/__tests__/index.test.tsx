@@ -23,7 +23,8 @@ const mockStore = new Store<State>({
   algodClient: new algosdk.Algodv2('', 'https://testnet-api.algonode.cloud', ''),
   managerStatus: 'ready',
   wallets: {},
-  customNetworkConfigs: {}
+  customNetworkConfigs: {},
+  networkConfig: DEFAULT_NETWORKS
 })
 
 // Create mock wallet manager
@@ -44,6 +45,7 @@ beforeEach(() => {
     algodClient: new algosdk.Algodv2('', 'https://testnet-api.algonode.cloud', ''),
     managerStatus: 'ready',
     wallets: {},
+    networkConfig: { ...DEFAULT_NETWORKS },
     customNetworkConfigs: {}
   }))
 })
@@ -491,31 +493,44 @@ describe('useNetwork', () => {
   })
 
   it('updates algodClient when resetting active network', () => {
-    const newAlgodClient = new algosdk.Algodv2('', 'https://testnet-api.4160.nodely.dev/', '')
+    let initialClient!: algosdk.Algodv2
+    let finalClient!: algosdk.Algodv2
 
     const TestComponent = () => {
       const { resetNetworkConfig } = useNetwork()
       const { algodClient } = useWallet()
+
+      // Store the initial client reference
+      initialClient = algodClient()
+
       return (
-        <div>
-          <div data-testid="algod-client">{JSON.stringify(algodClient())}</div>
-          <button
-            data-testid="reset-btn"
-            onClick={() => {
-              // Mock the manager's resetNetworkConfig to update the config
-              mockWalletManager.networkConfig[NetworkId.TESTNET] =
-                DEFAULT_NETWORKS[NetworkId.TESTNET]
-              // Update the store's algodClient
-              mockSetAlgodClient(newAlgodClient)
-              // Call the function under test
-              resetNetworkConfig(NetworkId.TESTNET)
-            }}
-          >
-            Reset
-          </button>
-        </div>
+        <button
+          data-testid="reset-btn"
+          onClick={() => {
+            resetNetworkConfig(NetworkId.TESTNET)
+            // Store the new client reference after reset
+            finalClient = algodClient()
+          }}
+        >
+          Reset
+        </button>
       )
     }
+
+    // First set a custom network config
+    mockStore.setState((state) => ({
+      ...state,
+      networkConfig: {
+        ...state.networkConfig,
+        [NetworkId.TESTNET]: {
+          ...state.networkConfig[NetworkId.TESTNET],
+          algod: {
+            ...state.networkConfig[NetworkId.TESTNET].algod,
+            baseServer: 'https://new-server.com'
+          }
+        }
+      }
+    }))
 
     render(() => (
       <WalletProvider manager={mockWalletManager}>
@@ -526,7 +541,8 @@ describe('useNetwork', () => {
     const resetButton = screen.getByTestId('reset-btn')
     fireEvent.click(resetButton)
 
-    expect(screen.getByTestId('algod-client')).toHaveTextContent(JSON.stringify(newAlgodClient))
+    // Verify that a new algodClient instance was created
+    expect(finalClient).not.toBe(initialClient)
   })
 
   it('provides activeNetworkConfig through useNetwork', () => {
@@ -605,7 +621,8 @@ describe('useWallet', () => {
       activeNetwork: NetworkId.TESTNET,
       algodClient: new algosdk.Algodv2('', 'https://testnet-api.4160.nodely.dev/'),
       managerStatus: 'initializing' as ManagerStatus,
-      customNetworkConfigs: {}
+      customNetworkConfigs: {},
+      networkConfig: { ...DEFAULT_NETWORKS }
     }
 
     mockStore = new Store<State>(defaultState)
@@ -615,8 +632,7 @@ describe('useWallet', () => {
       metadata: { name: 'Defly', icon: 'icon' },
       getAlgodClient: () => ({}) as any,
       store: mockStore,
-      subscribe: vi.fn(),
-      networks: DEFAULT_NETWORKS
+      subscribe: vi.fn()
     })
 
     mockMagicAuth = new MagicAuth({
@@ -624,8 +640,7 @@ describe('useWallet', () => {
       metadata: { name: 'Magic', icon: 'icon' },
       getAlgodClient: () => ({}) as any,
       store: mockStore,
-      subscribe: vi.fn(),
-      networks: DEFAULT_NETWORKS
+      subscribe: vi.fn()
     })
 
     mockWalletManager = new WalletManager()
