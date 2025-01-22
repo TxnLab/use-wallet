@@ -1,5 +1,6 @@
 import { Store } from '@tanstack/vue-store'
 import {
+  DEFAULT_NETWORKS,
   NetworkId,
   WalletManager,
   WalletId,
@@ -36,6 +37,7 @@ const setupMocks = () => {
     algodClient: new algosdk.Algodv2('', 'https://testnet-api.algonode.cloud', ''),
     managerStatus: 'ready',
     wallets: {},
+    networkConfig: DEFAULT_NETWORKS,
     customNetworkConfigs: {}
   })
 
@@ -61,6 +63,8 @@ beforeEach(() => {
     activeWallet: null,
     algodClient: new algosdk.Algodv2('', 'https://testnet-api.algonode.cloud', ''),
     managerStatus: 'ready',
+    networkConfig: { ...DEFAULT_NETWORKS },
+    customNetworkConfigs: {},
     wallets: {}
   }))
 })
@@ -203,24 +207,6 @@ describe('useNetwork', () => {
   })
 
   it('updates activeNetworkConfig when switching networks', async () => {
-    // Set up initial network configs
-    mockWalletManager.networkConfig = {
-      [NetworkId.TESTNET]: {
-        algod: { baseServer: 'https://testnet-api.algonode.cloud', token: '' },
-        isTestnet: true,
-        genesisId: 'testnet-v1.0',
-        genesisHash: 'SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=',
-        caipChainId: 'algorand:SGO1GKSzyE7IEPItTxCByw9x8FmnrCDe'
-      },
-      [NetworkId.MAINNET]: {
-        algod: { baseServer: 'https://mainnet-api.algonode.cloud', token: '' },
-        isTestnet: false,
-        genesisId: 'mainnet-v1.0',
-        genesisHash: 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=',
-        caipChainId: 'algorand:wGHE2Pwdvd7S12BL5FaOP20EGYesN73k'
-      }
-    }
-
     const TestComponent = {
       template: `
         <div data-testid="active-network-config">{{ stringifiedConfig }}</div>
@@ -258,16 +244,6 @@ describe('useNetwork', () => {
   })
 
   it('updates activeNetworkConfig when updating network configuration', async () => {
-    mockWalletManager.networkConfig = {
-      [NetworkId.TESTNET]: {
-        algod: { baseServer: 'https://testnet-api.algonode.cloud', token: '' },
-        isTestnet: true,
-        genesisId: 'testnet-v1.0',
-        genesisHash: 'SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=',
-        caipChainId: 'algorand:SGO1GKSzyE7IEPItTxCByw9x8FmnrCDe'
-      }
-    }
-
     const TestComponent = {
       template: `
         <div data-testid="active-network-config">{{ stringifiedConfig }}</div>
@@ -345,26 +321,18 @@ describe('useNetwork', () => {
   })
 
   it('updates activeNetworkConfig when resetting network configuration', async () => {
-    const defaultConfig = {
-      algod: {
-        baseServer: 'https://testnet-api.algonode.cloud',
-        token: ''
-      },
-      isTestnet: true,
-      genesisId: 'testnet-v1.0',
-      genesisHash: 'SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=',
-      caipChainId: 'algorand:SGO1GKSzyE7IEPItTxCByw9x8FmnrCDe'
-    }
-
-    mockWalletManager.networkConfig = {
-      [NetworkId.TESTNET]: {
-        ...defaultConfig,
-        algod: {
-          ...defaultConfig.algod,
-          baseServer: 'https://custom-server.com'
+    mockStore.setState((state) => ({
+      ...state,
+      networkConfig: {
+        [NetworkId.TESTNET]: {
+          ...DEFAULT_NETWORKS[NetworkId.TESTNET],
+          algod: {
+            ...DEFAULT_NETWORKS[NetworkId.TESTNET].algod,
+            baseServer: 'https://custom-server.com'
+          }
         }
       }
-    }
+    }))
 
     const TestComponent = {
       template: `
@@ -381,7 +349,7 @@ describe('useNetwork', () => {
 
     // Mock the resetNetworkConfig behavior
     mockWalletManager.resetNetworkConfig = () => {
-      mockWalletManager.networkConfig[NetworkId.TESTNET] = defaultConfig
+      mockWalletManager.networkConfig[NetworkId.TESTNET] = DEFAULT_NETWORKS[NetworkId.TESTNET]
       mockStore.setState((state) => ({ ...state }))
     }
 
@@ -390,6 +358,6 @@ describe('useNetwork', () => {
     await nextTick()
 
     const actual = JSON.parse(wrapper.get('[data-testid="active-network-config"]').text())
-    expect(actual).toEqual(defaultConfig)
+    expect(actual).toEqual(DEFAULT_NETWORKS[NetworkId.TESTNET])
   })
 })

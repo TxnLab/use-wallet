@@ -76,7 +76,7 @@ export function useNetwork() {
 
   return {
     activeNetwork,
-    networks: manager.networks,
+    networkConfig: manager.networkConfig,
     activeNetworkConfig,
     setActiveNetwork,
     updateNetworkAlgod,

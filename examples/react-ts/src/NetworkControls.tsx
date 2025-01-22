@@ -4,7 +4,7 @@ import * as React from 'react'
 export function NetworkControls() {
   const {
     activeNetwork,
-    networks,
+    networkConfig,
     activeNetworkConfig,
     setActiveNetwork,
     updateNetworkAlgod,
@@ -71,7 +71,7 @@ export function NetworkControls() {
       <div className="active-network">Active: {activeNetwork}</div>
 
       <div className="network-buttons">
-        {Object.keys(networks).map((networkId) => (
+        {Object.keys(networkConfig).map((networkId) => (
           <button
             key={networkId}
             onClick={() => handleNetworkSwitch(networkId as NetworkId)}

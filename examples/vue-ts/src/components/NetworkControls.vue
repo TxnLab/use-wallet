@@ -4,7 +4,7 @@ import { ref, reactive, watch } from 'vue'
 
 const {
   activeNetwork,
-  networks,
+  networkConfig,
   activeNetworkConfig,
   setActiveNetwork,
   updateNetworkAlgod,
@@ -69,7 +69,7 @@ const handleResetConfig = () => {
 
     <div class="network-buttons">
       <button
-        v-for="networkId in Object.keys(networks)"
+        v-for="networkId in Object.keys(networkConfig)"
         :key="networkId"
         @click="() => handleNetworkSwitch(networkId as NetworkId)"
         :disabled="networkId === activeNetwork"

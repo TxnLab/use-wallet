@@ -7,7 +7,6 @@ import {
   NetworkId,
   WalletManager,
   WalletId,
-  DEFAULT_NETWORKS,
   DEFAULT_STATE,
   type State,
   type WalletAccount
@@ -60,8 +59,7 @@ const mockDeflyWallet = new DeflyWallet({
   metadata: { name: 'Defly', icon: 'icon' },
   getAlgodClient: () => ({}) as any,
   store: mockStore,
-  subscribe: vi.fn(),
-  networks: DEFAULT_NETWORKS
+  subscribe: vi.fn()
 })
 
 const mockMagicAuth = new MagicAuth({
@@ -72,8 +70,7 @@ const mockMagicAuth = new MagicAuth({
   metadata: { name: 'Magic', icon: 'icon' },
   getAlgodClient: () => ({}) as any,
   store: mockStore,
-  subscribe: vi.fn(),
-  networks: DEFAULT_NETWORKS
+  subscribe: vi.fn()
 })
 
 describe('WalletProvider', () => {
@@ -147,8 +144,10 @@ describe('useNetwork', () => {
     const { result } = renderHook(() => useNetwork(), { wrapper })
 
     expect(result.current.activeNetwork).toBe(NetworkId.TESTNET)
-    expect(result.current.networks).toBeDefined()
-    expect(result.current.activeNetworkConfig).toBe(mockWalletManager.networks[NetworkId.TESTNET])
+    expect(result.current.networkConfig).toBeDefined()
+    expect(result.current.activeNetworkConfig).toBe(
+      mockWalletManager.networkConfig[NetworkId.TESTNET]
+    )
     expect(typeof result.current.setActiveNetwork).toBe('function')
     expect(typeof result.current.updateNetworkAlgod).toBe('function')
   })
@@ -224,7 +223,7 @@ describe('useNetwork', () => {
       await result.current.setActiveNetwork(newNetwork)
     })
 
-    expect(result.current.activeNetworkConfig).toBe(mockWalletManager.networks[newNetwork])
+    expect(result.current.activeNetworkConfig).toBe(mockWalletManager.networkConfig[newNetwork])
   })
 
   it('updates activeNetworkConfig when updating network configuration', async () => {
@@ -283,7 +282,8 @@ describe('useNetwork', () => {
     })
 
     // Verify new algod client was created
-    expect(createAlgodClientSpy).toHaveBeenCalledWith(NetworkId.TESTNET)
+    const algodConfig = mockWalletManager.networkConfig[NetworkId.TESTNET].algod
+    expect(createAlgodClientSpy).toHaveBeenCalledWith(algodConfig)
   })
 
   it('updates algodClient when updating active network config', async () => {

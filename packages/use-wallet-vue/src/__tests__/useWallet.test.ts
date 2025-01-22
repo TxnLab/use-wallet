@@ -77,7 +77,8 @@ const setupMocks = () => {
     algodClient: new algosdk.Algodv2('', 'https://testnet-api.algonode.cloud', ''),
     managerStatus: 'ready',
     wallets: {},
-    customNetworkConfigs: {}
+    customNetworkConfigs: {},
+    networkConfig: DEFAULT_NETWORKS
   })
 
   mockWalletManager = new WalletManager({
@@ -92,8 +93,7 @@ const setupMocks = () => {
     metadata: { name: 'Defly', icon: 'icon' },
     getAlgodClient: () => ({}) as any,
     store: mockStore,
-    subscribe: vi.fn(),
-    networks: DEFAULT_NETWORKS
+    subscribe: vi.fn()
   })
 
   mockMagicAuth = new MagicAuth({
@@ -104,8 +104,7 @@ const setupMocks = () => {
     metadata: { name: 'Magic', icon: 'icon' },
     getAlgodClient: () => ({}) as any,
     store: mockStore,
-    subscribe: vi.fn(),
-    networks: DEFAULT_NETWORKS
+    subscribe: vi.fn()
   })
   ;(inject as Mock).mockImplementation((token: string | InjectionKey<unknown>) => {
     if (token === 'walletManager') return mockWalletManager
