@@ -1,3 +1,15 @@
+## [4.0.0-beta.5](https://github.com/TxnLab/use-wallet/tree/v4.0.0-beta.4...v4.0.0-beta.5) (2025-01-22)
+
+### Features
+
+- **Network:** Enable runtime connection to custom Algorand nodes ([#339](https://github.com/txnlab/use-wallet/pull/339)) ([6d6494e](https://github.com/txnlab/use-wallet/commit/6d6494e5c9d8493886a2937ffb02170a014df12f))
+
+### Other Changes
+
+- Remove Liquid Auth provider ([#337](https://github.com/txnlab/use-wallet/pull/337)) ([74fdf73](https://github.com/txnlab/use-wallet/commit/74fdf73eb1e3c3dc764a26b419f6977a2201b413))
+- **Network:** Remove `name` property and improve network ID types ([#338](https://github.com/txnlab/use-wallet/pull/338)) ([dbbad1b](https://github.com/txnlab/use-wallet/commit/dbbad1b0e610e11e301fa005705dda88f7004931))
+- Update local storage key for v4 ([72e0c23](https://github.com/txnlab/use-wallet/commit/72e0c2310c00da5cb4cfc16da7ab1870d5054e5d))
+
 ## [4.0.0-beta.4](https://github.com/TxnLab/use-wallet/tree/v4.0.0-beta.3...v4.0.0-beta.4) (2025-01-09)
 
 ### Dependencies
