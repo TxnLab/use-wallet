@@ -6,7 +6,6 @@ import { StorageAdapter } from 'src/storage'
 import { LOCAL_STORAGE_KEY, State, WalletState, DEFAULT_STATE } from 'src/store'
 import { LiquidWallet } from 'src/wallets/liquid'
 import { WalletId } from 'src/wallets/types'
-import { DEFAULT_NETWORKS } from 'src/network'
 
 // Mock logger
 vi.mock('src/logger', () => ({
@@ -57,8 +56,7 @@ function createWalletWithStore(store: Store<State>): LiquidWallet {
     metadata: {},
     getAlgodClient: () => ({}) as any,
     store,
-    subscribe: vi.fn(),
-    networks: DEFAULT_NETWORKS
+    subscribe: vi.fn()
   })
 }
 

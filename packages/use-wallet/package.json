@@ -41,7 +41,7 @@
   },
   "devDependencies": {
     "@agoralabs-sh/avm-web-provider": "1.7.0",
-    "@algorandfoundation/liquid-auth-use-wallet-client": "1.1.0",
+    "@algorandfoundation/liquid-auth-use-wallet-client": "1.2.0",
     "@blockshake/defly-connect": "1.2.1",
     "@magic-ext/algorand": "23.20.0",
     "@magic-sdk/provider": "28.20.0",
@@ -59,7 +59,7 @@
   },
   "peerDependencies": {
     "@agoralabs-sh/avm-web-provider": "^1.7.0",
-    "@algorandfoundation/liquid-auth-use-wallet-client": "1.1.0",
+    "@algorandfoundation/liquid-auth-use-wallet-client": "1.2.0",
     "@blockshake/defly-connect": "^1.2.1",
     "@perawallet/connect": "^1.4.1",
     "@walletconnect/modal": "^2.7.0",

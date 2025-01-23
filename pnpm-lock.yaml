@@ -118,8 +118,8 @@ importers:
   examples/nuxt:
     dependencies:
       '@algorandfoundation/liquid-auth-use-wallet-client':
-        specifier: 1.1.0
-        version: 1.1.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        specifier: 1.2.0
+        version: 1.2.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.0.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -164,8 +164,8 @@ importers:
   examples/react-ts:
     dependencies:
       '@algorandfoundation/liquid-auth-use-wallet-client':
-        specifier: 1.1.0
-        version: 1.1.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        specifier: 1.2.0
+        version: 1.2.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.0.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -228,8 +228,8 @@ importers:
   examples/solid-ts:
     dependencies:
       '@algorandfoundation/liquid-auth-use-wallet-client':
-        specifier: 1.1.0
-        version: 1.1.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        specifier: 1.2.0
+        version: 1.2.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.0.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -268,8 +268,8 @@ importers:
   examples/vanilla-ts:
     dependencies:
       '@algorandfoundation/liquid-auth-use-wallet-client':
-        specifier: 1.1.0
-        version: 1.1.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        specifier: 1.2.0
+        version: 1.2.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.0.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -305,8 +305,8 @@ importers:
   examples/vue-ts:
     dependencies:
       '@algorandfoundation/liquid-auth-use-wallet-client':
-        specifier: 1.1.0
-        version: 1.1.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        specifier: 1.2.0
+        version: 1.2.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.0.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -355,8 +355,8 @@ importers:
         specifier: 1.7.0
         version: 1.7.0
       '@algorandfoundation/liquid-auth-use-wallet-client':
-        specifier: 1.1.0
-        version: 1.1.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        specifier: 1.2.0
+        version: 1.2.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
         specifier: 1.2.1
         version: 1.2.1(algosdk@3.0.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -553,8 +553,8 @@ packages:
     resolution: {integrity: sha512-AfMdBdFS3EW1RunzHVEwNFucS6UIALs661d+zL6AHFDdxOTvUgahRC4l163VoGWA0UEpnayT1jGObci8nitZeA==}
     engines: {node: '>=18.20.3'}
 
-  '@algorandfoundation/liquid-auth-use-wallet-client@1.1.0':
-    resolution: {integrity: sha512-pGTHq9RXT4qN81mF0TGcTl+EBvnOiYGI42BHkIHDF43StogM0ueFRh/qvO6ei+aYRxKaFogqfhgB1twm9afcuQ==}
+  '@algorandfoundation/liquid-auth-use-wallet-client@1.2.0':
+    resolution: {integrity: sha512-+QflKTM5ngubnWf4w6Ocp+ZnliePvS3PdF3SaknyyIx+cypWodyesyfkn5dXQZc2fXUF0rDaVJcCQhi6o6fRmg==}
 
   '@algorandfoundation/liquid-client@https://codeload.github.com/algorandfoundation/liquid-auth-js/tar.gz/0958cb96627b5ead1ef5cfbdc4f47fe43a2e4908':
     resolution: {tarball: https://codeload.github.com/algorandfoundation/liquid-auth-js/tar.gz/0958cb96627b5ead1ef5cfbdc4f47fe43a2e4908}
@@ -2269,17 +2269,9 @@ packages:
   ajv@6.12.6:
     resolution: {integrity: sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==}
 
-  algo-msgpack-with-bigint@2.1.1:
-    resolution: {integrity: sha512-F1tGh056XczEaEAqu7s+hlZUDWwOBT70Eq0lfMpBP2YguSQVyxRbprLq5rELXKQOyOaixTWYhMeMQMzP0U5FoQ==}
-    engines: {node: '>= 10'}
-
   algorand-msgpack@1.1.0:
     resolution: {integrity: sha512-08k7pBQnkaUB5p+jL7f1TRaUIlTSDE0cesFu1mD7llLao+1cAhtvvZmGE3OnisTd0xOn118QMw74SRqddqaYvw==}
     engines: {node: '>= 14'}
-
-  algosdk@2.9.0:
-    resolution: {integrity: sha512-o0n0nLMbTX6SFQdMUk2/2sy50jmEmZk5OTPYSh2aAeP8DUPxrhjMPfwGsYNvaO+qk75MixC2eWpfA9vygCQ/Mg==}
-    engines: {node: '>=18.0.0'}
 
   algosdk@3.0.0:
     resolution: {integrity: sha512-PIKZ/YvbBpCudduug4KSH1CY/pTotI7/ccbUIbXKtcI9Onevl+57E+K5X4ow4gsCdysZ8zVvSLdxuCcXvsmPOw==}
@@ -6521,11 +6513,10 @@ snapshots:
     dependencies:
       uuid: 9.0.1
 
-  '@algorandfoundation/liquid-auth-use-wallet-client@1.1.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
+  '@algorandfoundation/liquid-auth-use-wallet-client@1.2.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
     dependencies:
       '@algorandfoundation/liquid-client': https://codeload.github.com/algorandfoundation/liquid-auth-js/tar.gz/0958cb96627b5ead1ef5cfbdc4f47fe43a2e4908(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@algorandfoundation/provider': https://codeload.github.com/algorandfoundation/wallet-provider-ts/tar.gz/28c80f5b9e0259b8e83e65c65d802d8123de9046
-      algosdk: 2.9.0
       cbor-x: 1.6.0
     transitivePeerDependencies:
       - bufferutil
@@ -8742,21 +8733,7 @@ snapshots:
       json-schema-traverse: 0.4.1
       uri-js: 4.4.1
 
-  algo-msgpack-with-bigint@2.1.1: {}
-
   algorand-msgpack@1.1.0: {}
-
-  algosdk@2.9.0:
-    dependencies:
-      algo-msgpack-with-bigint: 2.1.1
-      buffer: 6.0.3
-      hi-base32: 0.5.1
-      js-sha256: 0.9.0
-      js-sha3: 0.8.0
-      js-sha512: 0.8.0
-      json-bigint: 1.0.0
-      tweetnacl: 1.0.3
-      vlq: 2.0.4
 
   algosdk@3.0.0:
     dependencies:

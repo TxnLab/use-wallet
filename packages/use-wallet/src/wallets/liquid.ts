@@ -35,10 +35,9 @@ export class LiquidWallet extends BaseWallet {
     subscribe,
     getAlgodClient,
     options,
-    metadata = {},
-    networks
+    metadata = {}
   }: WalletConstructor<WalletId.LIQUID>) {
-    super({ id, metadata, getAlgodClient, store, subscribe, networks })
+    super({ id, metadata, getAlgodClient, store, subscribe })
 
     this.store = store
     this.options = options ?? {
@@ -140,7 +139,6 @@ export class LiquidWallet extends BaseWallet {
       this.logger.debug('Signing transactions...', { txnGroup, indexesToSign })
 
       const authClient = this.authClient || (await this.initializeClient())
-      // @ts-expect-error - TODO: update liquid-auth-use-wallet-client to use algosdk v3
       return authClient.signTransactions(txnGroup, this.activeAddress, indexesToSign)
     } catch (error) {
       this.logger.error('Error signing transactions', error)
