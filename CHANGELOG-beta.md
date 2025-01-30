@@ -1,3 +1,11 @@
+## [4.0.0-beta.6](https://github.com/TxnLab/use-wallet/tree/v4.0.0-beta.5...v4.0.0-beta.6) (2025-01-30)
+
+### Bug Fixes
+
+- Export `NetworkConfigBuilder` class ([#345](https://github.com/txnlab/use-wallet/pull/345)) ([b258440](https://github.com/txnlab/use-wallet/commit/b2584408590c8721d6365679fca996182b23c248))
+
+### Other Changes
+
 ## [4.0.0-beta.5](https://github.com/TxnLab/use-wallet/tree/v4.0.0-beta.4...v4.0.0-beta.5) (2025-01-22)
 
 ### Features
