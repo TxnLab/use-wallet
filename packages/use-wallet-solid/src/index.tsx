@@ -4,10 +4,8 @@ import { JSX, createContext, createMemo, onMount, useContext } from 'solid-js'
 import type {
   AlgodConfig,
   NetworkId,
-  WalletAccount,
   WalletId,
   WalletManager,
-  WalletMetadata,
   WalletState
 } from '@txnlab/use-wallet'
 
@@ -118,19 +116,6 @@ export const useNetwork = () => {
     updateAlgodConfig,
     resetNetworkConfig
   }
-}
-
-export interface Wallet {
-  id: () => string
-  metadata: () => WalletMetadata
-  accounts: () => WalletAccount[]
-  activeAccount: () => WalletAccount | null
-  isConnected: () => boolean
-  isActive: () => boolean
-  connect: (args?: Record<string, any>) => Promise<WalletAccount[]>
-  disconnect: () => Promise<void>
-  setActive: () => void
-  setActiveAccount: (address: string) => void
 }
 
 export const useWallet = () => {
