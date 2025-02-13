@@ -1,10 +1,16 @@
 import { useStore } from '@tanstack/vue-store'
-import { WalletManager, type WalletAccount, type WalletMetadata } from '@txnlab/use-wallet'
+import {
+  BaseWallet,
+  WalletManager,
+  type WalletAccount,
+  type WalletMetadata,
+  type WalletId
+} from '@txnlab/use-wallet'
 import algosdk from 'algosdk'
 import { computed, inject, ref } from 'vue'
 
 export interface Wallet {
-  id: string
+  id: WalletId
   metadata: WalletMetadata
   accounts: WalletAccount[]
   activeAccount: WalletAccount | null
@@ -35,26 +41,32 @@ export function useWallet() {
   const walletStateMap = useStore(manager.store, (state) => state.wallets)
   const activeWalletId = useStore(manager.store, (state) => state.activeWallet)
 
-  const wallets = computed(() => {
-    return [...manager.wallets.values()].map((wallet): Wallet => {
-      const walletState = walletStateMap.value[wallet.id]
+  const transformToWallet = (wallet: BaseWallet): Wallet => {
+    const walletState = walletStateMap.value[wallet.id]
+    return {
+      id: wallet.id,
+      metadata: wallet.metadata,
+      accounts: walletState?.accounts ?? [],
+      activeAccount: walletState?.activeAccount ?? null,
+      isConnected: !!walletState,
+      isActive: wallet.id === activeWalletId.value,
+      connect: (args) => wallet.connect(args),
+      disconnect: () => wallet.disconnect(),
+      setActive: () => wallet.setActive(),
+      setActiveAccount: (addr) => wallet.setActiveAccount(addr)
+    }
+  }
 
-      return {
-        id: wallet.id,
-        metadata: wallet.metadata,
-        accounts: walletState?.accounts ?? [],
-        activeAccount: walletState?.activeAccount ?? null,
-        isConnected: !!walletState,
-        isActive: wallet.id === activeWalletId.value,
-        connect: (args) => wallet.connect(args),
-        disconnect: () => wallet.disconnect(),
-        setActive: () => wallet.setActive(),
-        setActiveAccount: (addr) => wallet.setActiveAccount(addr)
-      }
-    })
+  const wallets = computed(() => {
+    return [...manager.wallets.values()].map(transformToWallet)
   })
 
   const activeWallet = computed(() => {
+    const wallet = activeWalletId.value ? manager.getWallet(activeWalletId.value) || null : null
+    return wallet ? transformToWallet(wallet) : null
+  })
+
+  const activeBaseWallet = computed(() => {
     return activeWalletId.value ? manager.getWallet(activeWalletId.value) || null : null
   })
 
@@ -83,20 +95,20 @@ export function useWallet() {
     txnGroup: T | T[],
     indexesToSign?: number[]
   ): Promise<(Uint8Array | null)[]> => {
-    if (!activeWallet.value) {
+    if (!activeBaseWallet.value) {
       throw new Error('No active wallet')
     }
-    return activeWallet.value.signTransactions(txnGroup, indexesToSign)
+    return activeBaseWallet.value.signTransactions(txnGroup, indexesToSign)
   }
 
   const transactionSigner = (
     txnGroup: algosdk.Transaction[],
     indexesToSign: number[]
   ): Promise<Uint8Array[]> => {
-    if (!activeWallet.value) {
+    if (!activeBaseWallet.value) {
       throw new Error('No active wallet')
     }
-    return activeWallet.value.transactionSigner(txnGroup, indexesToSign)
+    return activeBaseWallet.value.transactionSigner(txnGroup, indexesToSign)
   }
 
   return {

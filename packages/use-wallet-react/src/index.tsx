@@ -1,8 +1,10 @@
 import { useStore } from '@tanstack/react-store'
 import {
   NetworkId,
+  WalletId,
   WalletManager,
   type AlgodConfig,
+  type BaseWallet,
   type WalletAccount,
   type WalletMetadata
 } from '@txnlab/use-wallet'
@@ -119,7 +121,7 @@ export const useNetwork = () => {
 }
 
 export interface Wallet {
-  id: string
+  id: WalletId
   metadata: WalletMetadata
   accounts: WalletAccount[]
   activeAccount: WalletAccount | null
@@ -146,10 +148,9 @@ export const useWallet = () => {
   const walletStateMap = useStore(manager.store, (state) => state.wallets)
   const activeWalletId = useStore(manager.store, (state) => state.activeWallet)
 
-  const wallets = React.useMemo(() => {
-    return [...manager.wallets.values()].map((wallet): Wallet => {
+  const transformToWallet = React.useCallback(
+    (wallet: BaseWallet): Wallet => {
       const walletState = walletStateMap[wallet.id]
-
       return {
         id: wallet.id,
         metadata: wallet.metadata,
@@ -162,35 +163,42 @@ export const useWallet = () => {
         setActive: () => wallet.setActive(),
         setActiveAccount: (addr) => wallet.setActiveAccount(addr)
       }
-    })
-  }, [manager, walletStateMap, activeWalletId])
+    },
+    [walletStateMap, activeWalletId]
+  )
 
-  const activeWallet = activeWalletId ? manager.getWallet(activeWalletId) || null : null
-  const activeWalletState = activeWalletId ? walletStateMap[activeWalletId] || null : null
+  const wallets = React.useMemo(() => {
+    return [...manager.wallets.values()].map(transformToWallet)
+  }, [manager, transformToWallet])
 
-  const activeWalletAccounts = activeWalletState?.accounts ?? null
+  const activeBaseWallet = activeWalletId ? manager.getWallet(activeWalletId) || null : null
+  const activeWallet = React.useMemo(() => {
+    return activeBaseWallet ? transformToWallet(activeBaseWallet) : null
+  }, [activeBaseWallet, transformToWallet])
+
+  const activeWalletAccounts = activeWallet?.accounts ?? null
   const activeWalletAddresses = activeWalletAccounts?.map((account) => account.address) ?? null
-  const activeAccount = activeWalletState?.activeAccount ?? null
+  const activeAccount = activeWallet?.activeAccount ?? null
   const activeAddress = activeAccount?.address ?? null
 
   const signTransactions = <T extends algosdk.Transaction[] | Uint8Array[]>(
     txnGroup: T | T[],
     indexesToSign?: number[]
   ): Promise<(Uint8Array | null)[]> => {
-    if (!activeWallet) {
+    if (!activeBaseWallet) {
       throw new Error('No active wallet')
     }
-    return activeWallet.signTransactions(txnGroup, indexesToSign)
+    return activeBaseWallet.signTransactions(txnGroup, indexesToSign)
   }
 
   const transactionSigner = (
     txnGroup: algosdk.Transaction[],
     indexesToSign: number[]
   ): Promise<Uint8Array[]> => {
-    if (!activeWallet) {
+    if (!activeBaseWallet) {
       throw new Error('No active wallet')
     }
-    return activeWallet.transactionSigner(txnGroup, indexesToSign)
+    return activeBaseWallet.transactionSigner(txnGroup, indexesToSign)
   }
 
   return {
