@@ -97,11 +97,6 @@ pnpm test:e2e
 * For more consistent and predictable tests, mock the responses of API requests. Mocking also prevents overwhelming the API provider (like [Nodely](https://nodely.io/)) with test requests. An example of mocking responses to Algorand node (Algod) API requests is in the [`examples/e2e-tests/` folder](https://github.com/TxnLab/use-wallet/tree/main/examples/e2e-tests).
 * More best practices: [https://playwright.dev/docs/best-practices](https://playwright.dev/docs/best-practices)
 
-## References
-
-[https://www.browserstack.com/guide/end-to-end-testing](https://www.browserstack.com/guide/end-to-end-testing)\
-[https://en.wikipedia.org/wiki/System\_testing](https://en.wikipedia.org/wiki/System_testing)
-
 [^1]: [End To End Testing: Tools, Types & Best Practices (BrowserStack)](https://www.browserstack.com/guide/end-to-end-testing)
 
 [^2]: [System testing (Wikipedia)](https://en.wikipedia.org/wiki/System_testing)
