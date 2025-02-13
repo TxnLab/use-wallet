@@ -22,4 +22,5 @@
 * [⚡ React Quick Start](guides/react-quick-start.md)
 * [⚡ Vue Quick Start](guides/vue-quick-start.md)
 * [⚡ Solid.js Quick Start](guides/solid.js-quick-start.md)
+* [🎯 End-to-End Testing](guides/end-to-end-testing.md)
 * [🚣 Migrating from v2.x](guides/migrating-from-v2.x.md)
