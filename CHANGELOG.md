@@ -1,3 +1,35 @@
+# [4.0.0](https://github.com/TxnLab/use-wallet/releases/tag/v4.0.0) (2024-02-13)
+
+### Summary
+
+Version 4.0.0 introduces several major improvements and breaking changes, building upon the framework-agnostic foundation established in v3.x.
+
+### Breaking Changes
+
+- Migrate to `algosdk` v3
+- New network configuration system
+- Remove Liquid Auth (Experimental) provider
+- Remove Pera Connect v2 (Beta) provider
+- Update local storage key for v4
+
+### Features
+
+- **Network:** Enable runtime connection to custom Algorand nodes
+- **Network:** Add new `NetworkConfigBuilder`
+- **Pera:** Add auto-connect for Pera Discover browser
+- **Defly:** Add Defly Web extension wallet provider
+
+### Bug Fixes
+
+- Ensure consistent wallet interface across framework adapters
+
+### Dependencies
+
+- Update `@blockshake/defly-connect` to v1.2.1
+- Update `@perawallet/connect` to v1.4.1
+- Remove `@perawallet/connect-beta` from dependencies
+- Remove `@algorandfoundation/liquid-auth-use-wallet-client` from dependencies
+
 # [3.12.0](https://github.com/txnlab/use-wallet/compare/v3.11.1...v3.12.0) (2024-01-17)
 
 ### Features
