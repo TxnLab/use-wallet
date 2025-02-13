@@ -14,7 +14,7 @@ import {
 } from '@txnlab/use-wallet'
 import algosdk from 'algosdk'
 import { For, Show, createEffect, createSignal } from 'solid-js'
-import { Wallet, WalletProvider, useWallet, useWalletManager, useNetwork } from '../index'
+import { WalletProvider, useWallet, useWalletManager, useNetwork } from '../index'
 
 // Create mock store with initial state
 const mockStore = new Store<State>({
@@ -606,7 +606,7 @@ describe('useWallet', () => {
   let mockWalletManager: WalletManager
   let mockDeflyWallet: DeflyWallet
   let mockMagicAuth: MagicAuth
-  let mockWallets: Wallet[]
+  let mockWallets: BaseWallet[]
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let mockSetAlgodClient: (client: algosdk.Algodv2) => void
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -650,32 +650,7 @@ describe('useWallet', () => {
     ])
     mockWalletManager.store = mockStore
 
-    mockWallets = [
-      {
-        id: () => mockDeflyWallet.id,
-        metadata: () => mockDeflyWallet.metadata,
-        accounts: () => [],
-        activeAccount: () => null,
-        isConnected: () => false,
-        isActive: () => false,
-        connect: expect.any(Function),
-        disconnect: expect.any(Function),
-        setActive: expect.any(Function),
-        setActiveAccount: expect.any(Function)
-      },
-      {
-        id: () => mockMagicAuth.id,
-        metadata: () => mockMagicAuth.metadata,
-        accounts: () => [],
-        activeAccount: () => null,
-        isConnected: () => false,
-        isActive: () => false,
-        connect: expect.any(Function),
-        disconnect: expect.any(Function),
-        setActive: expect.any(Function),
-        setActiveAccount: expect.any(Function)
-      }
-    ]
+    mockWallets = [mockDeflyWallet, mockMagicAuth]
 
     mockAlgodClient = new algosdk.Algodv2('token', 'https://server', '')
 
@@ -691,7 +666,7 @@ describe('useWallet', () => {
       </WalletProvider>
     ))
     expect(screen.getByTestId('wallets')).toHaveTextContent(
-      mockWallets.map((wallet) => wallet.id()).join(', ')
+      mockWallets.map((wallet) => wallet.id).join(', ')
     )
     expect(screen.getAllByTestId('wallet')).toHaveLength(2)
     expect(screen.getByTestId('active-wallet')).toHaveTextContent('null')
@@ -832,7 +807,7 @@ describe('useWallet', () => {
     expect(screen.getByTestId('active-wallet-state')).toHaveTextContent('null')
     expect(screen.getByTestId('wallet-store')).toHaveTextContent('{}')
     expect(screen.getByTestId('wallets')).toHaveTextContent(
-      mockWallets.map((wallet) => wallet.id()).join(', ')
+      mockWallets.map((wallet) => wallet.id).join(', ')
     )
     expect(screen.getAllByTestId('wallet')).toHaveLength(2)
     expect(screen.getByTestId('wallet-name-defly')).toHaveTextContent('Defly')
