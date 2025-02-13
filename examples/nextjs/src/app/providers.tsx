@@ -5,6 +5,7 @@ import { NetworkId, WalletId, WalletManager, WalletProvider } from '@txnlab/use-
 const walletManager = new WalletManager({
   wallets: [
     WalletId.DEFLY,
+    WalletId.DEFLY_WEB,
     WalletId.EXODUS,
     WalletId.PERA,
     {
@@ -27,7 +28,7 @@ const walletManager = new WalletManager({
     },
     WalletId.MNEMONIC
   ],
-  network: NetworkId.TESTNET
+  defaultNetwork: NetworkId.TESTNET
 })
 
 export function Providers({ children }: { children: React.ReactNode }) {

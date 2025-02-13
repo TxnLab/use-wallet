@@ -66,11 +66,17 @@ export class LuteWallet extends BaseWallet {
   }
 
   private async getGenesisId(): Promise<string> {
-    const algodClient = this.getAlgodClient()
-    const genesis = await algodClient.genesis().do()
-    const genesisId = `${genesis.network}-${genesis.id}`
+    const network = this.activeNetworkConfig
+    if (network.genesisId) {
+      return network.genesisId
+    }
 
-    return genesisId
+    const algodClient = this.getAlgodClient()
+    const genesisStr = await algodClient.genesis().do()
+    const genesis = algosdk.parseJSON(genesisStr, {
+      intDecoding: algosdk.IntDecoding.MIXED
+    })
+    return `${genesis.network}-${genesis.id}`
   }
 
   public connect = async (): Promise<WalletAccount[]> => {
@@ -139,7 +145,7 @@ export class LuteWallet extends BaseWallet {
 
     txnGroup.forEach((txn, index) => {
       const isIndexMatch = !indexesToSign || indexesToSign.includes(index)
-      const signer = algosdk.encodeAddress(txn.from.publicKey)
+      const signer = txn.sender.toString()
       const canSignTxn = this.addresses.includes(signer)
 
       const txnString = byteArrayToBase64(txn.toByte())
@@ -161,18 +167,15 @@ export class LuteWallet extends BaseWallet {
     const txnsToSign: WalletTransaction[] = []
 
     txnGroup.forEach((txnBuffer, index) => {
-      const txnDecodeObj = algosdk.decodeObj(txnBuffer) as
-        | algosdk.EncodedTransaction
-        | algosdk.EncodedSignedTransaction
-
-      const isSigned = isSignedTxn(txnDecodeObj)
+      const decodedObj = algosdk.msgpackRawDecode(txnBuffer)
+      const isSigned = isSignedTxn(decodedObj)
 
       const txn: algosdk.Transaction = isSigned
         ? algosdk.decodeSignedTransaction(txnBuffer).txn
         : algosdk.decodeUnsignedTransaction(txnBuffer)
 
       const isIndexMatch = !indexesToSign || indexesToSign.includes(index)
-      const signer = algosdk.encodeAddress(txn.from.publicKey)
+      const signer = txn.sender.toString()
       const canSignTxn = !isSigned && this.addresses.includes(signer)
 
       const txnString = byteArrayToBase64(txn.toByte())

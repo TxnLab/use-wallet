@@ -2,15 +2,15 @@ import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
 import { Logger, LogLevel, logger } from 'src/logger'
 import {
-  createDefaultNetworkConfig,
-  isNetworkConfigMap,
+  createNetworkConfig,
+  isNetworkConfig,
   NetworkId,
-  type NetworkConfig,
-  type NetworkConfigMap
+  type AlgodConfig,
+  type NetworkConfig
 } from 'src/network'
 import { StorageAdapter } from 'src/storage'
 import {
-  defaultState,
+  DEFAULT_STATE,
   isValidPersistedState,
   LOCAL_STORAGE_KEY,
   removeWallet,
@@ -20,7 +20,7 @@ import {
   type ManagerStatus,
   type PersistedState
 } from 'src/store'
-import { createWalletMap, deepMerge } from 'src/utils'
+import { createWalletMap } from 'src/utils'
 import type { BaseWallet } from 'src/wallets/base'
 import type {
   SupportedWallet,
@@ -40,14 +40,14 @@ export interface WalletManagerOptions {
 
 export interface WalletManagerConfig {
   wallets?: SupportedWallet[]
-  network?: NetworkId
-  algod?: NetworkConfig
+  networks?: Record<string, NetworkConfig>
+  defaultNetwork?: string
   options?: WalletManagerOptions
 }
 
 export class WalletManager {
   public _clients: Map<WalletId, BaseWallet> = new Map()
-  public networkConfig: NetworkConfigMap
+  private baseNetworkConfig: Record<string, NetworkConfig>
   public store: Store<State>
   public subscribe: (callback: (state: State) => void) => () => void
   public options: { resetNetwork: boolean }
@@ -56,8 +56,8 @@ export class WalletManager {
 
   constructor({
     wallets = [],
-    network = NetworkId.TESTNET,
-    algod = {},
+    networks,
+    defaultNetwork = 'testnet',
     options = {}
   }: WalletManagerConfig = {}) {
     // Initialize scoped logger
@@ -65,32 +65,41 @@ export class WalletManager {
 
     this.logger.debug('Initializing WalletManager with config:', {
       wallets,
-      network,
-      algod,
+      networks,
+      defaultNetwork,
       options
     })
-
-    // Initialize network config
-    this.networkConfig = this.initNetworkConfig(network, algod)
-
-    // Initialize options
-    this.options = { resetNetwork: options.resetNetwork || false }
 
     // Load persisted state from local storage
     const persistedState = this.loadPersistedState()
 
+    // Store the base network config from `networks` (or created default)
+    this.baseNetworkConfig = networks || createNetworkConfig()
+
+    // Initialize network config
+    const networkConfig = this.initNetworkConfig(this.baseNetworkConfig, persistedState)
+
+    // Initialize options
+    this.options = { resetNetwork: options.resetNetwork || false }
+
     // Set active network
     const activeNetwork = this.options.resetNetwork
-      ? network
-      : persistedState?.activeNetwork || network
+      ? defaultNetwork
+      : persistedState?.activeNetwork || defaultNetwork
+
+    // Validate active network exists in config
+    if (!networkConfig[activeNetwork]) {
+      throw new Error(`Network "${activeNetwork}" not found in network configuration`)
+    }
 
     // Create Algod client for active network
-    const algodClient = this.createAlgodClient(activeNetwork)
+    const algodClient = this.createAlgodClient(networkConfig[activeNetwork].algod)
 
     // Create initial state
     const initialState: State = {
-      ...defaultState,
+      ...DEFAULT_STATE,
       ...persistedState,
+      networkConfig,
       activeNetwork,
       algodClient
     }
@@ -166,8 +175,38 @@ export class WalletManager {
 
   private savePersistedState(): void {
     try {
-      const { wallets, activeWallet, activeNetwork } = this.store.state
-      const persistedState: PersistedState = { wallets, activeWallet, activeNetwork }
+      const { wallets, activeWallet, activeNetwork, networkConfig } = this.store.state
+      const persistedState: PersistedState = {
+        wallets,
+        activeWallet,
+        activeNetwork,
+        customNetworkConfigs: {}
+      }
+
+      // Compare current network config with base config to find user customizations
+      for (const [networkId, currentConfig] of Object.entries(networkConfig)) {
+        const baseNetworkConfig = this.baseNetworkConfig[networkId]
+        if (!baseNetworkConfig) continue
+
+        // Check if there are any differences from base config
+        const customizations: Partial<NetworkConfig> = {}
+        let hasCustomizations = false
+
+        // Compare algod configuration
+        if (JSON.stringify(currentConfig.algod) !== JSON.stringify(baseNetworkConfig.algod)) {
+          customizations.algod = currentConfig.algod
+          hasCustomizations = true
+        }
+
+        // If there are customizations, add them to the persisted state
+        if (hasCustomizations) {
+          persistedState.customNetworkConfigs = {
+            ...(persistedState.customNetworkConfigs || {}),
+            [networkId]: customizations
+          }
+        }
+      }
+
       const serializedState = JSON.stringify(persistedState)
       StorageAdapter.setItem(LOCAL_STORAGE_KEY, serializedState)
     } catch (error) {
@@ -277,27 +316,45 @@ export class WalletManager {
 
   // ---------- Network ----------------------------------------------- //
 
-  private initNetworkConfig(network: NetworkId, config: NetworkConfig): NetworkConfigMap {
-    this.logger.info('Initializing network...')
+  private initNetworkConfig(
+    baseConfig: Record<string, NetworkConfig>,
+    persistedState?: PersistedState | null
+  ): Record<string, NetworkConfig> {
+    this.logger.info('Initializing network configuration...')
 
-    let networkConfig = createDefaultNetworkConfig()
+    // Use provided persisted state for custom configurations
+    const customConfigs = persistedState?.customNetworkConfigs || {}
 
-    if (isNetworkConfigMap(config)) {
-      // Config for multiple networks
-      networkConfig = deepMerge(networkConfig, config)
-    } else {
-      // Config for single (active) network
-      networkConfig[network] = deepMerge(networkConfig[network], config)
+    // Merge base config with custom overrides
+    const config: Record<string, NetworkConfig> = {}
+    for (const [networkId, baseNetworkConfig] of Object.entries(baseConfig)) {
+      const customNetworkConfig = customConfigs[networkId]
+      config[networkId] = {
+        ...baseNetworkConfig,
+        ...customNetworkConfig,
+        // Ensure algod config is also deeply merged
+        algod: {
+          ...baseNetworkConfig.algod,
+          ...(customNetworkConfig?.algod || {})
+        }
+      }
     }
 
-    this.logger.debug('Algodv2 config:', networkConfig)
+    // Validate network configurations
+    for (const [id, network] of Object.entries(config)) {
+      if (!isNetworkConfig(network)) {
+        throw new Error(`Invalid network configuration for "${id}"`)
+      }
+    }
 
-    return networkConfig
+    this.logger.debug('Network configuration:', config)
+    return config
   }
 
-  private createAlgodClient(networkId: NetworkId): algosdk.Algodv2 {
-    this.logger.info(`Creating Algodv2 client for ${networkId}...`)
-    const { token = '', baseServer, port = '', headers = {} } = this.networkConfig[networkId]
+  private createAlgodClient(config: AlgodConfig): algosdk.Algodv2 {
+    this.logger.info(`Creating new Algodv2 client...`)
+
+    const { token = '', baseServer, port = '', headers = {} } = config
     return new algosdk.Algodv2(token, baseServer, port, headers)
   }
 
@@ -305,19 +362,104 @@ export class WalletManager {
     return this.algodClient
   }
 
-  public setActiveNetwork = async (networkId: NetworkId): Promise<void> => {
+  public setActiveNetwork = async (networkId: NetworkId | string): Promise<void> => {
     if (this.activeNetwork === networkId) {
       return
     }
 
-    const algodClient = this.createAlgodClient(networkId)
+    if (!this.networkConfig[networkId]) {
+      throw new Error(`Network "${networkId}" not found in network configuration`)
+    }
+
+    const algodClient = this.createAlgodClient(this.networkConfig[networkId].algod)
     setActiveNetwork(this.store, { networkId, algodClient })
 
-    this.logger.info(`✅ Active network set to ${networkId}.`)
+    this.logger.info(`✅ Active network set to ${networkId}`)
   }
 
-  public get activeNetwork(): NetworkId {
+  public updateAlgodConfig(networkId: string, algodConfig: Partial<AlgodConfig>): void {
+    // Verify network exists
+    if (!this.networkConfig[networkId]) {
+      throw new Error(`Network "${networkId}" not found in network configuration`)
+    }
+
+    // Create new config merging existing with updates
+    const updatedConfig = {
+      ...this.networkConfig[networkId],
+      algod: {
+        ...this.networkConfig[networkId].algod,
+        ...algodConfig
+      }
+    }
+
+    // Validate the new configuration
+    if (!isNetworkConfig(updatedConfig)) {
+      throw new Error('Invalid network configuration')
+    }
+
+    // Update the network config
+    this.store.setState((state) => ({
+      ...state,
+      networkConfig: {
+        ...state.networkConfig,
+        [networkId]: updatedConfig
+      }
+    }))
+
+    // If this is the active network, update the algod client
+    if (this.activeNetwork === networkId) {
+      this.algodClient = this.createAlgodClient(updatedConfig.algod)
+    }
+
+    // Save the updated configuration
+    this.savePersistedState()
+
+    this.logger.info(`✅ Updated algod configuration for ${networkId}`)
+  }
+
+  public resetNetworkConfig(networkId: string): void {
+    // Verify network exists
+    if (!this.baseNetworkConfig[networkId]) {
+      throw new Error(`Network "${networkId}" not found in network configuration`)
+    }
+
+    // Reset to base configuration
+    this.store.setState((state) => ({
+      ...state,
+      networkConfig: {
+        ...state.networkConfig,
+        [networkId]: { ...this.baseNetworkConfig[networkId] }
+      }
+    }))
+
+    // If this is the active network, update the algod client
+    if (this.activeNetwork === networkId) {
+      this.algodClient = this.createAlgodClient(this.baseNetworkConfig[networkId].algod)
+    }
+
+    // Load current persisted state
+    const persistedState = this.loadPersistedState()
+    if (persistedState?.customNetworkConfigs) {
+      // Remove the network's customizations
+      delete persistedState.customNetworkConfigs[networkId]
+      // Save the updated state
+      StorageAdapter.setItem(LOCAL_STORAGE_KEY, JSON.stringify(persistedState))
+    }
+
+    this.logger.info(`✅ Reset network configuration for ${networkId}`)
+  }
+
+  public get activeNetwork(): string {
     return this.store.state.activeNetwork
+  }
+
+  public get networkConfig(): Record<string, NetworkConfig> {
+    return this.store.state.networkConfig
+  }
+
+  public get activeNetworkConfig(): NetworkConfig {
+    const { networkConfig, activeNetwork } = this.store.state
+    return networkConfig[activeNetwork]
   }
 
   // ---------- Active Wallet ----------------------------------------- //

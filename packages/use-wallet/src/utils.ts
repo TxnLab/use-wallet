@@ -3,15 +3,14 @@ import { WalletId, type JsonRpcRequest, type WalletAccount, type WalletMap } fro
 import { BiatecWallet } from './wallets/biatec'
 import { CustomWallet } from './wallets/custom'
 import { DeflyWallet } from './wallets/defly'
+import { DeflyWebWallet } from './wallets/defly-web'
 import { ExodusWallet } from './wallets/exodus'
 import { KibisisWallet } from './wallets/kibisis'
 import { KmdWallet } from './wallets/kmd'
-import { LiquidWallet } from './wallets/liquid'
 import { LuteWallet } from './wallets/lute'
 import { MagicAuth } from './wallets/magic'
 import { MnemonicWallet } from './wallets/mnemonic'
 import { PeraWallet } from './wallets/pera'
-import { PeraWallet as PeraWalletBeta } from './wallets/pera2'
 import { WalletConnect } from './wallets/walletconnect'
 
 export function createWalletMap(): WalletMap {
@@ -19,15 +18,14 @@ export function createWalletMap(): WalletMap {
     [WalletId.BIATEC]: BiatecWallet,
     [WalletId.CUSTOM]: CustomWallet,
     [WalletId.DEFLY]: DeflyWallet,
+    [WalletId.DEFLY_WEB]: DeflyWebWallet,
     [WalletId.EXODUS]: ExodusWallet,
     [WalletId.KIBISIS]: KibisisWallet,
     [WalletId.KMD]: KmdWallet,
-    [WalletId.LIQUID]: LiquidWallet,
     [WalletId.LUTE]: LuteWallet,
     [WalletId.MAGIC]: MagicAuth,
     [WalletId.MNEMONIC]: MnemonicWallet,
     [WalletId.PERA]: PeraWallet,
-    [WalletId.PERA2]: PeraWalletBeta,
     [WalletId.WALLETCONNECT]: WalletConnect
   }
 }
@@ -74,15 +72,29 @@ export function byteArrayToString(array: Uint8Array): string {
   return result
 }
 
-export function isSignedTxn(
-  txnDecodeObj: algosdk.EncodedTransaction | algosdk.EncodedSignedTransaction
-): txnDecodeObj is algosdk.EncodedSignedTransaction {
-  return (txnDecodeObj as algosdk.EncodedSignedTransaction).txn !== undefined
+export function isSignedTxn(txnObj: any): boolean {
+  if (!txnObj || typeof txnObj !== 'object') return false
+  if (!('sig' in txnObj && 'txn' in txnObj)) return false
+
+  // Verify sig is a Uint8Array
+  if (!(txnObj.sig instanceof Uint8Array)) return false
+
+  // Verify txn is an object
+  const txn = txnObj.txn
+  if (!txn || typeof txn !== 'object') return false
+
+  // Check for common transaction properties
+  const hasRequiredProps = 'type' in txn && 'snd' in txn
+
+  return hasRequiredProps
 }
 
 export function isTransaction(item: any): item is algosdk.Transaction {
   return (
-    item && typeof item === 'object' && 'genesisID' in item && typeof item.genesisID === 'string'
+    item &&
+    typeof item === 'object' &&
+    'sender' in item &&
+    (item.sender instanceof algosdk.Address || typeof item.sender === 'string')
   )
 }
 
@@ -123,6 +135,7 @@ export function formatJsonRpcRequest<T = any>(method: string, params: T): JsonRp
   }
 }
 
+// @todo: remove
 export function deepMerge(target: any, source: any): any {
   const isObject = (obj: any) => obj && typeof obj === 'object'
 

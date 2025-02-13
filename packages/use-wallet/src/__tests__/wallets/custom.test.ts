@@ -2,7 +2,7 @@ import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
 import { logger } from 'src/logger'
 import { StorageAdapter } from 'src/storage'
-import { LOCAL_STORAGE_KEY, State, defaultState } from 'src/store'
+import { LOCAL_STORAGE_KEY, State, DEFAULT_STATE } from 'src/store'
 import { CustomProvider, CustomWallet, WalletId } from 'src/wallets'
 import type { Mock } from 'vitest'
 
@@ -99,7 +99,7 @@ describe('CustomWallet', () => {
     }
     vi.mocked(logger.createScopedLogger).mockReturnValue(mockLogger)
 
-    store = new Store<State>(defaultState)
+    store = new Store<State>(DEFAULT_STATE)
     wallet = createWalletWithStore(store)
   })
 
@@ -219,7 +219,7 @@ describe('CustomWallet', () => {
 
     it('should call provider.resumeSession if a session is found', async () => {
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.CUSTOM]: {
             accounts: [account1],
@@ -238,7 +238,7 @@ describe('CustomWallet', () => {
 
     it('should update the store if provider.resumeSession returns different account(s)', async () => {
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.CUSTOM]: {
             accounts: [account1],
@@ -262,7 +262,7 @@ describe('CustomWallet', () => {
 
     it('should still work if provider.resumeSession is not defined', async () => {
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.CUSTOM]: {
             accounts: [account1],
@@ -293,14 +293,19 @@ describe('CustomWallet', () => {
 
   describe('signTransactions', () => {
     const txn = new algosdk.Transaction({
-      from: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-      to: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-      amount: 1000,
-      fee: 10,
-      firstRound: 51,
-      lastRound: 61,
-      genesisHash: 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=',
-      genesisID: 'mainnet-v1.0'
+      type: algosdk.TransactionType.pay,
+      sender: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
+      suggestedParams: {
+        fee: 0,
+        firstValid: 51,
+        lastValid: 61,
+        minFee: 1000,
+        genesisID: 'mainnet-v1.0'
+      },
+      paymentParams: {
+        receiver: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
+        amount: 1000
+      }
     })
 
     const txnGroup = [txn]
@@ -337,14 +342,18 @@ describe('CustomWallet', () => {
 
   describe('transactionSigner', () => {
     const txn = new algosdk.Transaction({
-      from: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-      to: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
-      amount: 1000,
-      fee: 10,
-      firstRound: 51,
-      lastRound: 61,
-      genesisHash: 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=',
-      genesisID: 'mainnet-v1.0'
+      type: algosdk.TransactionType.pay,
+      sender: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
+      suggestedParams: {
+        fee: 10,
+        firstValid: 51,
+        lastValid: 61,
+        minFee: 10
+      },
+      paymentParams: {
+        receiver: '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q',
+        amount: 1000
+      }
     })
 
     const txnGroup = [txn]

@@ -2,7 +2,7 @@ import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
 import { logger } from 'src/logger'
 import { StorageAdapter } from 'src/storage'
-import { LOCAL_STORAGE_KEY, State, WalletState, defaultState } from 'src/store'
+import { LOCAL_STORAGE_KEY, State, WalletState, DEFAULT_STATE } from 'src/store'
 import { KmdWallet } from 'src/wallets/kmd'
 import { WalletId } from 'src/wallets/types'
 import type { Mock } from 'vitest'
@@ -105,7 +105,7 @@ describe('KmdWallet', () => {
     }
     vi.mocked(logger.createScopedLogger).mockReturnValue(mockLogger)
 
-    store = new Store<State>(defaultState)
+    store = new Store<State>(DEFAULT_STATE)
     wallet = createWalletWithStore(store)
 
     // Password prompt
@@ -190,7 +190,7 @@ describe('KmdWallet', () => {
       }
 
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.KMD]: walletState
         }
@@ -213,21 +213,26 @@ describe('KmdWallet', () => {
     // Not connected account
     const notConnectedAcct = 'EW64GC6F24M7NDSC5R3ES4YUVE3ZXXNMARJHDCCCLIHZU6TBEOC7XRSBG4'
 
-    const txnParams = {
-      from: connectedAcct1,
-      to: connectedAcct2,
-      fee: 10,
-      firstRound: 51,
-      lastRound: 61,
-      genesisHash: 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=',
-      genesisID: 'mainnet-v1.0'
+    const makePayTxn = ({ amount = 1000, sender = connectedAcct1, receiver = connectedAcct2 }) => {
+      return new algosdk.Transaction({
+        type: algosdk.TransactionType.pay,
+        sender,
+        suggestedParams: {
+          fee: 0,
+          firstValid: 51,
+          lastValid: 61,
+          minFee: 1000,
+          genesisID: 'testnet-v1.0'
+        },
+        paymentParams: { receiver, amount }
+      })
     }
 
     // Transactions used in tests
-    const txn1 = new algosdk.Transaction({ ...txnParams, amount: 1000 })
-    const txn2 = new algosdk.Transaction({ ...txnParams, amount: 2000 })
-    const txn3 = new algosdk.Transaction({ ...txnParams, amount: 3000 })
-    const txn4 = new algosdk.Transaction({ ...txnParams, amount: 4000 })
+    const txn1 = makePayTxn({ amount: 1000 })
+    const txn2 = makePayTxn({ amount: 2000 })
+    const txn3 = makePayTxn({ amount: 3000 })
+    const txn4 = makePayTxn({ amount: 4000 })
 
     beforeEach(async () => {
       // Mock two connected accounts
@@ -361,23 +366,9 @@ describe('KmdWallet', () => {
       })
 
       it('should only send transactions with connected signers for signature', async () => {
-        const canSignTxn1 = new algosdk.Transaction({
-          ...txnParams,
-          from: connectedAcct1,
-          amount: 1000
-        })
-
-        const cannotSignTxn2 = new algosdk.Transaction({
-          ...txnParams,
-          from: notConnectedAcct,
-          amount: 2000
-        })
-
-        const canSignTxn3 = new algosdk.Transaction({
-          ...txnParams,
-          from: connectedAcct2,
-          amount: 3000
-        })
+        const canSignTxn1 = makePayTxn({ sender: connectedAcct1, amount: 1000 })
+        const cannotSignTxn2 = makePayTxn({ sender: notConnectedAcct, amount: 2000 })
+        const canSignTxn3 = makePayTxn({ sender: connectedAcct2, amount: 3000 })
 
         // Signer for gtxn2 is not a connected account
         const [gtxn1, gtxn2, gtxn3] = algosdk.assignGroupID([

@@ -1,16 +1,9 @@
-import { NetworkId, WalletId, useWallet, type Wallet } from '@txnlab/use-wallet-react'
+import { useWallet, WalletId, type Wallet } from '@txnlab/use-wallet-react'
 import algosdk from 'algosdk'
 import * as React from 'react'
 
 export function Connect() {
-  const {
-    algodClient,
-    activeAddress,
-    activeNetwork,
-    setActiveNetwork,
-    transactionSigner,
-    wallets
-  } = useWallet()
+  const { algodClient, activeAddress, transactionSigner, wallets } = useWallet()
 
   const [isSending, setIsSending] = React.useState(false)
   const [magicEmail, setMagicEmail] = React.useState('')
@@ -50,8 +43,8 @@ export function Connect() {
       const suggestedParams = await algodClient.getTransactionParams().do()
 
       const transaction = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
-        from: activeAddress,
-        to: activeAddress,
+        sender: activeAddress,
+        receiver: activeAddress,
         amount: 0,
         suggestedParams
       })
@@ -77,35 +70,6 @@ export function Connect() {
 
   return (
     <div>
-      <div className="network-group">
-        <h4>
-          Current Network: <span className="active-network">{activeNetwork}</span>
-        </h4>
-        <div className="network-buttons">
-          <button
-            type="button"
-            onClick={() => setActiveNetwork(NetworkId.BETANET)}
-            disabled={activeNetwork === NetworkId.BETANET}
-          >
-            Set to Betanet
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveNetwork(NetworkId.TESTNET)}
-            disabled={activeNetwork === NetworkId.TESTNET}
-          >
-            Set to Testnet
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveNetwork(NetworkId.MAINNET)}
-            disabled={activeNetwork === NetworkId.MAINNET}
-          >
-            Set to Mainnet
-          </button>
-        </div>
-      </div>
-
       {wallets.map((wallet) => (
         <div key={wallet.id} className="wallet-group">
           <h4>

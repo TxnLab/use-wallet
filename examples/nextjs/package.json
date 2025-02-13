@@ -9,12 +9,12 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@blockshake/defly-connect": "^1.1.6",
-    "@perawallet/connect": "^1.3.5",
+    "@blockshake/defly-connect": "^1.2.1",
+    "@perawallet/connect": "^1.4.1",
     "@txnlab/use-wallet-react": "workspace:*",
     "@walletconnect/modal": "^2.7.0",
     "@walletconnect/sign-client": "^2.17.3",
-    "algosdk": "2.9.0",
+    "algosdk": "3.0.0",
     "lute-connect": "^1.4.1",
     "next": "14.2.22",
     "react": "18.3.1",

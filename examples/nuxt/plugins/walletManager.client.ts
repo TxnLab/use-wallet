@@ -5,6 +5,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.use(WalletManagerPlugin, {
     wallets: [
       WalletId.DEFLY,
+      WalletId.DEFLY_WEB,
       WalletId.EXODUS,
       WalletId.PERA,
       {
@@ -17,7 +18,6 @@ export default defineNuxtPlugin((nuxtApp) => {
       },
       WalletId.KMD,
       WalletId.KIBISIS,
-      WalletId.LIQUID,
       {
         id: WalletId.LUTE,
         options: { siteName: 'Example Site' }
@@ -28,6 +28,6 @@ export default defineNuxtPlugin((nuxtApp) => {
       },
       WalletId.MNEMONIC
     ],
-    network: NetworkId.TESTNET
+    defaultNetwork: NetworkId.TESTNET
   })
 })

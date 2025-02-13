@@ -47,11 +47,7 @@ export class DeflyWallet extends BaseWallet {
 
   private async initializeClient(): Promise<DeflyWalletConnect> {
     this.logger.info('Initializing client...')
-    const module = await import('@blockshake/defly-connect')
-    const DeflyWalletConnect = module.default
-      ? module.default.DeflyWalletConnect
-      : module.DeflyWalletConnect
-
+    const { DeflyWalletConnect } = await import('@blockshake/defly-connect')
     const client = new DeflyWalletConnect(this.options)
     this.client = client
     this.logger.info('Client initialized')
@@ -186,7 +182,7 @@ export class DeflyWallet extends BaseWallet {
 
     txnGroup.forEach((txn, index) => {
       const isIndexMatch = !indexesToSign || indexesToSign.includes(index)
-      const signer = algosdk.encodeAddress(txn.from.publicKey)
+      const signer = txn.sender.toString()
       const canSignTxn = this.addresses.includes(signer)
 
       if (isIndexMatch && canSignTxn) {
@@ -206,18 +202,15 @@ export class DeflyWallet extends BaseWallet {
     const txnsToSign: SignerTransaction[] = []
 
     txnGroup.forEach((txnBuffer, index) => {
-      const txnDecodeObj = algosdk.decodeObj(txnBuffer) as
-        | algosdk.EncodedTransaction
-        | algosdk.EncodedSignedTransaction
-
-      const isSigned = isSignedTxn(txnDecodeObj)
+      const decodedObj = algosdk.msgpackRawDecode(txnBuffer)
+      const isSigned = isSignedTxn(decodedObj)
 
       const txn: algosdk.Transaction = isSigned
         ? algosdk.decodeSignedTransaction(txnBuffer).txn
         : algosdk.decodeUnsignedTransaction(txnBuffer)
 
       const isIndexMatch = !indexesToSign || indexesToSign.includes(index)
-      const signer = algosdk.encodeAddress(txn.from.publicKey)
+      const signer = txn.sender.toString()
       const canSignTxn = !isSigned && this.addresses.includes(signer)
 
       if (isIndexMatch && canSignTxn) {

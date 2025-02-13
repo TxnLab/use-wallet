@@ -2,7 +2,7 @@ import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
 import { logger } from 'src/logger'
 import { StorageAdapter } from 'src/storage'
-import { LOCAL_STORAGE_KEY, State, WalletState, defaultState } from 'src/store'
+import { LOCAL_STORAGE_KEY, State, WalletState, DEFAULT_STATE } from 'src/store'
 import { base64ToByteArray, byteArrayToBase64 } from 'src/utils'
 import { MagicAuth } from 'src/wallets/magic'
 import { WalletId } from 'src/wallets/types'
@@ -105,7 +105,7 @@ describe('MagicAuth', () => {
     }
     vi.mocked(logger.createScopedLogger).mockReturnValue(mockLogger)
 
-    store = new Store<State>(defaultState)
+    store = new Store<State>(DEFAULT_STATE)
     wallet = createWalletWithStore(store)
 
     mockMagicClient.auth.loginWithMagicLink.mockImplementation(() => Promise.resolve())
@@ -206,7 +206,7 @@ describe('MagicAuth', () => {
       }
 
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.MAGIC]: walletState
         }
@@ -239,7 +239,7 @@ describe('MagicAuth', () => {
       }
 
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.MAGIC]: walletState
         }
@@ -276,7 +276,7 @@ describe('MagicAuth', () => {
       }
 
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.MAGIC]: walletState
         }
@@ -304,27 +304,32 @@ describe('MagicAuth', () => {
   })
 
   describe('signing transactions', () => {
-    // Connected accounts
+    // Connected account
     const connectedAcct = '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q'
 
     // Not connected account
     const notConnectedAcct = 'EW64GC6F24M7NDSC5R3ES4YUVE3ZXXNMARJHDCCCLIHZU6TBEOC7XRSBG4'
 
-    const txnParams = {
-      from: connectedAcct,
-      to: connectedAcct,
-      fee: 10,
-      firstRound: 51,
-      lastRound: 61,
-      genesisHash: 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=',
-      genesisID: 'mainnet-v1.0'
+    const makePayTxn = ({ amount = 1000, sender = connectedAcct, receiver = connectedAcct }) => {
+      return new algosdk.Transaction({
+        type: algosdk.TransactionType.pay,
+        sender,
+        suggestedParams: {
+          fee: 0,
+          firstValid: 51,
+          lastValid: 61,
+          minFee: 1000,
+          genesisID: 'mainnet-v1.0'
+        },
+        paymentParams: { receiver, amount }
+      })
     }
 
     // Transactions used in tests
-    const txn1 = new algosdk.Transaction({ ...txnParams, amount: 1000 })
-    const txn2 = new algosdk.Transaction({ ...txnParams, amount: 2000 })
-    const txn3 = new algosdk.Transaction({ ...txnParams, amount: 3000 })
-    const txn4 = new algosdk.Transaction({ ...txnParams, amount: 4000 })
+    const txn1 = makePayTxn({ amount: 1000 })
+    const txn2 = makePayTxn({ amount: 2000 })
+    const txn3 = makePayTxn({ amount: 3000 })
+    const txn4 = makePayTxn({ amount: 4000 })
 
     beforeEach(async () => {
       // Mock two connected accounts
@@ -451,23 +456,9 @@ describe('MagicAuth', () => {
       })
 
       it('should only send transactions with connected signers for signature', async () => {
-        const canSignTxn1 = new algosdk.Transaction({
-          ...txnParams,
-          from: connectedAcct,
-          amount: 1000
-        })
-
-        const cannotSignTxn2 = new algosdk.Transaction({
-          ...txnParams,
-          from: notConnectedAcct,
-          amount: 2000
-        })
-
-        const canSignTxn3 = new algosdk.Transaction({
-          ...txnParams,
-          from: connectedAcct,
-          amount: 3000
-        })
+        const canSignTxn1 = makePayTxn({ sender: connectedAcct, amount: 1000 })
+        const cannotSignTxn2 = makePayTxn({ sender: notConnectedAcct, amount: 2000 })
+        const canSignTxn3 = makePayTxn({ sender: connectedAcct, amount: 3000 })
 
         // Signer for gtxn2 is not a connected account
         const [gtxn1, gtxn2, gtxn3] = algosdk.assignGroupID([

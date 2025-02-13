@@ -2,11 +2,10 @@ import { useStore } from '@tanstack/solid-store'
 import algosdk from 'algosdk'
 import { JSX, createContext, createMemo, onMount, useContext } from 'solid-js'
 import type {
+  AlgodConfig,
   NetworkId,
-  WalletAccount,
   WalletId,
   WalletManager,
-  WalletMetadata,
   WalletState
 } from '@txnlab/use-wallet'
 
@@ -19,7 +18,7 @@ interface WalletProviderProps {
 
 const WalletContext = createContext<() => WalletManager>()
 
-export const WalletProvider = (props: WalletProviderProps) => {
+export const WalletProvider = (props: WalletProviderProps): JSX.Element => {
   const store = () => props.manager
 
   onMount(async () => {
@@ -41,53 +40,30 @@ export const useWalletManager = (): WalletManager => {
   return manager()
 }
 
-export interface Wallet {
-  id: () => string
-  metadata: () => WalletMetadata
-  accounts: () => WalletAccount[]
-  activeAccount: () => WalletAccount | null
-  isConnected: () => boolean
-  isActive: () => boolean
-  connect: (args?: Record<string, any>) => Promise<WalletAccount[]>
-  disconnect: () => Promise<void>
-  setActive: () => void
-  setActiveAccount: (address: string) => void
-}
-
-export function useWallet() {
+export const useNetwork = () => {
   const manager = createMemo(() => useWalletManager())
-
-  const managerStatus = useStore(manager().store, (state) => state.managerStatus)
-  const isReady = createMemo(() => managerStatus() === 'ready')
-
-  const algodClient = useStore(manager().store, (state) => state.algodClient)
-  const walletStore = useStore(manager().store, (state) => state.wallets)
-  const walletState = (walletId: WalletId): WalletState | null => walletStore()[walletId] || null
-  const activeWalletId = useStore(manager().store, (state) => state.activeWallet)
-  const activeWallet = () => manager().getWallet(activeWalletId() as WalletId) || null
-  const activeWalletState = () => walletState(activeWalletId() as WalletId)
-  const activeWalletAccounts = () => activeWalletState()?.accounts ?? null
-
-  const activeWalletAddresses = () =>
-    activeWalletAccounts()?.map((account) => account.address) ?? null
-
-  const activeAccount = () => activeWalletState()?.activeAccount ?? null
-  const activeAddress = () => activeAccount()?.address ?? null
-  const isWalletActive = (walletId: WalletId) => walletId === activeWalletId()
-  const isWalletConnected = (walletId: WalletId) =>
-    !!walletState(walletId)?.accounts.length || false
-
   const activeNetwork = useStore(manager().store, (state) => state.activeNetwork)
+  const activeNetworkConfig = () => {
+    const store = useStore(manager().store)
+    return store().networkConfig[activeNetwork()]
+  }
 
-  const setActiveNetwork = async (networkId: NetworkId): Promise<void> => {
-    if (activeNetwork() === networkId) {
+  const setActiveNetwork = async (networkId: NetworkId | string): Promise<void> => {
+    if (networkId === activeNetwork()) {
       return
     }
 
-    console.info(`[Solid] Creating Algodv2 client for ${networkId}...`)
+    if (!manager().networkConfig[networkId]) {
+      throw new Error(`Network "${networkId}" not found in network configuration`)
+    }
 
-    const { token, baseServer, port, headers } = manager().networkConfig[networkId]
+    console.info(`[Solid] Creating new Algodv2 client...`)
+
+    const { algod } = manager().networkConfig[networkId]
+    const { token = '', baseServer, port = '', headers = {} } = algod
     const newClient = new algosdk.Algodv2(token, baseServer, port, headers)
+
+    await manager().setActiveNetwork(networkId)
 
     manager().store.setState((state) => ({
       ...state,
@@ -97,6 +73,71 @@ export function useWallet() {
 
     console.info(`[Solid] ✅ Active network set to ${networkId}.`)
   }
+
+  const updateAlgodConfig = (networkId: string, config: Partial<AlgodConfig>): void => {
+    manager().updateAlgodConfig(networkId, config)
+
+    // If this is the active network, update the algodClient
+    if (networkId === activeNetwork()) {
+      console.info(`[Solid] Creating new Algodv2 client...`)
+      const { algod } = manager().networkConfig[networkId]
+      const { token = '', baseServer, port = '', headers = {} } = algod
+      const newClient = new algosdk.Algodv2(token, baseServer, port, headers)
+
+      manager().store.setState((state) => ({
+        ...state,
+        algodClient: newClient
+      }))
+    }
+  }
+
+  const resetNetworkConfig = (networkId: string): void => {
+    manager().resetNetworkConfig(networkId)
+
+    // If this is the active network, update the algodClient
+    if (networkId === activeNetwork()) {
+      console.info(`[Solid] Creating new Algodv2 client...`)
+      const { algod } = manager().networkConfig[networkId]
+      const { token = '', baseServer, port = '', headers = {} } = algod
+      const newClient = new algosdk.Algodv2(token, baseServer, port, headers)
+
+      manager().store.setState((state) => ({
+        ...state,
+        algodClient: newClient
+      }))
+    }
+  }
+
+  return {
+    activeNetwork,
+    networkConfig: () => manager().networkConfig,
+    activeNetworkConfig,
+    setActiveNetwork,
+    updateAlgodConfig,
+    resetNetworkConfig
+  }
+}
+
+export const useWallet = () => {
+  const manager = createMemo(() => useWalletManager())
+
+  const managerStatus = useStore(manager().store, (state) => state.managerStatus)
+  const isReady = createMemo(() => managerStatus() === 'ready')
+  const algodClient = useStore(manager().store, (state) => state.algodClient)
+
+  const walletStore = useStore(manager().store, (state) => state.wallets)
+  const walletState = (walletId: WalletId): WalletState | null => walletStore()[walletId] || null
+  const activeWalletId = useStore(manager().store, (state) => state.activeWallet)
+  const activeWallet = () => manager().getWallet(activeWalletId() as WalletId) || null
+  const activeWalletState = () => walletState(activeWalletId() as WalletId)
+  const activeWalletAccounts = () => activeWalletState()?.accounts ?? null
+  const activeWalletAddresses = () =>
+    activeWalletAccounts()?.map((account) => account.address) ?? null
+  const activeAccount = () => activeWalletState()?.activeAccount ?? null
+  const activeAddress = () => activeAccount()?.address ?? null
+  const isWalletActive = (walletId: WalletId) => walletId === activeWalletId()
+  const isWalletConnected = (walletId: WalletId) =>
+    !!walletState(walletId)?.accounts.length || false
 
   const signTransactions = <T extends algosdk.Transaction[] | Uint8Array[]>(
     txnGroup: T | T[],
@@ -121,22 +162,20 @@ export function useWallet() {
   }
 
   return {
-    activeWalletId,
-    walletStore,
+    wallets: manager().wallets,
+    isReady,
     algodClient,
-    activeNetwork,
     activeWallet,
     activeWalletAccounts,
     activeWalletAddresses,
     activeWalletState,
     activeAccount,
     activeAddress,
+    activeWalletId,
+    walletStore,
     isWalletActive,
     isWalletConnected,
-    setActiveNetwork,
     signTransactions,
-    transactionSigner,
-    wallets: manager().wallets,
-    isReady
+    transactionSigner
   }
 }

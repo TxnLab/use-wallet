@@ -1,6 +1,6 @@
 {
   "name": "@txnlab/use-wallet",
-  "version": "3.12.0",
+  "version": "4.0.0-beta.6",
   "description": "TypeScript library for integrating Algorand wallets into decentralized applications",
   "author": "Doug Richar <drichar@gmail.com>",
   "license": "MIT",
@@ -17,7 +17,7 @@
   "scripts": {
     "build": "tsup",
     "start": "tsup src/index.ts --watch",
-    "test": "vitest",
+    "test": "vitest run",
     "test:watch": "pnpm run test --watch",
     "lint": "eslint -c \"../../.eslintrc.json\" \"**/*.{js,ts}\"",
     "typecheck": "tsc --noEmit"
@@ -41,18 +41,16 @@
   },
   "devDependencies": {
     "@agoralabs-sh/avm-web-provider": "1.7.0",
-    "@algorandfoundation/liquid-auth-use-wallet-client": "1.1.0",
-    "@blockshake/defly-connect": "1.1.6",
+    "@blockshake/defly-connect": "1.2.1",
     "@magic-ext/algorand": "23.20.0",
     "@magic-sdk/provider": "28.20.0",
-    "@perawallet/connect": "1.3.5",
-    "@perawallet/connect-beta": "2.0.21",
+    "@perawallet/connect": "1.4.1",
     "@types/node": "20.11.30",
     "@walletconnect/modal": "2.7.0",
     "@walletconnect/modal-core": "2.7.0",
     "@walletconnect/sign-client": "2.17.3",
     "@walletconnect/types": "2.17.3",
-    "algosdk": "2.9.0",
+    "algosdk": "3.0.0",
     "lute-connect": "1.4.1",
     "magic-sdk": "28.21.0",
     "tsup": "8.3.5",
@@ -60,29 +58,21 @@
   },
   "peerDependencies": {
     "@agoralabs-sh/avm-web-provider": "^1.7.0",
-    "@algorandfoundation/liquid-auth-use-wallet-client": "1.1.0",
-    "@blockshake/defly-connect": "^1.1.6",
-    "@perawallet/connect": "^1.3.5",
-    "@perawallet/connect-beta": "^2.0.21",
+    "@blockshake/defly-connect": "^1.2.1",
+    "@perawallet/connect": "^1.4.1",
     "@walletconnect/modal": "^2.7.0",
     "@walletconnect/sign-client": "^2.17.3",
-    "algosdk": "^2.7.0",
+    "algosdk": "^3.0.0",
     "lute-connect": "^1.4.1"
   },
   "peerDependenciesMeta": {
     "@agoralabs-sh/avm-web-provider": {
       "optional": true
     },
-    "@algorandfoundation/liquid-auth-use-wallet-client": {
-      "optional": true
-    },
     "@blockshake/defly-connect": {
       "optional": true
     },
     "@perawallet/connect": {
-      "optional": true
-    },
-    "@perawallet/connect-beta": {
       "optional": true
     },
     "@walletconnect/modal": {

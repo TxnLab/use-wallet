@@ -1,19 +1,13 @@
 'use client'
 
-import { NetworkId, WalletId, useWallet, type Wallet } from '@txnlab/use-wallet-react'
+import { NetworkId, WalletId, useNetwork, useWallet, type Wallet } from '@txnlab/use-wallet-react'
 import algosdk from 'algosdk'
 import * as React from 'react'
 import styles from './Connect.module.css'
 
 export function Connect() {
-  const {
-    algodClient,
-    activeAddress,
-    activeNetwork,
-    setActiveNetwork,
-    transactionSigner,
-    wallets
-  } = useWallet()
+  const { algodClient, activeAddress, transactionSigner, wallets } = useWallet()
+  const { activeNetwork, setActiveNetwork } = useNetwork()
 
   const [isSending, setIsSending] = React.useState(false)
   const [magicEmail, setMagicEmail] = React.useState('')
@@ -53,8 +47,8 @@ export function Connect() {
       const suggestedParams = await algodClient.getTransactionParams().do()
 
       const transaction = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
-        from: activeAddress,
-        to: activeAddress,
+        sender: activeAddress,
+        receiver: activeAddress,
         amount: 0,
         suggestedParams
       })

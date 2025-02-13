@@ -52,11 +52,7 @@ export class PeraWallet extends BaseWallet {
 
   private async initializeClient(): Promise<PeraWalletConnect> {
     this.logger.info('Initializing client...')
-    const module = await import('@perawallet/connect')
-    const PeraWalletConnect = module.default
-      ? module.default.PeraWalletConnect
-      : module.PeraWalletConnect
-
+    const { PeraWalletConnect } = await import('@perawallet/connect')
     const client = new PeraWalletConnect(this.options)
     this.client = client
     this.logger.info('Client initialized')
@@ -136,6 +132,21 @@ export class PeraWallet extends BaseWallet {
       const state = this.store.state
       const walletState = state.wallets[this.id]
 
+      // Check for Pera Discover browser and auto-connect if no other wallet is active
+      if (typeof window !== 'undefined' && window.navigator) {
+        const isPeraDiscover = window.navigator.userAgent.includes('pera')
+        if (isPeraDiscover && !walletState && !state.activeWallet) {
+          this.logger.info('Pera Discover browser detected, attempting auto-connect...')
+          try {
+            await this.connect()
+            this.logger.info('Auto-connect successful')
+            return
+          } catch (error: any) {
+            this.logger.warn('Auto-connect failed:', error.message)
+          }
+        }
+      }
+
       // No session to resume
       if (!walletState) {
         this.logger.info('No session to resume')
@@ -191,7 +202,7 @@ export class PeraWallet extends BaseWallet {
 
     txnGroup.forEach((txn, index) => {
       const isIndexMatch = !indexesToSign || indexesToSign.includes(index)
-      const signer = algosdk.encodeAddress(txn.from.publicKey)
+      const signer = txn.sender.toString()
       const canSignTxn = this.addresses.includes(signer)
 
       if (isIndexMatch && canSignTxn) {
@@ -211,18 +222,15 @@ export class PeraWallet extends BaseWallet {
     const txnsToSign: SignerTransaction[] = []
 
     txnGroup.forEach((txnBuffer, index) => {
-      const txnDecodeObj = algosdk.decodeObj(txnBuffer) as
-        | algosdk.EncodedTransaction
-        | algosdk.EncodedSignedTransaction
-
-      const isSigned = isSignedTxn(txnDecodeObj)
+      const decodedObj = algosdk.msgpackRawDecode(txnBuffer)
+      const isSigned = isSignedTxn(decodedObj)
 
       const txn: algosdk.Transaction = isSigned
         ? algosdk.decodeSignedTransaction(txnBuffer).txn
         : algosdk.decodeUnsignedTransaction(txnBuffer)
 
       const isIndexMatch = !indexesToSign || indexesToSign.includes(index)
-      const signer = algosdk.encodeAddress(txn.from.publicKey)
+      const signer = txn.sender.toString()
       const canSignTxn = !isSigned && this.addresses.includes(signer)
 
       if (isIndexMatch && canSignTxn) {

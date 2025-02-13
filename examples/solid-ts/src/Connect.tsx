@@ -1,4 +1,4 @@
-import { useWallet, type BaseWallet, WalletId, NetworkId } from '@txnlab/use-wallet-solid'
+import { useWallet, WalletId, type BaseWallet } from '@txnlab/use-wallet-solid'
 import algosdk from 'algosdk'
 import { For, Show, createSignal } from 'solid-js'
 
@@ -7,15 +7,13 @@ export function Connect() {
   const [magicEmail, setMagicEmail] = createSignal('')
 
   const {
-    algodClient,
     activeAddress,
-    activeNetwork,
-    setActiveNetwork,
     activeWalletId,
     isWalletActive,
     isWalletConnected,
     transactionSigner,
-    wallets
+    wallets,
+    algodClient
   } = useWallet()
 
   const isMagicLink = (wallet: BaseWallet) => wallet.id === WalletId.MAGIC
@@ -54,8 +52,8 @@ export function Connect() {
       const suggestedParams = await algodClient().getTransactionParams().do()
 
       const transaction = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
-        from: sender,
-        to: sender,
+        sender: sender,
+        receiver: sender,
         amount: 0,
         suggestedParams
       })
@@ -80,102 +78,71 @@ export function Connect() {
   }
 
   return (
-    <div>
-      <div class="network-group">
-        <h4>
-          Current Network: <span class="active-network">{activeNetwork()}</span>
-        </h4>
-        <div class="network-buttons">
-          <button
-            type="button"
-            onClick={() => setActiveNetwork(NetworkId.BETANET)}
-            disabled={activeNetwork() === NetworkId.BETANET}
-          >
-            Set to Betanet
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveNetwork(NetworkId.TESTNET)}
-            disabled={activeNetwork() === NetworkId.TESTNET}
-          >
-            Set to Testnet
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveNetwork(NetworkId.MAINNET)}
-            disabled={activeNetwork() === NetworkId.MAINNET}
-          >
-            Set to Mainnet
-          </button>
-        </div>
-      </div>
-
-      <For each={wallets}>
-        {(wallet) => (
-          <div class="wallet-group">
-            <h4>
-              {wallet.metadata.name}{' '}
-              <Show when={wallet.id === activeWalletId()} fallback="">
-                [active]
-              </Show>
-            </h4>
-            <div class="wallet-buttons">
-              <button
-                type="button"
-                onClick={() => wallet.connect(getConnectArgs(wallet))}
-                disabled={isConnectDisabled(wallet)}
-              >
-                Connect
+    <For each={wallets}>
+      {(wallet) => (
+        <div class="wallet-group">
+          <h4>
+            {wallet.metadata.name}{' '}
+            <Show when={wallet.id === activeWalletId()} fallback="">
+              [active]
+            </Show>
+          </h4>
+          <div class="wallet-buttons">
+            <button
+              type="button"
+              onClick={() => wallet.connect(getConnectArgs(wallet))}
+              disabled={isConnectDisabled(wallet)}
+            >
+              Connect
+            </button>
+            <button
+              type="button"
+              onClick={() => wallet.disconnect()}
+              disabled={!isWalletConnected(wallet.id)}
+            >
+              Disconnect
+            </button>
+            <Show when={isWalletActive(wallet.id)}>
+              <button type="button" onClick={sendTransaction} disabled={isSending()}>
+                {isSending() ? 'Sending Transaction...' : 'Send Transaction'}
               </button>
+            </Show>
+            <Show when={!isWalletActive(wallet.id)}>
               <button
                 type="button"
-                onClick={() => wallet.disconnect()}
+                onClick={() => wallet.setActive()}
                 disabled={!isWalletConnected(wallet.id)}
               >
-                Disconnect
+                Set Active
               </button>
-              <Show when={isWalletActive(wallet.id)}>
-                <button type="button" onClick={sendTransaction} disabled={isSending()}>
-                  {isSending() ? 'Sending Transaction...' : 'Send Transaction'}
-                </button>
-              </Show>
-              <Show when={!isWalletActive(wallet.id)}>
-                <button
-                  type="button"
-                  onClick={() => wallet.setActive()}
-                  disabled={!isWalletConnected(wallet.id)}
-                >
-                  Set Active
-                </button>
-              </Show>
-            </div>
-
-            <Show when={isMagicLink(wallet)}>
-              <div class="input-group">
-                <label for="magic-email">Email:</label>
-                <input
-                  id="magic-email"
-                  type="email"
-                  value={magicEmail()}
-                  onInput={(e) => setMagicEmail(e.target.value)}
-                  placeholder="Enter email to connect..."
-                  disabled={isWalletConnected(wallet.id)}
-                />
-              </div>
-            </Show>
-
-            <Show when={wallet.id === activeWalletId() && wallet.accounts.length}>
-              <div>
-                <select onChange={(event) => setActiveAccount(event, wallet)}>
-                  <For each={wallet.accounts}>
-                    {(account) => <option value={account.address}>{account.address}</option>}
-                  </For>
-                </select>
-              </div>
             </Show>
           </div>
-        )}
-      </For>
-    </div>
+
+          <Show when={isMagicLink(wallet)}>
+            <div class="input-group">
+              <label for="magic-email">Email:</label>
+              <input
+                id="magic-email"
+                type="email"
+                value={magicEmail()}
+                onInput={(e) => setMagicEmail(e.target.value)}
+                placeholder="Enter email to connect..."
+                disabled={isWalletConnected(wallet.id)}
+              />
+            </div>
+          </Show>
+
+          <Show when={wallet.id === activeWalletId() && wallet.accounts.length}>
+            <div>
+              <select onChange={(event) => setActiveAccount(event, wallet)}>
+                <For each={wallet.accounts}>
+                  {(account) => <option value={account.address}>{account.address}</option>}
+                </For>
+              </select>
+            </div>
+          </Show>
+        </div>
+      )}
+    </For>
   )
 }

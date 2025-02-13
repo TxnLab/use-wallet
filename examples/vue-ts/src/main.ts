@@ -8,6 +8,7 @@ const app = createApp(App)
 app.use(WalletManagerPlugin, {
   wallets: [
     WalletId.DEFLY,
+    WalletId.DEFLY_WEB,
     WalletId.EXODUS,
     WalletId.PERA,
     {
@@ -20,7 +21,6 @@ app.use(WalletManagerPlugin, {
     },
     WalletId.KMD,
     WalletId.KIBISIS,
-    WalletId.LIQUID,
     {
       id: WalletId.LUTE,
       options: { siteName: 'Example Site' }
@@ -31,7 +31,7 @@ app.use(WalletManagerPlugin, {
     },
     WalletId.MNEMONIC
   ],
-  network: NetworkId.TESTNET
+  defaultNetwork: NetworkId.TESTNET
 })
 
 app.mount('#app')

@@ -8,6 +8,7 @@ import { WalletComponent } from './WalletComponent'
 const walletManager = new WalletManager({
   wallets: [
     WalletId.DEFLY,
+    WalletId.DEFLY_WEB,
     WalletId.EXODUS,
     WalletId.PERA,
     {
@@ -20,7 +21,6 @@ const walletManager = new WalletManager({
     },
     WalletId.KMD,
     WalletId.KIBISIS,
-    WalletId.LIQUID,
     {
       id: WalletId.LUTE,
       options: { siteName: 'Example Site' }
@@ -31,7 +31,7 @@ const walletManager = new WalletManager({
     },
     WalletId.MNEMONIC
   ],
-  network: NetworkId.TESTNET
+  defaultNetwork: NetworkId.TESTNET
 })
 
 const appDiv = document.querySelector<HTMLDivElement>('#app')

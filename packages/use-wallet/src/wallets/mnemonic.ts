@@ -1,5 +1,4 @@
 import algosdk from 'algosdk'
-import { NetworkId } from 'src/network'
 import { StorageAdapter } from 'src/storage'
 import { LOCAL_STORAGE_KEY, WalletState, addWallet, type State } from 'src/store'
 import { flattenTxnGroup, isSignedTxn, isTransactionArray } from 'src/utils'
@@ -74,12 +73,12 @@ export class MnemonicWallet extends BaseWallet {
 
   private checkMainnet(): void {
     try {
-      const network = this.activeNetwork
-      if (network === NetworkId.MAINNET) {
+      const network = this.activeNetworkConfig
+      if (!network.isTestnet) {
         this.logger.warn(
           'The Mnemonic wallet provider is insecure and intended for testing only. Any private key mnemonics used should never hold real Algos (i.e., on MainNet).'
         )
-        throw new Error('MainNet active network detected. Aborting.')
+        throw new Error('Production network detected. Aborting.')
       }
     } catch (error) {
       this.disconnect()
@@ -117,7 +116,7 @@ export class MnemonicWallet extends BaseWallet {
 
     const walletAccount = {
       name: `${this.metadata.name} Account`,
-      address: account.addr
+      address: account.addr.toString()
     }
 
     const walletState: WalletState = {
@@ -182,8 +181,8 @@ export class MnemonicWallet extends BaseWallet {
 
     txnGroup.forEach((txn, index) => {
       const isIndexMatch = !indexesToSign || indexesToSign.includes(index)
-      const signer = algosdk.encodeAddress(txn.from.publicKey)
-      const canSignTxn = signer === this.account!.addr
+      const signer = txn.sender.toString()
+      const canSignTxn = signer === this.account!.addr.toString()
 
       if (isIndexMatch && canSignTxn) {
         txnsToSign.push(txn)
@@ -200,19 +199,16 @@ export class MnemonicWallet extends BaseWallet {
     const txnsToSign: algosdk.Transaction[] = []
 
     txnGroup.forEach((txnBuffer, index) => {
-      const txnDecodeObj = algosdk.decodeObj(txnBuffer) as
-        | algosdk.EncodedTransaction
-        | algosdk.EncodedSignedTransaction
-
-      const isSigned = isSignedTxn(txnDecodeObj)
+      const decodedObj = algosdk.msgpackRawDecode(txnBuffer)
+      const isSigned = isSignedTxn(decodedObj)
 
       const txn: algosdk.Transaction = isSigned
         ? algosdk.decodeSignedTransaction(txnBuffer).txn
         : algosdk.decodeUnsignedTransaction(txnBuffer)
 
       const isIndexMatch = !indexesToSign || indexesToSign.includes(index)
-      const signer = algosdk.encodeAddress(txn.from.publicKey)
-      const canSignTxn = !isSigned && signer === this.account!.addr
+      const signer = txn.sender.toString()
+      const canSignTxn = !isSigned && signer === this.account!.addr.toString()
 
       if (isIndexMatch && canSignTxn) {
         txnsToSign.push(txn)

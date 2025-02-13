@@ -1,5 +1,6 @@
 import { NetworkId, WalletId, WalletManager, WalletProvider } from '@txnlab/use-wallet-solid'
 import { Connect } from './Connect'
+import { NetworkControls } from './NetworkControls'
 import solidLogo from './assets/solid.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
@@ -7,6 +8,7 @@ import './App.css'
 const walletManager = new WalletManager({
   wallets: [
     WalletId.DEFLY,
+    WalletId.DEFLY_WEB,
     WalletId.EXODUS,
     WalletId.PERA,
     {
@@ -19,7 +21,6 @@ const walletManager = new WalletManager({
     },
     WalletId.KMD,
     WalletId.KIBISIS,
-    WalletId.LIQUID,
     {
       id: WalletId.LUTE,
       options: { siteName: 'Example Site' }
@@ -30,7 +31,7 @@ const walletManager = new WalletManager({
     },
     WalletId.MNEMONIC
   ],
-  network: NetworkId.TESTNET
+  defaultNetwork: NetworkId.TESTNET
 })
 
 function App() {
@@ -45,6 +46,7 @@ function App() {
         </a>
       </div>
       <h1>@txnlab/use-wallet-solid</h1>
+      <NetworkControls />
       <Connect />
     </WalletProvider>
   )

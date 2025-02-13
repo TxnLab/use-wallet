@@ -1,6 +1,6 @@
 {
   "name": "@txnlab/use-wallet-solid",
-  "version": "3.12.0",
+  "version": "4.0.0-beta.6",
   "description": "Solid.js library for integrating Algorand wallets into decentralized applications",
   "author": "Doug Richar <drichar@gmail.com>",
   "license": "MIT",
@@ -40,7 +40,7 @@
   "scripts": {
     "build": "tsup",
     "start": "tsup src/index.tsx --watch",
-    "test": "vitest",
+    "test": "vitest run",
     "test:watch": "vitest --watch",
     "lint": "eslint -c \"../../.eslintrc.json\" \"**/*.{js,ts}\"",
     "typecheck": "tsc --noEmit"
@@ -66,20 +66,19 @@
   },
   "devDependencies": {
     "@solidjs/testing-library": "0.8.10",
-    "algosdk": "2.9.0",
+    "algosdk": "3.0.0",
     "solid-js": "1.9.3",
     "tsup": "8.3.5",
     "tsup-preset-solid": "2.2.0",
     "typescript": "5.7.2"
   },
   "peerDependencies": {
-    "@blockshake/defly-connect": "^1.1.6",
+    "@blockshake/defly-connect": "^1.2.1",
     "@magic-ext/algorand": "^23.20.0",
-    "@perawallet/connect": "^1.3.5",
-    "@perawallet/connect-beta": "^2.0.21",
+    "@perawallet/connect": "^1.4.1",
     "@walletconnect/modal": "^2.7.0",
     "@walletconnect/sign-client": "^2.17.3",
-    "algosdk": "^2.7.0",
+    "algosdk": "^3.0.0",
     "lute-connect": "^1.4.1",
     "magic-sdk": "^28.21.0"
   },
@@ -91,9 +90,6 @@
       "optional": true
     },
     "@perawallet/connect": {
-      "optional": true
-    },
-    "@perawallet/connect-beta": {
       "optional": true
     },
     "@walletconnect/modal": {

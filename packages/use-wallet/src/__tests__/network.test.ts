@@ -1,80 +1,132 @@
-import { isAlgodConfig, isNetworkConfigMap, isValidNetworkId, NetworkId } from 'src/network'
+import { NetworkConfigBuilder, isNetworkConfig, createNetworkConfig } from 'src/network'
 
-describe('Network Type Guards', () => {
-  describe('isValidNetworkId', () => {
-    it('returns true for a valid NetworkId', () => {
-      expect(isValidNetworkId(NetworkId.TESTNET)).toBe(true)
+describe('Network Configuration', () => {
+  describe('createNetworkConfig', () => {
+    it('returns default network configurations', () => {
+      const networks = createNetworkConfig()
+
+      expect(networks).toHaveProperty('mainnet')
+      expect(networks).toHaveProperty('testnet')
+      expect(networks).toHaveProperty('betanet')
+      expect(networks).toHaveProperty('fnet')
+      expect(networks).toHaveProperty('localnet')
     })
 
-    it('returns false for an invalid NetworkId', () => {
-      expect(isValidNetworkId('foo')).toBe(false)
+    it('includes correct default values for mainnet', () => {
+      const networks = createNetworkConfig()
+
+      expect(networks.mainnet).toEqual({
+        algod: {
+          token: '',
+          baseServer: 'https://mainnet-api.4160.nodely.dev',
+          headers: {}
+        },
+        isTestnet: false,
+        genesisHash: 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8=',
+        genesisId: 'mainnet-v1.0',
+        caipChainId: 'algorand:wGHE2Pwdvd7S12BL5FaOP20EGYesN73k'
+      })
     })
   })
 
-  describe('isAlgodConfig', () => {
-    it('returns true for a valid AlgodConfig', () => {
-      expect(
-        isAlgodConfig({
-          token: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-          baseServer: 'http://localhost',
-          port: 1234,
-          headers: {
-            'X-Foo': 'bar'
+  describe('NetworkConfigBuilder', () => {
+    it('allows customizing default network algod config', () => {
+      const networks = new NetworkConfigBuilder()
+        .mainnet({
+          algod: {
+            token: 'custom-token',
+            baseServer: 'custom-server',
+            headers: { 'X-API-Key': 'key' }
           }
         })
-      ).toBe(true)
+        .build()
 
-      expect(
-        isAlgodConfig({
-          token: '',
-          baseServer: ''
-        })
-      ).toBe(true)
+      expect(networks.mainnet.algod).toEqual({
+        token: 'custom-token',
+        baseServer: 'custom-server',
+        headers: { 'X-API-Key': 'key' }
+      })
+      // Other properties should remain unchanged
+      expect(networks.mainnet.isTestnet).toBe(false)
     })
 
-    it('returns false for an invalid AlgodConfig', () => {
-      expect(
-        isAlgodConfig({
-          baseServer: ''
-        })
-      ).toBe(false)
+    it('allows adding custom networks', () => {
+      const customNetwork = {
+        algod: {
+          token: 'token',
+          baseServer: 'server',
+          headers: {}
+        },
+        isTestnet: true
+      }
 
-      expect(
-        isAlgodConfig({
-          token: ''
-        })
-      ).toBe(false)
+      const networks = new NetworkConfigBuilder().addNetwork('custom', customNetwork).build()
 
-      expect(
-        isAlgodConfig({
-          token: '',
-          baseServer: '',
-          foo: ''
+      expect(networks.custom).toEqual(customNetwork)
+      // Default networks should still be present
+      expect(networks.mainnet).toBeDefined()
+    })
+
+    it('prevents overwriting default networks using addNetwork', () => {
+      const builder = new NetworkConfigBuilder()
+
+      expect(() =>
+        builder.addNetwork('mainnet', {
+          algod: {
+            token: '',
+            baseServer: ''
+          }
         })
-      ).toBe(false)
+      ).toThrow('Cannot add network with reserved id "mainnet"')
+    })
+
+    it('maintains all default networks when customizing one', () => {
+      const networks = new NetworkConfigBuilder()
+        .mainnet({
+          algod: {
+            token: 'custom-token',
+            baseServer: 'custom-server'
+          }
+        })
+        .build()
+
+      expect(networks.testnet).toBeDefined()
+      expect(networks.betanet).toBeDefined()
+      expect(networks.fnet).toBeDefined()
+      expect(networks.localnet).toBeDefined()
     })
   })
 
-  describe('isNetworkConfigMap', () => {
-    it('returns true for a valid NetworkConfigMap', () => {
-      const validConfigMap = {
-        [NetworkId.MAINNET]: {
-          token: '',
-          baseServer: ''
-        },
-        [NetworkId.TESTNET]: {
-          token: '',
-          baseServer: ''
+  describe('isNetworkConfig', () => {
+    it('validates correct network configs', () => {
+      const validConfig = {
+        algod: {
+          token: 'token',
+          baseServer: 'server'
         }
       }
-      expect(isNetworkConfigMap(validConfigMap)).toBe(true)
+      expect(isNetworkConfig(validConfig)).toBe(true)
     })
 
-    it('returns false for an invalid NetworkConfigMap', () => {
+    it('validates network configs with optional properties', () => {
+      const validConfig = {
+        algod: {
+          token: 'token',
+          baseServer: 'server'
+        },
+        isTestnet: true,
+        genesisHash: 'hash',
+        genesisId: 'id'
+      }
+      expect(isNetworkConfig(validConfig)).toBe(true)
+    })
+
+    it('rejects invalid network configs', () => {
+      expect(isNetworkConfig(null)).toBe(false)
+      expect(isNetworkConfig({})).toBe(false)
       expect(
-        isNetworkConfigMap({
-          token: '',
-          baseServer: ''
+        isNetworkConfig({
+          algod: { baseServer: 'server' }
         })
       ).toBe(false)
     })

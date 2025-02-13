@@ -1,11 +1,10 @@
 import { Store } from '@tanstack/store'
 import { Algodv2 } from 'algosdk'
-import { NetworkId } from 'src/network'
 import {
   State,
   PersistedState,
   addWallet,
-  defaultState,
+  DEFAULT_STATE,
   removeWallet,
   setAccounts,
   setActiveAccount,
@@ -32,7 +31,7 @@ describe('Mutations', () => {
   let store: Store<State>
 
   beforeEach(() => {
-    store = new Store<State>(defaultState)
+    store = new Store<State>(DEFAULT_STATE)
   })
 
   describe('addWallet', () => {
@@ -95,7 +94,7 @@ describe('Mutations', () => {
   describe('removeWallet', () => {
     beforeEach(() => {
       store = new Store<State>({
-        ...defaultState,
+        ...DEFAULT_STATE,
         wallets: {
           [WalletId.DEFLY]: {
             accounts: [
@@ -433,10 +432,10 @@ describe('Mutations', () => {
 
   describe('setActiveNetwork', () => {
     it('should set the active network', () => {
-      // Default network is TESTNET
-      expect(store.state.activeNetwork).toBe(NetworkId.TESTNET)
+      // Default network is testnet
+      expect(store.state.activeNetwork).toBe('testnet')
 
-      const networkId = NetworkId.MAINNET
+      const networkId = 'mainnet'
       const algodClient = new Algodv2('', 'https://mainnet-api.4160.nodely.dev/')
       setActiveNetwork(store, { networkId, algodClient })
       expect(store.state.activeNetwork).toBe(networkId)
@@ -566,7 +565,8 @@ describe('Type Guards', () => {
       const defaultState: PersistedState = {
         wallets: {},
         activeWallet: null,
-        activeNetwork: NetworkId.TESTNET
+        activeNetwork: 'testnet',
+        customNetworkConfigs: {}
       }
       expect(isValidPersistedState(defaultState)).toBe(true)
 
@@ -602,7 +602,8 @@ describe('Type Guards', () => {
           }
         },
         activeWallet: WalletId.DEFLY,
-        activeNetwork: NetworkId.TESTNET
+        activeNetwork: 'testnet',
+        customNetworkConfigs: {}
       }
       expect(isValidPersistedState(state)).toBe(true)
     })
@@ -614,14 +615,14 @@ describe('Type Guards', () => {
       expect(
         isValidPersistedState({
           activeWallet: WalletId.DEFLY,
-          activeNetwork: NetworkId.TESTNET
+          activeNetwork: 'testnet'
         })
       ).toBe(false)
 
       expect(
         isValidPersistedState({
           wallets: {},
-          activeNetwork: NetworkId.TESTNET
+          activeNetwork: 'testnet'
         })
       ).toBe(false)
 
