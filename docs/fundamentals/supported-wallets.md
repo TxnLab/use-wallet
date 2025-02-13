@@ -20,7 +20,7 @@ Defly Connect
 
 Pera Wallet, formerly known as Algorand Wallet, provides a secure and easy-to-use mobile interface for managing Algorand assets. Pera Explorer is a companion web-based block explorer for convenient transaction and account monitoring. The upcoming Pera Connect v2 library (currently in beta) will support WalletConnect v2, enhancing its integration capabilities with Algorand dApps across various platforms.
 
-<figure><img src="../.gitbook/assets/image (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/image (2).png" alt=""><figcaption></figcaption></figure>
 
 {% embed url="https://perawallet.app/" %}
 
@@ -32,7 +32,7 @@ Pera Connect
 
 Exodus is a multi-cryptocurrency wallet that supports Algorand along with many other blockchain assets. Known for its sleek design and user-friendly interface, Exodus offers desktop, mobile, and browser extension options, providing flexibility for users across different platforms.
 
-<figure><img src="../.gitbook/assets/image (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/image (3).png" alt=""><figcaption></figcaption></figure>
 
 {% embed url="https://www.exodus.com/" %}
 
@@ -42,9 +42,9 @@ Exodus Algorand Provider API
 
 ## WalletConnect
 
-WalletConnect is not a wallet itself, but a protocol that enables secure connections between mobile wallets and desktop dApps. It allows users to interact with Algorand dApps using their preferred mobile wallet, bridging the gap between mobile and desktop experiences. The WalletConnect provider can be used to connect with any WalletConnect v2 supporting wallet, including Defly, Pera, Fireblocks and more.&#x20;
+WalletConnect is not a wallet itself, but a protocol that enables secure connections between mobile wallets and desktop dApps. It allows users to interact with Algorand dApps using their preferred mobile wallet, bridging the gap between mobile and desktop experiences. The WalletConnect provider can be used to connect with any WalletConnect v2 supporting wallet, including Defly, Pera, Fireblocks and more.
 
-<figure><img src="../.gitbook/assets/image (3).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/image (4).png" alt=""><figcaption></figcaption></figure>
 
 {% embed url="https://walletconnect.com/" %}
 
@@ -66,7 +66,7 @@ Lute Connect
 
 Kibisis is a browser extension wallet designed for the Algorand Virtual Machine (AVM) ecosystem. Uniquely, it supports both Algorand and Voi, making it versatile across all AVM-compatible chains. Kibisis distinguishes itself by focusing on assets as utility beyond just DeFi applications. Available for Chrome, Edge, and Brave browsers.
 
-<figure><img src="../.gitbook/assets/image (4).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/image (5).png" alt=""><figcaption></figcaption></figure>
 
 {% embed url="https://kibis.is/" %}
 
@@ -78,7 +78,7 @@ AVM Web Provider
 
 Magic Auth provides passwordless authentication for dApps, allowing users to log in using their email, phone, or social media accounts. While not a traditional cryptocurrency wallet, it offers a way for users to interact with Algorand dApps without needing to manage seed phrases or private keys directly.
 
-<figure><img src="../.gitbook/assets/image (5).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/image (6).png" alt=""><figcaption></figcaption></figure>
 
 {% embed url="https://magic.link/" %}
 
@@ -108,7 +108,7 @@ Liquid Auth backend README
 
 Biatec Wallet (formerly AWallet) is the first fully open-source wallet in the Algorand ecosystem, built by and for the community. It offers comprehensive account management, including support for standard and multisig accounts, along with advanced features like account rekeying and dApp integration via WalletConnect. Biatec also provides multilanguage support, making it accessible to a diverse user base across the Algorand ecosystem.
 
-<figure><img src="../.gitbook/assets/image (6).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/image (7).png" alt=""><figcaption></figcaption></figure>
 
 {% embed url="https://wallet.biatec.io/" %}
 
@@ -118,7 +118,7 @@ AWallet source code
 
 ## KMD
 
-The KMD (Key Management Daemon) wallet provider is a development-focused solution that integrates with Algorand's `goal` CLI tool. It's primarily used for testing and local development environments, allowing developers to easily manage and use accounts created with the Algorand node software. KMD provides a convenient way to interact with local Algorand networks and sign transactions in development scenarios, making it an essential tool for Algorand developers working on dApps or smart contracts.&#x20;
+The KMD (Key Management Daemon) wallet provider is a development-focused solution that integrates with Algorand's `goal` CLI tool. It's primarily used for testing and local development environments, allowing developers to easily manage and use accounts created with the Algorand node software. KMD provides a convenient way to interact with local Algorand networks and sign transactions in development scenarios, making it an essential tool for Algorand developers working on dApps or smart contracts.
 
 {% hint style="warning" %}
 **Important:** KMD is not intended for production use or for managing real assets on MainNet.
