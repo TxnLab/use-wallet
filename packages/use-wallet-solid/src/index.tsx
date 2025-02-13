@@ -57,27 +57,22 @@ export interface Wallet {
 export function useWallet() {
   const manager = createMemo(() => useWalletManager())
 
+  const managerStatus = useStore(manager().store, (state) => state.managerStatus)
+  const isReady = createMemo(() => managerStatus() === 'ready')
+
   const algodClient = useStore(manager().store, (state) => state.algodClient)
-
   const walletStore = useStore(manager().store, (state) => state.wallets)
-
   const walletState = (walletId: WalletId): WalletState | null => walletStore()[walletId] || null
-
   const activeWalletId = useStore(manager().store, (state) => state.activeWallet)
-
   const activeWallet = () => manager().getWallet(activeWalletId() as WalletId) || null
-
   const activeWalletState = () => walletState(activeWalletId() as WalletId)
-
   const activeWalletAccounts = () => activeWalletState()?.accounts ?? null
 
   const activeWalletAddresses = () =>
     activeWalletAccounts()?.map((account) => account.address) ?? null
 
   const activeAccount = () => activeWalletState()?.activeAccount ?? null
-
   const activeAddress = () => activeAccount()?.address ?? null
-
   const isWalletActive = (walletId: WalletId) => walletId === activeWalletId()
   const isWalletConnected = (walletId: WalletId) =>
     !!walletState(walletId)?.accounts.length || false
@@ -141,6 +136,7 @@ export function useWallet() {
     setActiveNetwork,
     signTransactions,
     transactionSigner,
-    wallets: manager().wallets
+    wallets: manager().wallets,
+    isReady
   }
 }

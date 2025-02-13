@@ -8,7 +8,8 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint": "eslint -c \"../../.eslintrc.json\" \"**/*.{js,ts}\"",
-    "typecheck": "npx nuxi typecheck"
+    "typecheck": "npx nuxi typecheck",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@algorandfoundation/liquid-auth-use-wallet-client": "1.1.0",
@@ -17,15 +18,15 @@
     "@txnlab/use-wallet": "workspace:*",
     "@txnlab/use-wallet-vue": "workspace:*",
     "@walletconnect/modal": "^2.7.0",
-    "@walletconnect/sign-client": "^2.17.1",
+    "@walletconnect/sign-client": "^2.17.3",
     "algosdk": "2.9.0",
     "lute-connect": "^1.4.1",
-    "nuxt": "3.13.2",
-    "vue": "3.5.12",
-    "vue-router": "4.4.5"
+    "nuxt": "3.15.1",
+    "vue": "3.5.13",
+    "vue-router": "4.5.0"
   },
   "devDependencies": {
-    "typescript": "5.6.3",
-    "vue-tsc": "2.1.6"
+    "typescript": "5.7.2",
+    "vue-tsc": "2.2.0"
   }
 }

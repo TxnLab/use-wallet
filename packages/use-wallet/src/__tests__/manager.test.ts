@@ -2,7 +2,7 @@ import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
 import { logger } from 'src/logger'
 import { NetworkId } from 'src/network'
-import { LOCAL_STORAGE_KEY, State, defaultState } from 'src/store'
+import { LOCAL_STORAGE_KEY, PersistedState, State, defaultState } from 'src/store'
 import { WalletManager } from 'src/manager'
 import { StorageAdapter } from 'src/storage'
 import { BaseWallet } from 'src/wallets/base'
@@ -293,7 +293,8 @@ describe('WalletManager', () => {
         },
         activeWallet: WalletId.KIBISIS,
         activeNetwork: NetworkId.BETANET,
-        algodClient: new algosdk.Algodv2('', 'https://betanet-api.4160.nodely.dev/')
+        algodClient: new algosdk.Algodv2('', 'https://betanet-api.4160.nodely.dev/'),
+        managerStatus: 'ready'
       }
     })
 
@@ -338,7 +339,7 @@ describe('WalletManager', () => {
 
   describe('savePersistedState', () => {
     it('saves state to local storage', async () => {
-      const stateToSave: Omit<State, 'algodClient'> = {
+      const stateToSave: PersistedState = {
         wallets: {},
         activeWallet: null,
         activeNetwork: NetworkId.MAINNET
@@ -379,7 +380,8 @@ describe('WalletManager', () => {
         },
         activeWallet: WalletId.KIBISIS,
         activeNetwork: NetworkId.BETANET,
-        algodClient: new algosdk.Algodv2('', 'https://betanet-api.4160.nodely.dev/')
+        algodClient: new algosdk.Algodv2('', 'https://betanet-api.4160.nodely.dev/'),
+        managerStatus: 'ready'
       }
     })
 
@@ -431,8 +433,16 @@ describe('WalletManager', () => {
     // @todo: Tests for successful signing
   })
 
-  describe('resumeSessions', () => {
-    it('resumes sessions for all wallets', async () => {
+  describe('status', () => {
+    it('returns initializing by default', () => {
+      const manager = new WalletManager({
+        wallets: [WalletId.DEFLY, WalletId.KIBISIS]
+      })
+      expect(manager.status).toBe('initializing')
+      expect(manager.isReady).toBe(false)
+    })
+
+    it('changes to ready after resumeSessions', async () => {
       const manager = new WalletManager({
         wallets: [WalletId.DEFLY, WalletId.KIBISIS]
       })
@@ -440,6 +450,45 @@ describe('WalletManager', () => {
         [WalletId.DEFLY, mockDeflyWallet],
         [WalletId.KIBISIS, mockKibisisWallet]
       ])
+
+      expect(manager.status).toBe('initializing')
+      await manager.resumeSessions()
+      expect(manager.status).toBe('ready')
+      expect(manager.isReady).toBe(true)
+    })
+
+    it('changes to ready after resumeSessions even if it fails', async () => {
+      const manager = new WalletManager({
+        wallets: [WalletId.DEFLY, WalletId.KIBISIS]
+      })
+      manager._clients = new Map<WalletId, BaseWallet>([
+        [WalletId.DEFLY, mockDeflyWallet],
+        [WalletId.KIBISIS, mockKibisisWallet]
+      ])
+
+      // Mock one of the wallets to throw an error
+      vi.mocked(mockDeflyWallet.resumeSession).mockRejectedValueOnce(
+        new Error('Failed to resume session')
+      )
+
+      expect(manager.status).toBe('initializing')
+      await expect(manager.resumeSessions()).rejects.toThrow('Failed to resume session')
+      expect(manager.status).toBe('ready')
+      expect(manager.isReady).toBe(true)
+    })
+  })
+
+  describe('resumeSessions', () => {
+    it('resumes sessions for all wallets and updates status', async () => {
+      const manager = new WalletManager({
+        wallets: [WalletId.DEFLY, WalletId.KIBISIS]
+      })
+      manager._clients = new Map<WalletId, BaseWallet>([
+        [WalletId.DEFLY, mockDeflyWallet],
+        [WalletId.KIBISIS, mockKibisisWallet]
+      ])
+
+      expect(manager.status).toBe('initializing')
       await manager.resumeSessions()
 
       const deflyResumeSessionMock = mockDeflyWallet.resumeSession as Mock
@@ -447,6 +496,7 @@ describe('WalletManager', () => {
 
       expect(deflyResumeSessionMock).toHaveBeenCalled()
       expect(kibisisResumeSessionMock).toHaveBeenCalled()
+      expect(manager.status).toBe('ready')
 
       const calls = [
         deflyResumeSessionMock.mock.calls.length,
@@ -525,7 +575,8 @@ describe('WalletManager', () => {
           wallets: {},
           activeWallet: null,
           activeNetwork: NetworkId.MAINNET,
-          algodClient: new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud')
+          algodClient: new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud'),
+          managerStatus: 'ready'
         }
 
         const manager = new WalletManager({
@@ -542,7 +593,8 @@ describe('WalletManager', () => {
           wallets: {},
           activeWallet: null,
           activeNetwork: NetworkId.MAINNET,
-          algodClient: new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud')
+          algodClient: new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud'),
+          managerStatus: 'ready'
         }
 
         const manager = new WalletManager({
@@ -574,7 +626,8 @@ describe('WalletManager', () => {
           },
           activeWallet: WalletId.PERA,
           activeNetwork: NetworkId.MAINNET,
-          algodClient: new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud')
+          algodClient: new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud'),
+          managerStatus: 'ready'
         }
 
         const manager = new WalletManager({

@@ -35,6 +35,9 @@ export const useWallet = () => {
 
   const { manager, algodClient, setAlgodClient } = context
 
+  const managerStatus = useStore(manager.store, (state) => state.managerStatus)
+  const isReady = managerStatus === 'ready'
+
   const activeNetwork = useStore(manager.store, (state) => state.activeNetwork)
 
   const setActiveNetwork = async (networkId: NetworkId): Promise<void> => {
@@ -108,6 +111,7 @@ export const useWallet = () => {
 
   return {
     wallets,
+    isReady,
     algodClient,
     activeNetwork,
     activeWallet,
@@ -137,16 +141,8 @@ export const WalletProvider = ({ manager, children }: WalletProviderProps): JSX.
   const resumedRef = React.useRef(false)
 
   React.useEffect(() => {
-    const resumeSessions = async () => {
-      try {
-        await manager.resumeSessions()
-      } catch (error) {
-        console.error('Error resuming sessions:', error)
-      }
-    }
-
     if (!resumedRef.current) {
-      resumeSessions()
+      manager.resumeSessions()
       resumedRef.current = true
     }
   }, [manager])
