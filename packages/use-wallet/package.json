@@ -48,11 +48,11 @@
     "@types/node": "20.11.30",
     "@walletconnect/modal": "2.7.0",
     "@walletconnect/modal-core": "2.7.0",
-    "@walletconnect/sign-client": "2.17.3",
-    "@walletconnect/types": "2.17.3",
+    "@walletconnect/sign-client": "2.18.1",
+    "@walletconnect/types": "2.18.1",
     "algosdk": "3.0.0",
     "lute-connect": "1.4.1",
-    "magic-sdk": "28.21.0",
+    "magic-sdk": "28.21.1",
     "tsup": "8.3.5",
     "typescript": "5.7.2"
   },
@@ -61,7 +61,7 @@
     "@blockshake/defly-connect": "^1.2.1",
     "@perawallet/connect": "^1.4.1",
     "@walletconnect/modal": "^2.7.0",
-    "@walletconnect/sign-client": "^2.17.3",
+    "@walletconnect/sign-client": "^2.18.1",
     "algosdk": "^3.0.0",
     "lute-connect": "^1.4.1"
   },
