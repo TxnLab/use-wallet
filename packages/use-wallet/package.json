@@ -54,7 +54,7 @@
     "lute-connect": "1.4.1",
     "magic-sdk": "28.21.0",
     "tsup": "8.3.5",
-    "typescript": "5.7.2"
+    "typescript": "5.8.2"
   },
   "peerDependencies": {
     "@agoralabs-sh/avm-web-provider": "^1.7.0",
