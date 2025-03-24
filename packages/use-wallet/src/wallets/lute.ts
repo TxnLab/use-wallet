@@ -37,14 +37,10 @@ export class LuteWallet extends BaseWallet {
     store,
     subscribe,
     getAlgodClient,
-    options,
+    options = {},
     metadata = {}
   }: WalletConstructor<WalletId.LUTE>) {
     super({ id, metadata, getAlgodClient, store, subscribe })
-    if (!options?.siteName) {
-      this.logger.error('Missing required option: siteName')
-      throw new Error('Missing required option: siteName')
-    }
     this.options = options
     this.store = store
   }
@@ -59,7 +55,7 @@ export class LuteWallet extends BaseWallet {
     const module = await import('lute-connect')
     const LuteConnect = module.default
 
-    const client = new LuteConnect(this.options.siteName as string)
+    const client = new LuteConnect(this.options?.siteName)
     this.client = client
     this.logger.info('Client initialized')
     return client
