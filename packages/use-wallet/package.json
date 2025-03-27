@@ -51,7 +51,7 @@
     "@walletconnect/sign-client": "2.17.3",
     "@walletconnect/types": "2.17.3",
     "algosdk": "3.0.0",
-    "lute-connect": "1.4.1",
+    "lute-connect": "1.5.1",
     "magic-sdk": "28.21.0",
     "tsup": "8.3.5",
     "typescript": "5.7.2"
@@ -63,7 +63,7 @@
     "@walletconnect/modal": "^2.7.0",
     "@walletconnect/sign-client": "^2.17.3",
     "algosdk": "^3.0.0",
-    "lute-connect": "^1.4.1"
+    "lute-connect": "^1.5.1"
   },
   "peerDependenciesMeta": {
     "@agoralabs-sh/avm-web-provider": {

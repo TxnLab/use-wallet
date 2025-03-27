@@ -21,10 +21,7 @@ app.use(WalletManagerPlugin, {
     },
     WalletId.KMD,
     WalletId.KIBISIS,
-    {
-      id: WalletId.LUTE,
-      options: { siteName: 'Example Site' }
-    },
+    WalletId.LUTE,
     {
       id: WalletId.MAGIC,
       options: { apiKey: 'pk_live_D17FD8D89621B5F3' }
