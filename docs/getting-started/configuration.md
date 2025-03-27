@@ -63,6 +63,7 @@ const manager = new WalletManager({
     WalletId.PERA,
     WalletId.EXODUS,
     WalletId.KIBISIS,
+    WalletId.LUTE,
     
     // Example of a wallet with optional customizations
     {
@@ -87,12 +88,6 @@ const manager = new WalletManager({
       id: WalletId.MAGIC,
       options: {
         apiKey: '<MAGIC_API_KEY>'  // Required
-      }
-    },
-    {
-      id: WalletId.LUTE,
-      options: {
-        siteName: '<YOUR_SITE_NAME>'  // Required
       }
     },
     {
