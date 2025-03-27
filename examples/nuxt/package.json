@@ -18,7 +18,7 @@
     "@txnlab/use-wallet-vue": "workspace:*",
     "@walletconnect/modal": "^2.7.0",
     "@walletconnect/sign-client": "^2.17.3",
-    "algosdk": "3.0.0",
+    "algosdk": "3.2.0",
     "lute-connect": "^1.4.1",
     "nuxt": "3.15.1",
     "vue": "3.5.13",
