@@ -59,8 +59,8 @@
     "algosdk": "^3.0.0",
     "lute-connect": "^1.4.1",
     "magic-sdk": "^28.21.0",
-    "react": "^17.0.0 || ^18.0.0",
-    "react-dom": "^17.0.0 || ^18.0.0"
+    "react": "^17.0.0 || ^18.0.0 || ^19.0.0",
+    "react-dom": "^17.0.0 || ^18.0.0 || ^19.0.0"
   },
   "peerDependenciesMeta": {
     "@blockshake/defly-connect": {
