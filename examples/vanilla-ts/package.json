@@ -11,8 +11,8 @@
   },
   "devDependencies": {
     "@walletconnect/types": "2.17.3",
-    "typescript": "5.7.2",
-    "vite": "6.0.7"
+    "typescript": "5.8.2",
+    "vite": "6.2.3"
   },
   "dependencies": {
     "@blockshake/defly-connect": "^1.2.1",
@@ -20,7 +20,7 @@
     "@txnlab/use-wallet": "workspace:*",
     "@walletconnect/modal": "^2.7.0",
     "@walletconnect/sign-client": "^2.17.3",
-    "algosdk": "3.0.0",
+    "algosdk": "3.2.0",
     "lute-connect": "^1.5.1"
   }
 }

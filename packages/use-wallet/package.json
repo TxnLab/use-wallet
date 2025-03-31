@@ -50,11 +50,11 @@
     "@walletconnect/modal-core": "2.7.0",
     "@walletconnect/sign-client": "2.17.3",
     "@walletconnect/types": "2.17.3",
-    "algosdk": "3.0.0",
+    "algosdk": "3.2.0",
     "lute-connect": "1.5.1",
     "magic-sdk": "28.21.0",
-    "tsup": "8.3.5",
-    "typescript": "5.7.2"
+    "tsup": "8.4.0",
+    "typescript": "5.8.2"
   },
   "peerDependencies": {
     "@agoralabs-sh/avm-web-provider": "^1.7.0",
@@ -62,7 +62,7 @@
     "@perawallet/connect": "^1.4.1",
     "@walletconnect/modal": "^2.7.0",
     "@walletconnect/sign-client": "^2.17.3",
-    "algosdk": "^3.0.0",
+    "algosdk": "^3.2.0",
     "lute-connect": "^1.5.1"
   },
   "peerDependenciesMeta": {

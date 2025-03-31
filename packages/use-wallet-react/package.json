@@ -42,13 +42,13 @@
     "@txnlab/use-wallet": "workspace:*"
   },
   "devDependencies": {
-    "@types/react": "18.3.18",
-    "algosdk": "3.0.0",
-    "jsdom": "25.0.1",
+    "@types/react": "18.3.20",
+    "algosdk": "3.2.0",
+    "jsdom": "26.0.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "tsup": "8.3.5",
-    "typescript": "5.7.2"
+    "tsup": "8.4.0",
+    "typescript": "5.8.2"
   },
   "peerDependencies": {
     "@blockshake/defly-connect": "^1.2.1",
@@ -59,8 +59,8 @@
     "algosdk": "^3.0.0",
     "lute-connect": "^1.5.1",
     "magic-sdk": "^28.21.0",
-    "react": "^17.0.0 || ^18.0.0",
-    "react-dom": "^17.0.0 || ^18.0.0"
+    "react": "^17.0.0 || ^18.0.0 || ^19.0.0",
+    "react-dom": "^17.0.0 || ^18.0.0 || ^19.0.0"
   },
   "peerDependenciesMeta": {
     "@blockshake/defly-connect": {

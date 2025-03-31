@@ -16,13 +16,13 @@
     "@txnlab/use-wallet-solid": "workspace:*",
     "@walletconnect/modal": "^2.7.0",
     "@walletconnect/sign-client": "^2.17.3",
-    "algosdk": "3.0.0",
+    "algosdk": "3.2.0",
     "lute-connect": "^1.5.1",
-    "solid-js": "1.9.3"
+    "solid-js": "1.9.5"
   },
   "devDependencies": {
-    "typescript": "5.7.2",
-    "vite": "6.0.7",
-    "vite-plugin-solid": "2.11.0"
+    "typescript": "5.8.2",
+    "vite": "6.2.3",
+    "vite-plugin-solid": "2.11.6"
   }
 }
