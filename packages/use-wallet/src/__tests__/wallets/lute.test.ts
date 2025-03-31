@@ -5,7 +5,7 @@ import { StorageAdapter } from 'src/storage'
 import { LOCAL_STORAGE_KEY, State, WalletState, DEFAULT_STATE } from 'src/store'
 import { byteArrayToBase64 } from 'src/utils'
 import { LuteWallet } from 'src/wallets/lute'
-import { SignTxnsError, WalletId } from 'src/wallets/types'
+import { WalletId } from 'src/wallets/types'
 import type { Mock } from 'vitest'
 
 // Mock logger
@@ -253,15 +253,15 @@ describe('LuteWallet', () => {
 
     describe('signTransactions', () => {
       it('should re-throw SignTxnsError to the consuming application', async () => {
-        const mockSignTxns = vi.fn().mockRejectedValue({
+        const mockError = Object.assign(new Error('User Rejected Request'), { code: 4001 })
+        const mockSignTxns = vi.fn().mockRejectedValue(mockError)
+        vi.mocked(mockLuteConnect.signTxns).mockImplementation(mockSignTxns)
+
+        await expect(wallet.signTransactions([txn1])).rejects.toMatchObject({
+          name: 'SignTxnsError',
           message: 'User Rejected Request',
           code: 4001
         })
-        vi.mocked(mockLuteConnect.signTxns).mockImplementation(mockSignTxns)
-
-        await expect(wallet.signTransactions([txn1])).rejects.toThrow(
-          new SignTxnsError('User Rejected Request', 4001)
-        )
       })
 
       it('should process and sign a single algosdk.Transaction', async () => {
