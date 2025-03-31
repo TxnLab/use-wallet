@@ -44,7 +44,7 @@
   "devDependencies": {
     "@types/react": "18.3.18",
     "algosdk": "3.2.0",
-    "jsdom": "25.0.1",
+    "jsdom": "26.0.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "tsup": "8.3.5",
