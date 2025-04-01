@@ -84,8 +84,8 @@ importers:
         specifier: 3.2.0
         version: 3.2.0
       lute-connect:
-        specifier: ^1.4.1
-        version: 1.4.1
+        specifier: ^1.5.1
+        version: 1.5.1
       next:
         specifier: 14.2.26
         version: 14.2.26(@babel/core@7.26.0)(@playwright/test@1.51.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -139,8 +139,8 @@ importers:
         specifier: 3.2.0
         version: 3.2.0
       lute-connect:
-        specifier: ^1.4.1
-        version: 1.4.1
+        specifier: ^1.5.1
+        version: 1.5.1
       nuxt:
         specifier: 3.16.1
         version: 3.16.1(@parcel/watcher@2.5.0)(@types/node@20.11.30)(bufferutil@4.0.9)(db0@0.3.1)(eslint@8.57.1)(idb-keyval@6.2.1)(ioredis@5.6.0)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.38.0)(terser@5.37.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(vite@6.2.3(@types/node@20.11.30)(jiti@2.4.2)(terser@5.37.0)(yaml@2.7.0))(vue-tsc@2.2.8(typescript@5.8.2))(yaml@2.7.0)
@@ -179,8 +179,8 @@ importers:
         specifier: 3.2.0
         version: 3.2.0
       lute-connect:
-        specifier: ^1.4.1
-        version: 1.4.1
+        specifier: ^1.5.1
+        version: 1.5.1
       react:
         specifier: 18.3.1
         version: 18.3.1
@@ -240,8 +240,8 @@ importers:
         specifier: 3.2.0
         version: 3.2.0
       lute-connect:
-        specifier: ^1.4.1
-        version: 1.4.1
+        specifier: ^1.5.1
+        version: 1.5.1
       solid-js:
         specifier: 1.9.5
         version: 1.9.5
@@ -277,8 +277,8 @@ importers:
         specifier: 3.2.0
         version: 3.2.0
       lute-connect:
-        specifier: ^1.4.1
-        version: 1.4.1
+        specifier: ^1.5.1
+        version: 1.5.1
     devDependencies:
       '@walletconnect/types':
         specifier: 2.17.3
@@ -311,8 +311,8 @@ importers:
         specifier: 3.2.0
         version: 3.2.0
       lute-connect:
-        specifier: ^1.4.1
-        version: 1.4.1
+        specifier: ^1.5.1
+        version: 1.5.1
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.8.2)
@@ -370,8 +370,8 @@ importers:
         specifier: 3.2.0
         version: 3.2.0
       lute-connect:
-        specifier: 1.4.1
-        version: 1.4.1
+        specifier: 1.5.1
+        version: 1.5.1
       magic-sdk:
         specifier: 28.21.0
         version: 28.21.0
@@ -406,8 +406,8 @@ importers:
         specifier: ^2.17.3
         version: 2.17.3(bufferutil@4.0.9)(db0@0.3.1)(ioredis@5.6.0)(utf-8-validate@5.0.10)
       lute-connect:
-        specifier: ^1.4.1
-        version: 1.4.1
+        specifier: ^1.5.1
+        version: 1.5.1
       magic-sdk:
         specifier: ^28.21.0
         version: 28.21.0
@@ -458,8 +458,8 @@ importers:
         specifier: ^2.17.3
         version: 2.17.3(bufferutil@4.0.9)(db0@0.3.1)(ioredis@5.6.0)(utf-8-validate@5.0.10)
       lute-connect:
-        specifier: ^1.4.1
-        version: 1.4.1
+        specifier: ^1.5.1
+        version: 1.5.1
       magic-sdk:
         specifier: ^28.21.0
         version: 28.21.0
@@ -507,8 +507,8 @@ importers:
         specifier: ^2.17.3
         version: 2.17.3(bufferutil@4.0.9)(db0@0.3.1)(ioredis@5.6.0)(utf-8-validate@5.0.10)
       lute-connect:
-        specifier: ^1.4.1
-        version: 1.4.1
+        specifier: ^1.5.1
+        version: 1.5.1
       magic-sdk:
         specifier: ^28.21.0
         version: 28.21.0
@@ -4133,8 +4133,8 @@ packages:
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
 
-  lute-connect@1.4.1:
-    resolution: {integrity: sha512-mOiu0NzXR4Ep8w8xBBVX3naoM9/VMPudZZWrtRS6pk+g83czfzmoMwlsuzUltC/t+UrNFlSP8xKp2M9bmYtf8Q==}
+  lute-connect@1.5.1:
+    resolution: {integrity: sha512-R7155BuCczZhwYf7tQv3tf4sE4Pwx9RuZSZPg+eAEPcnT6K09w9wY91MdPX+sJIJrgUV0vOeZGYHQcW4xKM8Zw==}
 
   lz-string@1.5.0:
     resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
@@ -10811,7 +10811,7 @@ snapshots:
     dependencies:
       yallist: 3.1.1
 
-  lute-connect@1.4.1: {}
+  lute-connect@1.5.1: {}
 
   lz-string@1.5.0: {}
 

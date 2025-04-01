@@ -115,11 +115,14 @@ Web and browser extension wallet with Ledger hardware support. [Installation ins
 ```typescript
 import { WalletId } from '@txnlab/use-wallet'
 
-// Configuration required
+// Basic usage (no options required)
+WalletId.LUTE
+
+// With optional configuration
 {
   id: WalletId.LUTE,
   options: {
-    siteName: string // Required: Your site name
+    siteName?: string // Defaults to document title
   }
 }
 ```

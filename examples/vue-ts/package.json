@@ -16,7 +16,7 @@
     "@walletconnect/modal": "^2.7.0",
     "@walletconnect/sign-client": "^2.17.3",
     "algosdk": "3.2.0",
-    "lute-connect": "^1.4.1",
+    "lute-connect": "^1.5.1",
     "vue": "3.5.13"
   },
   "devDependencies": {
