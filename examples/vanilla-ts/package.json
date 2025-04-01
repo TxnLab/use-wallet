@@ -10,7 +10,7 @@
     "test:e2e": "playwright test"
   },
   "devDependencies": {
-    "@walletconnect/types": "2.17.3",
+    "@walletconnect/types": "2.19.2",
     "typescript": "5.8.2",
     "vite": "6.2.3"
   },
@@ -19,7 +19,7 @@
     "@perawallet/connect": "^1.4.1",
     "@txnlab/use-wallet": "workspace:*",
     "@walletconnect/modal": "^2.7.0",
-    "@walletconnect/sign-client": "^2.17.3",
+    "@walletconnect/sign-client": "^2.19.2",
     "algosdk": "3.2.0",
     "lute-connect": "^1.5.1"
   }
