@@ -55,10 +55,10 @@
     "@magic-ext/algorand": "^23.20.0",
     "@walletconnect/modal": "^2.7.0",
     "@perawallet/connect": "^1.4.1",
-    "@walletconnect/sign-client": "^2.17.3",
+    "@walletconnect/sign-client": "^2.19.2",
     "algosdk": "^3.0.0",
     "lute-connect": "^1.5.1",
-    "magic-sdk": "^28.21.0",
+    "magic-sdk": "^28.21.1",
     "react": "^17.0.0 || ^18.0.0 || ^19.0.0",
     "react-dom": "^17.0.0 || ^18.0.0 || ^19.0.0"
   },
