@@ -24,7 +24,7 @@ export default defineNuxtPlugin((nuxtApp) => {
           origin: 'https://liquid-auth.onrender.com',
           RTC_config_username: 'username',
           RTC_config_credential: 'credential'
-        },
+        }
       },
       {
         id: WalletId.LUTE,
