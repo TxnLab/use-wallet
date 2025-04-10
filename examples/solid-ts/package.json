@@ -11,7 +11,7 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@algorandfoundation/liquid-auth-use-wallet-client": "1.2.0",
+    "@algorandfoundation/liquid-auth-use-wallet-client": "^1.3.0",
     "@blockshake/defly-connect": "^1.2.1",
     "@perawallet/connect": "^1.4.1",
     "@txnlab/use-wallet-solid": "workspace:*",

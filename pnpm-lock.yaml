@@ -118,8 +118,8 @@ importers:
   examples/nuxt:
     dependencies:
       '@algorandfoundation/liquid-auth-use-wallet-client':
-        specifier: 1.2.0
-        version: 1.2.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        specifier: ^1.3.0
+        version: 1.3.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.0.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -164,8 +164,8 @@ importers:
   examples/react-ts:
     dependencies:
       '@algorandfoundation/liquid-auth-use-wallet-client':
-        specifier: 1.2.0
-        version: 1.2.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        specifier: ^1.3.0
+        version: 1.3.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.0.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -228,8 +228,8 @@ importers:
   examples/solid-ts:
     dependencies:
       '@algorandfoundation/liquid-auth-use-wallet-client':
-        specifier: 1.2.0
-        version: 1.2.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        specifier: ^1.3.0
+        version: 1.3.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.0.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -268,8 +268,8 @@ importers:
   examples/vanilla-ts:
     dependencies:
       '@algorandfoundation/liquid-auth-use-wallet-client':
-        specifier: 1.2.0
-        version: 1.2.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        specifier: ^1.3.0
+        version: 1.3.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.0.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -305,8 +305,8 @@ importers:
   examples/vue-ts:
     dependencies:
       '@algorandfoundation/liquid-auth-use-wallet-client':
-        specifier: 1.2.0
-        version: 1.2.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        specifier: ^1.3.0
+        version: 1.3.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.0.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -355,8 +355,8 @@ importers:
         specifier: 1.7.0
         version: 1.7.0
       '@algorandfoundation/liquid-auth-use-wallet-client':
-        specifier: 1.2.0
-        version: 1.2.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        specifier: ^1.3.0
+        version: 1.3.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
         specifier: 1.2.1
         version: 1.2.1(algosdk@3.0.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -553,12 +553,11 @@ packages:
     resolution: {integrity: sha512-AfMdBdFS3EW1RunzHVEwNFucS6UIALs661d+zL6AHFDdxOTvUgahRC4l163VoGWA0UEpnayT1jGObci8nitZeA==}
     engines: {node: '>=18.20.3'}
 
-  '@algorandfoundation/liquid-auth-use-wallet-client@1.2.0':
-    resolution: {integrity: sha512-+QflKTM5ngubnWf4w6Ocp+ZnliePvS3PdF3SaknyyIx+cypWodyesyfkn5dXQZc2fXUF0rDaVJcCQhi6o6fRmg==}
+  '@algorandfoundation/liquid-auth-use-wallet-client@1.3.0':
+    resolution: {integrity: sha512-tZB47pnLe8gsx8msb0O8zYeSQkID9DCK2imHiY2Eo0uRYwETvHUkTo6blxIkAuOOzkT6BBa7oB4e0ggnCFX4ig==}
 
-  '@algorandfoundation/liquid-client@https://codeload.github.com/algorandfoundation/liquid-auth-js/tar.gz/0958cb96627b5ead1ef5cfbdc4f47fe43a2e4908':
-    resolution: {tarball: https://codeload.github.com/algorandfoundation/liquid-auth-js/tar.gz/0958cb96627b5ead1ef5cfbdc4f47fe43a2e4908}
-    version: 1.0.0-canary.3
+  '@algorandfoundation/liquid-client@1.0.0-canary.3':
+    resolution: {integrity: sha512-QbHKeGPjx2RMNh29PSoVr9i98KVn593dppoS7jjqgum5kFobxGZ8kfpEEbOSGbt6qzw1vfL4iM2yhl4g5kAasg==}
 
   '@algorandfoundation/provider@https://codeload.github.com/algorandfoundation/wallet-provider-ts/tar.gz/28c80f5b9e0259b8e83e65c65d802d8123de9046':
     resolution: {tarball: https://codeload.github.com/algorandfoundation/wallet-provider-ts/tar.gz/28c80f5b9e0259b8e83e65c65d802d8123de9046}
@@ -1251,6 +1250,7 @@ packages:
 
   '@magic-sdk/provider@28.20.0':
     resolution: {integrity: sha512-BmNfctAABoUX0iyCx15a753XL796V2fY1nGtVBIk4zyW5ZGqfF6poVQ9MlJDf0TqyPm1Ff+9qHZsazUP6YjoSg==}
+    deprecated: This version included an issue. Please use 29.0.0 instead.
     peerDependencies:
       localforage: ^1.7.4
 
@@ -3095,8 +3095,8 @@ packages:
   end-of-stream@1.4.4:
     resolution: {integrity: sha512-+uw1inIHVPQoaVuHzRyXd21icM+cnt4CzD5rW+NC1wjOUSTOs+Te7FOv7AhN7vS9x/oIyhLP5PR1H+phQAHu5Q==}
 
-  engine.io-client@6.6.2:
-    resolution: {integrity: sha512-TAr+NKeoVTjEVW8P3iHguO1LO6RlUz9O5Y8o7EY0fU+gY1NYqas7NN3slpFtbXEsLMHk0h90fJMfKjRkQ0qUIw==}
+  engine.io-client@6.6.3:
+    resolution: {integrity: sha512-T0iLjnyNWahNyv/lcjS2y4oE358tVS/SYQNxYXGAJ9/GLgH4VCvOQ/mhTjqU88mLZCQgiG8RIegFHYCdVC+j5w==}
 
   engine.io-parser@5.2.3:
     resolution: {integrity: sha512-HqD3yTBfnBxIrbnM1DoD6Pcq8NECnh8d4As1Qgh0z5Gg3jRRIqijury0CL3ghu/edArpUYiYqQiDUQBIs4np3Q==}
@@ -4188,6 +4188,7 @@ packages:
 
   lodash.isequal@4.5.0:
     resolution: {integrity: sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==}
+    deprecated: This package is deprecated. Use require('node:util').isDeepStrictEqual instead.
 
   lodash.memoize@4.1.2:
     resolution: {integrity: sha512-t7j+NzmgnQzTAYXcsHYLgimltOV1MXHtlOWf6GjL9Kj8GK5FInw5JotxvbOs+IvV1/Dzo04/fCGfLVs7aXb4Ag==}
@@ -4229,6 +4230,7 @@ packages:
 
   magic-sdk@28.21.0:
     resolution: {integrity: sha512-aT/ReZLXNRccfxNw8YfYjHxTf4/9qq/gA8loCF2XN0W9E/6dx1RUpaRVtVsBSO2HQcLpj83GNIKAL554kagfkQ==}
+    deprecated: This version included an issue. Please use 29.0.0 instead.
 
   magic-string-ast@0.6.3:
     resolution: {integrity: sha512-C9sgUzVZtUtzCBoMdYtwrIRQ4IucGRFGgdhkjL7PXsVfPYmTuWtewqzk7dlipaCMWH/gOYehW9rgMoa4Oebtpw==}
@@ -4396,8 +4398,8 @@ packages:
   mz@2.7.0:
     resolution: {integrity: sha512-z81GNO7nnYMEhrGh9LeymoE4+Yr0Wn5McHIZMK5cfQCl+NDX08sCZgUc9/6MHni9IWuFLm1Z3HTCXu2z9fN62Q==}
 
-  nan@2.22.0:
-    resolution: {integrity: sha512-nbajikzWTMwsW+eSsNm3QwlOs7het9gGJU5dDZzRTQGk03vyBOauxgI4VakDzE0PtsGTmXPsXTbbjVhRwR5mpw==}
+  nan@2.22.2:
+    resolution: {integrity: sha512-DANghxFkS1plDdRsX0X9pm0Z6SJNN6gBdtXfanwoZ8hooC5gosGFSBGRYHUVPz1asKA/kMRqDRdHrluZ61SpBQ==}
 
   nanoid@3.3.8:
     resolution: {integrity: sha512-WNLf5Sd8oZxOm+TzppcYk8gVOgP+l58xNy58D0nbUnOxOWRWvlcCV4kUF7ltmI6PsrLl/BgKEyS4mqsGChFN0w==}
@@ -5283,6 +5285,11 @@ packages:
 
   semver@7.6.3:
     resolution: {integrity: sha512-oVekP1cKtI+CTDvHWYFUcMtsK/00wmAEfyqKfNdARm8u1wNVhSgaX7A8d4UuIlUI5e84iEwOhs7ZPYRmzU9U6A==}
+    engines: {node: '>=10'}
+    hasBin: true
+
+  semver@7.7.1:
+    resolution: {integrity: sha512-hlq8tAfn0m/61p4BVRcPzIGr6LKiMwo4VM6dGi6pt4qcRkmNzTcWq6eCEjEh+qXjkMDvPlOFFSGwQjoEa6gyMA==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -6459,6 +6466,7 @@ packages:
   yaeti@0.0.6:
     resolution: {integrity: sha512-MvQa//+KcZCUkBTIC9blM+CU9J2GzuTytsOUwf2lidtvkx/6gnEp1QvJv34t9vdjhFmha/mUiNDbN0D0mJWdug==}
     engines: {node: '>=0.10.32'}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   yallist@3.1.1:
     resolution: {integrity: sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g==}
@@ -6513,9 +6521,9 @@ snapshots:
     dependencies:
       uuid: 9.0.1
 
-  '@algorandfoundation/liquid-auth-use-wallet-client@1.2.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
+  '@algorandfoundation/liquid-auth-use-wallet-client@1.3.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
     dependencies:
-      '@algorandfoundation/liquid-client': https://codeload.github.com/algorandfoundation/liquid-auth-js/tar.gz/0958cb96627b5ead1ef5cfbdc4f47fe43a2e4908(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@algorandfoundation/liquid-client': 1.0.0-canary.3(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@algorandfoundation/provider': https://codeload.github.com/algorandfoundation/wallet-provider-ts/tar.gz/28c80f5b9e0259b8e83e65c65d802d8123de9046
       cbor-x: 1.6.0
     transitivePeerDependencies:
@@ -6524,7 +6532,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@algorandfoundation/liquid-client@https://codeload.github.com/algorandfoundation/liquid-auth-js/tar.gz/0958cb96627b5ead1ef5cfbdc4f47fe43a2e4908(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
+  '@algorandfoundation/liquid-client@1.0.0-canary.3(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
     dependencies:
       '@algorandfoundation/qr-code-styling': https://codeload.github.com/algorandfoundation/qr-code-styling/tar.gz/ce8541ee1cb3b0ab2acd9926f3092d4ab217e276
       canvas: 2.11.2
@@ -7223,7 +7231,7 @@ snapshots:
       nopt: 5.0.0
       npmlog: 5.0.1
       rimraf: 3.0.2
-      semver: 7.6.3
+      semver: 7.7.1
       tar: 6.2.1
     transitivePeerDependencies:
       - encoding
@@ -9087,7 +9095,7 @@ snapshots:
   canvas@2.11.2:
     dependencies:
       '@mapbox/node-pre-gyp': 1.0.11
-      nan: 2.22.0
+      nan: 2.22.2
       simple-get: 3.1.1
     transitivePeerDependencies:
       - encoding
@@ -9591,7 +9599,7 @@ snapshots:
     dependencies:
       once: 1.4.0
 
-  engine.io-client@6.6.2(bufferutil@4.0.9)(utf-8-validate@5.0.10):
+  engine.io-client@6.6.3(bufferutil@4.0.9)(utf-8-validate@5.0.10):
     dependencies:
       '@socket.io/component-emitter': 3.1.2
       debug: 4.3.7
@@ -11162,7 +11170,7 @@ snapshots:
       object-assign: 4.1.1
       thenify-all: 1.6.0
 
-  nan@2.22.0: {}
+  nan@2.22.2: {}
 
   nanoid@3.3.8: {}
 
@@ -12246,6 +12254,8 @@ snapshots:
 
   semver@7.6.3: {}
 
+  semver@7.7.1: {}
+
   send@0.19.0:
     dependencies:
       debug: 2.6.9
@@ -12400,7 +12410,7 @@ snapshots:
     dependencies:
       '@socket.io/component-emitter': 3.1.2
       debug: 4.3.7
-      engine.io-client: 6.6.2(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      engine.io-client: 6.6.3(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       socket.io-parser: 4.2.4
     transitivePeerDependencies:
       - bufferutil

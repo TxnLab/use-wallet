@@ -21,7 +21,14 @@ const walletManager = new WalletManager({
     },
     WalletId.KMD,
     WalletId.KIBISIS,
-    WalletId.LIQUID,
+    {
+      id: WalletId.LIQUID,
+      options: {
+        origin: 'https://liquid-auth.onrender.com',
+        RTC_config_username: 'username',
+        RTC_config_credential: 'credential'
+      },
+    },
     {
       id: WalletId.LUTE,
       options: { siteName: 'Example Site' }
