@@ -22,8 +22,8 @@ export default defineNuxtPlugin((nuxtApp) => {
         id: WalletId.LIQUID,
         options: {
           origin: 'https://liquid-auth.onrender.com',
-          RTC_config_username: 'username',
-          RTC_config_credential: 'credential'
+          RTC_config_username: "liquid-auth",
+          RTC_config_credential: "sqmcP4MiTKMT4TGEDSk9jgHY"
         }
       },
       {
