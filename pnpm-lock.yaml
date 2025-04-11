@@ -118,8 +118,8 @@ importers:
   examples/nuxt:
     dependencies:
       '@algorandfoundation/liquid-auth-use-wallet-client':
-        specifier: ^1.3.0
-        version: 1.3.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        specifier: ^1.4.0-canary.1
+        version: 1.4.0-canary.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.0.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -164,8 +164,8 @@ importers:
   examples/react-ts:
     dependencies:
       '@algorandfoundation/liquid-auth-use-wallet-client':
-        specifier: ^1.3.0
-        version: 1.3.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        specifier: ^1.4.0-canary.1
+        version: 1.4.0-canary.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.0.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -228,8 +228,8 @@ importers:
   examples/solid-ts:
     dependencies:
       '@algorandfoundation/liquid-auth-use-wallet-client':
-        specifier: ^1.3.0
-        version: 1.3.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        specifier: ^1.4.0-canary.1
+        version: 1.4.0-canary.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.0.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -268,8 +268,8 @@ importers:
   examples/vanilla-ts:
     dependencies:
       '@algorandfoundation/liquid-auth-use-wallet-client':
-        specifier: ^1.3.0
-        version: 1.3.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        specifier: ^1.4.0-canary.1
+        version: 1.4.0-canary.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.0.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -305,8 +305,8 @@ importers:
   examples/vue-ts:
     dependencies:
       '@algorandfoundation/liquid-auth-use-wallet-client':
-        specifier: ^1.3.0
-        version: 1.3.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        specifier: ^1.4.0-canary.1
+        version: 1.4.0-canary.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.0.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -355,8 +355,8 @@ importers:
         specifier: 1.7.0
         version: 1.7.0
       '@algorandfoundation/liquid-auth-use-wallet-client':
-        specifier: ^1.3.0
-        version: 1.3.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        specifier: ^1.4.0-canary.1
+        version: 1.4.0-canary.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@blockshake/defly-connect':
         specifier: 1.2.1
         version: 1.2.1(algosdk@3.0.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -553,8 +553,8 @@ packages:
     resolution: {integrity: sha512-AfMdBdFS3EW1RunzHVEwNFucS6UIALs661d+zL6AHFDdxOTvUgahRC4l163VoGWA0UEpnayT1jGObci8nitZeA==}
     engines: {node: '>=18.20.3'}
 
-  '@algorandfoundation/liquid-auth-use-wallet-client@1.3.0':
-    resolution: {integrity: sha512-tZB47pnLe8gsx8msb0O8zYeSQkID9DCK2imHiY2Eo0uRYwETvHUkTo6blxIkAuOOzkT6BBa7oB4e0ggnCFX4ig==}
+  '@algorandfoundation/liquid-auth-use-wallet-client@1.4.0-canary.1':
+    resolution: {integrity: sha512-9HHLtJoXE4Y3s3DbFKeROexrY3fkvajIGKyD/ZwcG90sbvMaWF5iZwmaBOGgFYYxIruth8lgiegJSAUdSjIUwQ==}
 
   '@algorandfoundation/liquid-client@1.0.0-canary.3':
     resolution: {integrity: sha512-QbHKeGPjx2RMNh29PSoVr9i98KVn593dppoS7jjqgum5kFobxGZ8kfpEEbOSGbt6qzw1vfL4iM2yhl4g5kAasg==}
@@ -6521,7 +6521,7 @@ snapshots:
     dependencies:
       uuid: 9.0.1
 
-  '@algorandfoundation/liquid-auth-use-wallet-client@1.3.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
+  '@algorandfoundation/liquid-auth-use-wallet-client@1.4.0-canary.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
     dependencies:
       '@algorandfoundation/liquid-client': 1.0.0-canary.3(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@algorandfoundation/provider': https://codeload.github.com/algorandfoundation/wallet-provider-ts/tar.gz/28c80f5b9e0259b8e83e65c65d802d8123de9046

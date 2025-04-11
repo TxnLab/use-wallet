@@ -65,10 +65,7 @@ export class LiquidWallet extends BaseWallet {
     this.logger.info('Connecting...')
     const authClient = this.authClient || (await this.initializeClient())
 
-    await authClient.connect()
-
-    const sessionData = await authClient.checkSession()
-    const account = sessionData?.user?.wallet
+    const account = await authClient.connect()
 
     if (!account) {
       this.logger.error('No accounts found!')
@@ -99,12 +96,12 @@ export class LiquidWallet extends BaseWallet {
 
   public disconnect = async (): Promise<void> => {
     this.logger.info('Disconnecting...')
-    if (!this.authClient) {
-      this.logger.error('No auth client to disconnect')
-      throw new Error('No auth client to disconnect')
+    if (this.authClient) {
+      await this.authClient.disconnect()
+    } else {
+      this.logger.warn('No auth client to disconnect')
     }
 
-    await this.authClient.disconnect()
     this.onDisconnect()
     this.logger.info('Disconnected.')
     this.authClient = null
@@ -120,14 +117,13 @@ export class LiquidWallet extends BaseWallet {
         this.logger.info('No session to resume')
         return
       }
-      this.disconnect()
+
     } catch (error) {
       this.logger.error('Error resuming session', error)
       this.onDisconnect()
       throw error
     }
   }
-
   public signTransactions = async <T extends Transaction[] | Uint8Array[]>(
     txnGroup: T | T[],
     indexesToSign?: number[]
@@ -139,6 +135,13 @@ export class LiquidWallet extends BaseWallet {
       this.logger.debug('Signing transactions...', { txnGroup, indexesToSign })
 
       const authClient = this.authClient || (await this.initializeClient())
+
+      // Reconnect the modal if we don't have a peer but there is an active address
+      if (!authClient.client.peerClient) {
+        await authClient.connect()
+        authClient.hideModal()
+      }
+
       return authClient.signTransactions(txnGroup, this.activeAddress, indexesToSign)
     } catch (error) {
       this.logger.error('Error signing transactions', error)

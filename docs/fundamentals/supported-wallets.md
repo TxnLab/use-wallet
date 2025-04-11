@@ -90,9 +90,10 @@ Magic Algorand Extension
 
 Liquid Auth is a self-hosted authentication service that provides a simple way to associate Passkeys to KeyPair(s) commonly found in cryptocurrencies, in accordance with the FIDO2 WebAuthn specification. In addition to authentication, Liquid Auth provides a Peer to Peer signaling service. Not only can you authenticate users, but you can also establish secure, WebRTC-based connections between a mobile wallet and a desktop dApp. Liquid Auth serves as an alternative to protocols where access is controlled or limited by centralized entities.
 
-When integrating the Liquid Auth wallet provider it will default to `window.origin` as the origin (and assume that you are hosting a Liquid Auth backend at the same domain). However, you may also provide a separate endpoint.
+The Liquid Auth wallet provider defaults to `window.origin` as the origin, assuming the Liquid Auth backend is hosted on the same domain. Alternatively, you can specify a custom endpoint.
 
-The example use-cases have been setup to point to the Algorand Foundation-hosted endpoint at `https://liquid-auth.onrender.com`. While it is suitable for testing, it should not be relied upon for production usage.
+Example use cases are configured to use the Algorand Foundation-hosted endpoint at `https://liquid-auth.onrender.com`. This endpoint is suitable for testing but should not be used in production environments.
+
 
 {% hint style="info" %}
 The Liquid Auth provider is currently experimental and subject to change in future releases. It requires users to have an Android (v14+) device and developers to set up a [specific backend](https://github.com/TxnLab/use-wallet/blob/main/examples/liquid-auth-backend/README.md). For more info, please refer to the [documentation](https://liquidauth.com/guides/getting-started/).
