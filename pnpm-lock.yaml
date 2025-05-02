@@ -248,6 +248,9 @@ importers:
       algosdk:
         specifier: 3.2.0
         version: 3.2.0
+      libsodium-wrappers-sumo:
+        specifier: ^0.7.15
+        version: 0.7.15
       lute-connect:
         specifier: ^1.6.1
         version: 1.6.1
@@ -255,12 +258,18 @@ importers:
         specifier: 1.9.5
         version: 1.9.5
     devDependencies:
+      '@types/libsodium-wrappers-sumo':
+        specifier: ^0.7.8
+        version: 0.7.8
       typescript:
         specifier: 5.8.2
         version: 5.8.2
       vite:
         specifier: 6.2.3
         version: 6.2.3(@types/node@20.11.30)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.1)
+      vite-plugin-node-polyfills:
+        specifier: ^0.23.0
+        version: 0.23.0(rollup@4.38.0)(vite@6.2.3(@types/node@20.11.30)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.1))
       vite-plugin-solid:
         specifier: 2.11.6
         version: 2.11.6(@testing-library/jest-dom@6.6.3)(solid-js@1.9.5)(vite@6.2.3(@types/node@20.11.30)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.1))

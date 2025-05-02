@@ -1,5 +1,14 @@
-import { useWallet, WalletId, type BaseWallet } from '@txnlab/use-wallet-solid'
-import algosdk from 'algosdk'
+import {
+  ScopeType,
+  SignDataError,
+  useWallet,
+  WalletId,
+  type BaseWallet
+} from '@txnlab/use-wallet-solid'
+import algosdk, { Address } from 'algosdk'
+import { createHash, randomBytes } from 'crypto'
+import na from 'libsodium-wrappers-sumo'
+import { Siwa } from 'lute-connect'
 import { For, Show, createSignal } from 'solid-js'
 
 export function Connect() {
@@ -9,8 +18,10 @@ export function Connect() {
   const {
     activeAddress,
     activeWalletId,
+    canSignData,
     isWalletActive,
     isWalletConnected,
+    signData,
     transactionSigner,
     wallets,
     algodClient
@@ -77,6 +88,57 @@ export function Connect() {
     }
   }
 
+  const auth = async () => {
+    const sender = activeAddress()
+    if (!sender) {
+      throw new Error('[App] No active account')
+    }
+
+    try {
+      const date = new Date()
+      const nowIso = date.toISOString()
+      date.setMonth(date.getMonth() + 2)
+      const expIso = date.toISOString()
+      const addr = Address.fromString(sender)
+      const siwxRequest: Siwa = {
+        domain: location.host,
+        chain_id: '283',
+        account_address: addr.toString(),
+        type: 'ed25519',
+        uri: location.origin,
+        version: '1',
+        nonce: Buffer.from(randomBytes(12)).toString('base64'),
+        'expiration-time': expIso,
+        'not-before': nowIso,
+        'issued-at': nowIso
+      }
+
+      const dataString = JSON.stringify(siwxRequest)
+
+      const data = btoa(dataString)
+      const metadata = {
+        scope: ScopeType.AUTH,
+        encoding: 'base64'
+      }
+
+      const resp = await signData(data, metadata)
+
+      // verify signature
+      const clientDataJsonHash = createHash('sha256').update(dataString).digest()
+      const authenticatorDataHash = createHash('sha256').update(resp.authenticatorData).digest()
+
+      const payloadToSign: Buffer = Buffer.concat([clientDataJsonHash, authenticatorDataHash])
+
+      await na.ready
+      if (!na.crypto_sign_verify_detached(resp.signature, payloadToSign, addr.publicKey)) {
+        throw new SignDataError('Verification Failed', 4300)
+      }
+      console.info(`[App] ✅ Successfully authenticated!`)
+    } catch (error) {
+      console.error('[App] Error signing data:', error)
+    }
+  }
+
   return (
     <For each={wallets}>
       {(wallet) => (
@@ -106,6 +168,11 @@ export function Connect() {
               <button type="button" onClick={sendTransaction} disabled={isSending()}>
                 {isSending() ? 'Sending Transaction...' : 'Send Transaction'}
               </button>
+              <Show when={canSignData()}>
+                <button type="button" onClick={auth} disabled={isSending()}>
+                  Authenticate
+                </button>
+              </Show>
             </Show>
             <Show when={!isWalletActive(wallet.id)}>
               <button
