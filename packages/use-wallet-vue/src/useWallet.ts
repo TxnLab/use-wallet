@@ -22,7 +22,7 @@ export interface Wallet {
   disconnect: () => Promise<void>
   setActive: () => void
   setActiveAccount: (address: string) => void
-  canSignData: () => boolean
+  canSignData: boolean
 }
 
 export type SetAlgodClient = (client: algosdk.Algodv2) => void
@@ -53,11 +53,11 @@ export function useWallet() {
       activeAccount: walletState?.activeAccount ?? null,
       isConnected: !!walletState,
       isActive: wallet.id === activeWalletId.value,
+      canSignData: activeBaseWallet.value?.canSignData ?? false,
       connect: (args) => wallet.connect(args),
       disconnect: () => wallet.disconnect(),
       setActive: () => wallet.setActive(),
-      setActiveAccount: (addr) => wallet.setActiveAccount(addr),
-      canSignData: () => canSignData()
+      setActiveAccount: (addr) => wallet.setActiveAccount(addr)
     }
   }
 
@@ -113,13 +113,6 @@ export function useWallet() {
       throw new Error('No active wallet')
     }
     return activeBaseWallet.value.transactionSigner(txnGroup, indexesToSign)
-  }
-
-  const canSignData = (): boolean => {
-    if (!activeBaseWallet.value) {
-      throw new Error('No active wallet')
-    }
-    return activeBaseWallet.value.canSignData()
   }
 
   const signData = (data: string, metadata: SignMetadata): Promise<SignDataResponse> => {

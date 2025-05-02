@@ -90,7 +90,7 @@ export abstract class BaseWallet {
     return signedTxns
   }
 
-  public canSignData = (): boolean => false
+  public canSignData = false
 
   public signData = async (_data: string, _metadata: SignMetadata): Promise<SignDataResponse> => {
     this.logger.error('Method not supported: signData')

@@ -233,7 +233,7 @@ export class LuteWallet extends BaseWallet {
     }
   }
 
-  public canSignData = (): boolean => true
+  public canSignData = true
 
   public signData = async (data: string, metadata: SignMetadata): Promise<SignDataResponse> => {
     try {

@@ -86,7 +86,6 @@ const auth = async () => {
       type: 'ed25519',
       uri: location.origin,
       version: '1',
-      nonce: Buffer.from(crypto.getRandomValues(new Uint8Array(12))).toString('base64'),
       'expiration-time': expIso,
       'not-before': nowIso,
       'issued-at': nowIso
@@ -103,16 +102,16 @@ const auth = async () => {
     const resp = await signData(data, metadata)
 
     // verify signature
-    const clientDataJsonHash = await crypto.subtle.digest('SHA-256', Buffer.from(dataString))
+    const enc = new TextEncoder()
+    const clientDataJsonHash = await crypto.subtle.digest('SHA-256', enc.encode(dataString))
     const authenticatorDataHash = await crypto.subtle.digest('SHA-256', resp.authenticatorData)
 
-    const payloadToSign = Buffer.concat([
-      Buffer.from(clientDataJsonHash),
-      Buffer.from(authenticatorDataHash)
-    ])
+    const toSign = new Uint8Array(64)
+    toSign.set(new Uint8Array(clientDataJsonHash), 0)
+    toSign.set(new Uint8Array(authenticatorDataHash), 32)
 
     await libsodium.ready
-    if (!libsodium.crypto_sign_verify_detached(resp.signature, payloadToSign, sender.publicKey)) {
+    if (!libsodium.crypto_sign_verify_detached(resp.signature, toSign, sender.publicKey)) {
       throw new SignDataError('Verification Failed', 4300)
     }
     console.info(`[App] ✅ Successfully authenticated!`)
@@ -141,7 +140,7 @@ const auth = async () => {
         <button @click="sendTransaction()" :disabled="isSending">
           {{ isSending ? 'Sending Transaction...' : 'Send Transaction' }}
         </button>
-        <button v-if="wallet.canSignData()" @click="auth()">Authenticate</button>
+        <button v-if="wallet.canSignData" @click="auth()">Authenticate</button>
       </template>
     </div>
 

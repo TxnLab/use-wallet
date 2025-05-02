@@ -129,11 +129,11 @@ export interface Wallet {
   activeAccount: WalletAccount | null
   isConnected: boolean
   isActive: boolean
+  canSignData: boolean
   connect: (args?: Record<string, any>) => Promise<WalletAccount[]>
   disconnect: () => Promise<void>
   setActive: () => void
   setActiveAccount: (address: string) => void
-  canSignData: () => boolean
 }
 
 export const useWallet = () => {
@@ -150,6 +150,7 @@ export const useWallet = () => {
 
   const walletStateMap = useStore(manager.store, (state) => state.wallets)
   const activeWalletId = useStore(manager.store, (state) => state.activeWallet)
+  const activeBaseWallet = activeWalletId ? manager.getWallet(activeWalletId) || null : null
 
   const transformToWallet = React.useCallback(
     (wallet: BaseWallet): Wallet => {
@@ -161,11 +162,11 @@ export const useWallet = () => {
         activeAccount: walletState?.activeAccount ?? null,
         isConnected: !!walletState,
         isActive: wallet.id === activeWalletId,
+        canSignData: activeBaseWallet?.canSignData ?? false,
         connect: (args) => wallet.connect(args),
         disconnect: () => wallet.disconnect(),
         setActive: () => wallet.setActive(),
-        setActiveAccount: (addr) => wallet.setActiveAccount(addr),
-        canSignData: () => canSignData()
+        setActiveAccount: (addr) => wallet.setActiveAccount(addr)
       }
     },
     [walletStateMap, activeWalletId]
@@ -175,7 +176,6 @@ export const useWallet = () => {
     return [...manager.wallets.values()].map(transformToWallet)
   }, [manager, transformToWallet])
 
-  const activeBaseWallet = activeWalletId ? manager.getWallet(activeWalletId) || null : null
   const activeWallet = React.useMemo(() => {
     return activeBaseWallet ? transformToWallet(activeBaseWallet) : null
   }, [activeBaseWallet, transformToWallet])
@@ -203,13 +203,6 @@ export const useWallet = () => {
       throw new Error('No active wallet')
     }
     return activeBaseWallet.transactionSigner(txnGroup, indexesToSign)
-  }
-
-  const canSignData = (): boolean => {
-    if (!activeBaseWallet) {
-      throw new Error('No active wallet')
-    }
-    return activeBaseWallet.canSignData()
   }
 
   const signData = (data: string, metadata: SignMetadata): Promise<SignDataResponse> => {

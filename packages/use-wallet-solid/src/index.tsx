@@ -168,7 +168,7 @@ export const useWallet = () => {
     if (!wallet) {
       throw new Error('No active wallet')
     }
-    return wallet.canSignData()
+    return wallet.canSignData
   }
 
   const signData = (data: string, metadata: SignMetadata): Promise<SignDataResponse> => {

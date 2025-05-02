@@ -96,7 +96,6 @@ export class WalletComponent {
         type: 'ed25519',
         uri: location.origin,
         version: '1',
-        nonce: Buffer.from(crypto.getRandomValues(new Uint8Array(12))).toString('base64'),
         'expiration-time': expIso,
         'not-before': nowIso,
         'issued-at': nowIso
@@ -113,16 +112,16 @@ export class WalletComponent {
       const resp = await this.wallet.signData(data, metadata)
 
       // verify signature
-      const clientDataJsonHash = await crypto.subtle.digest('SHA-256', Buffer.from(dataString))
+      const enc = new TextEncoder()
+      const clientDataJsonHash = await crypto.subtle.digest('SHA-256', enc.encode(dataString))
       const authenticatorDataHash = await crypto.subtle.digest('SHA-256', resp.authenticatorData)
 
-      const payloadToSign = Buffer.concat([
-        Buffer.from(clientDataJsonHash),
-        Buffer.from(authenticatorDataHash)
-      ])
+      const toSign = new Uint8Array(64)
+      toSign.set(new Uint8Array(clientDataJsonHash), 0)
+      toSign.set(new Uint8Array(authenticatorDataHash), 32)
 
       await libsodium.ready
-      if (!libsodium.crypto_sign_verify_detached(resp.signature, payloadToSign, sender.publicKey)) {
+      if (!libsodium.crypto_sign_verify_detached(resp.signature, toSign, sender.publicKey)) {
         throw new SignDataError('Verification Failed', 4300)
       }
       console.info(`[App] ✅ Successfully authenticated!`)
@@ -159,7 +158,7 @@ export class WalletComponent {
             this.wallet.isActive
               ? `<button id="transaction-button" type="button">Send Transaction</button>
               ${
-                this.wallet.canSignData()
+                this.wallet.canSignData
                   ? `<button id="auth-button" type="button">Authenticate</button>`
                   : ''
               }`
