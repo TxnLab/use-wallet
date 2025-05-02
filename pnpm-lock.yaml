@@ -178,6 +178,9 @@ importers:
       algosdk:
         specifier: 3.2.0
         version: 3.2.0
+      libsodium-wrappers-sumo:
+        specifier: ^0.7.15
+        version: 0.7.15
       lute-connect:
         specifier: ^1.6.1
         version: 1.6.1
@@ -188,6 +191,9 @@ importers:
         specifier: 18.3.1
         version: 18.3.1(react@18.3.1)
     devDependencies:
+      '@types/libsodium-wrappers-sumo':
+        specifier: ^0.7.8
+        version: 0.7.8
       '@types/react':
         specifier: 18.3.20
         version: 18.3.20
@@ -218,6 +224,9 @@ importers:
       vite:
         specifier: 6.2.3
         version: 6.2.3(@types/node@20.11.30)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.1)
+      vite-plugin-node-polyfills:
+        specifier: ^0.23.0
+        version: 0.23.0(rollup@4.38.0)(vite@6.2.3(@types/node@20.11.30)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.1))
 
   examples/solid-ts:
     dependencies:
@@ -333,8 +342,8 @@ importers:
         specifier: 6.2.3
         version: 6.2.3(@types/node@20.11.30)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.1)
       vite-plugin-node-polyfills:
-        specifier: ^0.22.0
-        version: 0.22.0(rollup@4.38.0)(vite@6.2.3(@types/node@20.11.30)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.1))
+        specifier: ^0.23.0
+        version: 0.23.0(rollup@4.38.0)(vite@6.2.3(@types/node@20.11.30)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.1))
       vue-tsc:
         specifier: 2.2.8
         version: 2.2.8(typescript@5.8.2)
@@ -5918,10 +5927,10 @@ packages:
       '@nuxt/kit':
         optional: true
 
-  vite-plugin-node-polyfills@0.22.0:
-    resolution: {integrity: sha512-F+G3LjiGbG8QpbH9bZ//GSBr9i1InSTkaulfUHFa9jkLqVGORFBoqc2A/Yu5Mmh1kNAbiAeKeK+6aaQUf3x0JA==}
+  vite-plugin-node-polyfills@0.23.0:
+    resolution: {integrity: sha512-4n+Ys+2bKHQohPBKigFlndwWQ5fFKwaGY6muNDMTb0fSQLyBzS+jjUNRZG9sKF0S/Go4ApG6LFnUGopjkILg3w==}
     peerDependencies:
-      vite: ^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0
+      vite: ^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0
 
   vite-plugin-solid@2.11.6:
     resolution: {integrity: sha512-Sl5CTqJTGyEeOsmdH6BOgalIZlwH3t4/y0RQuFLMGnvWMBvxb4+lq7x3BSiAw6etf0QexfNJW7HSOO/Qf7pigg==}
@@ -12772,7 +12781,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  vite-plugin-node-polyfills@0.22.0(rollup@4.38.0)(vite@6.2.3(@types/node@20.11.30)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.1)):
+  vite-plugin-node-polyfills@0.23.0(rollup@4.38.0)(vite@6.2.3(@types/node@20.11.30)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.1)):
     dependencies:
       '@rollup/plugin-inject': 5.0.5(rollup@4.38.0)
       node-stdlib-browser: 1.3.1

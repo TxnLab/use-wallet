@@ -6,7 +6,7 @@ import na from 'libsodium-wrappers-sumo'
 import { type Siwa } from 'lute-connect'
 import { ref } from 'vue'
 
-const { algodClient, transactionSigner, signData, wallets } = useWallet()
+const { activeAddress, algodClient, transactionSigner, signData, wallets } = useWallet()
 
 const isSending = ref(false)
 const magicEmail = ref('')
@@ -28,10 +28,9 @@ const setActiveAccount = (event: Event, wallet: Wallet) => {
   wallet.setActiveAccount(target.value)
 }
 
-const sendTransaction = async (wallet: Wallet) => {
-  if (!wallet.activeAccount?.address) {
-    alert('No active account')
-    return
+const sendTransaction = async () => {
+  if (!activeAddress.value) {
+    throw new Error('[App] No active account')
   }
 
   isSending.value = true
@@ -41,8 +40,8 @@ const sendTransaction = async (wallet: Wallet) => {
     const suggestedParams = await algodClient.value.getTransactionParams().do()
 
     const transaction = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
-      sender: wallet.activeAccount.address,
-      receiver: wallet.activeAccount.address,
+      sender: activeAddress.value,
+      receiver: activeAddress.value,
       amount: 0,
       suggestedParams
     })
@@ -64,14 +63,17 @@ const sendTransaction = async (wallet: Wallet) => {
   }
 }
 
-const auth = async (wallet: Wallet) => {
+const auth = async () => {
+  if (!activeAddress.value) {
+    throw new Error('[App] No active account')
+  }
+
   try {
     const date = new Date()
     const nowIso = date.toISOString()
     date.setMonth(date.getMonth() + 2)
     const expIso = date.toISOString()
-    if (!wallet.activeAccount) throw Error('Invalid Sender')
-    const sender = Address.fromString(wallet.activeAccount.address)
+    const sender = Address.fromString(activeAddress.value)
     const siwxRequest: Siwa = {
       domain: location.host,
       chain_id: '283',
@@ -128,12 +130,10 @@ const auth = async (wallet: Wallet) => {
         Set Active
       </button>
       <template v-else>
-        <button @click="sendTransaction(wallet)" :disabled="isSending">
+        <button @click="sendTransaction()" :disabled="isSending">
           {{ isSending ? 'Sending Transaction...' : 'Send Transaction' }}
         </button>
-        <button v-if="wallet.canSignData()" @click="auth(wallet)" :disabled="isSending">
-          Authenticate
-        </button>
+        <button v-if="wallet.canSignData()" @click="auth()">Authenticate</button>
       </template>
     </div>
 
