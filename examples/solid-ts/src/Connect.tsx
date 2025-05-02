@@ -169,7 +169,7 @@ export function Connect() {
                 {isSending() ? 'Sending Transaction...' : 'Send Transaction'}
               </button>
               <Show when={canSignData()}>
-                <button type="button" onClick={auth} disabled={isSending()}>
+                <button type="button" onClick={auth}>
                   Authenticate
                 </button>
               </Show>
