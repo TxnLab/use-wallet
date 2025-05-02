@@ -1,9 +1,20 @@
 <script setup lang="ts">
-import { NetworkId, WalletId, useNetwork, useWallet, type Wallet } from '@txnlab/use-wallet-vue'
+import {
+  NetworkId,
+  ScopeType,
+  SignDataError,
+  WalletId,
+  useNetwork,
+  useWallet,
+  type Siwa,
+  type Wallet
+} from '@txnlab/use-wallet-vue'
 import algosdk from 'algosdk'
+import { createHash, randomBytes } from 'crypto'
+import na from 'libsodium-wrappers-sumo'
 import { ref } from 'vue'
 
-const { algodClient, transactionSigner, wallets: walletsRef } = useWallet()
+const { activeAddress, algodClient, signData, transactionSigner, wallets: walletsRef } = useWallet()
 const wallets = computed(() => walletsRef.value)
 
 const { activeNetwork, setActiveNetwork } = useNetwork()
@@ -28,8 +39,8 @@ const setActiveAccount = (event: Event, wallet: Wallet) => {
   wallet.setActiveAccount(target.value)
 }
 
-const sendTransaction = async (wallet: Wallet) => {
-  if (!wallet.activeAccount?.address) {
+const sendTransaction = async () => {
+  if (!activeAddress.value) {
     alert('No active account')
     return
   }
@@ -41,8 +52,8 @@ const sendTransaction = async (wallet: Wallet) => {
     const suggestedParams = await algodClient.value.getTransactionParams().do()
 
     const transaction = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
-      sender: wallet.activeAccount.address,
-      receiver: wallet.activeAccount.address,
+      sender: activeAddress.value,
+      receiver: activeAddress.value,
       amount: 0,
       suggestedParams
     })
@@ -61,6 +72,57 @@ const sendTransaction = async (wallet: Wallet) => {
     console.error('[App] Error signing transaction:', error)
   } finally {
     isSending.value = false
+  }
+}
+
+const auth = async () => {
+  if (!activeAddress.value) {
+    alert('No active account')
+    return
+  }
+
+  try {
+    const date = new Date()
+    const nowIso = date.toISOString()
+    date.setMonth(date.getMonth() + 2)
+    const expIso = date.toISOString()
+    const sender = algosdk.Address.fromString(activeAddress.value)
+    const siwxRequest: Siwa = {
+      domain: location.host,
+      chain_id: '283',
+      account_address: sender.toString(),
+      type: 'ed25519',
+      uri: location.origin,
+      version: '1',
+      nonce: Buffer.from(randomBytes(12)).toString('base64'),
+      'expiration-time': expIso,
+      'not-before': nowIso,
+      'issued-at': nowIso
+    }
+
+    const dataString = JSON.stringify(siwxRequest)
+
+    const data = btoa(dataString)
+    const metadata = {
+      scope: ScopeType.AUTH,
+      encoding: 'base64'
+    }
+
+    const resp = await signData(data, metadata)
+
+    // verify signature
+    const clientDataJsonHash = createHash('sha256').update(dataString).digest()
+    const authenticatorDataHash = createHash('sha256').update(resp.authenticatorData).digest()
+
+    const payloadToSign: Buffer = Buffer.concat([clientDataJsonHash, authenticatorDataHash])
+
+    await na.ready
+    if (!na.crypto_sign_verify_detached(resp.signature, payloadToSign, sender.publicKey)) {
+      throw new SignDataError('Verification Failed', 4300)
+    }
+    console.info(`[App] ✅ Successfully authenticated!`)
+  } catch (error) {
+    console.error('[App] Error signing data:', error)
   }
 }
 </script>
@@ -115,9 +177,12 @@ const sendTransaction = async (wallet: Wallet) => {
         >
           Set Active
         </button>
-        <button v-else @click="sendTransaction(wallet)" :disabled="isSending">
-          {{ isSending ? 'Sending Transaction...' : 'Send Transaction' }}
-        </button>
+        <template v-else>
+          <button @click="sendTransaction()" :disabled="isSending">
+            {{ isSending ? 'Sending Transaction...' : 'Send Transaction' }}
+          </button>
+          <button v-if="wallet.canSignData()" @click="auth()">Authenticate</button>
+        </template>
       </div>
 
       <div v-if="isMagicLink(wallet)" class="input-group">
