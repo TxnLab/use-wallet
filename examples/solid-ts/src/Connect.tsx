@@ -7,7 +7,6 @@ import {
   type BaseWallet
 } from '@txnlab/use-wallet-solid'
 import algosdk from 'algosdk'
-import { createHash, randomBytes } from 'crypto'
 import na from 'libsodium-wrappers-sumo'
 import { For, Show, createSignal } from 'solid-js'
 
@@ -107,7 +106,7 @@ export function Connect() {
         type: 'ed25519',
         uri: location.origin,
         version: '1',
-        nonce: Buffer.from(randomBytes(12)).toString('base64'),
+        nonce: Buffer.from(crypto.getRandomValues(new Uint8Array(12))).toString('base64'),
         'expiration-time': expIso,
         'not-before': nowIso,
         'issued-at': nowIso
@@ -124,10 +123,13 @@ export function Connect() {
       const resp = await signData(data, metadata)
 
       // verify signature
-      const clientDataJsonHash = createHash('sha256').update(dataString).digest()
-      const authenticatorDataHash = createHash('sha256').update(resp.authenticatorData).digest()
+      const clientDataJsonHash = await crypto.subtle.digest('SHA-256', Buffer.from(dataString))
+      const authenticatorDataHash = await crypto.subtle.digest('SHA-256', resp.authenticatorData)
 
-      const payloadToSign: Buffer = Buffer.concat([clientDataJsonHash, authenticatorDataHash])
+      const payloadToSign = Buffer.concat([
+        Buffer.from(clientDataJsonHash),
+        Buffer.from(authenticatorDataHash)
+      ])
 
       await na.ready
       if (!na.crypto_sign_verify_detached(resp.signature, payloadToSign, addr.publicKey)) {
