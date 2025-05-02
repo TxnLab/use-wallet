@@ -7,7 +7,7 @@ import {
   WalletManager
 } from '@txnlab/use-wallet'
 import algosdk from 'algosdk'
-import na from 'libsodium-wrappers-sumo'
+import libsodium from 'libsodium-wrappers-sumo'
 
 export class WalletComponent {
   wallet: BaseWallet
@@ -121,8 +121,8 @@ export class WalletComponent {
         Buffer.from(authenticatorDataHash)
       ])
 
-      await na.ready
-      if (!na.crypto_sign_verify_detached(resp.signature, payloadToSign, sender.publicKey)) {
+      await libsodium.ready
+      if (!libsodium.crypto_sign_verify_detached(resp.signature, payloadToSign, sender.publicKey)) {
         throw new SignDataError('Verification Failed', 4300)
       }
       console.info(`[App] ✅ Successfully authenticated!`)

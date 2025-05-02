@@ -439,7 +439,8 @@ describe('useWallet', () => {
         connect: expect.any(Function),
         disconnect: expect.any(Function),
         setActive: expect.any(Function),
-        setActiveAccount: expect.any(Function)
+        setActiveAccount: expect.any(Function),
+        canSignData: expect.any(Function)
       },
       {
         id: mockMagicAuth.id,
@@ -451,7 +452,8 @@ describe('useWallet', () => {
         connect: expect.any(Function),
         disconnect: expect.any(Function),
         setActive: expect.any(Function),
-        setActiveAccount: expect.any(Function)
+        setActiveAccount: expect.any(Function),
+        canSignData: expect.any(Function)
       }
     ]
     mockWalletManager._clients = new Map<WalletId, BaseWallet>([

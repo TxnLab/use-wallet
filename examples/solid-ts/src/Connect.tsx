@@ -7,7 +7,7 @@ import {
   type BaseWallet
 } from '@txnlab/use-wallet-solid'
 import algosdk from 'algosdk'
-import na from 'libsodium-wrappers-sumo'
+import libsodium from 'libsodium-wrappers-sumo'
 import { For, Show, createSignal } from 'solid-js'
 
 export function Connect() {
@@ -131,8 +131,8 @@ export function Connect() {
         Buffer.from(authenticatorDataHash)
       ])
 
-      await na.ready
-      if (!na.crypto_sign_verify_detached(resp.signature, payloadToSign, addr.publicKey)) {
+      await libsodium.ready
+      if (!libsodium.crypto_sign_verify_detached(resp.signature, payloadToSign, addr.publicKey)) {
         throw new SignDataError('Verification Failed', 4300)
       }
       console.info(`[App] ✅ Successfully authenticated!`)

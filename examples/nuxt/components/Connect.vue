@@ -10,7 +10,7 @@ import {
   type Wallet
 } from '@txnlab/use-wallet-vue'
 import algosdk from 'algosdk'
-import na from 'libsodium-wrappers-sumo'
+import libsodium from 'libsodium-wrappers-sumo'
 import { ref } from 'vue'
 
 const { activeAddress, algodClient, signData, transactionSigner, wallets: walletsRef } = useWallet()
@@ -118,8 +118,8 @@ const auth = async () => {
       Buffer.from(authenticatorDataHash)
     ])
 
-    await na.ready
-    if (!na.crypto_sign_verify_detached(resp.signature, payloadToSign, sender.publicKey)) {
+    await libsodium.ready
+    if (!libsodium.crypto_sign_verify_detached(resp.signature, payloadToSign, sender.publicKey)) {
       throw new SignDataError('Verification Failed', 4300)
     }
     console.info(`[App] ✅ Successfully authenticated!`)

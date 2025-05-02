@@ -67,6 +67,7 @@ function createWalletWithStore(store: Store<State>): LuteWallet {
 interface MockLuteConnect {
   connect: Mock
   signTxns: Mock
+  signData: Mock
   siteName: string
   forceWeb: boolean
   isExtensionInstalled: () => Promise<boolean>
@@ -100,6 +101,7 @@ describe('LuteWallet', () => {
     mockLuteConnect = {
       connect: vi.fn(),
       signTxns: vi.fn(),
+      signData: vi.fn(),
       siteName: 'Mock Site',
       forceWeb: false,
       isExtensionInstalled: vi.fn().mockResolvedValue(true)
