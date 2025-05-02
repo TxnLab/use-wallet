@@ -1,6 +1,7 @@
 import {
   ScopeType,
   SignDataError,
+  Siwa,
   useWallet,
   WalletId,
   type BaseWallet
@@ -8,7 +9,6 @@ import {
 import algosdk from 'algosdk'
 import { createHash, randomBytes } from 'crypto'
 import na from 'libsodium-wrappers-sumo'
-import { Siwa } from 'lute-connect'
 import { For, Show, createSignal } from 'solid-js'
 
 export function Connect() {

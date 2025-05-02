@@ -1,9 +1,15 @@
 <script setup lang="ts">
-import { ScopeType, SignDataError, WalletId, useWallet, type Wallet } from '@txnlab/use-wallet-vue'
+import {
+  ScopeType,
+  SignDataError,
+  Siwa,
+  WalletId,
+  useWallet,
+  type Wallet
+} from '@txnlab/use-wallet-vue'
 import algosdk from 'algosdk'
 import { createHash, randomBytes } from 'crypto'
 import na from 'libsodium-wrappers-sumo'
-import { type Siwa } from 'lute-connect'
 import { ref } from 'vue'
 
 const { activeAddress, algodClient, transactionSigner, signData, wallets } = useWallet()

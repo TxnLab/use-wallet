@@ -1,8 +1,14 @@
-import { BaseWallet, ScopeType, SignDataError, WalletId, WalletManager } from '@txnlab/use-wallet'
+import {
+  BaseWallet,
+  ScopeType,
+  SignDataError,
+  Siwa,
+  WalletId,
+  WalletManager
+} from '@txnlab/use-wallet'
 import algosdk from 'algosdk'
 import { createHash, randomBytes } from 'crypto'
 import na from 'libsodium-wrappers-sumo'
-import { Siwa } from 'lute-connect'
 
 export class WalletComponent {
   wallet: BaseWallet

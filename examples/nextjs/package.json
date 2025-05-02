@@ -15,13 +15,15 @@
     "@walletconnect/modal": "^2.7.0",
     "@walletconnect/sign-client": "^2.19.2",
     "algosdk": "3.2.0",
+    "libsodium-wrappers-sumo": "^0.7.15",
     "lute-connect": "^1.6.1",
     "next": "14.2.26",
     "react": "18.3.1",
     "react-dom": "18.3.1"
   },
   "devDependencies": {
-    "@types/node": "20.11.30",
+    "@types/libsodium-wrappers-sumo": "^0.7.8",
+    "@types/node": "22.15.3",
     "@types/react": "18.3.20",
     "@types/react-dom": "18.3.5",
     "eslint": "8.57.1",
