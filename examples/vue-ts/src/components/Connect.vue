@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ScopeType, SignDataError, WalletId, useWallet, type Wallet } from '@txnlab/use-wallet-vue'
-import algosdk, { Address } from 'algosdk'
+import algosdk from 'algosdk'
 import { createHash, randomBytes } from 'crypto'
 import na from 'libsodium-wrappers-sumo'
 import { type Siwa } from 'lute-connect'
@@ -73,7 +73,7 @@ const auth = async () => {
     const nowIso = date.toISOString()
     date.setMonth(date.getMonth() + 2)
     const expIso = date.toISOString()
-    const sender = Address.fromString(activeAddress.value)
+    const sender = algosdk.Address.fromString(activeAddress.value)
     const siwxRequest: Siwa = {
       domain: location.host,
       chain_id: '283',

@@ -5,7 +5,7 @@ import {
   WalletId,
   type Wallet
 } from '@txnlab/use-wallet-react'
-import algosdk, { Address } from 'algosdk'
+import algosdk from 'algosdk'
 import { createHash, randomBytes } from 'crypto'
 import na from 'libsodium-wrappers-sumo'
 import { Siwa } from 'lute-connect'
@@ -87,7 +87,7 @@ export function Connect() {
       const nowIso = date.toISOString()
       date.setMonth(date.getMonth() + 2)
       const expIso = date.toISOString()
-      const sender = Address.fromString(activeAddress)
+      const sender = algosdk.Address.fromString(activeAddress)
       const siwxRequest: Siwa = {
         domain: location.host,
         chain_id: '283',
