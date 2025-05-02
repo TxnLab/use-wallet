@@ -23,7 +23,7 @@ export type CustomProvider = {
     txnGroup: algosdk.Transaction[],
     indexesToSign: number[]
   ): Promise<Uint8Array[]>
-  signData(data: string, metadata: SignMetadata): Promise<SignDataResponse>
+  signData?(data: string, metadata: SignMetadata): Promise<SignDataResponse>
 }
 
 export interface CustomWalletOptions {
