@@ -4,8 +4,15 @@ import { byteArrayToBase64, flattenTxnGroup, isSignedTxn, isTransactionArray } f
 import { BaseWallet } from 'src/wallets/base'
 import type { Store } from '@tanstack/store'
 import type LuteConnect from 'lute-connect'
-import type { SignTxnsError as ISignTxnsError, WalletTransaction } from 'lute-connect'
 import {
+  SignDataError as ISignDataError,
+  type SignTxnsError as ISignTxnsError,
+  type WalletTransaction
+} from 'lute-connect'
+import {
+  SignDataError,
+  SignDataResponse,
+  SignMetadata,
   SignTxnsError,
   type WalletAccount,
   type WalletConstructor,
@@ -17,6 +24,10 @@ export interface LuteConnectOptions {
 }
 
 function isSignTxnsError(error: any): error is ISignTxnsError {
+  return error instanceof Error && 'code' in error
+}
+
+function isSignDataError(error: any): error is ISignDataError {
   return error instanceof Error && 'code' in error
 }
 
@@ -218,6 +229,29 @@ export class LuteWallet extends BaseWallet {
         throw new SignTxnsError(error.message, error.code)
       }
       this.logger.error('Unknown error signing transactions:', error)
+      throw error
+    }
+  }
+
+  public canSignData = (): boolean => true
+
+  public signData = async (data: string, metadata: SignMetadata): Promise<SignDataResponse> => {
+    try {
+      this.logger.debug('Signing data...', { data, metadata })
+
+      const client = this.client || (await this.initializeClient())
+
+      // Sign data
+      const signDataResult = await client.signData(data, metadata)
+
+      this.logger.debug('Data signed successfully', signDataResult)
+      return signDataResult
+    } catch (error) {
+      if (isSignDataError(error)) {
+        this.logger.error('Error signing data:', error.message, `(code: ${error.code})`)
+        throw new SignDataError(error.message, error.code)
+      }
+      this.logger.error('Unknown error signing data:', error)
       throw error
     }
   }

@@ -3,7 +3,7 @@ import { WalletState, addWallet, setAccounts, type State } from 'src/store'
 import { compareAccounts } from 'src/utils'
 import { BaseWallet } from 'src/wallets/base'
 import type { Store } from '@tanstack/store'
-import type { WalletAccount, WalletConstructor, WalletId } from 'src/wallets/types'
+import type { SignDataResponse, SignMetadata, WalletAccount, WalletConstructor, WalletId } from 'src/wallets/types'
 
 export type CustomProvider = {
   connect(args?: Record<string, any>): Promise<WalletAccount[]>
@@ -17,6 +17,10 @@ export type CustomProvider = {
     txnGroup: algosdk.Transaction[],
     indexesToSign: number[]
   ): Promise<Uint8Array[]>
+  signData(
+    data: string,
+    metadata: SignMetadata
+  ): Promise<SignDataResponse>
 }
 
 export interface CustomWalletOptions {
@@ -161,5 +165,17 @@ export class CustomWallet extends BaseWallet {
     }
     this.logger.debug('Transaction signer called...', { txnGroup, indexesToSign })
     return await this.provider.transactionSigner(txnGroup, indexesToSign)
+  }
+
+  public signData = async (
+    data: string,
+    metadata: SignMetadata
+  ): Promise<SignDataResponse> => {
+    if (!this.provider.signData) {
+      this.logger.error('Method not supported: signData')
+      throw new Error('Method not supported: signData')
+    }
+    this.logger.debug('Signing data...', { data, metadata })
+    return await this.provider.signData(data, metadata)
   }
 }

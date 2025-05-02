@@ -4,7 +4,14 @@ import { StorageAdapter } from 'src/storage'
 import { setActiveWallet, setActiveAccount, removeWallet, type State } from 'src/store'
 import type { Store } from '@tanstack/store'
 import type algosdk from 'algosdk'
-import type { WalletAccount, WalletConstructor, WalletId, WalletMetadata } from 'src/wallets/types'
+import type {
+  SignDataResponse,
+  SignMetadata,
+  WalletAccount,
+  WalletConstructor,
+  WalletId,
+  WalletMetadata
+} from 'src/wallets/types'
 
 interface WalletConstructorType {
   new (...args: any[]): BaseWallet
@@ -81,6 +88,13 @@ export abstract class BaseWallet {
     }, [])
 
     return signedTxns
+  }
+
+  public canSignData = (): boolean => false
+
+  public signData = async (_data: string, _metadata: SignMetadata): Promise<SignDataResponse> => {
+    this.logger.error('Method not supported: signData')
+    throw new Error('Method not supported: signData')
   }
 
   // ---------- Derived Properties ------------------------------------ //

@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { WalletId, useWallet, type Wallet } from '@txnlab/use-wallet-vue'
-import algosdk from 'algosdk'
+import { ScopeType, SignDataError, WalletId, useWallet, type Wallet } from '@txnlab/use-wallet-vue'
+import algosdk, { Address } from 'algosdk'
+import { createHash, randomBytes } from 'crypto'
+import na from 'libsodium-wrappers-sumo'
+import { type Siwa } from 'lute-connect'
 import { ref } from 'vue'
 
-const { algodClient, transactionSigner, wallets } = useWallet()
+const { algodClient, transactionSigner, signData, wallets } = useWallet()
 
 const isSending = ref(false)
 const magicEmail = ref('')
@@ -60,54 +63,97 @@ const sendTransaction = async (wallet: Wallet) => {
     isSending.value = false
   }
 }
+
+const auth = async (wallet: Wallet) => {
+  try {
+    const date = new Date()
+    const nowIso = date.toISOString()
+    date.setMonth(date.getMonth() + 2)
+    const expIso = date.toISOString()
+    if (!wallet.activeAccount) throw Error('Invalid Sender')
+    const sender = Address.fromString(wallet.activeAccount.address)
+    const siwxRequest: Siwa = {
+      domain: location.host,
+      chain_id: '283',
+      account_address: sender.toString(),
+      type: 'ed25519',
+      uri: location.origin,
+      version: '1',
+      nonce: Buffer.from(randomBytes(12)).toString('base64'),
+      'expiration-time': expIso,
+      'not-before': nowIso,
+      'issued-at': nowIso
+    }
+
+    const dataString = JSON.stringify(siwxRequest)
+
+    const data = btoa(dataString)
+    const metadata = {
+      scope: ScopeType.AUTH,
+      encoding: 'base64'
+    }
+
+    const resp = await signData(data, metadata)
+
+    // verify signature
+    const clientDataJsonHash = createHash('sha256').update(dataString).digest()
+    const authenticatorDataHash = createHash('sha256').update(resp.authenticatorData).digest()
+
+    const payloadToSign: Buffer = Buffer.concat([clientDataJsonHash, authenticatorDataHash])
+
+    await na.ready
+    if (!na.crypto_sign_verify_detached(resp.signature, payloadToSign, sender.publicKey)) {
+      throw new SignDataError('Verification Failed', 4300)
+    }
+    console.info(`[App] ✅ Successfully authenticated!`)
+  } catch (error) {
+    console.error('[App] Error signing data:', error)
+  }
+}
 </script>
 
 <template>
-  <div>
-    <div v-for="wallet in wallets" :key="wallet.id" class="wallet-group">
-      <h4>{{ wallet.metadata.name }} <span v-if="wallet.isActive">[active]</span></h4>
-      <div class="wallet-buttons">
-        <button
-          @click="wallet.connect(getConnectArgs(wallet))"
-          :disabled="isConnectDisabled(wallet)"
-        >
-          Connect
-        </button>
-        <button @click="wallet.disconnect()" :disabled="!wallet.isConnected">Disconnect</button>
-        <button
-          v-if="!wallet.isActive"
-          @click="wallet.setActive()"
-          :disabled="!wallet.isConnected || wallet.isActive"
-        >
-          Set Active
-        </button>
-        <button v-else @click="sendTransaction(wallet)" :disabled="isSending">
+  <div v-for="wallet in wallets" :key="wallet.id" class="wallet-group">
+    <h4>{{ wallet.metadata.name }} <span v-if="wallet.isActive">[active]</span></h4>
+    <div class="wallet-buttons">
+      <button @click="wallet.connect(getConnectArgs(wallet))" :disabled="isConnectDisabled(wallet)">
+        Connect
+      </button>
+      <button @click="wallet.disconnect()" :disabled="!wallet.isConnected">Disconnect</button>
+      <button
+        v-if="!wallet.isActive"
+        @click="wallet.setActive()"
+        :disabled="!wallet.isConnected || wallet.isActive"
+      >
+        Set Active
+      </button>
+      <template v-else>
+        <button @click="sendTransaction(wallet)" :disabled="isSending">
           {{ isSending ? 'Sending Transaction...' : 'Send Transaction' }}
         </button>
-      </div>
+        <button v-if="wallet.canSignData()" @click="auth(wallet)" :disabled="isSending">
+          Authenticate
+        </button>
+      </template>
+    </div>
 
-      <div v-if="isMagicLink(wallet)" class="input-group">
-        <label for="magic-email">Email:</label>
-        <input
-          id="magic-email"
-          type="email"
-          v-model="magicEmail"
-          placeholder="Enter email to connect..."
-          :disabled="wallet.isConnected"
-        />
-      </div>
+    <div v-if="isMagicLink(wallet)" class="input-group">
+      <label for="magic-email">Email:</label>
+      <input
+        id="magic-email"
+        type="email"
+        v-model="magicEmail"
+        placeholder="Enter email to connect..."
+        :disabled="wallet.isConnected"
+      />
+    </div>
 
-      <div v-if="wallet.isActive && wallet.accounts.length > 0">
-        <select @change="(event) => setActiveAccount(event, wallet)">
-          <option
-            v-for="account in wallet.accounts"
-            :key="account.address"
-            :value="account.address"
-          >
-            {{ account.address }}
-          </option>
-        </select>
-      </div>
+    <div v-if="wallet.isActive && wallet.accounts.length > 0">
+      <select @change="(event) => setActiveAccount(event, wallet)">
+        <option v-for="account in wallet.accounts" :key="account.address" :value="account.address">
+          {{ account.address }}
+        </option>
+      </select>
     </div>
   </div>
 </template>

@@ -209,3 +209,39 @@ export class SignTxnsError extends Error {
     this.data = data
   }
 }
+
+export class SignDataError extends Error {
+  code: number
+  data?: any
+
+  constructor(message: string, code: number, data?: any) {
+    super(message)
+    this.name = 'SignDataError'
+    this.code = code
+    this.data = data
+  }
+}
+
+export interface SignData {
+  data: string;
+  signer: Uint8Array;
+  domain: string;
+  authenticatorData: Uint8Array;
+  requestId?: string;
+  hdPath?: string;
+  signature?: Uint8Array;
+}
+
+export interface SignDataResponse extends SignData {
+  signature: Uint8Array;
+}
+
+export enum ScopeType {
+  UNKNOWN = -1,
+  AUTH = 1,
+}
+
+export interface SignMetadata {
+  scope: ScopeType;
+  encoding: string;
+}

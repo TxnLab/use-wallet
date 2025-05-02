@@ -1,6 +1,8 @@
 import { useStore } from '@tanstack/react-store'
 import {
   NetworkId,
+  SignDataResponse,
+  SignMetadata,
   WalletId,
   WalletManager,
   type AlgodConfig,
@@ -131,6 +133,7 @@ export interface Wallet {
   disconnect: () => Promise<void>
   setActive: () => void
   setActiveAccount: (address: string) => void
+  canSignData: () => boolean
 }
 
 export const useWallet = () => {
@@ -161,7 +164,8 @@ export const useWallet = () => {
         connect: (args) => wallet.connect(args),
         disconnect: () => wallet.disconnect(),
         setActive: () => wallet.setActive(),
-        setActiveAccount: (addr) => wallet.setActiveAccount(addr)
+        setActiveAccount: (addr) => wallet.setActiveAccount(addr),
+        canSignData: () => canSignData()
       }
     },
     [walletStateMap, activeWalletId]
@@ -201,6 +205,20 @@ export const useWallet = () => {
     return activeBaseWallet.transactionSigner(txnGroup, indexesToSign)
   }
 
+  const canSignData = (): boolean => {
+    if (!activeBaseWallet) {
+      throw new Error('No active wallet')
+    }
+    return activeBaseWallet.canSignData()
+  }
+
+  const signData = (data: string, metadata: SignMetadata): Promise<SignDataResponse> => {
+    if (!activeBaseWallet) {
+      throw new Error('No active wallet')
+    }
+    return activeBaseWallet.signData(data, metadata)
+  }
+
   return {
     wallets,
     isReady,
@@ -211,6 +229,7 @@ export const useWallet = () => {
     activeWalletAddresses,
     activeAccount,
     activeAddress,
+    signData,
     signTransactions,
     transactionSigner
   }
