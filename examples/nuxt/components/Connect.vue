@@ -10,8 +10,8 @@ import {
   type Wallet
 } from '@txnlab/use-wallet-vue'
 import algosdk from 'algosdk'
-import { createHash, randomBytes } from 'crypto'
 import na from 'libsodium-wrappers-sumo'
+import { getRandomValues, subtle } from 'node:crypto'
 import { ref } from 'vue'
 
 const { activeAddress, algodClient, signData, transactionSigner, wallets: walletsRef } = useWallet()
@@ -94,7 +94,7 @@ const auth = async () => {
       type: 'ed25519',
       uri: location.origin,
       version: '1',
-      nonce: Buffer.from(randomBytes(12)).toString('base64'),
+      nonce: Buffer.from(getRandomValues(new Uint8Array(12))).toString('base64'),
       'expiration-time': expIso,
       'not-before': nowIso,
       'issued-at': nowIso
@@ -111,10 +111,13 @@ const auth = async () => {
     const resp = await signData(data, metadata)
 
     // verify signature
-    const clientDataJsonHash = createHash('sha256').update(dataString).digest()
-    const authenticatorDataHash = createHash('sha256').update(resp.authenticatorData).digest()
+    const clientDataJsonHash = await subtle.digest('SHA-256', Buffer.from(dataString))
+    const authenticatorDataHash = await subtle.digest('SHA-256', resp.authenticatorData)
 
-    const payloadToSign: Buffer = Buffer.concat([clientDataJsonHash, authenticatorDataHash])
+    const payloadToSign = Buffer.concat([
+      Buffer.from(clientDataJsonHash),
+      Buffer.from(authenticatorDataHash)
+    ])
 
     await na.ready
     if (!na.crypto_sign_verify_detached(resp.signature, payloadToSign, sender.publicKey)) {
