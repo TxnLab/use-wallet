@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import * as ed from '@noble/ed25519'
 import {
   NetworkId,
   ScopeType,
@@ -10,7 +11,6 @@ import {
   type Wallet
 } from '@txnlab/use-wallet-vue'
 import algosdk from 'algosdk'
-import libsodium from 'libsodium-wrappers-sumo'
 import { ref } from 'vue'
 
 const { activeAddress, algodClient, signData, transactionSigner, wallets: walletsRef } = useWallet()
@@ -79,46 +79,30 @@ const auth = async () => {
     alert('No active account')
     return
   }
-
   try {
-    const date = new Date()
-    const nowIso = date.toISOString()
-    date.setMonth(date.getMonth() + 2)
-    const expIso = date.toISOString()
-    const sender = algosdk.Address.fromString(activeAddress.value)
     const siwxRequest: Siwa = {
       domain: location.host,
       chain_id: '283',
-      account_address: sender.toString(),
+      account_address: activeAddress.value,
       type: 'ed25519',
       uri: location.origin,
       version: '1',
-      'expiration-time': expIso,
-      'not-before': nowIso,
-      'issued-at': nowIso
+      'issued-at': new Date().toISOString()
     }
-
     const dataString = JSON.stringify(siwxRequest)
-
     const data = btoa(dataString)
-    const metadata = {
-      scope: ScopeType.AUTH,
-      encoding: 'base64'
-    }
-
+    const metadata = { scope: ScopeType.AUTH, encoding: 'base64' }
     const resp = await signData(data, metadata)
-
     // verify signature
     const enc = new TextEncoder()
     const clientDataJsonHash = await crypto.subtle.digest('SHA-256', enc.encode(dataString))
     const authenticatorDataHash = await crypto.subtle.digest('SHA-256', resp.authenticatorData)
-
     const toSign = new Uint8Array(64)
     toSign.set(new Uint8Array(clientDataJsonHash), 0)
     toSign.set(new Uint8Array(authenticatorDataHash), 32)
-
-    await libsodium.ready
-    if (!libsodium.crypto_sign_verify_detached(resp.signature, toSign, sender.publicKey)) {
+    const pubKey = algosdk.Address.fromString(activeAddress.value).publicKey
+    await ed.verifyAsync(resp.signature, toSign, pubKey)
+    if (!(await ed.verifyAsync(resp.signature, toSign, pubKey))) {
       throw new SignDataError('Verification Failed', 4300)
     }
     console.info(`[App] ✅ Successfully authenticated!`)

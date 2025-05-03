@@ -68,6 +68,9 @@ importers:
       '@blockshake/defly-connect':
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@noble/ed25519':
+        specifier: ^2.2.3
+        version: 2.2.3
       '@perawallet/connect':
         specifier: ^1.4.1
         version: 1.4.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -83,9 +86,6 @@ importers:
       algosdk:
         specifier: 3.2.0
         version: 3.2.0
-      libsodium-wrappers-sumo:
-        specifier: ^0.7.15
-        version: 0.7.15
       lute-connect:
         specifier: ^1.6.1
         version: 1.6.1
@@ -99,9 +99,6 @@ importers:
         specifier: 18.3.1
         version: 18.3.1(react@18.3.1)
     devDependencies:
-      '@types/libsodium-wrappers-sumo':
-        specifier: ^0.7.8
-        version: 0.7.8
       '@types/node':
         specifier: 22.15.3
         version: 22.15.3
@@ -126,6 +123,9 @@ importers:
       '@blockshake/defly-connect':
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@noble/ed25519':
+        specifier: ^2.2.3
+        version: 2.2.3
       '@perawallet/connect':
         specifier: ^1.4.1
         version: 1.4.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -144,9 +144,6 @@ importers:
       algosdk:
         specifier: 3.2.0
         version: 3.2.0
-      libsodium-wrappers-sumo:
-        specifier: ^0.7.15
-        version: 0.7.15
       lute-connect:
         specifier: ^1.6.1
         version: 1.6.1
@@ -160,9 +157,6 @@ importers:
         specifier: 4.5.0
         version: 4.5.0(vue@3.5.13(typescript@5.8.2))
     devDependencies:
-      '@types/libsodium-wrappers-sumo':
-        specifier: ^0.7.8
-        version: 0.7.8
       '@types/node':
         specifier: 22.15.3
         version: 22.15.3
@@ -178,6 +172,9 @@ importers:
       '@blockshake/defly-connect':
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@noble/ed25519':
+        specifier: ^2.2.3
+        version: 2.2.3
       '@perawallet/connect':
         specifier: ^1.4.1
         version: 1.4.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -193,9 +190,6 @@ importers:
       algosdk:
         specifier: 3.2.0
         version: 3.2.0
-      libsodium-wrappers-sumo:
-        specifier: ^0.7.15
-        version: 0.7.15
       lute-connect:
         specifier: ^1.6.1
         version: 1.6.1
@@ -206,9 +200,6 @@ importers:
         specifier: 18.3.1
         version: 18.3.1(react@18.3.1)
     devDependencies:
-      '@types/libsodium-wrappers-sumo':
-        specifier: ^0.7.8
-        version: 0.7.8
       '@types/react':
         specifier: 18.3.20
         version: 18.3.20
@@ -245,6 +236,9 @@ importers:
       '@blockshake/defly-connect':
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@noble/ed25519':
+        specifier: ^2.2.3
+        version: 2.2.3
       '@perawallet/connect':
         specifier: ^1.4.1
         version: 1.4.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -260,9 +254,6 @@ importers:
       algosdk:
         specifier: 3.2.0
         version: 3.2.0
-      libsodium-wrappers-sumo:
-        specifier: ^0.7.15
-        version: 0.7.15
       lute-connect:
         specifier: ^1.6.1
         version: 1.6.1
@@ -270,9 +261,6 @@ importers:
         specifier: 1.9.5
         version: 1.9.5
     devDependencies:
-      '@types/libsodium-wrappers-sumo':
-        specifier: ^0.7.8
-        version: 0.7.8
       typescript:
         specifier: 5.8.2
         version: 5.8.2
@@ -288,6 +276,9 @@ importers:
       '@blockshake/defly-connect':
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@noble/ed25519':
+        specifier: ^2.2.3
+        version: 2.2.3
       '@perawallet/connect':
         specifier: ^1.4.1
         version: 1.4.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -303,16 +294,10 @@ importers:
       algosdk:
         specifier: 3.2.0
         version: 3.2.0
-      libsodium-wrappers-sumo:
-        specifier: ^0.7.15
-        version: 0.7.15
       lute-connect:
         specifier: ^1.6.1
         version: 1.6.1
     devDependencies:
-      '@types/libsodium-wrappers-sumo':
-        specifier: ^0.7.8
-        version: 0.7.8
       '@walletconnect/types':
         specifier: 2.19.2
         version: 2.19.2(db0@0.3.1)(ioredis@5.6.0)
@@ -328,6 +313,9 @@ importers:
       '@blockshake/defly-connect':
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@noble/ed25519':
+        specifier: ^2.2.3
+        version: 2.2.3
       '@perawallet/connect':
         specifier: ^1.4.1
         version: 1.4.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -343,9 +331,6 @@ importers:
       algosdk:
         specifier: 3.2.0
         version: 3.2.0
-      libsodium-wrappers-sumo:
-        specifier: ^0.7.15
-        version: 0.7.15
       lute-connect:
         specifier: ^1.6.1
         version: 1.6.1
@@ -353,9 +338,6 @@ importers:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.8.2)
     devDependencies:
-      '@types/libsodium-wrappers-sumo':
-        specifier: ^0.7.8
-        version: 0.7.8
       '@vitejs/plugin-vue':
         specifier: 5.2.3
         version: 5.2.3(vite@6.2.3(@types/node@22.15.3)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.1))(vue@3.5.13(typescript@5.8.2))
@@ -1174,6 +1156,9 @@ packages:
     resolution: {integrity: sha512-warwspo+UYUPep0Q+vtdVB4Ugn8GGQj8iyB3gnRWsztmUHTI3S1nhdiWNsPUGL0vud7JlRRk1XEu7Lq1KGTnMQ==}
     engines: {node: ^14.21.3 || >=16}
 
+  '@noble/ed25519@2.2.3':
+    resolution: {integrity: sha512-iHV8eI2mRcUmOx159QNrU8vTpQ/Xm70yJ2cTk3Trc86++02usfqFoNl6x0p3JN81ZDS/1gx6xiK0OwrgqCT43g==}
+
   '@noble/hashes@1.7.0':
     resolution: {integrity: sha512-HXydb0DgzTpDPwbVeDGCG1gIu7X6+AuU6Zl6av/E/KG8LMsvPntvq+w17CHRpKBmN6Ybdrt1eP3k4cj8DJa78w==}
     engines: {node: ^14.21.3 || >=16}
@@ -1724,12 +1709,6 @@ packages:
 
   '@types/json5@0.0.29':
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
-
-  '@types/libsodium-wrappers-sumo@0.7.8':
-    resolution: {integrity: sha512-N2+df4MB/A+W0RAcTw7A5oxKgzD+Vh6Ye7lfjWIi5SdTzVLfHPzxUjhwPqHLO5Ev9fv/+VHl+sUaUuTg4fUPqw==}
-
-  '@types/libsodium-wrappers@0.7.14':
-    resolution: {integrity: sha512-5Kv68fXuXK0iDuUir1WPGw2R9fOZUlYlSAa0ztMcL0s0BfIDTqg9GXz8K30VJpPP3sxWhbolnQma2x+/TfkzDQ==}
 
   '@types/node@12.20.55':
     resolution: {integrity: sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==}
@@ -3966,12 +3945,6 @@ packages:
   levn@0.4.1:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
-
-  libsodium-sumo@0.7.15:
-    resolution: {integrity: sha512-5tPmqPmq8T8Nikpm1Nqj0hBHvsLFCXvdhBFV7SGOitQPZAA6jso8XoL0r4L7vmfKXr486fiQInvErHtEvizFMw==}
-
-  libsodium-wrappers-sumo@0.7.15:
-    resolution: {integrity: sha512-aSWY8wKDZh5TC7rMvEdTHoyppVq/1dTSAeAR7H6pzd6QRT3vQWcT5pGwCotLcpPEOLXX6VvqihSPkpEhYAjANA==}
 
   lie@3.1.1:
     resolution: {integrity: sha512-RiNhHysUjhrDQntfYSfY4MU24coXXdEOgw9WGcKHNeEwffDYbF//u87M1EWaMGzuFoSbqW0C9C6lEEhDOAswfw==}
@@ -6858,6 +6831,8 @@ snapshots:
     dependencies:
       '@noble/hashes': 1.7.1
 
+  '@noble/ed25519@2.2.3': {}
+
   '@noble/hashes@1.7.0': {}
 
   '@noble/hashes@1.7.1': {}
@@ -7473,12 +7448,6 @@ snapshots:
   '@types/estree@1.0.7': {}
 
   '@types/json5@0.0.29': {}
-
-  '@types/libsodium-wrappers-sumo@0.7.8':
-    dependencies:
-      '@types/libsodium-wrappers': 0.7.14
-
-  '@types/libsodium-wrappers@0.7.14': {}
 
   '@types/node@12.20.55': {}
 
@@ -10281,12 +10250,6 @@ snapshots:
     dependencies:
       prelude-ls: 1.2.1
       type-check: 0.4.0
-
-  libsodium-sumo@0.7.15: {}
-
-  libsodium-wrappers-sumo@0.7.15:
-    dependencies:
-      libsodium-sumo: 0.7.15
 
   lie@3.1.1:
     dependencies:
