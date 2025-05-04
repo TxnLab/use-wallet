@@ -93,7 +93,7 @@ export function Connect() {
       throw new Error('[App] No active account')
     }
     try {
-      const siwxRequest: Siwa = {
+      const siwaRequest: Siwa = {
         domain: location.host,
         chain_id: '283',
         account_address: activeAddr,
@@ -102,7 +102,7 @@ export function Connect() {
         version: '1',
         'issued-at': new Date().toISOString()
       }
-      const dataString = JSON.stringify(siwxRequest)
+      const dataString = JSON.stringify(siwaRequest)
       const data = btoa(dataString)
       const metadata = { scope: ScopeType.AUTH, encoding: 'base64' }
       const resp = await signData(data, metadata)
@@ -114,7 +114,6 @@ export function Connect() {
       toSign.set(new Uint8Array(clientDataJsonHash), 0)
       toSign.set(new Uint8Array(authenticatorDataHash), 32)
       const pubKey = algosdk.Address.fromString(activeAddr).publicKey
-      await ed.verifyAsync(resp.signature, toSign, pubKey)
       if (!(await ed.verifyAsync(resp.signature, toSign, pubKey))) {
         throw new SignDataError('Verification Failed', 4300)
       }
