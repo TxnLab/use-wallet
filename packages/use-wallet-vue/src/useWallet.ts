@@ -53,7 +53,7 @@ export function useWallet() {
       activeAccount: walletState?.activeAccount ?? null,
       isConnected: !!walletState,
       isActive: wallet.id === activeWalletId.value,
-      canSignData: activeBaseWallet.value?.canSignData ?? false,
+      canSignData: wallet.canSignData ?? false,
       connect: (args) => wallet.connect(args),
       disconnect: () => wallet.disconnect(),
       setActive: () => wallet.setActive(),

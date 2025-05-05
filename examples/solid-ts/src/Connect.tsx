@@ -17,7 +17,6 @@ export function Connect() {
   const {
     activeAddress,
     activeWalletId,
-    canSignData,
     isWalletActive,
     isWalletConnected,
     signData,
@@ -152,7 +151,7 @@ export function Connect() {
               <button type="button" onClick={sendTransaction} disabled={isSending()}>
                 {isSending() ? 'Sending Transaction...' : 'Send Transaction'}
               </button>
-              <Show when={canSignData()}>
+              <Show when={wallet.canSignData}>
                 <button type="button" onClick={auth}>
                   Authenticate
                 </button>

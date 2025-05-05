@@ -163,14 +163,6 @@ export const useWallet = () => {
     return wallet.transactionSigner(txnGroup, indexesToSign)
   }
 
-  const canSignData = (): boolean => {
-    const wallet = activeWallet()
-    if (!wallet) {
-      throw new Error('No active wallet')
-    }
-    return wallet.canSignData
-  }
-
   const signData = (data: string, metadata: SignMetadata): Promise<SignDataResponse> => {
     const wallet = activeWallet()
     if (!wallet) {
@@ -190,7 +182,6 @@ export const useWallet = () => {
     activeAccount,
     activeAddress,
     activeWalletId,
-    canSignData,
     isWalletActive,
     isWalletConnected,
     signData,
