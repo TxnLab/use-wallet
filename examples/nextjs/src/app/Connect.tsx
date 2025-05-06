@@ -1,12 +1,22 @@
 'use client'
 
-import { NetworkId, WalletId, useNetwork, useWallet, type Wallet } from '@txnlab/use-wallet-react'
+import * as ed from '@noble/ed25519'
+import {
+  NetworkId,
+  ScopeType,
+  SignDataError,
+  Siwa,
+  WalletId,
+  useNetwork,
+  useWallet,
+  type Wallet
+} from '@txnlab/use-wallet-react'
 import algosdk from 'algosdk'
 import * as React from 'react'
 import styles from './Connect.module.css'
 
 export function Connect() {
-  const { algodClient, activeAddress, transactionSigner, wallets } = useWallet()
+  const { algodClient, activeAddress, signData, transactionSigner, wallets } = useWallet()
   const { activeNetwork, setActiveNetwork } = useNetwork()
 
   const [isSending, setIsSending] = React.useState(false)
@@ -72,6 +82,41 @@ export function Connect() {
     }
   }
 
+  const auth = async () => {
+    if (!activeAddress) {
+      throw new Error('[App] No active account')
+    }
+    try {
+      const siwaRequest: Siwa = {
+        domain: location.host,
+        chain_id: '283',
+        account_address: activeAddress,
+        type: 'ed25519',
+        uri: location.origin,
+        version: '1',
+        'issued-at': new Date().toISOString()
+      }
+      const dataString = JSON.stringify(siwaRequest)
+      const data = btoa(dataString)
+      const metadata = { scope: ScopeType.AUTH, encoding: 'base64' }
+      const resp = await signData(data, metadata)
+      // verify signature
+      const enc = new TextEncoder()
+      const clientDataJsonHash = await crypto.subtle.digest('SHA-256', enc.encode(dataString))
+      const authenticatorDataHash = await crypto.subtle.digest('SHA-256', resp.authenticatorData)
+      const toSign = new Uint8Array(64)
+      toSign.set(new Uint8Array(clientDataJsonHash), 0)
+      toSign.set(new Uint8Array(authenticatorDataHash), 32)
+      const pubKey = algosdk.Address.fromString(activeAddress).publicKey
+      if (!(await ed.verifyAsync(resp.signature, toSign, pubKey))) {
+        throw new SignDataError('Verification Failed', 4300)
+      }
+      console.info(`[App] ✅ Successfully authenticated!`)
+    } catch (error) {
+      console.error('[App] Error signing data:', error)
+    }
+  }
+
   return (
     <div>
       <div className={styles.networkGroup}>
@@ -124,9 +169,16 @@ export function Connect() {
               Disconnect
             </button>
             {wallet.isActive ? (
-              <button type="button" onClick={sendTransaction} disabled={isSending}>
-                {isSending ? 'Sending Transaction...' : 'Send Transaction'}
-              </button>
+              <div className={styles.walletButtons}>
+                <button type="button" onClick={sendTransaction} disabled={isSending}>
+                  {isSending ? 'Sending Transaction...' : 'Send Transaction'}
+                </button>
+                {wallet.canSignData && (
+                  <button type="button" onClick={auth}>
+                    Authenticate
+                  </button>
+                )}
+              </div>
             ) : (
               <button
                 type="button"

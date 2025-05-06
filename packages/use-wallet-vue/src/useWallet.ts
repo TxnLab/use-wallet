@@ -4,7 +4,9 @@ import {
   WalletManager,
   type WalletAccount,
   type WalletMetadata,
-  type WalletId
+  type WalletId,
+  type SignMetadata,
+  type SignDataResponse
 } from '@txnlab/use-wallet'
 import algosdk from 'algosdk'
 import { computed, inject, ref } from 'vue'
@@ -20,6 +22,7 @@ export interface Wallet {
   disconnect: () => Promise<void>
   setActive: () => void
   setActiveAccount: (address: string) => void
+  canSignData: boolean
 }
 
 export type SetAlgodClient = (client: algosdk.Algodv2) => void
@@ -50,6 +53,7 @@ export function useWallet() {
       activeAccount: walletState?.activeAccount ?? null,
       isConnected: !!walletState,
       isActive: wallet.id === activeWalletId.value,
+      canSignData: wallet.canSignData ?? false,
       connect: (args) => wallet.connect(args),
       disconnect: () => wallet.disconnect(),
       setActive: () => wallet.setActive(),
@@ -111,6 +115,13 @@ export function useWallet() {
     return activeBaseWallet.value.transactionSigner(txnGroup, indexesToSign)
   }
 
+  const signData = (data: string, metadata: SignMetadata): Promise<SignDataResponse> => {
+    if (!activeBaseWallet.value) {
+      throw new Error('No active wallet')
+    }
+    return activeBaseWallet.value.signData(data, metadata)
+  }
+
   return {
     wallets,
     isReady,
@@ -125,6 +136,7 @@ export function useWallet() {
     activeWalletAddresses,
     activeAccount,
     activeAddress,
+    signData,
     signTransactions,
     transactionSigner
   }

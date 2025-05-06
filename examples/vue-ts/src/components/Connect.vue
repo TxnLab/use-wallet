@@ -1,9 +1,17 @@
 <script setup lang="ts">
-import { WalletId, useWallet, type Wallet } from '@txnlab/use-wallet-vue'
+import * as ed from '@noble/ed25519'
+import {
+  ScopeType,
+  SignDataError,
+  Siwa,
+  WalletId,
+  useWallet,
+  type Wallet
+} from '@txnlab/use-wallet-vue'
 import algosdk from 'algosdk'
 import { ref } from 'vue'
 
-const { algodClient, transactionSigner, wallets } = useWallet()
+const { activeAddress, algodClient, transactionSigner, signData, wallets } = useWallet()
 
 const isSending = ref(false)
 const magicEmail = ref('')
@@ -25,10 +33,9 @@ const setActiveAccount = (event: Event, wallet: Wallet) => {
   wallet.setActiveAccount(target.value)
 }
 
-const sendTransaction = async (wallet: Wallet) => {
-  if (!wallet.activeAccount?.address) {
-    alert('No active account')
-    return
+const sendTransaction = async () => {
+  if (!activeAddress.value) {
+    throw new Error('[App] No active account')
   }
 
   isSending.value = true
@@ -38,8 +45,8 @@ const sendTransaction = async (wallet: Wallet) => {
     const suggestedParams = await algodClient.value.getTransactionParams().do()
 
     const transaction = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
-      sender: wallet.activeAccount.address,
-      receiver: wallet.activeAccount.address,
+      sender: activeAddress.value,
+      receiver: activeAddress.value,
       amount: 0,
       suggestedParams
     })
@@ -60,54 +67,83 @@ const sendTransaction = async (wallet: Wallet) => {
     isSending.value = false
   }
 }
+
+const auth = async () => {
+  if (!activeAddress.value) {
+    throw new Error('[App] No active account')
+  }
+  try {
+    const siwaRequest: Siwa = {
+      domain: location.host,
+      chain_id: '283',
+      account_address: activeAddress.value,
+      type: 'ed25519',
+      uri: location.origin,
+      version: '1',
+      'issued-at': new Date().toISOString()
+    }
+    const dataString = JSON.stringify(siwaRequest)
+    const data = btoa(dataString)
+    const metadata = { scope: ScopeType.AUTH, encoding: 'base64' }
+    const resp = await signData(data, metadata)
+    // verify signature
+    const enc = new TextEncoder()
+    const clientDataJsonHash = await crypto.subtle.digest('SHA-256', enc.encode(dataString))
+    const authenticatorDataHash = await crypto.subtle.digest('SHA-256', resp.authenticatorData)
+    const toSign = new Uint8Array(64)
+    toSign.set(new Uint8Array(clientDataJsonHash), 0)
+    toSign.set(new Uint8Array(authenticatorDataHash), 32)
+    const pubKey = algosdk.Address.fromString(activeAddress.value).publicKey
+    if (!(await ed.verifyAsync(resp.signature, toSign, pubKey))) {
+      throw new SignDataError('Verification Failed', 4300)
+    }
+    console.info(`[App] ✅ Successfully authenticated!`)
+  } catch (error) {
+    console.error('[App] Error signing data:', error)
+  }
+}
 </script>
 
 <template>
-  <div>
-    <div v-for="wallet in wallets" :key="wallet.id" class="wallet-group">
-      <h4>{{ wallet.metadata.name }} <span v-if="wallet.isActive">[active]</span></h4>
-      <div class="wallet-buttons">
-        <button
-          @click="wallet.connect(getConnectArgs(wallet))"
-          :disabled="isConnectDisabled(wallet)"
-        >
-          Connect
-        </button>
-        <button @click="wallet.disconnect()" :disabled="!wallet.isConnected">Disconnect</button>
-        <button
-          v-if="!wallet.isActive"
-          @click="wallet.setActive()"
-          :disabled="!wallet.isConnected || wallet.isActive"
-        >
-          Set Active
-        </button>
-        <button v-else @click="sendTransaction(wallet)" :disabled="isSending">
+  <div v-for="wallet in wallets" :key="wallet.id" class="wallet-group">
+    <h4>{{ wallet.metadata.name }} <span v-if="wallet.isActive">[active]</span></h4>
+    <div class="wallet-buttons">
+      <button @click="wallet.connect(getConnectArgs(wallet))" :disabled="isConnectDisabled(wallet)">
+        Connect
+      </button>
+      <button @click="wallet.disconnect()" :disabled="!wallet.isConnected">Disconnect</button>
+      <button
+        v-if="!wallet.isActive"
+        @click="wallet.setActive()"
+        :disabled="!wallet.isConnected || wallet.isActive"
+      >
+        Set Active
+      </button>
+      <template v-else>
+        <button @click="sendTransaction()" :disabled="isSending">
           {{ isSending ? 'Sending Transaction...' : 'Send Transaction' }}
         </button>
-      </div>
+        <button v-if="wallet.canSignData" @click="auth()">Authenticate</button>
+      </template>
+    </div>
 
-      <div v-if="isMagicLink(wallet)" class="input-group">
-        <label for="magic-email">Email:</label>
-        <input
-          id="magic-email"
-          type="email"
-          v-model="magicEmail"
-          placeholder="Enter email to connect..."
-          :disabled="wallet.isConnected"
-        />
-      </div>
+    <div v-if="isMagicLink(wallet)" class="input-group">
+      <label for="magic-email">Email:</label>
+      <input
+        id="magic-email"
+        type="email"
+        v-model="magicEmail"
+        placeholder="Enter email to connect..."
+        :disabled="wallet.isConnected"
+      />
+    </div>
 
-      <div v-if="wallet.isActive && wallet.accounts.length > 0">
-        <select @change="(event) => setActiveAccount(event, wallet)">
-          <option
-            v-for="account in wallet.accounts"
-            :key="account.address"
-            :value="account.address"
-          >
-            {{ account.address }}
-          </option>
-        </select>
-      </div>
+    <div v-if="wallet.isActive && wallet.accounts.length > 0">
+      <select @change="(event) => setActiveAccount(event, wallet)">
+        <option v-for="account in wallet.accounts" :key="account.address" :value="account.address">
+          {{ account.address }}
+        </option>
+      </select>
     </div>
   </div>
 </template>
