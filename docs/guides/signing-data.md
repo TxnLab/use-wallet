@@ -4,14 +4,11 @@
 
 The `useWallet` hook/composable/primitive provides a `signData` method for implementing ARC-60 authentication with the [Lute](../getting-started/supported-wallets.md#lute-wallet) wallet provider. This guide demonstrates how to implement Sign-In with Algorand (SIWA) using Lute wallet.
 
-### Prerequisites
+{% hint style="info" %}
+**Wallet Compatibility**
 
-* A React/Vue/Solid application with [`@noble/ed25519`](https://www.npmjs.com/package/@noble/ed25519) installed (for signature verification)
-* Lute wallet provider configured in your application
-
-### Wallet Compatibility
-
-> **Important**: Currently, only the Lute wallet provider supports ARC-60 data signing. Attempting to call `signData` with any other wallet provider will throw an error. You should check the wallet's capabilities before attempting to sign data.
+Currently, only the Lute wallet provider supports ARC-60 data signing. Attempting to call `signData` with any other wallet provider will throw an error. You should check the wallet's capabilities before attempting to sign data.
+{% endhint %}
 
 ### Implementation
 
@@ -223,20 +220,35 @@ function Authenticate() {
 ### How It Works
 
 1. **Create SIWA Request**: The code creates a Sign-In with Algorand (SIWA) request object containing:
-   * `domain`: The current host
-   * `chain_id`: The Algorand network ID (283 for MainNet)
-   * `account_address`: The user's wallet address
-   * `type`: The signature type (ed25519)
-   * `uri`: The origin URL
-   * `version`: The SIWA version
-   * `issued-at`: The current timestamp
+   * Required Properties
+     * `domain` - The current host
+     * `chain_id` - The Algorand network ID (283 for MainNet)
+     * `account_address` - The user's wallet address
+     * `type` - The signature type (ed25519)
+     * `uri` - The origin URL
+     * `version` - The SIWA version
+   * Optional Properties
+     * `statement` - A human-readable statement about the purpose of the sign-in
+     * `nonce` - A unique value to prevent replay attacks
+     * `issued-at` - The timestamp when the request was created
+     * `expiration-time` - When the request should expire
+     * `not-before` - The earliest time the request should be considered valid
+     * `request-id` - A unique identifier for the request
+     * `resources` - An array of URIs the user is requesting access to
+   * The SIWA request format follows the [CAIP-122 specification](https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-122.md) for chain-agnostic sign-in.
 2. **Sign Data**: The request is converted to base64 and signed using the `signData` method with:
-   * `scope`: Set to 'auth' for authentication
-   * `encoding`: Set to 'base64' for the data format
+   * `scope` - Set to 'auth' for authentication
+   * `encoding` - Set to 'base64' for the data format
 3. **Verify Signature**: The signature is verified by:
    * Computing SHA-256 hashes of the client data and authenticator data
    * Combining the hashes into a single buffer
    * Using the user's public key to verify the signature
+
+{% hint style="info" %}
+**Signature Verification**
+
+While this example demonstrates signature verification in the front-end for simplicity, in a production environment, it's generally better to perform signature verification on the backend. This approach provides better security and allows for proper session management and authentication state persistence.
+{% endhint %}
 
 ### Error Handling
 
@@ -255,4 +267,7 @@ The implementation includes error handling for:
 4. Use HTTPS for secure communication
 5. Consider implementing session management
 
-For more information about ARC-60 and Sign-In with Algorand, see the [ARC-60 specification](https://github.com/algorandfoundation/ARCs/pull/313).
+### Resources
+
+* [CAIP-122 specification](https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-122.md) - Chain-agnostic sign-in standard
+* [ARC-60 specification](https://github.com/algorandfoundation/ARCs/pull/313) - Algorand implementation of CAIP-122 (Draft)
