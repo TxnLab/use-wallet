@@ -54,7 +54,7 @@ importers:
         specifier: 6.2.3
         version: 6.2.3(@types/node@20.11.30)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.1)
       vite-plugin-solid:
-        specifier: ^2.11.1
+        specifier: 2.11.6
         version: 2.11.6(@testing-library/jest-dom@6.6.3)(solid-js@1.9.5)(vite@6.2.3(@types/node@20.11.30)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.1))
       vitest:
         specifier: 3.0.9
@@ -69,7 +69,7 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@noble/ed25519':
-        specifier: ^2.2.3
+        specifier: 2.2.3
         version: 2.2.3
       '@perawallet/connect':
         specifier: ^1.4.1
@@ -124,7 +124,7 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@noble/ed25519':
-        specifier: ^2.2.3
+        specifier: 2.2.3
         version: 2.2.3
       '@perawallet/connect':
         specifier: ^1.4.1
@@ -173,7 +173,7 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@noble/ed25519':
-        specifier: ^2.2.3
+        specifier: 2.2.3
         version: 2.2.3
       '@perawallet/connect':
         specifier: ^1.4.1
@@ -237,7 +237,7 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@noble/ed25519':
-        specifier: ^2.2.3
+        specifier: 2.2.3
         version: 2.2.3
       '@perawallet/connect':
         specifier: ^1.4.1
@@ -277,7 +277,7 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@noble/ed25519':
-        specifier: ^2.2.3
+        specifier: 2.2.3
         version: 2.2.3
       '@perawallet/connect':
         specifier: ^1.4.1
@@ -314,7 +314,7 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@noble/ed25519':
-        specifier: ^2.2.3
+        specifier: 2.2.3
         version: 2.2.3
       '@perawallet/connect':
         specifier: ^1.4.1
@@ -1337,6 +1337,7 @@ packages:
 
   '@oxc-parser/wasm@0.60.0':
     resolution: {integrity: sha512-Dkf9/D87WGBCW3L0+1DtpAfL4SrNsgeRvxwjpKCtbH7Kf6K+pxrT0IridaJfmWKu1Ml+fDvj+7HEyBcfUC/TXQ==}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   '@oxc-project/types@0.56.5':
     resolution: {integrity: sha512-skY3kOJwp22W4RkaadH1hZ3hqFHjkRrIIE0uQ4VUg+/Chvbl+2pF+B55IrIk2dgsKXS57YEUsJuN6I6s4rgFjA==}
