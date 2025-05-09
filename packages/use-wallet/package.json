@@ -42,8 +42,8 @@
   "devDependencies": {
     "@agoralabs-sh/avm-web-provider": "1.7.0",
     "@blockshake/defly-connect": "1.2.1",
-    "@magic-ext/algorand": "23.20.0",
-    "@magic-sdk/provider": "28.20.0",
+    "@magic-ext/algorand": "24.0.6",
+    "@magic-sdk/provider": "29.0.6",
     "@perawallet/connect": "1.4.1",
     "@types/node": "20.11.30",
     "@walletconnect/modal": "2.7.0",
@@ -52,7 +52,7 @@
     "@walletconnect/types": "2.19.2",
     "algosdk": "3.2.0",
     "lute-connect": "1.6.1",
-    "magic-sdk": "28.21.1",
+    "magic-sdk": "29.0.6",
     "tsup": "8.4.0",
     "typescript": "5.8.2"
   },
