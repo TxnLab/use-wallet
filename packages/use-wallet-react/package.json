@@ -52,13 +52,13 @@
   },
   "peerDependencies": {
     "@blockshake/defly-connect": "^1.2.1",
-    "@magic-ext/algorand": "^23.20.0",
+    "@magic-ext/algorand": "^24.1.0",
     "@walletconnect/modal": "^2.7.0",
     "@perawallet/connect": "^1.4.1",
     "@walletconnect/sign-client": "^2.19.2",
     "algosdk": "^3.0.0",
     "lute-connect": "^1.6.1",
-    "magic-sdk": "^28.21.1",
+    "magic-sdk": "^29.1.0",
     "react": "^17.0.0 || ^18.0.0 || ^19.0.0",
     "react-dom": "^17.0.0 || ^18.0.0 || ^19.0.0"
   },
