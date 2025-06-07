@@ -18,12 +18,12 @@
     "@walletconnect/sign-client": "^2.19.2",
     "algosdk": "3.2.0",
     "lute-connect": "^1.6.1",
-    "vue": "3.5.13"
+    "vue": "3.5.16"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "5.2.3",
+    "@vitejs/plugin-vue": "5.2.4",
     "typescript": "5.8.2",
-    "vite": "6.2.3",
-    "vue-tsc": "2.2.8"
+    "vite": "6.3.5",
+    "vue-tsc": "2.2.10"
   }
 }
