@@ -20,6 +20,7 @@ Here's how to implement ARC-60 authentication:
 import { useWallet } from '@txnlab/use-wallet-react'
 import algosdk from 'algosdk'
 import { ed } from '@noble/ed25519'
+import { canonify } from "canonify";
 
 function Authenticate() {
   const { activeAddress, activeWallet, signData } = useWallet()
@@ -46,7 +47,8 @@ function Authenticate() {
       }
 
       // Convert request to base64
-      const dataString = JSON.stringify(siwaRequest)
+      const dataString = canonify(siwaRequest)
+      if (!dataString) throw Error('Invalid JSON')
       const data = btoa(dataString)
       
       // Sign data with authentication scope
@@ -88,6 +90,7 @@ function Authenticate() {
 import { useWallet } from '@txnlab/use-wallet-vue'
 import algosdk from 'algosdk'
 import { ed } from '@noble/ed25519'
+import { canonify } from "canonify";
 
 const { activeAddress, activeWallet, signData } = useWallet()
 
@@ -113,7 +116,8 @@ const handleAuth = async () => {
     }
 
     // Convert request to base64
-    const dataString = JSON.stringify(siwaRequest)
+    const dataString = canonify(siwaRequest)
+    if (!dataString) throw Error('Invalid JSON')
     const data = btoa(dataString)
     
     // Sign data with authentication scope
@@ -154,6 +158,7 @@ const handleAuth = async () => {
 import { useWallet } from '@txnlab/use-wallet-solid'
 import algosdk from 'algosdk'
 import { ed } from '@noble/ed25519'
+import { canonify } from "canonify";
 
 function Authenticate() {
   const { activeAddress, activeWallet, signData } = useWallet()
@@ -180,7 +185,8 @@ function Authenticate() {
       }
 
       // Convert request to base64
-      const dataString = JSON.stringify(siwaRequest)
+      const dataString = canonify(siwaRequest)
+      if (!dataString) throw Error('Invalid JSON')
       const data = btoa(dataString)
       
       // Sign data with authentication scope

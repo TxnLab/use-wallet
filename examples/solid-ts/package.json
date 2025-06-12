@@ -18,6 +18,7 @@
     "@walletconnect/modal": "^2.7.0",
     "@walletconnect/sign-client": "^2.19.2",
     "algosdk": "3.2.0",
+    "canonify": "^2.1.1",
     "lute-connect": "^1.6.1",
     "solid-js": "1.9.5"
   },
