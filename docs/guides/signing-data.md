@@ -20,7 +20,7 @@ Here's how to implement ARC-60 authentication:
 import { useWallet } from '@txnlab/use-wallet-react'
 import algosdk from 'algosdk'
 import { ed } from '@noble/ed25519'
-import { canonify } from "canonify";
+import { canonify } from "canonify"
 
 function Authenticate() {
   const { activeAddress, activeWallet, signData } = useWallet()
@@ -90,7 +90,7 @@ function Authenticate() {
 import { useWallet } from '@txnlab/use-wallet-vue'
 import algosdk from 'algosdk'
 import { ed } from '@noble/ed25519'
-import { canonify } from "canonify";
+import { canonify } from "canonify"
 
 const { activeAddress, activeWallet, signData } = useWallet()
 
@@ -158,7 +158,7 @@ const handleAuth = async () => {
 import { useWallet } from '@txnlab/use-wallet-solid'
 import algosdk from 'algosdk'
 import { ed } from '@noble/ed25519'
-import { canonify } from "canonify";
+import { canonify } from "canonify"
 
 function Authenticate() {
   const { activeAddress, activeWallet, signData } = useWallet()
