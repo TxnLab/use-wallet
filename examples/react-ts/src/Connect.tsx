@@ -8,6 +8,7 @@ import {
   type Wallet
 } from '@txnlab/use-wallet-react'
 import algosdk from 'algosdk'
+import { canonify } from 'canonify'
 import * as React from 'react'
 
 export function Connect() {
@@ -90,7 +91,8 @@ export function Connect() {
         version: '1',
         'issued-at': new Date().toISOString()
       }
-      const dataString = JSON.stringify(siwaRequest)
+      const dataString = canonify(siwaRequest)
+      if (!dataString) throw Error('Invalid JSON')
       const data = btoa(dataString)
       const metadata = { scope: ScopeType.AUTH, encoding: 'base64' }
       const resp = await signData(data, metadata)

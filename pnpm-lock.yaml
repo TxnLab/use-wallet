@@ -86,6 +86,9 @@ importers:
       algosdk:
         specifier: 3.2.0
         version: 3.2.0
+      canonify:
+        specifier: ^2.1.1
+        version: 2.1.1
       lute-connect:
         specifier: ^1.6.1
         version: 1.6.1
@@ -144,6 +147,9 @@ importers:
       algosdk:
         specifier: 3.2.0
         version: 3.2.0
+      canonify:
+        specifier: ^2.1.1
+        version: 2.1.1
       lute-connect:
         specifier: ^1.6.1
         version: 1.6.1
@@ -190,6 +196,9 @@ importers:
       algosdk:
         specifier: 3.2.0
         version: 3.2.0
+      canonify:
+        specifier: ^2.1.1
+        version: 2.1.1
       lute-connect:
         specifier: ^1.6.1
         version: 1.6.1
@@ -254,6 +263,9 @@ importers:
       algosdk:
         specifier: 3.2.0
         version: 3.2.0
+      canonify:
+        specifier: ^2.1.1
+        version: 2.1.1
       lute-connect:
         specifier: ^1.6.1
         version: 1.6.1
@@ -294,6 +306,9 @@ importers:
       algosdk:
         specifier: 3.2.0
         version: 3.2.0
+      canonify:
+        specifier: ^2.1.1
+        version: 2.1.1
       lute-connect:
         specifier: ^1.6.1
         version: 1.6.1
@@ -331,6 +346,9 @@ importers:
       algosdk:
         specifier: 3.2.0
         version: 3.2.0
+      canonify:
+        specifier: ^2.1.1
+        version: 2.1.1
       lute-connect:
         specifier: ^1.6.1
         version: 1.6.1
@@ -390,6 +408,9 @@ importers:
       algosdk:
         specifier: 3.2.0
         version: 3.2.0
+      canonify:
+        specifier: ^2.1.1
+        version: 2.1.1
       lute-connect:
         specifier: 1.6.1
         version: 1.6.1
@@ -2549,6 +2570,9 @@ packages:
 
   caniuse-lite@1.0.30001707:
     resolution: {integrity: sha512-3qtRjw/HQSMlDWf+X79N206fepf4SOOU6SQLMaq/0KkZLmSjPxAkBOQQ+FxbHKfHmYLZFfdWsO3KA90ceHPSnw==}
+
+  canonify@2.1.1:
+    resolution: {integrity: sha512-bDHlvXhY1fmi9P6cF8PVvs0G7+zOGKYww+5OLBM30+TotDif8tvKFCpdIqP0MJT5vDAgdgvm6CToLnH3RRIhAA==}
 
   chai@5.2.0:
     resolution: {integrity: sha512-mCuXncKXk5iCLhfhwTc0izo0gtEmpz5CtG2y8GiOINBlMVS6v8TMRc5TaLWKS6692m9+dVVfzgeVxR5UxWHTYw==}
@@ -8953,6 +8977,8 @@ snapshots:
       lodash.uniq: 4.5.0
 
   caniuse-lite@1.0.30001707: {}
+
+  canonify@2.1.1: {}
 
   chai@5.2.0:
     dependencies:
