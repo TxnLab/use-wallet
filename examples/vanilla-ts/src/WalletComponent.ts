@@ -1,5 +1,14 @@
-import { BaseWallet, WalletId, WalletManager } from '@txnlab/use-wallet'
+import * as ed from '@noble/ed25519'
+import {
+  BaseWallet,
+  ScopeType,
+  SignDataError,
+  Siwa,
+  WalletId,
+  WalletManager
+} from '@txnlab/use-wallet'
 import algosdk from 'algosdk'
+import { canonify } from 'canonify'
 
 export class WalletComponent {
   wallet: BaseWallet
@@ -68,6 +77,43 @@ export class WalletComponent {
     }
   }
 
+  auth = async () => {
+    const activeAddress = this.wallet.activeAccount?.address
+    if (!activeAddress) {
+      throw new Error('[App] No active account')
+    }
+    try {
+      const siwaRequest: Siwa = {
+        domain: location.host,
+        chain_id: '283',
+        account_address: activeAddress,
+        type: 'ed25519',
+        uri: location.origin,
+        version: '1',
+        'issued-at': new Date().toISOString()
+      }
+      const dataString = canonify(siwaRequest)
+      if (!dataString) throw Error('Invalid JSON')
+      const data = btoa(dataString)
+      const metadata = { scope: ScopeType.AUTH, encoding: 'base64' }
+      const resp = await this.wallet.signData(data, metadata)
+      // verify signature
+      const enc = new TextEncoder()
+      const clientDataJsonHash = await crypto.subtle.digest('SHA-256', enc.encode(dataString))
+      const authenticatorDataHash = await crypto.subtle.digest('SHA-256', resp.authenticatorData)
+      const toSign = new Uint8Array(64)
+      toSign.set(new Uint8Array(clientDataJsonHash), 0)
+      toSign.set(new Uint8Array(authenticatorDataHash), 32)
+      const pubKey = algosdk.Address.fromString(activeAddress).publicKey
+      if (!(await ed.verifyAsync(resp.signature, toSign, pubKey))) {
+        throw new SignDataError('Verification Failed', 4300)
+      }
+      console.info(`[App] ✅ Successfully authenticated!`)
+    } catch (error) {
+      console.error('[App] Error signing data:', error)
+    }
+  }
+
   setActiveAccount = (event: Event) => {
     const target = event.target as HTMLSelectElement
     this.wallet.setActiveAccount(target.value)
@@ -94,7 +140,12 @@ export class WalletComponent {
           </button>
           ${
             this.wallet.isActive
-              ? `<button id="transaction-button" type="button">Send Transaction</button>`
+              ? `<button id="transaction-button" type="button">Send Transaction</button>
+              ${
+                this.wallet.canSignData
+                  ? `<button id="auth-button" type="button">Authenticate</button>`
+                  : ''
+              }`
               : `<button id="set-active-button" type="button" ${
                   !this.wallet.isConnected ? 'disabled' : ''
                 }>Set Active</button>`
@@ -167,6 +218,8 @@ export class WalletComponent {
         this.setActive()
       } else if (target.id === 'transaction-button') {
         this.sendTransaction()
+      } else if (target.id === 'auth-button') {
+        this.auth()
       }
     })
 

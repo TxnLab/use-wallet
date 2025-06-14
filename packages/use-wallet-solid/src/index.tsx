@@ -4,6 +4,8 @@ import { JSX, createContext, createMemo, onMount, useContext } from 'solid-js'
 import type {
   AlgodConfig,
   NetworkId,
+  SignDataResponse,
+  SignMetadata,
   WalletId,
   WalletManager,
   WalletState
@@ -161,6 +163,14 @@ export const useWallet = () => {
     return wallet.transactionSigner(txnGroup, indexesToSign)
   }
 
+  const signData = (data: string, metadata: SignMetadata): Promise<SignDataResponse> => {
+    const wallet = activeWallet()
+    if (!wallet) {
+      throw new Error('No active wallet')
+    }
+    return wallet.signData(data, metadata)
+  }
+
   return {
     wallets: manager().wallets,
     isReady,
@@ -172,10 +182,11 @@ export const useWallet = () => {
     activeAccount,
     activeAddress,
     activeWalletId,
-    walletStore,
     isWalletActive,
     isWalletConnected,
+    signData,
     signTransactions,
-    transactionSigner
+    transactionSigner,
+    walletStore
   }
 }

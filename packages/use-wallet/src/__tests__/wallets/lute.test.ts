@@ -1,11 +1,13 @@
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
+import { canonify } from 'canonify'
 import { logger } from 'src/logger'
 import { StorageAdapter } from 'src/storage'
 import { LOCAL_STORAGE_KEY, State, WalletState, DEFAULT_STATE } from 'src/store'
 import { byteArrayToBase64 } from 'src/utils'
+import { ScopeType } from 'src/wallets'
 import { LuteWallet } from 'src/wallets/lute'
-import { SignTxnsError, WalletId } from 'src/wallets/types'
+import { WalletId } from 'src/wallets/types'
 import type { Mock } from 'vitest'
 
 // Mock logger
@@ -35,6 +37,7 @@ vi.mock('lute-connect', () => {
     default: vi.fn().mockImplementation(() => ({
       connect: vi.fn(),
       signTxns: vi.fn(),
+      signData: vi.fn(),
       siteName: 'Mock Site',
       forceWeb: false,
       isExtensionInstalled: vi.fn().mockResolvedValue(true)
@@ -67,6 +70,7 @@ function createWalletWithStore(store: Store<State>): LuteWallet {
 interface MockLuteConnect {
   connect: Mock
   signTxns: Mock
+  signData: Mock
   siteName: string
   forceWeb: boolean
   isExtensionInstalled: () => Promise<boolean>
@@ -100,6 +104,7 @@ describe('LuteWallet', () => {
     mockLuteConnect = {
       connect: vi.fn(),
       signTxns: vi.fn(),
+      signData: vi.fn(),
       siteName: 'Mock Site',
       forceWeb: false,
       isExtensionInstalled: vi.fn().mockResolvedValue(true)
@@ -253,15 +258,15 @@ describe('LuteWallet', () => {
 
     describe('signTransactions', () => {
       it('should re-throw SignTxnsError to the consuming application', async () => {
-        const mockSignTxns = vi.fn().mockRejectedValue({
+        const mockError = Object.assign(new Error('User Rejected Request'), { code: 4001 })
+        const mockSignTxns = vi.fn().mockRejectedValue(mockError)
+        vi.mocked(mockLuteConnect.signTxns).mockImplementation(mockSignTxns)
+
+        await expect(wallet.signTransactions([txn1])).rejects.toMatchObject({
+          name: 'SignTxnsError',
           message: 'User Rejected Request',
           code: 4001
         })
-        vi.mocked(mockLuteConnect.signTxns).mockImplementation(mockSignTxns)
-
-        await expect(wallet.signTransactions([txn1])).rejects.toThrow(
-          new SignTxnsError('User Rejected Request', 4001)
-        )
       })
 
       it('should process and sign a single algosdk.Transaction', async () => {
@@ -405,6 +410,106 @@ describe('LuteWallet', () => {
         expect(signTransactionsSpy).toHaveBeenCalledWith(txnGroup, indexesToSign)
         expect(result).toEqual([new Uint8Array([1, 2, 3])])
       })
+    })
+  })
+
+  describe('signData', () => {
+    // Connected accounts
+    const connectedAcct1 = '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q'
+
+    beforeEach(async () => {
+      const mockConnect = vi.fn().mockResolvedValue([connectedAcct1])
+      vi.mocked(mockLuteConnect.connect).mockImplementation(mockConnect)
+
+      await wallet.connect()
+    })
+
+    it('should have canSignData set to true', () => {
+      expect(wallet.canSignData).toBe(true)
+    })
+
+    it('should call Lute client signData with correct parameters', async () => {
+      const testData = 'test-data'
+      const testMetadata = { scope: ScopeType.AUTH, encoding: 'base64' }
+
+      const mockResponse = {
+        data: testData,
+        signer: new Uint8Array([1, 2, 3]),
+        domain: 'test.domain',
+        authenticatorData: new Uint8Array([4, 5, 6]),
+        signature: new Uint8Array([7, 8, 9])
+      }
+
+      mockLuteConnect.signData.mockResolvedValue(mockResponse)
+
+      const result = await wallet.signData(testData, testMetadata)
+
+      expect(mockLuteConnect.signData).toHaveBeenCalledWith(testData, testMetadata)
+      expect(result).toEqual(mockResponse)
+    })
+
+    it('should re-throw SignDataError to the consuming application', async () => {
+      const mockError = Object.assign(new Error('User Rejected Request'), { code: 4300 })
+      const mockSignData = vi.fn().mockRejectedValue(mockError)
+      vi.mocked(mockLuteConnect.signData).mockImplementation(mockSignData)
+
+      await expect(
+        wallet.signData('test-data', { scope: ScopeType.AUTH, encoding: 'base64' })
+      ).rejects.toMatchObject({
+        name: 'SignDataError',
+        message: 'User Rejected Request',
+        code: 4300
+      })
+    })
+
+    it('should handle sign and verify data flow', async () => {
+      // Mock the data to be signed
+      const siwaRequest = {
+        domain: 'test.domain',
+        chain_id: '283',
+        account_address: connectedAcct1,
+        type: 'ed25519',
+        uri: 'https://test.domain',
+        version: '1',
+        'issued-at': new Date().toISOString()
+      }
+
+      const dataString = canonify(siwaRequest)
+      if (!dataString) throw Error('Invalid JSON')
+      const data = btoa(dataString)
+      const metadata = { scope: ScopeType.AUTH, encoding: 'base64' }
+
+      // Create test authenticator data
+      const testAuthData = new Uint8Array(32).fill(1)
+
+      // Create a valid signature that would verify correctly
+      const testSigner = new Uint8Array(algosdk.Address.fromString(connectedAcct1).publicKey)
+      const testSignature = new Uint8Array(64).fill(9)
+
+      // Setup the mock response
+      const mockResponse = {
+        data,
+        signer: testSigner,
+        domain: 'test.domain',
+        authenticatorData: testAuthData,
+        signature: testSignature
+      }
+
+      mockLuteConnect.signData.mockResolvedValue(mockResponse)
+
+      // Call signData
+      const response = await wallet.signData(data, metadata)
+
+      // Verify the response
+      expect(response).toEqual(mockResponse)
+      expect(mockLuteConnect.signData).toHaveBeenCalledWith(data, metadata)
+
+      // Verify response contains required fields
+      expect(response.data).toBeDefined()
+      expect(response.signer).toBeDefined()
+      expect(response.domain).toBeDefined()
+      expect(response.authenticatorData).toBeDefined()
+      expect(response.signature).toBeDefined()
     })
   })
 })

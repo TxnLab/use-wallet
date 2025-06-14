@@ -1,6 +1,6 @@
 {
   "name": "@txnlab/use-wallet-solid",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "Solid.js library for integrating Algorand wallets into decentralized applications",
   "author": "Doug Richar <drichar@gmail.com>",
   "license": "MIT",
@@ -66,21 +66,21 @@
   },
   "devDependencies": {
     "@solidjs/testing-library": "0.8.10",
-    "algosdk": "3.0.0",
-    "solid-js": "1.9.3",
-    "tsup": "8.3.5",
+    "algosdk": "3.2.0",
+    "solid-js": "1.9.5",
+    "tsup": "8.4.0",
     "tsup-preset-solid": "2.2.0",
-    "typescript": "5.7.2"
+    "typescript": "5.8.2"
   },
   "peerDependencies": {
     "@blockshake/defly-connect": "^1.2.1",
     "@magic-ext/algorand": "^23.20.0",
     "@perawallet/connect": "^1.4.1",
     "@walletconnect/modal": "^2.7.0",
-    "@walletconnect/sign-client": "^2.17.3",
+    "@walletconnect/sign-client": "^2.19.2",
     "algosdk": "^3.0.0",
-    "lute-connect": "^1.4.1",
-    "magic-sdk": "^28.21.0"
+    "lute-connect": "^1.6.1",
+    "magic-sdk": "^28.21.1"
   },
   "peerDependenciesMeta": {
     "@blockshake/defly-connect": {

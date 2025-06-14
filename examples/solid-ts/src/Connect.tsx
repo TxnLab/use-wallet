@@ -1,5 +1,14 @@
-import { useWallet, WalletId, type BaseWallet } from '@txnlab/use-wallet-solid'
+import * as ed from '@noble/ed25519'
+import {
+  ScopeType,
+  SignDataError,
+  Siwa,
+  useWallet,
+  WalletId,
+  type BaseWallet
+} from '@txnlab/use-wallet-solid'
 import algosdk from 'algosdk'
+import { canonify } from 'canonify'
 import { For, Show, createSignal } from 'solid-js'
 
 export function Connect() {
@@ -11,6 +20,7 @@ export function Connect() {
     activeWalletId,
     isWalletActive,
     isWalletConnected,
+    signData,
     transactionSigner,
     wallets,
     algodClient
@@ -77,6 +87,43 @@ export function Connect() {
     }
   }
 
+  const auth = async () => {
+    const activeAddr = activeAddress()
+    if (!activeAddr) {
+      throw new Error('[App] No active account')
+    }
+    try {
+      const siwaRequest: Siwa = {
+        domain: location.host,
+        chain_id: '283',
+        account_address: activeAddr,
+        type: 'ed25519',
+        uri: location.origin,
+        version: '1',
+        'issued-at': new Date().toISOString()
+      }
+      const dataString = canonify(siwaRequest)
+      if (!dataString) throw Error('Invalid JSON')
+      const data = btoa(dataString)
+      const metadata = { scope: ScopeType.AUTH, encoding: 'base64' }
+      const resp = await signData(data, metadata)
+      // verify signature
+      const enc = new TextEncoder()
+      const clientDataJsonHash = await crypto.subtle.digest('SHA-256', enc.encode(dataString))
+      const authenticatorDataHash = await crypto.subtle.digest('SHA-256', resp.authenticatorData)
+      const toSign = new Uint8Array(64)
+      toSign.set(new Uint8Array(clientDataJsonHash), 0)
+      toSign.set(new Uint8Array(authenticatorDataHash), 32)
+      const pubKey = algosdk.Address.fromString(activeAddr).publicKey
+      if (!(await ed.verifyAsync(resp.signature, toSign, pubKey))) {
+        throw new SignDataError('Verification Failed', 4300)
+      }
+      console.info(`[App] ✅ Successfully authenticated!`)
+    } catch (error) {
+      console.error('[App] Error signing data:', error)
+    }
+  }
+
   return (
     <For each={wallets}>
       {(wallet) => (
@@ -106,6 +153,11 @@ export function Connect() {
               <button type="button" onClick={sendTransaction} disabled={isSending()}>
                 {isSending() ? 'Sending Transaction...' : 'Send Transaction'}
               </button>
+              <Show when={wallet.canSignData}>
+                <button type="button" onClick={auth}>
+                  Authenticate
+                </button>
+              </Show>
             </Show>
             <Show when={!isWalletActive(wallet.id)}>
               <button
