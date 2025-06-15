@@ -102,7 +102,7 @@ export class W3Wallet extends BaseWallet {
 
       this.logger.info('Resuming session...')
       const client = await this.initializeClient()
-      const isConnected = await client.isConnected();
+      const isConnected = await client.isConnected()
 
       if (!isConnected) {
         this.logger.error('W3 Wallet is not connected.')

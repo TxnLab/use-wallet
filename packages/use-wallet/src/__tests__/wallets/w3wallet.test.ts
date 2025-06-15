@@ -34,10 +34,11 @@ const mockSignTxns = vi.fn()
 // Mock W3 Wallet
 const mockW3Wallet: W3WalletProvider = {
   isConnected: () => Promise.resolve(true),
-  account: () => Promise.resolve({
-    address: "mockAddress1",
-    name: "W3 Wallet Account 1",
-  }),
+  account: () =>
+    Promise.resolve({
+      address: 'mockAddress1',
+      name: 'W3 Wallet Account 1'
+    }),
   signTxns: mockSignTxns
 }
 
@@ -109,10 +110,11 @@ describe('W3 Wallet', () => {
   describe('connect', () => {
     it('should initialize client, return accounts, and update store', async () => {
       // @ts-expect-error defined using Object.defineProperty
-      window.algorand.account = () => Promise.resolve({
-        address: "mockAddress1",
-        name: "W3 Wallet Account 1",
-      });
+      window.algorand.account = () =>
+        Promise.resolve({
+          address: 'mockAddress1',
+          name: 'W3 Wallet Account 1'
+        })
       const accounts = await wallet.connect()
 
       expect(wallet.isConnected).toBe(true)
@@ -208,7 +210,11 @@ describe('W3 Wallet', () => {
     // Not connected account
     const notConnectedAcct = 'EW64GC6F24M7NDSC5R3ES4YUVE3ZXXNMARJHDCCCLIHZU6TBEOC7XRSBG4'
 
-    const makePayTxn = ({ amount = 1000, sender = connectedAcct1, receiver = notConnectedAcct }) => {
+    const makePayTxn = ({
+      amount = 1000,
+      sender = connectedAcct1,
+      receiver = notConnectedAcct
+    }) => {
       return new algosdk.Transaction({
         type: algosdk.TransactionType.pay,
         sender,
@@ -243,7 +249,6 @@ describe('W3 Wallet', () => {
     })
 
     describe('signTransactions', () => {
-
       it('should correctly process and sign a single algosdk.Transaction', async () => {
         await wallet.signTransactions([txn1])
 
@@ -352,14 +357,14 @@ describe('W3 Wallet', () => {
         // Signer for gtxn2 is not a connected account
         const [gtxn1, gtxn2] = algosdk.assignGroupID([
           canSignTxn1,
-          cannotSignTxn2, // Should not be signed
+          cannotSignTxn2 // Should not be signed
         ])
 
         await wallet.signTransactions([gtxn1, gtxn2])
 
         expect(mockSignTxns).toHaveBeenCalledWith([
           { txn: byteArrayToBase64(gtxn1.toByte()) },
-          { txn: byteArrayToBase64(gtxn2.toByte()), signers: [] },
+          { txn: byteArrayToBase64(gtxn2.toByte()), signers: [] }
         ])
       })
     })

@@ -28,7 +28,7 @@ export function createWalletMap(): WalletMap {
     [WalletId.MNEMONIC]: MnemonicWallet,
     [WalletId.PERA]: PeraWallet,
     [WalletId.WALLETCONNECT]: WalletConnect,
-    [WalletId.W3_WALLET]: W3Wallet,
+    [WalletId.W3_WALLET]: W3Wallet
   }
 }
 
