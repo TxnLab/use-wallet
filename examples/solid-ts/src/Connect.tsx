@@ -8,6 +8,7 @@ import {
   type BaseWallet
 } from '@txnlab/use-wallet-solid'
 import algosdk from 'algosdk'
+import { canonify } from 'canonify'
 import { For, Show, createSignal } from 'solid-js'
 
 export function Connect() {
@@ -101,7 +102,8 @@ export function Connect() {
         version: '1',
         'issued-at': new Date().toISOString()
       }
-      const dataString = JSON.stringify(siwaRequest)
+      const dataString = canonify(siwaRequest)
+      if (!dataString) throw Error('Invalid JSON')
       const data = btoa(dataString)
       const metadata = { scope: ScopeType.AUTH, encoding: 'base64' }
       const resp = await signData(data, metadata)

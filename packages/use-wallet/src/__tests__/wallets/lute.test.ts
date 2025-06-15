@@ -1,5 +1,6 @@
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
+import { canonify } from 'canonify'
 import { logger } from 'src/logger'
 import { StorageAdapter } from 'src/storage'
 import { LOCAL_STORAGE_KEY, State, WalletState, DEFAULT_STATE } from 'src/store'
@@ -473,7 +474,8 @@ describe('LuteWallet', () => {
         'issued-at': new Date().toISOString()
       }
 
-      const dataString = JSON.stringify(siwaRequest)
+      const dataString = canonify(siwaRequest)
+      if (!dataString) throw Error('Invalid JSON')
       const data = btoa(dataString)
       const metadata = { scope: ScopeType.AUTH, encoding: 'base64' }
 
