@@ -64,6 +64,7 @@ const manager = new WalletManager({
     WalletId.EXODUS,
     WalletId.KIBISIS,
     WalletId.LUTE,
+    WalletId.W3_WALLET,
     
     // Example of a wallet with optional customizations
     {

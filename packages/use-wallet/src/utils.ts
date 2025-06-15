@@ -12,6 +12,7 @@ import { MagicAuth } from './wallets/magic'
 import { MnemonicWallet } from './wallets/mnemonic'
 import { PeraWallet } from './wallets/pera'
 import { WalletConnect } from './wallets/walletconnect'
+import { W3Wallet } from './wallets/w3wallet'
 
 export function createWalletMap(): WalletMap {
   return {
@@ -26,7 +27,8 @@ export function createWalletMap(): WalletMap {
     [WalletId.MAGIC]: MagicAuth,
     [WalletId.MNEMONIC]: MnemonicWallet,
     [WalletId.PERA]: PeraWallet,
-    [WalletId.WALLETCONNECT]: WalletConnect
+    [WalletId.WALLETCONNECT]: WalletConnect,
+    [WalletId.W3_WALLET]: W3Wallet,
   }
 }
 
