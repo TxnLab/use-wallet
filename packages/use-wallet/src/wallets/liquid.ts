@@ -97,7 +97,7 @@ export class LiquidWallet extends BaseWallet {
   public disconnect = async (): Promise<void> => {
     this.logger.info('Disconnecting...')
     if (!this.authClient) {
-      throw new Error('No auth client to disconnect');
+      throw new Error('No auth client to disconnect')
     }
     await this.authClient.disconnect()
 
@@ -111,7 +111,7 @@ export class LiquidWallet extends BaseWallet {
       const state = this.store.state
       const walletState = state.wallets[this.id]
       if (walletState) {
-        await this.disconnect();
+        await this.disconnect()
       }
     } catch (error) {
       this.logger.error('Error resuming session', error)

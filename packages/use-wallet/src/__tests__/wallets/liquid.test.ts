@@ -6,6 +6,7 @@ import { StorageAdapter } from 'src/storage'
 import { LOCAL_STORAGE_KEY, State, WalletState, DEFAULT_STATE } from 'src/store'
 import { LiquidWallet } from 'src/wallets/liquid'
 import { WalletId } from 'src/wallets/types'
+import { LiquidAuthClient } from '@algorandfoundation/liquid-auth-use-wallet-client/lib/types/LiquidAuthClient'
 
 // Mock logger
 vi.mock('src/logger', () => ({
@@ -31,13 +32,19 @@ vi.mock('src/storage', () => ({
 vi.spyOn(console, 'info').mockImplementation(() => {}) // @todo: remove when debug logger is implemented
 vi.spyOn(console, 'warn').mockImplementation(() => {})
 
+const account1 = {
+  name: 'Liquid Account 1',
+  address: 'mockWalletAddress'
+}
+
 // Mock LiquidAuthClient
 const mockLiquidAuthClient = {
-  connect: vi.fn().mockResolvedValue(undefined),
+  connect: vi.fn().mockResolvedValueOnce([account1.address]),
   disconnect: vi.fn().mockResolvedValue(undefined),
-  checkSession: vi.fn().mockResolvedValue({ user: { wallet: 'mockWalletAddress' } }), // Ensure checkSession returns the correct data
+  checkSession: vi.fn().mockResolvedValueOnce({ user: { wallet: account1.address } }), // Ensure checkSession returns the correct data
   signTransactions: vi.fn().mockResolvedValue([new Uint8Array()]),
-  hideModal: vi.fn()
+  hideModal: vi.fn(),
+  client: { peerClient: {} }
 }
 
 // Mock the module
@@ -71,11 +78,6 @@ describe('LiquidWallet', () => {
     error: Mock
   }
 
-  const account1 = {
-    name: 'Liquid Account 1',
-    address: 'mockWalletAddress'
-  }
-
   beforeEach(() => {
     vi.clearAllMocks()
 
@@ -102,6 +104,12 @@ describe('LiquidWallet', () => {
 
     store = new Store<State>(DEFAULT_STATE)
     wallet = createWalletWithStore(store)
+
+    mockLiquidAuthClient.connect.mockReset()
+    mockLiquidAuthClient.checkSession.mockReset()
+    mockLiquidAuthClient.disconnect.mockReset()
+    mockLiquidAuthClient.signTransactions.mockReset()
+    mockLiquidAuthClient.hideModal.mockReset()
   })
 
   afterEach(async () => {
@@ -137,7 +145,8 @@ describe('LiquidWallet', () => {
     })
 
     it('connect: should throw an error if no accounts are found', async () => {
-      mockLiquidAuthClient.checkSession.mockResolvedValueOnce({ user: { wallet: null } })
+      mockLiquidAuthClient.connect.mockResolvedValueOnce(null)
+      mockLiquidAuthClient.checkSession.mockResolvedValueOnce(null)
 
       await expect(wallet.connect()).rejects.toThrowError('No accounts found!')
       expect(wallet.isConnected).toBe(false)
@@ -153,6 +162,7 @@ describe('LiquidWallet', () => {
 
   describe('disconnect', () => {
     it('disconnect: should call authClient.disconnect and update store', async () => {
+      mockLiquidAuthClient.connect.mockResolvedValueOnce([account1.address])
       await wallet.connect()
       await wallet.disconnect()
 
@@ -183,6 +193,7 @@ describe('LiquidWallet', () => {
       })
 
       wallet = createWalletWithStore(store)
+      wallet.authClient = mockLiquidAuthClient as unknown as LiquidAuthClient
 
       const disconnectSpy = vi.spyOn(wallet, 'disconnect')
       await wallet.resumeSession()
@@ -223,6 +234,7 @@ describe('LiquidWallet', () => {
 
     it('signTransaction: should call authClient.signTransactions', async () => {
       // Ensure the wallet is connected and has an active account
+      mockLiquidAuthClient.connect.mockResolvedValueOnce([account1.address])
       await wallet.connect()
 
       await wallet.signTransactions(txnGroup, indexesToSign)
