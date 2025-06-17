@@ -67,7 +67,7 @@ export class LiquidWallet extends BaseWallet {
 
     const account = await authClient.connect()
 
-    if (!account) {
+    if (!account || account.length === 0) {
       this.logger.error('No accounts found!')
       throw new Error('No accounts found!')
     }
@@ -96,11 +96,10 @@ export class LiquidWallet extends BaseWallet {
 
   public disconnect = async (): Promise<void> => {
     this.logger.info('Disconnecting...')
-    if (this.authClient) {
-      await this.authClient.disconnect()
-    } else {
-      this.logger.warn('No auth client to disconnect')
+    if (!this.authClient) {
+      throw new Error('No auth client to disconnect');
     }
+    await this.authClient.disconnect()
 
     this.onDisconnect()
     this.logger.info('Disconnected.')
@@ -111,11 +110,8 @@ export class LiquidWallet extends BaseWallet {
     try {
       const state = this.store.state
       const walletState = state.wallets[this.id]
-
-      // No session to resume
-      if (!walletState) {
-        this.logger.info('No session to resume')
-        return
+      if (walletState) {
+        await this.disconnect();
       }
     } catch (error) {
       this.logger.error('Error resuming session', error)
@@ -123,6 +119,7 @@ export class LiquidWallet extends BaseWallet {
       throw error
     }
   }
+
   public signTransactions = async <T extends Transaction[] | Uint8Array[]>(
     txnGroup: T | T[],
     indexesToSign?: number[]
