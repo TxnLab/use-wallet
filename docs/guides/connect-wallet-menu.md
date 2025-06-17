@@ -335,6 +335,96 @@ const WalletMenu = () => {
 }
 ```
 {% endtab %}
+
+{% tab title="Svelte" %}
+```typescript
+<script lang="ts">
+import { useWallet, type Wallet } from '@txnlab/use-wallet-svelte'
+
+const { wallets, activeWallet } = useWallet()
+const connecting = $state(false)
+
+const handleConnect = async (wallet: Wallet) => {
+  connecting = true
+  try {
+    await wallet.connect()
+  } catch (error) {
+    console.error('Failed to connect:', error)
+  } finally {
+    connecting = false
+  }
+}
+
+const setActiveAccount = (event: Event, wallet: Wallet) => {
+  const selectElement = event.target as HTMLSelectElement
+  wallet.setActiveAccount(selectElement.value)
+}
+</script>
+
+<div>
+  {#if activeWallet()}
+    <!-- Connected state -->
+    <div class="connected-wallet">
+      <div class="wallet-header">
+        <img
+          src={activeWallet().metadata.icon}
+          alt={activeWallet().metadata.name}
+          width="32"
+          height="32"
+        />
+        <span>{activeWallet().metadata.name}</span>
+      </div>
+
+      {#if activeWallet().accounts.length > 1}
+        <select
+          value={activeWallet().activeAccount?.address}
+          onchange={(event) => setActiveAccount(event, activeWallet())}
+        >
+          {#each activeWallet().accounts as account}
+            <option value={account.address}>
+              {account.name}
+            </option>
+          {/each}
+        </select>
+      {/if}
+
+      {#if activeWallet().activeAccount}
+        <div class="account-info">
+          <span>{activeWallet().activeAccount.name}</span>
+          <span>{activeWallet().activeAccount.address}</span>
+        </div>
+      {/if}
+
+      <button onclick={activeWallet().disconnect}>
+        Disconnect
+      </button>
+    </div>
+  {:else}
+    <!-- Disconnected state -->
+    <div class="wallet-list">
+      <h3>Connect Wallet</h3>
+      <div class="wallet-options">
+        {#each wallets as wallet}
+          <button
+            onclick={() => handleConnect(wallet)}
+            disabled={connecting}
+            class="wallet-option"
+          >
+            <img
+              src={wallet.metadata.icon}
+              alt={wallet.metadata.name}
+              width="32"
+              height="32"
+            />
+            <span>{wallet.metadata.name}</span>
+          </button>
+        {/each}
+      </div>
+    </div>
+  {/if}
+</div>
+```
+{% endtab %}
 {% endtabs %}
 
 ### Error Handling and Loading States
@@ -391,7 +481,7 @@ const handleConnect = async (wallet: Wallet) => {
 
 <template>
   <button
-    @click="handleConnect"
+    @click="handleConnect(wallet)"
     :disabled="status === 'connecting'"
   >
     {{ status === 'connecting' ? 'Connecting...' : 'Connect' }}
@@ -426,6 +516,33 @@ const WalletOption = ({ wallet }: { wallet: BaseWallet }) => {
     </button>
   )
 }
+```
+{% endtab %}
+
+{% tab title="Svelte" %}
+```typescript
+<script lang="ts">
+const status = $state('idle')
+
+const handleConnect = async (wallet: Wallet) => {
+  status = 'connecting'
+  try {
+    await wallet.connect()
+    status = 'connected'
+  } catch (error) {
+    status = 'error'
+    showNotification('Failed to connect wallet')
+    console.error('Connection error:', error)
+  }
+}
+</script>
+
+<button
+  onclick={() => handleConnect(wallet)}
+  disabled={status === 'connecting'}
+>
+  {status === 'connecting' ? 'Connecting...' : 'Connect'}
+</button>
 ```
 {% endtab %}
 {% endtabs %}

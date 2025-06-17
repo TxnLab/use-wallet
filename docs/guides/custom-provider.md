@@ -366,6 +366,69 @@ function WalletConnect() {
 }
 ```
 {% endtab %}
+
+{% tab title="Svelte" %}
+```typescript
+<script setup lang="ts">
+  import { CustomProvider, WalletAccount, useWallet } from '@txnlab/use-wallet-svelte'
+  import algosdk from 'algosdk'
+
+  class MyWalletProvider implements CustomProvider {
+    private accounts: WalletAccount[] = []
+    
+    async connect(): Promise<WalletAccount[]> {
+      // Connect to wallet
+      this.accounts = [{
+        name: 'Account 1',
+        address: 'ABC...',
+        providerId: 'my-wallet'
+      }]
+      return this.accounts
+    }
+    
+    async disconnect(): Promise<void> {
+      // Clean up
+      this.accounts = []
+    }
+    
+    async resumeSession(): Promise<WalletAccount[] | void> {
+      // Check for existing session
+      if (localStorage.getItem('wallet-connected')) {
+        return this.connect()
+      }
+    }
+    
+    async signTransactions(
+      txnGroup: algosdk.Transaction[] | Uint8Array[],
+      indexesToSign?: number[]
+    ): Promise<(Uint8Array | null)[]> {
+      // Implementation details same as React example
+    }
+    
+    async transactionSigner(
+      txnGroup: algosdk.Transaction[],
+      indexesToSign: number[]
+    ): Promise<Uint8Array[]> {
+      const signed = await this.signTransactions(txnGroup, indexesToSign)
+      return signed.filter((s): s is Uint8Array => s !== null)
+    }
+  }
+
+  const { activeAccount } = useWallet()
+</script>
+
+<div>
+  {#if activeAccount()}
+    <div>
+      Connected: {{ activeAccount.address }}
+    </div>
+  {:else}
+    <div>
+      Not connected
+    </div>
+</div>
+```
+{% endtab %}
 {% endtabs %}
 
 ### Next Steps

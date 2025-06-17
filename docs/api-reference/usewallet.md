@@ -14,15 +14,16 @@ layout:
 
 # useWallet
 
-The `useWallet` adapter provides reactive access to wallet state and methods from the WalletManager. It's available for React, Vue, and SolidJS, offering a consistent API across frameworks while respecting each framework's patterns and conventions.
+The `useWallet` adapter provides reactive access to wallet state and methods from the WalletManager. It's available for React, Vue, SolidJS, and Svelte, offering a consistent API across frameworks while respecting each framework's patterns and conventions.
 
 {% tabs %}
 {% tab title="React" %}
 ```tsx
-import { useWallet } from '@txnlab/use-wallet-react'
+import { useNetwork, useWallet } from '@txnlab/use-wallet-react'
 
 function WalletStatus() {
-  const { activeAccount, activeNetwork } = useWallet()
+  const { activeAccount } = useWallet()
+  const { activeNetwork } = useNetwork()
 
   if (!activeAccount) {
     return <div>No wallet connected</div>
@@ -41,9 +42,10 @@ function WalletStatus() {
 {% tab title="Vue" %}
 ```typescript
 <script setup>
-import { useWallet } from '@txnlab/use-wallet-vue'
+import { useNetwork, useWallet } from '@txnlab/use-wallet-vue'
 
-const { activeAccount, activeNetwork } = useWallet()
+const { activeAccount } = useWallet()
+const { activeNetwork } = useNetwork()
 </script>
 
 <template>
@@ -60,10 +62,11 @@ const { activeAccount, activeNetwork } = useWallet()
 
 {% tab title="Solid" %}
 ```tsx
-import { useWallet } from '@txnlab/use-wallet-solid'
+import { useNetwork, useWallet } from '@txnlab/use-wallet-solid'
 
 function WalletStatus() {
-  const { activeAccount, activeNetwork } = useWallet()
+  const { activeAccount } = useWallet()
+  const { activeNetwork } = useNetwork()
 
   return (
     <Show when={activeAccount()} fallback={<div>No wallet connected</div>}>
@@ -74,6 +77,24 @@ function WalletStatus() {
     </Show>
   )
 }
+```
+{% endtab %}
+{% tab title="Svelte" %}
+```typescript
+<script lang="ts">
+  import { useNetwork, useWallet } from '@txnlab/use-wallet-svelte'
+  const { activeAccount } = useWallet()
+  const { activeNetwork } = useNetwork()
+</script>
+
+{#if !activeAccount()}
+  <div>No wallet connected</div>
+{:else}
+  <div>
+    <div>Account: {activeAccount().name}</div>
+    <div>Network: {activeNetwork()}</div>
+  </div>
+{/if}
 ```
 {% endtab %}
 {% endtabs %}
@@ -166,6 +187,25 @@ function App() {
 }
 ```
 {% endtab %}
+
+{% tab title="Svelte" %}
+```typescript
+// routes/+layout.svelte
+<script lang="ts">
+  import { useWalletContext, WalletManager } from '@txnlab/use-wallet-svelte'
+
+  const manager = new WalletManager({
+    // ... WalletManager config
+  })
+
+  useWalletContext(manager)
+
+  let { children } = $props()
+</script>
+
+{@render children()}
+```
+{% endtab %}
 {% endtabs %}
 
 See the [framework-specific guides](broken-reference) for detailed setup instructions.
@@ -232,6 +272,23 @@ function Component() {
 }
 ```
 {% endtab %}
+
+{% tab title="Svelte" %}
+Svelte provides state through a getter functions:
+
+```typescript
+<script lang="ts">
+  import { useWallet } from '@txnlab/use-wallet-svelte'
+  const { activeAccount } = useWallet()
+</script>
+
+{#if activeAccount()}
+  <div>
+    <p>Connected to {activeAccount().name}</p>
+  </div>
+{/if}
+```
+{% endtab %}
 {% endtabs %}
 
 #### Complete Example
@@ -241,15 +298,16 @@ Here's a complete example showing wallet connection, transaction signing, and er
 {% tabs %}
 {% tab title="React" %}
 ```tsx
-import { useWallet, WalletId } from '@txnlab/use-wallet-react'
+import { useNetwork, useWallet, WalletId } from '@txnlab/use-wallet-react'
 
 function WalletComponent() {
   const {
     activeAccount,
-    activeNetwork,
     wallets,
     signTransactions
   } = useWallet()
+
+  const { activeNetwork } = useNetwork()
 
   const handleConnect = async () => {
     const pera = wallets.find((w) => w.id === WalletId.PERA)
@@ -303,14 +361,15 @@ function WalletComponent() {
 {% tab title="Vue" %}
 ```typescript
 <script setup lang="ts">
-import { useWallet, WalletId } from '@txnlab/use-wallet-vue'
+import { useNetwork, useWallet, WalletId } from '@txnlab/use-wallet-vue'
 
 const {
   activeAccount,
-  activeNetwork,
   wallets,
   signTransactions
 } = useWallet()
+
+const { activeNetwork } = useNetwork()
 
 const handleConnect = async () => {
   const pera = wallets.value.find((w) => w.id === WalletId.PERA)
@@ -364,16 +423,17 @@ const handleSign = async () => {
 
 {% tab title="Solid" %}
 ```tsx
-import { useWallet, WalletId } from '@txnlab/use-wallet-solid'
+import { useNetwork, useWallet, WalletId } from '@txnlab/use-wallet-solid'
 import { Show } from 'solid-js'
 
 function WalletComponent() {
   const {
     activeAccount,
-    activeNetwork,
     wallets,
     signTransactions
   } = useWallet()
+
+  const { activeNetwork } = useNetwork()
 
   const handleConnect = async () => {
     const pera = wallets().find((w) => w.id === WalletId.PERA)
@@ -421,6 +481,66 @@ function WalletComponent() {
 }
 ```
 {% endtab %}
+
+{% tab title="Svelte" %}
+```typescript
+<script lang="ts">
+import { useNetwork, useWallet, WalletId } from '@txnlab/use-wallet-svelte'
+
+const {
+  activeAccount,
+  wallets,
+  signTransactions
+} = useWallet()
+
+const { activeNetwork } = useNetwork()
+
+const handleConnect = async () => {
+  const pera = wallets.value.find((w) => w.id === WalletId.PERA)
+  if (!pera) return
+
+  try {
+    await pera.connect()
+  } catch (error) {
+    console.error('Connection failed:', error)
+  }
+}
+
+const handleDisconnect = async () => {
+  const pera = wallets.value.find((w) => w.id === WalletId.PERA)
+  if (!pera) return
+
+  try {
+    await pera.disconnect()
+  } catch (error) {
+    console.error('Disconnect failed:', error)
+  }
+}
+
+const handleSign = async () => {
+  try {
+    // Example: Sign a transaction
+    // See the Signing Transactions guide for complete examples
+    const signedTxns = await signTransactions([/* transactions */])
+    console.log('Transaction signed!')
+  } catch (error) {
+    console.error('Signing failed:', error)
+    }
+}
+</script>
+
+<div>
+  {#if !activeAccount()}
+    <button onclick={handleConnect}>Connect Wallet</button>
+  {:else}
+    <p>Connected to {activeAccount().name}</p>
+    <p>Network: {activeNetwork()}</p>
+    <button onclick={handleDisconnect}>Disconnect</button>
+    <button onclick={handleSign}>Sign Transaction</button>
+  {/if}
+</div>
+```
+{% endtab %}
 {% endtabs %}
 
 ### Framework-Specific Considerations
@@ -442,6 +562,11 @@ function WalletComponent() {
 * Uses Solid's fine-grained reactivity system
 * State values are accessed via getter functions for reactivity
 * Compatible with Solid 1.x
+
+#### Svelte
+
+* State values are accessed via getter functions for reactivity
+* Compatible with Svelte 5.x
 
 ### Error Handling
 

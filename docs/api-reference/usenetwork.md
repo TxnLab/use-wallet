@@ -142,6 +142,30 @@ function NetworkComponent() {
 }
 ```
 {% endtab %}
+
+{% tab title="Svelte" %}
+```typescript
+import { useNetwork } from '@txnlab/use-wallet-svelte'
+
+function NetworkComponent() {
+  const {
+    activeNetwork,          // () => string
+    networkConfig,          // () => Record<string, NetworkConfig>
+    activeNetworkConfig,    // () => NetworkConfig
+    setActiveNetwork,       // (networkId: string) => Promise<void>
+    updateAlgodConfig,      // (networkId: string, config: Partial<AlgodConfig>) => void
+    resetNetworkConfig      // (networkId: string) => void
+  } = useNetwork()
+
+  return (
+    <div>
+      <div>Current network: {activeNetwork()}</div>
+      <div>Is testnet: {activeNetworkConfig().isTestnet ? 'Yes' : 'No'}</div>
+    </div>
+  )
+}
+```
+{% endtab %}
 {% endtabs %}
 
 ### Method Details
