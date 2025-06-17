@@ -117,7 +117,6 @@ export class LiquidWallet extends BaseWallet {
         this.logger.info('No session to resume')
         return
       }
-
     } catch (error) {
       this.logger.error('Error resuming session', error)
       this.onDisconnect()
