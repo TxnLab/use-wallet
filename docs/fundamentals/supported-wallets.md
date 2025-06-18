@@ -92,11 +92,11 @@ Liquid Auth is a self-hosted authentication service that provides a simple way t
 
 The Liquid Auth wallet provider defaults to `window.origin` as the origin, assuming the Liquid Auth backend is hosted on the same domain. Alternatively, you can specify a custom endpoint.
 
-Example use cases are configured to use the Algorand Foundation-hosted endpoint at `https://liquid-auth.onrender.com`. This endpoint is suitable for testing but should not be used in production environments.
+Example use cases are configured to use the Algorand Foundation-hosted endpoint at `https://liquid-auth.onrender.com`. This endpoint is suitable for testing but should NOT be used in production environments.
 
 
 {% hint style="info" %}
-The Liquid Auth provider is currently experimental and subject to change in future releases. It requires users to have an Android (v14+) device and developers to set up a [specific backend](https://github.com/TxnLab/use-wallet/blob/main/examples/liquid-auth-backend/README.md). For more info, please refer to the [documentation](https://liquidauth.com/guides/getting-started/).
+The Liquid Auth provider is currently experimental and subject to change in future releases. It requires users to have an Android v14+ device or an iOS 17+ device, and for developers to set up a [specific backend](https://liquidauth.com/server/introduction/). For more info, please refer to the [documentation](https://liquidauth.com/guides/getting-started/).
 {% endhint %}
 
 <figure><img src="../.gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
