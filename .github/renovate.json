@@ -29,6 +29,7 @@
       "rangeStrategy": "bump",
       "matchPackageNames": [
         "/@agoralabs-sh/avm-web-provider/",
+        "/@algorandfoundation/liquid-auth-use-wallet-client/",
         "/@magic-ext/algorand/",
         "/magic-sdk/",
         "/lute-connect/",
