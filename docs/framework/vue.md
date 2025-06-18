@@ -47,20 +47,20 @@ The Vue adapter provides two composables for accessing wallet functionality. In 
 
 The `useWallet` composable provides access to wallet management features. Here's an example showing some commonly used values:
 
-```typescript
+```vue
 <script setup lang="ts">
-import { useWallet } from '@txnlab/use-wallet-vue'
+  import { useWallet } from '@txnlab/use-wallet-vue'
 
-const { 
-  wallets,             // List of available wallets
-  activeWallet,        // Currently active wallet
-  activeAccount,       // Active account in active wallet
-  activeAddress,       // Address of active account
-  isReady,             // Whether all wallet providers have finished initialization
-  signTransactions,    // Function to sign transactions
-  transactionSigner,   // Typed signer for ATC and Algokit Utils
-  algodClient          // Algod client for active network
-} = useWallet()
+  const { 
+    wallets,             // List of available wallets
+    activeWallet,        // Currently active wallet
+    activeAccount,       // Active account in active wallet
+    activeAddress,       // Address of active account
+    isReady,             // Whether all wallet providers have finished initialization
+    signTransactions,    // Function to sign transactions
+    transactionSigner,   // Typed signer for ATC and Algokit Utils
+    algodClient          // Algod client for active network
+  } = useWallet()
 </script>
 
 <template>
@@ -84,21 +84,21 @@ For a complete list of all available properties and methods, see the [useWallet 
 
 The `useNetwork` composable serves two primary functions: managing the active network and supporting runtime node configuration.
 
-```typescript
+```vue
 <script setup lang="ts">
-import { useNetwork } from '@txnlab/use-wallet-vue'
+  import { useNetwork } from '@txnlab/use-wallet-vue'
 
-const {
-  // Active network management
-  activeNetwork,         // Currently active network
-  setActiveNetwork,      // Function to change networks
-  
-  // Runtime node configuration
-  networkConfig,         // Complete configuration for all networks
-  activeNetworkConfig,   // Configuration for active network only
-  updateAlgodConfig,     // Update a network's Algod configuration
-  resetNetworkConfig     // Reset network config to initial values
-} = useNetwork()
+  const {
+    // Active network management
+    activeNetwork,         // Currently active network
+    setActiveNetwork,      // Function to change networks
+    
+    // Runtime node configuration
+    networkConfig,         // Complete configuration for all networks
+    activeNetworkConfig,   // Configuration for active network only
+    updateAlgodConfig,     // Update a network's Algod configuration
+    resetNetworkConfig     // Reset network config to initial values
+  } = useNetwork()
 </script>
 
 <template>

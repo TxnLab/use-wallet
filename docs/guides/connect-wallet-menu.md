@@ -148,29 +148,29 @@ const ConnectedWallet = ({ wallet }: { wallet: Wallet }) => {
 {% endtab %}
 
 {% tab title="Vue" %}
-```typescript
+```vue
 <script setup lang="ts">
-import { useWallet, type Wallet } from '@txnlab/use-wallet-vue'
-import { ref } from 'vue'
+  import { useWallet, type Wallet } from '@txnlab/use-wallet-vue'
+  import { ref } from 'vue'
 
-const { wallets, activeWallet } = useWallet()
-const connecting = ref(false)
+  const { wallets, activeWallet } = useWallet()
+  const connecting = ref(false)
 
-const handleConnect = async (wallet: Wallet) => {
-  connecting.value = true
-  try {
-    await wallet.connect()
-  } catch (error) {
-    console.error('Failed to connect:', error)
-  } finally {
-    connecting.value = false
+  const handleConnect = async (wallet: Wallet) => {
+    connecting.value = true
+    try {
+      await wallet.connect()
+    } catch (error) {
+      console.error('Failed to connect:', error)
+    } finally {
+      connecting.value = false
+    }
   }
-}
 
-const setActiveAccount = (event: Event, wallet: Wallet) => {
-  const selectElement = event.target as HTMLSelectElement
-  wallet.setActiveAccount(selectElement.value)
-}
+  const setActiveAccount = (event: Event, wallet: Wallet) => {
+    const selectElement = event.target as HTMLSelectElement
+    wallet.setActiveAccount(selectElement.value)
+  }
 </script>
 
 <template>
@@ -337,28 +337,28 @@ const WalletMenu = () => {
 {% endtab %}
 
 {% tab title="Svelte" %}
-```typescript
+```sv
 <script lang="ts">
-import { useWallet, type Wallet } from '@txnlab/use-wallet-svelte'
+  import { useWallet, type Wallet } from '@txnlab/use-wallet-svelte'
 
-const { wallets, activeWallet } = useWallet()
-const connecting = $state(false)
+  const { wallets, activeWallet } = useWallet()
+  const connecting = $state(false)
 
-const handleConnect = async (wallet: Wallet) => {
-  connecting = true
-  try {
-    await wallet.connect()
-  } catch (error) {
-    console.error('Failed to connect:', error)
-  } finally {
-    connecting = false
+  const handleConnect = async (wallet: Wallet) => {
+    connecting = true
+    try {
+      await wallet.connect()
+    } catch (error) {
+      console.error('Failed to connect:', error)
+    } finally {
+      connecting = false
+    }
   }
-}
 
-const setActiveAccount = (event: Event, wallet: Wallet) => {
-  const selectElement = event.target as HTMLSelectElement
-  wallet.setActiveAccount(selectElement.value)
-}
+  const setActiveAccount = (event: Event, wallet: Wallet) => {
+    const selectElement = event.target as HTMLSelectElement
+    wallet.setActiveAccount(selectElement.value)
+  }
 </script>
 
 <div>
@@ -462,21 +462,21 @@ const WalletOption = ({ wallet }: { wallet: Wallet }) => {
 {% endtab %}
 
 {% tab title="Vue" %}
-```typescript
+```vue
 <script setup lang="ts">
-const status = ref('idle')
+  const status = ref('idle')
 
-const handleConnect = async (wallet: Wallet) => {
-  status.value = 'connecting'
-  try {
-    await wallet.connect()
-    status.value = 'connected'
-  } catch (error) {
-    status.value = 'error'
-    showNotification('Failed to connect wallet')
-    console.error('Connection error:', error)
+  const handleConnect = async (wallet: Wallet) => {
+    status.value = 'connecting'
+    try {
+      await wallet.connect()
+      status.value = 'connected'
+    } catch (error) {
+      status.value = 'error'
+      showNotification('Failed to connect wallet')
+      console.error('Connection error:', error)
+    }
   }
-}
 </script>
 
 <template>
@@ -520,21 +520,21 @@ const WalletOption = ({ wallet }: { wallet: BaseWallet }) => {
 {% endtab %}
 
 {% tab title="Svelte" %}
-```typescript
+```sv
 <script lang="ts">
-const status = $state('idle')
+  const status = $state('idle')
 
-const handleConnect = async (wallet: Wallet) => {
-  status = 'connecting'
-  try {
-    await wallet.connect()
-    status = 'connected'
-  } catch (error) {
-    status = 'error'
-    showNotification('Failed to connect wallet')
-    console.error('Connection error:', error)
+  const handleConnect = async (wallet: Wallet) => {
+    status = 'connecting'
+    try {
+      await wallet.connect()
+      status = 'connected'
+    } catch (error) {
+      status = 'error'
+      showNotification('Failed to connect wallet')
+      console.error('Connection error:', error)
+    }
   }
-}
 </script>
 
 <button

@@ -96,18 +96,18 @@ function NetworkComponent() {
 {% endtab %}
 
 {% tab title="Vue" %}
-```typescript
+```vue
 <script setup>
-import { useNetwork } from '@txnlab/use-wallet-vue'
+  import { useNetwork } from '@txnlab/use-wallet-vue'
 
-const {
-  activeNetwork,          // Ref<string>
-  networkConfig,          // NetworkConfig object
-  activeNetworkConfig,   // ComputedRef<NetworkConfig>
-  setActiveNetwork,      // (networkId: string) => Promise<void>
-  updateAlgodConfig,     // (networkId: string, config: Partial<AlgodConfig>) => void
-  resetNetworkConfig     // (networkId: string) => void
-} = useNetwork()
+  const {
+    activeNetwork,          // Ref<string>
+    networkConfig,          // NetworkConfig object
+    activeNetworkConfig,   // ComputedRef<NetworkConfig>
+    setActiveNetwork,      // (networkId: string) => Promise<void>
+    updateAlgodConfig,     // (networkId: string, config: Partial<AlgodConfig>) => void
+    resetNetworkConfig     // (networkId: string) => void
+  } = useNetwork()
 </script>
 
 <template>
@@ -144,10 +144,10 @@ function NetworkComponent() {
 {% endtab %}
 
 {% tab title="Svelte" %}
-```typescript
-import { useNetwork } from '@txnlab/use-wallet-svelte'
+```sv
+<script lang="ts">
+  import { useNetwork } from '@txnlab/use-wallet-svelte'
 
-function NetworkComponent() {
   const {
     activeNetwork,          // () => string
     networkConfig,          // () => Record<string, NetworkConfig>
@@ -156,14 +156,12 @@ function NetworkComponent() {
     updateAlgodConfig,      // (networkId: string, config: Partial<AlgodConfig>) => void
     resetNetworkConfig      // (networkId: string) => void
   } = useNetwork()
+</script>
 
-  return (
-    <div>
-      <div>Current network: {activeNetwork()}</div>
-      <div>Is testnet: {activeNetworkConfig().isTestnet ? 'Yes' : 'No'}</div>
-    </div>
-  )
-}
+<div>
+  <div>Current network: {activeNetwork()}</div>
+  <div>Is testnet: {activeNetworkConfig().isTestnet ? 'Yes' : 'No'}</div>
+</div>
 ```
 {% endtab %}
 {% endtabs %}

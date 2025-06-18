@@ -40,12 +40,12 @@ function WalletStatus() {
 {% endtab %}
 
 {% tab title="Vue" %}
-```typescript
+```vue
 <script setup>
-import { useNetwork, useWallet } from '@txnlab/use-wallet-vue'
+  import { useNetwork, useWallet } from '@txnlab/use-wallet-vue'
 
-const { activeAccount } = useWallet()
-const { activeNetwork } = useNetwork()
+  const { activeAccount } = useWallet()
+  const { activeNetwork } = useNetwork()
 </script>
 
 <template>
@@ -80,7 +80,7 @@ function WalletStatus() {
 ```
 {% endtab %}
 {% tab title="Svelte" %}
-```typescript
+```sv
 <script lang="ts">
   import { useNetwork, useWallet } from '@txnlab/use-wallet-svelte'
   const { activeAccount } = useWallet()
@@ -236,14 +236,14 @@ function Component() {
 {% tab title="Vue" %}
 Vue returns reactive refs that can be used in templates or unwrapped with `.value`:
 
-```typescript
+```vue
 <script setup lang="ts">
-import { useWallet } from '@txnlab/use-wallet-vue'
+  import { useWallet } from '@txnlab/use-wallet-vue'
 
-const { activeAccount } = useWallet()
+  const { activeAccount } = useWallet()
 
-// Access ref value in script
-console.log('Account name:', activeAccount.value?.name)
+  // Access ref value in script
+  console.log('Account name:', activeAccount.value?.name)
 </script>
 
 <template>
@@ -276,7 +276,7 @@ function Component() {
 {% tab title="Svelte" %}
 Svelte provides state through a getter functions:
 
-```typescript
+```sv
 <script lang="ts">
   import { useWallet } from '@txnlab/use-wallet-svelte'
   const { activeAccount } = useWallet()
@@ -359,50 +359,50 @@ function WalletComponent() {
 {% endtab %}
 
 {% tab title="Vue" %}
-```typescript
+```vue
 <script setup lang="ts">
-import { useNetwork, useWallet, WalletId } from '@txnlab/use-wallet-vue'
+  import { useNetwork, useWallet, WalletId } from '@txnlab/use-wallet-vue'
 
-const {
-  activeAccount,
-  wallets,
-  signTransactions
-} = useWallet()
+  const {
+    activeAccount,
+    wallets,
+    signTransactions
+  } = useWallet()
 
-const { activeNetwork } = useNetwork()
+  const { activeNetwork } = useNetwork()
 
-const handleConnect = async () => {
-  const pera = wallets.value.find((w) => w.id === WalletId.PERA)
-  if (!pera) return
+  const handleConnect = async () => {
+    const pera = wallets.value.find((w) => w.id === WalletId.PERA)
+    if (!pera) return
 
-  try {
-    await pera.connect()
-  } catch (error) {
-    console.error('Connection failed:', error)
-  }
-}
-
-const handleDisconnect = async () => {
-  const pera = wallets.value.find((w) => w.id === WalletId.PERA)
-  if (!pera) return
-
-  try {
-    await pera.disconnect()
-  } catch (error) {
-    console.error('Disconnect failed:', error)
-  }
-}
-
-const handleSign = async () => {
-  try {
-    // Example: Sign a transaction
-    // See the Signing Transactions guide for complete examples
-    const signedTxns = await signTransactions([/* transactions */])
-    console.log('Transaction signed!')
-  } catch (error) {
-    console.error('Signing failed:', error)
+    try {
+      await pera.connect()
+    } catch (error) {
+      console.error('Connection failed:', error)
     }
-}
+  }
+
+  const handleDisconnect = async () => {
+    const pera = wallets.value.find((w) => w.id === WalletId.PERA)
+    if (!pera) return
+
+    try {
+      await pera.disconnect()
+    } catch (error) {
+      console.error('Disconnect failed:', error)
+    }
+  }
+
+  const handleSign = async () => {
+    try {
+      // Example: Sign a transaction
+      // See the Signing Transactions guide for complete examples
+      const signedTxns = await signTransactions([/* transactions */])
+      console.log('Transaction signed!')
+    } catch (error) {
+      console.error('Signing failed:', error)
+      }
+  }
 </script>
 
 <template>
@@ -483,50 +483,50 @@ function WalletComponent() {
 {% endtab %}
 
 {% tab title="Svelte" %}
-```typescript
+```sv
 <script lang="ts">
-import { useNetwork, useWallet, WalletId } from '@txnlab/use-wallet-svelte'
+  import { useNetwork, useWallet, WalletId } from '@txnlab/use-wallet-svelte'
 
-const {
-  activeAccount,
-  wallets,
-  signTransactions
-} = useWallet()
+  const {
+    activeAccount,
+    wallets,
+    signTransactions
+  } = useWallet()
 
-const { activeNetwork } = useNetwork()
+  const { activeNetwork } = useNetwork()
 
-const handleConnect = async () => {
-  const pera = wallets.value.find((w) => w.id === WalletId.PERA)
-  if (!pera) return
+  const handleConnect = async () => {
+    const pera = wallets.value.find((w) => w.id === WalletId.PERA)
+    if (!pera) return
 
-  try {
-    await pera.connect()
-  } catch (error) {
-    console.error('Connection failed:', error)
-  }
-}
-
-const handleDisconnect = async () => {
-  const pera = wallets.value.find((w) => w.id === WalletId.PERA)
-  if (!pera) return
-
-  try {
-    await pera.disconnect()
-  } catch (error) {
-    console.error('Disconnect failed:', error)
-  }
-}
-
-const handleSign = async () => {
-  try {
-    // Example: Sign a transaction
-    // See the Signing Transactions guide for complete examples
-    const signedTxns = await signTransactions([/* transactions */])
-    console.log('Transaction signed!')
-  } catch (error) {
-    console.error('Signing failed:', error)
+    try {
+      await pera.connect()
+    } catch (error) {
+      console.error('Connection failed:', error)
     }
-}
+  }
+
+  const handleDisconnect = async () => {
+    const pera = wallets.value.find((w) => w.id === WalletId.PERA)
+    if (!pera) return
+
+    try {
+      await pera.disconnect()
+    } catch (error) {
+      console.error('Disconnect failed:', error)
+    }
+  }
+
+  const handleSign = async () => {
+    try {
+      // Example: Sign a transaction
+      // See the Signing Transactions guide for complete examples
+      const signedTxns = await signTransactions([/* transactions */])
+      console.log('Transaction signed!')
+    } catch (error) {
+      console.error('Signing failed:', error)
+      }
+  }
 </script>
 
 <div>

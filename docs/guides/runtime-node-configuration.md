@@ -134,6 +134,39 @@ function NodeConfig() {
 }
 ```
 {% endtab %}
+
+{% tab title="Svelte" %}
+```typescript
+<script lang="ts">
+  import { useNetwork } from '@txnlab/use-wallet-svelte'
+
+  const { updateAlgodConfig, resetNetworkConfig } = useNetwork()
+
+  const handleNodeChange = () => {
+    // Update node configuration for TestNet
+    updateAlgodConfig('testnet', {
+      baseServer: 'https://testnet-api.algonode.cloud',
+      port: '443',
+      token: ''
+    })
+  }
+
+  const handleReset = () => {
+    // Reset TestNet back to default configuration
+    resetNetworkConfig('testnet')
+  }
+</script>
+
+<div>
+  <button onclick={handleNodeChange}>
+    Use AlgoNode
+  </button>
+  <button @click={handleReset}>
+    Reset Node
+  </button>
+</div>
+```
+{% endtab %}
 {% endtabs %}
 
 ### Configuration Persistence
@@ -440,6 +473,90 @@ function NodeConfigForm() {
     </form>
   )
 }
+```
+{% endtab %}
+
+{% tab title="Svelte" %}
+```typescript
+<script lang="ts">
+import { useNetwork } from '@txnlab/use-wallet-svelte'
+
+const {
+  activeNetwork,
+  activeNetworkConfig,
+  updateAlgodConfig,
+  resetNetworkConfig
+} = useNetwork()
+
+const formData = $state({
+  baseServer: activeNetworkConfig().algod.baseServer,
+  port: activeNetworkConfig().algod.port || '',
+  token: ''
+})
+
+const error = $state('')
+
+const handleSubmit = async ((e): Event) => {
+  e.preventDefault()
+  error = ''
+
+  try {
+    await updateAlgodConfig(activeNetwork(), {
+      baseServer: formData.baseServer,
+      port: formData.port || undefined,
+      token: formData.token || ''
+    })
+  } catch (err: any) {
+    error = err.message
+  }
+}
+</script>
+
+<form @submit="handleSubmit">
+  <h3>Configure {activeNetwork()} Node</h3>
+  
+  <div>
+    <label>Server URL:</label>
+    <input
+      type="url"
+      bind:value={formData.baseServer}
+      required
+    />
+  </div>
+
+  <div>
+    <label>Port:</label>
+    <input
+      type="text"
+      bind:value={formData.port}
+      placeholder="Optional"
+    />
+  </div>
+
+  <div>
+    <label>Token:</label>
+    <input
+      type="password"
+      bind:value={formData.token}
+      placeholder="Optional"
+    />
+  </div>
+
+  {#if error}
+    <div class="error">
+      {{ error }}
+    </div>
+  {/if}
+
+  <div>
+    <button type="submit">
+      Update Node
+    </button>
+    <button type="button" onclick={() => resetNetworkConfig(activeNetwork())}>
+      Reset to Default
+    </button>
+  </div>
+</form>
 ```
 {% endtab %}
 {% endtabs %}

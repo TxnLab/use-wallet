@@ -132,6 +132,33 @@ function NetworkSwitch() {
 }
 ```
 {% endtab %}
+
+{% tab title="Svelte" %}
+```typescript
+<script setup lang="ts">
+  import { useNetwork } from '@txnlab/use-wallet-svelte'
+
+  const {
+    activeNetwork,
+    setActiveNetwork,
+    networkConfig
+  } = useNetwork()
+</script>
+
+<template>
+  <select
+    value={activeNetwork()}
+    onchange={(e) => setActiveNetwork((e.target as HTMLSelectElement).value)}
+  >
+    {#each Object.entries(networkConfig) as [id, network]}
+      <option>
+        {id}
+      </option>
+    {/each}
+  </select>
+</template>
+```
+{% endtab %}
 {% endtabs %}
 
 ### Network Status
@@ -174,6 +201,20 @@ const isTestnet = () => activeNetworkConfig().isTestnet
 
 // Get genesis ID
 const genesisId = () => activeNetworkConfig().genesisId
+```
+{% endtab %}
+
+{% tab title="Svelte" %}
+```typescript
+<script lang="ts">
+  const { activeNetworkConfig } = useNetwork()
+
+  // Check if we're on a test network
+  const isTestnet = $derived(activeNetworkConfig.value.isTestnet)
+
+  // Get genesis ID
+  const genesisId = $derived(activeNetworkConfig.value.genesisId)
+</script>
 ```
 {% endtab %}
 {% endtabs %}
