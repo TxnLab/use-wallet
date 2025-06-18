@@ -66,25 +66,25 @@ function NodeConfig() {
 {% endtab %}
 
 {% tab title="Vue" %}
-```typescript
+```vue
 <script setup lang="ts">
-import { useNetwork } from '@txnlab/use-wallet-vue'
+  import { useNetwork } from '@txnlab/use-wallet-vue'
 
-const { updateAlgodConfig, resetNetworkConfig } = useNetwork()
+  const { updateAlgodConfig, resetNetworkConfig } = useNetwork()
 
-const handleNodeChange = () => {
-  // Update node configuration for TestNet
-  updateAlgodConfig('testnet', {
-    baseServer: 'https://testnet-api.algonode.cloud',
-    port: '443',
-    token: ''
-  })
-}
+  const handleNodeChange = () => {
+    // Update node configuration for TestNet
+    updateAlgodConfig('testnet', {
+      baseServer: 'https://testnet-api.algonode.cloud',
+      port: '443',
+      token: ''
+    })
+  }
 
-const handleReset = () => {
-  // Reset TestNet back to default configuration
-  resetNetworkConfig('testnet')
-}
+  const handleReset = () => {
+    // Reset TestNet back to default configuration
+    resetNetworkConfig('testnet')
+  }
 </script>
 
 <template>
@@ -136,7 +136,7 @@ function NodeConfig() {
 {% endtab %}
 
 {% tab title="Svelte" %}
-```typescript
+```sv
 <script lang="ts">
   import { useNetwork } from '@txnlab/use-wallet-svelte'
 
@@ -302,40 +302,40 @@ function NodeConfigForm() {
 {% endtab %}
 
 {% tab title="Vue" %}
-```typescript
+```vue
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useNetwork } from '@txnlab/use-wallet-vue'
+  import { ref, computed } from 'vue'
+  import { useNetwork } from '@txnlab/use-wallet-vue'
 
-const {
-  activeNetwork,
-  activeNetworkConfig,
-  updateAlgodConfig,
-  resetNetworkConfig
-} = useNetwork()
+  const {
+    activeNetwork,
+    activeNetworkConfig,
+    updateAlgodConfig,
+    resetNetworkConfig
+  } = useNetwork()
 
-const formData = ref({
-  baseServer: activeNetworkConfig.value.algod.baseServer,
-  port: activeNetworkConfig.value.algod.port || '',
-  token: ''
-})
+  const formData = ref({
+    baseServer: activeNetworkConfig.value.algod.baseServer,
+    port: activeNetworkConfig.value.algod.port || '',
+    token: ''
+  })
 
-const error = ref('')
+  const error = ref('')
 
-const handleSubmit = async ((e): Event) => {
-  e.preventDefault()
-  error.value = ''
+  const handleSubmit = async ((e): Event) => {
+    e.preventDefault()
+    error.value = ''
 
-  try {
-    await updateAlgodConfig(activeNetwork.value, {
-      baseServer: formData.value.baseServer,
-      port: formData.value.port || undefined,
-      token: formData.value.token || ''
-    })
-  } catch (err: any) {
-    error.value = err.message
+    try {
+      await updateAlgodConfig(activeNetwork.value, {
+        baseServer: formData.value.baseServer,
+        port: formData.value.port || undefined,
+        token: formData.value.token || ''
+      })
+    } catch (err: any) {
+      error.value = err.message
+    }
   }
-}
 </script>
 
 <template>
@@ -477,39 +477,39 @@ function NodeConfigForm() {
 {% endtab %}
 
 {% tab title="Svelte" %}
-```typescript
+```sv
 <script lang="ts">
-import { useNetwork } from '@txnlab/use-wallet-svelte'
+  import { useNetwork } from '@txnlab/use-wallet-svelte'
 
-const {
-  activeNetwork,
-  activeNetworkConfig,
-  updateAlgodConfig,
-  resetNetworkConfig
-} = useNetwork()
+  const {
+    activeNetwork,
+    activeNetworkConfig,
+    updateAlgodConfig,
+    resetNetworkConfig
+  } = useNetwork()
 
-const formData = $state({
-  baseServer: activeNetworkConfig().algod.baseServer,
-  port: activeNetworkConfig().algod.port || '',
-  token: ''
-})
+  const formData = $state({
+    baseServer: activeNetworkConfig().algod.baseServer,
+    port: activeNetworkConfig().algod.port || '',
+    token: ''
+  })
 
-const error = $state('')
+  const error = $state('')
 
-const handleSubmit = async ((e): Event) => {
-  e.preventDefault()
-  error = ''
+  const handleSubmit = async ((e): Event) => {
+    e.preventDefault()
+    error = ''
 
-  try {
-    await updateAlgodConfig(activeNetwork(), {
-      baseServer: formData.baseServer,
-      port: formData.port || undefined,
-      token: formData.token || ''
-    })
-  } catch (err: any) {
-    error = err.message
+    try {
+      await updateAlgodConfig(activeNetwork(), {
+        baseServer: formData.baseServer,
+        port: formData.port || undefined,
+        token: formData.token || ''
+      })
+    } catch (err: any) {
+      error = err.message
+    }
   }
-}
 </script>
 
 <form @submit="handleSubmit">

@@ -78,15 +78,15 @@ function NetworkSwitch() {
 {% endtab %}
 
 {% tab title="Vue" %}
-```typescript
+```vue
 <script setup lang="ts">
-import { useNetwork } from '@txnlab/use-wallet-vue'
+  import { useNetwork } from '@txnlab/use-wallet-vue'
 
-const {
-  activeNetwork,
-  setActiveNetwork,
-  networkConfig
-} = useNetwork()
+  const {
+    activeNetwork,
+    setActiveNetwork,
+    networkConfig
+  } = useNetwork()
 </script>
 
 <template>
@@ -134,8 +134,8 @@ function NetworkSwitch() {
 {% endtab %}
 
 {% tab title="Svelte" %}
-```typescript
-<script setup lang="ts">
+```sv
+<script lang="ts">
   import { useNetwork } from '@txnlab/use-wallet-svelte'
 
   const {
@@ -145,18 +145,16 @@ function NetworkSwitch() {
   } = useNetwork()
 </script>
 
-<template>
-  <select
-    value={activeNetwork()}
-    onchange={(e) => setActiveNetwork((e.target as HTMLSelectElement).value)}
-  >
-    {#each Object.entries(networkConfig) as [id, network]}
-      <option>
-        {id}
-      </option>
-    {/each}
-  </select>
-</template>
+<select
+  value={activeNetwork()}
+  onchange={(e) => setActiveNetwork((e.target as HTMLSelectElement).value)}
+>
+  {#each Object.entries(networkConfig) as [id, network]}
+    <option>
+      {id}
+    </option>
+  {/each}
+</select>
 ```
 {% endtab %}
 {% endtabs %}
@@ -179,15 +177,15 @@ const genesisId = activeNetworkConfig.genesisId
 {% endtab %}
 
 {% tab title="Vue" %}
-```typescript
+```vue
 <script setup lang="ts">
-const { activeNetworkConfig } = useNetwork()
+  const { activeNetworkConfig } = useNetwork()
 
-// Check if we're on a test network
-const isTestnet = computed(() => activeNetworkConfig.value.isTestnet)
+  // Check if we're on a test network
+  const isTestnet = computed(() => activeNetworkConfig.value.isTestnet)
 
-// Get genesis ID
-const genesisId = computed(() => activeNetworkConfig.value.genesisId)
+  // Get genesis ID
+  const genesisId = computed(() => activeNetworkConfig.value.genesisId)
 </script>
 ```
 {% endtab %}
@@ -205,7 +203,7 @@ const genesisId = () => activeNetworkConfig().genesisId
 {% endtab %}
 
 {% tab title="Svelte" %}
-```typescript
+```sv
 <script lang="ts">
   const { activeNetworkConfig } = useNetwork()
 
