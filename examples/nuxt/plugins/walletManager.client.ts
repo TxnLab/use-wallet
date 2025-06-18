@@ -19,6 +19,14 @@ export default defineNuxtPlugin((nuxtApp) => {
       WalletId.KMD,
       WalletId.KIBISIS,
       {
+        id: WalletId.LIQUID,
+        options: {
+          origin: 'https://liquid-auth.onrender.com',
+          RTC_config_username: 'liquid-auth',
+          RTC_config_credential: 'sqmcP4MiTKMT4TGEDSk9jgHY'
+        }
+      },
+      {
         id: WalletId.LUTE,
         options: { siteName: 'Example Site' }
       },
