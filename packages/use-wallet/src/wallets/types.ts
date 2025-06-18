@@ -213,3 +213,57 @@ export class SignTxnsError extends Error {
     this.data = data
   }
 }
+
+// signData types
+
+export interface Siwa {
+  domain: string
+  account_address: string
+  uri: string
+  version: string
+  statement?: string
+  nonce?: string
+  'issued-at'?: string
+  'expiration-time'?: string
+  'not-before'?: string
+  'request-id'?: string
+  chain_id: '283'
+  resources?: string[]
+  type: 'ed25519'
+}
+
+export class SignDataError extends Error {
+  code: number
+  data?: any
+
+  constructor(message: string, code: number, data?: any) {
+    super(message)
+    this.name = 'SignDataError'
+    this.code = code
+    this.data = data
+  }
+}
+
+export interface SignData {
+  data: string
+  signer: Uint8Array
+  domain: string
+  authenticatorData: Uint8Array
+  requestId?: string
+  hdPath?: string
+  signature?: Uint8Array
+}
+
+export interface SignDataResponse extends SignData {
+  signature: Uint8Array
+}
+
+export enum ScopeType {
+  UNKNOWN = -1,
+  AUTH = 1
+}
+
+export interface SignMetadata {
+  scope: ScopeType
+  encoding: string
+}

@@ -118,8 +118,11 @@ export function isTransactionArray(
   return false
 }
 
-export function flattenTxnGroup<T>(txnGroup: T[]): T extends (infer U)[] ? U[] : T[] {
-  return Array.isArray(txnGroup[0]) ? ((txnGroup as any[]).flat() as any) : txnGroup
+export function flattenTxnGroup<T>(txnGroup: T[]): T[] {
+  if (!Array.isArray(txnGroup[0])) {
+    return txnGroup
+  }
+  return (txnGroup as unknown as any[]).flat()
 }
 
 function getPayloadId(): number {

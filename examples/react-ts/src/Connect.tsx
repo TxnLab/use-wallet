@@ -1,9 +1,18 @@
-import { useWallet, WalletId, type Wallet } from '@txnlab/use-wallet-react'
+import * as ed from '@noble/ed25519'
+import {
+  ScopeType,
+  SignDataError,
+  Siwa,
+  useWallet,
+  WalletId,
+  type Wallet
+} from '@txnlab/use-wallet-react'
 import algosdk from 'algosdk'
+import { canonify } from 'canonify'
 import * as React from 'react'
 
 export function Connect() {
-  const { algodClient, activeAddress, transactionSigner, wallets } = useWallet()
+  const { algodClient, activeAddress, signData, transactionSigner, wallets } = useWallet()
 
   const [isSending, setIsSending] = React.useState(false)
   const [magicEmail, setMagicEmail] = React.useState('')
@@ -68,6 +77,42 @@ export function Connect() {
     }
   }
 
+  const auth = async () => {
+    if (!activeAddress) {
+      throw new Error('[App] No active account')
+    }
+    try {
+      const siwaRequest: Siwa = {
+        domain: location.host,
+        chain_id: '283',
+        account_address: activeAddress,
+        type: 'ed25519',
+        uri: location.origin,
+        version: '1',
+        'issued-at': new Date().toISOString()
+      }
+      const dataString = canonify(siwaRequest)
+      if (!dataString) throw Error('Invalid JSON')
+      const data = btoa(dataString)
+      const metadata = { scope: ScopeType.AUTH, encoding: 'base64' }
+      const resp = await signData(data, metadata)
+      // verify signature
+      const enc = new TextEncoder()
+      const clientDataJsonHash = await crypto.subtle.digest('SHA-256', enc.encode(dataString))
+      const authenticatorDataHash = await crypto.subtle.digest('SHA-256', resp.authenticatorData)
+      const toSign = new Uint8Array(64)
+      toSign.set(new Uint8Array(clientDataJsonHash), 0)
+      toSign.set(new Uint8Array(authenticatorDataHash), 32)
+      const pubKey = algosdk.Address.fromString(activeAddress).publicKey
+      if (!(await ed.verifyAsync(resp.signature, toSign, pubKey))) {
+        throw new SignDataError('Verification Failed', 4300)
+      }
+      console.info(`[App] ✅ Successfully authenticated!`)
+    } catch (error) {
+      console.error('[App] Error signing data:', error)
+    }
+  }
+
   return (
     <div>
       {wallets.map((wallet) => (
@@ -92,9 +137,16 @@ export function Connect() {
               Disconnect
             </button>
             {wallet.isActive ? (
-              <button type="button" onClick={sendTransaction} disabled={isSending}>
-                {isSending ? 'Sending Transaction...' : 'Send Transaction'}
-              </button>
+              <div className="wallet-buttons">
+                <button type="button" onClick={sendTransaction} disabled={isSending}>
+                  {isSending ? 'Sending Transaction...' : 'Send Transaction'}
+                </button>
+                {wallet.canSignData && (
+                  <button type="button" onClick={auth}>
+                    Authenticate
+                  </button>
+                )}
+              </div>
             ) : (
               <button
                 type="button"

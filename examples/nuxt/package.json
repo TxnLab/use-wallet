@@ -14,19 +14,22 @@
   "dependencies": {
     "@algorandfoundation/liquid-auth-use-wallet-client": "^1.4.0-canary.1",
     "@blockshake/defly-connect": "^1.2.1",
+    "@noble/ed25519": "^2.2.3",
     "@perawallet/connect": "^1.4.1",
     "@txnlab/use-wallet": "workspace:*",
     "@txnlab/use-wallet-vue": "workspace:*",
     "@walletconnect/modal": "^2.7.0",
-    "@walletconnect/sign-client": "^2.17.3",
-    "algosdk": "3.0.0",
-    "lute-connect": "^1.4.1",
-    "nuxt": "3.15.1",
+    "@walletconnect/sign-client": "^2.19.2",
+    "algosdk": "3.2.0",
+    "canonify": "^2.1.1",
+    "lute-connect": "^1.6.1",
+    "nuxt": "3.16.1",
     "vue": "3.5.13",
     "vue-router": "4.5.0"
   },
   "devDependencies": {
-    "typescript": "5.7.2",
-    "vue-tsc": "2.2.0"
+    "@types/node": "20.11.30",
+    "typescript": "5.8.2",
+    "vue-tsc": "2.2.8"
   }
 }
