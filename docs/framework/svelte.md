@@ -12,45 +12,44 @@ layout:
     visible: true
 ---
 
-# Vue
+# Svelte
 
-The Vue adapter (`@txnlab/use-wallet-vue`) provides a plugin and composables for integrating use-wallet into Vue applications. This guide covers how to set up the adapter and use its features effectively.
+The Svelte adapter (`@txnlab/use-wallet-svelte`) provides primitives for integrating use-wallet into Svelte applications. This guide covers how to set up the adapter and use its features effectively.
 
 ### Setup
 
-After installing the package, any required wallet dependencies (see [Installation](../getting-started/installation.md)), and [configuring your WalletManager](../getting-started/configuration.md), install the WalletManager plugin in your Vue application:
+After installing the package and any required wallet dependencies (see [Installation](../getting-started/installation.md)) and [configuring your WalletManager](../getting-started/configuration.md), call `useWalletContext` in your base `+layout.svelte`:
 
-```typescript
-// main.ts
-import { createApp } from 'vue'
-import { WalletManagerPlugin, NetworkId } from '@txnlab/use-wallet-vue'
-import App from './App.vue'
+```ts
+import {
+  useWalletContext,
+  WalletManager,
+  NetworkId
+} from '@txnlab/use-wallet-svelte'
 
-const app = createApp(App)
-
-app.use(WalletManagerPlugin, {
+// Create manager instance (see Configuration guide)
+const manager = new WalletManager({
   wallets: [...],
   networks: {...},
   defaultNetwork: NetworkId.TESTNET
 })
 
-app.mount('#app')
+useWalletContext(manager)
 ```
 
-The plugin makes the wallet functionality available throughout your application via Vue composables.
+This makes the wallet functionality available throughout your application via Svelte's primitives.
 
-### Using the Composables
+### Using the Primitives
 
-The Vue adapter provides two composables for accessing wallet functionality. In v4.0.0, network-related features were moved from `useWallet` into a new `useNetwork` composable to provide better separation of concerns:
+The Svelte adapter provides two primitives for accessing wallet functionality. In v4.0.0, network-related features were moved from `useWallet` into a new `useNetwork` primitive to provide better separation of concerns:
 
 #### useWallet
 
-The `useWallet` composable provides access to wallet management features. Here's an example showing some commonly used values:
+The `useWallet` primitive provides access to wallet management features. Here's an example showing some commonly used values:
 
-```vue
-<script setup lang="ts">
-  import { useWallet } from '@txnlab/use-wallet-vue'
-
+```sv
+<script lang="ts">
+  import { useWallet } from '@txnlab/use-wallet-svelte'
   const { 
     wallets,             // List of available wallets
     activeWallet,        // Currently active wallet
@@ -63,30 +62,28 @@ The `useWallet` composable provides access to wallet management features. Here's
   } = useWallet()
 </script>
 
-<template>
-  <div>
-    <div v-if="!isReady">Loading...</div>
-    <div v-else>
-      <div v-if="activeAddress">
-        Connected: {{ activeAddress }}
-      </div>
-      <div v-else>
-        Not connected
-      </div>
-    </div>
-  </div>
-</template>
+{#if isReady()}
+  {#if activeAddress()}
+    <div>Connected: {activeAddress()}</div>
+  {:else}
+    <div>Not connected</div>
+  {/if}
+{:else}
+  <div>Loading...</div>
+{/if}
 ```
+
+Note that unlike [React's hooks](react.md#using-the-hooks), Svelte's primitives return functions that need to be called to access their current value. The values are automatically tracked and will trigger reactivity when they change.
 
 For a complete list of all available properties and methods, see the [useWallet API Reference](../api-reference/usewallet.md).
 
 #### useNetwork
 
-The `useNetwork` composable serves two primary functions: managing the active network and supporting runtime node configuration.
+The `useNetwork` primitive serves two primary functions: managing the active network and supporting runtime node configuration.
 
-```vue
-<script setup lang="ts">
-  import { useNetwork } from '@txnlab/use-wallet-vue'
+```sv
+<script lang="ts">
+  import { useNetwork } from '@txnlab/use-wallet-svelte'
 
   const {
     // Active network management
@@ -101,23 +98,19 @@ The `useNetwork` composable serves two primary functions: managing the active ne
   } = useNetwork()
 </script>
 
-<template>
-  <div>
-    <!-- Example: Network selector dropdown -->
-    <select
-      :value="activeNetwork"
-      @change="(e) => setActiveNetwork(e.target.value)"
-    >
-      <option
-        v-for="networkId in Object.keys(networkConfig)"
-        :key="networkId"
-        :value="networkId"
-      >
-        {{ networkId }}
+<div>
+  <!-- Example: Network selector dropdown -->
+  <select
+    value={activeNetwork()}
+    onchange={(e) => setActiveNetwork(e.currentTarget.value)}
+  >
+    {#each Object.keys(networkConfig()) as networkId}
+      <option>
+        {networkId}
       </option>
-    </select>
-  </div>
-</template>
+    {/each}
+  </select>
+</div>
 ```
 
 Active network management (previously part of `useWallet`) enables users to switch between different networks.
@@ -132,4 +125,4 @@ For a complete list of all available properties and methods, see the [useNetwork
 * Learn about transaction signing patterns in the [Signing Transactions](../guides/signing-transactions.md) guide
 * Explore network features in the [Switching Networks](../guides/switching-networks.md) and [Runtime Node Configuration](../guides/runtime-node-configuration.md) guides
 * Read the [API Reference](broken-reference) for detailed documentation of the library's main exports
-* Browse [Example Projects](../resources/example-projects.md) for working implementations in Vite (Vue) and Nuxt
+* Browse [Example Projects](../resources/example-projects.md) for a working implementation in Vite (Svelte)

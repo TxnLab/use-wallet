@@ -14,7 +14,7 @@ layout:
 
 # WalletManager
 
-The WalletManager class is the core of use-wallet, responsible for managing wallet connections, network configurations, and state persistence. It provides a framework-agnostic API that serves as the foundation for the React, Vue, and SolidJS adapters.
+The WalletManager class is the core of use-wallet, responsible for managing wallet connections, network configurations, and state persistence. It provides a framework-agnostic API that serves as the foundation for the React, Vue, SolidJS, and Svelte adapters.
 
 ### Constructor
 
@@ -323,6 +323,11 @@ function App() {
     </WalletProvider>
   )
 }
+
+// Svelte
+import { useWalletContext } from '@txnlab/use-wallet-svelte'
+
+useWalletContext(manager)
 ```
 
 See these guides for more information:
@@ -330,5 +335,6 @@ See these guides for more information:
 * [React Integration](../framework/react.md)
 * [Vue Integration](../framework/vue.md)
 * [SolidJS Integration](../framework/solidjs.md)
+* [Svelte Integration](../framework/svelte.md)
 
 The WalletManager's framework-agnostic design makes it possible to create adapters for other frameworks. Community contributions for additional framework adapters (e.g., Svelte, Angular) are welcome!

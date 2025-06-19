@@ -6,7 +6,7 @@ description: Easily integrate Algorand wallets in your dApps
 
 Use-wallet is a comprehensive wallet management solution for Algorand/AVM dApps. It reduces the complexity of wallet integrations, letting developers focus on core application logic.
 
-The library is framework-agnostic and can be used in any modern front-end stack, with official adapters for [React](framework/react.md), [Vue](framework/vue.md), and [SolidJS](framework/solidjs.md).
+The library is framework-agnostic and can be used in any modern front-end stack, with official adapters for [React](framework/react.md), [Vue](framework/vue.md), and [SolidJS](framework/solidjs.md), and [Svelte](framework/svelte.md).
 
 Version 4.x introduces several major improvements:
 

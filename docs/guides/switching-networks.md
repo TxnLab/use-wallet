@@ -78,15 +78,15 @@ function NetworkSwitch() {
 {% endtab %}
 
 {% tab title="Vue" %}
-```typescript
+```vue
 <script setup lang="ts">
-import { useNetwork } from '@txnlab/use-wallet-vue'
+  import { useNetwork } from '@txnlab/use-wallet-vue'
 
-const {
-  activeNetwork,
-  setActiveNetwork,
-  networkConfig
-} = useNetwork()
+  const {
+    activeNetwork,
+    setActiveNetwork,
+    networkConfig
+  } = useNetwork()
 </script>
 
 <template>
@@ -132,6 +132,31 @@ function NetworkSwitch() {
 }
 ```
 {% endtab %}
+
+{% tab title="Svelte" %}
+```sv
+<script lang="ts">
+  import { useNetwork } from '@txnlab/use-wallet-svelte'
+
+  const {
+    activeNetwork,
+    setActiveNetwork,
+    networkConfig
+  } = useNetwork()
+</script>
+
+<select
+  value={activeNetwork()}
+  onchange={(e) => setActiveNetwork((e.target as HTMLSelectElement).value)}
+>
+  {#each Object.entries(networkConfig) as [id, network]}
+    <option>
+      {id}
+    </option>
+  {/each}
+</select>
+```
+{% endtab %}
 {% endtabs %}
 
 ### Network Status
@@ -152,15 +177,15 @@ const genesisId = activeNetworkConfig.genesisId
 {% endtab %}
 
 {% tab title="Vue" %}
-```typescript
+```vue
 <script setup lang="ts">
-const { activeNetworkConfig } = useNetwork()
+  const { activeNetworkConfig } = useNetwork()
 
-// Check if we're on a test network
-const isTestnet = computed(() => activeNetworkConfig.value.isTestnet)
+  // Check if we're on a test network
+  const isTestnet = computed(() => activeNetworkConfig.value.isTestnet)
 
-// Get genesis ID
-const genesisId = computed(() => activeNetworkConfig.value.genesisId)
+  // Get genesis ID
+  const genesisId = computed(() => activeNetworkConfig.value.genesisId)
 </script>
 ```
 {% endtab %}
@@ -174,6 +199,20 @@ const isTestnet = () => activeNetworkConfig().isTestnet
 
 // Get genesis ID
 const genesisId = () => activeNetworkConfig().genesisId
+```
+{% endtab %}
+
+{% tab title="Svelte" %}
+```sv
+<script lang="ts">
+  const { activeNetworkConfig } = useNetwork()
+
+  // Check if we're on a test network
+  const isTestnet = $derived(activeNetworkConfig.value.isTestnet)
+
+  // Get genesis ID
+  const genesisId = $derived(activeNetworkConfig.value.genesisId)
+</script>
 ```
 {% endtab %}
 {% endtabs %}

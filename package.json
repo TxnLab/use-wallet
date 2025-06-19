@@ -22,10 +22,13 @@
     "example:solid": "pnpm --filter \"./examples/solid-ts\" dev",
     "example:vue": "pnpm --filter \"./examples/vue-ts\" dev",
     "example:nextjs": "pnpm --filter \"./examples/nextjs\" dev",
-    "example:nuxt": "pnpm --filter \"./examples/nuxt\" dev"
+    "example:nuxt": "pnpm --filter \"./examples/nuxt\" dev",
+    "example:svelte": "pnpm --filter \"./examples/svelte-ts\" dev"
   },
   "devDependencies": {
     "@playwright/test": "1.51.1",
+    "@sveltejs/kit": "^2.16.0",
+    "@sveltejs/vite-plugin-svelte": "^5.0.0",
     "@testing-library/jest-dom": "6.6.3",
     "@testing-library/react": "16.2.0",
     "@types/node": "20.11.30",

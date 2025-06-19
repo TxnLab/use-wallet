@@ -12,6 +12,7 @@
 * [React](framework/react.md)
 * [Vue](framework/vue.md)
 * [SolidJS](framework/solidjs.md)
+* [Svelte](framework/svelte.md)
 
 ## Guides & Concepts <a href="#guides" id="guides"></a>
 

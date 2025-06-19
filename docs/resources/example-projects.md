@@ -74,6 +74,22 @@ The Solid example illustrates:
 * TypeScript configuration for Solid
 * Advanced features like runtime node configuration
 
+#### **Vite (Svelte)**
+
+```bash
+git clone https://github.com/TxnLab/use-wallet
+cd use-wallet/examples/svelte-ts
+pnpm install
+pnpm dev
+```
+
+The Svelte example showcases:
+
+* Svelte primitives and patterns
+* Integration with Svelte's reactivity system
+* TypeScript support in Svelte components
+* Advanced features like runtime node configuration
+
 #### **Vite (Vanilla TypeScript)**
 
 ```bash
