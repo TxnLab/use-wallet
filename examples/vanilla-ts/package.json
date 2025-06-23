@@ -12,7 +12,8 @@
   "devDependencies": {
     "@walletconnect/types": "2.19.2",
     "typescript": "5.8.2",
-    "vite": "6.2.3"
+    "vite": "6.2.3",
+    "vite-plugin-node-polyfills": "^0.23.0"
   },
   "dependencies": {
     "@algorandfoundation/liquid-auth-use-wallet-client": "^1.4.0-canary.1",

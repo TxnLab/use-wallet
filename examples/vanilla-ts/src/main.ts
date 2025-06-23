@@ -1,5 +1,5 @@
 import './style.css'
-import typescriptLogo from './typescript.svg'
+import typescriptLogo from '/typescript.svg'
 import viteLogo from '/vite.svg'
 import { NetworkId, WalletId, WalletManager } from '@txnlab/use-wallet'
 import { ActiveNetwork } from './ActiveNetwork'

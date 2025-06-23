@@ -40,6 +40,7 @@
     "eslint-plugin-prettier": "5.2.5",
     "prettier": "3.5.3",
     "vite": "6.2.3",
+    "vite-plugin-node-polyfills": "^0.23.0",
     "vite-plugin-solid": "^2.11.1",
     "vitest": "3.0.9",
     "vue-demi": "0.14.10"

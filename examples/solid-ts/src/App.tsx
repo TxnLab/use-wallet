@@ -1,7 +1,7 @@
 import { NetworkId, WalletId, WalletManager, WalletProvider } from '@txnlab/use-wallet-solid'
 import { Connect } from './Connect'
 import { NetworkControls } from './NetworkControls'
-import solidLogo from './assets/solid.svg'
+import solidLogo from '/solid.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 
