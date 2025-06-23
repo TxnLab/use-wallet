@@ -1,22 +1,21 @@
 <script lang="ts">
   import * as ed from '@noble/ed25519'
   import {
-    BaseWallet,
     ScopeType,
     SignDataError,
     useWallet,
     WalletId,
-    type Siwa
+    type Siwa,
+    type Wallet
   } from '@txnlab/use-wallet-svelte'
   import algosdk from 'algosdk'
   import { canonify } from 'canonify'
 
   const props = $props()
-  const { activeAddress, algodClient, isWalletActive, isWalletConnected, transactionSigner } =
-    useWallet()
-  const wallet: BaseWallet = props.wallet
+  const { activeAddress, algodClient, signData, transactionSigner } = useWallet()
+  const wallet: Wallet = props.wallet
 
-  const setActiveAccount = (event: Event, wallet: BaseWallet) => {
+  const setActiveAccount = (event: Event, wallet: Wallet) => {
     const target = event.target as HTMLSelectElement
     wallet.setActiveAccount(target.value)
   }
@@ -24,19 +23,19 @@
   let magicEmail = $state('')
   const isMagicLink = () => wallet.id === WalletId.MAGIC
   const isEmailValid = () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(magicEmail)
-  const isConnectDisabled = () => isWalletConnected(wallet.id) || (isMagicLink() && !isEmailValid())
+  const isConnectDisabled = () => wallet.isConnected() || (isMagicLink() && !isEmailValid())
   const getConnectArgs = () => (isMagicLink() ? { email: magicEmail } : undefined)
 
   let isSending = $state(false)
   async function sendTransaction() {
     try {
-      const sender = activeAddress()
+      const sender = activeAddress.current
       if (!sender) {
         throw new Error('[App] No active account')
       }
 
       const atc = new algosdk.AtomicTransactionComposer()
-      const suggestedParams = await algodClient().getTransactionParams().do()
+      const suggestedParams = await algodClient.current.getTransactionParams().do()
 
       const transaction = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
         sender: sender,
@@ -51,7 +50,7 @@
 
       isSending = true
 
-      const result = await atc.execute(algodClient(), 4)
+      const result = await atc.execute(algodClient.current, 4)
 
       console.info(`[App] ✅ Successfully sent transaction!`, {
         confirmedRound: result.confirmedRound,
@@ -64,7 +63,7 @@
     }
   }
   async function auth() {
-    const activeAddr = activeAddress()
+    const activeAddr = activeAddress.current
     if (!activeAddr) {
       throw new Error('[App] No active account')
     }
@@ -82,7 +81,7 @@
       if (!dataString) throw Error('Invalid JSON')
       const data = btoa(dataString)
       const metadata = { scope: ScopeType.AUTH, encoding: 'base64' }
-      const resp = await wallet.signData(data, metadata)
+      const resp = await signData(data, metadata)
       // verify signature
       const enc = new TextEncoder()
       const clientDataJsonHash = await crypto.subtle.digest('SHA-256', enc.encode(dataString))
@@ -104,20 +103,15 @@
 <div class="wallet-group">
   <h4>
     {wallet.metadata.name}
-    {#if isWalletActive(wallet.id)}<span>[active]</span>{/if}
+    {#if wallet.isActive()}<span>[active]</span>{/if}
   </h4>
   <div class="wallet-buttons">
     <button onclick={() => wallet.connect(getConnectArgs())} disabled={isConnectDisabled()}>
       Connect
     </button>
-    <button onclick={wallet.disconnect} disabled={!isWalletConnected(wallet.id)}>
-      Disconnect
-    </button>
-    {#if !isWalletActive(wallet.id)}
-      <button
-        onclick={wallet.setActive}
-        disabled={!isWalletConnected(wallet.id) || isWalletActive(wallet.id)}
-      >
+    <button onclick={wallet.disconnect} disabled={!wallet.isConnected()}> Disconnect </button>
+    {#if !wallet.isActive()}
+      <button onclick={wallet.setActive} disabled={!wallet.isConnected() || wallet.isActive()}>
         Set Active
       </button>
     {:else}
@@ -137,14 +131,14 @@
         type="email"
         bind:value={magicEmail}
         placeholder="Enter email to connect..."
-        disabled={isWalletConnected(wallet.id)}
+        disabled={wallet.isConnected()}
       />
     </div>
   {/if}
-  {#if isWalletActive(wallet.id) && wallet.accounts.length}
+  {#if wallet.isActive() && wallet.accounts.current?.length}
     <div>
-      <select value={activeAddress()} onchange={(event) => setActiveAccount(event, wallet)}>
-        {#each wallet.accounts as account}
+      <select value={activeAddress.current} onchange={(event) => setActiveAccount(event, wallet)}>
+        {#each wallet.accounts.current as account}
           <option>
             {account.address}
           </option>

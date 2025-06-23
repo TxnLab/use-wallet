@@ -52,7 +52,7 @@ The `useWallet` primitive provides access to wallet management features. Here's 
   import { useWallet } from '@txnlab/use-wallet-svelte'
   const { 
     wallets,             // List of available wallets
-    activeWallet,        // Currently active wallet
+    activeWallet,        // Currently active wallet (function)
     activeAccount,       // Active account in active wallet
     activeAddress,       // Address of active account
     isReady,             // Whether all wallet providers have finished initialization
@@ -63,8 +63,8 @@ The `useWallet` primitive provides access to wallet management features. Here's 
 </script>
 
 {#if isReady()}
-  {#if activeAddress()}
-    <div>Connected: {activeAddress()}</div>
+  {#if activeAddress.current}
+    <div>Connected: {activeAddress.current}</div>
   {:else}
     <div>Not connected</div>
   {/if}
@@ -101,7 +101,7 @@ The `useNetwork` primitive serves two primary functions: managing the active net
 <div>
   <!-- Example: Network selector dropdown -->
   <select
-    value={activeNetwork()}
+    value={activeNetwork.current}
     onchange={(e) => setActiveNetwork(e.currentTarget.value)}
   >
     {#each Object.keys(networkConfig()) as networkId}

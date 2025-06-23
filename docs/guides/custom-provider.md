@@ -418,9 +418,9 @@ function WalletConnect() {
 </script>
 
 <div>
-  {#if activeAccount()}
+  {#if activeAccount.current}
     <div>
-      Connected: {{ activeAccount.address }}
+      Connected: {{ activeAccount.current.address }}
     </div>
   {:else}
     <div>

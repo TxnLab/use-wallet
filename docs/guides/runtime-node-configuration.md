@@ -489,8 +489,8 @@ function NodeConfigForm() {
   } = useNetwork()
 
   const formData = $state({
-    baseServer: activeNetworkConfig().algod.baseServer,
-    port: activeNetworkConfig().algod.port || '',
+    baseServer: activeNetworkConfig.current.algod.baseServer,
+    port: activeNetworkConfig.current.algod.port || '',
     token: ''
   })
 
@@ -501,7 +501,7 @@ function NodeConfigForm() {
     error = ''
 
     try {
-      await updateAlgodConfig(activeNetwork(), {
+      await updateAlgodConfig(activeNetwork.current, {
         baseServer: formData.baseServer,
         port: formData.port || undefined,
         token: formData.token || ''
@@ -513,7 +513,7 @@ function NodeConfigForm() {
 </script>
 
 <form @submit="handleSubmit">
-  <h3>Configure {activeNetwork()} Node</h3>
+  <h3>Configure {activeNetwork.current} Node</h3>
   
   <div>
     <label>Server URL:</label>
@@ -552,7 +552,7 @@ function NodeConfigForm() {
     <button type="submit">
       Update Node
     </button>
-    <button type="button" onclick={() => resetNetworkConfig(activeNetwork())}>
+    <button type="button" onclick={() => resetNetworkConfig(activeNetwork.current)}>
       Reset to Default
     </button>
   </div>

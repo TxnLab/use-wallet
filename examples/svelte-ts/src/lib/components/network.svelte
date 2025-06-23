@@ -5,11 +5,14 @@
 
 <div class="network-group">
   <h4>
-    Current Network: <span class="active-network">{activeNetwork()}</span>
+    Current Network: <span class="active-network">{activeNetwork.current}</span>
   </h4>
   <div class="network-buttons">
     {#each Object.values(NetworkId) as network}
-      <button onclick={() => setActiveNetwork(network)} disabled={network === activeNetwork()}>
+      <button
+        onclick={() => setActiveNetwork(network)}
+        disabled={network === activeNetwork.current}
+      >
         Switch to {network}
       </button>
     {/each}

@@ -87,12 +87,12 @@ function WalletStatus() {
   const { activeNetwork } = useNetwork()
 </script>
 
-{#if !activeAccount()}
+{#if !activeAccount.current}
   <div>No wallet connected</div>
 {:else}
   <div>
-    <div>Account: {activeAccount().name}</div>
-    <div>Network: {activeNetwork()}</div>
+    <div>Account: {activeAccount.current.name}</div>
+    <div>Network: {activeNetwork.current}</div>
   </div>
 {/if}
 ```
@@ -274,7 +274,7 @@ function Component() {
 {% endtab %}
 
 {% tab title="Svelte" %}
-Svelte provides state through a getter functions:
+Svelte provides state through a getter functions and reactive objects that can be unwrapped with `.current`:
 
 ```sv
 <script lang="ts">
@@ -282,9 +282,9 @@ Svelte provides state through a getter functions:
   const { activeAccount } = useWallet()
 </script>
 
-{#if activeAccount()}
+{#if activeAccount.current}
   <div>
-    <p>Connected to {activeAccount().name}</p>
+    <p>Connected to {activeAccount.current.name}</p>
   </div>
 {/if}
 ```
@@ -530,11 +530,11 @@ function WalletComponent() {
 </script>
 
 <div>
-  {#if !activeAccount()}
+  {#if !activeAccount.current}
     <button onclick={handleConnect}>Connect Wallet</button>
   {:else}
-    <p>Connected to {activeAccount().name}</p>
-    <p>Network: {activeNetwork()}</p>
+    <p>Connected to {activeAccount.current.name}</p>
+    <p>Network: {activeNetwork.current}</p>
     <button onclick={handleDisconnect}>Disconnect</button>
     <button onclick={handleSign}>Sign Transaction</button>
   {/if}

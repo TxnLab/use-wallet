@@ -146,7 +146,7 @@ function NetworkSwitch() {
 </script>
 
 <select
-  value={activeNetwork()}
+  value={activeNetwork.current}
   onchange={(e) => setActiveNetwork((e.target as HTMLSelectElement).value)}
 >
   {#each Object.entries(networkConfig) as [id, network]}
@@ -208,10 +208,10 @@ const genesisId = () => activeNetworkConfig().genesisId
   const { activeNetworkConfig } = useNetwork()
 
   // Check if we're on a test network
-  const isTestnet = $derived(activeNetworkConfig.value.isTestnet)
+  const isTestnet = $derived(activeNetworkConfig.current.isTestnet)
 
   // Get genesis ID
-  const genesisId = $derived(activeNetworkConfig.value.genesisId)
+  const genesisId = $derived(activeNetworkConfig.current.genesisId)
 </script>
 ```
 {% endtab %}

@@ -149,9 +149,9 @@ function NetworkComponent() {
   import { useNetwork } from '@txnlab/use-wallet-svelte'
 
   const {
-    activeNetwork,          // () => string
+    activeNetwork,          // { current: string }
     networkConfig,          // () => Record<string, NetworkConfig>
-    activeNetworkConfig,    // () => NetworkConfig
+    activeNetworkConfig,    // { current: NetworkConfig }
     setActiveNetwork,       // (networkId: string) => Promise<void>
     updateAlgodConfig,      // (networkId: string, config: Partial<AlgodConfig>) => void
     resetNetworkConfig      // (networkId: string) => void
@@ -159,8 +159,8 @@ function NetworkComponent() {
 </script>
 
 <div>
-  <div>Current network: {activeNetwork()}</div>
-  <div>Is testnet: {activeNetworkConfig().isTestnet ? 'Yes' : 'No'}</div>
+  <div>Current network: {activeNetwork.current}</div>
+  <div>Is testnet: {activeNetworkConfig.current.isTestnet ? 'Yes' : 'No'}</div>
 </div>
 ```
 {% endtab %}

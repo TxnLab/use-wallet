@@ -3,11 +3,14 @@ import algosdk from 'algosdk'
 import { getContext, setContext } from 'svelte'
 import {
   type AlgodConfig,
+  BaseWallet,
   NetworkId,
   type SignDataResponse,
   type SignMetadata,
+  WalletAccount,
   WalletId,
-  WalletManager
+  WalletManager,
+  WalletMetadata
 } from '@txnlab/use-wallet'
 
 export * from '@txnlab/use-wallet'
@@ -30,13 +33,14 @@ export const useWalletManager = (): WalletManager => {
 
 export const useNetwork = () => {
   const manager = useWalletManager()
-  const activeNetworkObj = useStore(manager.store, (state) => state.activeNetwork)
-  const activeNetwork = () => activeNetworkObj.current
-  const networkConfigObj = useStore(manager.store, (state) => state.networkConfig)
-  const activeNetworkConfig = () => networkConfigObj.current[activeNetwork()]
+  const activeNetwork = useStore(manager.store, (state) => state.activeNetwork)
+  const activeNetworkConfig = useStore(
+    manager.store,
+    (state) => state.networkConfig[activeNetwork.current]
+  )
 
   const setActiveNetwork = async (networkId: NetworkId | string): Promise<void> => {
-    if (networkId === activeNetwork()) {
+    if (networkId === activeNetwork.current) {
       return
     }
 
@@ -65,7 +69,7 @@ export const useNetwork = () => {
     manager.updateAlgodConfig(networkId, config)
 
     // If this is the active network, update the algodClient
-    if (networkId === activeNetwork()) {
+    if (networkId === activeNetwork.current) {
       console.info(`[Svelte] Creating new Algodv2 client...`)
       const { algod } = manager.networkConfig[networkId]
       const { token = '', baseServer, port = '', headers = {} } = algod
@@ -82,7 +86,7 @@ export const useNetwork = () => {
     manager.resetNetworkConfig(networkId)
 
     // If this is the active network, update the algodClient
-    if (networkId === activeNetwork()) {
+    if (networkId === activeNetwork.current) {
       console.info(`[Svelte] Creating new Algodv2 client...`)
       const { algod } = manager.networkConfig[networkId]
       const { token = '', baseServer, port = '', headers = {} } = algod
@@ -97,7 +101,7 @@ export const useNetwork = () => {
 
   return {
     activeNetwork,
-    networkConfig: () => manager.networkConfig,
+    networkConfig: manager.networkConfig,
     activeNetworkConfig,
     setActiveNetwork,
     updateAlgodConfig,
@@ -105,32 +109,66 @@ export const useNetwork = () => {
   }
 }
 
+export interface Wallet {
+  id: WalletId
+  metadata: WalletMetadata
+  accounts: { current: WalletAccount[] | undefined }
+  isConnected: () => boolean
+  isActive: () => boolean
+  canSignData: boolean
+  connect: (args?: Record<string, any>) => Promise<WalletAccount[]>
+  disconnect: () => Promise<void>
+  setActive: () => void
+  setActiveAccount: (address: string) => void
+}
+
 export const useWallet = () => {
   const manager = useWalletManager()
-
-  const managerStatusObj = useStore(manager.store, (state) => state.managerStatus)
-  const managerStatus = () => managerStatusObj.current
-  const isReady = () => managerStatus() === 'ready'
-  const algodClient = () => manager.algodClient
   const walletStore = useStore(manager.store, (state) => state.wallets)
-  const walletState = (walletId: WalletId) => walletStore.current[walletId] || null
+
+  const transformToWallet = (wallet: BaseWallet): Wallet => {
+    return {
+      id: wallet.id,
+      metadata: wallet.metadata,
+      accounts: useStore(manager.store, (state) => state.wallets[wallet.id]?.accounts),
+      isConnected: () => !!walletStore.current[wallet.id],
+      isActive: () => wallet.id === activeWalletId.current,
+      canSignData: wallet.canSignData ?? false,
+      connect: (args) => wallet.connect(args),
+      disconnect: () => wallet.disconnect(),
+      setActive: () => wallet.setActive(),
+      setActiveAccount: (addr) => wallet.setActiveAccount(addr)
+    }
+  }
+
+  const wallets = [...manager.wallets].map(transformToWallet)
   const activeWalletId = useStore(manager.store, (state) => state.activeWallet)
-  const activeWallet = () => manager.getWallet(activeWalletId.current as WalletId) || null
-  const activeWalletState = () => walletState(activeWalletId.current as WalletId)
-  const activeWalletAccounts = () => activeWalletState()?.accounts ?? null
-  const activeWalletAddresses = () =>
-    activeWalletAccounts()?.map((account) => account.address) ?? null
-  const activeAccount = () => activeWalletState()?.activeAccount ?? null
-  const activeAddress = () => activeAccount()?.address ?? null
-  const isWalletActive = (walletId: WalletId) => walletId === activeWalletId.current
-  const isWalletConnected = (walletId: WalletId) =>
-    !!walletState(walletId)?.accounts.length || false
+  const managerStatus = useStore(manager.store, (state) => state.managerStatus)
+  const isReady = () => managerStatus.current === 'ready'
+  const algodClient = useStore(manager.store, (state) => state.algodClient)
+  const activeBaseWallet = manager.wallets.find((w) => w.id === activeWalletId.current)
+  const activeWallet = () => wallets.find((w) => w.id === activeWalletId.current)
+  const activeWalletAccounts = useStore(
+    manager.store,
+    (state) => state.wallets[activeWalletId.current!]?.accounts
+  )
+  const activeWalletAddresses = useStore(manager.store, (state) =>
+    state.wallets[activeWalletId.current!]?.accounts.map((account) => account.address)
+  )
+  const activeAccount = useStore(
+    manager.store,
+    (state) => state.wallets[activeWalletId.current!]?.activeAccount
+  )
+  const activeAddress = useStore(
+    manager.store,
+    (state) => state.wallets[activeWalletId.current!]?.activeAccount?.address
+  )
 
   const signTransactions = <T extends algosdk.Transaction[] | Uint8Array[]>(
     txnGroup: T | T[],
     indexesToSign?: number[]
   ): Promise<(Uint8Array | null)[]> => {
-    const wallet = activeWallet()
+    const wallet = activeBaseWallet
     if (!wallet) {
       throw new Error('No active wallet')
     }
@@ -141,7 +179,7 @@ export const useWallet = () => {
     txnGroup: algosdk.Transaction[],
     indexesToSign: number[]
   ): Promise<Uint8Array[]> => {
-    const wallet = activeWallet()
+    const wallet = activeBaseWallet
     if (!wallet) {
       throw new Error('No active wallet')
     }
@@ -149,7 +187,7 @@ export const useWallet = () => {
   }
 
   const signData = (data: string, metadata: SignMetadata): Promise<SignDataResponse> => {
-    const wallet = activeWallet()
+    const wallet = activeBaseWallet
     if (!wallet) {
       throw new Error('No active wallet')
     }
@@ -157,7 +195,7 @@ export const useWallet = () => {
   }
 
   return {
-    wallets: manager.wallets,
+    wallets,
     isReady,
     algodClient,
     activeWallet,
@@ -165,8 +203,6 @@ export const useWallet = () => {
     activeWalletAddresses,
     activeAccount,
     activeAddress,
-    isWalletActive,
-    isWalletConnected,
     signData,
     signTransactions,
     transactionSigner

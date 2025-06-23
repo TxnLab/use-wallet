@@ -181,14 +181,14 @@ function SendTransaction() {
   } = useWallet()
 
   const handleSend = async () => {
-    if (!activeAddress()) return
+    if (!activeAddress.current) return
 
     try {
       // Create transaction
-      const suggestedParams = await algodClient().getTransactionParams().do()
+      const suggestedParams = await algodClient.current.getTransactionParams().do()
       const transaction = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
-        sender: activeAddress(),
-        receiver: activeAddress(),
+        sender: activeAddress.current,
+        receiver: activeAddress.current,
         amount: 0,
         suggestedParams
       })
@@ -197,10 +197,10 @@ function SendTransaction() {
       const signedTxns = await signTransactions([transaction])
 
       // Send transaction
-      const { txid } = await algodClient().sendRawTransaction(signedTxns).do()
+      const { txid } = await algodClient.current.sendRawTransaction(signedTxns).do()
       
       // Wait for confirmation
-      const result = await algosdk.waitForConfirmation(algodClient(), txid, 4)
+      const result = await algosdk.waitForConfirmation(algodClient.current, txid, 4)
       console.log(`Transaction confirmed at round ${result['confirmed-round']}`)
     } catch (error) {
       console.error('Error:', error)
@@ -422,19 +422,19 @@ function CallContractAtc() {
   } = useWallet()
 
   const handleCall = async () => {
-    if (!activeAddress()) return
+    if (!activeAddress.current) return
 
     try {
       // Create ATC instance
       const atc = new algosdk.AtomicTransactionComposer()
       
       // Get suggested params
-      const suggestedParams = await algodClient().getTransactionParams().do()
+      const suggestedParams = await algodClient.current.getTransactionParams().do()
       
       // Add ABI method call
       const method = algosdk.ABIMethod.fromSignature('hello(string)string')
       atc.addMethodCall({
-        sender: activeAddress(),
+        sender: activeAddress.current,
         signer: transactionSigner,
         appID: 123,
         method,
@@ -444,15 +444,15 @@ function CallContractAtc() {
 
       // Add payment transaction
       const paymentTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
-        sender: activeAddress(),
-        receiver: activeAddress(),
+        sender: activeAddress.current,
+        receiver: activeAddress.current,
         amount: 1000,
         suggestedParams,
       })
       atc.addTransaction({ txn: paymentTxn, signer: transactionSigner })
 
       // Execute transaction group
-      const result = await atc.execute(algodClient(), 4)
+      const result = await atc.execute(algodClient.current, 4)
       console.log('Transaction confirmed:', result.txIDs[0])
       
       // Get return value from ABI method
@@ -517,8 +517,8 @@ function CallContractAlgoKit() {
         // Add payment transaction
         .addTransaction(
           algorand.createTransaction.payment({
-            sender: activeAddress(),
-            receiver: activeAddress(),
+            sender: activeAddress,
+            receiver: activeAddress,
             amount: (1000).microAlgo()
           })
         )
@@ -573,8 +573,8 @@ function CallContractAlgoKit() {
         // Add payment transaction
         .addTransaction(
           algorand.createTransaction.payment({
-            sender: activeAddress(),
-            receiver: activeAddress(),
+            sender: activeAddress.value,
+            receiver: activeAddress.value,
             amount: (1000).microAlgo()
           })
         )
@@ -664,13 +664,13 @@ function CallContractAlgoKit() {
   } = useWallet()
 
   const handleCall = async () => {
-    if (!activeAddress()) return
+    if (!activeAddress.current) return
 
     try {
       // Initialize AlgorandClient with algodClient and signer from use-wallet
       const algorand = AlgorandClient
-        .fromClients({ algod: algodClient() })
-        .setSigner(activeAddress(), transactionSigner)
+        .fromClients({ algod: algodClient.current })
+        .setSigner(activeAddress.current, transactionSigner)
 
       // Get typed app client instance
       const client = algorand.client.getTypedAppClientById(HelloWorldClient, {
@@ -685,8 +685,8 @@ function CallContractAlgoKit() {
         // Add payment transaction
         .addTransaction(
           algorand.createTransaction.payment({
-            sender: activeAddress(),
-            receiver: activeAddress(),
+            sender: activeAddress.current,
+            receiver: activeAddress.current,
             amount: (1000).microAlgo()
           })
         )

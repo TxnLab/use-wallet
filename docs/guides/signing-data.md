@@ -234,11 +234,11 @@ function Authenticate() {
 
   const handleAuth = async () => {
     try {
-      if (!activeAddress.value) {
+      if (!activeAddress.current) {
         throw new Error('No active account')
       }
       
-      if (!activeWallet?.canSignData) {
+      if (!activeWallet()?.canSignData) {
         throw new Error('Current wallet does not support data signing')
       }
 
@@ -246,7 +246,7 @@ function Authenticate() {
       const siwaRequest = {
         domain: location.host,
         chain_id: '283',
-        account_address: activeAddress.value,
+        account_address: activeAddress.current,
         type: 'ed25519',
         uri: location.origin,
         version: '1',
@@ -271,7 +271,7 @@ function Authenticate() {
       toSign.set(new Uint8Array(clientDataJsonHash), 0)
       toSign.set(new Uint8Array(authenticatorDataHash), 32)
       
-      const pubKey = algosdk.Address.fromString(activeAddress.value).publicKey
+      const pubKey = algosdk.Address.fromString(activeAddress.current).publicKey
       const isValid = await ed.verifyAsync(resp.signature, toSign, pubKey)
 
       if (!isValid) {
