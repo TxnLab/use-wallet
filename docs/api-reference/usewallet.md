@@ -565,7 +565,7 @@ function WalletComponent() {
 
 #### Svelte
 
-* State values are accessed via getter functions for reactivity
+* Uses Svelte's Context API for state management
 * Compatible with Svelte 5.x
 
 ### Error Handling
