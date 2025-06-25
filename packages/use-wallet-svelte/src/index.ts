@@ -146,7 +146,6 @@ export const useWallet = () => {
   const managerStatus = useStore(manager.store, (state) => state.managerStatus)
   const isReady = () => managerStatus.current === 'ready'
   const algodClient = useStore(manager.store, (state) => state.algodClient)
-  const activeBaseWallet = manager.wallets.find((w) => w.id === activeWalletId.current)
   const activeWallet = () => wallets.find((w) => w.id === activeWalletId.current)
   const activeWalletAccounts = useStore(
     manager.store,
@@ -168,7 +167,7 @@ export const useWallet = () => {
     txnGroup: T | T[],
     indexesToSign?: number[]
   ): Promise<(Uint8Array | null)[]> => {
-    const wallet = activeBaseWallet
+    const wallet = manager.wallets.find((w) => w.id === activeWalletId.current)
     if (!wallet) {
       throw new Error('No active wallet')
     }
@@ -179,7 +178,7 @@ export const useWallet = () => {
     txnGroup: algosdk.Transaction[],
     indexesToSign: number[]
   ): Promise<Uint8Array[]> => {
-    const wallet = activeBaseWallet
+    const wallet = manager.wallets.find((w) => w.id === activeWalletId.current)
     if (!wallet) {
       throw new Error('No active wallet')
     }
@@ -187,7 +186,7 @@ export const useWallet = () => {
   }
 
   const signData = (data: string, metadata: SignMetadata): Promise<SignDataResponse> => {
-    const wallet = activeBaseWallet
+    const wallet = manager.wallets.find((w) => w.id === activeWalletId.current)
     if (!wallet) {
       throw new Error('No active wallet')
     }
