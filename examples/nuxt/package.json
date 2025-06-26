@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@blockshake/defly-connect": "^1.2.1",
-    "@noble/ed25519": "^2.2.3",
+    "@noble/ed25519": "^2.3.0",
     "@perawallet/connect": "^1.4.1",
     "@txnlab/use-wallet": "workspace:*",
     "@txnlab/use-wallet-vue": "workspace:*",
@@ -22,13 +22,13 @@
     "algosdk": "3.2.0",
     "canonify": "^2.1.1",
     "lute-connect": "^1.6.1",
-    "nuxt": "3.16.1",
-    "vue": "3.5.13",
-    "vue-router": "4.5.0"
+    "nuxt": "3.17.5",
+    "vue": "3.5.17",
+    "vue-router": "4.5.1"
   },
   "devDependencies": {
     "@types/node": "20.11.30",
     "typescript": "5.8.2",
-    "vue-tsc": "2.2.8"
+    "vue-tsc": "2.2.10"
   }
 }

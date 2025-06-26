@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@blockshake/defly-connect": "^1.2.1",
-    "@noble/ed25519": "^2.2.3",
+    "@noble/ed25519": "^2.3.0",
     "@perawallet/connect": "^1.4.1",
     "@txnlab/use-wallet-svelte": "workspace:*",
     "@walletconnect/modal": "^2.7.0",
@@ -24,15 +24,15 @@
     "algosdk": "3.2.0",
     "canonify": "^2.1.1",
     "lute-connect": "^1.6.1",
-    "svelte": "5.34.3"
+    "svelte": "5.34.7"
   },
   "devDependencies": {
     "@sveltejs/adapter-auto": "^6.0.0",
-    "@sveltejs/kit": "^2.16.0",
+    "@sveltejs/kit": "^2.22.0",
     "@sveltejs/vite-plugin-svelte": "^5.0.0",
-    "svelte-check": "^4.0.0",
+    "svelte-check": "^4.2.1",
     "typescript": "5.8.2",
-    "vite": "6.2.3",
+    "vite": "6.3.5",
     "vite-plugin-node-polyfills": "^0.23.0"
   }
 }

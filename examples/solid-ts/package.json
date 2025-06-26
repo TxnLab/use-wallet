@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@blockshake/defly-connect": "^1.2.1",
-    "@noble/ed25519": "^2.2.3",
+    "@noble/ed25519": "^2.3.0",
     "@perawallet/connect": "^1.4.1",
     "@txnlab/use-wallet-solid": "workspace:*",
     "@walletconnect/modal": "^2.7.0",
@@ -20,11 +20,11 @@
     "algosdk": "3.2.0",
     "canonify": "^2.1.1",
     "lute-connect": "^1.6.1",
-    "solid-js": "1.9.5"
+    "solid-js": "1.9.7"
   },
   "devDependencies": {
     "typescript": "5.8.2",
-    "vite": "6.2.3",
+    "vite": "6.3.5",
     "vite-plugin-node-polyfills": "^0.23.0",
     "vite-plugin-solid": "2.11.6"
   }
