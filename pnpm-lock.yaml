@@ -76,13 +76,13 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.2.1
-        version: 1.2.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        version: 1.2.1(algosdk@3.3.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@noble/ed25519':
         specifier: ^2.3.0
         version: 2.3.0
       '@perawallet/connect':
         specifier: ^1.4.1
-        version: 1.4.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        version: 1.4.1(algosdk@3.3.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet-react':
         specifier: workspace:*
         version: link:../../packages/use-wallet-react
@@ -93,8 +93,8 @@ importers:
         specifier: ^2.19.2
         version: 2.19.2(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.4)
       algosdk:
-        specifier: 3.2.0
-        version: 3.2.0
+        specifier: 3.3.1
+        version: 3.3.1
       canonify:
         specifier: ^2.1.1
         version: 2.1.1
@@ -134,13 +134,13 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.2.1
-        version: 1.2.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        version: 1.2.1(algosdk@3.3.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@noble/ed25519':
         specifier: ^2.3.0
         version: 2.3.0
       '@perawallet/connect':
         specifier: ^1.4.1
-        version: 1.4.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        version: 1.4.1(algosdk@3.3.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../../packages/use-wallet
@@ -154,8 +154,8 @@ importers:
         specifier: ^2.19.2
         version: 2.19.2(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.4)
       algosdk:
-        specifier: 3.2.0
-        version: 3.2.0
+        specifier: 3.3.1
+        version: 3.3.1
       canonify:
         specifier: ^2.1.1
         version: 2.1.1
@@ -186,13 +186,13 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.2.1
-        version: 1.2.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        version: 1.2.1(algosdk@3.3.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@noble/ed25519':
         specifier: ^2.3.0
         version: 2.3.0
       '@perawallet/connect':
         specifier: ^1.4.1
-        version: 1.4.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        version: 1.4.1(algosdk@3.3.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet-react':
         specifier: workspace:*
         version: link:../../packages/use-wallet-react
@@ -203,8 +203,8 @@ importers:
         specifier: ^2.19.2
         version: 2.19.2(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.4)
       algosdk:
-        specifier: 3.2.0
-        version: 3.2.0
+        specifier: 3.3.1
+        version: 3.3.1
       canonify:
         specifier: ^2.1.1
         version: 2.1.1
@@ -256,13 +256,13 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.2.1
-        version: 1.2.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        version: 1.2.1(algosdk@3.3.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@noble/ed25519':
         specifier: ^2.3.0
         version: 2.3.0
       '@perawallet/connect':
         specifier: ^1.4.1
-        version: 1.4.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        version: 1.4.1(algosdk@3.3.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet-solid':
         specifier: workspace:*
         version: link:../../packages/use-wallet-solid
@@ -273,8 +273,8 @@ importers:
         specifier: ^2.19.2
         version: 2.19.2(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.4)
       algosdk:
-        specifier: 3.2.0
-        version: 3.2.0
+        specifier: 3.3.1
+        version: 3.3.1
       canonify:
         specifier: ^2.1.1
         version: 2.1.1
@@ -302,13 +302,13 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.2.1
-        version: 1.2.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        version: 1.2.1(algosdk@3.3.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@noble/ed25519':
         specifier: ^2.3.0
         version: 2.3.0
       '@perawallet/connect':
         specifier: ^1.4.1
-        version: 1.4.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        version: 1.4.1(algosdk@3.3.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet-svelte':
         specifier: workspace:*
         version: link:../../packages/use-wallet-svelte
@@ -319,8 +319,8 @@ importers:
         specifier: ^2.19.2
         version: 2.19.2(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.4)
       algosdk:
-        specifier: 3.2.0
-        version: 3.2.0
+        specifier: 3.3.1
+        version: 3.3.1
       canonify:
         specifier: ^2.1.1
         version: 2.1.1
@@ -357,13 +357,13 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.2.1
-        version: 1.2.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        version: 1.2.1(algosdk@3.3.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@noble/ed25519':
         specifier: ^2.3.0
         version: 2.3.0
       '@perawallet/connect':
         specifier: ^1.4.1
-        version: 1.4.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        version: 1.4.1(algosdk@3.3.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../../packages/use-wallet
@@ -374,8 +374,8 @@ importers:
         specifier: ^2.19.2
         version: 2.19.2(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.4)
       algosdk:
-        specifier: 3.2.0
-        version: 3.2.0
+        specifier: 3.3.1
+        version: 3.3.1
       canonify:
         specifier: ^2.1.1
         version: 2.1.1
@@ -400,13 +400,13 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.2.1
-        version: 1.2.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        version: 1.2.1(algosdk@3.3.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@noble/ed25519':
         specifier: ^2.3.0
         version: 2.3.0
       '@perawallet/connect':
         specifier: ^1.4.1
-        version: 1.4.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        version: 1.4.1(algosdk@3.3.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@txnlab/use-wallet-vue':
         specifier: workspace:*
         version: link:../../packages/use-wallet-vue
@@ -417,8 +417,8 @@ importers:
         specifier: ^2.19.2
         version: 2.19.2(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.4)
       algosdk:
-        specifier: 3.2.0
-        version: 3.2.0
+        specifier: 3.3.1
+        version: 3.3.1
       canonify:
         specifier: ^2.1.1
         version: 2.1.1
@@ -456,7 +456,7 @@ importers:
         version: 1.7.0
       '@blockshake/defly-connect':
         specifier: 1.2.1
-        version: 1.2.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        version: 1.2.1(algosdk@3.3.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@magic-ext/algorand':
         specifier: 23.20.0
         version: 23.20.0
@@ -465,7 +465,7 @@ importers:
         version: 28.20.0(localforage@1.10.0)
       '@perawallet/connect':
         specifier: 1.4.1
-        version: 1.4.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        version: 1.4.1(algosdk@3.3.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@types/node':
         specifier: 20.11.30
         version: 20.11.30
@@ -482,8 +482,8 @@ importers:
         specifier: 2.19.2
         version: 2.19.2(db0@0.3.2)(ioredis@5.6.1)
       algosdk:
-        specifier: 3.2.0
-        version: 3.2.0
+        specifier: 3.3.1
+        version: 3.3.1
       canonify:
         specifier: ^2.1.1
         version: 2.1.1
@@ -504,13 +504,13 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.2.1
-        version: 1.2.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        version: 1.2.1(algosdk@3.3.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@magic-ext/algorand':
         specifier: ^23.20.0
         version: 23.20.0
       '@perawallet/connect':
         specifier: ^1.4.1
-        version: 1.4.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        version: 1.4.1(algosdk@3.3.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@tanstack/react-store':
         specifier: 0.7.1
         version: 0.7.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -534,8 +534,8 @@ importers:
         specifier: 18.3.23
         version: 18.3.23
       algosdk:
-        specifier: 3.2.0
-        version: 3.2.0
+        specifier: 3.3.1
+        version: 3.3.1
       jsdom:
         specifier: 26.1.0
         version: 26.1.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -556,13 +556,13 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.2.1
-        version: 1.2.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        version: 1.2.1(algosdk@3.3.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@magic-ext/algorand':
         specifier: ^23.20.0
         version: 23.20.0
       '@perawallet/connect':
         specifier: ^1.4.1
-        version: 1.4.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        version: 1.4.1(algosdk@3.3.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@tanstack/solid-store':
         specifier: 0.7.1
         version: 0.7.1(solid-js@1.9.7)
@@ -586,8 +586,8 @@ importers:
         specifier: 0.8.10
         version: 0.8.10(solid-js@1.9.7)
       algosdk:
-        specifier: 3.2.0
-        version: 3.2.0
+        specifier: 3.3.1
+        version: 3.3.1
       solid-js:
         specifier: 1.9.7
         version: 1.9.7
@@ -605,13 +605,13 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.2.1
-        version: 1.2.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        version: 1.2.1(algosdk@3.3.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@magic-ext/algorand':
         specifier: ^23.20.0
         version: 23.20.0
       '@perawallet/connect':
         specifier: ^1.4.1
-        version: 1.4.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        version: 1.4.1(algosdk@3.3.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@tanstack/svelte-store':
         specifier: 0.7.1
         version: 0.7.1(svelte@5.34.7)
@@ -635,8 +635,8 @@ importers:
         specifier: ^5.2.8
         version: 5.2.8(svelte@5.34.7)(vite@6.3.5(@types/node@22.15.3)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.1))(vitest@3.2.4(@types/node@22.15.3)(jiti@2.4.2)(jsdom@26.1.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(terser@5.39.0)(yaml@2.7.1))
       algosdk:
-        specifier: 3.2.0
-        version: 3.2.0
+        specifier: 3.3.1
+        version: 3.3.1
       svelte:
         specifier: 5.34.7
         version: 5.34.7
@@ -651,13 +651,13 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.2.1
-        version: 1.2.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        version: 1.2.1(algosdk@3.3.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@magic-ext/algorand':
         specifier: ^23.20.0
         version: 23.20.0
       '@perawallet/connect':
         specifier: ^1.4.1
-        version: 1.4.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        version: 1.4.1(algosdk@3.3.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@tanstack/vue-store':
         specifier: 0.7.1
         version: 0.7.1(vue@3.5.17(typescript@5.8.2))
@@ -678,8 +678,8 @@ importers:
         version: 28.21.1
     devDependencies:
       algosdk:
-        specifier: 3.2.0
-        version: 3.2.0
+        specifier: 3.3.1
+        version: 3.3.1
       tsup:
         specifier: 8.5.0
         version: 8.5.0(jiti@2.4.2)(postcss@8.5.6)(typescript@5.8.2)(yaml@2.7.1)
@@ -2895,8 +2895,8 @@ packages:
     resolution: {integrity: sha512-08k7pBQnkaUB5p+jL7f1TRaUIlTSDE0cesFu1mD7llLao+1cAhtvvZmGE3OnisTd0xOn118QMw74SRqddqaYvw==}
     engines: {node: '>= 14'}
 
-  algosdk@3.2.0:
-    resolution: {integrity: sha512-iz7cRtv03vuYgQYp2IfLs+n512dxdjpalALZNiiFvreM7/oPmflfLkfD5dph/HUQwuJTomXx51LgiY19QP5ihg==}
+  algosdk@3.3.1:
+    resolution: {integrity: sha512-HhECqY3SIqXTl7qNS7pFR+raOU7OPaJlTQBB8JWPA4F2N2OmUHYu9IDHeN+nu6Sb2uDlFJVB/tWYSc17zCNUoQ==}
     engines: {node: '>=18.0.0'}
 
   alien-signals@1.0.13:
@@ -8018,12 +8018,12 @@ snapshots:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.27.1
 
-  '@blockshake/defly-connect@1.2.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
+  '@blockshake/defly-connect@1.2.1(algosdk@3.3.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
     dependencies:
       '@likecoin/qr-code-styling': 1.6.6
       '@walletconnect/client': 1.8.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@walletconnect/types': 1.8.0
-      algosdk: 3.2.0
+      algosdk: 3.3.1
       bowser: 2.11.0
       buffer: 6.0.3
       lottie-web: 5.12.2
@@ -8969,12 +8969,12 @@ snapshots:
       '@parcel/watcher-win32-ia32': 2.5.1
       '@parcel/watcher-win32-x64': 2.5.1
 
-  '@perawallet/connect@1.4.1(algosdk@3.2.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
+  '@perawallet/connect@1.4.1(algosdk@3.3.1)(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
     dependencies:
       '@evanhahn/lottie-web-light': 5.8.1
       '@walletconnect/client': 1.8.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@walletconnect/types': 1.8.0
-      algosdk: 3.2.0
+      algosdk: 3.3.1
       bowser: 2.11.0
       buffer: 6.0.3
       qr-code-styling: 1.6.0-rc.1
@@ -10370,7 +10370,7 @@ snapshots:
 
   algorand-msgpack@1.1.0: {}
 
-  algosdk@3.2.0:
+  algosdk@3.3.1:
     dependencies:
       algorand-msgpack: 1.1.0
       hi-base32: 0.5.1
