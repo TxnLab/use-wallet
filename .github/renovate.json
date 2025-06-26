@@ -61,14 +61,14 @@
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": ["^package\\.json$"],
+      "managerFilePatterns": ["/^package\\.json$/"],
       "matchStrings": ["\"packageManager\":\\s*\"pnpm@(?<currentValue>\\d+\\.\\d+\\.\\d+)\""],
       "depNameTemplate": "pnpm",
       "datasourceTemplate": "npm"
     },
     {
       "customType": "regex",
-      "fileMatch": ["^\\.github/workflows/[^/]+\\.ya?ml$"],
+      "managerFilePatterns": ["/^\\.github/workflows/[^/]+\\.ya?ml$/"],
       "matchStrings": ["\\s+version:\\s*(?<currentValue>\\d+\\.\\d+\\.\\d+)"],
       "depNameTemplate": "pnpm",
       "datasourceTemplate": "npm"
