@@ -9,4 +9,4 @@ pnpm-lock.yaml
 docs/**
 
 # Generated Svelte files
-examples/svelte-ts/.svelte-kit
+**/.svelte-kit
