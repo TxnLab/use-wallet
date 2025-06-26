@@ -58,7 +58,7 @@ export const DEFAULT_NETWORK_CONFIG: Record<string, NetworkConfig> = {
     },
     isTestnet: true,
     genesisHash: 'kUt08LxeVAAGHnh4JoAoAMM9ql_hBwSoRrQQKWSVgxk=',
-    genesisId: 'fnet-v1.0',
+    genesisId: 'fnet-v1',
     caipChainId: 'algorand:kUt08LxeVAAGHnh4JoAoAMM9ql_hBwSo'
   },
   localnet: {

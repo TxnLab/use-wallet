@@ -404,3 +404,4 @@ The configuration options described in this guide apply to all framework adapter
 * [React](../framework/react.md)
 * [Vue](../framework/vue.md)
 * [SolidJS](../framework/solidjs.md)
+* [Svelte](../framework/svelte.md)

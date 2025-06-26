@@ -21,7 +21,7 @@ layout:
 
 ### Install Package
 
-Use-wallet is available as a core library and as framework-specific adapters for React, Vue, and SolidJS. Choose the appropriate package for your project's framework.
+Use-wallet is available as a core library and as framework-specific adapters for React, Vue, SolidJS, and Svelte. Choose the appropriate package for your project's framework.
 
 #### React
 
@@ -103,6 +103,34 @@ pnpm add @txnlab/use-wallet-solid
 {% tab title="bun" %}
 ```bash
 bun add @txnlab/use-wallet-solid
+```
+{% endtab %}
+{% endtabs %}
+
+#### Svelte
+
+{% tabs %}
+{% tab title="npm" %}
+```bash
+npm install @txnlab/use-wallet-svelte
+```
+{% endtab %}
+
+{% tab title="yarn" %}
+```bash
+yarn add @txnlab/use-wallet-svelte
+```
+{% endtab %}
+
+{% tab title="pnpm" %}
+```bash
+pnpm add @txnlab/use-wallet-svelte
+```
+{% endtab %}
+
+{% tab title="bun" %}
+```bash
+bun add @txnlab/use-wallet-svelte
 ```
 {% endtab %}
 {% endtabs %}

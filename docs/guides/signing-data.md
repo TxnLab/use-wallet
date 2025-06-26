@@ -87,64 +87,64 @@ function Authenticate() {
 {% tab title="Vue" %}
 ```typescript
 <script setup lang="ts">
-import { useWallet } from '@txnlab/use-wallet-vue'
-import algosdk from 'algosdk'
-import { ed } from '@noble/ed25519'
-import { canonify } from "canonify"
+  import { useWallet } from '@txnlab/use-wallet-vue'
+  import algosdk from 'algosdk'
+  import { ed } from '@noble/ed25519'
+  import { canonify } from "canonify"
 
-const { activeAddress, activeWallet, signData } = useWallet()
+  const { activeAddress, activeWallet, signData } = useWallet()
 
-const handleAuth = async () => {
-  try {
-    if (!activeAddress.value) {
-      throw new Error('No active account')
+  const handleAuth = async () => {
+    try {
+      if (!activeAddress.value) {
+        throw new Error('No active account')
+      }
+      
+      if (!activeWallet?.canSignData) {
+        throw new Error('Current wallet does not support data signing')
+      }
+
+      // Create SIWA request
+      const siwaRequest = {
+        domain: location.host,
+        chain_id: '283',
+        account_address: activeAddress.value,
+        type: 'ed25519',
+        uri: location.origin,
+        version: '1',
+        'issued-at': new Date().toISOString()
+      }
+
+      // Convert request to base64
+      const dataString = canonify(siwaRequest)
+      if (!dataString) throw Error('Invalid JSON')
+      const data = btoa(dataString)
+      
+      // Sign data with authentication scope
+      const metadata = { scope: 'auth', encoding: 'base64' }
+      const resp = await signData(data, metadata)
+
+      // Verify signature
+      const enc = new TextEncoder()
+      const clientDataJsonHash = await crypto.subtle.digest('SHA-256', enc.encode(dataString))
+      const authenticatorDataHash = await crypto.subtle.digest('SHA-256', resp.authenticatorData)
+      
+      const toSign = new Uint8Array(64)
+      toSign.set(new Uint8Array(clientDataJsonHash), 0)
+      toSign.set(new Uint8Array(authenticatorDataHash), 32)
+      
+      const pubKey = algosdk.Address.fromString(activeAddress.value).publicKey
+      const isValid = await ed.verifyAsync(resp.signature, toSign, pubKey)
+
+      if (!isValid) {
+        throw new Error('Verification Failed')
+      }
+
+      console.info('Successfully authenticated!')
+    } catch (error) {
+      console.error('Error signing data:', error)
     }
-    
-    if (!activeWallet?.canSignData) {
-      throw new Error('Current wallet does not support data signing')
-    }
-
-    // Create SIWA request
-    const siwaRequest = {
-      domain: location.host,
-      chain_id: '283',
-      account_address: activeAddress.value,
-      type: 'ed25519',
-      uri: location.origin,
-      version: '1',
-      'issued-at': new Date().toISOString()
-    }
-
-    // Convert request to base64
-    const dataString = canonify(siwaRequest)
-    if (!dataString) throw Error('Invalid JSON')
-    const data = btoa(dataString)
-    
-    // Sign data with authentication scope
-    const metadata = { scope: 'auth', encoding: 'base64' }
-    const resp = await signData(data, metadata)
-
-    // Verify signature
-    const enc = new TextEncoder()
-    const clientDataJsonHash = await crypto.subtle.digest('SHA-256', enc.encode(dataString))
-    const authenticatorDataHash = await crypto.subtle.digest('SHA-256', resp.authenticatorData)
-    
-    const toSign = new Uint8Array(64)
-    toSign.set(new Uint8Array(clientDataJsonHash), 0)
-    toSign.set(new Uint8Array(authenticatorDataHash), 32)
-    
-    const pubKey = algosdk.Address.fromString(activeAddress.value).publicKey
-    const isValid = await ed.verifyAsync(resp.signature, toSign, pubKey)
-
-    if (!isValid) {
-      throw new Error('Verification Failed')
-    }
-
-    console.info('Successfully authenticated!')
-  } catch (error) {
-    console.error('Error signing data:', error)
   }
-}
 </script>
 
 <template>
@@ -219,6 +219,73 @@ function Authenticate() {
     <button onClick={handleAuth}>Sign In with Algorand</button>
   )
 }
+```
+{% endtab %}
+
+{% tab title="Svelte" %}
+```typescript
+<script lang="ts">
+  import { useWallet } from '@txnlab/use-wallet-svelte'
+  import algosdk from 'algosdk'
+  import { ed } from '@noble/ed25519'
+  import { canonify } from "canonify"
+
+  const { activeAddress, activeWallet, signData } = useWallet()
+
+  const handleAuth = async () => {
+    try {
+      if (!activeAddress.current) {
+        throw new Error('No active account')
+      }
+      
+      if (!activeWallet()?.canSignData) {
+        throw new Error('Current wallet does not support data signing')
+      }
+
+      // Create SIWA request
+      const siwaRequest = {
+        domain: location.host,
+        chain_id: '283',
+        account_address: activeAddress.current,
+        type: 'ed25519',
+        uri: location.origin,
+        version: '1',
+        'issued-at': new Date().toISOString()
+      }
+
+      // Convert request to base64
+      const dataString = canonify(siwaRequest)
+      if (!dataString) throw Error('Invalid JSON')
+      const data = btoa(dataString)
+      
+      // Sign data with authentication scope
+      const metadata = { scope: 'auth', encoding: 'base64' }
+      const resp = await signData(data, metadata)
+
+      // Verify signature
+      const enc = new TextEncoder()
+      const clientDataJsonHash = await crypto.subtle.digest('SHA-256', enc.encode(dataString))
+      const authenticatorDataHash = await crypto.subtle.digest('SHA-256', resp.authenticatorData)
+      
+      const toSign = new Uint8Array(64)
+      toSign.set(new Uint8Array(clientDataJsonHash), 0)
+      toSign.set(new Uint8Array(authenticatorDataHash), 32)
+      
+      const pubKey = algosdk.Address.fromString(activeAddress.current).publicKey
+      const isValid = await ed.verifyAsync(resp.signature, toSign, pubKey)
+
+      if (!isValid) {
+        throw new Error('Verification Failed')
+      }
+
+      console.info('Successfully authenticated!')
+    } catch (error) {
+      console.error('Error signing data:', error)
+    }
+  }
+</script>
+
+<button onclick={handleAuth}>Sign In with Algorand</button>
 ```
 {% endtab %}
 {% endtabs %}
