@@ -23,7 +23,7 @@
     "solid-js": "1.9.7"
   },
   "devDependencies": {
-    "typescript": "5.8.2",
+    "typescript": "5.8.3",
     "vite": "6.3.5",
     "vite-plugin-node-polyfills": "0.23.0",
     "vite-plugin-solid": "2.11.6"
