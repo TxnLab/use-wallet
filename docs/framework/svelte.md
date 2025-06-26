@@ -113,11 +113,30 @@ The `useNetwork` primitive serves two primary functions: managing the active net
 </div>
 ```
 
-Active network management (previously part of `useWallet`) enables users to switch between different networks.
+Active network management enables users to switch between different networks.
 
-Runtime node configuration, introduced in v4.0.0, enables users to override the application's default node settings and connect to any Algorand node. See the [Runtime Node Configuration](../guides/runtime-node-configuration.md) guide for details about implementing this feature.
+Runtime node configuration, enables users to override the application's default node settings and connect to any Algorand node. See the [Runtime Node Configuration](../guides/runtime-node-configuration.md) guide for details about implementing this feature.
 
 For a complete list of all available properties and methods, see the [useNetwork API Reference](../api-reference/usenetwork.md).
+
+### Working with Reactive Values
+
+The Svelte adapter uses a `.current` property pattern for accessing reactive values:
+
+```tsx
+<script lang="ts">
+  import { useWallet, useNetwork } from '@txnlab/use-wallet-svelte'
+
+  const { activeAddress } = useWallet()
+  const { activeNetwork } = useNetwork()
+  
+  // Access reactive values using .current
+  $: console.log(activeAddress.current)
+  $: console.log(activeNetwork.current)
+</script>
+```
+
+This pattern integrates with [TanStack Store](https://tanstack.com/store) for cross-framework consistency. The `.current` property aligns directly with TanStack Store's reactive system (see the [`useStore` reference](https://tanstack.com/store/v0/docs/framework/svelte/reference/functions/usestore)) and ensures consistent behavior across all framework adapters (React, Vue, SolidJS) while providing reliable reactivity within Svelte's compilation context.
 
 ### Next Steps
 

@@ -566,6 +566,7 @@ function WalletComponent() {
 #### Svelte
 
 * Uses Svelte's Context API for state management
+* Reactive values are accessed via `.current` property (see [Svelte Guide](../framework/svelte.md#working-with-reactive-values))
 * Compatible with Svelte 5.x
 
 ### Error Handling
