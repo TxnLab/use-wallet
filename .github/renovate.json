@@ -62,9 +62,7 @@
     {
       "customType": "regex",
       "managerFilePatterns": ["/^package\\.json$/"],
-      "matchStrings": [
-        "\"packageManager\":\\s*\"pnpm@(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
-      ],
+      "matchStrings": ["\"packageManager\":\\s*\"pnpm@(?<currentValue>\\d+\\.\\d+\\.\\d+)\""],
       "depNameTemplate": "pnpm",
       "datasourceTemplate": "npm"
     },
