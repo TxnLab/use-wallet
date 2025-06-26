@@ -47,7 +47,7 @@ The Svelte adapter provides two primitives for accessing wallet functionality. I
 
 The `useWallet` primitive provides access to wallet management features. Here's an example showing some commonly used values:
 
-```sv
+```typescript
 <script lang="ts">
   import { useWallet } from '@txnlab/use-wallet-svelte'
   const { 
@@ -81,7 +81,7 @@ For a complete list of all available properties and methods, see the [useWallet 
 
 The `useNetwork` primitive serves two primary functions: managing the active network and supporting runtime node configuration.
 
-```sv
+```typescript
 <script lang="ts">
   import { useNetwork } from '@txnlab/use-wallet-svelte'
 

@@ -78,7 +78,7 @@ function NetworkSwitch() {
 {% endtab %}
 
 {% tab title="Vue" %}
-```vue
+```typescript
 <script setup lang="ts">
   import { useNetwork } from '@txnlab/use-wallet-vue'
 
@@ -134,7 +134,7 @@ function NetworkSwitch() {
 {% endtab %}
 
 {% tab title="Svelte" %}
-```sv
+```typescript
 <script lang="ts">
   import { useNetwork } from '@txnlab/use-wallet-svelte'
 
@@ -177,7 +177,7 @@ const genesisId = activeNetworkConfig.genesisId
 {% endtab %}
 
 {% tab title="Vue" %}
-```vue
+```typescript
 <script setup lang="ts">
   const { activeNetworkConfig } = useNetwork()
 
@@ -203,7 +203,7 @@ const genesisId = () => activeNetworkConfig().genesisId
 {% endtab %}
 
 {% tab title="Svelte" %}
-```sv
+```typescript
 <script lang="ts">
   const { activeNetworkConfig } = useNetwork()
 

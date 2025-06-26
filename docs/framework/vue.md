@@ -47,7 +47,7 @@ The Vue adapter provides two composables for accessing wallet functionality. In 
 
 The `useWallet` composable provides access to wallet management features. Here's an example showing some commonly used values:
 
-```vue
+```typescript
 <script setup lang="ts">
   import { useWallet } from '@txnlab/use-wallet-vue'
 
@@ -84,7 +84,7 @@ For a complete list of all available properties and methods, see the [useWallet 
 
 The `useNetwork` composable serves two primary functions: managing the active network and supporting runtime node configuration.
 
-```vue
+```typescript
 <script setup lang="ts">
   import { useNetwork } from '@txnlab/use-wallet-vue'
 

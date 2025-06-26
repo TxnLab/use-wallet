@@ -40,7 +40,7 @@ function WalletStatus() {
 {% endtab %}
 
 {% tab title="Vue" %}
-```vue
+```typescript
 <script setup>
   import { useNetwork, useWallet } from '@txnlab/use-wallet-vue'
 
@@ -80,7 +80,7 @@ function WalletStatus() {
 ```
 {% endtab %}
 {% tab title="Svelte" %}
-```sv
+```typescript
 <script lang="ts">
   import { useNetwork, useWallet } from '@txnlab/use-wallet-svelte'
   const { activeAccount } = useWallet()
@@ -236,7 +236,7 @@ function Component() {
 {% tab title="Vue" %}
 Vue returns reactive refs that can be used in templates or unwrapped with `.value`:
 
-```vue
+```typescript
 <script setup lang="ts">
   import { useWallet } from '@txnlab/use-wallet-vue'
 
@@ -276,7 +276,7 @@ function Component() {
 {% tab title="Svelte" %}
 Svelte provides state through a getter functions and reactive objects that can be unwrapped with `.current`:
 
-```sv
+```typescript
 <script lang="ts">
   import { useWallet } from '@txnlab/use-wallet-svelte'
   const { activeAccount } = useWallet()
@@ -359,7 +359,7 @@ function WalletComponent() {
 {% endtab %}
 
 {% tab title="Vue" %}
-```vue
+```typescript
 <script setup lang="ts">
   import { useNetwork, useWallet, WalletId } from '@txnlab/use-wallet-vue'
 
@@ -483,7 +483,7 @@ function WalletComponent() {
 {% endtab %}
 
 {% tab title="Svelte" %}
-```sv
+```typescript
 <script lang="ts">
   import { useNetwork, useWallet, WalletId } from '@txnlab/use-wallet-svelte'
 

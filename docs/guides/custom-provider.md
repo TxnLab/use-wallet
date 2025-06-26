@@ -243,7 +243,7 @@ function WalletConnect() {
 {% endtab %}
 
 {% tab title="Vue" %}
-```vue
+```typescript
 <script setup lang="ts">
   import { CustomProvider, WalletAccount, useWallet } from '@txnlab/use-wallet-vue'
   import algosdk from 'algosdk'
@@ -368,7 +368,7 @@ function WalletConnect() {
 {% endtab %}
 
 {% tab title="Svelte" %}
-```sv
+```typescript
 <script lang="ts">
   import { CustomProvider, WalletAccount, useWallet } from '@txnlab/use-wallet-svelte'
   import algosdk from 'algosdk'

@@ -148,7 +148,7 @@ const ConnectedWallet = ({ wallet }: { wallet: Wallet }) => {
 {% endtab %}
 
 {% tab title="Vue" %}
-```vue
+```typescript
 <script setup lang="ts">
   import { useWallet, type Wallet } from '@txnlab/use-wallet-vue'
   import { ref } from 'vue'
@@ -337,7 +337,7 @@ const WalletMenu = () => {
 {% endtab %}
 
 {% tab title="Svelte" %}
-```sv
+```typescript
 <script lang="ts">
   import { useWallet, type Wallet } from '@txnlab/use-wallet-svelte'
 
@@ -462,7 +462,7 @@ const WalletOption = ({ wallet }: { wallet: Wallet }) => {
 {% endtab %}
 
 {% tab title="Vue" %}
-```vue
+```typescript
 <script setup lang="ts">
   const status = ref('idle')
 
@@ -520,7 +520,7 @@ const WalletOption = ({ wallet }: { wallet: BaseWallet }) => {
 {% endtab %}
 
 {% tab title="Svelte" %}
-```sv
+```typescript
 <script lang="ts">
   const status = $state('idle')
 

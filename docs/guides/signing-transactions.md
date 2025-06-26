@@ -77,7 +77,7 @@ function SendTransaction() {
 {% endtab %}
 
 {% tab title="Vue" %}
-```vue
+```typescript
 <script setup lang="ts">
   import { useWallet } from '@txnlab/use-wallet-vue'
   import algosdk from 'algosdk'
@@ -169,7 +169,7 @@ function SendTransaction() {
 {% endtab %}
 
 {% tab title="Svelte" %}
-```sv
+```typescript
 <script lang="ts">
   import { useWallet } from '@txnlab/use-wallet-svelte'
   import algosdk from 'algosdk'
@@ -288,7 +288,7 @@ function CallContractAtc() {
 {% endtab %}
 
 {% tab title="Vue" %}
-```vue
+```typescript
 <script setup lang="ts">
   import { useWallet } from '@txnlab/use-wallet-vue'
   import algosdk from 'algosdk'
@@ -410,7 +410,7 @@ function CallContractAtc() {
 {% endtab %}
 
 {% tab title="Svelte" %}
-```sv
+```typescript
 <script lang="ts">
   import { useWallet } from '@txnlab/use-wallet-svelte'
   import algosdk from 'algosdk'
@@ -539,7 +539,7 @@ function CallContractAlgoKit() {
 {% endtab %}
 
 {% tab title="Vue" %}
-```vue
+```typescript
 <script setup lang="ts">
   import { useWallet } from '@txnlab/use-wallet-vue'
   import { AlgorandClient } from '@algorandfoundation/algokit-utils'
@@ -651,7 +651,7 @@ function CallContractAlgoKit() {
 {% endtab %}
 
 {% tab title="Svelte" %}
-```sv
+```typescript
 <script lang="ts">
   import { useWallet } from '@txnlab/use-wallet-svelte'
   import { AlgorandClient } from '@algorandfoundation/algokit-utils'

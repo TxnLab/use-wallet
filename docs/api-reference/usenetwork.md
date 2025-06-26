@@ -96,7 +96,7 @@ function NetworkComponent() {
 {% endtab %}
 
 {% tab title="Vue" %}
-```vue
+```typescript
 <script setup>
   import { useNetwork } from '@txnlab/use-wallet-vue'
 
@@ -144,7 +144,7 @@ function NetworkComponent() {
 {% endtab %}
 
 {% tab title="Svelte" %}
-```sv
+```typescript
 <script lang="ts">
   import { useNetwork } from '@txnlab/use-wallet-svelte'
 

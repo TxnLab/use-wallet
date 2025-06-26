@@ -66,7 +66,7 @@ function NodeConfig() {
 {% endtab %}
 
 {% tab title="Vue" %}
-```vue
+```typescript
 <script setup lang="ts">
   import { useNetwork } from '@txnlab/use-wallet-vue'
 
@@ -136,7 +136,7 @@ function NodeConfig() {
 {% endtab %}
 
 {% tab title="Svelte" %}
-```sv
+```typescript
 <script lang="ts">
   import { useNetwork } from '@txnlab/use-wallet-svelte'
 
@@ -302,7 +302,7 @@ function NodeConfigForm() {
 {% endtab %}
 
 {% tab title="Vue" %}
-```vue
+```typescript
 <script setup lang="ts">
   import { ref, computed } from 'vue'
   import { useNetwork } from '@txnlab/use-wallet-vue'
@@ -477,7 +477,7 @@ function NodeConfigForm() {
 {% endtab %}
 
 {% tab title="Svelte" %}
-```sv
+```typescript
 <script lang="ts">
   import { useNetwork } from '@txnlab/use-wallet-svelte'
 

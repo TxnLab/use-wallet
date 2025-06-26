@@ -85,7 +85,7 @@ function Authenticate() {
 {% endtab %}
 
 {% tab title="Vue" %}
-```vue
+```typescript
 <script setup lang="ts">
   import { useWallet } from '@txnlab/use-wallet-vue'
   import algosdk from 'algosdk'
@@ -223,7 +223,7 @@ function Authenticate() {
 {% endtab %}
 
 {% tab title="Svelte" %}
-```sv
+```typescript
 <script lang="ts">
   import { useWallet } from '@txnlab/use-wallet-svelte'
   import algosdk from 'algosdk'
