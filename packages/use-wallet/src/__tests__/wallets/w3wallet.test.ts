@@ -44,7 +44,7 @@ const mockW3Wallet: W3WalletProvider = {
 
 Object.defineProperty(global, 'window', {
   value: {
-    algorand: mockW3Wallet
+    w3walletAlgorand: mockW3Wallet
   }
 })
 
@@ -110,7 +110,7 @@ describe('W3 Wallet', () => {
   describe('connect', () => {
     it('should initialize client, return accounts, and update store', async () => {
       // @ts-expect-error defined using Object.defineProperty
-      window.algorand.account = () =>
+      window.w3walletAlgorand.account = () =>
         Promise.resolve({
           address: 'mockAddress1',
           name: 'W3 Wallet Account 1'
@@ -127,14 +127,14 @@ describe('W3 Wallet', () => {
 
     it('should throw an error if connection fails', async () => {
       // @ts-expect-error defined using Object.defineProperty
-      window.algorand = undefined
+      window.w3walletAlgorand = undefined
 
       await expect(wallet.connect()).rejects.toThrow('W3 Wallet is not available.')
       expect(store.state.wallets[WalletId.W3_WALLET]).toBeUndefined()
       expect(wallet.isConnected).toBe(false)
 
       // @ts-expect-error defined using Object.defineProperty
-      window.algorand = mockW3Wallet
+      window.w3walletAlgorand = mockW3Wallet
     })
   })
 
@@ -178,7 +178,7 @@ describe('W3 Wallet', () => {
 
     it('should throw an error and disconnect if isConnected is false', async () => {
       // @ts-expect-error defined using Object.defineProperty
-      window.algorand.isConnected = () => Promise.resolve(false)
+      window.w3walletAlgorand.isConnected = () => Promise.resolve(false)
 
       const walletState: WalletState = {
         accounts: [account1],
@@ -200,7 +200,7 @@ describe('W3 Wallet', () => {
       expect(store.state.wallets[WalletId.W3_WALLET]).toBeUndefined()
 
       // @ts-expect-error defined using Object.defineProperty
-      window.algorand.isConnected = true
+      window.w3walletAlgorand.isConnected = true
     })
   })
 
@@ -240,7 +240,7 @@ describe('W3 Wallet', () => {
       mockSignTxns.mockResolvedValue([mockSignedTxn])
 
       // @ts-expect-error defined using Object.defineProperty
-      window.algorand.account = () =>
+      window.w3walletAlgorand.account = () =>
         Promise.resolve({
           address: connectedAcct1,
           name: 'Connected Account 1'
