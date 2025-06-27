@@ -26,7 +26,8 @@ app.use(WalletManagerPlugin, {
       id: WalletId.MAGIC,
       options: { apiKey: 'pk_live_D17FD8D89621B5F3' }
     },
-    WalletId.MNEMONIC
+    WalletId.MNEMONIC,
+    WalletId.W3_WALLET
   ],
   defaultNetwork: NetworkId.TESTNET
 })

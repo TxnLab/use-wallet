@@ -22,7 +22,7 @@ export interface W3WalletProvider {
   signTxns: (transactions: WalletTransaction[]) => Promise<(string | null)[]>
 }
 
-type WindowExtended = { algorand: W3WalletProvider } & Window & typeof globalThis
+type WindowExtended = { w3walletAlgorand: W3WalletProvider } & Window & typeof globalThis
 
 const ICON = `data:image/svg+xml;base64,${btoa(`
 <svg width="860" height="860" viewBox="0 0 860 860" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -53,11 +53,14 @@ export class W3Wallet extends BaseWallet {
 
   private async initializeClient(): Promise<W3WalletProvider> {
     this.logger.info('Initializing client...')
-    if (typeof window === 'undefined' || (window as WindowExtended).algorand === undefined) {
+    if (
+      typeof window === 'undefined' ||
+      (window as WindowExtended).w3walletAlgorand === undefined
+    ) {
       this.logger.error('W3 Wallet is not available.')
       throw new Error('W3 Wallet is not available.')
     }
-    const client = (window as WindowExtended).algorand
+    const client = (window as WindowExtended).w3walletAlgorand
     this.client = client
     this.logger.info('Client initialized')
     return client
