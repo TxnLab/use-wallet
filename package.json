@@ -5,7 +5,7 @@
     "type": "git",
     "url": "https://github.com/txnlab/use-wallet.git"
   },
-  "packageManager": "pnpm@9.15.9",
+  "packageManager": "pnpm@10.12.4",
   "type": "module",
   "scripts": {
     "build": "pnpm build:packages && pnpm build:examples",
