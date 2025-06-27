@@ -12,6 +12,7 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@algorandfoundation/liquid-auth-use-wallet-client": "^1.4.0-canary.1",
     "@blockshake/defly-connect": "^1.2.1",
     "@noble/ed25519": "2.3.0",
     "@perawallet/connect": "^1.4.1",
