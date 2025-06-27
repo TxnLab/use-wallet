@@ -1,7 +1,7 @@
 import { NetworkId, WalletId, WalletManager, WalletProvider } from '@txnlab/use-wallet-react'
 import { Connect } from './Connect'
 import { NetworkControls } from './NetworkControls'
-import reactLogo from './assets/react.svg'
+import reactLogo from '/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 
@@ -21,6 +21,14 @@ const walletManager = new WalletManager({
     },
     WalletId.KMD,
     WalletId.KIBISIS,
+    {
+      id: WalletId.LIQUID,
+      options: {
+        origin: 'https://debug.liquidauth.com',
+        RTC_config_username: 'liquid-auth',
+        RTC_config_credential: 'sqmcP4MiTKMT4TGEDSk9jgHY'
+      }
+    },
     WalletId.LUTE,
     {
       id: WalletId.MAGIC,

@@ -1,5 +1,5 @@
 import './style.css'
-import typescriptLogo from './typescript.svg'
+import typescriptLogo from '/typescript.svg'
 import viteLogo from '/vite.svg'
 import { NetworkId, WalletId, WalletManager } from '@txnlab/use-wallet'
 import { ActiveNetwork } from './ActiveNetwork'
@@ -21,6 +21,14 @@ const walletManager = new WalletManager({
     },
     WalletId.KMD,
     WalletId.KIBISIS,
+    {
+      id: WalletId.LIQUID,
+      options: {
+        origin: 'https://debug.liquidauth.com',
+        RTC_config_username: 'liquid-auth',
+        RTC_config_credential: 'sqmcP4MiTKMT4TGEDSk9jgHY'
+      }
+    },
     WalletId.LUTE,
     {
       id: WalletId.MAGIC,

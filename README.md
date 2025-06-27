@@ -3,7 +3,7 @@
 [![GitHub package.json version](https://img.shields.io/github/package-json/v/TxnLab/use-wallet?filename=packages%2Fuse-wallet%2Fpackage.json&label=version)](https://www.npmjs.com/package/@txnlab/use-wallet?activeTab=versions)
 [![GitHub License](https://img.shields.io/github/license/TxnLab/use-wallet)](https://github.com/TxnLab/use-wallet/blob/main/LICENSE.md)
 
-A framework agnostic Algorand wallet integration library with reactive framework adapters for React, Vue, and Solid.js.
+A framework agnostic Algorand wallet integration library with reactive framework adapters for React, Vue, SolidJS, and Svelte.
 
 ## Features
 

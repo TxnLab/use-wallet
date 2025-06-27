@@ -1,0 +1,85 @@
+{
+  "name": "@txnlab/use-wallet-svelte",
+  "version": "4.2.0",
+  "description": "Svelte library for integrating Algorand wallets into decentralized applications",
+  "author": "Andrew Funk <acfunk@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/txnlab/use-wallet.git",
+    "directory": "packages/use-wallet-svelte"
+  },
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "exports": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsup",
+    "start": "tsup src/index.ts --watch",
+    "test": "vitest run",
+    "test:watch": "vitest --watch",
+    "lint": "eslint -c \"../../.eslintrc.json\" \"**/*.{js,ts}\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "algorand",
+    "wallet",
+    "walletconnect",
+    "pera",
+    "defly",
+    "exodus",
+    "algosdk",
+    "algokit",
+    "kmd",
+    "svelte"
+  ],
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@tanstack/svelte-store": "0.7.1",
+    "@txnlab/use-wallet": "workspace:*"
+  },
+  "devDependencies": {
+    "@testing-library/svelte": "5.2.8",
+    "algosdk": "3.3.1",
+    "svelte": "5.34.7",
+    "tsup": "8.5.0",
+    "typescript": "5.8.3"
+  },
+  "peerDependencies": {
+    "@blockshake/defly-connect": "^1.2.1",
+    "@magic-ext/algorand": "^24.1.0",
+    "@perawallet/connect": "^1.4.1",
+    "@walletconnect/modal": "^2.7.0",
+    "@walletconnect/sign-client": "^2.21.3",
+    "algosdk": "^3.0.0",
+    "lute-connect": "^1.6.1",
+    "magic-sdk": "^29.1.0",
+    "svelte": "^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@blockshake/defly-connect": {
+      "optional": true
+    },
+    "@magic-ext/algorand": {
+      "optional": true
+    },
+    "@perawallet/connect": {
+      "optional": true
+    },
+    "@walletconnect/modal": {
+      "optional": true
+    },
+    "@walletconnect/sign-client": {
+      "optional": true
+    },
+    "lute-connect": {
+      "optional": true
+    },
+    "magic-sdk": {
+      "optional": true
+    }
+  }
+}

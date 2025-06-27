@@ -10,28 +10,30 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@algorandfoundation/liquid-auth-use-wallet-client": "^1.4.0-canary.1",
     "@blockshake/defly-connect": "^1.2.1",
-    "@noble/ed25519": "^2.2.3",
+    "@noble/ed25519": "2.3.0",
     "@perawallet/connect": "^1.4.1",
     "@txnlab/use-wallet-react": "workspace:*",
     "@walletconnect/modal": "^2.7.0",
-    "@walletconnect/sign-client": "^2.19.2",
-    "algosdk": "3.2.0",
-    "canonify": "^2.1.1",
+    "@walletconnect/sign-client": "^2.21.3",
+    "algosdk": "3.3.1",
+    "canonify": "2.1.1",
     "lute-connect": "^1.6.1",
     "react": "18.3.1",
     "react-dom": "18.3.1"
   },
   "devDependencies": {
-    "@types/react": "18.3.20",
-    "@types/react-dom": "18.3.5",
-    "@typescript-eslint/eslint-plugin": "8.28.0",
-    "@typescript-eslint/parser": "8.28.0",
-    "@vitejs/plugin-react": "4.3.4",
+    "@types/react": "18.3.23",
+    "@types/react-dom": "18.3.7",
+    "@typescript-eslint/eslint-plugin": "8.34.1",
+    "@typescript-eslint/parser": "8.34.1",
+    "@vitejs/plugin-react": "4.6.0",
     "eslint": "8.57.1",
     "eslint-plugin-react-hooks": "5.2.0",
-    "eslint-plugin-react-refresh": "0.4.19",
-    "typescript": "5.8.2",
-    "vite": "6.2.3"
+    "eslint-plugin-react-refresh": "0.4.20",
+    "typescript": "5.8.3",
+    "vite": "6.3.5",
+    "vite-plugin-node-polyfills": "0.23.0"
   }
 }

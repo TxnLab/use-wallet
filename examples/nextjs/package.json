@@ -10,24 +10,24 @@
   },
   "dependencies": {
     "@blockshake/defly-connect": "^1.2.1",
-    "@noble/ed25519": "^2.2.3",
+    "@noble/ed25519": "2.3.0",
     "@perawallet/connect": "^1.4.1",
     "@txnlab/use-wallet-react": "workspace:*",
     "@walletconnect/modal": "^2.7.0",
-    "@walletconnect/sign-client": "^2.19.2",
-    "algosdk": "3.2.0",
-    "canonify": "^2.1.1",
+    "@walletconnect/sign-client": "^2.21.3",
+    "algosdk": "3.3.1",
+    "canonify": "2.1.1",
     "lute-connect": "^1.6.1",
-    "next": "14.2.26",
+    "next": "14.2.30",
     "react": "18.3.1",
     "react-dom": "18.3.1"
   },
   "devDependencies": {
     "@types/node": "20.11.30",
-    "@types/react": "18.3.20",
-    "@types/react-dom": "18.3.5",
+    "@types/react": "18.3.23",
+    "@types/react-dom": "18.3.7",
     "eslint": "8.57.1",
-    "eslint-config-next": "14.2.26",
-    "typescript": "5.8.2"
+    "eslint-config-next": "14.2.30",
+    "typescript": "5.8.3"
   }
 }

@@ -1,3 +1,13 @@
 packages:
-  - 'examples/*'
-  - 'packages/*'
+  - examples/*
+  - packages/*
+
+onlyBuiltDependencies:
+  - '@algorandfoundation/liquid-client'
+  - '@parcel/watcher'
+  - bufferutil
+  - canvas
+  - cbor-extract
+  - esbuild
+  - utf-8-validate
+  - vue-demi

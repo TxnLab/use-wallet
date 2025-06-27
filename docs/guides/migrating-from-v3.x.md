@@ -36,6 +36,8 @@ npm upgrade @txnlab/use-wallet-react@^4.0.0
 npm upgrade @txnlab/use-wallet-vue@^4.0.0
 # if using Solid adapter
 npm upgrade @txnlab/use-wallet-solid@^4.0.0
+# if using Svelte adapter
+npm upgrade @txnlab/use-wallet-svelte@^4.0.0
 ```
 {% endtab %}
 
@@ -48,6 +50,8 @@ yarn upgrade @txnlab/use-wallet-react@^4.0.0
 yarn upgrade @txnlab/use-wallet-vue@^4.0.0
 # if using Solid adapter
 yarn upgrade @txnlab/use-wallet-solid@^4.0.0
+# if using Svelte adapter
+yarn upgrade @txnlab/use-wallet-svelte@^4.0.0
 ```
 {% endtab %}
 
@@ -60,6 +64,8 @@ pnpm update @txnlab/use-wallet-react@^4.0.0
 pnpm update @txnlab/use-wallet-vue@^4.0.0
 # if using Solid adapter
 pnpm update @txnlab/use-wallet-solid@^4.0.0
+# if using Svelte adapter
+pnpm update @txnlab/use-wallet-svelte@^4.0.0
 ```
 {% endtab %}
 
@@ -72,6 +78,8 @@ bun update @txnlab/use-wallet-react@^4.0.0
 bun update @txnlab/use-wallet-vue@^4.0.0
 # if using Solid adapter
 bun update @txnlab/use-wallet-solid@^4.0.0
+# if using Svelte adapter
+bun update @txnlab/use-wallet-svelte@^4.0.0
 ```
 {% endtab %}
 {% endtabs %}
@@ -291,6 +299,19 @@ const { activeNetwork, setActiveNetwork, /* other wallet returns */ } = useWalle
 
 // After - network returns moved to useNetwork
 import { useWallet, useNetwork } from '@txnlab/use-wallet-solid'
+const { /* wallet returns */ } = useWallet()
+const { activeNetwork, setActiveNetwork } = useNetwork()
+```
+{% endtab %}
+
+{% tab title="Svelte" %}
+```typescript
+// Before - all functionality from useWallet
+import { useWallet } from '@txnlab/use-wallet-svelte'
+const { activeNetwork, setActiveNetwork, /* other wallet returns */ } = useWallet()
+
+// After - network returns moved to useNetwork
+import { useWallet, useNetwork } from '@txnlab/use-wallet-svelte'
 const { /* wallet returns */ } = useWallet()
 const { activeNetwork, setActiveNetwork } = useNetwork()
 ```
