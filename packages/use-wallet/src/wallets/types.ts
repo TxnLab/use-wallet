@@ -14,6 +14,7 @@ import { BiatecWallet } from './biatec'
 import type { Store } from '@tanstack/store'
 import type algosdk from 'algosdk'
 import type { State } from 'src/store'
+import { W3Wallet } from './w3wallet'
 
 export enum WalletId {
   BIATEC = 'biatec',
@@ -28,7 +29,8 @@ export enum WalletId {
   MAGIC = 'magic',
   MNEMONIC = 'mnemonic',
   PERA = 'pera',
-  WALLETCONNECT = 'walletconnect'
+  WALLETCONNECT = 'walletconnect',
+  W3_WALLET = 'w3-wallet'
 }
 
 export type WalletMap = {
@@ -45,6 +47,7 @@ export type WalletMap = {
   [WalletId.MNEMONIC]: typeof MnemonicWallet
   [WalletId.PERA]: typeof PeraWallet
   [WalletId.WALLETCONNECT]: typeof WalletConnect
+  [WalletId.W3_WALLET]: typeof W3Wallet
 }
 
 export type WalletOptionsMap = {
@@ -61,6 +64,7 @@ export type WalletOptionsMap = {
   [WalletId.MNEMONIC]: MnemonicOptions
   [WalletId.PERA]: PeraWalletConnectOptions
   [WalletId.WALLETCONNECT]: WalletConnectOptions
+  [WalletId.W3_WALLET]: Record<string, never>
 }
 
 export type SupportedWallet = WalletIdConfig<WalletId> | WalletId

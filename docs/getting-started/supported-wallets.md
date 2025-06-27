@@ -277,6 +277,19 @@ import { WalletId } from '@txnlab/use-wallet'
 
 See the [Testing with Mnemonic Wallet](../guides/testing-with-mnemonic-wallet.md) guide for details about end-to-end (E2E) testing.
 
+#### W3 Wallet
+
+Multi-currency wallet with desktop, mobile, and browser extension support.
+
+```typescript
+import { WalletId } from '@txnlab/use-wallet'
+
+// Basic usage (no options required)
+WalletId.W3_WALLET
+```
+
+* [W3 Wallet Website](https://w3wallet.app)
+
 ### Custom Provider
 
 For integrating unsupported wallets or implementing specialized wallet interactions.
