@@ -52,7 +52,7 @@
     "@magic-ext/algorand": "^24.1.0",
     "@perawallet/connect": "^1.4.1",
     "@walletconnect/modal": "^2.7.0",
-    "@walletconnect/sign-client": "^2.21.3",
+    "@walletconnect/sign-client": "^2.21.4",
     "algosdk": "^3.0.0",
     "lute-connect": "^1.6.1",
     "magic-sdk": "^29.1.0",
