@@ -90,8 +90,8 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.23)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.21.3
-        version: 2.21.3(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
+        specifier: ^2.21.4
+        version: 2.21.4(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
       algosdk:
         specifier: 3.3.1
         version: 3.3.1
@@ -154,8 +154,8 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.23)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.21.3
-        version: 2.21.3(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
+        specifier: ^2.21.4
+        version: 2.21.4(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
       algosdk:
         specifier: 3.3.1
         version: 3.3.1
@@ -206,8 +206,8 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.23)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.21.3
-        version: 2.21.3(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
+        specifier: ^2.21.4
+        version: 2.21.4(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
       algosdk:
         specifier: 3.3.1
         version: 3.3.1
@@ -279,8 +279,8 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.23)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.21.3
-        version: 2.21.3(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
+        specifier: ^2.21.4
+        version: 2.21.4(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
       algosdk:
         specifier: 3.3.1
         version: 3.3.1
@@ -325,8 +325,8 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.23)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.21.3
-        version: 2.21.3(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
+        specifier: ^2.21.4
+        version: 2.21.4(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
       algosdk:
         specifier: 3.3.1
         version: 3.3.1
@@ -383,8 +383,8 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.23)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.21.3
-        version: 2.21.3(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
+        specifier: ^2.21.4
+        version: 2.21.4(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
       algosdk:
         specifier: 3.3.1
         version: 3.3.1
@@ -396,8 +396,8 @@ importers:
         version: 1.6.1
     devDependencies:
       '@walletconnect/types':
-        specifier: 2.21.3
-        version: 2.21.3(db0@0.3.2)(ioredis@5.6.1)
+        specifier: 2.21.4
+        version: 2.21.4(db0@0.3.2)(ioredis@5.6.1)
       typescript:
         specifier: 5.8.3
         version: 5.8.3
@@ -429,8 +429,8 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.23)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.21.3
-        version: 2.21.3(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
+        specifier: ^2.21.4
+        version: 2.21.4(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
       algosdk:
         specifier: 3.3.1
         version: 3.3.1
@@ -494,11 +494,11 @@ importers:
         specifier: 2.7.0
         version: 2.7.0(@types/react@18.3.23)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: 2.21.3
-        version: 2.21.3(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
+        specifier: 2.21.4
+        version: 2.21.4(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
       '@walletconnect/types':
-        specifier: 2.21.3
-        version: 2.21.3(db0@0.3.2)(ioredis@5.6.1)
+        specifier: 2.21.4
+        version: 2.21.4(db0@0.3.2)(ioredis@5.6.1)
       algosdk:
         specifier: 3.3.1
         version: 3.3.1
@@ -539,8 +539,8 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.23)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.21.3
-        version: 2.21.3(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
+        specifier: ^2.21.4
+        version: 2.21.4(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
       lute-connect:
         specifier: ^1.6.1
         version: 1.6.1
@@ -591,8 +591,8 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.23)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.21.3
-        version: 2.21.3(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
+        specifier: ^2.21.4
+        version: 2.21.4(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
       lute-connect:
         specifier: ^1.6.1
         version: 1.6.1
@@ -640,8 +640,8 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.23)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.21.3
-        version: 2.21.3(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
+        specifier: ^2.21.4
+        version: 2.21.4(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
       lute-connect:
         specifier: ^1.6.1
         version: 1.6.1
@@ -686,8 +686,8 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.23)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.21.3
-        version: 2.21.3(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
+        specifier: ^2.21.4
+        version: 2.21.4(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
       lute-connect:
         specifier: ^1.6.1
         version: 1.6.1
@@ -2398,8 +2398,8 @@ packages:
   '@walletconnect/core@1.8.0':
     resolution: {integrity: sha512-aFTHvEEbXcZ8XdWBw6rpQDte41Rxwnuk3SgTD8/iKGSRTni50gI9S3YEzMj05jozSiOBxQci4pJDMVhIUMtarw==}
 
-  '@walletconnect/core@2.21.3':
-    resolution: {integrity: sha512-kMjo5bI6VOsFe/DmxgeTMxCdAIfSzUzG8kCDrpxUXrTnMgaU4H2JBW+tGn7KP/YY1x49+lErZsN5JiQsE5n6Rw==}
+  '@walletconnect/core@2.21.4':
+    resolution: {integrity: sha512-XtwPUCj3bCNX/2yjYGlQyvcsn32wkzixCjyWOD4pdKFVk7opZPAdF4xr85rmo6nJ7AiBYxjV1IH0bemTPEdE6Q==}
     engines: {node: '>=18'}
 
   '@walletconnect/crypto@1.0.3':
@@ -2468,8 +2468,8 @@ packages:
   '@walletconnect/safe-json@1.0.2':
     resolution: {integrity: sha512-Ogb7I27kZ3LPC3ibn8ldyUr5544t3/STow9+lzz7Sfo808YD7SBWk7SAsdBFlYgP2zDRy2hS3sKRcuSRM0OTmA==}
 
-  '@walletconnect/sign-client@2.21.3':
-    resolution: {integrity: sha512-Z6sTCBrset7u5CNjPWlqQuWxmLL2WlGLZYKoB7g/Nvg8wLWo0VaaNeTtNsuopLfJeqdV9/4nV/qHE4xXs2nMIQ==}
+  '@walletconnect/sign-client@2.21.4':
+    resolution: {integrity: sha512-v1OJ9IQCZAqaDEUYGFnGLe2fSp8DN9cv7j8tUYm5ngiFK7h6LjP4Ew3gGCca4AHWzMFkHuIRNQ+6Ypep1K/B7g==}
 
   '@walletconnect/socket-transport@1.8.0':
     resolution: {integrity: sha512-5DyIyWrzHXTcVp0Vd93zJ5XMW61iDM6bcWT4p8DTRfFsOtW46JquruMhxOLeCOieM4D73kcr3U7WtyR4JUsGuQ==}
@@ -2481,14 +2481,14 @@ packages:
     resolution: {integrity: sha512-Cn+3I0V0vT9ghMuzh1KzZvCkiAxTq+1TR2eSqw5E5AVWfmCtECFkVZBP6uUJZ8YjwLqXheI+rnjqPy7sVM4Fyg==}
     deprecated: 'WalletConnect''s v1 SDKs are now deprecated. Please upgrade to a v2 SDK. For details see: https://docs.walletconnect.com/'
 
-  '@walletconnect/types@2.21.3':
-    resolution: {integrity: sha512-4fDchSb6q/YIuUokaIvp+/tpWtmiL+dOWuKUCq0+w81R0unsQzn4Zc57Xh+TkNAlBGSJmZ44ZQPevN4vaTnjwg==}
+  '@walletconnect/types@2.21.4':
+    resolution: {integrity: sha512-6O61esDSW8FZNdFezgB4bX2S35HM6tCwBEjGHNB8JeoKCfpXG33hw2raU/SBgBL/jmM57QRW4M1aFH7v1u9z7g==}
 
   '@walletconnect/utils@1.8.0':
     resolution: {integrity: sha512-zExzp8Mj1YiAIBfKNm5u622oNw44WOESzo6hj+Q3apSMIb0Jph9X3GDIdbZmvVZsNPxWDL7uodKgZcCInZv2vA==}
 
-  '@walletconnect/utils@2.21.3':
-    resolution: {integrity: sha512-LHxYX69vG7aPCQB9YT1F8ibwAfRNYwqCEBMplrmquAX+l4lMHTpXvsFF/a5NWFT23DKzbWZ4VTfQTDZ//XJKpg==}
+  '@walletconnect/utils@2.21.4':
+    resolution: {integrity: sha512-LuSyBXvRLiDqIu4uMFei5eJ/WPhkIkdW58fmDlRnryatIuBPCho3dlrNSbOjVSdsID+OvxjOlpPLi+5h4oTbaA==}
 
   '@walletconnect/window-getters@1.0.0':
     resolution: {integrity: sha512-xB0SQsLaleIYIkSsl43vm8EwETpBzJ2gnzk7e0wMF3ktqiTGS6TFHxcprMl5R44KKh4tCcHCJwolMCaDSwtAaA==}
@@ -9163,7 +9163,7 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@walletconnect/core@2.21.3(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)':
+  '@walletconnect/core@2.21.4(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)':
     dependencies:
       '@walletconnect/heartbeat': 1.2.2
       '@walletconnect/jsonrpc-provider': 1.0.14
@@ -9176,8 +9176,8 @@ snapshots:
       '@walletconnect/relay-auth': 1.1.0
       '@walletconnect/safe-json': 1.0.2
       '@walletconnect/time': 1.0.2
-      '@walletconnect/types': 2.21.3(db0@0.3.2)(ioredis@5.6.1)
-      '@walletconnect/utils': 2.21.3(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
+      '@walletconnect/types': 2.21.4(db0@0.3.2)(ioredis@5.6.1)
+      '@walletconnect/utils': 2.21.4(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
       '@walletconnect/window-getters': 1.0.1
       es-toolkit: 1.39.3
       events: 3.3.0
@@ -9348,16 +9348,16 @@ snapshots:
     dependencies:
       tslib: 1.14.1
 
-  '@walletconnect/sign-client@2.21.3(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)':
+  '@walletconnect/sign-client@2.21.4(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)':
     dependencies:
-      '@walletconnect/core': 2.21.3(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
+      '@walletconnect/core': 2.21.4(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
       '@walletconnect/events': 1.0.1
       '@walletconnect/heartbeat': 1.2.2
       '@walletconnect/jsonrpc-utils': 1.0.8
       '@walletconnect/logger': 2.1.2
       '@walletconnect/time': 1.0.2
-      '@walletconnect/types': 2.21.3(db0@0.3.2)(ioredis@5.6.1)
-      '@walletconnect/utils': 2.21.3(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
+      '@walletconnect/types': 2.21.4(db0@0.3.2)(ioredis@5.6.1)
+      '@walletconnect/utils': 2.21.4(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
       events: 3.3.0
     transitivePeerDependencies:
       - '@azure/app-configuration'
@@ -9398,7 +9398,7 @@ snapshots:
 
   '@walletconnect/types@1.8.0': {}
 
-  '@walletconnect/types@2.21.3(db0@0.3.2)(ioredis@5.6.1)':
+  '@walletconnect/types@2.21.4(db0@0.3.2)(ioredis@5.6.1)':
     dependencies:
       '@walletconnect/events': 1.0.1
       '@walletconnect/heartbeat': 1.2.2
@@ -9436,7 +9436,7 @@ snapshots:
       js-sha3: 0.8.0
       query-string: 6.13.5
 
-  '@walletconnect/utils@2.21.3(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)':
+  '@walletconnect/utils@2.21.4(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)':
     dependencies:
       '@msgpack/msgpack': 3.1.2
       '@noble/ciphers': 1.3.0
@@ -9449,7 +9449,7 @@ snapshots:
       '@walletconnect/relay-auth': 1.1.0
       '@walletconnect/safe-json': 1.0.2
       '@walletconnect/time': 1.0.2
-      '@walletconnect/types': 2.21.3(db0@0.3.2)(ioredis@5.6.1)
+      '@walletconnect/types': 2.21.4(db0@0.3.2)(ioredis@5.6.1)
       '@walletconnect/window-getters': 1.0.1
       '@walletconnect/window-metadata': 1.0.1
       blakejs: 1.2.1
@@ -10788,8 +10788,8 @@ snapshots:
       '@typescript-eslint/parser': 8.34.1(eslint@8.57.1)(typescript@5.8.3)
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.7.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1)
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-typescript@3.7.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-import-resolver-typescript: 3.7.0(eslint-plugin-import@2.31.0)(eslint@8.57.1)
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-typescript@3.7.0)(eslint@8.57.1)
       eslint-plugin-jsx-a11y: 6.10.2(eslint@8.57.1)
       eslint-plugin-react: 7.37.4(eslint@8.57.1)
       eslint-plugin-react-hooks: 5.0.0-canary-7118f5dd7-20230705(eslint@8.57.1)
@@ -10812,7 +10812,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@3.7.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1):
+  eslint-import-resolver-typescript@3.7.0(eslint-plugin-import@2.31.0)(eslint@8.57.1):
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
       debug: 4.4.1
@@ -10824,22 +10824,22 @@ snapshots:
       is-glob: 4.0.3
       stable-hash: 0.0.4
     optionalDependencies:
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-typescript@3.7.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-typescript@3.7.0)(eslint@8.57.1)
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.7.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1):
+  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.7.0)(eslint@8.57.1):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
       '@typescript-eslint/parser': 8.34.1(eslint@8.57.1)(typescript@5.8.3)
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.7.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-import-resolver-typescript: 3.7.0(eslint-plugin-import@2.31.0)(eslint@8.57.1)
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-typescript@3.7.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1):
+  eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-typescript@3.7.0)(eslint@8.57.1):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.8
@@ -10850,7 +10850,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.7.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.7.0)(eslint@8.57.1)
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
