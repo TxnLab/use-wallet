@@ -26,7 +26,7 @@
     "@vitejs/plugin-vue": "5.2.4",
     "typescript": "5.8.3",
     "vite": "6.3.5",
-    "vite-plugin-node-polyfills": "0.23.0",
-    "vue-tsc": "2.2.10"
+    "vite-plugin-node-polyfills": "0.24.0",
+    "vue-tsc": "2.2.12"
   }
 }
