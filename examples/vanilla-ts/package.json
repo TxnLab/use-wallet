@@ -10,19 +10,19 @@
     "test:e2e": "playwright test"
   },
   "devDependencies": {
-    "@walletconnect/types": "2.21.3",
+    "@walletconnect/types": "2.21.4",
     "typescript": "5.8.3",
     "vite": "6.3.5",
     "vite-plugin-node-polyfills": "0.24.0"
   },
   "dependencies": {
-    "@algorandfoundation/liquid-auth-use-wallet-client": "^1.4.0-canary.1",
+    "@algorandfoundation/liquid-auth-use-wallet-client": "^1.4.0-canary.2",
     "@blockshake/defly-connect": "^1.2.1",
     "@noble/ed25519": "2.3.0",
     "@perawallet/connect": "^1.4.1",
     "@txnlab/use-wallet": "workspace:*",
     "@walletconnect/modal": "^2.7.0",
-    "@walletconnect/sign-client": "^2.21.3",
+    "@walletconnect/sign-client": "^2.21.4",
     "algosdk": "3.3.1",
     "canonify": "2.1.1",
     "lute-connect": "^1.6.1"
