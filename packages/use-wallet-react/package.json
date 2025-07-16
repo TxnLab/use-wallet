@@ -1,6 +1,6 @@
 {
   "name": "@txnlab/use-wallet-react",
-  "version": "4.2.0",
+  "version": "4.3.0",
   "description": "React library for integrating Algorand wallets into decentralized applications",
   "author": "Doug Richar <drichar@gmail.com>",
   "license": "MIT",
@@ -38,7 +38,7 @@
     "dist"
   ],
   "dependencies": {
-    "@tanstack/react-store": "0.7.1",
+    "@tanstack/react-store": "0.7.3",
     "@txnlab/use-wallet": "workspace:*"
   },
   "devDependencies": {
@@ -55,7 +55,7 @@
     "@magic-ext/algorand": "^24.1.0",
     "@walletconnect/modal": "^2.7.0",
     "@perawallet/connect": "^1.4.1",
-    "@walletconnect/sign-client": "^2.21.3",
+    "@walletconnect/sign-client": "^2.21.4",
     "algosdk": "^3.0.0",
     "lute-connect": "^1.6.1",
     "magic-sdk": "^29.1.0",

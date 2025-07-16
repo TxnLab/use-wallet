@@ -21,19 +21,19 @@
     "@perawallet/connect": "^1.4.1",
     "@txnlab/use-wallet-svelte": "workspace:*",
     "@walletconnect/modal": "^2.7.0",
-    "@walletconnect/sign-client": "^2.21.3",
+    "@walletconnect/sign-client": "^2.21.4",
     "algosdk": "3.3.1",
     "canonify": "2.1.1",
     "lute-connect": "^1.6.1",
-    "svelte": "5.34.7"
+    "svelte": "5.35.4"
   },
   "devDependencies": {
     "@sveltejs/adapter-auto": "6.0.1",
-    "@sveltejs/kit": "2.22.1",
+    "@sveltejs/kit": "2.22.2",
     "@sveltejs/vite-plugin-svelte": "5.1.0",
-    "svelte-check": "4.2.1",
+    "svelte-check": "4.2.2",
     "typescript": "5.8.3",
     "vite": "6.3.5",
-    "vite-plugin-node-polyfills": "0.23.0"
+    "vite-plugin-node-polyfills": "0.24.0"
   }
 }

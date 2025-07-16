@@ -16,7 +16,7 @@
     "@perawallet/connect": "^1.4.1",
     "@txnlab/use-wallet-react": "workspace:*",
     "@walletconnect/modal": "^2.7.0",
-    "@walletconnect/sign-client": "^2.21.3",
+    "@walletconnect/sign-client": "^2.21.4",
     "algosdk": "3.3.1",
     "canonify": "2.1.1",
     "lute-connect": "^1.6.1",
@@ -26,14 +26,14 @@
   "devDependencies": {
     "@types/react": "18.3.23",
     "@types/react-dom": "18.3.7",
-    "@typescript-eslint/eslint-plugin": "8.34.1",
-    "@typescript-eslint/parser": "8.34.1",
+    "@typescript-eslint/eslint-plugin": "8.35.1",
+    "@typescript-eslint/parser": "8.35.1",
     "@vitejs/plugin-react": "4.6.0",
     "eslint": "8.57.1",
     "eslint-plugin-react-hooks": "5.2.0",
     "eslint-plugin-react-refresh": "0.4.20",
     "typescript": "5.8.3",
     "vite": "6.3.5",
-    "vite-plugin-node-polyfills": "0.23.0"
+    "vite-plugin-node-polyfills": "0.24.0"
   }
 }

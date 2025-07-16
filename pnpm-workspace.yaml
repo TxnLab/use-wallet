@@ -9,5 +9,6 @@ onlyBuiltDependencies:
   - canvas
   - cbor-extract
   - esbuild
+  - unrs-resolver
   - utf-8-validate
   - vue-demi
