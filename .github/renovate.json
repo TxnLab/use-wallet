@@ -10,7 +10,7 @@
   "configMigration": true,
   "timezone": "America/New_York",
   "assignees": ["drichar"],
-  "baseBranches": ["main"],
+  "baseBranchPatterns": ["main"],
   "ignorePaths": ["**/node_modules/**"],
   "minimumReleaseAge": "3 days",
   "lockFileMaintenance": {
@@ -62,7 +62,9 @@
     {
       "customType": "regex",
       "managerFilePatterns": ["/^package\\.json$/"],
-      "matchStrings": ["\"packageManager\":\\s*\"pnpm@(?<currentValue>\\d+\\.\\d+\\.\\d+)\""],
+      "matchStrings": [
+        "\"packageManager\":\\s*\"pnpm@(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
+      ],
       "depNameTemplate": "pnpm",
       "datasourceTemplate": "npm"
     },
