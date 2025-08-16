@@ -22,8 +22,8 @@
     "algosdk": "3.3.1",
     "canonify": "2.1.1",
     "lute-connect": "^1.6.1",
-    "nuxt": "3.17.6",
-    "vue": "3.5.17",
+    "nuxt": "3.18.1",
+    "vue": "3.5.18",
     "vue-router": "4.5.1"
   },
   "devDependencies": {
