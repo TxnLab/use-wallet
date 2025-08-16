@@ -90,8 +90,8 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.23)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.21.4
-        version: 2.21.4(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
+        specifier: ^2.21.8
+        version: 2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
       algosdk:
         specifier: 3.4.0
         version: 3.4.0
@@ -99,8 +99,8 @@ importers:
         specifier: 2.1.1
         version: 2.1.1
       lute-connect:
-        specifier: ^1.6.1
-        version: 1.6.1
+        specifier: ^1.6.2
+        version: 1.6.2
       next:
         specifier: 14.2.31
         version: 14.2.31(@babel/core@7.28.0)(@playwright/test@1.54.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -151,8 +151,8 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.23)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.21.4
-        version: 2.21.4(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
+        specifier: ^2.21.8
+        version: 2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
       algosdk:
         specifier: 3.4.0
         version: 3.4.0
@@ -160,8 +160,8 @@ importers:
         specifier: 2.1.1
         version: 2.1.1
       lute-connect:
-        specifier: ^1.6.1
-        version: 1.6.1
+        specifier: ^1.6.2
+        version: 1.6.2
       nuxt:
         specifier: 3.18.1
         version: 3.18.1(@netlify/blobs@9.1.2)(@parcel/watcher@2.5.1)(@types/node@20.11.30)(@vue/compiler-sfc@3.5.18)(db0@0.3.2)(eslint@8.57.1)(idb-keyval@6.2.2)(ioredis@5.6.1)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.46.2)(terser@5.43.1)(typescript@5.8.3)(vite@7.1.2(@types/node@20.11.30)(jiti@2.5.1)(terser@5.43.1)(yaml@2.8.0))(vue-tsc@2.2.12(typescript@5.8.3))(yaml@2.8.0)
@@ -200,8 +200,8 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.23)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.21.4
-        version: 2.21.4(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
+        specifier: ^2.21.8
+        version: 2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
       algosdk:
         specifier: 3.4.0
         version: 3.4.0
@@ -209,8 +209,8 @@ importers:
         specifier: 2.1.1
         version: 2.1.1
       lute-connect:
-        specifier: ^1.6.1
-        version: 1.6.1
+        specifier: ^1.6.2
+        version: 1.6.2
       react:
         specifier: 18.3.1
         version: 18.3.1
@@ -270,8 +270,8 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.23)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.21.4
-        version: 2.21.4(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
+        specifier: ^2.21.8
+        version: 2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
       algosdk:
         specifier: 3.4.0
         version: 3.4.0
@@ -279,8 +279,8 @@ importers:
         specifier: 2.1.1
         version: 2.1.1
       lute-connect:
-        specifier: ^1.6.1
-        version: 1.6.1
+        specifier: ^1.6.2
+        version: 1.6.2
       solid-js:
         specifier: 1.9.9
         version: 1.9.9
@@ -316,8 +316,8 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.23)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.21.4
-        version: 2.21.4(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
+        specifier: ^2.21.8
+        version: 2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
       algosdk:
         specifier: 3.4.0
         version: 3.4.0
@@ -325,8 +325,8 @@ importers:
         specifier: 2.1.1
         version: 2.1.1
       lute-connect:
-        specifier: ^1.6.1
-        version: 1.6.1
+        specifier: ^1.6.2
+        version: 1.6.2
       svelte:
         specifier: 5.38.1
         version: 5.38.1
@@ -371,8 +371,8 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.23)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.21.4
-        version: 2.21.4(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
+        specifier: ^2.21.8
+        version: 2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
       algosdk:
         specifier: 3.4.0
         version: 3.4.0
@@ -380,12 +380,12 @@ importers:
         specifier: 2.1.1
         version: 2.1.1
       lute-connect:
-        specifier: ^1.6.1
-        version: 1.6.1
+        specifier: ^1.6.2
+        version: 1.6.2
     devDependencies:
       '@walletconnect/types':
-        specifier: 2.21.4
-        version: 2.21.4(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)
+        specifier: 2.21.8
+        version: 2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)
       typescript:
         specifier: 5.8.3
         version: 5.8.3
@@ -414,8 +414,8 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.23)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.21.4
-        version: 2.21.4(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
+        specifier: ^2.21.8
+        version: 2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
       algosdk:
         specifier: 3.4.0
         version: 3.4.0
@@ -423,8 +423,8 @@ importers:
         specifier: 2.1.1
         version: 2.1.1
       lute-connect:
-        specifier: ^1.6.1
-        version: 1.6.1
+        specifier: ^1.6.2
+        version: 1.6.2
       vue:
         specifier: 3.5.18
         version: 3.5.18(typescript@5.8.3)
@@ -458,11 +458,11 @@ importers:
         specifier: 1.2.1
         version: 1.2.1(algosdk@3.4.0)
       '@magic-ext/algorand':
-        specifier: 24.1.0
-        version: 24.1.0
+        specifier: 24.4.2
+        version: 24.4.2
       '@magic-sdk/provider':
-        specifier: 29.1.0
-        version: 29.1.0(localforage@1.10.0)
+        specifier: 29.4.2
+        version: 29.4.2(localforage@1.10.0)
       '@perawallet/connect':
         specifier: 1.4.1
         version: 1.4.1(algosdk@3.4.0)
@@ -476,11 +476,11 @@ importers:
         specifier: 2.7.0
         version: 2.7.0(@types/react@18.3.23)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: 2.21.4
-        version: 2.21.4(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
+        specifier: 2.21.8
+        version: 2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
       '@walletconnect/types':
-        specifier: 2.21.4
-        version: 2.21.4(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)
+        specifier: 2.21.8
+        version: 2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)
       algosdk:
         specifier: 3.4.0
         version: 3.4.0
@@ -488,11 +488,11 @@ importers:
         specifier: 2.1.1
         version: 2.1.1
       lute-connect:
-        specifier: 1.6.1
-        version: 1.6.1
+        specifier: 1.6.2
+        version: 1.6.2
       magic-sdk:
-        specifier: 29.1.0
-        version: 29.1.0
+        specifier: 29.4.2
+        version: 29.4.2
       tsup:
         specifier: 8.5.0
         version: 8.5.0(jiti@2.5.1)(postcss@8.5.6)(typescript@5.8.3)(yaml@2.8.0)
@@ -506,8 +506,8 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.4.0)
       '@magic-ext/algorand':
-        specifier: ^24.1.0
-        version: 24.1.0
+        specifier: ^24.4.2
+        version: 24.4.2
       '@perawallet/connect':
         specifier: ^1.4.1
         version: 1.4.1(algosdk@3.4.0)
@@ -521,14 +521,14 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.23)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.21.4
-        version: 2.21.4(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
+        specifier: ^2.21.8
+        version: 2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
       lute-connect:
-        specifier: ^1.6.1
-        version: 1.6.1
+        specifier: ^1.6.2
+        version: 1.6.2
       magic-sdk:
-        specifier: ^29.1.0
-        version: 29.1.0
+        specifier: ^29.4.2
+        version: 29.4.2
     devDependencies:
       '@types/react':
         specifier: 18.3.23
@@ -558,8 +558,8 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.4.0)
       '@magic-ext/algorand':
-        specifier: ^24.1.0
-        version: 24.1.0
+        specifier: ^24.4.2
+        version: 24.4.2
       '@perawallet/connect':
         specifier: ^1.4.1
         version: 1.4.1(algosdk@3.4.0)
@@ -573,14 +573,14 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.23)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.21.4
-        version: 2.21.4(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
+        specifier: ^2.21.8
+        version: 2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
       lute-connect:
-        specifier: ^1.6.1
-        version: 1.6.1
+        specifier: ^1.6.2
+        version: 1.6.2
       magic-sdk:
-        specifier: ^29.1.0
-        version: 29.1.0
+        specifier: ^29.4.2
+        version: 29.4.2
     devDependencies:
       '@solidjs/testing-library':
         specifier: 0.8.10
@@ -607,8 +607,8 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.4.0)
       '@magic-ext/algorand':
-        specifier: ^24.1.0
-        version: 24.1.0
+        specifier: ^24.4.2
+        version: 24.4.2
       '@perawallet/connect':
         specifier: ^1.4.1
         version: 1.4.1(algosdk@3.4.0)
@@ -622,14 +622,14 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.23)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.21.4
-        version: 2.21.4(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
+        specifier: ^2.21.8
+        version: 2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
       lute-connect:
-        specifier: ^1.6.1
-        version: 1.6.1
+        specifier: ^1.6.2
+        version: 1.6.2
       magic-sdk:
-        specifier: ^29.1.0
-        version: 29.1.0
+        specifier: ^29.4.2
+        version: 29.4.2
     devDependencies:
       '@testing-library/svelte':
         specifier: 5.2.8
@@ -653,8 +653,8 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.4.0)
       '@magic-ext/algorand':
-        specifier: ^24.1.0
-        version: 24.1.0
+        specifier: ^24.4.2
+        version: 24.4.2
       '@perawallet/connect':
         specifier: ^1.4.1
         version: 1.4.1(algosdk@3.4.0)
@@ -668,14 +668,14 @@ importers:
         specifier: ^2.7.0
         version: 2.7.0(@types/react@18.3.23)(react@18.3.1)
       '@walletconnect/sign-client':
-        specifier: ^2.21.4
-        version: 2.21.4(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
+        specifier: ^2.21.8
+        version: 2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
       lute-connect:
-        specifier: ^1.6.1
-        version: 1.6.1
+        specifier: ^1.6.2
+        version: 1.6.2
       magic-sdk:
-        specifier: ^29.1.0
-        version: 29.1.0
+        specifier: ^29.4.2
+        version: 29.4.2
     devDependencies:
       algosdk:
         specifier: 3.4.0
@@ -1468,22 +1468,22 @@ packages:
   '@lit/reactive-element@1.6.3':
     resolution: {integrity: sha512-QuTgnG52Poic7uM1AN5yJ09QMe0O28e10XzSvWDz02TJiiKee4stsiownEIadWm8nYzyDAyT+gKzUoZmiWQtsQ==}
 
-  '@magic-ext/algorand@24.1.0':
-    resolution: {integrity: sha512-aM+Dhef9keCrfWwnVBFsNxf37U2bbmCND71jHATUW2zy2+NWMzrXb9QMPH27JJcjgutfFzwYrB02u1w/yNY8Xg==}
+  '@magic-ext/algorand@24.4.2':
+    resolution: {integrity: sha512-q4EgTTVN/wedF6x7EtyzUJd/4sK5J/5AYCEtqGN1g0OM4UrqHt2FBq+nrFM93hRtBaAtLcsIlZSh9dP78xHw8Q==}
 
-  '@magic-sdk/commons@25.1.0':
-    resolution: {integrity: sha512-k+22ICI2I5zQPIYJen4kUB8dT0Nu48nwtJMc/Tm0M4Hm7j9HFldkU3HAQwRtBjMDHaupl0kOlLPnXmsYeVm2QA==}
+  '@magic-sdk/commons@25.4.2':
+    resolution: {integrity: sha512-R3wJ1NWa+uDH9+Cc6kLjPDCSkelG3VM9pnuHR0zpE52XxiYaL0IplSG8DsjCqt2FeurTgqlUHGUEFrDHIdXEFQ==}
     peerDependencies:
       '@magic-sdk/provider': '>=18.6.0'
       '@magic-sdk/types': '>=15.8.0'
 
-  '@magic-sdk/provider@29.1.0':
-    resolution: {integrity: sha512-gzqwnlGSf/j6gFnVZmSTgQxZUPErRGPnepbWRqlYYwdVEpisSQ6xdl6gLb+/Xa50t7691onlNxM1Sgj2Dqa3jw==}
+  '@magic-sdk/provider@29.4.2':
+    resolution: {integrity: sha512-9PbFC3MGY9ipKy3VjVJBwWJyp6QFmrlzXBvVCp/WE8GBDTs9CHh7naQ5pmrOMCc8d9B15ogLuB5/XXkCR1BQQA==}
     peerDependencies:
       localforage: ^1.7.4
 
-  '@magic-sdk/types@24.19.0':
-    resolution: {integrity: sha512-rA1yRLDJ6+5LN76c9TOS6ThuaiGJEGosv/1zq7ckKpD1Wi37wtYzSAoHK0s033ZtlTAH6+6VuKZIXDag/oS/jQ==}
+  '@magic-sdk/types@24.21.0':
+    resolution: {integrity: sha512-FVrGoHknzl+rV3GwQisxOvDu0MriBitzHFc4RGPEGOUianc90EhmJj2IFahMfIlh9YzqASpUV2PYgu96AUL/TA==}
 
   '@mapbox/node-pre-gyp@2.0.0':
     resolution: {integrity: sha512-llMXd39jtP0HpQLVI37Bf1m2ADlEb35GYSh1SDSLsBhR+5iCxiNGlT31yqbNtVHygHAtMy6dWFERpU2JgufhPg==}
@@ -2967,8 +2967,8 @@ packages:
   '@walletconnect/core@1.8.0':
     resolution: {integrity: sha512-aFTHvEEbXcZ8XdWBw6rpQDte41Rxwnuk3SgTD8/iKGSRTni50gI9S3YEzMj05jozSiOBxQci4pJDMVhIUMtarw==}
 
-  '@walletconnect/core@2.21.4':
-    resolution: {integrity: sha512-XtwPUCj3bCNX/2yjYGlQyvcsn32wkzixCjyWOD4pdKFVk7opZPAdF4xr85rmo6nJ7AiBYxjV1IH0bemTPEdE6Q==}
+  '@walletconnect/core@2.21.8':
+    resolution: {integrity: sha512-MD1SY7KAeHWvufiBK8C1MwP9/pxxI7SnKi/rHYfjco2Xvke+M+Bbm2OzvuSN7dYZvwLTkZCiJmBccTNVPCpSUQ==}
     engines: {node: '>=18'}
 
   '@walletconnect/crypto@1.1.0':
@@ -3037,8 +3037,8 @@ packages:
   '@walletconnect/safe-json@1.0.2':
     resolution: {integrity: sha512-Ogb7I27kZ3LPC3ibn8ldyUr5544t3/STow9+lzz7Sfo808YD7SBWk7SAsdBFlYgP2zDRy2hS3sKRcuSRM0OTmA==}
 
-  '@walletconnect/sign-client@2.21.4':
-    resolution: {integrity: sha512-v1OJ9IQCZAqaDEUYGFnGLe2fSp8DN9cv7j8tUYm5ngiFK7h6LjP4Ew3gGCca4AHWzMFkHuIRNQ+6Ypep1K/B7g==}
+  '@walletconnect/sign-client@2.21.8':
+    resolution: {integrity: sha512-lTcUbMjQ0YUZ5wzCLhpBeS9OkWYgLLly6BddEp2+pm4QxiwCCU2Nao0nBJXgzKbZYQOgrEGqtdm/7ze67gjzRA==}
 
   '@walletconnect/socket-transport@1.8.0':
     resolution: {integrity: sha512-5DyIyWrzHXTcVp0Vd93zJ5XMW61iDM6bcWT4p8DTRfFsOtW46JquruMhxOLeCOieM4D73kcr3U7WtyR4JUsGuQ==}
@@ -3050,14 +3050,14 @@ packages:
     resolution: {integrity: sha512-Cn+3I0V0vT9ghMuzh1KzZvCkiAxTq+1TR2eSqw5E5AVWfmCtECFkVZBP6uUJZ8YjwLqXheI+rnjqPy7sVM4Fyg==}
     deprecated: 'WalletConnect''s v1 SDKs are now deprecated. Please upgrade to a v2 SDK. For details see: https://docs.walletconnect.com/'
 
-  '@walletconnect/types@2.21.4':
-    resolution: {integrity: sha512-6O61esDSW8FZNdFezgB4bX2S35HM6tCwBEjGHNB8JeoKCfpXG33hw2raU/SBgBL/jmM57QRW4M1aFH7v1u9z7g==}
+  '@walletconnect/types@2.21.8':
+    resolution: {integrity: sha512-xuLIPrLxe6viMu8Uk28Nf0sgyMy+4oT0mroOjBe5Vqyft8GTiwUBKZXmrGU9uDzZsYVn1FXLO9CkuNHXda3ODA==}
 
   '@walletconnect/utils@1.8.0':
     resolution: {integrity: sha512-zExzp8Mj1YiAIBfKNm5u622oNw44WOESzo6hj+Q3apSMIb0Jph9X3GDIdbZmvVZsNPxWDL7uodKgZcCInZv2vA==}
 
-  '@walletconnect/utils@2.21.4':
-    resolution: {integrity: sha512-LuSyBXvRLiDqIu4uMFei5eJ/WPhkIkdW58fmDlRnryatIuBPCho3dlrNSbOjVSdsID+OvxjOlpPLi+5h4oTbaA==}
+  '@walletconnect/utils@2.21.8':
+    resolution: {integrity: sha512-HtMraGJ9qXo55l4wGSM1aZvyz0XVv460iWhlRGAyRl9Yz8RQeKyXavDhwBfcTFha/6kwLxPExqQ+MURtKeVVXw==}
 
   '@walletconnect/window-getters@1.0.0':
     resolution: {integrity: sha512-xB0SQsLaleIYIkSsl43vm8EwETpBzJ2gnzk7e0wMF3ktqiTGS6TFHxcprMl5R44KKh4tCcHCJwolMCaDSwtAaA==}
@@ -4571,9 +4571,6 @@ packages:
     resolution: {integrity: sha512-O1Ld7Dr+nqPnmGpdhzLmMTQ4vAsD+rHwMm1NLUmoUFFymBOMKxCCrtDxqdBRYXdeEPEi3SyoR4TizJLQrnKBNA==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
-  h3@1.15.3:
-    resolution: {integrity: sha512-z6GknHqyX0h9aQaTx22VZDf6QyZn+0Nh+Ym8O/u0SGSkyF5cuTJYKlc8MkzW3Nzf9LE1ivcpmYC3FUGpywhuUQ==}
-
   h3@1.15.4:
     resolution: {integrity: sha512-z5cFQWDffyOe4vQ9xIqNfCZdV4p//vy6fBnr8Q1AWnVZ0teurKMG66rLj++TKwKPUP3u7iMUvrvKaEUiQw2QWQ==}
 
@@ -5200,8 +5197,8 @@ packages:
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
 
-  lute-connect@1.6.1:
-    resolution: {integrity: sha512-DTu1En7UsoGlBwYkqTi2lWzzMeRLeB5PfYG/ZxDoe3bv405+JDIzOGd1SoPZI3sU9E9KGRHgzMW+TFlbsEVrUA==}
+  lute-connect@1.6.2:
+    resolution: {integrity: sha512-ufY/KdVgb63852RYURZh2id3T0FbVW56j6Mz/YholFk3eyIJfDL8FKhiN1HN96mGisejmYxc+wG/taWUoa5AfQ==}
 
   luxon@3.7.1:
     resolution: {integrity: sha512-RkRWjA926cTvz5rAb1BqyWkKbbjzCGchDUIKMCUvNi17j6f6j8uHGDV82Aqcqtzd+icoYpELmG3ksgGiFNNcNg==}
@@ -5214,8 +5211,8 @@ packages:
   magic-regexp@0.10.0:
     resolution: {integrity: sha512-Uly1Bu4lO1hwHUW0CQeSWuRtzCMNO00CmXtS8N6fyvB3B979GOEEeAkiTUDsmbYLAbvpUS/Kt5c4ibosAzVyVg==}
 
-  magic-sdk@29.1.0:
-    resolution: {integrity: sha512-s7W7RtR5gYf6siv6Og1O123lCsbnz0DzhRKIVUxvpOOzNt4xXP4UX5Qy5Nq1ifKfCEU5tBuTcKMxl48aZZkKMg==}
+  magic-sdk@29.4.2:
+    resolution: {integrity: sha512-m5DFM+FUxAwDkmG8cuGKp9aIcJfIrI7TUoL5oL2ywumVAPAfBdJys0Udda7nZMJMN0mtHAhYPhqoOSqDU9HvgA==}
 
   magic-string-ast@1.0.0:
     resolution: {integrity: sha512-8rbuNizut2gW94kv7pqgt0dvk+AHLPVIm0iJtpSgQJ9dx21eWx5SBel8z3jp1xtC0j6/iyK3AWGhAR1H61s7LA==}
@@ -6981,65 +6978,6 @@ packages:
   unrs-resolver@1.11.1:
     resolution: {integrity: sha512-bSjt9pjaEBnNiGgc9rUiHGKv5l4/TGzDmYw3RhnkJGtLhbnnA/5qJj7x3dNDCRx/PJxu774LlH8lCOlB4hEfKg==}
 
-  unstorage@1.16.0:
-    resolution: {integrity: sha512-WQ37/H5A7LcRPWfYOrDa1Ys02xAbpPJq6q5GkO88FBXVSQzHd7+BjEwfRqyaSWCv9MbsJy058GWjjPjcJ16GGA==}
-    peerDependencies:
-      '@azure/app-configuration': ^1.8.0
-      '@azure/cosmos': ^4.2.0
-      '@azure/data-tables': ^13.3.0
-      '@azure/identity': ^4.6.0
-      '@azure/keyvault-secrets': ^4.9.0
-      '@azure/storage-blob': ^12.26.0
-      '@capacitor/preferences': ^6.0.3 || ^7.0.0
-      '@deno/kv': '>=0.9.0'
-      '@netlify/blobs': ^6.5.0 || ^7.0.0 || ^8.1.0
-      '@planetscale/database': ^1.19.0
-      '@upstash/redis': ^1.34.3
-      '@vercel/blob': '>=0.27.1'
-      '@vercel/kv': ^1.0.1
-      aws4fetch: ^1.0.20
-      db0: '>=0.2.1'
-      idb-keyval: ^6.2.1
-      ioredis: ^5.4.2
-      uploadthing: ^7.4.4
-    peerDependenciesMeta:
-      '@azure/app-configuration':
-        optional: true
-      '@azure/cosmos':
-        optional: true
-      '@azure/data-tables':
-        optional: true
-      '@azure/identity':
-        optional: true
-      '@azure/keyvault-secrets':
-        optional: true
-      '@azure/storage-blob':
-        optional: true
-      '@capacitor/preferences':
-        optional: true
-      '@deno/kv':
-        optional: true
-      '@netlify/blobs':
-        optional: true
-      '@planetscale/database':
-        optional: true
-      '@upstash/redis':
-        optional: true
-      '@vercel/blob':
-        optional: true
-      '@vercel/kv':
-        optional: true
-      aws4fetch:
-        optional: true
-      db0:
-        optional: true
-      idb-keyval:
-        optional: true
-      ioredis:
-        optional: true
-      uploadthing:
-        optional: true
-
   unstorage@1.16.1:
     resolution: {integrity: sha512-gdpZ3guLDhz+zWIlYP1UwQ259tG5T5vYRzDaHMkQ1bBY1SQPutvZnrRjTFaWUUpseErJIgAZS51h6NOcZVZiqQ==}
     peerDependencies:
@@ -8289,20 +8227,20 @@ snapshots:
     dependencies:
       '@lit-labs/ssr-dom-shim': 1.3.0
 
-  '@magic-ext/algorand@24.1.0': {}
+  '@magic-ext/algorand@24.4.2': {}
 
-  '@magic-sdk/commons@25.1.0(@magic-sdk/provider@29.1.0(localforage@1.10.0))(@magic-sdk/types@24.19.0)':
+  '@magic-sdk/commons@25.4.2(@magic-sdk/provider@29.4.2(localforage@1.10.0))(@magic-sdk/types@24.21.0)':
     dependencies:
-      '@magic-sdk/provider': 29.1.0(localforage@1.10.0)
-      '@magic-sdk/types': 24.19.0
+      '@magic-sdk/provider': 29.4.2(localforage@1.10.0)
+      '@magic-sdk/types': 24.21.0
 
-  '@magic-sdk/provider@29.1.0(localforage@1.10.0)':
+  '@magic-sdk/provider@29.4.2(localforage@1.10.0)':
     dependencies:
-      '@magic-sdk/types': 24.19.0
+      '@magic-sdk/types': 24.21.0
       eventemitter3: 4.0.7
       localforage: 1.10.0
 
-  '@magic-sdk/types@24.19.0': {}
+  '@magic-sdk/types@24.21.0': {}
 
   '@mapbox/node-pre-gyp@2.0.0':
     dependencies:
@@ -9935,7 +9873,7 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@walletconnect/core@2.21.4(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)':
+  '@walletconnect/core@2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)':
     dependencies:
       '@walletconnect/heartbeat': 1.2.2
       '@walletconnect/jsonrpc-provider': 1.0.14
@@ -9948,8 +9886,8 @@ snapshots:
       '@walletconnect/relay-auth': 1.1.0
       '@walletconnect/safe-json': 1.0.2
       '@walletconnect/time': 1.0.2
-      '@walletconnect/types': 2.21.4(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)
-      '@walletconnect/utils': 2.21.4(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
+      '@walletconnect/types': 2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)
+      '@walletconnect/utils': 2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
       '@walletconnect/window-getters': 1.0.1
       es-toolkit: 1.39.3
       events: 3.3.0
@@ -10045,7 +9983,7 @@ snapshots:
     dependencies:
       '@walletconnect/safe-json': 1.0.2
       idb-keyval: 6.2.2
-      unstorage: 1.16.0(@netlify/blobs@9.1.2)(db0@0.3.2)(idb-keyval@6.2.2)(ioredis@5.6.1)
+      unstorage: 1.16.1(@netlify/blobs@9.1.2)(db0@0.3.2)(idb-keyval@6.2.2)(ioredis@5.6.1)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -10120,16 +10058,16 @@ snapshots:
     dependencies:
       tslib: 1.14.1
 
-  '@walletconnect/sign-client@2.21.4(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)':
+  '@walletconnect/sign-client@2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)':
     dependencies:
-      '@walletconnect/core': 2.21.4(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
+      '@walletconnect/core': 2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
       '@walletconnect/events': 1.0.1
       '@walletconnect/heartbeat': 1.2.2
       '@walletconnect/jsonrpc-utils': 1.0.8
       '@walletconnect/logger': 2.1.2
       '@walletconnect/time': 1.0.2
-      '@walletconnect/types': 2.21.4(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)
-      '@walletconnect/utils': 2.21.4(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
+      '@walletconnect/types': 2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)
+      '@walletconnect/utils': 2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)
       events: 3.3.0
     transitivePeerDependencies:
       - '@azure/app-configuration'
@@ -10170,7 +10108,7 @@ snapshots:
 
   '@walletconnect/types@1.8.0': {}
 
-  '@walletconnect/types@2.21.4(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)':
+  '@walletconnect/types@2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)':
     dependencies:
       '@walletconnect/events': 1.0.1
       '@walletconnect/heartbeat': 1.2.2
@@ -10208,7 +10146,7 @@ snapshots:
       js-sha3: 0.8.0
       query-string: 6.13.5
 
-  '@walletconnect/utils@2.21.4(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)':
+  '@walletconnect/utils@2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.76)':
     dependencies:
       '@msgpack/msgpack': 3.1.2
       '@noble/ciphers': 1.3.0
@@ -10221,7 +10159,7 @@ snapshots:
       '@walletconnect/relay-auth': 1.1.0
       '@walletconnect/safe-json': 1.0.2
       '@walletconnect/time': 1.0.2
-      '@walletconnect/types': 2.21.4(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)
+      '@walletconnect/types': 2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.6.1)
       '@walletconnect/window-getters': 1.0.1
       '@walletconnect/window-metadata': 1.0.1
       blakejs: 1.2.1
@@ -10262,7 +10200,7 @@ snapshots:
 
   '@walletconnect/window-metadata@1.0.0':
     dependencies:
-      '@walletconnect/window-getters': 1.0.0
+      '@walletconnect/window-getters': 1.0.1
 
   '@walletconnect/window-metadata@1.0.1':
     dependencies:
@@ -12066,18 +12004,6 @@ snapshots:
     dependencies:
       duplexer: 0.1.2
 
-  h3@1.15.3:
-    dependencies:
-      cookie-es: 1.2.2
-      crossws: 0.3.5
-      defu: 6.1.4
-      destr: 2.0.5
-      iron-webcrypto: 1.2.1
-      node-mock-http: 1.0.1
-      radix3: 1.1.2
-      ufo: 1.6.1
-      uncrypto: 0.1.3
-
   h3@1.15.4:
     dependencies:
       cookie-es: 1.2.2
@@ -12711,7 +12637,7 @@ snapshots:
     dependencies:
       yallist: 3.1.1
 
-  lute-connect@1.6.1: {}
+  lute-connect@1.6.2: {}
 
   luxon@3.7.1: {}
 
@@ -12727,11 +12653,11 @@ snapshots:
       ufo: 1.6.1
       unplugin: 2.3.5
 
-  magic-sdk@29.1.0:
+  magic-sdk@29.4.2:
     dependencies:
-      '@magic-sdk/commons': 25.1.0(@magic-sdk/provider@29.1.0(localforage@1.10.0))(@magic-sdk/types@24.19.0)
-      '@magic-sdk/provider': 29.1.0(localforage@1.10.0)
-      '@magic-sdk/types': 24.19.0
+      '@magic-sdk/commons': 25.4.2(@magic-sdk/provider@29.4.2(localforage@1.10.0))(@magic-sdk/types@24.21.0)
+      '@magic-sdk/provider': 29.4.2(localforage@1.10.0)
+      '@magic-sdk/types': 24.21.0
       localforage: 1.10.0
 
   magic-string-ast@1.0.0:
@@ -14944,22 +14870,6 @@ snapshots:
       '@unrs/resolver-binding-win32-arm64-msvc': 1.11.1
       '@unrs/resolver-binding-win32-ia32-msvc': 1.11.1
       '@unrs/resolver-binding-win32-x64-msvc': 1.11.1
-
-  unstorage@1.16.0(@netlify/blobs@9.1.2)(db0@0.3.2)(idb-keyval@6.2.2)(ioredis@5.6.1):
-    dependencies:
-      anymatch: 3.1.3
-      chokidar: 4.0.3
-      destr: 2.0.5
-      h3: 1.15.3
-      lru-cache: 10.4.3
-      node-fetch-native: 1.6.6
-      ofetch: 1.4.1
-      ufo: 1.6.1
-    optionalDependencies:
-      '@netlify/blobs': 9.1.2
-      db0: 0.3.2
-      idb-keyval: 6.2.2
-      ioredis: 5.6.1
 
   unstorage@1.16.1(@netlify/blobs@9.1.2)(db0@0.3.2)(idb-keyval@6.2.2)(ioredis@5.6.1):
     dependencies:

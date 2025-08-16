@@ -18,10 +18,10 @@
     "@txnlab/use-wallet": "workspace:*",
     "@txnlab/use-wallet-vue": "workspace:*",
     "@walletconnect/modal": "^2.7.0",
-    "@walletconnect/sign-client": "^2.21.4",
+    "@walletconnect/sign-client": "^2.21.8",
     "algosdk": "3.4.0",
     "canonify": "2.1.1",
-    "lute-connect": "^1.6.1",
+    "lute-connect": "^1.6.2",
     "nuxt": "3.18.1",
     "vue": "3.5.18",
     "vue-router": "4.5.1"
