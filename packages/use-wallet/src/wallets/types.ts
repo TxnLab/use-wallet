@@ -4,7 +4,6 @@ import { DeflyWebWallet } from './defly-web'
 import { ExodusWallet, type ExodusOptions } from './exodus'
 import { KibisisWallet } from './kibisis'
 import { KmdWallet, type KmdOptions } from './kmd'
-import { LiquidOptions, LiquidWallet } from './liquid'
 import { LuteConnectOptions, LuteWallet } from './lute'
 import { MagicAuth, MagicAuthOptions } from './magic'
 import { MnemonicWallet, type MnemonicOptions } from './mnemonic'
@@ -24,7 +23,6 @@ export enum WalletId {
   EXODUS = 'exodus',
   KIBISIS = 'kibisis',
   KMD = 'kmd',
-  LIQUID = 'liquid',
   LUTE = 'lute',
   MAGIC = 'magic',
   MNEMONIC = 'mnemonic',
@@ -41,7 +39,6 @@ export type WalletMap = {
   [WalletId.EXODUS]: typeof ExodusWallet
   [WalletId.KIBISIS]: typeof KibisisWallet
   [WalletId.KMD]: typeof KmdWallet
-  [WalletId.LIQUID]: typeof LiquidWallet
   [WalletId.LUTE]: typeof LuteWallet
   [WalletId.MAGIC]: typeof MagicAuth
   [WalletId.MNEMONIC]: typeof MnemonicWallet
@@ -58,7 +55,6 @@ export type WalletOptionsMap = {
   [WalletId.EXODUS]: ExodusOptions
   [WalletId.KIBISIS]: Record<string, never>
   [WalletId.KMD]: KmdOptions
-  [WalletId.LIQUID]: LiquidOptions
   [WalletId.LUTE]: LuteConnectOptions
   [WalletId.MAGIC]: MagicAuthOptions
   [WalletId.MNEMONIC]: MnemonicOptions

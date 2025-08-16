@@ -3,7 +3,6 @@ packages:
   - packages/*
 
 onlyBuiltDependencies:
-  - '@algorandfoundation/liquid-client'
   - '@parcel/watcher'
   - bufferutil
   - canvas
