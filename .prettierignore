@@ -7,6 +7,7 @@
 pnpm-lock.yaml
 *.code-workspace
 docs/**
+.github/renovate.json
 
 # Generated Svelte files
 **/.svelte-kit
