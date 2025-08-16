@@ -21,14 +21,6 @@ app.use(WalletManagerPlugin, {
     },
     WalletId.KMD,
     WalletId.KIBISIS,
-    {
-      id: WalletId.LIQUID,
-      options: {
-        origin: 'https://debug.liquidauth.com',
-        RTC_config_username: 'liquid-auth',
-        RTC_config_credential: 'sqmcP4MiTKMT4TGEDSk9jgHY'
-      }
-    },
     WalletId.LUTE,
     {
       id: WalletId.MAGIC,
