@@ -42,7 +42,7 @@
     "@txnlab/use-wallet": "workspace:*"
   },
   "devDependencies": {
-    "algosdk": "3.3.1",
+    "algosdk": "3.4.0",
     "tsup": "8.5.0",
     "typescript": "5.8.3",
     "vue": "3.5.18"
