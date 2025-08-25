@@ -38,14 +38,14 @@
     "dist"
   ],
   "dependencies": {
-    "@tanstack/vue-store": "0.7.3",
+    "@tanstack/vue-store": "0.7.4",
     "@txnlab/use-wallet": "workspace:*"
   },
   "devDependencies": {
     "algosdk": "3.4.0",
     "tsup": "8.5.0",
     "typescript": "5.8.3",
-    "vue": "3.5.18"
+    "vue": "3.5.19"
   },
   "peerDependencies": {
     "@blockshake/defly-connect": "^1.2.1",
