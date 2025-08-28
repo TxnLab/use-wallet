@@ -38,13 +38,13 @@
     "dist"
   ],
   "dependencies": {
-    "@tanstack/svelte-store": "0.7.3",
+    "@tanstack/svelte-store": "0.7.4",
     "@txnlab/use-wallet": "workspace:*"
   },
   "devDependencies": {
     "@testing-library/svelte": "5.2.8",
     "algosdk": "3.4.0",
-    "svelte": "5.38.1",
+    "svelte": "5.38.3",
     "tsup": "8.5.0",
     "typescript": "5.8.3"
   },
