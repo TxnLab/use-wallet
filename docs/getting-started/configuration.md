@@ -96,6 +96,12 @@ const manager = new WalletManager({
       options: {
         projectId: '<REOWN_PROJECT_ID>'  // Required
       }
+    },
+    {
+      id: WalletId.VOIWALLET,
+      options: {
+        projectId: '<REOWN_PROJECT_ID>'  // Required
+      }
     }
   ]
 })

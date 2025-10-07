@@ -10,6 +10,7 @@ import { MnemonicWallet, type MnemonicOptions } from './mnemonic'
 import { PeraWallet, type PeraWalletConnectOptions } from './pera'
 import { WalletConnect, type WalletConnectOptions } from './walletconnect'
 import { BiatecWallet } from './biatec'
+import { VoiWallet } from './voiwallet'
 import type { Store } from '@tanstack/store'
 import type algosdk from 'algosdk'
 import type { State } from 'src/store'
@@ -27,6 +28,7 @@ export enum WalletId {
   MAGIC = 'magic',
   MNEMONIC = 'mnemonic',
   PERA = 'pera',
+  VOIWALLET = 'voiwallet',
   WALLETCONNECT = 'walletconnect',
   W3_WALLET = 'w3-wallet'
 }
@@ -43,6 +45,7 @@ export type WalletMap = {
   [WalletId.MAGIC]: typeof MagicAuth
   [WalletId.MNEMONIC]: typeof MnemonicWallet
   [WalletId.PERA]: typeof PeraWallet
+  [WalletId.VOIWALLET]: typeof VoiWallet
   [WalletId.WALLETCONNECT]: typeof WalletConnect
   [WalletId.W3_WALLET]: typeof W3Wallet
 }
@@ -59,6 +62,7 @@ export type WalletOptionsMap = {
   [WalletId.MAGIC]: MagicAuthOptions
   [WalletId.MNEMONIC]: MnemonicOptions
   [WalletId.PERA]: PeraWalletConnectOptions
+  [WalletId.VOIWALLET]: WalletConnectOptions
   [WalletId.WALLETCONNECT]: WalletConnectOptions
   [WalletId.W3_WALLET]: Record<string, never>
 }

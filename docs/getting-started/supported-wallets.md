@@ -200,6 +200,20 @@ WalletId.BIATEC
 * [Biatec Website](https://wallet.biatec.io)
 * [Biatec GitHub Repository](https://github.com/scholtz/wallet)
 
+#### Voi Wallet
+
+Cross-chain AVM Mobile wallet with WalletConnect support. [Installation instructions](installation.md#walletconnect).
+
+```typescript
+import { WalletId } from '@txnlab/use-wallet'
+
+// Basic usage (no options required)
+WalletId.VOIWALLET
+```
+
+* [Voi Wallet Website](https://getvoi.app)
+* [Voi Wallet GitHub Repository](https://github.com/xarmian/voiwallet)
+
 #### Liquid Auth (experimental)
 
  {% hint style="warning" %}

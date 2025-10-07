@@ -11,6 +11,7 @@ import { LuteWallet } from './wallets/lute'
 import { MagicAuth } from './wallets/magic'
 import { MnemonicWallet } from './wallets/mnemonic'
 import { PeraWallet } from './wallets/pera'
+import { VoiWallet } from './wallets/voiwallet'
 import { WalletConnect } from './wallets/walletconnect'
 import { W3Wallet } from './wallets/w3wallet'
 
@@ -27,6 +28,7 @@ export function createWalletMap(): WalletMap {
     [WalletId.MAGIC]: MagicAuth,
     [WalletId.MNEMONIC]: MnemonicWallet,
     [WalletId.PERA]: PeraWallet,
+    [WalletId.VOIWALLET]: VoiWallet,
     [WalletId.WALLETCONNECT]: WalletConnect,
     [WalletId.W3_WALLET]: W3Wallet
   }
