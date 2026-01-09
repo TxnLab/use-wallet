@@ -13,8 +13,11 @@ const walletManager = new WalletManager({
       options: { projectId: 'fcfde0713d43baa0d23be0773c80a72b' }
     },
     {
-      id: WalletId.BIATEC,
-      options: { projectId: 'fcfde0713d43baa0d23be0773c80a72b' }
+      id: WalletId.WALLETCONNECT,
+      options: {
+        skin: 'biatec',
+        projectId: 'fcfde0713d43baa0d23be0773c80a72b'
+      }
     },
     WalletId.KMD,
     WalletId.KIBISIS,
