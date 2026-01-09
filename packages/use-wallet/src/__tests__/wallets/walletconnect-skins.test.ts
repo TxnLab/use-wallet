@@ -377,10 +377,7 @@ describe('WalletConnect Skins', () => {
       expect(manager1.wallets[0].walletKey).toBe('walletconnect:biatec')
 
       // Verify the state was persisted
-      expect(StorageAdapter.setItem).toHaveBeenCalledWith(
-        LOCAL_STORAGE_KEY,
-        expect.any(String)
-      )
+      expect(StorageAdapter.setItem).toHaveBeenCalledWith(LOCAL_STORAGE_KEY, expect.any(String))
 
       // Create a new manager - should load persisted state
       const manager2 = new WalletManager({

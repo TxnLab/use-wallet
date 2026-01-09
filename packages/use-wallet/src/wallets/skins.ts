@@ -74,9 +74,7 @@ export function getSkin(skinId: string): WalletConnectSkin | undefined {
  * @param skinOption - Either a skin ID string or a full skin definition
  * @returns The resolved skin, or undefined if not found (when string ID provided)
  */
-export function resolveSkin(
-  skinOption: WalletConnectSkinOption
-): WalletConnectSkin | undefined {
+export function resolveSkin(skinOption: WalletConnectSkinOption): WalletConnectSkin | undefined {
   if (typeof skinOption === 'string') {
     return getSkin(skinOption)
   }
