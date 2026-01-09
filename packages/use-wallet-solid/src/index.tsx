@@ -6,7 +6,7 @@ import type {
   NetworkId,
   SignDataResponse,
   SignMetadata,
-  WalletId,
+  WalletKey,
   WalletManager,
   WalletState
 } from '@txnlab/use-wallet'
@@ -128,18 +128,18 @@ export const useWallet = () => {
   const algodClient = useStore(manager().store, (state) => state.algodClient)
 
   const walletStore = useStore(manager().store, (state) => state.wallets)
-  const walletState = (walletId: WalletId): WalletState | null => walletStore()[walletId] || null
+  const walletState = (walletKey: WalletKey): WalletState | null => walletStore()[walletKey] || null
   const activeWalletId = useStore(manager().store, (state) => state.activeWallet)
-  const activeWallet = () => manager().getWallet(activeWalletId() as WalletId) || null
-  const activeWalletState = () => walletState(activeWalletId() as WalletId)
+  const activeWallet = () => manager().getWallet(activeWalletId() as WalletKey) || null
+  const activeWalletState = () => walletState(activeWalletId() as WalletKey)
   const activeWalletAccounts = () => activeWalletState()?.accounts ?? null
   const activeWalletAddresses = () =>
     activeWalletAccounts()?.map((account) => account.address) ?? null
   const activeAccount = () => activeWalletState()?.activeAccount ?? null
   const activeAddress = () => activeAccount()?.address ?? null
-  const isWalletActive = (walletId: WalletId) => walletId === activeWalletId()
-  const isWalletConnected = (walletId: WalletId) =>
-    !!walletState(walletId)?.accounts.length || false
+  const isWalletActive = (walletKey: WalletKey) => walletKey === activeWalletId()
+  const isWalletConnected = (walletKey: WalletKey) =>
+    !!walletState(walletKey)?.accounts.length || false
 
   const signTransactions = <T extends algosdk.Transaction[] | Uint8Array[]>(
     txnGroup: T | T[],

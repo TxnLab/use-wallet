@@ -431,6 +431,7 @@ describe('useWallet', () => {
     mockWallets = [
       {
         id: mockDeflyWallet.id,
+        walletKey: mockDeflyWallet.walletKey,
         metadata: mockDeflyWallet.metadata,
         accounts: [],
         activeAccount: null,
@@ -444,6 +445,7 @@ describe('useWallet', () => {
       },
       {
         id: mockMagicAuth.id,
+        walletKey: mockMagicAuth.walletKey,
         metadata: mockMagicAuth.metadata,
         accounts: [],
         activeAccount: null,

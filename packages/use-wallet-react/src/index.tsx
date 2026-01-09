@@ -8,6 +8,7 @@ import {
   type AlgodConfig,
   type BaseWallet,
   type WalletAccount,
+  type WalletKey,
   type WalletMetadata
 } from '@txnlab/use-wallet'
 import algosdk from 'algosdk'
@@ -124,6 +125,8 @@ export const useNetwork = () => {
 
 export interface Wallet {
   id: WalletId
+  /** Unique key for this wallet instance. Used for skinned WalletConnect instances. */
+  walletKey: WalletKey
   metadata: WalletMetadata
   accounts: WalletAccount[]
   activeAccount: WalletAccount | null
@@ -153,14 +156,15 @@ export const useWallet = () => {
 
   const transformToWallet = React.useCallback(
     (wallet: BaseWallet): Wallet => {
-      const walletState = walletStateMap[wallet.id]
+      const walletState = walletStateMap[wallet.walletKey]
       return {
         id: wallet.id,
+        walletKey: wallet.walletKey,
         metadata: wallet.metadata,
         accounts: walletState?.accounts ?? [],
         activeAccount: walletState?.activeAccount ?? null,
         isConnected: !!walletState,
-        isActive: wallet.id === activeWalletId,
+        isActive: wallet.walletKey === activeWalletId,
         canSignData: wallet.canSignData ?? false,
         connect: (args) => wallet.connect(args),
         disconnect: () => wallet.disconnect(),

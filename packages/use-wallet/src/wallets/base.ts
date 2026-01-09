@@ -10,6 +10,7 @@ import type {
   WalletAccount,
   WalletConstructor,
   WalletId,
+  WalletKey,
   WalletMetadata
 } from 'src/wallets/types'
 
@@ -20,6 +21,8 @@ interface WalletConstructorType {
 
 export abstract class BaseWallet {
   readonly id: WalletId
+  /** Unique key for this wallet instance. Used for state storage and session isolation. */
+  readonly walletKey: WalletKey
   readonly metadata: WalletMetadata
 
   protected store: Store<State>
@@ -31,12 +34,14 @@ export abstract class BaseWallet {
 
   protected constructor({
     id,
+    walletKey,
     metadata,
     store,
     subscribe,
     getAlgodClient
   }: WalletConstructor<WalletId>) {
     this.id = id
+    this.walletKey = walletKey || id // Default to id for backward compatibility
     this.store = store
     this.subscribe = subscribe
     this.getAlgodClient = getAlgodClient
@@ -44,8 +49,8 @@ export abstract class BaseWallet {
     const ctor = this.constructor as WalletConstructorType
     this.metadata = { ...ctor.defaultMetadata, ...metadata }
 
-    // Initialize logger with a scope based on the wallet ID
-    this.logger = logger.createScopedLogger(`Wallet:${this.id.toUpperCase()}`)
+    // Initialize logger with a scope based on the wallet key
+    this.logger = logger.createScopedLogger(`Wallet:${this.walletKey.toUpperCase()}`)
   }
 
   static defaultMetadata: WalletMetadata = { name: 'Base Wallet', icon: '' }
@@ -57,14 +62,14 @@ export abstract class BaseWallet {
   public abstract resumeSession(): Promise<void>
 
   public setActive = (): void => {
-    this.logger.info(`Set active wallet: ${this.id}`)
-    setActiveWallet(this.store, { walletId: this.id })
+    this.logger.info(`Set active wallet: ${this.walletKey}`)
+    setActiveWallet(this.store, { walletId: this.walletKey })
   }
 
   public setActiveAccount = (account: string): void => {
     this.logger.info(`Set active account: ${account}`)
     setActiveAccount(this.store, {
-      walletId: this.id,
+      walletId: this.walletKey,
       address: account
     })
   }
@@ -105,7 +110,7 @@ export abstract class BaseWallet {
 
   public get accounts(): WalletAccount[] {
     const state = this.store.state
-    const walletState = state.wallets[this.id]
+    const walletState = state.wallets[this.walletKey]
     return walletState ? walletState.accounts : []
   }
 
@@ -115,7 +120,7 @@ export abstract class BaseWallet {
 
   public get activeAccount(): WalletAccount | null {
     const state = this.store.state
-    const walletState = state.wallets[this.id]
+    const walletState = state.wallets[this.walletKey]
     return walletState ? walletState.activeAccount : null
   }
 
@@ -130,13 +135,13 @@ export abstract class BaseWallet {
 
   public get isConnected(): boolean {
     const state = this.store.state
-    const walletState = state.wallets[this.id]
+    const walletState = state.wallets[this.walletKey]
     return walletState ? walletState.accounts.length > 0 : false
   }
 
   public get isActive(): boolean {
     const state = this.store.state
-    return state.activeWallet === this.id
+    return state.activeWallet === this.walletKey
   }
 
   public get activeNetworkConfig(): NetworkConfig {
@@ -148,27 +153,27 @@ export abstract class BaseWallet {
 
   protected onDisconnect = (): void => {
     this.logger.debug(`Removing wallet from store...`)
-    removeWallet(this.store, { walletId: this.id })
+    removeWallet(this.store, { walletId: this.walletKey })
   }
 
   protected manageWalletConnectSession = (
     action: 'backup' | 'restore',
-    targetWalletId?: WalletId
+    targetWalletKey?: WalletKey
   ): void => {
-    const walletId = targetWalletId || this.id
+    const key = targetWalletKey || this.walletKey
     if (action === 'backup') {
       const data = StorageAdapter.getItem('walletconnect')
       if (data) {
-        StorageAdapter.setItem(`walletconnect-${walletId}`, data)
+        StorageAdapter.setItem(`walletconnect-${key}`, data)
         StorageAdapter.removeItem('walletconnect')
-        this.logger.debug(`Backed up WalletConnect session for ${walletId}`)
+        this.logger.debug(`Backed up WalletConnect session for ${key}`)
       }
     } else if (action === 'restore') {
-      const data = StorageAdapter.getItem(`walletconnect-${walletId}`)
+      const data = StorageAdapter.getItem(`walletconnect-${key}`)
       if (data) {
         StorageAdapter.setItem('walletconnect', data)
-        StorageAdapter.removeItem(`walletconnect-${walletId}`)
-        this.logger.debug(`Restored WalletConnect session for ${walletId}`)
+        StorageAdapter.removeItem(`walletconnect-${key}`)
+        this.logger.debug(`Restored WalletConnect session for ${key}`)
       }
     }
   }

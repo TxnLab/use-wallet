@@ -31,6 +31,35 @@ export enum WalletId {
   W3_WALLET = 'w3-wallet'
 }
 
+// ---------- WalletConnect Skins ---------- //
+
+/**
+ * Metadata for a WalletConnect skin. Used to customize the appearance of
+ * a WalletConnect-based wallet in the UI.
+ */
+export interface WalletConnectSkin {
+  /** Unique identifier for the skin (e.g., 'biatec', 'voiwallet') */
+  id: string
+  /** Display name for the wallet */
+  name: string
+  /** Wallet icon as a data URI or URL */
+  icon: string
+}
+
+/**
+ * Skin option can be either:
+ * - A string ID referencing a built-in skin (e.g., 'biatec')
+ * - A full WalletConnectSkin object for custom skins
+ */
+export type WalletConnectSkinOption = string | WalletConnectSkin
+
+/**
+ * Composite key type that can be either:
+ * - A standard WalletId (for backward compatibility)
+ * - A composite string for skinned WalletConnect instances (e.g., 'walletconnect:biatec')
+ */
+export type WalletKey = WalletId | `${WalletId.WALLETCONNECT}:${string}`
+
 export type WalletMap = {
   [WalletId.BIATEC]: typeof BiatecWallet
   [WalletId.CUSTOM]: typeof CustomWallet
@@ -93,6 +122,8 @@ export type WalletMetadata = {
 
 export interface BaseWalletConstructor {
   id: WalletId
+  /** Optional wallet key override. Defaults to id. Used for skinned WalletConnect instances. */
+  walletKey?: WalletKey
   metadata: Partial<WalletMetadata> | undefined
   getAlgodClient: () => algosdk.Algodv2
   store: Store<State>

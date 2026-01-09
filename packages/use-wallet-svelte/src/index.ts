@@ -9,6 +9,7 @@ import {
   type SignMetadata,
   WalletAccount,
   WalletId,
+  type WalletKey,
   WalletManager,
   WalletMetadata
 } from '@txnlab/use-wallet'
@@ -111,6 +112,8 @@ export const useNetwork = () => {
 
 export interface Wallet {
   id: WalletId
+  /** Unique key for this wallet instance. Used for skinned WalletConnect instances. */
+  walletKey: WalletKey
   metadata: WalletMetadata
   accounts: { current: WalletAccount[] | undefined }
   isConnected: () => boolean
@@ -129,10 +132,11 @@ export const useWallet = () => {
   const transformToWallet = (wallet: BaseWallet): Wallet => {
     return {
       id: wallet.id,
+      walletKey: wallet.walletKey,
       metadata: wallet.metadata,
-      accounts: useStore(manager.store, (state) => state.wallets[wallet.id]?.accounts),
-      isConnected: () => !!walletStore.current[wallet.id],
-      isActive: () => wallet.id === activeWalletId.current,
+      accounts: useStore(manager.store, (state) => state.wallets[wallet.walletKey]?.accounts),
+      isConnected: () => !!walletStore.current[wallet.walletKey],
+      isActive: () => wallet.walletKey === activeWalletId.current,
       canSignData: wallet.canSignData ?? false,
       connect: (args) => wallet.connect(args),
       disconnect: () => wallet.disconnect(),
@@ -146,7 +150,7 @@ export const useWallet = () => {
   const managerStatus = useStore(manager.store, (state) => state.managerStatus)
   const isReady = () => managerStatus.current === 'ready'
   const algodClient = useStore(manager.store, (state) => state.algodClient)
-  const activeWallet = () => wallets.find((w) => w.id === activeWalletId.current)
+  const activeWallet = () => wallets.find((w) => w.walletKey === activeWalletId.current)
   const activeWalletAccounts = useStore(
     manager.store,
     (state) => state.wallets[activeWalletId.current!]?.accounts
@@ -167,7 +171,7 @@ export const useWallet = () => {
     txnGroup: T | T[],
     indexesToSign?: number[]
   ): Promise<(Uint8Array | null)[]> => {
-    const wallet = manager.wallets.find((w) => w.id === activeWalletId.current)
+    const wallet = manager.wallets.find((w) => w.walletKey === activeWalletId.current)
     if (!wallet) {
       throw new Error('No active wallet')
     }
@@ -178,7 +182,7 @@ export const useWallet = () => {
     txnGroup: algosdk.Transaction[],
     indexesToSign: number[]
   ): Promise<Uint8Array[]> => {
-    const wallet = manager.wallets.find((w) => w.id === activeWalletId.current)
+    const wallet = manager.wallets.find((w) => w.walletKey === activeWalletId.current)
     if (!wallet) {
       throw new Error('No active wallet')
     }
@@ -186,7 +190,7 @@ export const useWallet = () => {
   }
 
   const signData = (data: string, metadata: SignMetadata): Promise<SignDataResponse> => {
-    const wallet = manager.wallets.find((w) => w.id === activeWalletId.current)
+    const wallet = manager.wallets.find((w) => w.walletKey === activeWalletId.current)
     if (!wallet) {
       throw new Error('No active wallet')
     }
