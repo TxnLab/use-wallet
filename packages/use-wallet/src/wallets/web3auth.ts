@@ -167,28 +167,33 @@ export class Web3AuthWallet extends BaseWallet {
     let CHAIN_NAMESPACES: any
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let WEB3AUTH_NETWORK: any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let CommonPrivateKeyProvider: any
 
     try {
-      // @ts-expect-error - @web3auth/modal is an optional peer dependency
+      // Dynamic imports - these are optional peer dependencies
       const modal = await import('@web3auth/modal')
       Web3Auth = modal.Web3Auth
-      // @ts-expect-error - @web3auth/base is an optional peer dependency
       const base = await import('@web3auth/base')
       CHAIN_NAMESPACES = base.CHAIN_NAMESPACES
       WEB3AUTH_NETWORK = base.WEB3AUTH_NETWORK
+      const baseProvider = await import('@web3auth/base-provider')
+      CommonPrivateKeyProvider = baseProvider.CommonPrivateKeyProvider
     } catch {
-      this.logger.error('Failed to load Web3Auth. Make sure @web3auth/modal and @web3auth/base are installed.')
+      this.logger.error(
+        'Failed to load Web3Auth. Make sure @web3auth/modal, @web3auth/base, and @web3auth/base-provider are installed.'
+      )
       throw new Error(
-        'Web3Auth packages not found. Please install @web3auth/modal and @web3auth/base'
+        'Web3Auth packages not found. Please install @web3auth/modal, @web3auth/base, and @web3auth/base-provider'
       )
     }
 
     const chainConfig = {
       chainNamespace: CHAIN_NAMESPACES.OTHER,
-      chainId: '0x1', // Algorand doesn't use numeric chain IDs, but Web3Auth requires one
-      rpcTarget: '', // Not used for Algorand
+      chainId: 'algorand',
+      rpcTarget: 'https://mainnet-api.algonode.cloud', // Required by Web3Auth, not actually used for signing
       displayName: 'Algorand',
-      blockExplorerUrl: 'https://algoexplorer.io',
+      blockExplorerUrl: 'https://lora.algokit.io/mainnet',
       ticker: 'ALGO',
       tickerName: 'Algorand'
     }
@@ -202,10 +207,15 @@ export class Web3AuthWallet extends BaseWallet {
       aqua: WEB3AUTH_NETWORK.AQUA
     }
 
+    // Create private key provider for non-EVM chains (required in Web3Auth v9)
+    const privateKeyProvider = new CommonPrivateKeyProvider({
+      config: { chainConfig }
+    })
+
     const web3auth = new Web3Auth({
       clientId: this.options.clientId,
       web3AuthNetwork: networkMap[this.options.web3AuthNetwork || 'sapphire_mainnet'] as any,
-      chainConfig,
+      privateKeyProvider,
       uiConfig: this.options.uiConfig
     })
 

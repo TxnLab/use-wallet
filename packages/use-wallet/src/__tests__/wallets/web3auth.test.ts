@@ -65,6 +65,10 @@ vi.mock('@web3auth/base', () => ({
   }
 }))
 
+vi.mock('@web3auth/base-provider', () => ({
+  CommonPrivateKeyProvider: vi.fn(() => ({}))
+}))
+
 function createWalletWithStore(store: Store<State>): Web3AuthWallet {
   return new Web3AuthWallet({
     id: WalletId.WEB3AUTH,
