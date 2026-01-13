@@ -9,5 +9,12 @@ export {
 } from './network'
 export { State, WalletState, ManagerStatus, DEFAULT_STATE } from './store'
 export { StorageAdapter } from './storage'
+export {
+  SecureKeyContainer,
+  zeroMemory,
+  zeroString,
+  withSecureKey,
+  withSecureKeySync
+} from './secure-key'
 export { webpackFallback } from './webpack'
 export * from './wallets'
