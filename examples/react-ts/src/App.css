@@ -166,3 +166,78 @@
   background: rgba(255, 68, 68, 0.1);
   border-radius: 4px;
 }
+
+/* Firebase Auth Styles */
+.firebase-auth-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  padding: 1em;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 0.5em;
+}
+
+.auth-tabs button {
+  flex: 1;
+  padding: 0.5em 1em;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.auth-tabs button.active {
+  background: rgba(100, 108, 255, 0.3);
+  border-color: #646cff;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75em;
+}
+
+.auth-form input {
+  padding: 0.6em;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.2);
+  color: inherit;
+}
+
+.auth-form button {
+  padding: 0.6em 1em;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.google-signin-btn {
+  padding: 0.6em 1em;
+}
+
+.auth-error {
+  padding: 0.5em;
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.1);
+  border-radius: 4px;
+  font-size: 0.9em;
+}

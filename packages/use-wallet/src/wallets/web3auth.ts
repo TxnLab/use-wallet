@@ -442,6 +442,16 @@ export class Web3AuthWallet extends BaseWallet {
         // Initialize the SFA client
         const web3authSFA = this.web3authSFA || (await this.initializeSFAClient())
 
+        // If already connected, logout first to allow reconnection with potentially different credentials
+        if (web3authSFA.connected) {
+          this.logger.debug('SFA already connected, logging out first...')
+          try {
+            await web3authSFA.logout()
+          } catch {
+            // Ignore logout errors
+          }
+        }
+
         // Connect using Single Factor Auth - no modal, direct connection
         provider = await web3authSFA.connect({
           verifier,

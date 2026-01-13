@@ -12,12 +12,12 @@ import { canonify } from 'canonify'
 import * as React from 'react'
 import {
   isFirebaseConfigured,
-  signInWithGoogle,
   firebaseSignOut,
   getFreshIdToken,
   onFirebaseAuthStateChanged,
   type User
 } from './firebase'
+import { FirebaseAuth } from './FirebaseAuth'
 
 export function Connect() {
   const { algodClient, activeAddress, signData, transactionSigner, wallets } = useWallet()
@@ -27,7 +27,6 @@ export function Connect() {
 
   // Firebase auth state
   const [firebaseUser, setFirebaseUser] = React.useState<User | null>(null)
-  const [isFirebaseLoading, setIsFirebaseLoading] = React.useState(false)
   const [useFirebaseAuth, setUseFirebaseAuth] = React.useState(false)
 
   // Subscribe to Firebase auth state changes
@@ -87,18 +86,6 @@ export function Connect() {
       await wallet.connect({ email: magicEmail })
     } else {
       await wallet.connect()
-    }
-  }
-
-  const handleFirebaseSignIn = async () => {
-    setIsFirebaseLoading(true)
-    try {
-      const { user } = await signInWithGoogle()
-      console.info('[App] Signed in with Firebase:', user.email)
-    } catch (error) {
-      console.error('[App] Firebase sign-in error:', error)
-    } finally {
-      setIsFirebaseLoading(false)
     }
   }
 
@@ -262,19 +249,17 @@ export function Connect() {
                 <div className="firebase-auth">
                   {firebaseUser ? (
                     <div className="firebase-user">
-                      <span>Signed in as: {firebaseUser.email}</span>
+                      <span>Signed in as: {firebaseUser.email || firebaseUser.uid}</span>
                       <button type="button" onClick={handleFirebaseSignOut}>
                         Sign Out
                       </button>
                     </div>
                   ) : (
-                    <button
-                      type="button"
-                      onClick={handleFirebaseSignIn}
-                      disabled={isFirebaseLoading}
-                    >
-                      {isFirebaseLoading ? 'Signing in...' : 'Sign in with Google'}
-                    </button>
+                    <FirebaseAuth
+                      onSignInSuccess={() => {
+                        console.info('[App] Firebase sign-in successful')
+                      }}
+                    />
                   )}
                 </div>
               )}
