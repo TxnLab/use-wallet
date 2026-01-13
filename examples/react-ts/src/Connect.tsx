@@ -10,6 +10,14 @@ import {
 import algosdk from 'algosdk'
 import { canonify } from 'canonify'
 import * as React from 'react'
+import {
+  isFirebaseConfigured,
+  signInWithGoogle,
+  firebaseSignOut,
+  getFreshIdToken,
+  onFirebaseAuthStateChanged,
+  type User
+} from './firebase'
 
 export function Connect() {
   const { algodClient, activeAddress, signData, transactionSigner, wallets } = useWallet()
@@ -17,10 +25,18 @@ export function Connect() {
   const [isSending, setIsSending] = React.useState(false)
   const [magicEmail, setMagicEmail] = React.useState('')
 
-  // Web3Auth custom auth state (for Firebase/custom JWT flows)
-  const [web3AuthIdToken, setWeb3AuthIdToken] = React.useState('')
-  const [web3AuthVerifierId, setWeb3AuthVerifierId] = React.useState('')
-  const [useCustomAuth, setUseCustomAuth] = React.useState(false)
+  // Firebase auth state
+  const [firebaseUser, setFirebaseUser] = React.useState<User | null>(null)
+  const [isFirebaseLoading, setIsFirebaseLoading] = React.useState(false)
+  const [useFirebaseAuth, setUseFirebaseAuth] = React.useState(false)
+
+  // Subscribe to Firebase auth state changes
+  React.useEffect(() => {
+    const unsubscribe = onFirebaseAuthStateChanged((user) => {
+      setFirebaseUser(user)
+    })
+    return unsubscribe
+  }, [])
 
   const isMagicLink = (wallet: Wallet) => wallet.id === WalletId.MAGIC
   const isWeb3Auth = (wallet: Wallet) => wallet.id === WalletId.WEB3AUTH
@@ -33,25 +49,66 @@ export function Connect() {
     if (isMagicLink(wallet) && !isEmailValid) {
       return true
     }
-    // For Web3Auth with custom auth, require both idToken and verifierId
-    if (isWeb3Auth(wallet) && useCustomAuth && (!web3AuthIdToken || !web3AuthVerifierId)) {
+    // For Web3Auth with Firebase auth, require Firebase sign-in
+    if (isWeb3Auth(wallet) && useFirebaseAuth && !firebaseUser) {
       return true
     }
     return false
   }
 
-  const getConnectArgs = (wallet: Wallet) => {
-    if (isMagicLink(wallet)) {
-      return { email: magicEmail }
-    }
-    // Web3Auth custom authentication (e.g., Firebase)
-    if (isWeb3Auth(wallet) && useCustomAuth && web3AuthIdToken && web3AuthVerifierId) {
-      return {
-        idToken: web3AuthIdToken,
-        verifierId: web3AuthVerifierId
+  const handleWeb3AuthConnect = async (wallet: Wallet) => {
+    if (useFirebaseAuth && firebaseUser) {
+      // Get a fresh ID token from Firebase
+      const idToken = await getFreshIdToken()
+      if (!idToken) {
+        console.error('[App] Failed to get Firebase ID token')
+        return
       }
+
+      // Use the UID as the verifier ID
+      const verifierId = firebaseUser.uid
+
+      console.info('[App] Connecting Web3Auth with Firebase auth...', { verifierId })
+
+      await wallet.connect({
+        idToken,
+        verifierId
+      })
+    } else {
+      // Standard Web3Auth modal flow
+      await wallet.connect()
     }
-    return undefined
+  }
+
+  const handleConnect = async (wallet: Wallet) => {
+    if (isWeb3Auth(wallet)) {
+      await handleWeb3AuthConnect(wallet)
+    } else if (isMagicLink(wallet)) {
+      await wallet.connect({ email: magicEmail })
+    } else {
+      await wallet.connect()
+    }
+  }
+
+  const handleFirebaseSignIn = async () => {
+    setIsFirebaseLoading(true)
+    try {
+      const { user } = await signInWithGoogle()
+      console.info('[App] Signed in with Firebase:', user.email)
+    } catch (error) {
+      console.error('[App] Firebase sign-in error:', error)
+    } finally {
+      setIsFirebaseLoading(false)
+    }
+  }
+
+  const handleFirebaseSignOut = async () => {
+    try {
+      await firebaseSignOut()
+      console.info('[App] Signed out from Firebase')
+    } catch (error) {
+      console.error('[App] Firebase sign-out error:', error)
+    }
   }
 
   const setActiveAccount = (event: React.ChangeEvent<HTMLSelectElement>, wallet: Wallet) => {
@@ -141,7 +198,7 @@ export function Connect() {
           <div className="wallet-buttons">
             <button
               type="button"
-              onClick={() => wallet.connect(getConnectArgs(wallet))}
+              onClick={() => handleConnect(wallet)}
               disabled={isConnectDisabled(wallet)}
             >
               Connect
@@ -189,35 +246,47 @@ export function Connect() {
             </div>
           )}
 
-          {isWeb3Auth(wallet) && (
+          {isWeb3Auth(wallet) && isFirebaseConfigured && (
             <div className="input-group">
               <label>
                 <input
                   type="checkbox"
-                  checked={useCustomAuth}
-                  onChange={(e) => setUseCustomAuth(e.target.checked)}
+                  checked={useFirebaseAuth}
+                  onChange={(e) => setUseFirebaseAuth(e.target.checked)}
                   disabled={wallet.isConnected}
                 />
-                Use custom auth (Firebase/JWT)
+                Use Firebase authentication
               </label>
-              {useCustomAuth && (
-                <>
-                  <input
-                    type="text"
-                    value={web3AuthVerifierId}
-                    onChange={(e) => setWeb3AuthVerifierId(e.target.value)}
-                    placeholder="Verifier ID (e.g., user email or uid)"
-                    disabled={wallet.isConnected}
-                  />
-                  <textarea
-                    value={web3AuthIdToken}
-                    onChange={(e) => setWeb3AuthIdToken(e.target.value)}
-                    placeholder="ID Token (JWT from Firebase/auth provider)"
-                    disabled={wallet.isConnected}
-                    rows={3}
-                  />
-                </>
+
+              {useFirebaseAuth && (
+                <div className="firebase-auth">
+                  {firebaseUser ? (
+                    <div className="firebase-user">
+                      <span>Signed in as: {firebaseUser.email}</span>
+                      <button type="button" onClick={handleFirebaseSignOut}>
+                        Sign Out
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleFirebaseSignIn}
+                      disabled={isFirebaseLoading}
+                    >
+                      {isFirebaseLoading ? 'Signing in...' : 'Sign in with Google'}
+                    </button>
+                  )}
+                </div>
               )}
+            </div>
+          )}
+
+          {isWeb3Auth(wallet) && !isFirebaseConfigured && (
+            <div className="input-group">
+              <small>
+                Firebase not configured. Set VITE_FIREBASE_* environment variables to enable
+                Firebase authentication.
+              </small>
             </div>
           )}
 
