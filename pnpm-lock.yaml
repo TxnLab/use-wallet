@@ -211,6 +211,9 @@ importers:
       '@web3auth/modal':
         specifier: ^9.6.0
         version: 9.6.0(@babel/runtime@7.28.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
+      '@web3auth/single-factor-auth':
+        specifier: ^9.4.0
+        version: 9.4.0(@babel/runtime@7.28.3)
       algosdk:
         specifier: 3.4.0
         version: 3.4.0
@@ -499,6 +502,9 @@ importers:
       '@web3auth/modal':
         specifier: 9.6.0
         version: 9.6.0(@babel/runtime@7.28.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
+      '@web3auth/single-factor-auth':
+        specifier: 9.4.0
+        version: 9.4.0(@babel/runtime@7.28.3)
       algosdk:
         specifier: 3.4.0
         version: 3.4.0
@@ -2320,6 +2326,12 @@ packages:
       vitest:
         optional: true
 
+  '@toruslabs/base-controllers@6.3.3':
+    resolution: {integrity: sha512-za1QD4jADtSWFMYVDZ9YZJMxzoBtT0T/SWkmQECOiAVtlUQgPn9naIqzc1ApBYdzwp9GUaxe4P1510R+5I/Ncg==}
+    engines: {node: '>=18.x', npm: '>=9.x'}
+    peerDependencies:
+      '@babel/runtime': 7.x
+
   '@toruslabs/base-controllers@7.4.0':
     resolution: {integrity: sha512-Qu6ov8fbKsF+PX8K6wSLBpT6pyBpDO+kGFc7pIbFP1zZU6JCyaD9c8ddfsWRr0ZOIWHzznjrYSbP/UZ0r3fZDA==}
     engines: {node: '>=18.x', npm: '>=9.x'}
@@ -2329,6 +2341,12 @@ packages:
   '@toruslabs/broadcast-channel@11.0.0':
     resolution: {integrity: sha512-nnM5yjQGzmCiie37G4Ks+5VsPjMrcY/81tga5ASb/u5TbZhSPQUw0CSW42Q9uBtR8sZbsHU06cPZ8j0z6LeAUg==}
     engines: {node: '>=18.x', npm: '>=9.x'}
+
+  '@toruslabs/bs58@1.0.0':
+    resolution: {integrity: sha512-osqIgm1MzEB6+fkaQeEUg4tuZXmhhXTn+K7+nZU7xDBcy+8Yr3eGNqJcQ4jds82g+dhkk2cBkge9sffv38iDQQ==}
+    engines: {node: '>=18.x', npm: '>=9.x'}
+    peerDependencies:
+      '@babel/runtime': 7.x
 
   '@toruslabs/constants@14.2.0':
     resolution: {integrity: sha512-Mb5EfYNSPyvvw5s1JXnpZwritCgp4NmLni1imTqrSKGV3yikYhUn1ufyLMAHGnBBgv4AuMIXBIe3EpJJ+SpA0g==}
@@ -2343,6 +2361,12 @@ packages:
   '@toruslabs/ffjavascript@4.0.0':
     resolution: {integrity: sha512-sGPKK0xZ7KDLOsVc8/rCb83iCT1xD12+yfl3eoVNppr4vMcPJcXGwqpw4r1nP3Ln10UHvTCduxjUr3axdoxOSw==}
     engines: {node: '>=18.x', npm: '>=9.x'}
+
+  '@toruslabs/fnd-base@14.2.0':
+    resolution: {integrity: sha512-nqfcigOuz3pQJi+Q+tdCaDUVCaSUkGqqmw0bGnaKK2/PyXBlZhnEDzReM3aUbApJn3xitfrJEhnRvOJhzog/og==}
+    engines: {node: '>=18.x', npm: '>=9.x'}
+    peerDependencies:
+      '@babel/runtime': 7.x
 
   '@toruslabs/http-helpers@7.0.1':
     resolution: {integrity: sha512-9LqvgH/JfMtgZSzRqSutDfXZ5gw6+hziByYgzOzLGTO3WcqALAKCcO+icvcNI/NCw8HW4xpTM2xZIEkkEcFYPg==}
@@ -2372,6 +2396,12 @@ packages:
 
   '@toruslabs/starkware-crypto@4.0.1':
     resolution: {integrity: sha512-AhnXUscFN2+oLeQuOEbi8vvrQnxUKnE0USWpg7eFHmqUBV8kg6+PAFiWsvJ01+GMQPTMKhKZHyMysxW5AFHc6Q==}
+    engines: {node: '>=18.x', npm: '>=9.x'}
+    peerDependencies:
+      '@babel/runtime': 7.x
+
+  '@toruslabs/torus.js@15.1.1':
+    resolution: {integrity: sha512-sLaXA1/R8KTTjU4t+teL3PPaJr2+j01QLYn5IY/t5uTD+1G2nzzfVWpkMDYrk9EfQYw0u4aKJ1lT7j9uKafMlg==}
     engines: {node: '>=18.x', npm: '>=9.x'}
     peerDependencies:
       '@babel/runtime': 7.x
@@ -2939,6 +2969,12 @@ packages:
       '@web3auth/wallet-connect-v2-adapter':
         optional: true
 
+  '@web3auth/single-factor-auth@9.4.0':
+    resolution: {integrity: sha512-SoDoLoWOMZFe3px/ij4AMJUkc18jhIE3hUXDwcR7/jzTmTM9ImHLiR7qvUy1b0fRB+l90/eJbGqRAJ2vz/kVGA==}
+    engines: {node: '>=18.x', npm: '>=9.x'}
+    peerDependencies:
+      '@babel/runtime': ^7.x
+
   '@web3auth/ui@9.7.0':
     resolution: {integrity: sha512-H9ol1CEEDSmqb4F/f5V4m6roRYllfZUkME2PI4EkU65tsvMCqNiTbotfQLhLDiEY5Pj4pOCuto4XbpvCZeP1nQ==}
     engines: {node: '>=18.x', npm: '>=9.x'}
@@ -3191,6 +3227,9 @@ packages:
   bare-events@2.6.1:
     resolution: {integrity: sha512-AuTJkq9XmE6Vk0FJVNq5QxETrSA/vKHarWVBG5l/JbdCL1prJemiyJqUS0jrlXO0MftuPq4m3YVYhoNc5+aE/g==}
 
+  base-x@4.0.1:
+    resolution: {integrity: sha512-uAZ8x6r6S3aUM9rbHGVOIsR15U/ZSc82b3ymnCPsT45Gk1DDvhDPdIgB5MrhirZWt+5K0EEPQH985kNqZgNPFw==}
+
   base-x@5.0.1:
     resolution: {integrity: sha512-M7uio8Zt++eg3jPj+rHMfCC+IuygQHHCOU+IYsVtik6FWjuYpVt/+MRKcgsAMHh8mMFAwnB+Bs+mTrFiXjMzKg==}
 
@@ -3271,6 +3310,9 @@ packages:
     resolution: {integrity: sha512-0si2SJK3ooGzIawRu61ZdPCO1IncZwS8IzuX73sPZsXW6EQ/w/DAfPyKI8l1ETTCr2MnvqWitmlCUxgdul45jA==}
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
+
+  bs58@5.0.0:
+    resolution: {integrity: sha512-r+ihvQJvahgYT50JD05dyJNKlmmSlMoOGwn1lCcEzanPglg7TxYjioQUYehQ9mAR/+hOSd2jRc/Z2y5UxBymvQ==}
 
   bs58@6.0.0:
     resolution: {integrity: sha512-PD0wEnEYg6ijszw/u8s+iI3H17cTymlrwkKhDhPZq+Sokl3AU4htyBFTjAeNAlCCmg0f53g6ih3jATyCKftTfw==}
@@ -9126,6 +9168,24 @@ snapshots:
       vite: 7.1.2(@types/node@20.11.30)(jiti@2.5.1)(terser@5.43.1)(yaml@2.8.1)
       vitest: 3.2.4(@types/node@20.11.30)(jiti@2.5.1)(jsdom@26.1.0)(terser@5.43.1)(yaml@2.8.1)
 
+  '@toruslabs/base-controllers@6.3.3(@babel/runtime@7.28.3)':
+    dependencies:
+      '@babel/runtime': 7.28.3
+      '@ethereumjs/util': 9.1.0
+      '@toruslabs/broadcast-channel': 11.0.0
+      '@toruslabs/http-helpers': 7.0.1(@babel/runtime@7.28.3)
+      '@web3auth/auth': 9.6.4(@babel/runtime@7.28.3)
+      async-mutex: 0.5.0
+      bignumber.js: 9.3.1
+      bowser: 2.11.0
+      jwt-decode: 4.0.0
+      loglevel: 1.9.2
+    transitivePeerDependencies:
+      - '@sentry/types'
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+
   '@toruslabs/base-controllers@7.4.0(@babel/runtime@7.28.3)':
     dependencies:
       '@babel/runtime': 7.28.3
@@ -9159,6 +9219,10 @@ snapshots:
       - supports-color
       - utf-8-validate
 
+  '@toruslabs/bs58@1.0.0(@babel/runtime@7.28.3)':
+    dependencies:
+      '@babel/runtime': 7.28.3
+
   '@toruslabs/constants@14.2.0(@babel/runtime@7.28.3)':
     dependencies:
       '@babel/runtime': 7.28.3
@@ -9168,6 +9232,11 @@ snapshots:
       elliptic: 6.6.1
 
   '@toruslabs/ffjavascript@4.0.0': {}
+
+  '@toruslabs/fnd-base@14.2.0(@babel/runtime@7.28.3)':
+    dependencies:
+      '@babel/runtime': 7.28.3
+      '@toruslabs/constants': 14.2.0(@babel/runtime@7.28.3)
 
   '@toruslabs/http-helpers@7.0.1(@babel/runtime@7.28.3)':
     dependencies:
@@ -9223,6 +9292,21 @@ snapshots:
       enc-utils: 3.0.0
       ethereum-cryptography: 2.2.1
       hash.js: 1.1.7
+
+  '@toruslabs/torus.js@15.1.1(@babel/runtime@7.28.3)':
+    dependencies:
+      '@babel/runtime': 7.28.3
+      '@toruslabs/bs58': 1.0.0(@babel/runtime@7.28.3)
+      '@toruslabs/constants': 14.2.0(@babel/runtime@7.28.3)
+      '@toruslabs/eccrypto': 5.0.4
+      '@toruslabs/http-helpers': 7.0.1(@babel/runtime@7.28.3)
+      bn.js: 5.2.2
+      elliptic: 6.6.1
+      ethereum-cryptography: 2.2.1
+      json-stable-stringify: 1.3.0
+      loglevel: 1.9.2
+    transitivePeerDependencies:
+      - '@sentry/types'
 
   '@toruslabs/tweetnacl-js@1.0.4': {}
 
@@ -10242,6 +10326,25 @@ snapshots:
       - supports-color
       - utf-8-validate
 
+  '@web3auth/single-factor-auth@9.4.0(@babel/runtime@7.28.3)':
+    dependencies:
+      '@babel/runtime': 7.28.3
+      '@toruslabs/base-controllers': 6.3.3(@babel/runtime@7.28.3)
+      '@toruslabs/constants': 14.2.0(@babel/runtime@7.28.3)
+      '@toruslabs/fnd-base': 14.2.0(@babel/runtime@7.28.3)
+      '@toruslabs/session-manager': 3.2.0(@babel/runtime@7.28.3)
+      '@toruslabs/torus.js': 15.1.1(@babel/runtime@7.28.3)
+      '@web3auth/auth': 9.6.4(@babel/runtime@7.28.3)
+      '@web3auth/base': 9.6.0(@babel/runtime@7.28.3)
+      bs58: 5.0.0
+    optionalDependencies:
+      '@rollup/rollup-linux-x64-gnu': 4.46.2
+    transitivePeerDependencies:
+      - '@sentry/types'
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+
   '@web3auth/ui@9.7.0(@babel/runtime@7.28.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)':
     dependencies:
       '@babel/runtime': 7.28.3
@@ -10542,6 +10645,8 @@ snapshots:
   bare-events@2.6.1:
     optional: true
 
+  base-x@4.0.1: {}
+
   base-x@5.0.1: {}
 
   base64-js@1.5.1: {}
@@ -10642,6 +10747,10 @@ snapshots:
       electron-to-chromium: 1.5.203
       node-releases: 2.0.19
       update-browserslist-db: 1.1.3(browserslist@4.25.2)
+
+  bs58@5.0.0:
+    dependencies:
+      base-x: 4.0.1
 
   bs58@6.0.0:
     dependencies:

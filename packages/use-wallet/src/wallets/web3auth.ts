@@ -44,6 +44,39 @@ interface IWeb3AuthModal {
   getUserInfo(): Promise<Partial<IWeb3AuthUserInfo>>
 }
 
+// Single Factor Auth SDK interface (for custom JWT auth)
+interface IWeb3AuthSFA {
+  init(): Promise<void>
+  connect(params: {
+    verifier: string
+    verifierId: string
+    idToken: string
+  }): Promise<IWeb3AuthProvider | null>
+  logout(): Promise<void>
+  connected: boolean
+  provider: IWeb3AuthProvider | null
+}
+
+/**
+ * Parameters for custom authentication (e.g., Firebase, custom JWT)
+ */
+export interface Web3AuthCustomAuth {
+  /**
+   * Custom verifier name configured in Web3Auth dashboard
+   */
+  verifier: string
+
+  /**
+   * User identifier (e.g., email, Firebase UID)
+   */
+  verifierId: string
+
+  /**
+   * JWT token from your authentication provider (e.g., Firebase ID token)
+   */
+  idToken: string
+}
+
 /**
  * Web3Auth configuration options
  */
@@ -104,6 +137,12 @@ export interface Web3AuthOptions {
    * @default true
    */
   usePopup?: boolean
+
+  /**
+   * Default verifier name for custom authentication.
+   * When set, connect() can be called with just { idToken, verifierId }
+   */
+  verifier?: string
 }
 
 const ICON = `data:image/svg+xml;base64,${btoa(`
@@ -115,6 +154,7 @@ const ICON = `data:image/svg+xml;base64,${btoa(`
 
 export class Web3AuthWallet extends BaseWallet {
   private web3auth: IWeb3AuthModal | null = null
+  private web3authSFA: IWeb3AuthSFA | null = null
   private options: Web3AuthOptions
   private userInfo: Partial<IWeb3AuthUserInfo> | null = null
 
@@ -123,6 +163,9 @@ export class Web3AuthWallet extends BaseWallet {
    * Keys are fetched fresh from Web3Auth and immediately cleared after use.
    */
   private _address: string | null = null
+
+  /** Track which SDK is currently in use */
+  private usingSFA: boolean = false
 
   protected store: Store<State>
 
@@ -227,14 +270,86 @@ export class Web3AuthWallet extends BaseWallet {
   }
 
   /**
+   * Initialize the Web3Auth Single Factor Auth client for custom JWT authentication
+   */
+  private async initializeSFAClient(): Promise<IWeb3AuthSFA> {
+    this.logger.info('Initializing Web3Auth Single Factor Auth client...')
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let Web3Auth: any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let WEB3AUTH_NETWORK: any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let CommonPrivateKeyProvider: any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let CHAIN_NAMESPACES: any
+
+    try {
+      // Dynamic imports - these are optional peer dependencies
+      const sfa = await import('@web3auth/single-factor-auth')
+      Web3Auth = sfa.Web3Auth
+      const base = await import('@web3auth/base')
+      WEB3AUTH_NETWORK = base.WEB3AUTH_NETWORK
+      CHAIN_NAMESPACES = base.CHAIN_NAMESPACES
+      const baseProvider = await import('@web3auth/base-provider')
+      CommonPrivateKeyProvider = baseProvider.CommonPrivateKeyProvider
+    } catch {
+      this.logger.error(
+        'Failed to load Web3Auth SFA. Make sure @web3auth/single-factor-auth, @web3auth/base, and @web3auth/base-provider are installed.'
+      )
+      throw new Error(
+        'Web3Auth SFA packages not found. Please install @web3auth/single-factor-auth, @web3auth/base, and @web3auth/base-provider'
+      )
+    }
+
+    const chainConfig = {
+      chainNamespace: CHAIN_NAMESPACES.OTHER,
+      chainId: 'algorand',
+      rpcTarget: 'https://mainnet-api.algonode.cloud', // Required by Web3Auth, not actually used for signing
+      displayName: 'Algorand',
+      blockExplorerUrl: 'https://lora.algokit.io/mainnet',
+      ticker: 'ALGO',
+      tickerName: 'Algorand'
+    }
+
+    const networkMap: Record<string, string> = {
+      mainnet: WEB3AUTH_NETWORK.MAINNET,
+      testnet: WEB3AUTH_NETWORK.TESTNET,
+      sapphire_mainnet: WEB3AUTH_NETWORK.SAPPHIRE_MAINNET,
+      sapphire_devnet: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
+      cyan: WEB3AUTH_NETWORK.CYAN,
+      aqua: WEB3AUTH_NETWORK.AQUA
+    }
+
+    // Create private key provider for non-EVM chains
+    const privateKeyProvider = new CommonPrivateKeyProvider({
+      config: { chainConfig }
+    })
+
+    const web3authSFA = new Web3Auth({
+      clientId: this.options.clientId,
+      web3AuthNetwork: networkMap[this.options.web3AuthNetwork || 'sapphire_mainnet'] as any,
+      privateKeyProvider
+    })
+
+    await web3authSFA.init()
+    this.web3authSFA = web3authSFA
+    this.logger.info('Web3Auth SFA client initialized')
+
+    return web3authSFA
+  }
+
+  /**
    * SECURITY: Fetch the private key from Web3Auth and return it in a SecureKeyContainer.
    * The caller MUST call container.clear() when done.
    *
    * @returns SecureKeyContainer holding the private key
    */
   private async getSecureKey(): Promise<SecureKeyContainer> {
-    const web3auth = this.web3auth
-    if (!web3auth || !web3auth.provider) {
+    // Get the provider from either the modal SDK or SFA SDK
+    const provider = this.usingSFA ? this.web3authSFA?.provider : this.web3auth?.provider
+
+    if (!provider) {
       throw new Error('Web3Auth not connected')
     }
 
@@ -242,7 +357,7 @@ export class Web3AuthWallet extends BaseWallet {
 
     // Request the private key from Web3Auth
     // For non-EVM chains, Web3Auth returns the raw ed25519 private key
-    const privateKeyHex = await web3auth.provider.request<string>({
+    const privateKeyHex = await provider.request<string>({
       method: 'private_key'
     })
 
@@ -281,23 +396,78 @@ export class Web3AuthWallet extends BaseWallet {
 
   /**
    * Connect to Web3Auth
+   *
+   * @param args - Optional connection arguments
+   * @param args.idToken - JWT token for custom authentication (e.g., Firebase ID token)
+   * @param args.verifierId - User identifier for custom authentication (e.g., email, uid)
+   * @param args.verifier - Custom verifier name (uses options.verifier if not provided)
+   *
+   * @example
+   * // Standard modal connection
+   * await wallet.connect()
+   *
+   * @example
+   * // Custom authentication with Firebase
+   * await wallet.connect({
+   *   idToken: firebaseIdToken,
+   *   verifierId: user.email,
+   *   verifier: 'my-firebase-verifier'
+   * })
    */
-  public connect = async (_args?: Record<string, any>): Promise<WalletAccount[]> => {
+  public connect = async (args?: {
+    idToken?: string
+    verifierId?: string
+    verifier?: string
+  }): Promise<WalletAccount[]> => {
     this.logger.info('Connecting to Web3Auth...')
 
-    const web3auth = this.web3auth || (await this.initializeClient())
-
     try {
-      // Connect using the modal or direct provider
-      const provider = await web3auth.connect()
+      let provider: IWeb3AuthProvider | null
+
+      // Check if custom authentication params are provided
+      const idToken = args?.idToken
+      const verifierId = args?.verifierId
+      const verifier = args?.verifier || this.options.verifier
+
+      if (idToken && verifierId) {
+        // Custom authentication flow using Single Factor Auth (e.g., Firebase)
+        if (!verifier) {
+          throw new Error(
+            'Custom authentication requires a verifier. Provide it in connect() args or options.verifier'
+          )
+        }
+
+        this.logger.info('Connecting with custom authentication (SFA)...', { verifier, verifierId })
+
+        // Initialize the SFA client
+        const web3authSFA = this.web3authSFA || (await this.initializeSFAClient())
+
+        // Connect using Single Factor Auth - no modal, direct connection
+        provider = await web3authSFA.connect({
+          verifier,
+          verifierId,
+          idToken
+        })
+
+        this.usingSFA = true
+
+        // SFA doesn't provide getUserInfo, use verifierId as display name
+        this.userInfo = { email: verifierId }
+      } else {
+        // Standard modal connection
+        const web3auth = this.web3auth || (await this.initializeClient())
+        provider = await web3auth.connect()
+
+        this.usingSFA = false
+
+        // Get user info for display purposes (modal SDK only)
+        this.userInfo = await web3auth.getUserInfo()
+        this.logger.debug('User info retrieved', { email: this.userInfo.email })
+      }
 
       if (!provider) {
         throw new Error('Failed to connect to Web3Auth')
       }
-
-      // Get user info for display purposes
-      this.userInfo = await web3auth.getUserInfo()
-      this.logger.debug('User info retrieved', { email: this.userInfo.email })
 
       // SECURITY: Get the key, derive the address, and immediately clear the key
       const keyContainer = await this.getSecureKey()
@@ -347,7 +517,9 @@ export class Web3AuthWallet extends BaseWallet {
     this.logger.info('Disconnecting from Web3Auth...')
 
     try {
-      if (this.web3auth?.connected) {
+      if (this.usingSFA && this.web3authSFA?.connected) {
+        await this.web3authSFA.logout()
+      } else if (this.web3auth?.connected) {
         await this.web3auth.logout()
       }
     } catch (error: any) {
@@ -357,6 +529,7 @@ export class Web3AuthWallet extends BaseWallet {
     // Clear local state
     this._address = null
     this.userInfo = null
+    this.usingSFA = false
     this.onDisconnect()
 
     this.logger.info('Disconnected')

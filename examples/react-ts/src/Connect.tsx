@@ -4,8 +4,8 @@ import {
   SignDataError,
   Siwa,
   useWallet,
-  WalletId,
-  type Wallet
+  type Wallet,
+  WalletId
 } from '@txnlab/use-wallet-react'
 import algosdk from 'algosdk'
 import { canonify } from 'canonify'
@@ -17,7 +17,13 @@ export function Connect() {
   const [isSending, setIsSending] = React.useState(false)
   const [magicEmail, setMagicEmail] = React.useState('')
 
+  // Web3Auth custom auth state (for Firebase/custom JWT flows)
+  const [web3AuthIdToken, setWeb3AuthIdToken] = React.useState('')
+  const [web3AuthVerifierId, setWeb3AuthVerifierId] = React.useState('')
+  const [useCustomAuth, setUseCustomAuth] = React.useState(false)
+
   const isMagicLink = (wallet: Wallet) => wallet.id === WalletId.MAGIC
+  const isWeb3Auth = (wallet: Wallet) => wallet.id === WalletId.WEB3AUTH
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(magicEmail)
 
   const isConnectDisabled = (wallet: Wallet) => {
@@ -27,12 +33,23 @@ export function Connect() {
     if (isMagicLink(wallet) && !isEmailValid) {
       return true
     }
+    // For Web3Auth with custom auth, require both idToken and verifierId
+    if (isWeb3Auth(wallet) && useCustomAuth && (!web3AuthIdToken || !web3AuthVerifierId)) {
+      return true
+    }
     return false
   }
 
   const getConnectArgs = (wallet: Wallet) => {
     if (isMagicLink(wallet)) {
       return { email: magicEmail }
+    }
+    // Web3Auth custom authentication (e.g., Firebase)
+    if (isWeb3Auth(wallet) && useCustomAuth && web3AuthIdToken && web3AuthVerifierId) {
+      return {
+        idToken: web3AuthIdToken,
+        verifierId: web3AuthVerifierId
+      }
     }
     return undefined
   }
@@ -169,6 +186,38 @@ export function Connect() {
                 placeholder="Enter email to connect..."
                 disabled={wallet.isConnected}
               />
+            </div>
+          )}
+
+          {isWeb3Auth(wallet) && (
+            <div className="input-group">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={useCustomAuth}
+                  onChange={(e) => setUseCustomAuth(e.target.checked)}
+                  disabled={wallet.isConnected}
+                />
+                Use custom auth (Firebase/JWT)
+              </label>
+              {useCustomAuth && (
+                <>
+                  <input
+                    type="text"
+                    value={web3AuthVerifierId}
+                    onChange={(e) => setWeb3AuthVerifierId(e.target.value)}
+                    placeholder="Verifier ID (e.g., user email or uid)"
+                    disabled={wallet.isConnected}
+                  />
+                  <textarea
+                    value={web3AuthIdToken}
+                    onChange={(e) => setWeb3AuthIdToken(e.target.value)}
+                    placeholder="ID Token (JWT from Firebase/auth provider)"
+                    disabled={wallet.isConnected}
+                    rows={3}
+                  />
+                </>
+              )}
             </div>
           )}
 

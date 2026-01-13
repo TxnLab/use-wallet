@@ -33,11 +33,12 @@ vi.mock('src/storage', () => ({
 const TEST_PRIVATE_KEY_HEX =
   'a'.repeat(64) // 32 bytes as hex (64 chars)
 
-// Mock Web3Auth client
+// Mock Web3Auth provider (shared between modal and SFA)
 const mockWeb3AuthProvider = {
   request: vi.fn()
 }
 
+// Mock Web3Auth Modal client
 const mockWeb3Auth = {
   initModal: vi.fn(),
   connect: vi.fn(),
@@ -47,8 +48,21 @@ const mockWeb3Auth = {
   getUserInfo: vi.fn()
 }
 
+// Mock Web3Auth Single Factor Auth client
+const mockWeb3AuthSFA = {
+  init: vi.fn(),
+  connect: vi.fn(),
+  logout: vi.fn(),
+  connected: false,
+  provider: null as typeof mockWeb3AuthProvider | null
+}
+
 vi.mock('@web3auth/modal', () => ({
   Web3Auth: vi.fn(() => mockWeb3Auth)
+}))
+
+vi.mock('@web3auth/single-factor-auth', () => ({
+  Web3Auth: vi.fn(() => mockWeb3AuthSFA)
 }))
 
 vi.mock('@web3auth/base', () => ({
@@ -127,7 +141,7 @@ describe('Web3AuthWallet', () => {
     }
     vi.mocked(logger.createScopedLogger).mockReturnValue(mockLogger)
 
-    // Reset mock Web3Auth state
+    // Reset mock Web3Auth Modal state
     mockWeb3Auth.connected = false
     mockWeb3Auth.provider = null
     mockWeb3Auth.initModal.mockResolvedValue(undefined)
@@ -138,6 +152,19 @@ describe('Web3AuthWallet', () => {
     })
     mockWeb3Auth.logout.mockResolvedValue(undefined)
     mockWeb3Auth.getUserInfo.mockResolvedValue({ email: 'test@example.com' })
+
+    // Reset mock Web3Auth SFA state
+    mockWeb3AuthSFA.connected = false
+    mockWeb3AuthSFA.provider = null
+    mockWeb3AuthSFA.init.mockResolvedValue(undefined)
+    mockWeb3AuthSFA.connect.mockImplementation(async () => {
+      mockWeb3AuthSFA.connected = true
+      mockWeb3AuthSFA.provider = mockWeb3AuthProvider
+      return mockWeb3AuthProvider
+    })
+    mockWeb3AuthSFA.logout.mockResolvedValue(undefined)
+
+    // Common provider mock
     mockWeb3AuthProvider.request.mockResolvedValue(TEST_PRIVATE_KEY_HEX)
 
     store = new Store<State>(DEFAULT_STATE)
@@ -209,6 +236,70 @@ describe('Web3AuthWallet', () => {
       mockWeb3AuthProvider.request.mockResolvedValueOnce(null)
 
       await expect(wallet.connect()).rejects.toThrow('Failed to retrieve private key from Web3Auth')
+    })
+
+    it('should support custom authentication with idToken and verifierId', async () => {
+      const customAuth = {
+        idToken: 'mock-firebase-id-token',
+        verifierId: 'user@example.com',
+        verifier: 'my-firebase-verifier'
+      }
+
+      const result = await wallet.connect(customAuth)
+
+      // Should use SFA SDK for custom JWT auth (no modal)
+      expect(mockWeb3AuthSFA.init).toHaveBeenCalled()
+      expect(mockWeb3AuthSFA.connect).toHaveBeenCalledWith({
+        verifier: 'my-firebase-verifier',
+        verifierId: 'user@example.com',
+        idToken: 'mock-firebase-id-token'
+      })
+      expect(result.length).toBe(1)
+      expect(result[0].address).toBe(testAddress)
+    })
+
+    it('should throw error if custom auth is missing verifier', async () => {
+      const customAuth = {
+        idToken: 'mock-token',
+        verifierId: 'user@example.com'
+        // no verifier provided
+      }
+
+      await expect(wallet.connect(customAuth)).rejects.toThrow(
+        'Custom authentication requires a verifier'
+      )
+    })
+
+    it('should use options.verifier as default for custom auth', async () => {
+      // Create wallet with default verifier in options
+      const walletWithVerifier = new Web3AuthWallet({
+        id: WalletId.WEB3AUTH,
+        options: {
+          clientId: 'mock-client-id',
+          verifier: 'default-verifier'
+        },
+        metadata: {},
+        getAlgodClient: {} as any,
+        store,
+        subscribe: vi.fn()
+      })
+
+      const customAuth = {
+        idToken: 'mock-token',
+        verifierId: 'user@example.com'
+        // verifier not provided, should use default
+      }
+
+      await walletWithVerifier.connect(customAuth)
+
+      // Should use SFA SDK with the default verifier from options
+      expect(mockWeb3AuthSFA.connect).toHaveBeenCalledWith({
+        verifier: 'default-verifier',
+        verifierId: 'user@example.com',
+        idToken: 'mock-token'
+      })
+
+      await walletWithVerifier.disconnect()
     })
   })
 

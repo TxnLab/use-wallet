@@ -40,7 +40,12 @@ if (import.meta.env.VITE_WEB3AUTH_CLIENT_ID) {
   wallets.push({
     id: WalletId.WEB3AUTH,
     options: {
-      clientId: import.meta.env.VITE_WEB3AUTH_CLIENT_ID
+      clientId: import.meta.env.VITE_WEB3AUTH_CLIENT_ID,
+      // Optional: Set a default verifier for custom auth (e.g., Firebase)
+      // This allows connect() to be called with just { idToken, verifierId }
+      ...(import.meta.env.VITE_WEB3AUTH_VERIFIER && {
+        verifier: import.meta.env.VITE_WEB3AUTH_VERIFIER
+      })
     }
   })
 }

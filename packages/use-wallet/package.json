@@ -54,6 +54,7 @@
     "@web3auth/base": "9.6.0",
     "@web3auth/base-provider": "9.6.0",
     "@web3auth/modal": "9.6.0",
+    "@web3auth/single-factor-auth": "9.4.0",
     "algosdk": "3.4.0",
     "canonify": "2.1.1",
     "lute-connect": "1.6.2",
@@ -70,6 +71,7 @@
     "@web3auth/base": "^9.0.0",
     "@web3auth/base-provider": "^9.0.0",
     "@web3auth/modal": "^9.0.0",
+    "@web3auth/single-factor-auth": "^9.0.0",
     "algosdk": "^3.0.0",
     "lute-connect": "^1.6.2"
   },
@@ -96,6 +98,9 @@
       "optional": true
     },
     "@web3auth/modal": {
+      "optional": true
+    },
+    "@web3auth/single-factor-auth": {
       "optional": true
     },
     "lute-connect": {
