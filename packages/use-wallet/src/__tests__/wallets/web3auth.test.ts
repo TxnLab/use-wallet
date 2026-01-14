@@ -30,8 +30,7 @@ vi.mock('src/storage', () => ({
 
 // Generate a test key pair for mocking
 // This is a deterministic test key - DO NOT use in production
-const TEST_PRIVATE_KEY_HEX =
-  'a'.repeat(64) // 32 bytes as hex (64 chars)
+const TEST_PRIVATE_KEY_HEX = 'a'.repeat(64) // 32 bytes as hex (64 chars)
 
 // Mock Web3Auth provider (shared between modal and SFA)
 const mockWeb3AuthProvider = {

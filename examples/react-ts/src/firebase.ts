@@ -1,5 +1,11 @@
 import { initializeApp, type FirebaseApp } from 'firebase/app'
-import { getAuth, signOut, onAuthStateChanged, type Auth, type User as FirebaseUser } from 'firebase/auth'
+import {
+  getAuth,
+  signOut,
+  onAuthStateChanged,
+  type Auth,
+  type User as FirebaseUser
+} from 'firebase/auth'
 
 // Re-export User type for convenience
 export type User = FirebaseUser
