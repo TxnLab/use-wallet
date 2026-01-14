@@ -326,11 +326,12 @@ describe('Web3AuthWallet', () => {
     it('should do nothing if no session exists', async () => {
       await wallet.resumeSession()
 
+      // Lazy mode: We don't touch Web3Auth during resume
       expect(mockWeb3Auth.getUserInfo).not.toHaveBeenCalled()
       expect(wallet.isConnected).toBe(false)
     })
 
-    it('should disconnect if Web3Auth session expired', async () => {
+    it('should restore cached address without checking Web3Auth (lazy mode)', async () => {
       const walletState: WalletState = {
         accounts: [{ name: 'test@example.com', address: testAddress }],
         activeAccount: { name: 'test@example.com', address: testAddress }
@@ -344,19 +345,23 @@ describe('Web3AuthWallet', () => {
       })
       wallet = createWalletWithStore(store)
 
-      // Web3Auth not connected
+      // Web3Auth not connected - but that's okay for lazy resume
       mockWeb3Auth.connected = false
       mockWeb3Auth.provider = null
 
       await wallet.resumeSession()
 
-      expect(store.state.wallets[WalletId.WEB3AUTH]).toBeUndefined()
+      // Lazy mode: Wallet should still be "connected" using cached address
+      // Web3Auth session check happens later at sign time
+      expect(mockWeb3Auth.getUserInfo).not.toHaveBeenCalled()
+      expect(wallet.isConnected).toBe(true)
+      expect(wallet.activeAddress).toBe(testAddress)
     })
 
-    it('should resume session if Web3Auth is connected', async () => {
+    it('should disconnect if cached session has no address', async () => {
       const walletState: WalletState = {
-        accounts: [{ name: 'test@example.com', address: testAddress }],
-        activeAccount: { name: 'test@example.com', address: testAddress }
+        accounts: [],
+        activeAccount: null
       }
 
       store = new Store<State>({
@@ -367,14 +372,9 @@ describe('Web3AuthWallet', () => {
       })
       wallet = createWalletWithStore(store)
 
-      // Initialize Web3Auth mock as connected
-      mockWeb3Auth.connected = true
-      mockWeb3Auth.provider = mockWeb3AuthProvider
-
       await wallet.resumeSession()
 
-      expect(mockWeb3Auth.getUserInfo).toHaveBeenCalled()
-      expect(wallet.isConnected).toBe(true)
+      expect(store.state.wallets[WalletId.WEB3AUTH]).toBeUndefined()
     })
   })
 
@@ -521,6 +521,108 @@ describe('Web3AuthWallet', () => {
 
       // Connect calls it once, then each signTransactions call should fetch fresh
       expect(mockWeb3AuthProvider.request).toHaveBeenCalledTimes(3)
+    })
+  })
+
+  describe('lazy authentication', () => {
+    const connectedAddress = getExpectedAddress()
+
+    const makePayTxn = () => {
+      return new algosdk.Transaction({
+        type: algosdk.TransactionType.pay,
+        sender: connectedAddress,
+        suggestedParams: {
+          fee: 0,
+          firstValid: 51,
+          lastValid: 61,
+          minFee: 1000,
+          genesisID: 'testnet-v1.0'
+        },
+        paymentParams: { receiver: connectedAddress, amount: 1000 }
+      })
+    }
+
+    it('should re-authenticate via modal when session expired during signing', async () => {
+      // First, connect normally
+      await wallet.connect()
+      expect(wallet.isConnected).toBe(true)
+
+      // Simulate session expiry
+      mockWeb3Auth.connected = false
+      mockWeb3Auth.provider = null
+
+      // Reset mock to track new calls
+      vi.mocked(mockWeb3Auth.connect).mockClear()
+
+      // Re-enable for reconnection
+      mockWeb3Auth.connect.mockImplementation(async () => {
+        mockWeb3Auth.connected = true
+        mockWeb3Auth.provider = mockWeb3AuthProvider
+        return mockWeb3AuthProvider
+      })
+
+      const txn = makePayTxn()
+      await wallet.signTransactions([txn])
+
+      // Should have called connect() again to re-authenticate
+      expect(mockWeb3Auth.connect).toHaveBeenCalled()
+    })
+
+    it('should throw error when modal re-authentication is cancelled', async () => {
+      await wallet.connect()
+
+      // Simulate session expiry
+      mockWeb3Auth.connected = false
+      mockWeb3Auth.provider = null
+
+      // Modal returns null (user cancelled)
+      mockWeb3Auth.connect.mockResolvedValueOnce(null)
+
+      const txn = makePayTxn()
+      await expect(wallet.signTransactions([txn])).rejects.toThrow(
+        'Re-authentication cancelled or failed'
+      )
+    })
+
+    it('should require re-authentication when session expires before signing', async () => {
+      // Connect first
+      await wallet.connect()
+      expect(wallet.isConnected).toBe(true)
+
+      // Record initial connect call count
+      const initialConnectCalls = mockWeb3Auth.connect.mock.calls.length
+
+      // Simulate session expiry
+      mockWeb3Auth.connected = false
+      mockWeb3Auth.provider = null
+
+      // Re-enable connection for the re-auth flow
+      mockWeb3Auth.connect.mockImplementation(async () => {
+        mockWeb3Auth.connected = true
+        mockWeb3Auth.provider = mockWeb3AuthProvider
+        return mockWeb3AuthProvider
+      })
+
+      const txn = makePayTxn()
+      await wallet.signTransactions([txn])
+
+      // Should have called connect() again for re-authentication
+      expect(mockWeb3Auth.connect.mock.calls.length).toBeGreaterThan(initialConnectCalls)
+    })
+
+    it('should not re-authenticate when session is still valid', async () => {
+      await wallet.connect()
+
+      // Session is still valid
+      expect(mockWeb3Auth.connected).toBe(true)
+
+      vi.mocked(mockWeb3Auth.connect).mockClear()
+
+      const txn = makePayTxn()
+      await wallet.signTransactions([txn])
+
+      // Should NOT have called connect() again
+      expect(mockWeb3Auth.connect).not.toHaveBeenCalled()
     })
   })
 })

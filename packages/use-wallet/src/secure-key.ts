@@ -182,7 +182,9 @@ export async function deriveAlgorandAccountFromEd25519(
   }
 
   // Use tweetnacl directly for ed25519 key derivation
-  // This is the same library algosdk uses internally
+  // This is the same library algosdk uses internally but this approach avoids the seed to 25-word mnemonic conversion
+  // and then mnemonic to secret key.  Because strings in JS are immutable, this avoids a dangerous security issue of
+  // not being able to securely erase the mnemonics.
   const nacl = await import('tweetnacl')
   const algosdk = await import('algosdk')
 

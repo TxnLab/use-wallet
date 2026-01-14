@@ -13,7 +13,7 @@
 
 import algosdk from 'algosdk'
 import { SecureKeyContainer, zeroMemory, deriveAlgorandAccountFromEd25519 } from 'src/secure-key'
-import { WalletState, addWallet, setAccounts, type State } from 'src/store'
+import { WalletState, addWallet, type State } from 'src/store'
 import { flattenTxnGroup, isSignedTxn, isTransactionArray } from 'src/utils'
 import { BaseWallet } from 'src/wallets/base'
 import type { Store } from '@tanstack/store'
@@ -75,6 +75,26 @@ export interface Web3AuthCustomAuth {
    * JWT token from your authentication provider (e.g., Firebase ID token)
    */
   idToken: string
+}
+
+/**
+ * Credentials returned by getAuthCredentials callback
+ */
+export interface Web3AuthCredentials {
+  /**
+   * JWT token from your authentication provider (e.g., Firebase ID token)
+   */
+  idToken: string
+
+  /**
+   * User identifier (e.g., email, Firebase UID)
+   */
+  verifierId: string
+
+  /**
+   * Custom verifier name (optional, uses options.verifier if not provided)
+   */
+  verifier?: string
 }
 
 /**
@@ -143,6 +163,25 @@ export interface Web3AuthOptions {
    * When set, connect() can be called with just { idToken, verifierId }
    */
   verifier?: string
+
+  /**
+   * Callback to get fresh authentication credentials when session expires.
+   * Required for automatic re-authentication with Single Factor Auth (SFA).
+   *
+   * If not provided and the session expires, signTransactions() will throw
+   * an error requiring the user to call connect() with fresh credentials.
+   *
+   * @example
+   * ```typescript
+   * getAuthCredentials: async () => {
+   *   const user = firebase.auth().currentUser
+   *   if (!user) throw new Error('Not logged in')
+   *   const idToken = await user.getIdToken(true)
+   *   return { idToken, verifierId: user.email || user.uid }
+   * }
+   * ```
+   */
+  getAuthCredentials?: () => Promise<Web3AuthCredentials>
 }
 
 const ICON = `data:image/svg+xml;base64,${btoa(`
@@ -546,11 +585,11 @@ export class Web3AuthWallet extends BaseWallet {
   }
 
   /**
-   * Resume session from Web3Auth
+   * Resume session from cached state
    *
-   * SECURITY: We do NOT cache the private key. On resume, we only verify
-   * the session is still valid and the address matches. The key is only
-   * fetched when actually needed for signing.
+   * LAZY AUTHENTICATION: We do NOT connect to Web3Auth here.
+   * We simply restore the cached address from localStorage.
+   * Web3Auth connection is deferred until signTransactions() is called.
    */
   public resumeSession = async (): Promise<void> => {
     try {
@@ -562,58 +601,189 @@ export class Web3AuthWallet extends BaseWallet {
         return
       }
 
-      this.logger.info('Resuming Web3Auth session...')
+      const storedAccount = walletState.accounts[0]
 
-      const web3auth = this.web3auth || (await this.initializeClient())
-
-      if (!web3auth.connected || !web3auth.provider) {
-        this.logger.warn('Web3Auth session expired, please reconnect')
+      if (!storedAccount?.address) {
+        this.logger.warn('No address found in cached session')
         this.onDisconnect()
         return
       }
 
-      // Get user info
-      this.userInfo = await web3auth.getUserInfo()
+      // Just restore the cached address - don't initialize Web3Auth
+      this._address = storedAccount.address
+      this.userInfo = { name: storedAccount.name }
 
-      // SECURITY: Verify the address matches without caching the key
-      const keyContainer = await this.getSecureKey()
-
-      try {
-        const currentAddress = await keyContainer.useKey(async (secretKey) => {
-          const account = await deriveAlgorandAccountFromEd25519(secretKey)
-          const addr = account.addr
-          zeroMemory(account.sk)
-          return addr
-        })
-
-        this._address = currentAddress
-
-        const storedAccount = walletState.accounts[0]
-        if (storedAccount.address !== currentAddress) {
-          this.logger.warn('Session address mismatch, updating', {
-            stored: storedAccount.address,
-            current: currentAddress
-          })
-
-          const walletAccount: WalletAccount = {
-            name: this.userInfo.name || this.userInfo.email || `${this.metadata.name} Account`,
-            address: currentAddress
-          }
-
-          setAccounts(this.store, {
-            walletId: this.id,
-            accounts: [walletAccount]
-          })
-        }
-      } finally {
-        keyContainer.clear()
-      }
-
-      this.logger.info('Session resumed successfully')
+      this.logger.info('Session restored from cache (lazy mode)', { address: this._address })
     } catch (error: any) {
       this.logger.error('Error resuming session:', error.message)
       this.onDisconnect()
       throw error
+    }
+  }
+
+  /**
+   * Check if Web3Auth is currently connected with a valid session
+   */
+  private isWeb3AuthConnected(): boolean {
+    if (this.usingSFA) {
+      return Boolean(this.web3authSFA?.connected && this.web3authSFA?.provider)
+    }
+    return Boolean(this.web3auth?.connected && this.web3auth?.provider)
+  }
+
+  /**
+   * Ensure Web3Auth is connected and ready for signing.
+   * Re-authenticates if the session has expired.
+   *
+   * This is called lazily when signTransactions() is invoked,
+   */
+  private async ensureConnected(): Promise<void> {
+    if (this.isWeb3AuthConnected()) {
+      this.logger.debug('Web3Auth session still valid')
+      return
+    }
+
+    this.logger.info('Web3Auth session expired or not initialized, re-authenticating...')
+
+    if (this.usingSFA) {
+      await this.reconnectSFA()
+    } else {
+      await this.reconnectModal()
+    }
+  }
+
+  /**
+   * Re-authenticate using Single Factor Auth (Firebase, custom JWT)
+   *
+   * Requires getAuthCredentials callback to be configured in options.
+   * If the callback returns credentials for a different user, this will
+   * disconnect the current wallet (the user logged out and back in as someone else).
+   */
+  private async reconnectSFA(): Promise<void> {
+    if (!this.options.getAuthCredentials) {
+      this.logger.error('Cannot re-authenticate: getAuthCredentials callback not configured')
+      throw new Error(
+        'Web3Auth session expired. Configure getAuthCredentials option for automatic re-auth, ' +
+          'or call disconnect() and connect() with fresh credentials.'
+      )
+    }
+
+    this.logger.info('Getting fresh credentials for SFA re-authentication...')
+
+    let credentials: Web3AuthCredentials
+    try {
+      credentials = await this.options.getAuthCredentials()
+    } catch (error: any) {
+      // User is no longer authenticated with the identity provider (e.g., logged out of Firebase)
+      this.logger.warn('Failed to get auth credentials, user may have logged out:', error.message)
+      this.onDisconnect()
+      throw new Error('Authentication provider session expired. Please log in again.')
+    }
+
+    // Initialize SFA client if needed
+    const web3authSFA = this.web3authSFA || (await this.initializeSFAClient())
+
+    // Logout first if still connected (stale session)
+    if (web3authSFA.connected) {
+      try {
+        await web3authSFA.logout()
+      } catch {
+        // Ignore logout errors
+      }
+    }
+
+    const verifier = credentials.verifier || this.options.verifier
+    if (!verifier) {
+      throw new Error('No verifier configured for SFA authentication')
+    }
+
+    // Connect with fresh credentials
+    const provider = await web3authSFA.connect({
+      verifier,
+      verifierId: credentials.verifierId,
+      idToken: credentials.idToken
+    })
+
+    if (!provider) {
+      throw new Error('Failed to re-authenticate with Web3Auth SFA')
+    }
+
+    this.usingSFA = true
+
+    // Verify we got the same address (same user)
+    await this.verifyAddressMatch()
+  }
+
+  /**
+   * Re-authenticate using the Web3Auth modal
+   *
+   * Shows the Web3Auth login modal for the user to authenticate again.
+   * If they log in as a different user, this will disconnect the current wallet.
+   */
+  private async reconnectModal(): Promise<void> {
+    this.logger.info('Showing Web3Auth modal for re-authentication...')
+
+    const web3auth = this.web3auth || (await this.initializeClient())
+
+    // Logout first if still connected (stale session)
+    if (web3auth.connected) {
+      try {
+        await web3auth.logout()
+      } catch {
+        // Ignore logout errors
+      }
+    }
+
+    const provider = await web3auth.connect()
+
+    if (!provider) {
+      throw new Error('Re-authentication cancelled or failed')
+    }
+
+    this.usingSFA = false
+
+    // Get updated user info
+    this.userInfo = await web3auth.getUserInfo()
+
+    // Verify we got the same address (same user)
+    await this.verifyAddressMatch()
+  }
+
+  /**
+   * Verify that the current Web3Auth session matches the cached address.
+   *
+   * If the address doesn't match (user logged in as someone else),
+   * this disconnects the wallet entirely - it's a different identity.
+   */
+  private async verifyAddressMatch(): Promise<void> {
+    const keyContainer = await this.getSecureKey()
+
+    try {
+      const currentAddress = await keyContainer.useKey(async (secretKey) => {
+        const account = await deriveAlgorandAccountFromEd25519(secretKey)
+        const addr = account.addr
+        zeroMemory(account.sk)
+        return addr
+      })
+
+      if (currentAddress !== this._address) {
+        this.logger.warn('Re-authenticated as different user, disconnecting wallet', {
+          expected: this._address,
+          actual: currentAddress
+        })
+
+        // Different user = different wallet. Full disconnect required.
+        this.onDisconnect()
+
+        throw new Error(
+          `Re-authenticated as a different account. Expected ${this._address}, got ${currentAddress}. ` +
+            'Please connect again with the correct account.'
+        )
+      }
+
+      this.logger.info('Address verified, session restored')
+    } finally {
+      keyContainer.clear()
     }
   }
 
@@ -671,6 +841,9 @@ export class Web3AuthWallet extends BaseWallet {
   /**
    * Sign transactions
    *
+   * LAZY AUTHENTICATION: If the Web3Auth session has expired, this will
+   * automatically re-authenticate before signing.
+   *
    * SECURITY: The private key is fetched fresh, used for signing,
    * and immediately cleared from memory. The key is never stored
    * between signing operations.
@@ -681,6 +854,9 @@ export class Web3AuthWallet extends BaseWallet {
   ): Promise<(Uint8Array | null)[]> => {
     try {
       this.logger.debug('Signing transactions...', { txnGroup, indexesToSign })
+
+      // Ensure Web3Auth is connected (re-authenticates if session expired)
+      await this.ensureConnected()
 
       let txnsToSign: algosdk.Transaction[] = []
 
