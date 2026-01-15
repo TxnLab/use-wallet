@@ -118,6 +118,23 @@ describe('WalletConnect Skins', () => {
       expect(wallet.walletKey).toBe('walletconnect:biatec')
     })
 
+    it('should derive composite walletKey when voiwallet skin is provided', () => {
+      const store = new Store<State>(DEFAULT_STATE)
+      const wallet = new WalletConnect({
+        id: WalletId.WALLETCONNECT,
+        options: { projectId: 'test-project-id', skin: 'voiwallet' },
+        metadata: {},
+        getAlgodClient: () => ({}) as any,
+        store,
+        subscribe: vi.fn()
+      })
+
+      expect(wallet.id).toBe(WalletId.WALLETCONNECT)
+      expect(wallet.walletKey).toBe('walletconnect:voiwallet')
+      expect(wallet.metadata.name).toBe('Voi Wallet')
+      expect(wallet.metadata.icon).toContain('data:image/svg+xml;base64,')
+    })
+
     it('should derive composite walletKey when custom skin object is provided', () => {
       const store = new Store<State>(DEFAULT_STATE)
       const wallet = new WalletConnect({
@@ -194,26 +211,32 @@ describe('WalletConnect Skins', () => {
         wallets: [
           // Generic WalletConnect (no skin)
           { id: WalletId.WALLETCONNECT, options: { projectId: 'test-project-id' } },
-          // Biatec skin
+          // Biatec skin (built-in)
           { id: WalletId.WALLETCONNECT, options: { projectId: 'test-project-id', skin: 'biatec' } },
+          // Voi Wallet skin (built-in)
+          {
+            id: WalletId.WALLETCONNECT,
+            options: { projectId: 'test-project-id', skin: 'voiwallet' }
+          },
           // Custom skin
           {
             id: WalletId.WALLETCONNECT,
             options: {
               projectId: 'test-project-id',
-              skin: { id: 'voiwallet', name: 'Voi Wallet', icon: 'voi-icon' }
+              skin: { id: 'customwallet', name: 'Custom Wallet', icon: 'custom-icon' }
             }
           }
         ]
       })
 
-      expect(manager.wallets.length).toBe(3)
+      expect(manager.wallets.length).toBe(4)
 
       // Verify each wallet has unique walletKey
       const walletKeys = manager.wallets.map((w) => w.walletKey)
       expect(walletKeys).toContain('walletconnect')
       expect(walletKeys).toContain('walletconnect:biatec')
       expect(walletKeys).toContain('walletconnect:voiwallet')
+      expect(walletKeys).toContain('walletconnect:customwallet')
 
       // All should have the same id
       expect(manager.wallets.every((w) => w.id === WalletId.WALLETCONNECT)).toBe(true)

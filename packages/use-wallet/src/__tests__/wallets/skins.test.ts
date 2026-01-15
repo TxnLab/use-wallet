@@ -9,6 +9,13 @@ describe('WalletConnect Skins', () => {
       expect(BUILTIN_SKINS.biatec.name).toBe('Biatec Wallet')
       expect(BUILTIN_SKINS.biatec.icon).toContain('data:image/svg+xml;base64,')
     })
+
+    it('should include the voiwallet skin', () => {
+      expect(BUILTIN_SKINS.voiwallet).toBeDefined()
+      expect(BUILTIN_SKINS.voiwallet.id).toBe('voiwallet')
+      expect(BUILTIN_SKINS.voiwallet.name).toBe('Voi Wallet')
+      expect(BUILTIN_SKINS.voiwallet.icon).toContain('data:image/svg+xml;base64,')
+    })
   })
 
   describe('getSkin', () => {
@@ -17,6 +24,13 @@ describe('WalletConnect Skins', () => {
       expect(skin).toBeDefined()
       expect(skin?.id).toBe('biatec')
       expect(skin?.name).toBe('Biatec Wallet')
+    })
+
+    it('should return the voiwallet skin by ID', () => {
+      const skin = getSkin('voiwallet')
+      expect(skin).toBeDefined()
+      expect(skin?.id).toBe('voiwallet')
+      expect(skin?.name).toBe('Voi Wallet')
     })
 
     it('should return undefined for non-existent skin', () => {
@@ -50,6 +64,16 @@ describe('WalletConnect Skins', () => {
 
       expect(() => registerSkin(overrideSkin)).toThrow('Cannot override built-in skin: biatec')
     })
+
+    it('should throw when trying to override the voiwallet built-in skin', () => {
+      const overrideSkin: WalletConnectSkin = {
+        id: 'voiwallet',
+        name: 'Fake Voi Wallet',
+        icon: 'fake-icon'
+      }
+
+      expect(() => registerSkin(overrideSkin)).toThrow('Cannot override built-in skin: voiwallet')
+    })
   })
 
   describe('resolveSkin', () => {
@@ -58,6 +82,13 @@ describe('WalletConnect Skins', () => {
       expect(skin).toBeDefined()
       expect(skin?.id).toBe('biatec')
       expect(skin?.name).toBe('Biatec Wallet')
+    })
+
+    it('should resolve the voiwallet string ID to a built-in skin', () => {
+      const skin = resolveSkin('voiwallet')
+      expect(skin).toBeDefined()
+      expect(skin?.id).toBe('voiwallet')
+      expect(skin?.name).toBe('Voi Wallet')
     })
 
     it('should return undefined for non-existent string ID', () => {
