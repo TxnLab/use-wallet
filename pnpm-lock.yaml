@@ -78,8 +78,8 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.5.2)
       '@noble/ed25519':
-        specifier: 2.3.0
-        version: 2.3.0
+        specifier: 3.0.0
+        version: 3.0.0
       '@perawallet/connect':
         specifier: ^1.4.1
         version: 1.4.1(algosdk@3.5.2)
@@ -151,8 +151,8 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.5.2)
       '@noble/ed25519':
-        specifier: 2.3.0
-        version: 2.3.0
+        specifier: 3.0.0
+        version: 3.0.0
       '@perawallet/connect':
         specifier: ^1.4.1
         version: 1.4.1(algosdk@3.5.2)
@@ -224,8 +224,8 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.5.2)
       '@noble/ed25519':
-        specifier: 2.3.0
-        version: 2.3.0
+        specifier: 3.0.0
+        version: 3.0.0
       '@perawallet/connect':
         specifier: ^1.4.1
         version: 1.4.1(algosdk@3.5.2)
@@ -306,8 +306,8 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.5.2)
       '@noble/ed25519':
-        specifier: 2.3.0
-        version: 2.3.0
+        specifier: 3.0.0
+        version: 3.0.0
       '@perawallet/connect':
         specifier: ^1.4.1
         version: 1.4.1(algosdk@3.5.2)
@@ -367,8 +367,8 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.5.2)
       '@noble/ed25519':
-        specifier: 2.3.0
-        version: 2.3.0
+        specifier: 3.0.0
+        version: 3.0.0
       '@perawallet/connect':
         specifier: ^1.4.1
         version: 1.4.1(algosdk@3.5.2)
@@ -437,8 +437,8 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.5.2)
       '@noble/ed25519':
-        specifier: 2.3.0
-        version: 2.3.0
+        specifier: 3.0.0
+        version: 3.0.0
       '@perawallet/connect':
         specifier: ^1.4.1
         version: 1.4.1(algosdk@3.5.2)
@@ -495,8 +495,8 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1(algosdk@3.5.2)
       '@noble/ed25519':
-        specifier: 2.3.0
-        version: 2.3.0
+        specifier: 3.0.0
+        version: 3.0.0
       '@perawallet/connect':
         specifier: ^1.4.1
         version: 1.4.1(algosdk@3.5.2)
@@ -1615,8 +1615,8 @@ packages:
     resolution: {integrity: sha512-HxngEd2XUcg9xi20JkwlLCtYwfoFw4JGkuZpT+WlsPD4gB/cxkvTD8fSsoAnphGZhFdZYKeQIPCuFlWPm1uE0g==}
     engines: {node: ^14.21.3 || >=16}
 
-  '@noble/ed25519@2.3.0':
-    resolution: {integrity: sha512-M7dvXL2B92/M7dw9+gzuydL8qn/jiqNHaoR3Q+cb1q1GHV7uwE17WCyFMG+Y+TZb5izcaXk5TdJRrDUxHXL78A==}
+  '@noble/ed25519@3.0.0':
+    resolution: {integrity: sha512-QyteqMNm0GLqfa5SoYbSC3+Pvykwpn95Zgth4MFVSMKBB75ELl9tX1LAVsN4c3HXOrakHsF2gL4zWDAYCcsnzg==}
 
   '@noble/hashes@1.4.0':
     resolution: {integrity: sha512-V1JJ1WTRUqHHrOSh597hURcMqVKVGL/ea3kv0gSnEdsEZ0/+VyPghM1lMNGc00z7CIQorSvbKpuJkxvuHbvdbg==}
@@ -8499,7 +8499,7 @@ snapshots:
     dependencies:
       '@noble/hashes': 1.8.0
 
-  '@noble/ed25519@2.3.0': {}
+  '@noble/ed25519@3.0.0': {}
 
   '@noble/hashes@1.4.0': {}
 
@@ -11745,7 +11745,7 @@ snapshots:
       '@typescript-eslint/parser': 8.39.1(eslint@8.57.1)(typescript@5.8.3)
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.39.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@8.57.1)
       eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.39.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1)
       eslint-plugin-jsx-a11y: 6.10.2(eslint@8.57.1)
       eslint-plugin-react: 7.37.5(eslint@8.57.1)
@@ -11769,7 +11769,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.39.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1):
+  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0)(eslint@8.57.1):
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
       debug: 4.4.1
@@ -11784,14 +11784,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.1(@typescript-eslint/parser@8.39.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.39.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1):
+  eslint-module-utils@2.12.1(@typescript-eslint/parser@8.39.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
       '@typescript-eslint/parser': 8.39.1(eslint@8.57.1)(typescript@5.8.3)
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.39.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@8.57.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -11806,7 +11806,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.39.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.39.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.39.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1)
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
