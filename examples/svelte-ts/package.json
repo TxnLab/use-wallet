@@ -25,7 +25,7 @@
     "@web3auth/base-provider": "^9.6.0",
     "@web3auth/modal": "^9.6.0",
     "@web3auth/single-factor-auth": "^9.4.0",
-    "algosdk": "3.4.0",
+    "algosdk": "3.5.2",
     "canonify": "2.1.1",
     "lute-connect": "^1.6.2",
     "svelte": "5.38.1",

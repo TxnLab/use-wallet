@@ -43,7 +43,7 @@
   },
   "devDependencies": {
     "@testing-library/svelte": "5.2.8",
-    "algosdk": "3.4.0",
+    "algosdk": "3.5.2",
     "svelte": "5.38.1",
     "tsup": "8.5.0",
     "typescript": "5.8.3"
