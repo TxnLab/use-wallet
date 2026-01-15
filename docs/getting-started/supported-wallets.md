@@ -314,7 +314,7 @@ This advanced use case requires:
 - Configuring the `verifier` option and `getAuthCredentials` callback
 - Managing authentication tokens and passing credentials to the `connect()` method
 
-For implementation details, refer to the [Web3Auth Single Factor Auth documentation](https://web3auth.io/docs/sdk/core-kit/sfa-web).
+For implementation details, refer to the [Web3Auth Custom Authentication documentation](https://docs.metamask.io/embedded-wallets/sdk/js/advanced/custom-authentication/).
 
 * [Web3Auth Website](https://web3auth.io)
 * [Web3Auth Dashboard](https://dashboard.web3auth.io)
