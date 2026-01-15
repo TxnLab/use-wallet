@@ -10,39 +10,14 @@ import {
 } from '@txnlab/use-wallet-vue'
 import algosdk from 'algosdk'
 import { canonify } from 'canonify'
-import { ref, onMounted, onUnmounted } from 'vue'
-import {
-  isFirebaseConfigured,
-  firebaseSignOut,
-  getFreshIdToken,
-  onFirebaseAuthStateChanged,
-  type User
-} from '../firebase'
-import FirebaseAuth from './FirebaseAuth.vue'
+import { ref } from 'vue'
 
 const { activeAddress, algodClient, transactionSigner, signData, wallets } = useWallet()
 
 const isSending = ref(false)
 const magicEmail = ref('')
 
-// Firebase auth state
-const firebaseUser = ref<User | null>(null)
-
-// Auth state subscription
-let unsubscribe: (() => void) | undefined
-
-onMounted(() => {
-  unsubscribe = onFirebaseAuthStateChanged((user) => {
-    firebaseUser.value = user
-  })
-})
-
-onUnmounted(() => {
-  unsubscribe?.()
-})
-
 const isMagicLink = (wallet: Wallet) => wallet.id === WalletId.MAGIC
-const isWeb3Auth = (wallet: Wallet) => wallet.id === WalletId.WEB3AUTH
 const isEmailValid = () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(magicEmail.value)
 
 const isConnectDisabled = (wallet: Wallet) => {
@@ -51,39 +26,11 @@ const isConnectDisabled = (wallet: Wallet) => {
   return false
 }
 
-// Firebase SFA connection
-const handleFirebaseConnect = async (wallet: Wallet) => {
-  if (!firebaseUser.value) {
-    console.error('[App] No Firebase user signed in')
-    return
-  }
-
-  const idToken = await getFreshIdToken()
-  if (!idToken) {
-    console.error('[App] Failed to get Firebase ID token')
-    return
-  }
-
-  const verifierId = firebaseUser.value.uid
-  console.info('[App] Connecting Web3Auth with Firebase auth...', { verifierId })
-
-  await wallet.connect({ idToken, verifierId })
-}
-
 const handleConnect = async (wallet: Wallet) => {
   if (isMagicLink(wallet)) {
     await wallet.connect({ email: magicEmail.value })
   } else {
     await wallet.connect()
-  }
-}
-
-const handleFirebaseSignOut = async () => {
-  try {
-    await firebaseSignOut()
-    console.info('[App] Signed out from Firebase')
-  } catch (error) {
-    console.error('[App] Firebase sign-out error:', error)
   }
 }
 
@@ -198,26 +145,6 @@ const auth = async () => {
       />
     </div>
 
-    <!-- Firebase SFA Authentication -->
-    <div v-if="isWeb3Auth(wallet) && isFirebaseConfigured && !wallet.isConnected" class="firebase-sfa-section">
-      <div class="section-divider">
-        <span>or connect with Firebase</span>
-      </div>
-      <div v-if="firebaseUser" class="firebase-user">
-        <span>Signed in as: {{ firebaseUser.email || firebaseUser.uid }}</span>
-        <div class="firebase-user-buttons">
-          <button type="button" @click="handleFirebaseSignOut">Sign Out</button>
-          <button type="button" @click="handleFirebaseConnect(wallet)">Connect with Firebase</button>
-        </div>
-      </div>
-      <div v-else class="firebase-auth">
-        <FirebaseAuth
-          :on-sign-in-success="() => console.info('[App] Firebase sign-in successful')"
-        />
-      </div>
-    </div>
-    <!-- End Firebase SFA Authentication -->
-
     <div v-if="wallet.isActive && wallet.accounts.length > 0">
       <select @change="(event) => setActiveAccount(event, wallet)">
         <option v-for="account in wallet.accounts" :key="account.address" :value="account.address">
@@ -268,67 +195,5 @@ const auth = async () => {
 .input-group input[disabled] {
   opacity: 0.75;
   color: light-dark(rgba(16, 16, 16, 0.3), rgba(255, 255, 255, 0.3));
-}
-
-.firebase-user {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.6em;
-}
-
-.firebase-user-buttons {
-  display: flex;
-  gap: 0.5em;
-}
-
-.firebase-user-buttons button {
-  white-space: nowrap;
-}
-
-.firebase-user span {
-  font-size: 0.9em;
-  opacity: 0.8;
-}
-
-.firebase-auth {
-  margin-top: 0.5em;
-}
-
-.firebase-sfa-section {
-  width: 100%;
-  max-width: 300px;
-}
-
-.section-divider {
-  display: flex;
-  align-items: center;
-  gap: 1em;
-  margin: 1em 0;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.85em;
-}
-
-.section-divider::before,
-.section-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.2);
-}
-
-@media (prefers-color-scheme: light) {
-  .network-group {
-    border-color: #f9f9f9;
-  }
-
-  .section-divider {
-    color: rgba(0, 0, 0, 0.5);
-  }
-
-  .section-divider::before,
-  .section-divider::after {
-    background: rgba(0, 0, 0, 0.2);
-  }
 }
 </style>

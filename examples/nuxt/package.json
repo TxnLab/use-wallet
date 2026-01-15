@@ -26,7 +26,6 @@
     "algosdk": "3.4.0",
     "buffer": "^6.0.3",
     "canonify": "2.1.1",
-    "firebase": "^12.7.0",
     "process": "^0.11.10",
     "lute-connect": "^1.6.2",
     "nuxt": "3.18.1",

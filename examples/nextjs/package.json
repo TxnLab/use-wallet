@@ -21,7 +21,6 @@
     "@web3auth/single-factor-auth": "^9.4.0",
     "algosdk": "3.4.0",
     "canonify": "2.1.1",
-    "firebase": "^12.7.0",
     "lute-connect": "^1.6.2",
     "next": "14.2.31",
     "react": "18.3.1",

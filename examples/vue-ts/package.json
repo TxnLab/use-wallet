@@ -22,7 +22,6 @@
     "@web3auth/single-factor-auth": "^9.4.0",
     "algosdk": "3.4.0",
     "canonify": "2.1.1",
-    "firebase": "^12.7.0",
     "lute-connect": "^1.6.2",
     "tweetnacl": "^1.0.3",
     "vue": "3.5.18"

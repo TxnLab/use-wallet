@@ -9,24 +9,13 @@ import {
 } from '@txnlab/use-wallet'
 import algosdk from 'algosdk'
 import { canonify } from 'canonify'
-import {
-  isFirebaseConfigured,
-  firebaseSignOut,
-  getFreshIdToken,
-  onFirebaseAuthStateChanged,
-  type User
-} from './firebase'
-import { FirebaseAuthComponent } from './FirebaseAuthComponent'
 
 export class WalletComponent {
   wallet: BaseWallet
   manager: WalletManager
   element: HTMLElement
   private unsubscribe?: () => void
-  private unsubscribeFirebase?: () => void
   private magicEmail: string = ''
-  private firebaseUser: User | null = null
-  private firebaseAuthComponent: FirebaseAuthComponent | null = null
 
   constructor(wallet: BaseWallet, manager: WalletManager) {
     this.wallet = wallet
@@ -37,14 +26,6 @@ export class WalletComponent {
       console.info('[App] State change:', state)
       this.render()
     })
-
-    // Subscribe to Firebase auth state for Web3Auth wallets
-    if (this.isWeb3Auth()) {
-      this.unsubscribeFirebase = onFirebaseAuthStateChanged((user) => {
-        this.firebaseUser = user
-        this.render()
-      })
-    }
 
     this.render()
     this.addEventListeners()
@@ -139,7 +120,6 @@ export class WalletComponent {
   }
 
   isMagicLink = () => this.wallet.id === WalletId.MAGIC
-  isWeb3Auth = () => this.wallet.id === WalletId.WEB3AUTH
   isEmailValid = () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.magicEmail)
 
   isConnectDisabled = () => {
@@ -152,39 +132,11 @@ export class WalletComponent {
     return false
   }
 
-  // Firebase SFA connection
-  handleFirebaseConnect = async () => {
-    if (!this.firebaseUser) {
-      console.error('[App] No Firebase user signed in')
-      return
-    }
-
-    const idToken = await getFreshIdToken()
-    if (!idToken) {
-      console.error('[App] Failed to get Firebase ID token')
-      return
-    }
-
-    const verifierId = this.firebaseUser.uid
-    console.info('[App] Connecting Web3Auth with Firebase auth...', { verifierId })
-
-    await this.wallet.connect({ idToken, verifierId })
-  }
-
   handleConnect = async () => {
     if (this.isMagicLink()) {
       await this.wallet.connect({ email: this.magicEmail })
     } else {
       await this.wallet.connect()
-    }
-  }
-
-  handleFirebaseSignOut = async () => {
-    try {
-      await firebaseSignOut()
-      console.info('[App] Signed out from Firebase')
-    } catch (error) {
-      console.error('[App] Firebase sign-out error:', error)
     }
   }
 
@@ -234,36 +186,6 @@ export class WalletComponent {
         }
 
         ${
-          this.isWeb3Auth() && isFirebaseConfigured && !this.wallet.isConnected
-            ? `
-        <!-- Firebase SFA Authentication -->
-        <div class="firebase-sfa-section">
-          <div class="section-divider">
-            <span>or connect with Firebase</span>
-          </div>
-          ${
-            this.firebaseUser
-              ? `
-            <div class="firebase-user">
-              <span>Signed in as: ${this.firebaseUser.email || this.firebaseUser.uid}</span>
-              <div class="firebase-user-buttons">
-                <button type="button" id="firebase-signout">Sign Out</button>
-                <button type="button" id="firebase-connect">Connect with Firebase</button>
-              </div>
-            </div>
-          `
-              : `
-            <div class="firebase-auth" id="firebase-auth-container">
-            </div>
-          `
-          }
-        </div>
-        <!-- End Firebase SFA Authentication -->
-      `
-            : ''
-        }
-
-        ${
           this.wallet.isActive && this.wallet.accounts.length
             ? `
           <div>
@@ -286,21 +208,6 @@ export class WalletComponent {
         }
       </div>
     `
-
-    // Append Firebase auth component if needed
-    if (this.isWeb3Auth() && isFirebaseConfigured && !this.wallet.isConnected && !this.firebaseUser) {
-      const container = this.element.querySelector('#firebase-auth-container')
-      if (container) {
-        // Recreate the Firebase auth component
-        if (this.firebaseAuthComponent) {
-          this.firebaseAuthComponent.destroy()
-        }
-        this.firebaseAuthComponent = new FirebaseAuthComponent({
-          onSignInSuccess: () => console.info('[App] Firebase sign-in successful')
-        })
-        container.appendChild(this.firebaseAuthComponent.element)
-      }
-    }
   }
 
   updateEmailInput = () => {
@@ -328,10 +235,6 @@ export class WalletComponent {
         this.sendTransaction()
       } else if (target.id === 'auth-button') {
         this.auth()
-      } else if (target.id === 'firebase-signout') {
-        this.handleFirebaseSignOut()
-      } else if (target.id === 'firebase-connect') {
-        this.handleFirebaseConnect()
       }
     })
 
@@ -357,12 +260,6 @@ export class WalletComponent {
     // Disconnect the listener on unmount to prevent memory leaks
     if (this.unsubscribe) {
       this.unsubscribe()
-    }
-    if (this.unsubscribeFirebase) {
-      this.unsubscribeFirebase()
-    }
-    if (this.firebaseAuthComponent) {
-      this.firebaseAuthComponent.destroy()
     }
     this.element.removeEventListener('click', this.addEventListeners)
     this.element.removeEventListener('change', this.addEventListeners)
