@@ -12,6 +12,10 @@ export const webpackFallback = {
   '@perawallet/connect': false,
   '@walletconnect/modal': false,
   '@walletconnect/sign-client': false,
+  '@web3auth/base': false,
+  '@web3auth/base-provider': false,
+  '@web3auth/modal': false,
+  '@web3auth/single-factor-auth': false,
   'lute-connect': false,
   'magic-sdk': false
 }
