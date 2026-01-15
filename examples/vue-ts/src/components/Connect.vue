@@ -115,9 +115,7 @@ const auth = async () => {
   <div v-for="wallet in wallets" :key="wallet.id" class="wallet-group">
     <h4>{{ wallet.metadata.name }} <span v-if="wallet.isActive">[active]</span></h4>
     <div class="wallet-buttons">
-      <button @click="handleConnect(wallet)" :disabled="isConnectDisabled(wallet)">
-        Connect
-      </button>
+      <button @click="handleConnect(wallet)" :disabled="isConnectDisabled(wallet)">Connect</button>
       <button @click="wallet.disconnect()" :disabled="!wallet.isConnected">Disconnect</button>
       <button
         v-if="!wallet.isActive"

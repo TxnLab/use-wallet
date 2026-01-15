@@ -154,10 +154,7 @@ const auth = async () => {
         {{ wallet.metadata.name }}
       </h4>
       <div class="wallet-buttons">
-        <button
-          @click="handleConnect(wallet)"
-          :disabled="isConnectDisabled(wallet)"
-        >
+        <button @click="handleConnect(wallet)" :disabled="isConnectDisabled(wallet)">
           Connect
         </button>
         <button @click="wallet.disconnect()" :disabled="!wallet.isConnected">Disconnect</button>
