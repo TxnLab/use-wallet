@@ -38,7 +38,7 @@
     "dist"
   ],
   "dependencies": {
-    "@tanstack/store": "0.7.2"
+    "@tanstack/store": "0.8.0"
   },
   "devDependencies": {
     "@agoralabs-sh/avm-web-provider": "1.7.0",
@@ -51,15 +51,15 @@
     "@walletconnect/modal-core": "2.7.0",
     "@walletconnect/sign-client": "2.23.1",
     "@walletconnect/types": "2.23.1",
-    "@web3auth/base": "9.6.0",
-    "@web3auth/base-provider": "9.6.0",
-    "@web3auth/modal": "9.6.0",
-    "@web3auth/single-factor-auth": "9.4.0",
+    "@web3auth/base": "9.7.0",
+    "@web3auth/base-provider": "9.7.0",
+    "@web3auth/modal": "9.7.0",
+    "@web3auth/single-factor-auth": "9.5.0",
     "algosdk": "3.5.2",
     "canonify": "2.1.1",
     "lute-connect": "1.6.3",
     "magic-sdk": "29.4.2",
-    "tsup": "8.5.0",
+    "tsup": "8.5.1",
     "tweetnacl": "^1.0.3",
     "typescript": "5.9.3"
   },
