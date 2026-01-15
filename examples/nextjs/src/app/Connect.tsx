@@ -36,11 +36,12 @@ export function Connect() {
     return false
   }
 
-  const getConnectArgs = (wallet: Wallet) => {
+  const handleConnect = async (wallet: Wallet) => {
     if (isMagicLink(wallet)) {
-      return { email: magicEmail }
+      await wallet.connect({ email: magicEmail })
+    } else {
+      await wallet.connect()
     }
-    return undefined
   }
 
   const setActiveAccount = (event: React.ChangeEvent<HTMLSelectElement>, wallet: Wallet) => {
@@ -158,7 +159,7 @@ export function Connect() {
           <div className={styles.walletButtons}>
             <button
               type="button"
-              onClick={() => wallet.connect(getConnectArgs(wallet))}
+              onClick={() => handleConnect(wallet)}
               disabled={isConnectDisabled(wallet)}
             >
               Connect

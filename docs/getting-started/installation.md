@@ -367,6 +367,34 @@ bun add magic-sdk @magic-ext/algorand
 {% endtab %}
 {% endtabs %}
 
+#### Web3Auth
+
+{% tabs %}
+{% tab title="npm" %}
+```bash
+npm install @web3auth/modal @web3auth/base @web3auth/base-provider
+```
+{% endtab %}
+
+{% tab title="yarn" %}
+```bash
+yarn add @web3auth/modal @web3auth/base @web3auth/base-provider
+```
+{% endtab %}
+
+{% tab title="pnpm" %}
+```bash
+pnpm add @web3auth/modal @web3auth/base @web3auth/base-provider
+```
+{% endtab %}
+
+{% tab title="bun" %}
+```bash
+bun add @web3auth/modal @web3auth/base @web3auth/base-provider
+```
+{% endtab %}
+{% endtabs %}
+
 ### Webpack Configuration
 
 When using this library in a project that uses Webpack as its build tool, you may encounter "module not found" errors for optional dependencies of wallets you choose not to support. To resolve this, you can use the `webpackFallback` export.

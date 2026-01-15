@@ -121,8 +121,24 @@ export class WalletComponent {
 
   isMagicLink = () => this.wallet.id === WalletId.MAGIC
   isEmailValid = () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.magicEmail)
-  isConnectDisabled = () => this.wallet.isConnected || (this.isMagicLink() && !this.isEmailValid())
-  getConnectArgs = () => (this.isMagicLink() ? { email: this.magicEmail } : undefined)
+
+  isConnectDisabled = () => {
+    if (this.wallet.isConnected) {
+      return true
+    }
+    if (this.isMagicLink() && !this.isEmailValid()) {
+      return true
+    }
+    return false
+  }
+
+  handleConnect = async () => {
+    if (this.isMagicLink()) {
+      await this.wallet.connect({ email: this.magicEmail })
+    } else {
+      await this.wallet.connect()
+    }
+  }
 
   render() {
     this.element.innerHTML = `
@@ -210,8 +226,7 @@ export class WalletComponent {
     this.element.addEventListener('click', (e: Event) => {
       const target = e.target as HTMLElement
       if (target.id === 'connect-button') {
-        const args = this.getConnectArgs()
-        this.connect(args)
+        this.handleConnect()
       } else if (target.id === 'disconnect-button') {
         this.disconnect()
       } else if (target.id === 'set-active-button') {
