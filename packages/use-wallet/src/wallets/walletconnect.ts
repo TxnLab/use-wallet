@@ -10,14 +10,17 @@ import {
   isTransactionArray
 } from 'src/utils'
 import { BaseWallet } from 'src/wallets/base'
+import { resolveSkin } from 'src/wallets/skins'
 import type { Store } from '@tanstack/store'
 import type { WalletConnectModal, WalletConnectModalConfig } from '@walletconnect/modal'
 import type SignClient from '@walletconnect/sign-client'
 import type { SessionTypes, SignClientTypes } from '@walletconnect/types'
 import type {
   WalletAccount,
+  WalletConnectSkinOption,
   WalletConstructor,
   WalletId,
+  WalletKey,
   WalletTransaction
 } from 'src/wallets/types'
 
@@ -37,7 +40,20 @@ type WalletConnectModalOptions = Pick<
   | 'themeVariables'
 >
 
-export type WalletConnectOptions = SignClientOptions & WalletConnectModalOptions
+type WalletConnectBaseOptions = SignClientOptions & WalletConnectModalOptions
+
+export interface WalletConnectOptions extends WalletConnectBaseOptions {
+  /**
+   * Optional skin to apply to this WalletConnect instance.
+   * Can be either:
+   * - A string ID referencing a built-in skin (e.g., 'biatec')
+   * - A full skin object with id, name, and icon
+   *
+   * When a skin is applied, the wallet will use the skin's metadata
+   * and a unique walletKey for state isolation.
+   */
+  skin?: WalletConnectSkinOption
+}
 
 export type SignTxnsResponse = Array<Uint8Array | number[] | string | null | undefined>
 
@@ -71,7 +87,17 @@ export class WalletConnect extends BaseWallet {
     options,
     metadata = {}
   }: WalletConstructor<WalletId.WALLETCONNECT>) {
-    super({ id, metadata, getAlgodClient, store, subscribe })
+    // Resolve skin from options (if provided)
+    const skin = options?.skin ? resolveSkin(options.skin) : undefined
+
+    // Derive walletKey: if skin is provided, use composite key 'walletconnect:skinId'
+    const walletKey: WalletKey = skin ? `walletconnect:${skin.id}` : id
+
+    // Build effective metadata: skin metadata -> user override
+    const effectiveMetadata = skin ? { name: skin.name, icon: skin.icon, ...metadata } : metadata
+
+    super({ id, walletKey, metadata: effectiveMetadata, getAlgodClient, store, subscribe })
+
     if (!options?.projectId) {
       this.logger.error('Missing required option: projectId')
       throw new Error('Missing required option: projectId')
@@ -81,6 +107,8 @@ export class WalletConnect extends BaseWallet {
       projectId,
       relayUrl = 'wss://relay.walletconnect.com',
       metadata: metadataOptions,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      skin: _skinOption, // Extract skin to exclude from modalOptions
       ...modalOptions
     } = options
 
@@ -319,7 +347,7 @@ export class WalletConnect extends BaseWallet {
     }))
 
     const state = this.store.state
-    const walletState = state.wallets[this.id]
+    const walletState = state.wallets[this.walletKey]
 
     if (!walletState) {
       const newWalletState: WalletState = {
@@ -328,7 +356,7 @@ export class WalletConnect extends BaseWallet {
       }
 
       addWallet(this.store, {
-        walletId: this.id,
+        walletId: this.walletKey,
         wallet: newWalletState
       })
 
@@ -342,7 +370,7 @@ export class WalletConnect extends BaseWallet {
           current: walletAccounts
         })
         setAccounts(this.store, {
-          walletId: this.id,
+          walletId: this.walletKey,
           accounts: walletAccounts
         })
       }
@@ -420,7 +448,7 @@ export class WalletConnect extends BaseWallet {
   public resumeSession = async (): Promise<void> => {
     try {
       const state = this.store.state
-      const walletState = state.wallets[this.id]
+      const walletState = state.wallets[this.walletKey]
 
       // No session to resume
       if (!walletState) {

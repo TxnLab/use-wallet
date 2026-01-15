@@ -1,7 +1,7 @@
 import algosdk from 'algosdk'
 import { logger } from 'src/logger'
 import { DEFAULT_NETWORK_CONFIG, NetworkConfig, NetworkId } from 'src/network'
-import { WalletId, type WalletAccount } from 'src/wallets/types'
+import { WalletId, type WalletAccount, type WalletKey } from 'src/wallets/types'
 import type { Store } from '@tanstack/store'
 
 export type WalletState = {
@@ -9,13 +9,13 @@ export type WalletState = {
   activeAccount: WalletAccount | null
 }
 
-export type WalletStateMap = Partial<Record<WalletId, WalletState>>
+export type WalletStateMap = Partial<Record<WalletKey, WalletState>>
 
 export type ManagerStatus = 'initializing' | 'ready'
 
 export interface State {
   wallets: WalletStateMap
-  activeWallet: WalletId | null
+  activeWallet: WalletKey | null
   activeNetwork: string
   algodClient: algosdk.Algodv2
   managerStatus: ManagerStatus
@@ -41,7 +41,7 @@ export const LOCAL_STORAGE_KEY = '@txnlab/use-wallet:v4'
 
 export function addWallet(
   store: Store<State>,
-  { walletId, wallet }: { walletId: WalletId; wallet: WalletState }
+  { walletId, wallet }: { walletId: WalletKey; wallet: WalletState }
 ) {
   store.setState((state) => {
     const updatedWallets = {
@@ -60,7 +60,7 @@ export function addWallet(
   })
 }
 
-export function removeWallet(store: Store<State>, { walletId }: { walletId: WalletId }) {
+export function removeWallet(store: Store<State>, { walletId }: { walletId: WalletKey }) {
   store.setState((state) => {
     const updatedWallets = { ...state.wallets }
     delete updatedWallets[walletId]
@@ -73,7 +73,7 @@ export function removeWallet(store: Store<State>, { walletId }: { walletId: Wall
   })
 }
 
-export function setActiveWallet(store: Store<State>, { walletId }: { walletId: WalletId | null }) {
+export function setActiveWallet(store: Store<State>, { walletId }: { walletId: WalletKey | null }) {
   store.setState((state) => ({
     ...state,
     activeWallet: walletId
@@ -82,7 +82,7 @@ export function setActiveWallet(store: Store<State>, { walletId }: { walletId: W
 
 export function setActiveAccount(
   store: Store<State>,
-  { walletId, address }: { walletId: WalletId; address: string }
+  { walletId, address }: { walletId: WalletKey; address: string }
 ) {
   store.setState((state) => {
     const wallet = state.wallets[walletId]
@@ -117,7 +117,7 @@ export function setActiveAccount(
 
 export function setAccounts(
   store: Store<State>,
-  { walletId, accounts }: { walletId: WalletId; accounts: WalletAccount[] }
+  { walletId, accounts }: { walletId: WalletKey; accounts: WalletAccount[] }
 ) {
   store.setState((state) => {
     const wallet = state.wallets[walletId]
@@ -169,6 +169,24 @@ export function setActiveNetwork(
 
 export function isValidWalletId(walletId: any): walletId is WalletId {
   return Object.values(WalletId).includes(walletId)
+}
+
+/**
+ * Check if a value is a valid WalletKey.
+ * A WalletKey can be either:
+ * - A standard WalletId enum value
+ * - A composite string in the format 'walletconnect:skinId'
+ */
+export function isValidWalletKey(walletKey: any): walletKey is WalletKey {
+  if (isValidWalletId(walletKey)) {
+    return true
+  }
+  // Check for composite key format: walletconnect:skinId
+  if (typeof walletKey === 'string' && walletKey.startsWith(`${WalletId.WALLETCONNECT}:`)) {
+    const skinId = walletKey.slice(`${WalletId.WALLETCONNECT}:`.length)
+    return skinId.length > 0
+  }
+  return false
 }
 
 export function isValidWalletAccount(account: any): account is WalletAccount {

@@ -3,6 +3,7 @@ import {
   BaseWallet,
   WalletManager,
   type WalletAccount,
+  type WalletKey,
   type WalletMetadata,
   type WalletId,
   type SignMetadata,
@@ -13,6 +14,8 @@ import { computed, inject, ref } from 'vue'
 
 export interface Wallet {
   id: WalletId
+  /** Unique key for this wallet instance. Used for skinned WalletConnect instances. */
+  walletKey: WalletKey
   metadata: WalletMetadata
   accounts: WalletAccount[]
   activeAccount: WalletAccount | null
@@ -45,14 +48,15 @@ export function useWallet() {
   const activeWalletId = useStore(manager.store, (state) => state.activeWallet)
 
   const transformToWallet = (wallet: BaseWallet): Wallet => {
-    const walletState = walletStateMap.value[wallet.id]
+    const walletState = walletStateMap.value[wallet.walletKey]
     return {
       id: wallet.id,
+      walletKey: wallet.walletKey,
       metadata: wallet.metadata,
       accounts: walletState?.accounts ?? [],
       activeAccount: walletState?.activeAccount ?? null,
       isConnected: !!walletState,
-      isActive: wallet.id === activeWalletId.value,
+      isActive: wallet.walletKey === activeWalletId.value,
       canSignData: wallet.canSignData ?? false,
       connect: (args) => wallet.connect(args),
       disconnect: () => wallet.disconnect(),
@@ -76,7 +80,7 @@ export function useWallet() {
 
   const activeWalletState = computed(() => {
     const wallet = activeWallet.value
-    return wallet ? walletStateMap.value[wallet.id] || null : null
+    return wallet ? walletStateMap.value[wallet.walletKey] || null : null
   })
 
   const activeWalletAccounts = computed(() => {

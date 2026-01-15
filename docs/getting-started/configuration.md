@@ -91,10 +91,13 @@ const manager = new WalletManager({
         apiKey: '<MAGIC_API_KEY>'  // Required
       }
     },
+
+    // WalletConnect with skin (for branded wallet appearance)
     {
-      id: WalletId.BIATEC,
+      id: WalletId.WALLETCONNECT,
       options: {
-        projectId: '<REOWN_PROJECT_ID>'  // Required
+        projectId: '<REOWN_PROJECT_ID>', // Required
+        skin: 'biatec'  // Built-in skin for Biatec Wallet
       }
     }
   ]
