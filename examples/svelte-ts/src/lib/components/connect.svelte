@@ -10,10 +10,28 @@
   } from '@txnlab/use-wallet-svelte'
   import algosdk from 'algosdk'
   import { canonify } from 'canonify'
+  import { onDestroy } from 'svelte'
+  import {
+    isFirebaseConfigured,
+    firebaseSignOut,
+    getFreshIdToken,
+    onFirebaseAuthStateChanged,
+    type User
+  } from '$lib/firebase'
+  import FirebaseAuth from './FirebaseAuth.svelte'
 
   const props = $props()
   const { activeAddress, algodClient, signData, transactionSigner } = useWallet()
   const wallet: Wallet = props.wallet
+
+  // Firebase auth state
+  let firebaseUser = $state<User | null>(null)
+
+  // Subscribe to Firebase auth state
+  const unsubscribe = onFirebaseAuthStateChanged((user) => {
+    firebaseUser = user
+  })
+  onDestroy(() => unsubscribe())
 
   const setActiveAccount = (event: Event, wallet: Wallet) => {
     const target = event.target as HTMLSelectElement
@@ -22,9 +40,54 @@
 
   let magicEmail = $state('')
   const isMagicLink = () => wallet.id === WalletId.MAGIC
+  const isWeb3Auth = () => wallet.id === WalletId.WEB3AUTH
   const isEmailValid = () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(magicEmail)
-  const isConnectDisabled = () => wallet.isConnected() || (isMagicLink() && !isEmailValid())
-  const getConnectArgs = () => (isMagicLink() ? { email: magicEmail } : undefined)
+
+  const isConnectDisabled = () => {
+    if (wallet.isConnected()) {
+      return true
+    }
+    if (isMagicLink() && !isEmailValid()) {
+      return true
+    }
+    return false
+  }
+
+  // Firebase SFA connection
+  async function handleFirebaseConnect() {
+    if (!firebaseUser) {
+      console.error('[App] No Firebase user signed in')
+      return
+    }
+
+    const idToken = await getFreshIdToken()
+    if (!idToken) {
+      console.error('[App] Failed to get Firebase ID token')
+      return
+    }
+
+    const verifierId = firebaseUser.uid
+    console.info('[App] Connecting Web3Auth with Firebase auth...', { verifierId })
+
+    await wallet.connect({ idToken, verifierId })
+  }
+
+  async function handleConnect() {
+    if (isMagicLink()) {
+      await wallet.connect({ email: magicEmail })
+    } else {
+      await wallet.connect()
+    }
+  }
+
+  async function handleFirebaseSignOut() {
+    try {
+      await firebaseSignOut()
+      console.info('[App] Signed out from Firebase')
+    } catch (error) {
+      console.error('[App] Firebase sign-out error:', error)
+    }
+  }
 
   let isSending = $state(false)
   async function sendTransaction() {
@@ -106,7 +169,7 @@
     {#if wallet.isActive()}<span>[active]</span>{/if}
   </h4>
   <div class="wallet-buttons">
-    <button onclick={() => wallet.connect(getConnectArgs())} disabled={isConnectDisabled()}>
+    <button onclick={handleConnect} disabled={isConnectDisabled()}>
       Connect
     </button>
     <button onclick={wallet.disconnect} disabled={!wallet.isConnected()}> Disconnect </button>
@@ -135,6 +198,32 @@
       />
     </div>
   {/if}
+  <!-- Firebase SFA Authentication -->
+  {#if isWeb3Auth() && isFirebaseConfigured && !wallet.isConnected()}
+    <div class="firebase-sfa-section">
+      <div class="section-divider">
+        <span>or connect with Firebase</span>
+      </div>
+      {#if firebaseUser}
+        <div class="firebase-user">
+          <span>Signed in as: {firebaseUser.email || firebaseUser.uid}</span>
+          <div class="firebase-user-buttons">
+            <button type="button" onclick={handleFirebaseSignOut}>
+              Sign Out
+            </button>
+            <button type="button" onclick={handleFirebaseConnect}>
+              Connect with Firebase
+            </button>
+          </div>
+        </div>
+      {:else}
+        <div class="firebase-auth">
+          <FirebaseAuth onSignInSuccess={() => console.info('[App] Firebase sign-in successful')} />
+        </div>
+      {/if}
+    </div>
+  {/if}
+  <!-- End Firebase SFA Authentication -->
   {#if wallet.isActive() && wallet.accounts.current?.length}
     <div>
       <select value={activeAddress.current} onchange={(event) => setActiveAccount(event, wallet)}>

@@ -92,12 +92,27 @@ importers:
       '@walletconnect/sign-client':
         specifier: ^2.21.8
         version: 2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.7.0)(typescript@5.8.3)(zod@3.25.76)
+      '@web3auth/base':
+        specifier: ^9.6.0
+        version: 9.6.0(@babel/runtime@7.28.3)
+      '@web3auth/base-provider':
+        specifier: ^9.6.0
+        version: 9.6.0(@babel/runtime@7.28.3)
+      '@web3auth/modal':
+        specifier: ^9.6.0
+        version: 9.6.0(@babel/runtime@7.28.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
+      '@web3auth/single-factor-auth':
+        specifier: ^9.4.0
+        version: 9.4.0(@babel/runtime@7.28.3)
       algosdk:
         specifier: 3.4.0
         version: 3.4.0
       canonify:
         specifier: 2.1.1
         version: 2.1.1
+      firebase:
+        specifier: ^12.7.0
+        version: 12.7.0
       lute-connect:
         specifier: ^1.6.2
         version: 1.6.2
@@ -110,6 +125,9 @@ importers:
       react-dom:
         specifier: 18.3.1
         version: 18.3.1(react@18.3.1)
+      tweetnacl:
+        specifier: ^1.0.3
+        version: 1.0.3
     devDependencies:
       '@types/node':
         specifier: 20.11.30
@@ -153,18 +171,42 @@ importers:
       '@walletconnect/sign-client':
         specifier: ^2.21.8
         version: 2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.7.0)(typescript@5.8.3)(zod@3.25.76)
+      '@web3auth/base':
+        specifier: ^9.6.0
+        version: 9.6.0(@babel/runtime@7.28.3)
+      '@web3auth/base-provider':
+        specifier: ^9.6.0
+        version: 9.6.0(@babel/runtime@7.28.3)
+      '@web3auth/modal':
+        specifier: ^9.6.0
+        version: 9.6.0(@babel/runtime@7.28.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
+      '@web3auth/single-factor-auth':
+        specifier: ^9.4.0
+        version: 9.4.0(@babel/runtime@7.28.3)
       algosdk:
         specifier: 3.4.0
         version: 3.4.0
+      buffer:
+        specifier: ^6.0.3
+        version: 6.0.3
       canonify:
         specifier: 2.1.1
         version: 2.1.1
+      firebase:
+        specifier: ^12.7.0
+        version: 12.7.0
       lute-connect:
         specifier: ^1.6.2
         version: 1.6.2
       nuxt:
         specifier: 3.18.1
         version: 3.18.1(@netlify/blobs@9.1.2)(@parcel/watcher@2.5.1)(@types/node@20.11.30)(@vue/compiler-sfc@3.5.18)(db0@0.3.2)(eslint@8.57.1)(idb-keyval@6.2.2)(ioredis@5.7.0)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.46.2)(terser@5.43.1)(typescript@5.8.3)(vite@7.1.2(@types/node@20.11.30)(jiti@2.5.1)(terser@5.43.1)(yaml@2.8.1))(vue-tsc@2.2.12(typescript@5.8.3))(yaml@2.8.1)
+      process:
+        specifier: ^0.11.10
+        version: 0.11.10
+      tweetnacl:
+        specifier: ^1.0.3
+        version: 1.0.3
       vue:
         specifier: 3.5.18
         version: 3.5.18(typescript@5.8.3)
@@ -287,18 +329,36 @@ importers:
       '@walletconnect/sign-client':
         specifier: ^2.21.8
         version: 2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.7.0)(typescript@5.8.3)(zod@3.25.76)
+      '@web3auth/base':
+        specifier: ^9.6.0
+        version: 9.6.0(@babel/runtime@7.28.3)
+      '@web3auth/base-provider':
+        specifier: ^9.6.0
+        version: 9.6.0(@babel/runtime@7.28.3)
+      '@web3auth/modal':
+        specifier: ^9.6.0
+        version: 9.6.0(@babel/runtime@7.28.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
+      '@web3auth/single-factor-auth':
+        specifier: ^9.4.0
+        version: 9.4.0(@babel/runtime@7.28.3)
       algosdk:
         specifier: 3.4.0
         version: 3.4.0
       canonify:
         specifier: 2.1.1
         version: 2.1.1
+      firebase:
+        specifier: ^12.7.0
+        version: 12.7.0
       lute-connect:
         specifier: ^1.6.2
         version: 1.6.2
       solid-js:
         specifier: 1.9.9
         version: 1.9.9
+      tweetnacl:
+        specifier: ^1.0.3
+        version: 1.0.3
     devDependencies:
       typescript:
         specifier: 5.8.3
@@ -333,18 +393,36 @@ importers:
       '@walletconnect/sign-client':
         specifier: ^2.21.8
         version: 2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.7.0)(typescript@5.8.3)(zod@3.25.76)
+      '@web3auth/base':
+        specifier: ^9.6.0
+        version: 9.6.0(@babel/runtime@7.28.3)
+      '@web3auth/base-provider':
+        specifier: ^9.6.0
+        version: 9.6.0(@babel/runtime@7.28.3)
+      '@web3auth/modal':
+        specifier: ^9.6.0
+        version: 9.6.0(@babel/runtime@7.28.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
+      '@web3auth/single-factor-auth':
+        specifier: ^9.4.0
+        version: 9.4.0(@babel/runtime@7.28.3)
       algosdk:
         specifier: 3.4.0
         version: 3.4.0
       canonify:
         specifier: 2.1.1
         version: 2.1.1
+      firebase:
+        specifier: ^12.7.0
+        version: 12.7.0
       lute-connect:
         specifier: ^1.6.2
         version: 1.6.2
       svelte:
         specifier: 5.38.1
         version: 5.38.1
+      tweetnacl:
+        specifier: ^1.0.3
+        version: 1.0.3
     devDependencies:
       '@sveltejs/adapter-auto':
         specifier: 6.1.0
@@ -388,15 +466,33 @@ importers:
       '@walletconnect/sign-client':
         specifier: ^2.21.8
         version: 2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.7.0)(typescript@5.8.3)(zod@3.25.76)
+      '@web3auth/base':
+        specifier: ^9.6.0
+        version: 9.6.0(@babel/runtime@7.28.3)
+      '@web3auth/base-provider':
+        specifier: ^9.6.0
+        version: 9.6.0(@babel/runtime@7.28.3)
+      '@web3auth/modal':
+        specifier: ^9.6.0
+        version: 9.6.0(@babel/runtime@7.28.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
+      '@web3auth/single-factor-auth':
+        specifier: ^9.4.0
+        version: 9.4.0(@babel/runtime@7.28.3)
       algosdk:
         specifier: 3.4.0
         version: 3.4.0
       canonify:
         specifier: 2.1.1
         version: 2.1.1
+      firebase:
+        specifier: ^12.7.0
+        version: 12.7.0
       lute-connect:
         specifier: ^1.6.2
         version: 1.6.2
+      tweetnacl:
+        specifier: ^1.0.3
+        version: 1.0.3
     devDependencies:
       '@walletconnect/types':
         specifier: 2.21.8
@@ -431,15 +527,33 @@ importers:
       '@walletconnect/sign-client':
         specifier: ^2.21.8
         version: 2.21.8(@netlify/blobs@9.1.2)(db0@0.3.2)(ioredis@5.7.0)(typescript@5.8.3)(zod@3.25.76)
+      '@web3auth/base':
+        specifier: ^9.6.0
+        version: 9.6.0(@babel/runtime@7.28.3)
+      '@web3auth/base-provider':
+        specifier: ^9.6.0
+        version: 9.6.0(@babel/runtime@7.28.3)
+      '@web3auth/modal':
+        specifier: ^9.6.0
+        version: 9.6.0(@babel/runtime@7.28.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
+      '@web3auth/single-factor-auth':
+        specifier: ^9.4.0
+        version: 9.4.0(@babel/runtime@7.28.3)
       algosdk:
         specifier: 3.4.0
         version: 3.4.0
       canonify:
         specifier: 2.1.1
         version: 2.1.1
+      firebase:
+        specifier: ^12.7.0
+        version: 12.7.0
       lute-connect:
         specifier: ^1.6.2
         version: 1.6.2
+      tweetnacl:
+        specifier: ^1.0.3
+        version: 1.0.3
       vue:
         specifier: 3.5.18
         version: 3.5.18(typescript@5.8.3)
@@ -11659,7 +11773,7 @@ snapshots:
     dependencies:
       cipher-base: 1.0.6
       inherits: 2.0.4
-      ripemd160: 2.0.1
+      ripemd160: 2.0.2
       sha.js: 2.4.12
 
   create-hash@1.2.0:
@@ -12286,8 +12400,8 @@ snapshots:
       '@typescript-eslint/parser': 8.39.1(eslint@8.57.1)(typescript@5.8.3)
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@8.57.1)
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.39.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1)
+      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.39.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.39.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.39.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
       eslint-plugin-jsx-a11y: 6.10.2(eslint@8.57.1)
       eslint-plugin-react: 7.37.5(eslint@8.57.1)
       eslint-plugin-react-hooks: 5.0.0-canary-7118f5dd7-20230705(eslint@8.57.1)
@@ -12310,7 +12424,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0)(eslint@8.57.1):
+  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.39.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1):
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
       debug: 4.4.1
@@ -12321,22 +12435,22 @@ snapshots:
       tinyglobby: 0.2.14
       unrs-resolver: 1.11.1
     optionalDependencies:
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.39.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1)
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.39.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.39.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.1(@typescript-eslint/parser@8.39.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1):
+  eslint-module-utils@2.12.1(@typescript-eslint/parser@8.39.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.39.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
       '@typescript-eslint/parser': 8.39.1(eslint@8.57.1)(typescript@5.8.3)
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@8.57.1)
+      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.39.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1)
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.39.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1):
+  eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.39.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.39.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.9
@@ -12347,7 +12461,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.39.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1)
+      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.39.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.39.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3

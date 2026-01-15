@@ -79,7 +79,8 @@ button:disabled {
 }
 
 input[type='text'],
-input[type='email'] {
+input[type='email'],
+input[type='password'] {
   border-radius: 8px;
   border: 1px solid #1a1a1a;
   padding: 0.6em 0.9em;
@@ -197,9 +198,113 @@ select {
   }
   input[type='text'],
   input[type='email'],
+  input[type='password'],
   select {
     background-color: #f9f9f9;
     color: #000000;
     border-color: #f9f9f9;
   }
+}
+
+/* Firebase Auth Styles */
+.firebase-auth-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  padding: 1em;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 0.5em;
+}
+
+.auth-tabs button {
+  flex: 1;
+}
+
+.auth-tabs button.active {
+  border-color: #646cff;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75em;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.google-signin-btn {
+  padding: 0.6em 1em;
+}
+
+.auth-error {
+  padding: 0.5em;
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.1);
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.firebase-user {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6em;
+}
+
+.firebase-user-buttons {
+  display: flex;
+  gap: 0.5em;
+}
+
+.firebase-user-buttons button {
+  white-space: nowrap;
+}
+
+.firebase-user span {
+  font-size: 0.9em;
+  opacity: 0.8;
+}
+
+.firebase-auth {
+  margin-top: 0.5em;
+}
+
+.firebase-sfa-section {
+  width: 100%;
+  max-width: 300px;
+}
+
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  margin: 1em 0;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85em;
+}
+
+.section-divider::before,
+.section-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
 }

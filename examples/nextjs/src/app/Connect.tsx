@@ -14,6 +14,14 @@ import {
 import algosdk from 'algosdk'
 import { canonify } from 'canonify'
 import * as React from 'react'
+import {
+  isFirebaseConfigured,
+  firebaseSignOut,
+  getFreshIdToken,
+  onFirebaseAuthStateChanged,
+  type User
+} from './firebase'
+import { FirebaseAuth } from './FirebaseAuth'
 import styles from './Connect.module.css'
 
 export function Connect() {
@@ -23,7 +31,19 @@ export function Connect() {
   const [isSending, setIsSending] = React.useState(false)
   const [magicEmail, setMagicEmail] = React.useState('')
 
+  // Firebase auth state
+  const [firebaseUser, setFirebaseUser] = React.useState<User | null>(null)
+
+  // Subscribe to Firebase auth state changes
+  React.useEffect(() => {
+    const unsubscribe = onFirebaseAuthStateChanged((user) => {
+      setFirebaseUser(user)
+    })
+    return unsubscribe
+  }, [])
+
   const isMagicLink = (wallet: Wallet) => wallet.id === WalletId.MAGIC
+  const isWeb3Auth = (wallet: Wallet) => wallet.id === WalletId.WEB3AUTH
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(magicEmail)
 
   const isConnectDisabled = (wallet: Wallet) => {
@@ -36,11 +56,43 @@ export function Connect() {
     return false
   }
 
-  const getConnectArgs = (wallet: Wallet) => {
-    if (isMagicLink(wallet)) {
-      return { email: magicEmail }
+  // Firebase SFA connection
+  const handleFirebaseConnect = async (wallet: Wallet) => {
+    if (!firebaseUser) {
+      console.error('[App] No Firebase user signed in')
+      return
     }
-    return undefined
+
+    const idToken = await getFreshIdToken()
+    if (!idToken) {
+      console.error('[App] Failed to get Firebase ID token')
+      return
+    }
+
+    const verifierId = firebaseUser.uid
+    console.info('[App] Connecting Web3Auth with Firebase auth...', { verifierId })
+
+    await wallet.connect({
+      idToken,
+      verifierId
+    })
+  }
+
+  const handleConnect = async (wallet: Wallet) => {
+    if (isMagicLink(wallet)) {
+      await wallet.connect({ email: magicEmail })
+    } else {
+      await wallet.connect()
+    }
+  }
+
+  const handleFirebaseSignOut = async () => {
+    try {
+      await firebaseSignOut()
+      console.info('[App] Signed out from Firebase')
+    } catch (error) {
+      console.error('[App] Firebase sign-out error:', error)
+    }
   }
 
   const setActiveAccount = (event: React.ChangeEvent<HTMLSelectElement>, wallet: Wallet) => {
@@ -158,7 +210,7 @@ export function Connect() {
           <div className={styles.walletButtons}>
             <button
               type="button"
-              onClick={() => wallet.connect(getConnectArgs(wallet))}
+              onClick={() => handleConnect(wallet)}
               disabled={isConnectDisabled(wallet)}
             >
               Connect
@@ -205,6 +257,37 @@ export function Connect() {
               />
             </div>
           )}
+
+          {/* Firebase SFA Authentication */}
+          {isWeb3Auth(wallet) && isFirebaseConfigured && !wallet.isConnected && (
+            <div className="firebase-sfa-section">
+              <div className="section-divider">
+                <span>or connect with Firebase</span>
+              </div>
+              {firebaseUser ? (
+                <div className="firebase-user">
+                  <span>Signed in as: {firebaseUser.email || firebaseUser.uid}</span>
+                  <div className="firebase-user-buttons">
+                    <button type="button" onClick={handleFirebaseSignOut}>
+                      Sign Out
+                    </button>
+                    <button type="button" onClick={() => handleFirebaseConnect(wallet)}>
+                      Connect with Firebase
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="firebase-auth">
+                  <FirebaseAuth
+                    onSignInSuccess={() => {
+                      console.info('[App] Firebase sign-in successful')
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+          {/* End Firebase SFA Authentication */}
 
           {wallet.isActive && wallet.accounts.length > 0 && (
             <div>
