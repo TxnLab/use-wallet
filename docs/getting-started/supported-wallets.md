@@ -109,6 +109,10 @@ import { WalletId } from '@txnlab/use-wallet'
 
 WalletConnect supports "skins" to customize the wallet's appearance for different wallet providers. This allows multiple WalletConnect-based wallets to coexist in the same app with distinct branding.
 
+Built-in skins:
+- `'biatec'` - Biatec Wallet
+- `'voiwallet'` - Voi Wallet
+
 **Using a built-in skin:**
 
 ```typescript
@@ -117,6 +121,15 @@ WalletConnect supports "skins" to customize the wallet's appearance for differen
   id: WalletId.WALLETCONNECT,
   options: {
     skin: 'biatec',
+    projectId: '<YOUR_PROJECT_ID>',
+  }
+}
+
+// Use the built-in 'voiwallet' skin
+{
+  id: WalletId.WALLETCONNECT,
+  options: {
+    skin: 'voiwallet',
     projectId: '<YOUR_PROJECT_ID>',
   }
 }
@@ -150,6 +163,9 @@ const manager = new WalletManager({
     // Biatec-branded WalletConnect
     { id: WalletId.WALLETCONNECT, options: { skin: 'biatec', projectId: '...' } },
 
+    // Voi Wallet-branded WalletConnect
+    { id: WalletId.WALLETCONNECT, options: { skin: 'voiwallet', projectId: '...' } },
+
     // Custom wallet skin
     {
       id: WalletId.WALLETCONNECT,
@@ -164,6 +180,7 @@ const manager = new WalletManager({
 // Access wallets by their unique key
 const genericWC = manager.getWallet('walletconnect')
 const biatec = manager.getWallet('walletconnect:biatec')
+const voiwallet = manager.getWallet('walletconnect:voiwallet')
 const custom = manager.getWallet('walletconnect:customwallet')
 ```
 
@@ -330,6 +347,27 @@ WalletId.BIATEC
 
 * [Biatec Website](https://wallet.biatec.io)
 * [Biatec GitHub Repository](https://github.com/scholtz/wallet)
+
+#### Voi Wallet
+
+Secure, user-friendly mobile wallet built with React Native for the Voi Network, with Algorand compatibility. Features WalletConnect support for dApp connectivity, airgapped signing for offline transaction signing, and ARC-90 Advanced QR Code Support. [Installation instructions](installation.md#walletconnect).
+
+```typescript
+import { WalletId } from '@txnlab/use-wallet'
+
+// Use WalletConnect with the 'voiwallet' skin
+{
+  id: WalletId.WALLETCONNECT,
+  options: {
+    skin: 'voiwallet',
+    projectId: '<REOWN_PROJECT_ID>',
+  }
+}
+```
+
+* [Voi Wallet Website](https://getvera.app)
+* [Download for Android](https://play.google.com/store/apps/details?id=com.voinetwork.wallet)
+* [Download for iOS](https://apps.apple.com/us/app/voi-wallet/id6752960399)
 
 #### Liquid Auth (experimental)
 

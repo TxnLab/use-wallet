@@ -99,6 +99,13 @@ const manager = new WalletManager({
         projectId: '<REOWN_PROJECT_ID>', // Required
         skin: 'biatec'  // Built-in skin for Biatec Wallet
       }
+    },
+    {
+      id: WalletId.WALLETCONNECT,
+      options: {
+        projectId: '<REOWN_PROJECT_ID>', // Required
+        skin: 'voiwallet'  // Built-in skin for Voi Wallet
+      }
     }
   ]
 })
