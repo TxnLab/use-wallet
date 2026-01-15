@@ -261,9 +261,10 @@ export class Web3AuthWallet extends BaseWallet {
       WEB3AUTH_NETWORK = base.WEB3AUTH_NETWORK
       const baseProvider = await import('@web3auth/base-provider')
       CommonPrivateKeyProvider = baseProvider.CommonPrivateKeyProvider
-    } catch {
+    } catch (error) {
       this.logger.error(
-        'Failed to load Web3Auth. Make sure @web3auth/modal, @web3auth/base, and @web3auth/base-provider are installed.'
+        'Failed to load Web3Auth. Make sure @web3auth/modal, @web3auth/base, and @web3auth/base-provider are installed.',
+        error
       )
       throw new Error(
         'Web3Auth packages not found. Please install @web3auth/modal, @web3auth/base, and @web3auth/base-provider'
