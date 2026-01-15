@@ -106,7 +106,10 @@ export function Connect() {
       // verify signature
       const enc = new TextEncoder()
       const clientDataJsonHash = await crypto.subtle.digest('SHA-256', enc.encode(dataString))
-      const authenticatorDataHash = await crypto.subtle.digest('SHA-256', resp.authenticatorData)
+      const authenticatorDataHash = await crypto.subtle.digest(
+        'SHA-256',
+        new Uint8Array(resp.authenticatorData)
+      )
       const toSign = new Uint8Array(64)
       toSign.set(new Uint8Array(clientDataJsonHash), 0)
       toSign.set(new Uint8Array(authenticatorDataHash), 32)

@@ -46,7 +46,7 @@
     "algosdk": "3.5.2",
     "svelte": "5.38.1",
     "tsup": "8.5.0",
-    "typescript": "5.8.3"
+    "typescript": "5.9.3"
   },
   "peerDependencies": {
     "@blockshake/defly-connect": "^1.2.1",

@@ -28,7 +28,7 @@
     "tweetnacl": "^1.0.3"
   },
   "devDependencies": {
-    "typescript": "5.8.3",
+    "typescript": "5.9.3",
     "vite": "6.3.5",
     "vite-plugin-node-polyfills": "0.24.0",
     "vite-plugin-solid": "2.11.8"

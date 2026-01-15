@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "6.0.1",
-    "typescript": "5.8.3",
+    "typescript": "5.9.3",
     "vite": "6.3.5",
     "vite-plugin-node-polyfills": "0.24.0",
     "vue-tsc": "2.2.12"

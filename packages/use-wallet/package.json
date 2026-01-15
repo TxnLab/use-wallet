@@ -61,7 +61,7 @@
     "magic-sdk": "29.4.2",
     "tsup": "8.5.0",
     "tweetnacl": "^1.0.3",
-    "typescript": "5.8.3"
+    "typescript": "5.9.3"
   },
   "peerDependencies": {
     "@agoralabs-sh/avm-web-provider": "^1.7.0",
