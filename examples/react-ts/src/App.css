@@ -184,16 +184,9 @@
 
 .auth-tabs button {
   flex: 1;
-  padding: 0.5em 1em;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
-  border-radius: 4px;
 }
 
 .auth-tabs button.active {
-  background: rgba(100, 108, 255, 0.3);
   border-color: #646cff;
 }
 
@@ -201,18 +194,6 @@
   display: flex;
   flex-direction: column;
   gap: 0.75em;
-}
-
-.auth-form input {
-  padding: 0.6em;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-  background: rgba(0, 0, 0, 0.2);
-  color: inherit;
-}
-
-.auth-form button {
-  padding: 0.6em 1em;
 }
 
 .auth-divider {
@@ -240,4 +221,51 @@
   background: rgba(255, 107, 107, 0.1);
   border-radius: 4px;
   font-size: 0.9em;
+}
+
+.firebase-user {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6em;
+}
+
+.firebase-user-buttons {
+  display: flex;
+  gap: 0.5em;
+}
+
+.firebase-user-buttons button {
+  white-space: nowrap;
+}
+
+.firebase-user span {
+  font-size: 0.9em;
+  opacity: 0.8;
+}
+
+.firebase-auth {
+  margin-top: 0.5em;
+}
+
+.firebase-sfa-section {
+  width: 100%;
+  max-width: 300px;
+}
+
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  margin: 1em 0;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85em;
+}
+
+.section-divider::before,
+.section-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
 }

@@ -27,7 +27,6 @@ export function Connect() {
 
   // Firebase auth state
   const [firebaseUser, setFirebaseUser] = React.useState<User | null>(null)
-  const [useFirebaseAuth, setUseFirebaseAuth] = React.useState(false)
 
   // Subscribe to Firebase auth state changes
   React.useEffect(() => {
@@ -48,41 +47,33 @@ export function Connect() {
     if (isMagicLink(wallet) && !isEmailValid) {
       return true
     }
-    // For Web3Auth with Firebase auth, require Firebase sign-in
-    if (isWeb3Auth(wallet) && useFirebaseAuth && !firebaseUser) {
-      return true
-    }
     return false
   }
 
-  const handleWeb3AuthConnect = async (wallet: Wallet) => {
-    if (useFirebaseAuth && firebaseUser) {
-      // Get a fresh ID token from Firebase
-      const idToken = await getFreshIdToken()
-      if (!idToken) {
-        console.error('[App] Failed to get Firebase ID token')
-        return
-      }
-
-      // Use the UID as the verifier ID
-      const verifierId = firebaseUser.uid
-
-      console.info('[App] Connecting Web3Auth with Firebase auth...', { verifierId })
-
-      await wallet.connect({
-        idToken,
-        verifierId
-      })
-    } else {
-      // Standard Web3Auth modal flow
-      await wallet.connect()
+  // Firebase SFA connection
+  const handleFirebaseConnect = async (wallet: Wallet) => {
+    if (!firebaseUser) {
+      console.error('[App] No Firebase user signed in')
+      return
     }
+
+    const idToken = await getFreshIdToken()
+    if (!idToken) {
+      console.error('[App] Failed to get Firebase ID token')
+      return
+    }
+
+    const verifierId = firebaseUser.uid
+    console.info('[App] Connecting Web3Auth with Firebase auth...', { verifierId })
+
+    await wallet.connect({
+      idToken,
+      verifierId
+    })
   }
 
   const handleConnect = async (wallet: Wallet) => {
-    if (isWeb3Auth(wallet)) {
-      await handleWeb3AuthConnect(wallet)
-    } else if (isMagicLink(wallet)) {
+    if (isMagicLink(wallet)) {
       await wallet.connect({ email: magicEmail })
     } else {
       await wallet.connect()
@@ -233,47 +224,36 @@ export function Connect() {
             </div>
           )}
 
-          {isWeb3Auth(wallet) && isFirebaseConfigured && (
-            <div className="input-group">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={useFirebaseAuth}
-                  onChange={(e) => setUseFirebaseAuth(e.target.checked)}
-                  disabled={wallet.isConnected}
-                />
-                Use Firebase authentication
-              </label>
-
-              {useFirebaseAuth && (
+          {/* Firebase SFA Authentication */}
+          {isWeb3Auth(wallet) && isFirebaseConfigured && !wallet.isConnected && (
+            <div className="firebase-sfa-section">
+              <div className="section-divider">
+                <span>or connect with Firebase</span>
+              </div>
+              {firebaseUser ? (
+                <div className="firebase-user">
+                  <span>Signed in as: {firebaseUser.email || firebaseUser.uid}</span>
+                  <div className="firebase-user-buttons">
+                    <button type="button" onClick={handleFirebaseSignOut}>
+                      Sign Out
+                    </button>
+                    <button type="button" onClick={() => handleFirebaseConnect(wallet)}>
+                      Connect with Firebase
+                    </button>
+                  </div>
+                </div>
+              ) : (
                 <div className="firebase-auth">
-                  {firebaseUser ? (
-                    <div className="firebase-user">
-                      <span>Signed in as: {firebaseUser.email || firebaseUser.uid}</span>
-                      <button type="button" onClick={handleFirebaseSignOut}>
-                        Sign Out
-                      </button>
-                    </div>
-                  ) : (
-                    <FirebaseAuth
-                      onSignInSuccess={() => {
-                        console.info('[App] Firebase sign-in successful')
-                      }}
-                    />
-                  )}
+                  <FirebaseAuth
+                    onSignInSuccess={() => {
+                      console.info('[App] Firebase sign-in successful')
+                    }}
+                  />
                 </div>
               )}
             </div>
           )}
-
-          {isWeb3Auth(wallet) && !isFirebaseConfigured && (
-            <div className="input-group">
-              <small>
-                Firebase not configured. Set VITE_FIREBASE_* environment variables to enable
-                Firebase authentication.
-              </small>
-            </div>
-          )}
+          {/* End Firebase SFA Authentication */}
 
           {wallet.isActive && wallet.accounts.length > 0 && (
             <select onChange={(e) => setActiveAccount(e, wallet)}>
