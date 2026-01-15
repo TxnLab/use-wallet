@@ -45,6 +45,7 @@ If you want to contribute to `@txnlab/use-wallet`, please follow these steps to 
   ```bash
   pnpm install
   ```
+
   - We use pnpm v9 as our package manager. If you are not familiar with pnpm, please refer to the [pnpm documentation](https://pnpm.io/cli/install).
 
   - We use [nvm](https://github.com/nvm-sh/nvm) to manage node versions. Please make sure to use the version mentioned in the `.nvmrc` file.

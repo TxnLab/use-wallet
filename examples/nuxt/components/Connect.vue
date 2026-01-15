@@ -24,14 +24,19 @@ const magicEmail = ref('')
 
 const isMagicLink = (wallet: Wallet) => wallet.id === WalletId.MAGIC
 const isEmailValid = () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(magicEmail.value)
-const isConnectDisabled = (wallet: Wallet) =>
-  wallet.isConnected || (isMagicLink(wallet) && !isEmailValid())
 
-const getConnectArgs = (wallet: Wallet) => {
+const isConnectDisabled = (wallet: Wallet) => {
+  if (wallet.isConnected) return true
+  if (isMagicLink(wallet) && !isEmailValid()) return true
+  return false
+}
+
+const handleConnect = async (wallet: Wallet) => {
   if (isMagicLink(wallet)) {
-    return { email: magicEmail.value }
+    await wallet.connect({ email: magicEmail.value })
+  } else {
+    await wallet.connect()
   }
-  return undefined
 }
 
 const setActiveAccount = (event: Event, wallet: Wallet) => {
@@ -98,7 +103,10 @@ const auth = async () => {
     // verify signature
     const enc = new TextEncoder()
     const clientDataJsonHash = await crypto.subtle.digest('SHA-256', enc.encode(dataString))
-    const authenticatorDataHash = await crypto.subtle.digest('SHA-256', resp.authenticatorData)
+    const authenticatorDataHash = await crypto.subtle.digest(
+      'SHA-256',
+      new Uint8Array(resp.authenticatorData)
+    )
     const toSign = new Uint8Array(64)
     toSign.set(new Uint8Array(clientDataJsonHash), 0)
     toSign.set(new Uint8Array(authenticatorDataHash), 32)
@@ -149,10 +157,7 @@ const auth = async () => {
         {{ wallet.metadata.name }}
       </h4>
       <div class="wallet-buttons">
-        <button
-          @click="wallet.connect(getConnectArgs(wallet))"
-          :disabled="isConnectDisabled(wallet)"
-        >
+        <button @click="handleConnect(wallet)" :disabled="isConnectDisabled(wallet)">
           Connect
         </button>
         <button @click="wallet.disconnect()" :disabled="!wallet.isConnected">Disconnect</button>
@@ -307,7 +312,8 @@ button:disabled {
 }
 
 input[type='text'],
-input[type='email'] {
+input[type='email'],
+input[type='password'] {
   border-radius: 8px;
   border: 1px solid #1a1a1a;
   padding: 0.6em 0.9em;
@@ -352,6 +358,7 @@ select {
   }
   input[type='text'],
   input[type='email'],
+  input[type='password'],
   select {
     background-color: #f9f9f9;
     color: #000000;

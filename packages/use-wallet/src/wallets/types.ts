@@ -4,16 +4,17 @@ import { DeflyWebWallet } from './defly-web'
 import { ExodusWallet, type ExodusOptions } from './exodus'
 import { KibisisWallet } from './kibisis'
 import { KmdWallet, type KmdOptions } from './kmd'
-import { LiquidOptions, LiquidWallet } from './liquid'
 import { LuteConnectOptions, LuteWallet } from './lute'
 import { MagicAuth, MagicAuthOptions } from './magic'
 import { MnemonicWallet, type MnemonicOptions } from './mnemonic'
 import { PeraWallet, type PeraWalletConnectOptions } from './pera'
 import { WalletConnect, type WalletConnectOptions } from './walletconnect'
+import { Web3AuthWallet, type Web3AuthOptions } from './web3auth'
 import { BiatecWallet } from './biatec'
 import type { Store } from '@tanstack/store'
 import type algosdk from 'algosdk'
 import type { State } from 'src/store'
+import { W3Wallet } from './w3wallet'
 
 export enum WalletId {
   BIATEC = 'biatec',
@@ -23,13 +24,43 @@ export enum WalletId {
   EXODUS = 'exodus',
   KIBISIS = 'kibisis',
   KMD = 'kmd',
-  LIQUID = 'liquid',
   LUTE = 'lute',
   MAGIC = 'magic',
   MNEMONIC = 'mnemonic',
   PERA = 'pera',
-  WALLETCONNECT = 'walletconnect'
+  WALLETCONNECT = 'walletconnect',
+  WEB3AUTH = 'web3auth',
+  W3_WALLET = 'w3-wallet'
 }
+
+// ---------- WalletConnect Skins ---------- //
+
+/**
+ * Metadata for a WalletConnect skin. Used to customize the appearance of
+ * a WalletConnect-based wallet in the UI.
+ */
+export interface WalletConnectSkin {
+  /** Unique identifier for the skin (e.g., 'biatec', 'voiwallet') */
+  id: string
+  /** Display name for the wallet */
+  name: string
+  /** Wallet icon as a data URI or URL */
+  icon: string
+}
+
+/**
+ * Skin option can be either:
+ * - A string ID referencing a built-in skin (e.g., 'biatec')
+ * - A full WalletConnectSkin object for custom skins
+ */
+export type WalletConnectSkinOption = string | WalletConnectSkin
+
+/**
+ * Composite key type that can be either:
+ * - A standard WalletId (for backward compatibility)
+ * - A composite string for skinned WalletConnect instances (e.g., 'walletconnect:biatec')
+ */
+export type WalletKey = WalletId | `${WalletId.WALLETCONNECT}:${string}`
 
 export type WalletMap = {
   [WalletId.BIATEC]: typeof BiatecWallet
@@ -39,12 +70,13 @@ export type WalletMap = {
   [WalletId.EXODUS]: typeof ExodusWallet
   [WalletId.KIBISIS]: typeof KibisisWallet
   [WalletId.KMD]: typeof KmdWallet
-  [WalletId.LIQUID]: typeof LiquidWallet
   [WalletId.LUTE]: typeof LuteWallet
   [WalletId.MAGIC]: typeof MagicAuth
   [WalletId.MNEMONIC]: typeof MnemonicWallet
   [WalletId.PERA]: typeof PeraWallet
   [WalletId.WALLETCONNECT]: typeof WalletConnect
+  [WalletId.WEB3AUTH]: typeof Web3AuthWallet
+  [WalletId.W3_WALLET]: typeof W3Wallet
 }
 
 export type WalletOptionsMap = {
@@ -55,12 +87,13 @@ export type WalletOptionsMap = {
   [WalletId.EXODUS]: ExodusOptions
   [WalletId.KIBISIS]: Record<string, never>
   [WalletId.KMD]: KmdOptions
-  [WalletId.LIQUID]: LiquidOptions
   [WalletId.LUTE]: LuteConnectOptions
   [WalletId.MAGIC]: MagicAuthOptions
   [WalletId.MNEMONIC]: MnemonicOptions
   [WalletId.PERA]: PeraWalletConnectOptions
   [WalletId.WALLETCONNECT]: WalletConnectOptions
+  [WalletId.WEB3AUTH]: Web3AuthOptions
+  [WalletId.W3_WALLET]: Record<string, never>
 }
 
 export type SupportedWallet = WalletIdConfig<WalletId> | WalletId
@@ -93,6 +126,8 @@ export type WalletMetadata = {
 
 export interface BaseWalletConstructor {
   id: WalletId
+  /** Optional wallet key override. Defaults to id. Used for skinned WalletConnect instances. */
+  walletKey?: WalletKey
   metadata: Partial<WalletMetadata> | undefined
   getAlgodClient: () => algosdk.Algodv2
   store: Store<State>

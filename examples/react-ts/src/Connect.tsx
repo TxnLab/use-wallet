@@ -4,8 +4,8 @@ import {
   SignDataError,
   Siwa,
   useWallet,
-  WalletId,
-  type Wallet
+  type Wallet,
+  WalletId
 } from '@txnlab/use-wallet-react'
 import algosdk from 'algosdk'
 import { canonify } from 'canonify'
@@ -30,11 +30,12 @@ export function Connect() {
     return false
   }
 
-  const getConnectArgs = (wallet: Wallet) => {
+  const handleConnect = async (wallet: Wallet) => {
     if (isMagicLink(wallet)) {
-      return { email: magicEmail }
+      await wallet.connect({ email: magicEmail })
+    } else {
+      await wallet.connect()
     }
-    return undefined
   }
 
   const setActiveAccount = (event: React.ChangeEvent<HTMLSelectElement>, wallet: Wallet) => {
@@ -99,7 +100,10 @@ export function Connect() {
       // verify signature
       const enc = new TextEncoder()
       const clientDataJsonHash = await crypto.subtle.digest('SHA-256', enc.encode(dataString))
-      const authenticatorDataHash = await crypto.subtle.digest('SHA-256', resp.authenticatorData)
+      const authenticatorDataHash = await crypto.subtle.digest(
+        'SHA-256',
+        new Uint8Array(resp.authenticatorData)
+      )
       const toSign = new Uint8Array(64)
       toSign.set(new Uint8Array(clientDataJsonHash), 0)
       toSign.set(new Uint8Array(authenticatorDataHash), 32)
@@ -124,7 +128,7 @@ export function Connect() {
           <div className="wallet-buttons">
             <button
               type="button"
-              onClick={() => wallet.connect(getConnectArgs(wallet))}
+              onClick={() => handleConnect(wallet)}
               disabled={isConnectDisabled(wallet)}
             >
               Connect

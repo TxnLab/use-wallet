@@ -3,11 +3,11 @@ packages:
   - packages/*
 
 onlyBuiltDependencies:
-  - '@algorandfoundation/liquid-client'
   - '@parcel/watcher'
   - bufferutil
   - canvas
   - cbor-extract
   - esbuild
+  - unrs-resolver
   - utf-8-validate
   - vue-demi

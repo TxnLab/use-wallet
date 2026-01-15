@@ -22,14 +22,16 @@ import {
 } from 'src/store'
 import { createWalletMap } from 'src/utils'
 import type { BaseWallet } from 'src/wallets/base'
-import type {
-  SupportedWallet,
-  WalletAccount,
-  WalletConfigMap,
+import { resolveSkin } from 'src/wallets/skins'
+import {
   WalletId,
-  WalletIdConfig,
-  WalletMetadata,
-  WalletOptions
+  type SupportedWallet,
+  type WalletAccount,
+  type WalletConfigMap,
+  type WalletIdConfig,
+  type WalletKey,
+  type WalletMetadata,
+  type WalletOptions
 } from 'src/wallets/types'
 
 export interface WalletManagerOptions {
@@ -46,7 +48,7 @@ export interface WalletManagerConfig {
 }
 
 export class WalletManager {
-  public _clients: Map<WalletId, BaseWallet> = new Map()
+  public _clients: Map<WalletKey, BaseWallet> = new Map()
   private baseNetworkConfig: Record<string, NetworkConfig>
   public store: Store<State>
   public subscribe: (callback: (state: State) => void) => () => void
@@ -226,6 +228,28 @@ export class WalletManager {
 
   // ---------- Wallets ----------------------------------------------- //
 
+  /**
+   * Derive the wallet key from wallet config.
+   * For WalletConnect with a skin option, returns 'walletconnect:skinId'.
+   * For other wallets, returns the wallet ID.
+   */
+  private deriveWalletKey<T extends keyof WalletConfigMap>(
+    walletId: T,
+    walletOptions?: WalletOptions<T>
+  ): WalletKey {
+    // Check if this is a WalletConnect config with a skin option
+    if (walletId === WalletId.WALLETCONNECT && walletOptions) {
+      const options = walletOptions as WalletOptions<WalletId.WALLETCONNECT>
+      if (options.skin) {
+        const skin = resolveSkin(options.skin)
+        if (skin) {
+          return `walletconnect:${skin.id}`
+        }
+      }
+    }
+    return walletId
+  }
+
   private initializeWallets<T extends keyof WalletConfigMap>(
     walletsConfig: Array<T | WalletIdConfig<T>>
   ) {
@@ -246,6 +270,15 @@ export class WalletManager {
         walletMetadata = metadata
       }
 
+      // Derive wallet key (handles skin-based composite keys)
+      const walletKey = this.deriveWalletKey(walletId, walletOptions)
+
+      // Check for duplicate wallet keys
+      if (this._clients.has(walletKey)) {
+        this.logger.warn(`Duplicate wallet key: ${walletKey}. Skipping...`)
+        continue
+      }
+
       // Get wallet class
       const walletMap = createWalletMap()
       const WalletClass = walletMap[walletId]
@@ -264,18 +297,18 @@ export class WalletManager {
         subscribe: this.subscribe
       })
 
-      this._clients.set(walletId, walletInstance)
-      this.logger.info(`✅ Initialized ${walletId}`)
+      this._clients.set(walletKey, walletInstance)
+      this.logger.info(`✅ Initialized ${walletKey}`)
     }
 
     const state = this.store.state
 
     // Check if connected wallets are still valid
-    const connectedWallets = Object.keys(state.wallets) as WalletId[]
-    for (const walletId of connectedWallets) {
-      if (!this._clients.has(walletId)) {
-        this.logger.warn(`Connected wallet not found: ${walletId}`)
-        removeWallet(this.store, { walletId })
+    const connectedWallets = Object.keys(state.wallets) as WalletKey[]
+    for (const walletKey of connectedWallets) {
+      if (!this._clients.has(walletKey)) {
+        this.logger.warn(`Connected wallet not found: ${walletKey}`)
+        removeWallet(this.store, { walletId: walletKey })
       }
     }
 
@@ -290,8 +323,8 @@ export class WalletManager {
     return [...this._clients.values()]
   }
 
-  public getWallet(walletId: WalletId): BaseWallet | undefined {
-    return this._clients.get(walletId)
+  public getWallet(walletKey: WalletKey): BaseWallet | undefined {
+    return this._clients.get(walletKey)
   }
 
   public async resumeSessions(): Promise<void> {
@@ -466,7 +499,7 @@ export class WalletManager {
 
   public get activeWallet(): BaseWallet | null {
     const state = this.store.state
-    const activeWallet = this.wallets.find((wallet) => wallet.id === state.activeWallet)
+    const activeWallet = this.wallets.find((wallet) => wallet.walletKey === state.activeWallet)
     if (!activeWallet) {
       return null
     }

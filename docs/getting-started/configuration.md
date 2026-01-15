@@ -64,6 +64,7 @@ const manager = new WalletManager({
     WalletId.EXODUS,
     WalletId.KIBISIS,
     WalletId.LUTE,
+    WalletId.W3_WALLET,
     
     // Example of a wallet with optional customizations
     {
@@ -90,10 +91,20 @@ const manager = new WalletManager({
         apiKey: '<MAGIC_API_KEY>'  // Required
       }
     },
+
+    // WalletConnect with skin (for branded wallet appearance)
     {
-      id: WalletId.BIATEC,
+      id: WalletId.WALLETCONNECT,
       options: {
-        projectId: '<REOWN_PROJECT_ID>'  // Required
+        projectId: '<REOWN_PROJECT_ID>', // Required
+        skin: 'biatec'  // Built-in skin for Biatec Wallet
+      }
+    },
+    {
+      id: WalletId.WALLETCONNECT,
+      options: {
+        projectId: '<REOWN_PROJECT_ID>', // Required
+        skin: 'voiwallet'  // Built-in skin for Voi Wallet
       }
     }
   ]

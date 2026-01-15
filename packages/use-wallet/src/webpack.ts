@@ -7,12 +7,15 @@
  */
 export const webpackFallback = {
   '@agoralabs-sh/avm-web-provider': false,
-  '@algorandfoundation/liquid-auth-use-wallet-client': false,
   '@blockshake/defly-connect': false,
   '@magic-ext/algorand': false,
   '@perawallet/connect': false,
   '@walletconnect/modal': false,
   '@walletconnect/sign-client': false,
+  '@web3auth/base': false,
+  '@web3auth/base-provider': false,
+  '@web3auth/modal': false,
+  '@web3auth/single-factor-auth': false,
   'lute-connect': false,
   'magic-sdk': false
 }

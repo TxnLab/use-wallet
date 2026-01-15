@@ -1,6 +1,6 @@
 {
   "name": "@txnlab/use-wallet",
-  "version": "4.2.0",
+  "version": "4.4.0",
   "description": "TypeScript library for integrating Algorand wallets into decentralized applications",
   "author": "Doug Richar <drichar@gmail.com>",
   "license": "MIT",
@@ -31,48 +31,53 @@
     "exodus",
     "algosdk",
     "algokit",
-    "kmd"
+    "kmd",
+    "web3auth"
   ],
   "files": [
     "dist"
   ],
   "dependencies": {
-    "@tanstack/store": "0.7.1"
+    "@tanstack/store": "0.8.0"
   },
   "devDependencies": {
     "@agoralabs-sh/avm-web-provider": "1.7.0",
-    "@algorandfoundation/liquid-auth-use-wallet-client": "^1.4.0-canary.1",
     "@blockshake/defly-connect": "1.2.1",
-    "@magic-ext/algorand": "24.1.0",
-    "@magic-sdk/provider": "29.1.0",
+    "@magic-ext/algorand": "24.4.2",
+    "@magic-sdk/provider": "29.5.0",
     "@perawallet/connect": "1.4.1",
     "@types/node": "20.11.30",
     "@walletconnect/modal": "2.7.0",
     "@walletconnect/modal-core": "2.7.0",
-    "@walletconnect/sign-client": "2.21.3",
-    "@walletconnect/types": "2.21.3",
-    "algosdk": "3.3.1",
+    "@walletconnect/sign-client": "2.23.1",
+    "@walletconnect/types": "2.23.1",
+    "@web3auth/base": "9.7.0",
+    "@web3auth/base-provider": "9.7.0",
+    "@web3auth/modal": "9.7.0",
+    "@web3auth/single-factor-auth": "9.5.0",
+    "algosdk": "3.5.2",
     "canonify": "2.1.1",
-    "lute-connect": "1.6.1",
-    "magic-sdk": "29.1.0",
-    "tsup": "8.5.0",
-    "typescript": "5.8.3"
+    "lute-connect": "1.6.3",
+    "magic-sdk": "29.4.2",
+    "tsup": "8.5.1",
+    "tweetnacl": "^1.0.3",
+    "typescript": "5.9.3"
   },
   "peerDependencies": {
     "@agoralabs-sh/avm-web-provider": "^1.7.0",
-    "@algorandfoundation/liquid-auth-use-wallet-client": "^1.4.0-canary.1",
     "@blockshake/defly-connect": "^1.2.1",
     "@perawallet/connect": "^1.4.1",
     "@walletconnect/modal": "^2.7.0",
-    "@walletconnect/sign-client": "^2.21.3",
+    "@walletconnect/sign-client": "^2.23.1",
+    "@web3auth/base": "^9.0.0",
+    "@web3auth/base-provider": "^9.0.0",
+    "@web3auth/modal": "^9.0.0",
+    "@web3auth/single-factor-auth": "^9.0.0",
     "algosdk": "^3.0.0",
-    "lute-connect": "^1.6.1"
+    "lute-connect": "^1.6.3"
   },
   "peerDependenciesMeta": {
     "@agoralabs-sh/avm-web-provider": {
-      "optional": true
-    },
-    "@algorandfoundation/liquid-auth-use-wallet-client": {
       "optional": true
     },
     "@blockshake/defly-connect": {
@@ -85,6 +90,18 @@
       "optional": true
     },
     "@walletconnect/sign-client": {
+      "optional": true
+    },
+    "@web3auth/base": {
+      "optional": true
+    },
+    "@web3auth/base-provider": {
+      "optional": true
+    },
+    "@web3auth/modal": {
+      "optional": true
+    },
+    "@web3auth/single-factor-auth": {
       "optional": true
     },
     "lute-connect": {

@@ -7,12 +7,13 @@ import { DeflyWebWallet } from './wallets/defly-web'
 import { ExodusWallet } from './wallets/exodus'
 import { KibisisWallet } from './wallets/kibisis'
 import { KmdWallet } from './wallets/kmd'
-import { LiquidWallet } from './wallets/liquid'
 import { LuteWallet } from './wallets/lute'
 import { MagicAuth } from './wallets/magic'
 import { MnemonicWallet } from './wallets/mnemonic'
 import { PeraWallet } from './wallets/pera'
 import { WalletConnect } from './wallets/walletconnect'
+import { Web3AuthWallet } from './wallets/web3auth'
+import { W3Wallet } from './wallets/w3wallet'
 
 export function createWalletMap(): WalletMap {
   return {
@@ -23,12 +24,13 @@ export function createWalletMap(): WalletMap {
     [WalletId.EXODUS]: ExodusWallet,
     [WalletId.KIBISIS]: KibisisWallet,
     [WalletId.KMD]: KmdWallet,
-    [WalletId.LIQUID]: LiquidWallet,
     [WalletId.LUTE]: LuteWallet,
     [WalletId.MAGIC]: MagicAuth,
     [WalletId.MNEMONIC]: MnemonicWallet,
     [WalletId.PERA]: PeraWallet,
-    [WalletId.WALLETCONNECT]: WalletConnect
+    [WalletId.WALLETCONNECT]: WalletConnect,
+    [WalletId.WEB3AUTH]: Web3AuthWallet,
+    [WalletId.W3_WALLET]: W3Wallet
   }
 }
 

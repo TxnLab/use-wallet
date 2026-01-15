@@ -100,7 +100,10 @@ export class WalletComponent {
       // verify signature
       const enc = new TextEncoder()
       const clientDataJsonHash = await crypto.subtle.digest('SHA-256', enc.encode(dataString))
-      const authenticatorDataHash = await crypto.subtle.digest('SHA-256', resp.authenticatorData)
+      const authenticatorDataHash = await crypto.subtle.digest(
+        'SHA-256',
+        new Uint8Array(resp.authenticatorData)
+      )
       const toSign = new Uint8Array(64)
       toSign.set(new Uint8Array(clientDataJsonHash), 0)
       toSign.set(new Uint8Array(authenticatorDataHash), 32)
@@ -121,8 +124,24 @@ export class WalletComponent {
 
   isMagicLink = () => this.wallet.id === WalletId.MAGIC
   isEmailValid = () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.magicEmail)
-  isConnectDisabled = () => this.wallet.isConnected || (this.isMagicLink() && !this.isEmailValid())
-  getConnectArgs = () => (this.isMagicLink() ? { email: this.magicEmail } : undefined)
+
+  isConnectDisabled = () => {
+    if (this.wallet.isConnected) {
+      return true
+    }
+    if (this.isMagicLink() && !this.isEmailValid()) {
+      return true
+    }
+    return false
+  }
+
+  handleConnect = async () => {
+    if (this.isMagicLink()) {
+      await this.wallet.connect({ email: this.magicEmail })
+    } else {
+      await this.wallet.connect()
+    }
+  }
 
   render() {
     this.element.innerHTML = `
@@ -210,8 +229,7 @@ export class WalletComponent {
     this.element.addEventListener('click', (e: Event) => {
       const target = e.target as HTMLElement
       if (target.id === 'connect-button') {
-        const args = this.getConnectArgs()
-        this.connect(args)
+        this.handleConnect()
       } else if (target.id === 'disconnect-button') {
         this.disconnect()
       } else if (target.id === 'set-active-button') {

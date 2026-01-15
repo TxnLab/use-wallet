@@ -23,8 +23,24 @@
   let magicEmail = $state('')
   const isMagicLink = () => wallet.id === WalletId.MAGIC
   const isEmailValid = () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(magicEmail)
-  const isConnectDisabled = () => wallet.isConnected() || (isMagicLink() && !isEmailValid())
-  const getConnectArgs = () => (isMagicLink() ? { email: magicEmail } : undefined)
+
+  const isConnectDisabled = () => {
+    if (wallet.isConnected()) {
+      return true
+    }
+    if (isMagicLink() && !isEmailValid()) {
+      return true
+    }
+    return false
+  }
+
+  async function handleConnect() {
+    if (isMagicLink()) {
+      await wallet.connect({ email: magicEmail })
+    } else {
+      await wallet.connect()
+    }
+  }
 
   let isSending = $state(false)
   async function sendTransaction() {
@@ -85,7 +101,7 @@
       // verify signature
       const enc = new TextEncoder()
       const clientDataJsonHash = await crypto.subtle.digest('SHA-256', enc.encode(dataString))
-      const authenticatorDataHash = await crypto.subtle.digest('SHA-256', resp.authenticatorData)
+      const authenticatorDataHash = await crypto.subtle.digest('SHA-256', new Uint8Array(resp.authenticatorData))
       const toSign = new Uint8Array(64)
       toSign.set(new Uint8Array(clientDataJsonHash), 0)
       toSign.set(new Uint8Array(authenticatorDataHash), 32)
@@ -106,7 +122,7 @@
     {#if wallet.isActive()}<span>[active]</span>{/if}
   </h4>
   <div class="wallet-buttons">
-    <button onclick={() => wallet.connect(getConnectArgs())} disabled={isConnectDisabled()}>
+    <button onclick={handleConnect} disabled={isConnectDisabled()}>
       Connect
     </button>
     <button onclick={wallet.disconnect} disabled={!wallet.isConnected()}> Disconnect </button>

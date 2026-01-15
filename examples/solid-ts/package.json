@@ -11,22 +11,26 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@algorandfoundation/liquid-auth-use-wallet-client": "^1.4.0-canary.1",
     "@blockshake/defly-connect": "^1.2.1",
-    "@noble/ed25519": "2.3.0",
+    "@noble/ed25519": "3.0.0",
     "@perawallet/connect": "^1.4.1",
     "@txnlab/use-wallet-solid": "workspace:*",
     "@walletconnect/modal": "^2.7.0",
-    "@walletconnect/sign-client": "^2.21.3",
-    "algosdk": "3.3.1",
+    "@walletconnect/sign-client": "^2.23.1",
+    "@web3auth/base": "^9.6.0",
+    "@web3auth/base-provider": "^9.6.0",
+    "@web3auth/modal": "^9.6.0",
+    "@web3auth/single-factor-auth": "^9.4.0",
+    "algosdk": "3.5.2",
     "canonify": "2.1.1",
-    "lute-connect": "^1.6.1",
-    "solid-js": "1.9.7"
+    "lute-connect": "^1.6.3",
+    "solid-js": "1.9.10",
+    "tweetnacl": "^1.0.3"
   },
   "devDependencies": {
-    "typescript": "5.8.3",
-    "vite": "6.3.5",
-    "vite-plugin-node-polyfills": "0.23.0",
-    "vite-plugin-solid": "2.11.6"
+    "typescript": "5.9.3",
+    "vite": "6.4.1",
+    "vite-plugin-node-polyfills": "0.24.0",
+    "vite-plugin-solid": "2.11.10"
   }
 }

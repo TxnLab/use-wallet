@@ -100,9 +100,91 @@ import { WalletId } from '@txnlab/use-wallet'
       url?: string
       icons?: string[]
     }
+    skin?: string | WalletConnectSkin  // Optional: Skin for branded wallet appearance
   }
 }
 ```
+
+##### WalletConnect Skins
+
+WalletConnect supports "skins" to customize the wallet's appearance for different wallet providers. This allows multiple WalletConnect-based wallets to coexist in the same app with distinct branding.
+
+Built-in skins:
+- `'biatec'` - Biatec Wallet
+- `'voiwallet'` - Voi Wallet
+
+**Using a built-in skin:**
+
+```typescript
+// Use the built-in 'biatec' skin
+{
+  id: WalletId.WALLETCONNECT,
+  options: {
+    skin: 'biatec',
+    projectId: '<YOUR_PROJECT_ID>',
+  }
+}
+
+// Use the built-in 'voiwallet' skin
+{
+  id: WalletId.WALLETCONNECT,
+  options: {
+    skin: 'voiwallet',
+    projectId: '<YOUR_PROJECT_ID>',
+  }
+}
+```
+
+**Using a custom skin at runtime:**
+
+```typescript
+// Define a custom skin
+{
+  id: WalletId.WALLETCONNECT,
+  options: {
+    skin: {
+      id: 'mywallet',
+      name: 'My Wallet',
+      icon: 'data:image/svg+xml;base64,...'
+    },
+    projectId: '<YOUR_PROJECT_ID>',
+  }
+}
+```
+
+**Multiple WalletConnect instances:**
+
+```typescript
+const manager = new WalletManager({
+  wallets: [
+    // Generic WalletConnect (no skin)
+    { id: WalletId.WALLETCONNECT, options: { projectId: '...' } },
+
+    // Biatec-branded WalletConnect
+    { id: WalletId.WALLETCONNECT, options: { skin: 'biatec', projectId: '...' } },
+
+    // Voi Wallet-branded WalletConnect
+    { id: WalletId.WALLETCONNECT, options: { skin: 'voiwallet', projectId: '...' } },
+
+    // Custom wallet skin
+    {
+      id: WalletId.WALLETCONNECT,
+      options: {
+        skin: { id: 'customwallet', name: 'Custom Wallet', icon: '...' },
+        projectId: '...'
+      }
+    }
+  ]
+})
+
+// Access wallets by their unique key
+const genericWC = manager.getWallet('walletconnect')
+const biatec = manager.getWallet('walletconnect:biatec')
+const voiwallet = manager.getWallet('walletconnect:voiwallet')
+const custom = manager.getWallet('walletconnect:customwallet')
+```
+
+Each skinned WalletConnect instance maintains isolated session storage, allowing users to connect to multiple WalletConnect-based wallets simultaneously.
 
 * [WalletConnect Network](https://walletconnect.network)
 * [Sign API Documentation](https://docs.reown.com/api/sign/dapp-usage)
@@ -186,21 +268,112 @@ import { WalletId } from '@txnlab/use-wallet'
 * [Magic Website](https://magic.link)
 * [Magic Algorand Documentation](https://magic.link/docs/blockchains/other-chains/other/algorand)
 
+#### Web3Auth
+
+Social login authentication provider supporting Google, Facebook, Twitter, Discord, and other OAuth providers. Web3Auth enables users to sign in with familiar social accounts and derive an Algorand wallet from their authentication credentials. [Installation instructions](installation.md#web3auth).
+
+```typescript
+import { WalletId } from '@txnlab/use-wallet'
+
+// Basic usage with modal (shows social login options)
+{
+  id: WalletId.WEB3AUTH,
+  options: {
+    clientId: string // Required: from dashboard.web3auth.io
+  }
+}
+
+// With optional configuration
+{
+  id: WalletId.WEB3AUTH,
+  options: {
+    clientId: string               // Required: from dashboard.web3auth.io
+    web3AuthNetwork?: string       // Optional: 'sapphire_mainnet' (default) or 'sapphire_devnet'
+    loginProvider?: string         // Optional: skip modal and use specific provider (e.g., 'google', 'facebook')
+    uiConfig?: {                   // Optional: customize modal appearance
+      appName?: string
+      logoLight?: string
+      logoDark?: string
+      mode?: 'light' | 'dark' | 'auto'
+    }
+  }
+}
+```
+
+**Custom Authentication**
+
+Web3Auth also supports custom authentication flows using Single Factor Auth (SFA), allowing integration with existing authentication systems such as Firebase, Auth0, or custom JWT providers. This approach requires an additional dependency:
+
+```bash
+npm install @web3auth/single-factor-auth
+```
+
+This advanced use case requires:
+
+- Setting up a custom verifier in the [Web3Auth Dashboard](https://dashboard.web3auth.io)
+- Configuring the `verifier` option and `getAuthCredentials` callback
+- Managing authentication tokens and passing credentials to the `connect()` method
+
+For implementation details, refer to the [Web3Auth Single Factor Auth documentation](https://web3auth.io/docs/sdk/core-kit/sfa-web).
+
+* [Web3Auth Website](https://web3auth.io)
+* [Web3Auth Dashboard](https://dashboard.web3auth.io)
+* [Web3Auth Documentation](https://web3auth.io/docs)
+
 #### Biatec
+
+{% hint style="warning" %}
+**Deprecation Notice:** `WalletId.BIATEC` is deprecated and will be removed in v5. Use WalletConnect with the `'biatec'` skin instead:
+
+```typescript
+{
+  id: WalletId.WALLETCONNECT,
+  options: {
+    skin: 'biatec',
+    projectId: '<REOWN_PROJECT_ID>',
+  }
+}
+```
+{% endhint %}
 
 Open-source mobile wallet with community focus and WalletConnect support. [Installation instructions](installation.md#walletconnect).
 
 ```typescript
 import { WalletId } from '@txnlab/use-wallet'
 
-// Basic usage (no options required)
+// Deprecated - use WalletConnect with skin: 'biatec' instead
 WalletId.BIATEC
 ```
 
 * [Biatec Website](https://wallet.biatec.io)
 * [Biatec GitHub Repository](https://github.com/scholtz/wallet)
 
+#### Voi Wallet
+
+Secure, user-friendly mobile wallet built with React Native for the Voi Network, with Algorand compatibility. Features WalletConnect support for dApp connectivity, airgapped signing for offline transaction signing, and ARC-90 Advanced QR Code Support. [Installation instructions](installation.md#walletconnect).
+
+```typescript
+import { WalletId } from '@txnlab/use-wallet'
+
+// Use WalletConnect with the 'voiwallet' skin
+{
+  id: WalletId.WALLETCONNECT,
+  options: {
+    skin: 'voiwallet',
+    projectId: '<REOWN_PROJECT_ID>',
+  }
+}
+```
+
+* [Voi Wallet Website](https://getvera.app)
+* [Download for Android](https://play.google.com/store/apps/details?id=com.voinetwork.wallet)
+* [Download for iOS](https://apps.apple.com/us/app/voi-wallet/id6752960399)
+
 #### Liquid Auth (experimental)
+
+ {% hint style="warning" %}
+ Due to an unresolved issue with its peer dependencies, as of use-wallet v4.3.1 the Liquid Auth provider is not supported. Support will be restored when the issue is resolved.
+ {% endhint %}
 
  Liquid Auth is a self-hosted authentication service that provides a simple way to associate Passkeys to spending KeyPairs commonly found in cryptocurrencies, in accordance with the FIDO2 WebAuthn specification. In addition to authentication, Liquid Auth provides a Peer to Peer signaling service.
  
@@ -214,15 +387,14 @@ import { WalletId } from '@txnlab/use-wallet'
 {
   id: WalletId.LIQUID,
   options: {
-      origin?: string,
-      RTC_config_username: string,
-      RTC_config_credential: string
+    origin?: string,
+    RTC_config_username: string,
+    RTC_config_credential: string
   }
 }
 ``` 
 
  The example use cases are configured to use the Algorand Foundation-hosted endpoint at `https://debug.liquidauth.com`, with `liquid-auth` as the username and `sqmcP4MiTKMT4TGEDSk9jgHY` as the credential. This endpoint is suitable for testing but should NOT be used in production environments.
-
 
  {% hint style="info" %}
  The Liquid Auth provider is currently experimental and subject to change in future releases. It requires users to have an Android v14+ device or an iOS 17+ device, and for developers to set up a [specific backend](https://liquidauth.com/server/introduction/). For more info, please refer to the [documentation](https://liquidauth.com/guides/getting-started/).
@@ -276,6 +448,19 @@ import { WalletId } from '@txnlab/use-wallet'
 {% endhint %}
 
 See the [Testing with Mnemonic Wallet](../guides/testing-with-mnemonic-wallet.md) guide for details about end-to-end (E2E) testing.
+
+#### W3 Wallet
+
+Multi-currency wallet with desktop, mobile, and browser extension support.
+
+```typescript
+import { WalletId } from '@txnlab/use-wallet'
+
+// Basic usage (no options required)
+WalletId.W3_WALLET
+```
+
+* [W3 Wallet Website](https://w3wallet.app)
 
 ### Custom Provider
 

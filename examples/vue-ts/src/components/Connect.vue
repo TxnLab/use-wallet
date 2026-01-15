@@ -19,14 +19,19 @@ const magicEmail = ref('')
 
 const isMagicLink = (wallet: Wallet) => wallet.id === WalletId.MAGIC
 const isEmailValid = () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(magicEmail.value)
-const isConnectDisabled = (wallet: Wallet) =>
-  wallet.isConnected || (isMagicLink(wallet) && !isEmailValid())
 
-const getConnectArgs = (wallet: Wallet) => {
+const isConnectDisabled = (wallet: Wallet) => {
+  if (wallet.isConnected) return true
+  if (isMagicLink(wallet) && !isEmailValid()) return true
+  return false
+}
+
+const handleConnect = async (wallet: Wallet) => {
   if (isMagicLink(wallet)) {
-    return { email: magicEmail.value }
+    await wallet.connect({ email: magicEmail.value })
+  } else {
+    await wallet.connect()
   }
-  return undefined
 }
 
 const setActiveAccount = (event: Event, wallet: Wallet) => {
@@ -91,7 +96,10 @@ const auth = async () => {
     // verify signature
     const enc = new TextEncoder()
     const clientDataJsonHash = await crypto.subtle.digest('SHA-256', enc.encode(dataString))
-    const authenticatorDataHash = await crypto.subtle.digest('SHA-256', resp.authenticatorData)
+    const authenticatorDataHash = await crypto.subtle.digest(
+      'SHA-256',
+      new Uint8Array(resp.authenticatorData)
+    )
     const toSign = new Uint8Array(64)
     toSign.set(new Uint8Array(clientDataJsonHash), 0)
     toSign.set(new Uint8Array(authenticatorDataHash), 32)
@@ -110,9 +118,7 @@ const auth = async () => {
   <div v-for="wallet in wallets" :key="wallet.id" class="wallet-group">
     <h4>{{ wallet.metadata.name }} <span v-if="wallet.isActive">[active]</span></h4>
     <div class="wallet-buttons">
-      <button @click="wallet.connect(getConnectArgs(wallet))" :disabled="isConnectDisabled(wallet)">
-        Connect
-      </button>
+      <button @click="handleConnect(wallet)" :disabled="isConnectDisabled(wallet)">Connect</button>
       <button @click="wallet.disconnect()" :disabled="!wallet.isConnected">Disconnect</button>
       <button
         v-if="!wallet.isActive"
@@ -190,11 +196,5 @@ const auth = async () => {
 .input-group input[disabled] {
   opacity: 0.75;
   color: light-dark(rgba(16, 16, 16, 0.3), rgba(255, 255, 255, 0.3));
-}
-
-@media (prefers-color-scheme: light) {
-  .network-group {
-    border-color: #f9f9f9;
-  }
 }
 </style>
