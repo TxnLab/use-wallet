@@ -66,7 +66,7 @@
   },
   "devDependencies": {
     "@solidjs/testing-library": "0.8.10",
-    "algosdk": "3.4.0",
+    "algosdk": "3.5.2",
     "solid-js": "1.9.9",
     "tsup": "8.5.0",
     "tsup-preset-solid": "2.2.0",
