@@ -251,6 +251,58 @@ import { WalletId } from '@txnlab/use-wallet'
 * [Magic Website](https://magic.link)
 * [Magic Algorand Documentation](https://magic.link/docs/blockchains/other-chains/other/algorand)
 
+#### Web3Auth
+
+Social login authentication provider supporting Google, Facebook, Twitter, Discord, and other OAuth providers. Web3Auth enables users to sign in with familiar social accounts and derive an Algorand wallet from their authentication credentials. [Installation instructions](installation.md#web3auth).
+
+```typescript
+import { WalletId } from '@txnlab/use-wallet'
+
+// Basic usage with modal (shows social login options)
+{
+  id: WalletId.WEB3AUTH,
+  options: {
+    clientId: string // Required: from dashboard.web3auth.io
+  }
+}
+
+// With optional configuration
+{
+  id: WalletId.WEB3AUTH,
+  options: {
+    clientId: string               // Required: from dashboard.web3auth.io
+    web3AuthNetwork?: string       // Optional: 'sapphire_mainnet' (default) or 'sapphire_devnet'
+    loginProvider?: string         // Optional: skip modal and use specific provider (e.g., 'google', 'facebook')
+    uiConfig?: {                   // Optional: customize modal appearance
+      appName?: string
+      logoLight?: string
+      logoDark?: string
+      mode?: 'light' | 'dark' | 'auto'
+    }
+  }
+}
+```
+
+**Custom Authentication**
+
+Web3Auth also supports custom authentication flows using Single Factor Auth (SFA), allowing integration with existing authentication systems such as Firebase, Auth0, or custom JWT providers. This approach requires an additional dependency:
+
+```bash
+npm install @web3auth/single-factor-auth
+```
+
+This advanced use case requires:
+
+- Setting up a custom verifier in the [Web3Auth Dashboard](https://dashboard.web3auth.io)
+- Configuring the `verifier` option and `getAuthCredentials` callback
+- Managing authentication tokens and passing credentials to the `connect()` method
+
+For implementation details, refer to the [Web3Auth Single Factor Auth documentation](https://web3auth.io/docs/sdk/core-kit/sfa-web).
+
+* [Web3Auth Website](https://web3auth.io)
+* [Web3Auth Dashboard](https://dashboard.web3auth.io)
+* [Web3Auth Documentation](https://web3auth.io/docs)
+
 #### Biatec
 
 {% hint style="warning" %}

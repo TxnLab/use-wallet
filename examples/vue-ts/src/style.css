@@ -59,7 +59,8 @@ button:disabled {
 }
 
 input[type='text'],
-input[type='email'] {
+input[type='email'],
+input[type='password'] {
   border-radius: 8px;
   border: 1px solid #1a1a1a;
   padding: 0.6em 0.9em;
@@ -113,6 +114,7 @@ select {
   }
   input[type='text'],
   input[type='email'],
+  input[type='password'],
   select {
     background-color: #f9f9f9;
     color: #000000;

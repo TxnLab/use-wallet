@@ -1,6 +1,6 @@
 {
   "name": "@txnlab/use-wallet",
-  "version": "4.3.1",
+  "version": "4.4.0-beta.1",
   "description": "TypeScript library for integrating Algorand wallets into decentralized applications",
   "author": "Doug Richar <drichar@gmail.com>",
   "license": "MIT",
@@ -31,7 +31,8 @@
     "exodus",
     "algosdk",
     "algokit",
-    "kmd"
+    "kmd",
+    "web3auth"
   ],
   "files": [
     "dist"
@@ -50,11 +51,16 @@
     "@walletconnect/modal-core": "2.7.0",
     "@walletconnect/sign-client": "2.21.8",
     "@walletconnect/types": "2.21.8",
+    "@web3auth/base": "9.6.0",
+    "@web3auth/base-provider": "9.6.0",
+    "@web3auth/modal": "9.6.0",
+    "@web3auth/single-factor-auth": "9.4.0",
     "algosdk": "3.4.0",
     "canonify": "2.1.1",
     "lute-connect": "1.6.2",
     "magic-sdk": "29.4.2",
     "tsup": "8.5.0",
+    "tweetnacl": "^1.0.3",
     "typescript": "5.8.3"
   },
   "peerDependencies": {
@@ -63,6 +69,10 @@
     "@perawallet/connect": "^1.4.1",
     "@walletconnect/modal": "^2.7.0",
     "@walletconnect/sign-client": "^2.21.8",
+    "@web3auth/base": "^9.0.0",
+    "@web3auth/base-provider": "^9.0.0",
+    "@web3auth/modal": "^9.0.0",
+    "@web3auth/single-factor-auth": "^9.0.0",
     "algosdk": "^3.0.0",
     "lute-connect": "^1.6.2"
   },
@@ -80,6 +90,18 @@
       "optional": true
     },
     "@walletconnect/sign-client": {
+      "optional": true
+    },
+    "@web3auth/base": {
+      "optional": true
+    },
+    "@web3auth/base-provider": {
+      "optional": true
+    },
+    "@web3auth/modal": {
+      "optional": true
+    },
+    "@web3auth/single-factor-auth": {
       "optional": true
     },
     "lute-connect": {
