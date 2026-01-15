@@ -1,6 +1,6 @@
 {
   "name": "@txnlab/use-wallet-vue",
-  "version": "4.3.1",
+  "version": "4.4.0",
   "description": "Vue library for integrating Algorand wallets into decentralized applications",
   "author": "Doug Richar <drichar@gmail.com>",
   "license": "MIT",
