@@ -24,13 +24,13 @@
     "algosdk": "3.5.2",
     "canonify": "2.1.1",
     "lute-connect": "^1.6.3",
-    "solid-js": "1.9.10",
+    "solid-js": "1.9.11",
     "tweetnacl": "^1.0.3"
   },
   "devDependencies": {
     "typescript": "5.9.3",
     "vite": "6.4.1",
-    "vite-plugin-node-polyfills": "0.24.0",
+    "vite-plugin-node-polyfills": "0.25.0",
     "vite-plugin-solid": "2.11.10"
   }
 }
