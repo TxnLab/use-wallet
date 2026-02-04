@@ -93,16 +93,16 @@ importers:
         specifier: ^2.23.4
         version: 2.23.4(db0@0.3.4)(ioredis@5.9.1)(typescript@5.9.3)
       '@web3auth/base':
-        specifier: ^9.6.0
+        specifier: 9.7.0
         version: 9.7.0(@babel/runtime@7.28.6)
       '@web3auth/base-provider':
-        specifier: ^9.6.0
+        specifier: 9.7.0
         version: 9.7.0(@babel/runtime@7.28.6)
       '@web3auth/modal':
-        specifier: ^9.6.0
+        specifier: 9.7.0
         version: 9.7.0(@babel/runtime@7.28.6)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)
       '@web3auth/single-factor-auth':
-        specifier: ^9.4.0
+        specifier: 9.5.0
         version: 9.5.0(@babel/runtime@7.28.6)
       algosdk:
         specifier: 3.5.2
@@ -123,7 +123,7 @@ importers:
         specifier: 18.3.1
         version: 18.3.1(react@18.3.1)
       tweetnacl:
-        specifier: ^1.0.3
+        specifier: 1.0.3
         version: 1.0.3
     devDependencies:
       '@types/node':
@@ -169,22 +169,22 @@ importers:
         specifier: ^2.23.4
         version: 2.23.4(db0@0.3.4)(ioredis@5.9.1)(typescript@5.9.3)
       '@web3auth/base':
-        specifier: ^9.6.0
+        specifier: 9.7.0
         version: 9.7.0(@babel/runtime@7.28.6)
       '@web3auth/base-provider':
-        specifier: ^9.6.0
+        specifier: 9.7.0
         version: 9.7.0(@babel/runtime@7.28.6)
       '@web3auth/modal':
-        specifier: ^9.6.0
+        specifier: 9.7.0
         version: 9.7.0(@babel/runtime@7.28.6)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)
       '@web3auth/single-factor-auth':
-        specifier: ^9.4.0
+        specifier: 9.5.0
         version: 9.5.0(@babel/runtime@7.28.6)
       algosdk:
         specifier: 3.5.2
         version: 3.5.2
       buffer:
-        specifier: ^6.0.3
+        specifier: 6.0.3
         version: 6.0.3
       canonify:
         specifier: 2.1.1
@@ -196,10 +196,10 @@ importers:
         specifier: 3.21.0
         version: 3.21.0(@parcel/watcher@2.5.4)(@types/node@20.11.30)(@vue/compiler-sfc@3.5.27)(cac@6.7.14)(db0@0.3.4)(eslint@8.57.1)(idb-keyval@6.2.2)(ioredis@5.9.1)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.55.1)(terser@5.44.1)(typescript@5.9.3)(vite@6.4.1(@types/node@20.11.30)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.2))(vue-tsc@2.2.12(typescript@5.9.3))(yaml@2.8.2)
       process:
-        specifier: ^0.11.10
+        specifier: 0.11.10
         version: 0.11.10
       tweetnacl:
-        specifier: ^1.0.3
+        specifier: 1.0.3
         version: 1.0.3
       vue:
         specifier: 3.5.27
@@ -239,16 +239,16 @@ importers:
         specifier: ^2.23.4
         version: 2.23.4(db0@0.3.4)(ioredis@5.9.1)(typescript@5.9.3)
       '@web3auth/base':
-        specifier: ^9.6.0
+        specifier: 9.7.0
         version: 9.7.0(@babel/runtime@7.28.6)
       '@web3auth/base-provider':
-        specifier: ^9.6.0
+        specifier: 9.7.0
         version: 9.7.0(@babel/runtime@7.28.6)
       '@web3auth/modal':
-        specifier: ^9.6.0
+        specifier: 9.7.0
         version: 9.7.0(@babel/runtime@7.28.6)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)
       '@web3auth/single-factor-auth':
-        specifier: ^9.4.0
+        specifier: 9.5.0
         version: 9.5.0(@babel/runtime@7.28.6)
       algosdk:
         specifier: 3.5.2
@@ -321,16 +321,16 @@ importers:
         specifier: ^2.23.4
         version: 2.23.4(db0@0.3.4)(ioredis@5.9.1)(typescript@5.9.3)
       '@web3auth/base':
-        specifier: ^9.6.0
+        specifier: 9.7.0
         version: 9.7.0(@babel/runtime@7.28.6)
       '@web3auth/base-provider':
-        specifier: ^9.6.0
+        specifier: 9.7.0
         version: 9.7.0(@babel/runtime@7.28.6)
       '@web3auth/modal':
-        specifier: ^9.6.0
+        specifier: 9.7.0
         version: 9.7.0(@babel/runtime@7.28.6)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)
       '@web3auth/single-factor-auth':
-        specifier: ^9.4.0
+        specifier: 9.5.0
         version: 9.5.0(@babel/runtime@7.28.6)
       algosdk:
         specifier: 3.5.2
@@ -345,7 +345,7 @@ importers:
         specifier: 1.9.11
         version: 1.9.11
       tweetnacl:
-        specifier: ^1.0.3
+        specifier: 1.0.3
         version: 1.0.3
     devDependencies:
       typescript:
@@ -382,16 +382,16 @@ importers:
         specifier: ^2.23.4
         version: 2.23.4(db0@0.3.4)(ioredis@5.9.1)(typescript@5.9.3)
       '@web3auth/base':
-        specifier: ^9.6.0
+        specifier: 9.7.0
         version: 9.7.0(@babel/runtime@7.28.6)
       '@web3auth/base-provider':
-        specifier: ^9.6.0
+        specifier: 9.7.0
         version: 9.7.0(@babel/runtime@7.28.6)
       '@web3auth/modal':
-        specifier: ^9.6.0
+        specifier: 9.7.0
         version: 9.7.0(@babel/runtime@7.28.6)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)
       '@web3auth/single-factor-auth':
-        specifier: ^9.4.0
+        specifier: 9.5.0
         version: 9.5.0(@babel/runtime@7.28.6)
       algosdk:
         specifier: 3.5.2
@@ -406,7 +406,7 @@ importers:
         specifier: 5.49.1
         version: 5.49.1
       tweetnacl:
-        specifier: ^1.0.3
+        specifier: 1.0.3
         version: 1.0.3
     devDependencies:
       '@sveltejs/adapter-auto':
@@ -452,16 +452,16 @@ importers:
         specifier: ^2.23.4
         version: 2.23.4(db0@0.3.4)(ioredis@5.9.1)(typescript@5.9.3)
       '@web3auth/base':
-        specifier: ^9.6.0
+        specifier: 9.7.0
         version: 9.7.0(@babel/runtime@7.28.6)
       '@web3auth/base-provider':
-        specifier: ^9.6.0
+        specifier: 9.7.0
         version: 9.7.0(@babel/runtime@7.28.6)
       '@web3auth/modal':
-        specifier: ^9.6.0
+        specifier: 9.7.0
         version: 9.7.0(@babel/runtime@7.28.6)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)
       '@web3auth/single-factor-auth':
-        specifier: ^9.4.0
+        specifier: 9.5.0
         version: 9.5.0(@babel/runtime@7.28.6)
       algosdk:
         specifier: 3.5.2
@@ -473,7 +473,7 @@ importers:
         specifier: ^1.6.3
         version: 1.6.3
       tweetnacl:
-        specifier: ^1.0.3
+        specifier: 1.0.3
         version: 1.0.3
     devDependencies:
       '@walletconnect/types':
@@ -510,16 +510,16 @@ importers:
         specifier: ^2.23.4
         version: 2.23.4(db0@0.3.4)(ioredis@5.9.1)(typescript@5.9.3)
       '@web3auth/base':
-        specifier: ^9.6.0
+        specifier: 9.7.0
         version: 9.7.0(@babel/runtime@7.28.6)
       '@web3auth/base-provider':
-        specifier: ^9.6.0
+        specifier: 9.7.0
         version: 9.7.0(@babel/runtime@7.28.6)
       '@web3auth/modal':
-        specifier: ^9.6.0
+        specifier: 9.7.0
         version: 9.7.0(@babel/runtime@7.28.6)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)
       '@web3auth/single-factor-auth':
-        specifier: ^9.4.0
+        specifier: 9.5.0
         version: 9.5.0(@babel/runtime@7.28.6)
       algosdk:
         specifier: 3.5.2
@@ -531,7 +531,7 @@ importers:
         specifier: ^1.6.3
         version: 1.6.3
       tweetnacl:
-        specifier: ^1.0.3
+        specifier: 1.0.3
         version: 1.0.3
       vue:
         specifier: 3.5.27
@@ -617,7 +617,7 @@ importers:
         specifier: 8.5.1
         version: 8.5.1(jiti@2.6.1)(postcss@8.5.6)(typescript@5.9.3)(yaml@2.8.2)
       tweetnacl:
-        specifier: ^1.0.3
+        specifier: 1.0.3
         version: 1.0.3
       typescript:
         specifier: 5.9.3

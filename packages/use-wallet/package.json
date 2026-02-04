@@ -60,7 +60,7 @@
     "lute-connect": "1.6.3",
     "magic-sdk": "29.4.2",
     "tsup": "8.5.1",
-    "tweetnacl": "^1.0.3",
+    "tweetnacl": "1.0.3",
     "typescript": "5.9.3"
   },
   "peerDependencies": {
