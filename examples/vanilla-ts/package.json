@@ -13,7 +13,7 @@
     "@walletconnect/types": "2.23.1",
     "typescript": "5.9.3",
     "vite": "6.4.1",
-    "vite-plugin-node-polyfills": "0.24.0"
+    "vite-plugin-node-polyfills": "0.25.0"
   },
   "dependencies": {
     "@blockshake/defly-connect": "^1.2.1",

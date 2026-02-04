@@ -24,13 +24,13 @@
     "canonify": "2.1.1",
     "lute-connect": "^1.6.3",
     "tweetnacl": "^1.0.3",
-    "vue": "3.5.26"
+    "vue": "3.5.27"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "6.0.3",
     "typescript": "5.9.3",
     "vite": "6.4.1",
-    "vite-plugin-node-polyfills": "0.24.0",
+    "vite-plugin-node-polyfills": "0.25.0",
     "vue-tsc": "2.2.12"
   }
 }
