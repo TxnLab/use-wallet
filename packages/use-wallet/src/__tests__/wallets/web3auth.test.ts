@@ -877,4 +877,78 @@ describe('Web3AuthWallet', () => {
       expect(mockWeb3Auth.connect).not.toHaveBeenCalled()
     })
   })
+
+  describe('withPrivateKey', () => {
+    beforeEach(async () => {
+      await wallet.connect()
+    })
+
+    it('should provide 64-byte Algorand secret key to callback', async () => {
+      const result = await wallet.withPrivateKey(async (secretKey) => {
+        expect(secretKey).toBeInstanceOf(Uint8Array)
+        expect(secretKey.length).toBe(64)
+        return 'test-result'
+      })
+      expect(result).toBe('test-result')
+    })
+
+    it('should zero the key after callback completes', async () => {
+      let capturedKey: Uint8Array | null = null
+
+      await wallet.withPrivateKey(async (secretKey) => {
+        capturedKey = secretKey
+        // Key should be non-zero during callback
+        expect(secretKey.some((byte) => byte !== 0)).toBe(true)
+      })
+
+      // Key should be zeroed after callback
+      expect(capturedKey!.every((byte) => byte === 0)).toBe(true)
+    })
+
+    it('should zero the key even if callback throws', async () => {
+      let capturedKey: Uint8Array | null = null
+
+      await expect(
+        wallet.withPrivateKey(async (secretKey) => {
+          capturedKey = secretKey
+          throw new Error('Callback error')
+        })
+      ).rejects.toThrow('Callback error')
+
+      expect(capturedKey!.every((byte) => byte === 0)).toBe(true)
+    })
+
+    it('should re-authenticate if session expired', async () => {
+      // Simulate session expiry
+      mockWeb3Auth.connected = false
+      mockWeb3Auth.provider = null
+
+      vi.mocked(mockWeb3Auth.connect).mockClear()
+      mockWeb3Auth.connect.mockImplementation(async () => {
+        mockWeb3Auth.connected = true
+        mockWeb3Auth.provider = mockWeb3AuthProvider
+        return mockWeb3AuthProvider
+      })
+
+      await wallet.withPrivateKey(async (secretKey) => {
+        expect(secretKey.length).toBe(64)
+      })
+
+      expect(mockWeb3Auth.connect).toHaveBeenCalled()
+    })
+
+    it('should fetch key fresh for each call', async () => {
+      const initialCalls = mockWeb3AuthProvider.request.mock.calls.length
+
+      await wallet.withPrivateKey(async () => {})
+      await wallet.withPrivateKey(async () => {})
+
+      // Each withPrivateKey call should trigger a fresh provider.request
+      expect(mockWeb3AuthProvider.request.mock.calls.length).toBe(initialCalls + 2)
+    })
+
+    it('should report canUsePrivateKey as true', () => {
+      expect(wallet.canUsePrivateKey).toBe(true)
+    })
+  })
 })

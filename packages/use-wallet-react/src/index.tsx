@@ -133,6 +133,7 @@ export interface Wallet {
   isConnected: boolean
   isActive: boolean
   canSignData: boolean
+  canUsePrivateKey: boolean
   connect: (args?: Record<string, any>) => Promise<WalletAccount[]>
   disconnect: () => Promise<void>
   setActive: () => void
@@ -166,6 +167,7 @@ export const useWallet = () => {
         isConnected: !!walletState,
         isActive: wallet.walletKey === activeWalletId,
         canSignData: wallet.canSignData ?? false,
+        canUsePrivateKey: wallet.canUsePrivateKey ?? false,
         connect: (args) => wallet.connect(args),
         disconnect: () => wallet.disconnect(),
         setActive: () => wallet.setActive(),
@@ -216,6 +218,15 @@ export const useWallet = () => {
     return activeBaseWallet.signData(data, metadata)
   }
 
+  const withPrivateKey = <T,>(
+    callback: (secretKey: Uint8Array) => Promise<T>
+  ): Promise<T> => {
+    if (!activeBaseWallet) {
+      throw new Error('No active wallet')
+    }
+    return activeBaseWallet.withPrivateKey(callback)
+  }
+
   return {
     wallets,
     isReady,
@@ -227,6 +238,7 @@ export const useWallet = () => {
     activeAccount,
     activeAddress,
     signData,
+    withPrivateKey,
     signTransactions,
     transactionSigner
   }

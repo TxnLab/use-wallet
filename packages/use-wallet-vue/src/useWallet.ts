@@ -26,6 +26,7 @@ export interface Wallet {
   setActive: () => void
   setActiveAccount: (address: string) => void
   canSignData: boolean
+  canUsePrivateKey: boolean
 }
 
 export type SetAlgodClient = (client: algosdk.Algodv2) => void
@@ -58,6 +59,7 @@ export function useWallet() {
       isConnected: !!walletState,
       isActive: wallet.walletKey === activeWalletId.value,
       canSignData: wallet.canSignData ?? false,
+      canUsePrivateKey: wallet.canUsePrivateKey ?? false,
       connect: (args) => wallet.connect(args),
       disconnect: () => wallet.disconnect(),
       setActive: () => wallet.setActive(),
@@ -126,6 +128,15 @@ export function useWallet() {
     return activeBaseWallet.value.signData(data, metadata)
   }
 
+  const withPrivateKey = <T,>(
+    callback: (secretKey: Uint8Array) => Promise<T>
+  ): Promise<T> => {
+    if (!activeBaseWallet.value) {
+      throw new Error('No active wallet')
+    }
+    return activeBaseWallet.value.withPrivateKey(callback)
+  }
+
   return {
     wallets,
     isReady,
@@ -141,6 +152,7 @@ export function useWallet() {
     activeAccount,
     activeAddress,
     signData,
+    withPrivateKey,
     signTransactions,
     transactionSigner
   }
