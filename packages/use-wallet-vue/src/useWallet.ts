@@ -128,9 +128,7 @@ export function useWallet() {
     return activeBaseWallet.value.signData(data, metadata)
   }
 
-  const withPrivateKey = <T,>(
-    callback: (secretKey: Uint8Array) => Promise<T>
-  ): Promise<T> => {
+  const withPrivateKey = <T>(callback: (secretKey: Uint8Array) => Promise<T>): Promise<T> => {
     if (!activeBaseWallet.value) {
       throw new Error('No active wallet')
     }

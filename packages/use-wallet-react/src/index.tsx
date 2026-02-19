@@ -1,14 +1,14 @@
 import { useStore } from '@tanstack/react-store'
 import {
+  type AlgodConfig,
+  type BaseWallet,
   NetworkId,
   SignDataResponse,
   SignMetadata,
-  WalletId,
-  WalletManager,
-  type AlgodConfig,
-  type BaseWallet,
   type WalletAccount,
+  WalletId,
   type WalletKey,
+  WalletManager,
   type WalletMetadata
 } from '@txnlab/use-wallet'
 import algosdk from 'algosdk'
@@ -218,9 +218,7 @@ export const useWallet = () => {
     return activeBaseWallet.signData(data, metadata)
   }
 
-  const withPrivateKey = <T,>(
-    callback: (secretKey: Uint8Array) => Promise<T>
-  ): Promise<T> => {
+  const withPrivateKey = <T,>(callback: (secretKey: Uint8Array) => Promise<T>): Promise<T> => {
     if (!activeBaseWallet) {
       throw new Error('No active wallet')
     }

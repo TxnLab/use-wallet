@@ -199,9 +199,7 @@ export const useWallet = () => {
     return wallet.signData(data, metadata)
   }
 
-  const withPrivateKey = <T,>(
-    callback: (secretKey: Uint8Array) => Promise<T>
-  ): Promise<T> => {
+  const withPrivateKey = <T>(callback: (secretKey: Uint8Array) => Promise<T>): Promise<T> => {
     const wallet = manager.wallets.find((w) => w.walletKey === activeWalletId.current)
     if (!wallet) {
       throw new Error('No active wallet')
