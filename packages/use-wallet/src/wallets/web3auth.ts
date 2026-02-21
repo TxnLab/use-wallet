@@ -879,6 +879,61 @@ export class Web3AuthWallet extends BaseWallet {
     return txnsToSign
   }
 
+  public canUsePrivateKey = true
+
+  /**
+   * Provide scoped access to the private key via a callback.
+   *
+   * The callback receives a 64-byte Algorand secret key (ed25519 seed + public key).
+   * The key is a fresh copy that is guaranteed to be zeroed from memory when the
+   * callback completes, whether it succeeds or throws.
+   *
+   * SECURITY: The key is fetched fresh from Web3Auth for each call and never cached.
+   *
+   * @example
+   * ```typescript
+   * const result = await wallet.withPrivateKey(async (secretKey) => {
+   *   // secretKey is a 64-byte Uint8Array
+   *   // Use for custom signing, authentication, etc.
+   *   return doSomethingWith(secretKey)
+   * })
+   * // secretKey is zeroed at this point
+   * ```
+   */
+  public withPrivateKey = async <T>(
+    callback: (secretKey: Uint8Array) => Promise<T>
+  ): Promise<T> => {
+    this.logger.debug('withPrivateKey: Providing private key access...')
+
+    // Ensure Web3Auth is connected (re-authenticates if session expired)
+    await this.ensureConnected()
+
+    // SECURITY: Fetch key, derive Algorand account, provide copy to consumer
+    const keyContainer = await this.getSecureKey()
+
+    try {
+      return await keyContainer.useKey(async (secretKey) => {
+        const account = await deriveAlgorandAccountFromEd25519(secretKey)
+
+        // Create a copy for the consumer
+        const skCopy = new Uint8Array(account.sk)
+
+        // SECURITY: Zero the derived account's secret key immediately
+        zeroMemory(account.sk)
+
+        try {
+          return await callback(skCopy)
+        } finally {
+          // SECURITY: Always zero the consumer's copy
+          zeroMemory(skCopy)
+        }
+      })
+    } finally {
+      // SECURITY: Always clear the key container
+      keyContainer.clear()
+    }
+  }
+
   /**
    * Sign transactions
    *

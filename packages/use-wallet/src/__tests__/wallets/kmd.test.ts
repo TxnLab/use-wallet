@@ -453,4 +453,16 @@ describe('KmdWallet', () => {
       expect(mockKmd.initWalletHandle).toHaveBeenCalledWith(mockWallet.id, customPassword)
     })
   })
+
+  describe('withPrivateKey', () => {
+    it('should report canUsePrivateKey as false', () => {
+      expect(wallet.canUsePrivateKey).toBe(false)
+    })
+
+    it('should throw "Method not supported" error', async () => {
+      await expect(wallet.withPrivateKey(async () => {})).rejects.toThrow(
+        'Method not supported: withPrivateKey'
+      )
+    })
+  })
 })

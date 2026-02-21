@@ -396,4 +396,96 @@ describe('MnemonicWallet', () => {
       )
     })
   })
+
+  describe('withPrivateKey', () => {
+    const { sk: expectedSk } = algosdk.mnemonicToSecretKey(ACCOUNT_MNEMONIC)
+
+    beforeEach(async () => {
+      await wallet.connect()
+    })
+
+    it('should provide 64-byte Algorand secret key to callback', async () => {
+      const result = await wallet.withPrivateKey(async (secretKey) => {
+        expect(secretKey).toBeInstanceOf(Uint8Array)
+        expect(secretKey.length).toBe(64)
+        return 'test-result'
+      })
+      expect(result).toBe('test-result')
+    })
+
+    it('should provide a copy with correct key values', async () => {
+      await wallet.withPrivateKey(async (secretKey) => {
+        expect(Array.from(secretKey)).toEqual(Array.from(expectedSk))
+      })
+    })
+
+    it('should provide a copy, not the original key', async () => {
+      await wallet.withPrivateKey(async (secretKey) => {
+        // Modify the copy
+        secretKey.fill(0)
+      })
+
+      // Wallet should still be able to sign (original key intact)
+      const txn = new algosdk.Transaction({
+        type: algosdk.TransactionType.pay,
+        sender: TEST_ADDRESS,
+        suggestedParams: {
+          fee: 0,
+          firstValid: 51,
+          lastValid: 61,
+          minFee: 1000,
+          genesisID: 'testnet-v1.0'
+        },
+        paymentParams: { receiver: TEST_ADDRESS, amount: 1000 }
+      })
+      const result = await wallet.signTransactions([txn])
+      expect(result.length).toBe(1)
+    })
+
+    it('should zero the key copy after callback completes', async () => {
+      let capturedKey: Uint8Array | null = null
+
+      await wallet.withPrivateKey(async (secretKey) => {
+        capturedKey = secretKey
+        // Key should be non-zero during callback
+        expect(secretKey.some((byte) => byte !== 0)).toBe(true)
+      })
+
+      // Key should be zeroed after callback
+      expect(capturedKey!.every((byte) => byte === 0)).toBe(true)
+    })
+
+    it('should zero the key copy even if callback throws', async () => {
+      let capturedKey: Uint8Array | null = null
+
+      await expect(
+        wallet.withPrivateKey(async (secretKey) => {
+          capturedKey = secretKey
+          throw new Error('Callback error')
+        })
+      ).rejects.toThrow('Callback error')
+
+      expect(capturedKey!.every((byte) => byte === 0)).toBe(true)
+    })
+
+    it('should throw if wallet is not connected', async () => {
+      await wallet.disconnect()
+
+      await expect(wallet.withPrivateKey(async () => {})).rejects.toThrow(
+        'Mnemonic wallet not connected'
+      )
+    })
+
+    it('should throw if active network is MainNet', async () => {
+      setActiveNetwork('mainnet')
+
+      await expect(wallet.withPrivateKey(async () => {})).rejects.toThrow(
+        'Production network detected. Aborting.'
+      )
+    })
+
+    it('should report canUsePrivateKey as true', () => {
+      expect(wallet.canUsePrivateKey).toBe(true)
+    })
+  })
 })
