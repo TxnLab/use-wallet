@@ -102,6 +102,15 @@ export abstract class BaseWallet {
     throw new Error('Method not supported: signData')
   }
 
+  public canUsePrivateKey = false
+
+  public withPrivateKey = async <T>(
+    _callback: (secretKey: Uint8Array) => Promise<T>
+  ): Promise<T> => {
+    this.logger.error('Method not supported: withPrivateKey')
+    throw new Error('Method not supported: withPrivateKey')
+  }
+
   // ---------- Derived Properties ------------------------------------ //
 
   public get name(): string {

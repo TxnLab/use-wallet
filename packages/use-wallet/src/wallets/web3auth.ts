@@ -13,11 +13,20 @@
 
 import algosdk from 'algosdk'
 import { SecureKeyContainer, zeroMemory, deriveAlgorandAccountFromEd25519 } from 'src/secure-key'
-import { WalletState, addWallet, type State } from 'src/store'
+import { StorageAdapter } from 'src/storage'
+import { LOCAL_STORAGE_KEY, WalletState, addWallet, type State } from 'src/store'
 import { flattenTxnGroup, isSignedTxn, isTransactionArray } from 'src/utils'
 import { BaseWallet } from 'src/wallets/base'
 import type { Store } from '@tanstack/store'
 import type { WalletAccount, WalletConstructor, WalletId } from 'src/wallets/types'
+
+const LOCAL_STORAGE_WEB3AUTH_KEY = `${LOCAL_STORAGE_KEY}:web3auth`
+
+/** Metadata persisted to localStorage for Web3Auth session restoration */
+interface Web3AuthMetadata {
+  /** Whether the session was established using Single Factor Auth (SFA) vs modal */
+  usingSFA: boolean
+}
 
 // Type definitions for Web3Auth (to avoid requiring the package at compile time)
 // These are minimal type definitions that match the actual Web3Auth API
@@ -229,6 +238,25 @@ export class Web3AuthWallet extends BaseWallet {
       ...options
     }
     this.store = store
+  }
+
+  private loadMetadata(): Web3AuthMetadata | null {
+    const data = StorageAdapter.getItem(LOCAL_STORAGE_WEB3AUTH_KEY)
+    if (!data) return null
+    try {
+      return JSON.parse(data) as Web3AuthMetadata
+    } catch {
+      return null
+    }
+  }
+
+  private saveMetadata(): void {
+    const metadata: Web3AuthMetadata = { usingSFA: this.usingSFA }
+    StorageAdapter.setItem(LOCAL_STORAGE_WEB3AUTH_KEY, JSON.stringify(metadata))
+  }
+
+  private clearMetadata(): void {
+    StorageAdapter.removeItem(LOCAL_STORAGE_WEB3AUTH_KEY)
   }
 
   static defaultMetadata = {
@@ -552,6 +580,9 @@ export class Web3AuthWallet extends BaseWallet {
         wallet: walletState
       })
 
+      // Save metadata only after successful connection
+      this.saveMetadata()
+
       this.logger.info('Connected successfully', { address: this._address })
       return [walletAccount]
     } catch (error: any) {
@@ -580,6 +611,7 @@ export class Web3AuthWallet extends BaseWallet {
     this._address = null
     this.userInfo = null
     this.usingSFA = false
+    this.clearMetadata()
     this.onDisconnect()
 
     this.logger.info('Disconnected')
@@ -613,6 +645,12 @@ export class Web3AuthWallet extends BaseWallet {
       // Just restore the cached address - don't initialize Web3Auth
       this._address = storedAccount.address
       this.userInfo = { name: storedAccount.name }
+
+      // Restore usingSFA flag from metadata
+      const metadata = this.loadMetadata()
+      if (metadata) {
+        this.usingSFA = metadata.usingSFA
+      }
 
       this.logger.info('Session restored from cache (lazy mode)', { address: this._address })
     } catch (error: any) {
@@ -710,6 +748,7 @@ export class Web3AuthWallet extends BaseWallet {
     }
 
     this.usingSFA = true
+    this.saveMetadata()
 
     // Verify we got the same address (same user)
     await this.verifyAddressMatch()
@@ -742,6 +781,7 @@ export class Web3AuthWallet extends BaseWallet {
     }
 
     this.usingSFA = false
+    this.saveMetadata()
 
     // Get updated user info
     this.userInfo = await web3auth.getUserInfo()
@@ -837,6 +877,61 @@ export class Web3AuthWallet extends BaseWallet {
     })
 
     return txnsToSign
+  }
+
+  public canUsePrivateKey = true
+
+  /**
+   * Provide scoped access to the private key via a callback.
+   *
+   * The callback receives a 64-byte Algorand secret key (ed25519 seed + public key).
+   * The key is a fresh copy that is guaranteed to be zeroed from memory when the
+   * callback completes, whether it succeeds or throws.
+   *
+   * SECURITY: The key is fetched fresh from Web3Auth for each call and never cached.
+   *
+   * @example
+   * ```typescript
+   * const result = await wallet.withPrivateKey(async (secretKey) => {
+   *   // secretKey is a 64-byte Uint8Array
+   *   // Use for custom signing, authentication, etc.
+   *   return doSomethingWith(secretKey)
+   * })
+   * // secretKey is zeroed at this point
+   * ```
+   */
+  public withPrivateKey = async <T>(
+    callback: (secretKey: Uint8Array) => Promise<T>
+  ): Promise<T> => {
+    this.logger.debug('withPrivateKey: Providing private key access...')
+
+    // Ensure Web3Auth is connected (re-authenticates if session expired)
+    await this.ensureConnected()
+
+    // SECURITY: Fetch key, derive Algorand account, provide copy to consumer
+    const keyContainer = await this.getSecureKey()
+
+    try {
+      return await keyContainer.useKey(async (secretKey) => {
+        const account = await deriveAlgorandAccountFromEd25519(secretKey)
+
+        // Create a copy for the consumer
+        const skCopy = new Uint8Array(account.sk)
+
+        // SECURITY: Zero the derived account's secret key immediately
+        zeroMemory(account.sk)
+
+        try {
+          return await callback(skCopy)
+        } finally {
+          // SECURITY: Always zero the consumer's copy
+          zeroMemory(skCopy)
+        }
+      })
+    } finally {
+      // SECURITY: Always clear the key container
+      keyContainer.clear()
+    }
   }
 
   /**

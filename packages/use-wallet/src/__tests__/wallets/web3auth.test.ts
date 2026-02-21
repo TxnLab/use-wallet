@@ -132,6 +132,10 @@ describe('Web3AuthWallet', () => {
       }
     })
 
+    vi.mocked(StorageAdapter.removeItem).mockImplementation(() => {
+      // No-op for tests
+    })
+
     mockLogger = {
       debug: vi.fn(),
       info: vi.fn(),
@@ -524,6 +528,254 @@ describe('Web3AuthWallet', () => {
     })
   })
 
+  describe('usingSFA persistence', () => {
+    const LOCAL_STORAGE_WEB3AUTH_KEY = `${LOCAL_STORAGE_KEY}:web3auth`
+
+    it('should save usingSFA=true metadata after SFA connection', async () => {
+      const customAuth = {
+        idToken: 'mock-firebase-id-token',
+        verifierId: 'user@example.com',
+        verifier: 'my-firebase-verifier'
+      }
+
+      await wallet.connect(customAuth)
+
+      expect(StorageAdapter.setItem).toHaveBeenCalledWith(
+        LOCAL_STORAGE_WEB3AUTH_KEY,
+        JSON.stringify({ usingSFA: true })
+      )
+    })
+
+    it('should save usingSFA=false metadata after modal connection', async () => {
+      await wallet.connect()
+
+      expect(StorageAdapter.setItem).toHaveBeenCalledWith(
+        LOCAL_STORAGE_WEB3AUTH_KEY,
+        JSON.stringify({ usingSFA: false })
+      )
+    })
+
+    it('should clear metadata after disconnect', async () => {
+      await wallet.connect()
+      await wallet.disconnect()
+
+      expect(StorageAdapter.removeItem).toHaveBeenCalledWith(LOCAL_STORAGE_WEB3AUTH_KEY)
+    })
+
+    it('should restore usingSFA from metadata during resumeSession', async () => {
+      const walletState: WalletState = {
+        accounts: [{ name: 'test@example.com', address: TEST_ADDRESS }],
+        activeAccount: { name: 'test@example.com', address: TEST_ADDRESS }
+      }
+
+      store = new Store<State>({
+        ...DEFAULT_STATE,
+        wallets: {
+          [WalletId.WEB3AUTH]: walletState
+        }
+      })
+
+      // Mock metadata stored for SFA user
+      vi.mocked(StorageAdapter.getItem).mockImplementation((key: string) => {
+        if (key === LOCAL_STORAGE_WEB3AUTH_KEY) {
+          return JSON.stringify({ usingSFA: true })
+        }
+        return null
+      })
+
+      wallet = createWalletWithStore(store)
+      await wallet.resumeSession()
+
+      expect(StorageAdapter.getItem).toHaveBeenCalledWith(LOCAL_STORAGE_WEB3AUTH_KEY)
+      expect(wallet.isConnected).toBe(true)
+    })
+
+    it('should use SFA reconnection after resuming SFA session', async () => {
+      // Create wallet with getAuthCredentials callback for SFA re-auth
+      const walletWithCredentials = new Web3AuthWallet({
+        id: WalletId.WEB3AUTH,
+        options: {
+          clientId: 'mock-client-id',
+          verifier: 'my-verifier',
+          getAuthCredentials: async () => ({
+            idToken: 'fresh-token',
+            verifierId: 'user@example.com'
+          })
+        },
+        metadata: {},
+        getAlgodClient: {} as any,
+        store: new Store<State>({
+          ...DEFAULT_STATE,
+          wallets: {
+            [WalletId.WEB3AUTH]: {
+              accounts: [{ name: 'user@example.com', address: TEST_ADDRESS }],
+              activeAccount: { name: 'user@example.com', address: TEST_ADDRESS }
+            }
+          }
+        }),
+        subscribe: vi.fn()
+      })
+
+      // Mock metadata stored for SFA user
+      vi.mocked(StorageAdapter.getItem).mockImplementation((key: string) => {
+        if (key === LOCAL_STORAGE_WEB3AUTH_KEY) {
+          return JSON.stringify({ usingSFA: true })
+        }
+        return null
+      })
+
+      await walletWithCredentials.resumeSession()
+
+      // Reset call counts to track only reconnection calls
+      vi.mocked(mockWeb3AuthSFA.connect).mockClear()
+      vi.mocked(mockWeb3Auth.connect).mockClear()
+
+      // Make a transaction to trigger re-auth
+      const txn = new algosdk.Transaction({
+        type: algosdk.TransactionType.pay,
+        sender: TEST_ADDRESS,
+        suggestedParams: {
+          fee: 0,
+          firstValid: 51,
+          lastValid: 61,
+          minFee: 1000,
+          genesisID: 'testnet-v1.0'
+        },
+        paymentParams: { receiver: TEST_ADDRESS, amount: 1000 }
+      })
+
+      await walletWithCredentials.signTransactions([txn])
+
+      // Should have used SFA for re-authentication, not modal
+      expect(mockWeb3AuthSFA.connect).toHaveBeenCalled()
+      expect(mockWeb3Auth.connect).not.toHaveBeenCalled()
+
+      await walletWithCredentials.disconnect()
+    })
+
+    it('should use modal reconnection after resuming modal session', async () => {
+      store = new Store<State>({
+        ...DEFAULT_STATE,
+        wallets: {
+          [WalletId.WEB3AUTH]: {
+            accounts: [{ name: 'test@example.com', address: TEST_ADDRESS }],
+            activeAccount: { name: 'test@example.com', address: TEST_ADDRESS }
+          }
+        }
+      })
+
+      // Mock metadata stored for modal user
+      vi.mocked(StorageAdapter.getItem).mockImplementation((key: string) => {
+        if (key === LOCAL_STORAGE_WEB3AUTH_KEY) {
+          return JSON.stringify({ usingSFA: false })
+        }
+        return null
+      })
+
+      wallet = createWalletWithStore(store)
+      await wallet.resumeSession()
+
+      // Reset call counts to track only reconnection calls
+      vi.mocked(mockWeb3AuthSFA.connect).mockClear()
+      vi.mocked(mockWeb3Auth.connect).mockClear()
+
+      // Make a transaction to trigger re-auth
+      const txn = new algosdk.Transaction({
+        type: algosdk.TransactionType.pay,
+        sender: TEST_ADDRESS,
+        suggestedParams: {
+          fee: 0,
+          firstValid: 51,
+          lastValid: 61,
+          minFee: 1000,
+          genesisID: 'testnet-v1.0'
+        },
+        paymentParams: { receiver: TEST_ADDRESS, amount: 1000 }
+      })
+
+      await wallet.signTransactions([txn])
+
+      // Should have used modal for re-authentication, not SFA
+      expect(mockWeb3Auth.connect).toHaveBeenCalled()
+      expect(mockWeb3AuthSFA.connect).not.toHaveBeenCalled()
+    })
+
+    it('should default to modal reconnection when no metadata exists', async () => {
+      store = new Store<State>({
+        ...DEFAULT_STATE,
+        wallets: {
+          [WalletId.WEB3AUTH]: {
+            accounts: [{ name: 'test@example.com', address: TEST_ADDRESS }],
+            activeAccount: { name: 'test@example.com', address: TEST_ADDRESS }
+          }
+        }
+      })
+
+      // No metadata stored (simulates upgrade from old version)
+      vi.mocked(StorageAdapter.getItem).mockImplementation((key: string) => {
+        if (key === LOCAL_STORAGE_WEB3AUTH_KEY) {
+          return null
+        }
+        return null
+      })
+
+      wallet = createWalletWithStore(store)
+      await wallet.resumeSession()
+
+      // Reset call counts to track only reconnection calls
+      vi.mocked(mockWeb3AuthSFA.connect).mockClear()
+      vi.mocked(mockWeb3Auth.connect).mockClear()
+
+      // Make a transaction to trigger re-auth
+      const txn = new algosdk.Transaction({
+        type: algosdk.TransactionType.pay,
+        sender: TEST_ADDRESS,
+        suggestedParams: {
+          fee: 0,
+          firstValid: 51,
+          lastValid: 61,
+          minFee: 1000,
+          genesisID: 'testnet-v1.0'
+        },
+        paymentParams: { receiver: TEST_ADDRESS, amount: 1000 }
+      })
+
+      await wallet.signTransactions([txn])
+
+      // Should default to modal (usingSFA defaults to false)
+      expect(mockWeb3Auth.connect).toHaveBeenCalled()
+      expect(mockWeb3AuthSFA.connect).not.toHaveBeenCalled()
+    })
+
+    it('should not save metadata when connection fails', async () => {
+      mockWeb3Auth.connect.mockResolvedValueOnce(null)
+
+      await expect(wallet.connect()).rejects.toThrow('Failed to connect to Web3Auth')
+
+      expect(StorageAdapter.setItem).not.toHaveBeenCalledWith(
+        LOCAL_STORAGE_WEB3AUTH_KEY,
+        expect.any(String)
+      )
+    })
+
+    it('should not save metadata when SFA connection fails', async () => {
+      const customAuth = {
+        idToken: 'mock-firebase-id-token',
+        verifierId: 'user@example.com',
+        verifier: 'my-firebase-verifier'
+      }
+
+      mockWeb3AuthSFA.connect.mockRejectedValueOnce(new Error('SFA connection failed'))
+
+      await expect(wallet.connect(customAuth)).rejects.toThrow('SFA connection failed')
+
+      expect(StorageAdapter.setItem).not.toHaveBeenCalledWith(
+        LOCAL_STORAGE_WEB3AUTH_KEY,
+        expect.any(String)
+      )
+    })
+  })
+
   describe('lazy authentication', () => {
     const connectedAddress = getExpectedAddress()
 
@@ -623,6 +875,80 @@ describe('Web3AuthWallet', () => {
 
       // Should NOT have called connect() again
       expect(mockWeb3Auth.connect).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('withPrivateKey', () => {
+    beforeEach(async () => {
+      await wallet.connect()
+    })
+
+    it('should provide 64-byte Algorand secret key to callback', async () => {
+      const result = await wallet.withPrivateKey(async (secretKey) => {
+        expect(secretKey).toBeInstanceOf(Uint8Array)
+        expect(secretKey.length).toBe(64)
+        return 'test-result'
+      })
+      expect(result).toBe('test-result')
+    })
+
+    it('should zero the key after callback completes', async () => {
+      let capturedKey: Uint8Array | null = null
+
+      await wallet.withPrivateKey(async (secretKey) => {
+        capturedKey = secretKey
+        // Key should be non-zero during callback
+        expect(secretKey.some((byte) => byte !== 0)).toBe(true)
+      })
+
+      // Key should be zeroed after callback
+      expect(capturedKey!.every((byte) => byte === 0)).toBe(true)
+    })
+
+    it('should zero the key even if callback throws', async () => {
+      let capturedKey: Uint8Array | null = null
+
+      await expect(
+        wallet.withPrivateKey(async (secretKey) => {
+          capturedKey = secretKey
+          throw new Error('Callback error')
+        })
+      ).rejects.toThrow('Callback error')
+
+      expect(capturedKey!.every((byte) => byte === 0)).toBe(true)
+    })
+
+    it('should re-authenticate if session expired', async () => {
+      // Simulate session expiry
+      mockWeb3Auth.connected = false
+      mockWeb3Auth.provider = null
+
+      vi.mocked(mockWeb3Auth.connect).mockClear()
+      mockWeb3Auth.connect.mockImplementation(async () => {
+        mockWeb3Auth.connected = true
+        mockWeb3Auth.provider = mockWeb3AuthProvider
+        return mockWeb3AuthProvider
+      })
+
+      await wallet.withPrivateKey(async (secretKey) => {
+        expect(secretKey.length).toBe(64)
+      })
+
+      expect(mockWeb3Auth.connect).toHaveBeenCalled()
+    })
+
+    it('should fetch key fresh for each call', async () => {
+      const initialCalls = mockWeb3AuthProvider.request.mock.calls.length
+
+      await wallet.withPrivateKey(async () => {})
+      await wallet.withPrivateKey(async () => {})
+
+      // Each withPrivateKey call should trigger a fresh provider.request
+      expect(mockWeb3AuthProvider.request.mock.calls.length).toBe(initialCalls + 2)
+    })
+
+    it('should report canUsePrivateKey as true', () => {
+      expect(wallet.canUsePrivateKey).toBe(true)
     })
   })
 })

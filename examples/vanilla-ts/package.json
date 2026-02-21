@@ -10,10 +10,10 @@
     "test:e2e": "playwright test"
   },
   "devDependencies": {
-    "@walletconnect/types": "2.23.1",
+    "@walletconnect/types": "2.23.4",
     "typescript": "5.9.3",
     "vite": "6.4.1",
-    "vite-plugin-node-polyfills": "0.24.0"
+    "vite-plugin-node-polyfills": "0.25.0"
   },
   "dependencies": {
     "@blockshake/defly-connect": "^1.2.1",
@@ -21,14 +21,14 @@
     "@perawallet/connect": "^1.4.1",
     "@txnlab/use-wallet": "workspace:*",
     "@walletconnect/modal": "^2.7.0",
-    "@walletconnect/sign-client": "^2.23.1",
-    "@web3auth/base": "^9.6.0",
-    "@web3auth/base-provider": "^9.6.0",
-    "@web3auth/modal": "^9.6.0",
-    "@web3auth/single-factor-auth": "^9.4.0",
+    "@walletconnect/sign-client": "^2.23.4",
+    "@web3auth/base": "9.7.0",
+    "@web3auth/base-provider": "9.7.0",
+    "@web3auth/modal": "9.7.0",
+    "@web3auth/single-factor-auth": "9.5.0",
     "algosdk": "3.5.2",
     "canonify": "2.1.1",
     "lute-connect": "^1.6.3",
-    "tweetnacl": "^1.0.3"
+    "tweetnacl": "1.0.3"
   }
 }

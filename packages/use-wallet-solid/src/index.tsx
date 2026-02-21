@@ -171,6 +171,14 @@ export const useWallet = () => {
     return wallet.signData(data, metadata)
   }
 
+  const withPrivateKey = <T,>(callback: (secretKey: Uint8Array) => Promise<T>): Promise<T> => {
+    const wallet = activeWallet()
+    if (!wallet) {
+      throw new Error('No active wallet')
+    }
+    return wallet.withPrivateKey(callback)
+  }
+
   return {
     wallets: manager().wallets,
     isReady,
@@ -185,6 +193,7 @@ export const useWallet = () => {
     isWalletActive,
     isWalletConnected,
     signData,
+    withPrivateKey,
     signTransactions,
     transactionSigner,
     walletStore

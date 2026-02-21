@@ -1,6 +1,6 @@
 {
   "name": "@txnlab/use-wallet-vue",
-  "version": "4.4.0",
+  "version": "4.6.0",
   "description": "Vue library for integrating Algorand wallets into decentralized applications",
   "author": "Doug Richar <drichar@gmail.com>",
   "license": "MIT",
@@ -45,14 +45,14 @@
     "algosdk": "3.5.2",
     "tsup": "8.5.1",
     "typescript": "5.9.3",
-    "vue": "3.5.26"
+    "vue": "3.5.27"
   },
   "peerDependencies": {
     "@blockshake/defly-connect": "^1.2.1",
     "@magic-ext/algorand": "^24.4.2",
     "@perawallet/connect": "^1.4.1",
     "@walletconnect/modal": "^2.7.0",
-    "@walletconnect/sign-client": "^2.23.1",
+    "@walletconnect/sign-client": "^2.23.4",
     "algosdk": "^3.0.0",
     "lute-connect": "^1.6.3",
     "magic-sdk": "^29.4.2",

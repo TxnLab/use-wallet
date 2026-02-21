@@ -1,4 +1,5 @@
 import algosdk from 'algosdk'
+import { zeroMemory } from 'src/secure-key'
 import { StorageAdapter } from 'src/storage'
 import { LOCAL_STORAGE_KEY, WalletState, addWallet, type State } from 'src/store'
 import { flattenTxnGroup, isSignedTxn, isTransactionArray } from 'src/utils'
@@ -216,6 +217,52 @@ export class MnemonicWallet extends BaseWallet {
     })
 
     return txnsToSign
+  }
+
+  public canUsePrivateKey = true
+
+  /**
+   * Provide scoped access to the private key via a callback.
+   *
+   * The callback receives a copy of the 64-byte Algorand secret key.
+   * The copy is guaranteed to be zeroed from memory when the callback
+   * completes, whether it succeeds or throws.
+   *
+   * **Note:** This method is blocked on MainNet. The Mnemonic wallet is intended
+   * for development and testing only. For production use, see Web3Auth which
+   * supports `withPrivateKey` on all networks.
+   *
+   * @example
+   * ```typescript
+   * const result = await wallet.withPrivateKey(async (secretKey) => {
+   *   // secretKey is a 64-byte Uint8Array
+   *   return doSomethingWith(secretKey)
+   * })
+   * // secretKey is zeroed at this point
+   * ```
+   */
+  public withPrivateKey = async <T>(
+    callback: (secretKey: Uint8Array) => Promise<T>
+  ): Promise<T> => {
+    // Throw error if MainNet is active
+    this.checkMainnet()
+
+    if (!this.account) {
+      this.logger.error('Mnemonic wallet not connected')
+      throw new Error('Mnemonic wallet not connected')
+    }
+
+    this.logger.debug('withPrivateKey: Providing private key access...')
+
+    // Create a copy of the secret key for the consumer
+    const skCopy = new Uint8Array(this.account.sk)
+
+    try {
+      return await callback(skCopy)
+    } finally {
+      // SECURITY: Always zero the consumer's copy
+      zeroMemory(skCopy)
+    }
   }
 
   public signTransactions = async <T extends algosdk.Transaction[] | Uint8Array[]>(
