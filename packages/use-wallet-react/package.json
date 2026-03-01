@@ -38,11 +38,11 @@
     "dist"
   ],
   "dependencies": {
-    "@tanstack/react-store": "0.8.0",
+    "@tanstack/react-store": "0.9.1",
     "@txnlab/use-wallet": "workspace:*"
   },
   "devDependencies": {
-    "@types/react": "18.3.27",
+    "@types/react": "18.3.28",
     "algosdk": "3.5.2",
     "jsdom": "26.1.0",
     "react": "18.3.1",
