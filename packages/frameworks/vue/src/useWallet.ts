@@ -3,6 +3,7 @@ import {
   BaseWallet,
   WalletManager,
   type Wallet,
+  type WalletAccount,
   type StdSignMetadata,
   type StdSignDataResponse
 } from '@txnlab/use-wallet'
@@ -11,8 +12,37 @@ import { computed, inject, ref } from 'vue'
 
 export type SetAlgodClient = (client: algosdk.Algodv2) => void
 
-export function useWallet() {
-  const manager = inject<WalletManager>('walletManager')
+// Wagmi-style type registration: an app declares its manager type once,
+// next to where the manager is created:
+//
+//   const manager = WalletManager.create({ wallets: [pqWallet(), classicWallet()] })
+//   // or, with classic construction, declare the union explicitly:
+//   // const manager = new WalletManager<PQAccount | ClassicAccount>({ wallets: [...] })
+//
+//   declare module '@txnlab/use-wallet-vue' {
+//     interface Register { manager: typeof manager }
+//   }
+//
+// Every bare `useWallet()` then infers the manager's account union; apps
+// that don't register keep the base `WalletAccount` default.
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface Register {}
+
+export type ResolvedWalletManager<TRegister = Register> = TRegister extends {
+  manager: infer TManager extends WalletManager<any>
+}
+  ? TManager
+  : WalletManager
+
+export type ResolvedWalletAccount<TRegister = Register> =
+  ResolvedWalletManager<TRegister> extends WalletManager<infer TAccount> ? TAccount : WalletAccount
+
+// Internal implementation; the public composable binds `T` to the account
+// type resolved from the app's `Register` declaration
+function useWalletCore<T extends WalletAccount = WalletAccount>() {
+  // The injection erases the manager's generic; view it at the resolved
+  // account type `T` so the store-derived state flows as `T`
+  const manager = inject<WalletManager<T>>('walletManager')
   const algodClient = inject<ReturnType<typeof ref<algosdk.Algodv2>>>('algodClient')
 
   if (!manager) {
@@ -28,7 +58,7 @@ export function useWallet() {
   const walletStateMap = useStore(manager.store, (state) => state.wallets)
   const activeWalletId = useStore(manager.store, (state) => state.activeWallet)
 
-  const transformToWallet = (wallet: BaseWallet): Wallet => {
+  const transformToWallet = (wallet: BaseWallet<any, any>): Wallet<T> => {
     const walletState = walletStateMap.value[wallet.walletKey]
     return {
       id: wallet.id,
@@ -143,4 +173,8 @@ export function useWallet() {
     signTransactions,
     transactionSigner
   }
+}
+
+export function useWallet() {
+  return useWalletCore<ResolvedWalletAccount>()
 }

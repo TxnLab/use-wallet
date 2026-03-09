@@ -56,14 +56,14 @@ export interface WalletCapabilities {
  * All mutations are pre-bound to the adapter's wallet key —
  * adapters cannot accidentally modify another wallet's state.
  */
-export interface AdapterStoreAccessor {
-  getWalletState(): WalletState | undefined
+export interface AdapterStoreAccessor<TType extends WalletAccount = WalletAccount> {
+  getWalletState(): WalletState<TType> | undefined
   getActiveWallet(): WalletKey | null
   getActiveNetwork(): string
   getState(): State
-  addWallet(wallet: WalletState): void
+  addWallet(wallet: WalletState<TType>): void
   removeWallet(): void
-  setAccounts(accounts: WalletAccount[]): void
+  setAccounts(accounts: TType[]): void
   setActiveAccount(address: string): void
   setActive(): void
 }
@@ -73,10 +73,13 @@ export interface AdapterStoreAccessor {
  * Generic over the options type so adapters receive typed options
  * without unsafe casts.
  */
-export interface AdapterConstructorParams<TOptions = Record<string, unknown>> {
+export interface AdapterConstructorParams<
+  TOptions = Record<string, unknown>,
+  TType extends WalletAccount = WalletAccount
+> {
   id: string
   metadata: WalletMetadata
-  store: AdapterStoreAccessor
+  store: AdapterStoreAccessor<TType>
   subscribe: (callback: (state: State) => void) => () => void
   getAlgodClient: () => algosdk.Algodv2
   options?: TOptions
@@ -88,18 +91,43 @@ export interface AdapterConstructorParams<TOptions = Record<string, unknown>> {
  * the manager handles heterogeneous adapter configs in a single array.
  * Type safety lives in the factory function signature, not here.
  */
-export interface WalletAdapterConfig {
+export interface WalletAdapterConfig<TType extends WalletAccount = WalletAccount> {
   /** Unique identifier for this wallet adapter */
   id: string
   /** Display metadata (name, icon) */
   metadata: WalletMetadata
   /** The adapter class constructor */
-  Adapter: new (params: AdapterConstructorParams) => BaseWallet
+  Adapter: new (params: AdapterConstructorParams<Record<string, unknown>, TType>) => BaseWallet
   /** Wallet-specific options, passed through to the adapter constructor */
   options?: Record<string, unknown>
   /** Network capabilities — which networks this wallet supports */
   capabilities?: WalletCapabilities
 }
+
+/**
+ * Extracts the account type from a single adapter config.
+ * `WalletAdapterConfig<PQAccount>` resolves to `PQAccount`;
+ * anything else falls back to the base `WalletAccount`.
+ */
+export type WalletAccountOf<TConfig> =
+  TConfig extends WalletAdapterConfig<infer TType extends WalletAccount> ? TType : WalletAccount
+
+/**
+ * Infers the union of account types declared by an array of adapter
+ * configs. E.g. configs declaring `WalletAdapterConfig<PQAccount>` and
+ * `WalletAdapterConfig<ClassicAccount>` resolve to `PQAccount | ClassicAccount`.
+ * An empty array resolves to the base `WalletAccount`.
+ *
+ * Note: `WalletAccountOf` must be applied to the *naked* `TConfigs[number]`
+ * union so the conditional type distributes over each member; inferring
+ * directly from `TConfigs[number] extends WalletAdapterConfig<infer T>`
+ * would intersect the candidates instead of uniting them.
+ */
+export type InferWalletAccounts<TConfigs extends readonly WalletAdapterConfig<any>[]> = [
+  TConfigs[number]
+] extends [never]
+  ? WalletAccount
+  : WalletAccountOf<TConfigs[number]>
 
 /**
  * Common options accepted by all wallet adapter factory functions.
@@ -118,17 +146,17 @@ export interface WalletFactoryOptions {
  * (e.g. `useWallet()` in React). Defined in core so all framework
  * adapters share a single type.
  */
-export interface Wallet {
+export interface Wallet<TType extends WalletAccount = WalletAccount> {
   id: string
   walletKey: string
   metadata: WalletMetadata
-  accounts: WalletAccount[]
-  activeAccount: WalletAccount | null
+  accounts: TType[]
+  activeAccount: TType | null
   isConnected: boolean
   isActive: boolean
   canSignData: boolean
   canUsePrivateKey: boolean
-  connect: (args?: Record<string, any>) => Promise<WalletAccount[]>
+  connect: (args?: Record<string, any>) => Promise<TType[]>
   disconnect: () => Promise<void>
   setActive: () => void
   setActiveAccount: (address: string) => void
@@ -136,9 +164,9 @@ export interface Wallet {
 
 // ---------- Wallet State ------------------------------------------- //
 
-export type WalletState = {
-  accounts: WalletAccount[]
-  activeAccount: WalletAccount | null
+export type WalletState<T = WalletAccount> = {
+  accounts: T[]
+  activeAccount: T | null
 }
 
 // ---------- Transaction Types -------------------------------------- //

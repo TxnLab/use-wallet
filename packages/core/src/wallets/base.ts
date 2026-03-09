@@ -13,13 +13,16 @@ import type {
   WalletMetadata
 } from 'src/wallets/types'
 
-export abstract class BaseWallet<TOptions = Record<string, unknown>> {
+export abstract class BaseWallet<
+  TOptions = Record<string, unknown>,
+  TType extends WalletAccount = WalletAccount
+> {
   public readonly id: string
   public readonly walletKey: string
   public metadata: WalletMetadata
 
   protected options: TOptions
-  protected store: AdapterStoreAccessor
+  protected store: AdapterStoreAccessor<TType>
   protected getAlgodClient: () => algosdk.Algodv2
 
   public subscribe: (callback: (state: State) => void) => () => void
@@ -33,7 +36,7 @@ export abstract class BaseWallet<TOptions = Record<string, unknown>> {
     subscribe,
     getAlgodClient,
     options
-  }: AdapterConstructorParams<TOptions>) {
+  }: AdapterConstructorParams<TOptions, TType>) {
     this.id = id
     this.walletKey = id
     this.metadata = { ...metadata }
@@ -50,7 +53,7 @@ export abstract class BaseWallet<TOptions = Record<string, unknown>> {
 
   // ---------- Public Methods ---------------------------------------- //
 
-  public abstract connect(args?: Record<string, any>): Promise<WalletAccount[]>
+  public abstract connect(args?: Record<string, any>): Promise<TType[]>
   public abstract disconnect(): Promise<void>
   public abstract resumeSession(): Promise<void>
 
@@ -110,7 +113,7 @@ export abstract class BaseWallet<TOptions = Record<string, unknown>> {
     return this.id.toUpperCase()
   }
 
-  public get accounts(): WalletAccount[] {
+  public get accounts(): TType[] {
     const walletState = this.store.getWalletState()
     return walletState ? walletState.accounts : []
   }
@@ -119,7 +122,7 @@ export abstract class BaseWallet<TOptions = Record<string, unknown>> {
     return this.accounts.map((account) => account.address)
   }
 
-  public get activeAccount(): WalletAccount | null {
+  public get activeAccount(): TType | null {
     const walletState = this.store.getWalletState()
     return walletState ? walletState.activeAccount : null
   }
