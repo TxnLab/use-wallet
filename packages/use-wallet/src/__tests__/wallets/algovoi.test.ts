@@ -1,10 +1,8 @@
 import { Store } from '@tanstack/store'
-import { logger } from 'src/logger'
 import { StorageAdapter } from 'src/storage'
 import { LOCAL_STORAGE_KEY, State, DEFAULT_STATE } from 'src/store'
 import { AlgoVoiWallet } from 'src/wallets/algovoi'
 import { WalletId } from 'src/wallets/types'
-import type { Mock } from 'vitest'
 
 // Mock logger
 vi.mock('src/logger', () => ({
