@@ -1,5 +1,6 @@
 import algosdk from 'algosdk'
 import { WalletId, type JsonRpcRequest, type WalletAccount, type WalletMap } from './wallets/types'
+import { AlgoVoiWallet } from './wallets/algovoi'
 import { BiatecWallet } from './wallets/biatec'
 import { CustomWallet } from './wallets/custom'
 import { DeflyWallet } from './wallets/defly'
@@ -17,6 +18,7 @@ import { W3Wallet } from './wallets/w3wallet'
 
 export function createWalletMap(): WalletMap {
   return {
+    [WalletId.ALGOVOI]: AlgoVoiWallet,
     [WalletId.BIATEC]: BiatecWallet,
     [WalletId.CUSTOM]: CustomWallet,
     [WalletId.DEFLY]: DeflyWallet,

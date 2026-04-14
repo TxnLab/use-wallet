@@ -1,3 +1,4 @@
+import { AlgoVoiWallet } from './algovoi'
 import { CustomWallet, CustomWalletOptions } from './custom'
 import { DeflyWallet, type DeflyWalletConnectOptions } from './defly'
 import { DeflyWebWallet } from './defly-web'
@@ -17,6 +18,7 @@ import type { State } from 'src/store'
 import { W3Wallet } from './w3wallet'
 
 export enum WalletId {
+  ALGOVOI = 'algovoi',
   BIATEC = 'biatec',
   DEFLY = 'defly',
   DEFLY_WEB = 'defly-web',
@@ -63,6 +65,7 @@ export type WalletConnectSkinOption = string | WalletConnectSkin
 export type WalletKey = WalletId | `${WalletId.WALLETCONNECT}:${string}`
 
 export type WalletMap = {
+  [WalletId.ALGOVOI]: typeof AlgoVoiWallet
   [WalletId.BIATEC]: typeof BiatecWallet
   [WalletId.CUSTOM]: typeof CustomWallet
   [WalletId.DEFLY]: typeof DeflyWallet
@@ -80,6 +83,7 @@ export type WalletMap = {
 }
 
 export type WalletOptionsMap = {
+  [WalletId.ALGOVOI]: Record<string, never>
   [WalletId.BIATEC]: WalletConnectOptions
   [WalletId.CUSTOM]: CustomWalletOptions
   [WalletId.DEFLY]: DeflyWalletConnectOptions

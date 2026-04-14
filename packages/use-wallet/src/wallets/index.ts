@@ -1,3 +1,4 @@
+export * from './algovoi'
 export * from './base'
 export * from './biatec'
 export * from './custom'
