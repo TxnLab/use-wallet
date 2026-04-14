@@ -20,10 +20,7 @@ interface AlgoVoiProvider {
   isAlgoVoi: boolean
   enable(options?: { genesisHash?: string }): Promise<{ accounts: string[] }>
   disable(options?: { genesisHash?: string }): Promise<void>
-  signTransactions(
-    txns: WalletTransaction[],
-    indexesToSign?: number[]
-  ): Promise<(string | null)[]>
+  signTransactions(txns: WalletTransaction[], indexesToSign?: number[]): Promise<(string | null)[]>
   signBytes?(data: Uint8Array, signer: string): Promise<{ sig: Uint8Array }>
 }
 
