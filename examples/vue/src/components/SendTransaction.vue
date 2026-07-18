@@ -24,11 +24,13 @@ const handleSend = async () => {
       sender: activeAddress.value,
       receiver: activeAddress.value,
       amount: 0,
-      suggestedParams
+      suggestedParams,
+      note: Buffer.from(crypto.getRandomValues(new Uint8Array(12)))
     })
 
     const atc = new algosdk.AtomicTransactionComposer()
     atc.addTransaction({ txn, signer: transactionSigner })
+    await atc.gatherSignatures()
 
     status.value = 'confirming'
     const result = await atc.execute(algodClient.value, 4)

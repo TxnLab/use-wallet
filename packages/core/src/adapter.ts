@@ -24,9 +24,9 @@ export type {
   SignerTransaction,
   WalletTransaction,
   MultisigMetadata,
-  SignData,
-  SignDataResponse,
-  SignMetadata,
+  StdSignData,
+  StdSignDataResponse,
+  StdSignMetadata,
   JsonRpcRequest,
   Siwa
 } from './wallets/types'

@@ -2,6 +2,7 @@
 import { useWallet } from '@txnlab/use-wallet-vue'
 import AccountSwitcher from './AccountSwitcher.vue'
 import SendTransaction from './SendTransaction.vue'
+import Authenticate from './Authenticate.vue'
 
 const { activeWallet, activeAccount } = useWallet()
 </script>
@@ -54,5 +55,6 @@ const { activeWallet, activeAccount } = useWallet()
     </div>
 
     <SendTransaction />
+    <Authenticate v-if="activeWallet.canSignData" />
   </div>
 </template>

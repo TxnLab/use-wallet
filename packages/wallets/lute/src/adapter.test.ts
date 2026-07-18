@@ -412,7 +412,7 @@ describe('LuteAdapter', () => {
     it('should handle sign and verify data flow', async () => {
       const siwaRequest = {
         account_address: connectedAcct1,
-        chain_id: '283',
+        chain_id: 'algorand:SGO1GKSzyE7IEPItTxCByw9x8FmnrCDe',
         domain: 'test.domain',
         'issued-at': new Date().toISOString(),
         type: 'ed25519',

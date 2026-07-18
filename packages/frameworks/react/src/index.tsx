@@ -3,8 +3,9 @@ import {
   type AlgodConfig,
   type BaseWallet,
   NetworkId,
-  SignDataResponse,
-  SignMetadata,
+  StdSignData,
+  StdSignDataResponse,
+  StdSignMetadata,
   type Wallet,
   WalletManager
 } from '@txnlab/use-wallet'
@@ -196,7 +197,7 @@ export const useWallet = () => {
     return activeBaseWallet.transactionSigner(txnGroup, indexesToSign)
   }
 
-  const signData = (data: string, metadata: SignMetadata): Promise<SignDataResponse> => {
+  const signData = (data: StdSignData, metadata: StdSignMetadata): Promise<StdSignDataResponse> => {
     if (!activeBaseWallet) {
       throw new Error('No active wallet')
     }

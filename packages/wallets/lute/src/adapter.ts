@@ -8,8 +8,8 @@ import {
   isSignedTxn,
   isTransactionArray,
   type AdapterConstructorParams,
-  type SignDataResponse,
-  type SignMetadata,
+  type StdSignDataResponse,
+  type StdSignMetadata,
   type WalletAccount,
   type WalletMetadata,
   type WalletState
@@ -19,7 +19,7 @@ import {
   SignDataError as ISignDataError,
   type SignTxnsError as ISignTxnsError,
   type WalletTransaction
-} from 'lute-connect'
+} from 'lute-connect/dist/types'
 
 export interface LuteConnectOptions {
   siteName?: string
@@ -34,6 +34,7 @@ function isSignDataError(error: any): error is ISignDataError {
 }
 
 import { icon } from './icon'
+import { StdSignData } from '@txnlab/use-wallet'
 
 const ICON = `data:image/svg+xml;base64,${btoa(icon)}`
 
@@ -219,7 +220,10 @@ export class LuteAdapter extends BaseWallet<LuteConnectOptions> {
 
   public canSignData = true
 
-  public signData = async (data: string, metadata: SignMetadata): Promise<SignDataResponse> => {
+  public signData = async (
+    data: StdSignData,
+    metadata: StdSignMetadata
+  ): Promise<StdSignDataResponse> => {
     try {
       this.logger.debug('Signing data...', { data, metadata })
 

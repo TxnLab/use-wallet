@@ -4,7 +4,7 @@ import {
   NetworkId,
   WalletManager,
   type WalletAccount,
-  type SignDataResponse,
+  type StdSignDataResponse,
   type WalletAdapterConfig,
   type AdapterConstructorParams,
   ScopeType,
@@ -64,7 +64,7 @@ const mocks = vi.hoisted(() => {
         data: 'test-data',
         signer: new Uint8Array(),
         domain: 'test-domain'
-      } as SignDataResponse)
+      } as StdSignDataResponse)
     )
   }
 })

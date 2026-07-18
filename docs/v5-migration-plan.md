@@ -337,7 +337,7 @@ Wallet adapters need access to utilities and types that are currently internal. 
 - `AdapterConstructorParams<TOptions>` interface
 - `AdapterStoreAccessor` interface
 - `WalletAdapterConfig` interface
-- Shared types: `WalletAccount`, `WalletMetadata`, `WalletState`, `WalletKey`, `SignerTransaction`, `WalletTransaction`, `MultisigMetadata`, `SignData`, `SignDataResponse`, `SignMetadata`, `ScopeType`, `SignTxnsError`, `SignDataError`, `JsonRpcRequest`, `Siwa`
+- Shared types: `WalletAccount`, `WalletMetadata`, `WalletState`, `WalletKey`, `SignerTransaction`, `WalletTransaction`, `MultisigMetadata`, `StdSignData`, `StdSignDataResponse`, `StdSignMetadata`, `ScopeType`, `SignTxnsError`, `SignDataError`, `JsonRpcRequest`, `Siwa`
 - Utility functions: `compareAccounts`, `isSignedTxn`, `isTransaction`, `isTransactionArray`, `flattenTxnGroup`, `base64ToByteArray`, `byteArrayToBase64`, `stringToByteArray`, `byteArrayToString`, `formatJsonRpcRequest`
 - `SecureKeyContainer`, `withSecureKey`, `withSecureKeySync`, `zeroMemory`, `zeroString`
 - `State` type (for subscribe callback typing)
@@ -439,7 +439,7 @@ Types to **keep** (shared contract):
 - `WalletConstructor` → renamed/simplified to `AdapterConstructorParams`
 - `BaseWalletConstructor` → folded into `AdapterConstructorParams`
 - `WalletTransaction`, `SignerTransaction`, `MultisigMetadata`
-- `SignData`, `SignDataResponse`, `SignMetadata`, `ScopeType`
+- `StdSignData`, `StdSignDataResponse`, `StdSignMetadata`, `ScopeType`
 - `SignTxnsError`, `SignDataError`
 - `JsonRpcRequest`
 - `Siwa`
