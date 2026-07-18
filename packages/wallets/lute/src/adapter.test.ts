@@ -376,20 +376,30 @@ describe('LuteAdapter', () => {
     it('should call Lute client signData with correct parameters', async () => {
       const testData = 'test-data'
       const testMetadata = { scope: ScopeType.AUTH, encoding: 'base64' }
+      const testAuthData = new Uint8Array([4, 5, 6])
+      const testSigner = new Uint8Array([1, 2, 3])
+      const testDomain = 'test.domain'
+
+      const stdSignData = {
+        data: testData,
+        signer: testSigner,
+        domain: testDomain,
+        authenticatorData: testAuthData
+      }
 
       const mockResponse = {
         data: testData,
-        signer: new Uint8Array([1, 2, 3]),
-        domain: 'test.domain',
-        authenticatorData: new Uint8Array([4, 5, 6]),
+        signer: testSigner,
+        domain: testDomain,
+        authenticatorData: testAuthData,
         signature: new Uint8Array([7, 8, 9])
       }
 
       mockLuteConnect.signData.mockResolvedValue(mockResponse)
 
-      const result = await wallet.signData(testData, testMetadata)
+      const result = await wallet.signData(stdSignData, testMetadata)
 
-      expect(mockLuteConnect.signData).toHaveBeenCalledWith(testData, testMetadata)
+      expect(mockLuteConnect.signData).toHaveBeenCalledWith(stdSignData, testMetadata)
       expect(result).toEqual(mockResponse)
     })
 
@@ -397,8 +407,20 @@ describe('LuteAdapter', () => {
       const mockError = Object.assign(new Error('User Rejected Request'), { code: 4300 })
       mockLuteConnect.signData.mockRejectedValueOnce(mockError)
 
+      const testData = 'test-data'
+      const testAuthData = new Uint8Array([4, 5, 6])
+      const testSigner = new Uint8Array([1, 2, 3])
+      const testDomain = 'test.domain'
+
+      const stdSignData = {
+        data: testData,
+        signer: testSigner,
+        domain: testDomain,
+        authenticatorData: testAuthData
+      }
+
       await expect(
-        wallet.signData('test-data', {
+        wallet.signData(stdSignData, {
           scope: ScopeType.AUTH,
           encoding: 'base64'
         })
@@ -420,27 +442,34 @@ describe('LuteAdapter', () => {
         version: '1'
       }
 
-      const data = btoa(JSON.stringify(siwaRequest))
-      const metadata = { scope: ScopeType.AUTH, encoding: 'base64' }
-
       const testAuthData = new Uint8Array(32).fill(1)
       const testSigner = new Uint8Array(algosdk.Address.fromString(connectedAcct1).publicKey)
       const testSignature = new Uint8Array(64).fill(9)
+      const testDomain = 'test.domain'
+
+      const data = btoa(JSON.stringify(siwaRequest))
+      const stdSignData = {
+        data,
+        signer: testSigner,
+        domain: testDomain,
+        authenticatorData: testAuthData
+      }
+      const metadata = { scope: ScopeType.AUTH, encoding: 'base64' }
 
       const mockResponse = {
         data,
         signer: testSigner,
-        domain: 'test.domain',
+        domain: testDomain,
         authenticatorData: testAuthData,
         signature: testSignature
       }
 
       mockLuteConnect.signData.mockResolvedValue(mockResponse)
 
-      const response = await wallet.signData(data, metadata)
+      const response = await wallet.signData(stdSignData, metadata)
 
       expect(response).toEqual(mockResponse)
-      expect(mockLuteConnect.signData).toHaveBeenCalledWith(data, metadata)
+      expect(mockLuteConnect.signData).toHaveBeenCalledWith(stdSignData, metadata)
 
       expect(response.data).toBeDefined()
       expect(response.signer).toBeDefined()
