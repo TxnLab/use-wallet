@@ -87,14 +87,14 @@ const handleAuth = async () => {
       v-if="status === 'verified'"
       class="mt-4 rounded-lg bg-green-50 border border-green-200 p-3"
     >
-      <p class="text-sm font-medium text-green-800">✅ Authentication successful</p>
+      <p class="text-sm font-medium text-green-800">Authentication successful</p>
     </div>
 
     <div
       v-if="status === 'error' && error"
       class="mt-4 rounded-lg bg-red-50 border border-red-200 p-3"
     >
-      <p class="text-sm font-medium text-red-800">❌ Authentication failed</p>
+      <p class="text-sm font-medium text-red-800">Authentication failed</p>
       <p class="mt-1 text-xs text-red-600">{{ error }}</p>
     </div>
   </div>

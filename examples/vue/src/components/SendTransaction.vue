@@ -24,8 +24,7 @@ const handleSend = async () => {
       sender: activeAddress.value,
       receiver: activeAddress.value,
       amount: 0,
-      suggestedParams,
-      note: Buffer.from(crypto.getRandomValues(new Uint8Array(12)))
+      suggestedParams
     })
 
     const atc = new algosdk.AtomicTransactionComposer()

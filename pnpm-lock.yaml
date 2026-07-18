@@ -478,6 +478,9 @@ importers:
 
   examples/vanilla-ts:
     dependencies:
+      '@noble/ed25519':
+        specifier: ^3.1.0
+        version: 3.1.0
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../../packages/core
@@ -520,6 +523,9 @@ importers:
       algosdk:
         specifier: 3.5.2
         version: 3.5.2
+      canonify:
+        specifier: ^2.1.1
+        version: 2.1.1
     devDependencies:
       '@tailwindcss/vite':
         specifier: ^4.1.0
@@ -834,8 +840,8 @@ importers:
   packages/wallets/lute:
     dependencies:
       lute-connect:
-        specifier: file:lute-connect-2.0.0-beta.1.tgz
-        version: file:packages/wallets/lute/lute-connect-2.0.0-beta.1.tgz
+        specifier: 2.0.0-beta.1
+        version: 2.0.0-beta.1
     devDependencies:
       '@txnlab/use-wallet':
         specifier: workspace:*
@@ -6429,9 +6435,8 @@ packages:
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
 
-  lute-connect@file:packages/wallets/lute/lute-connect-2.0.0-beta.1.tgz:
-    resolution: {integrity: sha512-uKVoy1j8TZWYDUK7Qe/Ax4+kBhdncj4sz7JMN7zRz5A4El03RiOGvh865/1l51mdF4gH4vJN83DPkH/0aI8rGw==}
-    version: 2.0.0-beta.1
+  lute-connect@2.0.0-beta.1:
+    resolution: {integrity: sha512-enYR79nXFtB9SdJ4dvZjxLlnf/qPDr0qAfy/9rlFtHNhCO8I5D0/rDqD1UDJERyNFUmP1IXqJqjzQJ6EX5bkMA==}
 
   lz-string@1.5.0:
     resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
@@ -15514,7 +15519,7 @@ snapshots:
     dependencies:
       yallist: 3.1.1
 
-  lute-connect@file:packages/wallets/lute/lute-connect-2.0.0-beta.1.tgz: {}
+  lute-connect@2.0.0-beta.1: {}
 
   lz-string@1.5.0: {}
 
