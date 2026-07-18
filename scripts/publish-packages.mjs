@@ -59,13 +59,10 @@ for (const group of publishGroups) {
     console.log(`  Publishing ${pkg.name}@${pkg.version}...`)
 
     try {
-      execSync(
-        `pnpm publish --no-git-checks --access public --provenance --tag ${tag}`,
-        {
-          cwd: path.join(rootDir, dir),
-          stdio: 'pipe'
-        }
-      )
+      execSync(`pnpm publish --no-git-checks --access public --provenance --tag ${tag}`, {
+        cwd: path.join(rootDir, dir),
+        stdio: 'pipe'
+      })
       console.log(`  ✓ ${pkg.name} published successfully`)
     } catch (error) {
       const stderr = error.stderr?.toString() || ''
