@@ -2,6 +2,7 @@
 
 import { useWallet } from '@txnlab/use-wallet-react'
 import { AccountSwitcher } from './AccountSwitcher'
+import { Authenticate } from './Authenticate'
 import { SendTransaction } from './SendTransaction'
 
 export function ActiveWallet() {
@@ -52,6 +53,7 @@ export function ActiveWallet() {
       </div>
 
       <SendTransaction />
+      {activeWallet.canSignData && <Authenticate />}
     </div>
   )
 }

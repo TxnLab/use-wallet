@@ -29,6 +29,7 @@ export function SendTransaction() {
 
       const atc = new algosdk.AtomicTransactionComposer()
       atc.addTransaction({ txn, signer: transactionSigner })
+      await atc.gatherSignatures()
 
       setStatus('confirming')
       const result = await atc.execute(algodClient, 4)

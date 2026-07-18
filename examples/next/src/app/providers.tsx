@@ -18,13 +18,13 @@ const WC_PROJECT_ID = 'fcfde0713d43baa0d23be0773c80a72b'
 
 const wallets = [
   pera(),
+  lute(),
   defly(),
   deflyWeb(),
   exodus(),
   walletConnect({ projectId: WC_PROJECT_ID }),
   walletConnect({ projectId: WC_PROJECT_ID, skin: 'biatec' }),
   kibisis(),
-  lute(),
   w3wallet(),
   kmd(),
   mnemonic(),

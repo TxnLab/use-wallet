@@ -98,6 +98,9 @@ importers:
 
   examples/next:
     dependencies:
+      '@noble/ed25519':
+        specifier: ^3.1.0
+        version: 3.1.0
       '@txnlab/use-wallet-defly':
         specifier: workspace:*
         version: link:../../packages/wallets/defly
@@ -140,6 +143,9 @@ importers:
       algosdk:
         specifier: 3.5.2
         version: 3.5.2
+      canonify:
+        specifier: ^2.1.1
+        version: 2.1.1
       next:
         specifier: 16.1.6
         version: 16.1.6(@babel/core@7.29.0)(@playwright/test@1.58.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -171,6 +177,9 @@ importers:
 
   examples/nuxt:
     dependencies:
+      '@noble/ed25519':
+        specifier: ^3.1.0
+        version: 3.1.0
       '@txnlab/use-wallet-defly':
         specifier: workspace:*
         version: link:../../packages/wallets/defly
@@ -213,6 +222,9 @@ importers:
       algosdk:
         specifier: 3.5.2
         version: 3.5.2
+      canonify:
+        specifier: ^2.1.1
+        version: 2.1.1
       nuxt:
         specifier: ^3.21.0
         version: 3.21.0(@parcel/watcher@2.5.6)(@types/node@24.12.0)(@vue/compiler-sfc@3.5.27)(bufferutil@4.1.0)(cac@6.7.14)(db0@0.3.4)(eslint@9.39.3(jiti@2.6.1))(idb-keyval@6.2.2)(ioredis@5.9.2)(lightningcss@1.31.1)(magicast@0.5.1)(meow@13.2.0)(optionator@0.9.4)(rolldown@1.0.0-rc.7)(rollup@4.57.1)(terser@5.46.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(vite@7.3.1(@types/node@24.12.0)(jiti@2.6.1)(lightningcss@1.31.1)(terser@5.46.0)(yaml@2.8.2))(vue-tsc@3.2.5(typescript@5.9.3))(yaml@2.8.2)
@@ -235,6 +247,9 @@ importers:
 
   examples/react:
     dependencies:
+      '@noble/ed25519':
+        specifier: ^3.1.0
+        version: 3.1.0
       '@txnlab/use-wallet-defly':
         specifier: workspace:*
         version: link:../../packages/wallets/defly
@@ -277,6 +292,9 @@ importers:
       algosdk:
         specifier: 3.5.2
         version: 3.5.2
+      canonify:
+        specifier: ^2.1.1
+        version: 2.1.1
       react:
         specifier: ^19.2.0
         version: 19.2.4
@@ -332,6 +350,9 @@ importers:
 
   examples/solid:
     dependencies:
+      '@noble/ed25519':
+        specifier: ^3.1.0
+        version: 3.1.0
       '@txnlab/use-wallet-defly':
         specifier: workspace:*
         version: link:../../packages/wallets/defly
@@ -374,6 +395,9 @@ importers:
       algosdk:
         specifier: 3.5.2
         version: 3.5.2
+      canonify:
+        specifier: ^2.1.1
+        version: 2.1.1
       solid-js:
         specifier: ^1.9.10
         version: 1.9.11
@@ -402,6 +426,9 @@ importers:
 
   examples/svelte:
     dependencies:
+      '@noble/ed25519':
+        specifier: ^3.1.0
+        version: 3.1.0
       '@txnlab/use-wallet-defly':
         specifier: workspace:*
         version: link:../../packages/wallets/defly
@@ -444,6 +471,9 @@ importers:
       algosdk:
         specifier: 3.5.2
         version: 3.5.2
+      canonify:
+        specifier: ^2.1.1
+        version: 2.1.1
     devDependencies:
       '@sveltejs/adapter-static':
         specifier: ^3.0.0

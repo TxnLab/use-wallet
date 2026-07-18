@@ -29,6 +29,7 @@ const handleSend = async () => {
 
     const atc = new algosdk.AtomicTransactionComposer()
     atc.addTransaction({ txn, signer: transactionSigner })
+    await atc.gatherSignatures()
 
     status.value = 'confirming'
     const result = await atc.execute(algodClient.value, 4)

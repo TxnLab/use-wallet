@@ -52,5 +52,6 @@ const { activeWallet, activeAccount } = useWallet()
     </div>
 
     <SendTransaction />
+    <Authenticate v-if="activeWallet.canSignData" />
   </div>
 </template>
