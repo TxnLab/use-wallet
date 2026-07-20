@@ -76,13 +76,13 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.2.1
-        version: 1.2.1(algosdk@3.5.2)
+        version: 1.2.1(algosdk@3.6.0)
       '@noble/ed25519':
         specifier: 3.0.0
         version: 3.0.0
       '@perawallet/connect':
         specifier: ^1.4.1
-        version: 1.4.1(algosdk@3.5.2)
+        version: 1.4.1(algosdk@3.6.0)
       '@txnlab/use-wallet-react':
         specifier: workspace:*
         version: link:../../packages/use-wallet-react
@@ -105,8 +105,8 @@ importers:
         specifier: 9.5.0
         version: 9.5.0(@babel/runtime@7.28.6)
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       canonify:
         specifier: 2.1.1
         version: 2.1.1
@@ -149,13 +149,13 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.2.1
-        version: 1.2.1(algosdk@3.5.2)
+        version: 1.2.1(algosdk@3.6.0)
       '@noble/ed25519':
         specifier: 3.0.0
         version: 3.0.0
       '@perawallet/connect':
         specifier: ^1.4.1
-        version: 1.4.1(algosdk@3.5.2)
+        version: 1.4.1(algosdk@3.6.0)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../../packages/use-wallet
@@ -181,8 +181,8 @@ importers:
         specifier: 9.5.0
         version: 9.5.0(@babel/runtime@7.28.6)
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       buffer:
         specifier: 6.0.3
         version: 6.0.3
@@ -222,13 +222,13 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.2.1
-        version: 1.2.1(algosdk@3.5.2)
+        version: 1.2.1(algosdk@3.6.0)
       '@noble/ed25519':
         specifier: 3.0.0
         version: 3.0.0
       '@perawallet/connect':
         specifier: ^1.4.1
-        version: 1.4.1(algosdk@3.5.2)
+        version: 1.4.1(algosdk@3.6.0)
       '@txnlab/use-wallet-react':
         specifier: workspace:*
         version: link:../../packages/use-wallet-react
@@ -251,8 +251,8 @@ importers:
         specifier: 9.5.0
         version: 9.5.0(@babel/runtime@7.28.6)
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       canonify:
         specifier: 2.1.1
         version: 2.1.1
@@ -304,13 +304,13 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.2.1
-        version: 1.2.1(algosdk@3.5.2)
+        version: 1.2.1(algosdk@3.6.0)
       '@noble/ed25519':
         specifier: 3.0.0
         version: 3.0.0
       '@perawallet/connect':
         specifier: ^1.4.1
-        version: 1.4.1(algosdk@3.5.2)
+        version: 1.4.1(algosdk@3.6.0)
       '@txnlab/use-wallet-solid':
         specifier: workspace:*
         version: link:../../packages/use-wallet-solid
@@ -333,8 +333,8 @@ importers:
         specifier: 9.5.0
         version: 9.5.0(@babel/runtime@7.28.6)
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       canonify:
         specifier: 2.1.1
         version: 2.1.1
@@ -365,13 +365,13 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.2.1
-        version: 1.2.1(algosdk@3.5.2)
+        version: 1.2.1(algosdk@3.6.0)
       '@noble/ed25519':
         specifier: 3.0.0
         version: 3.0.0
       '@perawallet/connect':
         specifier: ^1.4.1
-        version: 1.4.1(algosdk@3.5.2)
+        version: 1.4.1(algosdk@3.6.0)
       '@txnlab/use-wallet-svelte':
         specifier: workspace:*
         version: link:../../packages/use-wallet-svelte
@@ -394,8 +394,8 @@ importers:
         specifier: 9.5.0
         version: 9.5.0(@babel/runtime@7.28.6)
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       canonify:
         specifier: 2.1.1
         version: 2.1.1
@@ -435,13 +435,13 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.2.1
-        version: 1.2.1(algosdk@3.5.2)
+        version: 1.2.1(algosdk@3.6.0)
       '@noble/ed25519':
         specifier: 3.0.0
         version: 3.0.0
       '@perawallet/connect':
         specifier: ^1.4.1
-        version: 1.4.1(algosdk@3.5.2)
+        version: 1.4.1(algosdk@3.6.0)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../../packages/use-wallet
@@ -464,8 +464,8 @@ importers:
         specifier: 9.5.0
         version: 9.5.0(@babel/runtime@7.28.6)
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       canonify:
         specifier: 2.1.1
         version: 2.1.1
@@ -493,13 +493,13 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.2.1
-        version: 1.2.1(algosdk@3.5.2)
+        version: 1.2.1(algosdk@3.6.0)
       '@noble/ed25519':
         specifier: 3.0.0
         version: 3.0.0
       '@perawallet/connect':
         specifier: ^1.4.1
-        version: 1.4.1(algosdk@3.5.2)
+        version: 1.4.1(algosdk@3.6.0)
       '@txnlab/use-wallet-vue':
         specifier: workspace:*
         version: link:../../packages/use-wallet-vue
@@ -522,8 +522,8 @@ importers:
         specifier: 9.5.0
         version: 9.5.0(@babel/runtime@7.28.6)
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       canonify:
         specifier: 2.1.1
         version: 2.1.1
@@ -564,7 +564,7 @@ importers:
         version: 1.7.0
       '@blockshake/defly-connect':
         specifier: 1.2.1
-        version: 1.2.1(algosdk@3.5.2)
+        version: 1.2.1(algosdk@3.6.0)
       '@magic-ext/algorand':
         specifier: 24.4.2
         version: 24.4.2
@@ -573,7 +573,7 @@ importers:
         version: 29.5.0(localforage@1.10.0)
       '@perawallet/connect':
         specifier: 1.4.1
-        version: 1.4.1(algosdk@3.5.2)
+        version: 1.4.1(algosdk@3.6.0)
       '@types/node':
         specifier: 20.11.30
         version: 20.11.30
@@ -602,8 +602,8 @@ importers:
         specifier: 9.5.0
         version: 9.5.0(@babel/runtime@7.28.6)
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       canonify:
         specifier: 2.1.1
         version: 2.1.1
@@ -627,13 +627,13 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.2.1
-        version: 1.2.1(algosdk@3.5.2)
+        version: 1.2.1(algosdk@3.6.0)
       '@magic-ext/algorand':
         specifier: ^24.4.2
         version: 24.4.2
       '@perawallet/connect':
         specifier: ^1.4.1
-        version: 1.4.1(algosdk@3.5.2)
+        version: 1.4.1(algosdk@3.6.0)
       '@tanstack/react-store':
         specifier: 0.8.0
         version: 0.8.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -657,8 +657,8 @@ importers:
         specifier: 18.3.27
         version: 18.3.27
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       jsdom:
         specifier: 26.1.0
         version: 26.1.0
@@ -679,13 +679,13 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.2.1
-        version: 1.2.1(algosdk@3.5.2)
+        version: 1.2.1(algosdk@3.6.0)
       '@magic-ext/algorand':
         specifier: ^24.4.2
         version: 24.4.2
       '@perawallet/connect':
         specifier: ^1.4.1
-        version: 1.4.1(algosdk@3.5.2)
+        version: 1.4.1(algosdk@3.6.0)
       '@tanstack/solid-store':
         specifier: 0.8.0
         version: 0.8.0(solid-js@1.9.11)
@@ -709,8 +709,8 @@ importers:
         specifier: 0.8.10
         version: 0.8.10(solid-js@1.9.11)
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       solid-js:
         specifier: 1.9.11
         version: 1.9.11
@@ -728,13 +728,13 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.2.1
-        version: 1.2.1(algosdk@3.5.2)
+        version: 1.2.1(algosdk@3.6.0)
       '@magic-ext/algorand':
         specifier: ^24.4.2
         version: 24.4.2
       '@perawallet/connect':
         specifier: ^1.4.1
-        version: 1.4.1(algosdk@3.5.2)
+        version: 1.4.1(algosdk@3.6.0)
       '@tanstack/svelte-store':
         specifier: 0.9.0
         version: 0.9.0(svelte@5.49.1)
@@ -758,8 +758,8 @@ importers:
         specifier: 5.3.1
         version: 5.3.1(svelte@5.49.1)(vite@7.3.1(@types/node@20.11.30)(jiti@2.6.1)(terser@5.46.0)(yaml@2.8.2))(vitest@3.2.4(@types/node@20.11.30)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.46.0)(yaml@2.8.2))
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       svelte:
         specifier: 5.49.1
         version: 5.49.1
@@ -774,13 +774,13 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: ^1.2.1
-        version: 1.2.1(algosdk@3.5.2)
+        version: 1.2.1(algosdk@3.6.0)
       '@magic-ext/algorand':
         specifier: ^24.4.2
         version: 24.4.2
       '@perawallet/connect':
         specifier: ^1.4.1
-        version: 1.4.1(algosdk@3.5.2)
+        version: 1.4.1(algosdk@3.6.0)
       '@tanstack/vue-store':
         specifier: 0.8.0
         version: 0.8.0(vue@3.5.27(typescript@5.9.3))
@@ -801,8 +801,8 @@ importers:
         version: 29.4.2
     devDependencies:
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       tsup:
         specifier: 8.5.1
         version: 8.5.1(jiti@2.6.1)(postcss@8.5.6)(typescript@5.9.3)(yaml@2.8.2)
@@ -2800,6 +2800,7 @@ packages:
 
   '@ungap/structured-clone@1.3.0':
     resolution: {integrity: sha512-WmoN8qaIAo7WTYWbAZuG8PYEhn5fkz7dZrqTBZ7dtt//lL2Gwms1IcnQ5yHqjDfX8Ft5j4YzDM23f87zBfDe9g==}
+    deprecated: Potential CWE-502 - Update to 1.3.1 or higher
 
   '@unhead/vue@2.1.2':
     resolution: {integrity: sha512-w5yxH/fkkLWAFAOnMSIbvAikNHYn6pgC7zGF/BasXf+K3CO1cYIPFehYAk5jpcsbiNPMc3goyyw1prGLoyD14g==}
@@ -3287,8 +3288,8 @@ packages:
     resolution: {integrity: sha512-08k7pBQnkaUB5p+jL7f1TRaUIlTSDE0cesFu1mD7llLao+1cAhtvvZmGE3OnisTd0xOn118QMw74SRqddqaYvw==}
     engines: {node: '>= 14'}
 
-  algosdk@3.5.2:
-    resolution: {integrity: sha512-frhGtZl1JvfrLRKmMvUm880wj4OiWsWo2FhbreNWh7pdFsKuWPj60fV682wt/CYefLI70iwHavPOwGBkTVt0VA==}
+  algosdk@3.6.0:
+    resolution: {integrity: sha512-pdM0neCgR3DasvpSPfgQKc5/hlhkSYmXjcUChePLGegA0kqA0AoLmcfMDyeREcsvHcu7rrv3Wa+RZnGa5kINwQ==}
     engines: {node: '>=18.0.0'}
 
   alien-signals@1.0.13:
@@ -6637,6 +6638,7 @@ packages:
   tar@7.5.7:
     resolution: {integrity: sha512-fov56fJiRuThVFXD6o6/Q354S7pnWMJIVlDBYijsTNx6jKSE4pvrDTs6lUnmGvNyfJwFQQwWy3owKz1ucIhveQ==}
     engines: {node: '>=18'}
+    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   terser@5.46.0:
     resolution: {integrity: sha512-jTwoImyr/QbOWFFso3YoU3ik0jBBDJ6JTOQiy/J2YxVJdZCc+5u7skhNwiOR3FQIygFqVUPHl7qbbxtjW2K3Qg==}
@@ -6880,6 +6882,7 @@ packages:
 
   unplugin-vue-router@0.19.2:
     resolution: {integrity: sha512-u5dgLBarxE5cyDK/hzJGfpCTLIAyiTXGlo85COuD4Nssj6G7NxS+i9mhCWz/1p/ud1eMwdcUbTXehQe41jYZUA==}
+    deprecated: 'Merged into vuejs/router. Migrate: https://router.vuejs.org/guide/migration/v4-to-v5.html'
     peerDependencies:
       '@vue/compiler-sfc': ^3.5.17
       vue-router: ^4.6.0
@@ -7001,6 +7004,7 @@ packages:
 
   uuid@9.0.1:
     resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   valtio@1.11.2:
@@ -7693,12 +7697,12 @@ snapshots:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.28.5
 
-  '@blockshake/defly-connect@1.2.1(algosdk@3.5.2)':
+  '@blockshake/defly-connect@1.2.1(algosdk@3.6.0)':
     dependencies:
       '@likecoin/qr-code-styling': 1.6.6
       '@walletconnect/client': 1.8.0
       '@walletconnect/types': 1.8.0
-      algosdk: 3.5.2
+      algosdk: 3.6.0
       bowser: 2.11.0
       buffer: 6.0.3
       lottie-web: 5.13.0
@@ -8756,12 +8760,12 @@ snapshots:
       '@parcel/watcher-win32-ia32': 2.5.6
       '@parcel/watcher-win32-x64': 2.5.6
 
-  '@perawallet/connect@1.4.1(algosdk@3.5.2)':
+  '@perawallet/connect@1.4.1(algosdk@3.6.0)':
     dependencies:
       '@evanhahn/lottie-web-light': 5.8.1
       '@walletconnect/client': 1.8.0
       '@walletconnect/types': 1.8.0
-      algosdk: 3.5.2
+      algosdk: 3.6.0
       bowser: 2.11.0
       buffer: 6.0.3
       qr-code-styling: 1.6.0-rc.1
@@ -10298,7 +10302,7 @@ snapshots:
 
   algorand-msgpack@1.1.0: {}
 
-  algosdk@3.5.2:
+  algosdk@3.6.0:
     dependencies:
       algorand-msgpack: 1.1.0
       hi-base32: 0.5.1
@@ -11402,7 +11406,7 @@ snapshots:
       '@typescript-eslint/parser': 8.54.0(eslint@8.57.1)(typescript@5.9.3)
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@8.57.1)
+      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.54.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1))(eslint@8.57.1)
       eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.54.0(eslint@8.57.1)(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1)
       eslint-plugin-jsx-a11y: 6.10.2(eslint@8.57.1)
       eslint-plugin-react: 7.37.5(eslint@8.57.1)
@@ -11426,7 +11430,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0)(eslint@8.57.1):
+  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.54.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1))(eslint@8.57.1):
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
       debug: 4.4.3
@@ -11441,14 +11445,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.1(@typescript-eslint/parser@8.54.0(eslint@8.57.1)(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1):
+  eslint-module-utils@2.12.1(@typescript-eslint/parser@8.54.0(eslint@8.57.1)(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.54.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
       '@typescript-eslint/parser': 8.54.0(eslint@8.57.1)(typescript@5.9.3)
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@8.57.1)
+      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.54.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1))(eslint@8.57.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -11463,7 +11467,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.54.0(eslint@8.57.1)(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1)
+      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.54.0(eslint@8.57.1)(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.54.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
