@@ -926,8 +926,8 @@ importers:
   packages/wallets/pera:
     dependencies:
       '@perawallet/connect':
-        specifier: 1.4.1
-        version: 1.4.1(algosdk@3.5.2)(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+        specifier: 1.6.0-beta.5
+        version: 1.6.0-beta.5(algosdk@3.5.2)
     devDependencies:
       '@txnlab/use-wallet':
         specifier: workspace:*
@@ -2102,6 +2102,10 @@ packages:
     resolution: {integrity: sha512-2I0gnIVPtfnMw9ee9h1dJG7tp81+8Ob3OJb3Mv37rx5L40/b0i7djjCVvGOVqc9AEIQyvyu1i6ypKdFw8R8gQw==}
     engines: {node: ^14.21.3 || >=16}
 
+  '@noble/ciphers@2.2.0':
+    resolution: {integrity: sha512-Z6pjIZ/8IJcCGzb2S/0Px5J81yij85xASuk1teLNeg75bfT07MV3a/O2Mtn1I2se43k3lkVEcFaR10N4cgQcZA==}
+    engines: {node: '>= 20.19.0'}
+
   '@noble/curves@1.2.0':
     resolution: {integrity: sha512-oYclrNgRaM9SsBUBVbb8M6DTV7ZHRTKugureoYEncY5c65HOmRzvSiTE3y5CYaPYJA/GVkrhXEoF0M3Ya9PMnw==}
 
@@ -2773,10 +2777,14 @@ packages:
     resolution: {integrity: sha512-IHnV6A+zxU7XwmKFinmYjUcwlyK9+xkG3/s9KcQhI9BjQKycrJ1JRO+FbNYPwZiPKW3je/DR0k7w8/gLa5eaxQ==}
     deprecated: 'The package is now available as "qr": npm install qr'
 
-  '@perawallet/connect@1.4.1':
-    resolution: {integrity: sha512-yXfpQ2SzblOBp0P2Xsneq4f0d1YsSuYrdpw2fSwivlTbc5a40hQfYiJMql+b3UdfSID/wcaPl9Vkb5cMSBxNwQ==}
+  '@perawallet/connect@1.6.0-beta.5':
+    resolution: {integrity: sha512-vZcWNaiCjIhpulzBXVMW7zqGz0vEogFZRzixqrG0TSyihH7l08CDBVCRWI0vU3RkqbQ8PXncbvX7YabvemASog==}
     peerDependencies:
-      algosdk: ^3.0.0
+      algosdk: ^3.5.2
+
+  '@perawallet/walletconnect@1.0.0':
+    resolution: {integrity: sha512-y7nSd2OEyX9eLMtuZH3RXC083OQ6QY7Q90MN5WguuueShiiuuHu7Ow2ofRtD+y2Ts/FQDttqPTkD4LyKGwwk3Q==}
+    engines: {node: '>=22'}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -8376,6 +8384,9 @@ packages:
     resolution: {integrity: sha512-1h/Lnq9yajKY2PEbBadPXj3VxsDDu844OnaAo52UVmIzIvwwtBPIuNvkjuzBlTWpfJyUbG3ez0KSBibQkj4ojg==}
     engines: {node: '>=0.6.11 <=0.7.0 || >=0.7.3'}
 
+  tweetnacl-ts@1.0.3:
+    resolution: {integrity: sha512-C5I/dWf6xjAXaCDlf84T4HvozU/8ycAlq5WRllF1hAeeq5390tfXD+bNas5bhEV0HMSOx8bsQYpLjPl8wfnEeQ==}
+
   tweetnacl@1.0.3:
     resolution: {integrity: sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==}
 
@@ -10260,6 +10271,8 @@ snapshots:
 
   '@noble/ciphers@1.3.0': {}
 
+  '@noble/ciphers@2.2.0': {}
+
   '@noble/curves@1.2.0':
     dependencies:
       '@noble/hashes': 1.3.2
@@ -10938,18 +10951,21 @@ snapshots:
 
   '@paulmillr/qr@0.2.1': {}
 
-  '@perawallet/connect@1.4.1(algosdk@3.5.2)(bufferutil@4.1.0)(utf-8-validate@5.0.10)':
+  '@perawallet/connect@1.6.0-beta.5(algosdk@3.5.2)':
     dependencies:
       '@evanhahn/lottie-web-light': 5.8.1
-      '@walletconnect/client': 1.8.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
-      '@walletconnect/types': 1.8.0
+      '@perawallet/walletconnect': 1.0.0
       algosdk: 3.5.2
       bowser: 2.11.0
       buffer: 6.0.3
       qr-code-styling: 1.6.0-rc.1
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
+      tslib: 2.8.1
+      tweetnacl-ts: 1.0.3
+
+  '@perawallet/walletconnect@1.0.0':
+    dependencies:
+      '@noble/ciphers': 2.2.0
+      '@noble/hashes': 2.0.1
 
   '@pkgjs/parseargs@0.11.0':
     optional: true
@@ -17790,6 +17806,10 @@ snapshots:
   tty-browserify@0.0.1: {}
 
   tunnel@0.0.6: {}
+
+  tweetnacl-ts@1.0.3:
+    dependencies:
+      tslib: 1.14.1
 
   tweetnacl@1.0.3: {}
 

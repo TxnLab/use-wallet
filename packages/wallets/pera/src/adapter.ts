@@ -5,6 +5,9 @@ import {
   flattenTxnGroup,
   isSignedTxn,
   isTransactionArray,
+  StdSignData,
+  StdSignDataResponse,
+  StdSignMetadata,
   type AdapterConstructorParams,
   type SignerTransaction,
   type WalletAccount,
@@ -285,6 +288,28 @@ export class PeraAdapter extends BaseWallet<PeraOptions> {
       return result
     } catch (error: any) {
       this.logger.error('Error signing transactions:', error.message)
+      throw error
+    }
+  }
+
+  public canSignData = true
+
+  public signData = async (
+    data: StdSignData,
+    metadata: StdSignMetadata
+  ): Promise<StdSignDataResponse> => {
+    try {
+      this.logger.debug('Signing data...', { data, metadata })
+
+      const client = this.client || (await this.initializeClient())
+
+      // Sign data
+      const signDataResult = await client.signArc60Data(data, metadata)
+
+      this.logger.debug('Data signed successfully', signDataResult)
+      return signDataResult
+    } catch (error: any) {
+      this.logger.error('Error signing data:', error.message)
       throw error
     }
   }
