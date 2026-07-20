@@ -3,6 +3,7 @@ import {
   BaseWallet,
   SignDataError,
   SignTxnsError,
+  StdSignData,
   byteArrayToBase64,
   flattenTxnGroup,
   isSignedTxn,
@@ -34,7 +35,6 @@ function isSignDataError(error: any): error is ISignDataError {
 }
 
 import { icon } from './icon'
-import { StdSignData } from '@txnlab/use-wallet'
 
 const ICON = `data:image/svg+xml;base64,${btoa(icon)}`
 
