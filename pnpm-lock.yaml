@@ -926,8 +926,8 @@ importers:
   packages/wallets/pera:
     dependencies:
       '@perawallet/connect':
-        specifier: 1.6.0-beta.5
-        version: 1.6.0-beta.5(algosdk@3.5.2)
+        specifier: 1.6.0-beta.6
+        version: 1.6.0-beta.6(algosdk@3.5.2)
     devDependencies:
       '@txnlab/use-wallet':
         specifier: workspace:*
@@ -2777,8 +2777,8 @@ packages:
     resolution: {integrity: sha512-IHnV6A+zxU7XwmKFinmYjUcwlyK9+xkG3/s9KcQhI9BjQKycrJ1JRO+FbNYPwZiPKW3je/DR0k7w8/gLa5eaxQ==}
     deprecated: 'The package is now available as "qr": npm install qr'
 
-  '@perawallet/connect@1.6.0-beta.5':
-    resolution: {integrity: sha512-vZcWNaiCjIhpulzBXVMW7zqGz0vEogFZRzixqrG0TSyihH7l08CDBVCRWI0vU3RkqbQ8PXncbvX7YabvemASog==}
+  '@perawallet/connect@1.6.0-beta.6':
+    resolution: {integrity: sha512-/7Oy2WKZP3mKj4ymHDO8VrGgq+s6ZWdXvudeRMRillfjdRRORAb8DoeEJUTeHq54ALTOlounx3dHgiZKckKAbg==}
     peerDependencies:
       algosdk: ^3.5.2
 
@@ -10951,7 +10951,7 @@ snapshots:
 
   '@paulmillr/qr@0.2.1': {}
 
-  '@perawallet/connect@1.6.0-beta.5(algosdk@3.5.2)':
+  '@perawallet/connect@1.6.0-beta.6(algosdk@3.5.2)':
     dependencies:
       '@evanhahn/lottie-web-light': 5.8.1
       '@perawallet/walletconnect': 1.0.0
