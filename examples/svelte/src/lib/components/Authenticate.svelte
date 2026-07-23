@@ -6,7 +6,7 @@
     useNetwork,
     useWallet,
     type Siwa,
-    type StdSignData,
+    type StdSignData
   } from '@txnlab/use-wallet-svelte'
   import { Address } from 'algosdk'
   import { canonify } from 'canonify'
@@ -43,7 +43,7 @@
         type: 'ed25519',
         uri: location.origin,
         version: '1',
-        'issued-at': new Date().toISOString(),
+        'issued-at': new Date().toISOString()
       }
       const dataString = canonify(siwaRequest)
       if (!dataString) throw Error('Invalid JSON')
@@ -51,14 +51,14 @@
       const enc = new TextEncoder()
       const authenticatorData = await sha256(enc.encode(domain))
       const signer = acctInfo.authAddr?.publicKey ?? Address.fromString(address).publicKey
-      const sdtSignData: StdSignData = {
+      const stdSignData: StdSignData = {
         data,
         signer,
         domain,
-        authenticatorData,
+        authenticatorData
       }
       const metadata = { scope: ScopeType.AUTH, encoding: 'base64' }
-      const resp = await signData(sdtSignData, metadata)
+      const resp = await signData(stdSignData, metadata)
       // verify signature
       const clientDataJsonHash = await sha256(enc.encode(dataString))
       const authenticatorDataHash = await sha256(authenticatorData)

@@ -47,14 +47,14 @@ const handleAuth = async () => {
     const enc = new TextEncoder()
     const authenticatorData = await sha256(enc.encode(domain))
     const signer = acctInfo.authAddr?.publicKey ?? Address.fromString(activeAddress.value).publicKey
-    const sdtSignData: StdSignData = {
+    const stdSignData: StdSignData = {
       data,
       signer,
       domain,
       authenticatorData
     }
     const metadata = { scope: ScopeType.AUTH, encoding: 'base64' }
-    const resp = await signData(sdtSignData, metadata)
+    const resp = await signData(stdSignData, metadata)
     // verify signature
     const clientDataJsonHash = await sha256(enc.encode(dataString))
     const authenticatorDataHash = await sha256(authenticatorData)
