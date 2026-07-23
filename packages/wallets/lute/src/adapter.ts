@@ -20,7 +20,7 @@ import {
   SignDataError as ISignDataError,
   type SignTxnsError as ISignTxnsError,
   type WalletTransaction
-} from 'lute-connect/dist/types'
+} from 'lute-connect'
 
 export interface LuteConnectOptions {
   siteName?: string
