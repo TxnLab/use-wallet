@@ -1,4 +1,11 @@
-import { WalletManager, type BaseWallet } from '@txnlab/use-wallet'
+import * as ed from '@noble/ed25519'
+import {
+  ScopeType,
+  SignDataError,
+  WalletManager,
+  type BaseWallet,
+  type Siwa
+} from '@txnlab/use-wallet'
 import { defly } from '@txnlab/use-wallet-defly'
 import { deflyWeb } from '@txnlab/use-wallet-defly-web'
 import { exodus } from '@txnlab/use-wallet-exodus'
@@ -11,7 +18,8 @@ import { pera } from '@txnlab/use-wallet-pera'
 import { w3wallet } from '@txnlab/use-wallet-w3wallet'
 import { walletConnect } from '@txnlab/use-wallet-walletconnect'
 import { web3auth } from '@txnlab/use-wallet-web3auth'
-import algosdk from 'algosdk'
+import algosdk, { Address } from 'algosdk'
+import { canonify } from 'canonify'
 import './style.css'
 
 const WC_PROJECT_ID = 'fcfde0713d43baa0d23be0773c80a72b'
@@ -19,13 +27,13 @@ const MAGIC_ID = 'magic'
 
 const wallets = [
   pera(),
+  lute(),
   defly(),
   deflyWeb(),
   exodus(),
   walletConnect({ projectId: WC_PROJECT_ID }),
   walletConnect({ projectId: WC_PROJECT_ID, skin: 'biatec' }),
   kibisis(),
-  lute(),
   w3wallet(),
   kmd(),
   mnemonic(),
@@ -43,8 +51,10 @@ const manager = new WalletManager({
 let connectingId: string | null = null
 let magicEmail = ''
 let txnStatus: 'idle' | 'signing' | 'confirming' | 'confirmed' | 'error' = 'idle'
+let authStatus: 'idle' | 'signing' | 'verified' | 'error' = 'idle'
 let txId: string | null = null
 let txnError: string | null = null
+let authError: string | null = null
 
 function getState() {
   return manager.store.state
@@ -176,13 +186,41 @@ function renderActiveWallet() {
       </div>`
   }
 
-  const btnLabel =
+  let authStatusHtml = ''
+  if (authStatus === 'verified') {
+    authStatusHtml = `
+      <div class="mt-4 rounded-lg bg-green-50 border border-green-200 p-3">
+        <p class="text-sm font-medium text-green-800">Authentication successful</p>
+      </div>`
+  } else if (authStatus === 'error' && authError) {
+    authStatusHtml = `
+      <div class="mt-4 rounded-lg bg-red-50 border border-red-200 p-3">
+        <p class="text-sm font-medium text-red-800">Authentication failed</p>
+        <p class="mt-1 text-xs text-red-600">${escapeHtml(authError)}</p>
+      </div>`
+  }
+
+  const authBtnLabel = authStatus === 'signing' ? 'Signing...' : 'Authenticate'
+  const authBtnDisabled = authStatus === 'signing'
+
+  let authHtml = ''
+  if (getWalletByKey(state.activeWallet)?.canSignData) {
+    authHtml = `
+      <div class="rounded-2xl border border-gray-200 bg-white p-6">
+        <h3 class="text-sm font-semibold text-gray-900 mb-4">Authenticate</h3>
+        <p class="text-sm text-gray-500 mb-4">Sign data to prove account ownership.</p>
+        <button data-auth ${authBtnDisabled ? 'disabled' : ''} class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors">${authBtnLabel}</button>
+        ${authStatusHtml}
+      </div>`
+  }
+
+  const txnBtnLabel =
     txnStatus === 'signing'
       ? 'Signing...'
       : txnStatus === 'confirming'
         ? 'Confirming...'
         : 'Send 0 ALGO'
-  const btnDisabled = txnStatus === 'signing' || txnStatus === 'confirming'
+  const txnBtnDisabled = txnStatus === 'signing' || txnStatus === 'confirming'
 
   return `
     <div class="space-y-6">
@@ -209,9 +247,11 @@ function renderActiveWallet() {
       <div class="rounded-2xl border border-gray-200 bg-white p-6">
         <h3 class="text-sm font-semibold text-gray-900 mb-4">Send Transaction</h3>
         <p class="text-sm text-gray-500 mb-4">Send a 0 ALGO payment to yourself as a test transaction.</p>
-        <button data-send-txn ${btnDisabled ? 'disabled' : ''} class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors">${btnLabel}</button>
+        <button data-send-txn ${txnBtnDisabled ? 'disabled' : ''} class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors">${txnBtnLabel}</button>
         ${txnStatusHtml}
       </div>
+
+        ${authHtml}
     </div>`
 }
 
@@ -322,6 +362,12 @@ function attachEventListeners() {
   if (sendBtn) {
     sendBtn.addEventListener('click', handleSendTransaction)
   }
+
+  // Authenticate
+  const authBtn = document.querySelector<HTMLButtonElement>('[data-auth]')
+  if (authBtn) {
+    authBtn.addEventListener('click', handleAuth)
+  }
 }
 
 async function handleSendTransaction() {
@@ -355,6 +401,7 @@ async function handleSendTransaction() {
       signer: (txnGroup: algosdk.Transaction[], indexesToSign: number[]) =>
         wallet.transactionSigner(txnGroup, indexesToSign)
     })
+    await atc.gatherSignatures()
 
     txnStatus = 'confirming'
     render()
@@ -365,6 +412,67 @@ async function handleSendTransaction() {
   } catch (err) {
     txnError = err instanceof Error ? err.message : 'Transaction failed'
     txnStatus = 'error'
+  }
+  render()
+}
+
+async function sha256(data: BufferSource) {
+  const buf = await crypto.subtle.digest('SHA-256', data)
+  return new Uint8Array(buf)
+}
+
+async function handleAuth() {
+  const state = getState()
+  if (!state.activeWallet) return
+
+  const wallet = getWalletByKey(state.activeWallet)
+  if (!wallet) return
+
+  const activeAccount = state.wallets[wallet.walletKey]?.activeAccount
+  if (!activeAccount) return
+
+  const activeNetworkConfig = state.networkConfig[state.activeNetwork]
+  if (!activeNetworkConfig) return
+
+  const algodClient = state.algodClient
+  if (!algodClient) return
+
+  try {
+    authStatus = 'signing'
+    render()
+
+    const siwaRequest: Siwa = {
+      domain: location.host,
+      chain_id: activeNetworkConfig.caipChainId || 'algorand:localnet',
+      account_address: activeAccount.address,
+      type: 'ed25519',
+      uri: location.origin,
+      version: '1',
+      'issued-at': new Date().toISOString()
+    }
+
+    const dataString = canonify(siwaRequest)
+    if (!dataString) throw Error('Invalid JSON')
+    const data = btoa(dataString)
+    const metadata = { scope: ScopeType.AUTH, encoding: 'base64' }
+    const resp = await wallet.signData(data, metadata)
+
+    // verify signature
+    const acctInfo = await algodClient.accountInformation(activeAccount.address).do()
+    const signer =
+      acctInfo.authAddr?.publicKey ?? Address.fromString(activeAccount.address).publicKey
+    const enc = new TextEncoder()
+    const clientDataJsonHash = await sha256(enc.encode(dataString))
+    const authenticatorDataHash = await sha256(new Uint8Array(resp.authenticatorData))
+    const toSign = new Uint8Array([...clientDataJsonHash, ...authenticatorDataHash])
+    if (!(await ed.verifyAsync(resp.signature, toSign, signer))) {
+      throw new SignDataError('Verification Failed', 4300)
+    }
+
+    authStatus = 'verified'
+  } catch (err) {
+    authError = err instanceof Error ? err.message : 'Verification failed'
+    authStatus = 'error'
   }
   render()
 }

@@ -26,11 +26,12 @@
         sender: address,
         receiver: address,
         amount: 0,
-        suggestedParams,
+        suggestedParams
       })
 
       const atc = new algosdk.AtomicTransactionComposer()
       atc.addTransaction({ txn, signer: transactionSigner })
+      await atc.gatherSignatures()
 
       status = 'confirming'
       const result = await atc.execute(client, 4)
@@ -46,9 +47,7 @@
 
 <div class="rounded-2xl border border-gray-200 bg-white p-6">
   <h3 class="text-sm font-semibold text-gray-900 mb-4">Send Transaction</h3>
-  <p class="text-sm text-gray-500 mb-4">
-    Send a 0 ALGO payment to yourself as a test transaction.
-  </p>
+  <p class="text-sm text-gray-500 mb-4">Send a 0 ALGO payment to yourself as a test transaction.</p>
 
   <button
     onclick={handleSend}

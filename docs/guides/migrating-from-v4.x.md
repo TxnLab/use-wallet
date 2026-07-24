@@ -299,6 +299,18 @@ const id: string = 'pera' // valid
 
 `WalletKey` was a union type of `WalletId | \`${WalletId.WALLETCONNECT}:${string}\``. In v5, it is simply `string`.
 
+#### Data Signing Types
+
+The ARC-60 data signing types have been renamed with a `Std` prefix to match the ARC-60 specification:
+
+* `SignData` → `StdSignData`
+* `SignDataResponse` → `StdSignDataResponse`
+* `SignMetadata` → `StdSignMetadata`
+
+The `Siwa` request type's `chain_id` field has also changed. In v4 it was the hardcoded literal `'283'`; in v5 it is a `string` that should be set to the [CAIP-2](https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-2.md) chain identifier of the active network, available from `activeNetworkConfig.caipChainId` (e.g. `algorand:wGHE2Pwdvd7S12BL5FaOP20EGYesN73k` for MainNet).
+
+The `signData(data: string, metadata)` call signature is unchanged. Under the hood, the wallet adapter now constructs the ARC-60 `StdSignData` envelope itself before sending it to the wallet, resolving the signer public key via algod so that rekeyed accounts sign with their auth address. Adapter authors can reuse this logic through the protected `createStdSignData()` method on `BaseWallet`. See the [Signing Data guide](signing-data.md) for a full example.
+
 #### Removed Types
 
 The following types have been removed in v5:

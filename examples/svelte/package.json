@@ -11,6 +11,7 @@
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json"
   },
   "dependencies": {
+    "@noble/ed25519": "^3.1.0",
     "@txnlab/use-wallet-defly": "workspace:*",
     "@txnlab/use-wallet-defly-web": "workspace:*",
     "@txnlab/use-wallet-exodus": "workspace:*",
@@ -24,7 +25,8 @@
     "@txnlab/use-wallet-w3wallet": "workspace:*",
     "@txnlab/use-wallet-walletconnect": "workspace:*",
     "@txnlab/use-wallet-web3auth": "workspace:*",
-    "algosdk": "3.5.2"
+    "algosdk": "3.5.2",
+    "canonify": "^2.1.1"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^3.0.0",

@@ -53,14 +53,17 @@ pnpm example:ts           # Vanilla TypeScript example
 All 17 publishable packages use lockstep versioning — every package shares the same version number.
 
 **Core** (`packages/core`):
+
 - `@txnlab/use-wallet` — Core framework-agnostic library
 
 **Wallet Adapters** (`packages/wallets/<name>`):
+
 - `@txnlab/use-wallet-pera`, `-defly`, `-defly-web`, `-exodus`, `-walletconnect`, `-kibisis`, `-lute`, `-w3wallet`, `-kmd`, `-mnemonic`, `-magic`, `-web3auth`
 - Each is a separate npm package with the wallet SDK as a peer dependency
 - Depends on `@txnlab/use-wallet` via `workspace:*`
 
 **Framework Adapters** (`packages/frameworks/<name>`):
+
 - `@txnlab/use-wallet-react`, `-vue`, `-solid`, `-svelte`
 - Depends on `@txnlab/use-wallet` via `workspace:*`
 - Re-exports all core types and classes
@@ -68,12 +71,14 @@ All 17 publishable packages use lockstep versioning — every package shares the
 ### Core Package Architecture
 
 **State Management**: Uses `@tanstack/store` for reactive state. State includes:
+
 - `wallets`: Map of wallet IDs to their connection state (accounts, active account)
 - `activeWallet`: Currently active wallet ID
 - `activeNetwork`: Current network (mainnet, testnet, etc.)
 - `algodClient`: Algorand SDK client instance
 
 **Key Classes**:
+
 - `WalletManager` (`src/manager.ts`): Orchestrates wallet initialization, network configuration, and state persistence. Entry point for configuring the library.
 - `BaseWallet` (`src/wallets/base.ts`): Abstract base class all wallet implementations extend. Defines the wallet interface: `connect()`, `disconnect()`, `resumeSession()`, `signTransactions()`.
 
@@ -88,6 +93,7 @@ All 17 publishable packages use lockstep versioning — every package shares the
 ### Framework Adapter Pattern
 
 Each adapter provides:
+
 1. A context provider component (e.g., `WalletProvider` in React)
 2. Hooks/composables that subscribe to store state and provide reactive wallet data
 3. Re-exports of all core types and classes
@@ -98,12 +104,12 @@ This project uses **semantic-release** for automated versioning and publishing. 
 
 ### Commit types that trigger a release
 
-| Type | Bump | Example |
-|------|------|---------|
-| `feat` | minor | `feat(core): add multi-account support` |
-| `fix` | patch | `fix(pera): handle session timeout` |
-| `perf` | patch | `perf(store): reduce state update overhead` |
-| `refactor` | patch | `refactor(wallets): simplify base class` |
+| Type       | Bump  | Example                                     |
+| ---------- | ----- | ------------------------------------------- |
+| `feat`     | minor | `feat(core): add multi-account support`     |
+| `fix`      | patch | `fix(pera): handle session timeout`         |
+| `perf`     | patch | `perf(store): reduce state update overhead` |
+| `refactor` | patch | `refactor(wallets): simplify base class`    |
 
 ### Commit types that DO NOT trigger a release
 

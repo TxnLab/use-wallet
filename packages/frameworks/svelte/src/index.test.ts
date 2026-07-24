@@ -4,7 +4,7 @@ import {
   NetworkId,
   WalletManager,
   type WalletAccount,
-  type SignDataResponse,
+  type StdSignDataResponse,
   type WalletAdapterConfig,
   type AdapterConstructorParams,
   ScopeType,
@@ -64,7 +64,7 @@ const mocks = vi.hoisted(() => {
         data: 'test-data',
         signer: new Uint8Array(),
         domain: 'test-domain'
-      } as SignDataResponse)
+      } as StdSignDataResponse)
     )
   }
 })
@@ -486,7 +486,7 @@ describe('useWallet', () => {
   it('throws error when signing data without active wallet', () => {
     const wallet = useWallet()
 
-    expect(() => wallet.signData('data', { scope: ScopeType.AUTH, encoding: 'utf8' })).toThrow(
+    expect(() => wallet.signData('test-data', { scope: ScopeType.AUTH, encoding: 'utf8' })).toThrow(
       'No active wallet'
     )
   })

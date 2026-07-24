@@ -10,10 +10,10 @@
   "scripts": {
     "build": "pnpm run build:packages && pnpm run build:examples",
     "build:core": "pnpm --filter @txnlab/use-wallet build",
-    "build:wallets": "pnpm -r --filter './packages/wallets/*' build",
-    "build:frameworks": "pnpm -r --filter './packages/frameworks/*' build",
+    "build:wallets": "pnpm -r --filter \"./packages/wallets/*\" build",
+    "build:frameworks": "pnpm -r --filter \"./packages/frameworks/*\" build",
     "build:packages": "pnpm run build:core && pnpm run build:wallets && pnpm run build:frameworks",
-    "build:examples": "pnpm -r --filter './examples/*' build",
+    "build:examples": "pnpm -r --filter \"./examples/*\" build",
     "watch": "pnpm -r --filter \"./packages/*\" --parallel start",
     "dev": "pnpm run watch",
     "test": "pnpm -r --if-present test",
@@ -28,7 +28,7 @@
     "example:next": "pnpm --filter \"./examples/next\" dev",
     "example:nuxt": "pnpm --filter \"./examples/nuxt\" dev",
     "example:svelte": "pnpm --filter \"./examples/svelte\" dev",
-    "publint": "pnpm -r --filter './packages/**' exec publint",
+    "publint": "pnpm -r --filter \"./packages/**\" exec publint",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"
   },

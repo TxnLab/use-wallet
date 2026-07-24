@@ -8,8 +8,8 @@ import {
   isSignedTxn,
   isTransactionArray,
   type AdapterConstructorParams,
-  type SignDataResponse,
-  type SignMetadata,
+  type StdSignDataResponse,
+  type StdSignMetadata,
   type WalletAccount,
   type WalletMetadata,
   type WalletState
@@ -219,14 +219,18 @@ export class LuteAdapter extends BaseWallet<LuteConnectOptions> {
 
   public canSignData = true
 
-  public signData = async (data: string, metadata: SignMetadata): Promise<SignDataResponse> => {
+  public signData = async (
+    data: string,
+    metadata: StdSignMetadata
+  ): Promise<StdSignDataResponse> => {
     try {
       this.logger.debug('Signing data...', { data, metadata })
 
+      const stdSignData = await this.createStdSignData(data)
       const client = this.client || (await this.initializeClient())
 
       // Sign data
-      const signDataResult = await client.signData(data, metadata)
+      const signDataResult = await client.signData(stdSignData, metadata)
 
       this.logger.debug('Data signed successfully', signDataResult)
       return signDataResult

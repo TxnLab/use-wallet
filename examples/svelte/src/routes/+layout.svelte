@@ -18,25 +18,25 @@
 
   const wallets = [
     pera(),
+    lute(),
     defly(),
     deflyWeb(),
     exodus(),
     walletConnect({ projectId: WC_PROJECT_ID }),
     walletConnect({ projectId: WC_PROJECT_ID, skin: 'biatec' }),
     kibisis(),
-    lute(),
     w3wallet(),
     kmd(),
     mnemonic(),
     magic({ apiKey: 'pk_live_D17FD8D89621B5F3' }),
     ...(import.meta.env.VITE_WEB3AUTH_CLIENT_ID
       ? [web3auth({ clientId: import.meta.env.VITE_WEB3AUTH_CLIENT_ID })]
-      : []),
+      : [])
   ]
 
   const manager = new WalletManager({
     wallets,
-    defaultNetwork: 'testnet',
+    defaultNetwork: 'testnet'
   })
 
   useWalletContext(manager)

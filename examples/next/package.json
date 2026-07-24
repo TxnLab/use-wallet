@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@noble/ed25519": "^3.1.0",
     "@txnlab/use-wallet-defly": "workspace:*",
     "@txnlab/use-wallet-defly-web": "workspace:*",
     "@txnlab/use-wallet-exodus": "workspace:*",
@@ -22,6 +23,7 @@
     "@txnlab/use-wallet-walletconnect": "workspace:*",
     "@txnlab/use-wallet-web3auth": "workspace:*",
     "algosdk": "3.5.2",
+    "canonify": "^2.1.1",
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3"

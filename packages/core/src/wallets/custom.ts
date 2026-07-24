@@ -3,8 +3,8 @@ import { BaseWallet } from './base'
 import { compareAccounts } from '../utils'
 import type {
   AdapterConstructorParams,
-  SignDataResponse,
-  SignMetadata,
+  StdSignDataResponse,
+  StdSignMetadata,
   WalletAccount,
   WalletAdapterConfig,
   WalletMetadata,
@@ -23,7 +23,7 @@ export type CustomProvider = {
     txnGroup: algosdk.Transaction[],
     indexesToSign: number[]
   ): Promise<Uint8Array[]>
-  signData?(data: string, metadata: SignMetadata): Promise<SignDataResponse>
+  signData?(data: string, metadata: StdSignMetadata): Promise<StdSignDataResponse>
 }
 
 export interface CustomWalletOptions {
@@ -170,7 +170,10 @@ export class CustomWallet extends BaseWallet<CustomWalletOptions> {
 
   // ---------- Sign Data ---------------------------------------------- //
 
-  public signData = async (data: string, metadata: SignMetadata): Promise<SignDataResponse> => {
+  public signData = async (
+    data: string,
+    metadata: StdSignMetadata
+  ): Promise<StdSignDataResponse> => {
     if (!this.provider.signData) {
       this.logger.error('Method not supported: signData')
       throw new Error('Method not supported: signData')

@@ -33,13 +33,17 @@ vi.mock('lute-connect', () => {
 
 const WALLET_ID = 'lute'
 
+let mockAlgodClient: {
+  accountInformation: Mock
+}
+
 function createWallet(store: AdapterStoreAccessor): LuteAdapter {
   const wallet = new LuteAdapter({
     id: WALLET_ID,
     metadata: LuteAdapter.defaultMetadata,
     store,
     subscribe: vi.fn(),
-    getAlgodClient: () => ({}) as any,
+    getAlgodClient: () => mockAlgodClient as any,
     options: {
       siteName: 'Mock Site Name'
     }
@@ -75,6 +79,12 @@ describe('LuteAdapter', () => {
       siteName: 'Mock Site',
       forceWeb: false,
       isExtensionInstalled: vi.fn().mockResolvedValue(true)
+    }
+
+    mockAlgodClient = {
+      accountInformation: vi.fn().mockReturnValue({
+        do: vi.fn().mockResolvedValue({})
+      })
     }
 
     const harness = createTestHarness(WALLET_ID)
@@ -362,26 +372,42 @@ describe('LuteAdapter', () => {
   describe('signData', () => {
     // Connected account
     const connectedAcct1 = '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q'
+    const testDomain = 'test.domain'
+
+    const sha256 = async (data: BufferSource): Promise<Uint8Array> => {
+      const buf = await crypto.subtle.digest('SHA-256', data)
+      return new Uint8Array(buf)
+    }
 
     beforeEach(async () => {
+      vi.stubGlobal('location', { host: testDomain })
+
       mockLuteConnect.connect.mockResolvedValueOnce([connectedAcct1])
 
       await wallet.connect()
+    })
+
+    afterEach(() => {
+      vi.unstubAllGlobals()
     })
 
     it('should have canSignData set to true', () => {
       expect(wallet.canSignData).toBe(true)
     })
 
-    it('should call Lute client signData with correct parameters', async () => {
+    it('should construct StdSignData and call Lute client signData with correct parameters', async () => {
       const testData = 'test-data'
       const testMetadata = { scope: ScopeType.AUTH, encoding: 'base64' }
 
-      const mockResponse = {
+      const expectedStdSignData = {
         data: testData,
-        signer: new Uint8Array([1, 2, 3]),
-        domain: 'test.domain',
-        authenticatorData: new Uint8Array([4, 5, 6]),
+        signer: algosdk.Address.fromString(connectedAcct1).publicKey,
+        domain: testDomain,
+        authenticatorData: await sha256(new TextEncoder().encode(testDomain))
+      }
+
+      const mockResponse = {
+        ...expectedStdSignData,
         signature: new Uint8Array([7, 8, 9])
       }
 
@@ -389,8 +415,31 @@ describe('LuteAdapter', () => {
 
       const result = await wallet.signData(testData, testMetadata)
 
-      expect(mockLuteConnect.signData).toHaveBeenCalledWith(testData, testMetadata)
+      expect(mockAlgodClient.accountInformation).toHaveBeenCalledWith(connectedAcct1)
+      expect(mockLuteConnect.signData).toHaveBeenCalledWith(expectedStdSignData, testMetadata)
       expect(result).toEqual(mockResponse)
+    })
+
+    it('should sign with the auth address public key for rekeyed accounts', async () => {
+      const authAddr = new algosdk.Address(new Uint8Array(32).fill(7))
+      mockAlgodClient.accountInformation.mockReturnValue({
+        do: vi.fn().mockResolvedValue({ authAddr })
+      })
+
+      mockLuteConnect.signData.mockResolvedValue({
+        data: 'test-data',
+        signer: authAddr.publicKey,
+        domain: testDomain,
+        authenticatorData: await sha256(new TextEncoder().encode(testDomain)),
+        signature: new Uint8Array([7, 8, 9])
+      })
+
+      await wallet.signData('test-data', { scope: ScopeType.AUTH, encoding: 'base64' })
+
+      expect(mockLuteConnect.signData).toHaveBeenCalledWith(
+        expect.objectContaining({ signer: authAddr.publicKey }),
+        { scope: ScopeType.AUTH, encoding: 'base64' }
+      )
     })
 
     it('should re-throw SignDataError to the consuming application', async () => {
@@ -412,25 +461,25 @@ describe('LuteAdapter', () => {
     it('should handle sign and verify data flow', async () => {
       const siwaRequest = {
         account_address: connectedAcct1,
-        chain_id: '283',
-        domain: 'test.domain',
+        chain_id: 'algorand:SGO1GKSzyE7IEPItTxCByw9x8FmnrCDe',
+        domain: testDomain,
         'issued-at': new Date().toISOString(),
         type: 'ed25519',
         uri: 'https://test.domain',
         version: '1'
       }
 
+      const testSigner = algosdk.Address.fromString(connectedAcct1).publicKey
+      const testAuthData = await sha256(new TextEncoder().encode(testDomain))
+      const testSignature = new Uint8Array(64).fill(9)
+
       const data = btoa(JSON.stringify(siwaRequest))
       const metadata = { scope: ScopeType.AUTH, encoding: 'base64' }
-
-      const testAuthData = new Uint8Array(32).fill(1)
-      const testSigner = new Uint8Array(algosdk.Address.fromString(connectedAcct1).publicKey)
-      const testSignature = new Uint8Array(64).fill(9)
 
       const mockResponse = {
         data,
         signer: testSigner,
-        domain: 'test.domain',
+        domain: testDomain,
         authenticatorData: testAuthData,
         signature: testSignature
       }
@@ -440,7 +489,15 @@ describe('LuteAdapter', () => {
       const response = await wallet.signData(data, metadata)
 
       expect(response).toEqual(mockResponse)
-      expect(mockLuteConnect.signData).toHaveBeenCalledWith(data, metadata)
+      expect(mockLuteConnect.signData).toHaveBeenCalledWith(
+        {
+          data,
+          signer: testSigner,
+          domain: testDomain,
+          authenticatorData: testAuthData
+        },
+        metadata
+      )
 
       expect(response.data).toBeDefined()
       expect(response.signer).toBeDefined()

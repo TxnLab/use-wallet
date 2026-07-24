@@ -1,6 +1,7 @@
 import { useWallet } from '@txnlab/use-wallet-solid'
 import { Show } from 'solid-js'
 import { AccountSwitcher } from './AccountSwitcher.tsx'
+import { Authenticate } from './Authenticate.tsx'
 import { SendTransaction } from './SendTransaction.tsx'
 
 export function ActiveWallet() {
@@ -53,6 +54,9 @@ export function ActiveWallet() {
         </div>
 
         <SendTransaction />
+        <Show when={activeWallet()!.canSignData}>
+          <Authenticate />
+        </Show>
       </div>
     </Show>
   )

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { useWallet } from '@txnlab/use-wallet-svelte'
   import AccountSwitcher from './AccountSwitcher.svelte'
+  import Authenticate from './Authenticate.svelte'
   import SendTransaction from './SendTransaction.svelte'
 
   const { activeWallet, activeAccount } = useWallet()
@@ -57,5 +58,8 @@
     </div>
 
     <SendTransaction />
+    {#if wallet.canSignData}
+      <Authenticate />
+    {/if}
   </div>
 {/if}

@@ -30,7 +30,7 @@
     "algosdk": "^3.0.0"
   },
   "dependencies": {
-    "lute-connect": "1.6.3"
+    "lute-connect": "2.0.1"
   },
   "devDependencies": {
     "@txnlab/use-wallet": "workspace:*",
