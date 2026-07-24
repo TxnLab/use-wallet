@@ -30,7 +30,7 @@
     "algosdk": "^3.0.0"
   },
   "dependencies": {
-    "@perawallet/connect": "1.6.0-beta.6"
+    "@perawallet/connect": "1.6.0-beta.7"
   },
   "devDependencies": {
     "@txnlab/use-wallet": "workspace:*",
