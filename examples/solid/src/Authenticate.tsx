@@ -4,8 +4,7 @@ import {
   SignDataError,
   useNetwork,
   useWallet,
-  type Siwa,
-  type StdSignData
+  type Siwa
 } from '@txnlab/use-wallet-solid'
 import { Address } from 'algosdk'
 import { canonify } from 'canonify'
@@ -32,35 +31,28 @@ export function Authenticate() {
       setStatus('signing')
       setError(null)
 
-      const domain = location.host
-      const acctInfo = await algodClient().accountInformation(address).do()
-
       const siwaRequest: Siwa = {
-        domain,
-        chain_id: activeNetworkConfig().caipChainId || 'algorand',
+        domain: location.host,
+        chain_id: activeNetworkConfig().caipChainId || 'algorand:localnet',
         account_address: address,
         type: 'ed25519',
         uri: location.origin,
         version: '1',
         'issued-at': new Date().toISOString()
       }
+
       const dataString = canonify(siwaRequest)
       if (!dataString) throw Error('Invalid JSON')
       const data = btoa(dataString)
-      const enc = new TextEncoder()
-      const authenticatorData = await sha256(enc.encode(domain))
-      const signer = acctInfo.authAddr?.publicKey ?? Address.fromString(address).publicKey
-      const sdtSignData: StdSignData = {
-        data,
-        signer,
-        domain,
-        authenticatorData
-      }
       const metadata = { scope: ScopeType.AUTH, encoding: 'base64' }
-      const resp = await signData(sdtSignData, metadata)
+      const resp = await signData(data, metadata)
+
       // verify signature
+      const acctInfo = await algodClient().accountInformation(address).do()
+      const signer = acctInfo.authAddr?.publicKey ?? Address.fromString(address).publicKey
+      const enc = new TextEncoder()
       const clientDataJsonHash = await sha256(enc.encode(dataString))
-      const authenticatorDataHash = await sha256(authenticatorData)
+      const authenticatorDataHash = await sha256(new Uint8Array(resp.authenticatorData))
       const toSign = new Uint8Array([...clientDataJsonHash, ...authenticatorDataHash])
       if (!(await ed.verifyAsync(resp.signature, toSign, signer))) {
         throw new SignDataError('Verification Failed', 4300)

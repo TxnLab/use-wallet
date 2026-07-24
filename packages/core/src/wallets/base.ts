@@ -1,7 +1,8 @@
 import { logger } from 'src/logger'
 import { NetworkConfig } from 'src/network'
 import type { State } from 'src/store'
-import type algosdk from 'algosdk'
+import algosdk from 'algosdk'
+import { SignDataError } from 'src/wallets/types'
 import type {
   AdapterConstructorParams,
   AdapterStoreAccessor,
@@ -87,7 +88,7 @@ export abstract class BaseWallet<TOptions = Record<string, unknown>> {
   public canSignData = false
 
   public signData = async (
-    _data: StdSignData,
+    _data: string,
     _metadata: StdSignMetadata
   ): Promise<StdSignDataResponse> => {
     this.logger.error('Method not supported: signData')
@@ -146,6 +147,31 @@ export abstract class BaseWallet<TOptions = Record<string, unknown>> {
   }
 
   // ---------- Protected Methods ------------------------------------- //
+
+  /**
+   * Constructs an ARC-60 `StdSignData` object for the given data payload.
+   * The signer public key is resolved via algod so that rekeyed accounts
+   * sign with their auth address, and the authenticator data is the
+   * SHA-256 hash of the current domain.
+   */
+  protected createStdSignData = async (data: string): Promise<StdSignData> => {
+    const activeAddress = this.activeAddress
+    if (!activeAddress) {
+      this.logger.error('No active account')
+      throw new SignDataError('No active account', 4100)
+    }
+
+    const domain = location.host
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(domain))
+    const authenticatorData = new Uint8Array(digest)
+
+    const algodClient = this.getAlgodClient()
+    const acctInfo = await algodClient.accountInformation(activeAddress).do()
+    const signer =
+      acctInfo.authAddr?.publicKey ?? algosdk.Address.fromString(activeAddress).publicKey
+
+    return { data, signer, domain, authenticatorData }
+  }
 
   protected onDisconnect = (): void => {
     this.logger.debug(`Removing wallet from store...`)

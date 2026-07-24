@@ -870,8 +870,8 @@ importers:
   packages/wallets/lute:
     dependencies:
       lute-connect:
-        specifier: 2.0.0
-        version: 2.0.0
+        specifier: 2.0.1
+        version: 2.0.1
     devDependencies:
       '@txnlab/use-wallet':
         specifier: workspace:*
@@ -6473,8 +6473,8 @@ packages:
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
 
-  lute-connect@2.0.0:
-    resolution: {integrity: sha512-6uvGRaJeQNxv04isBkbBvew/PP04BTBnCKMVRV39piNwhwPID9BaAvud9mUF6QPWn7jxkL4kDJCp9VkEELz+1A==}
+  lute-connect@2.0.1:
+    resolution: {integrity: sha512-gyQj9SbRjQnZ0mOp9UusrTX6kSePR5PwiEGeQ7VpmDcSaY4WbQPBEoQfRoyyzA054Ly2ypBE3vpdNG3Dvh5CYw==}
 
   lz-string@1.5.0:
     resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
@@ -15565,7 +15565,7 @@ snapshots:
     dependencies:
       yallist: 3.1.1
 
-  lute-connect@2.0.0: {}
+  lute-connect@2.0.1: {}
 
   lz-string@1.5.0: {}
 

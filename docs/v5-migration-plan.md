@@ -439,10 +439,13 @@ Types to **keep** (shared contract):
 - `WalletConstructor` → renamed/simplified to `AdapterConstructorParams`
 - `BaseWalletConstructor` → folded into `AdapterConstructorParams`
 - `WalletTransaction`, `SignerTransaction`, `MultisigMetadata`
-- `StdSignData`, `StdSignDataResponse`, `StdSignMetadata`, `ScopeType`
+- `SignData` → renamed to `StdSignData`; the optional `signature?` field is dropped (`signature` exists only on the response type)
+- `SignDataResponse` → renamed to `StdSignDataResponse`
+- `SignMetadata` → renamed to `StdSignMetadata`
+- `ScopeType`
 - `SignTxnsError`, `SignDataError`
 - `JsonRpcRequest`
-- `Siwa`
+- `Siwa` — `chain_id` changes from the hardcoded literal `'283'` to `string`, set to the active network's CAIP-2 chain identifier
 
 ### 4.10 State Persistence
 
@@ -833,7 +836,15 @@ protected updateMetadata(updates: Partial<WalletMetadata>): void {
 
 Some adapters don't know their display name/icon until after `connect()` (e.g., a future RainbowKit adapter discovers whether the user picked MetaMask or Rainbow at connect time). Currently `metadata` is effectively readonly after construction. A protected setter lets adapters update it post-connect without a public API change.
 
-### 7.5 Internal Import Paths
+### 7.5 Add `createStdSignData()` Protected Method
+
+```typescript
+protected createStdSignData = async (data: string): Promise<StdSignData>
+```
+
+`signData(data: string, metadata: StdSignMetadata)` accepts the payload as a plain string; constructing the ARC-60 `StdSignData` envelope is the adapter's responsibility, not the consuming app's. This helper builds it for the active account: it resolves the signer public key via algod (so rekeyed accounts sign with their auth address), sets `domain` to the current host, and derives `authenticatorData` from the SHA-256 hash of the domain. Adapters that support ARC-60 signing (currently Lute) call it and forward the result to the wallet.
+
+### 7.6 Internal Import Paths
 
 In v4, wallet implementations use path-aliased imports (`src/store`, `src/utils`). In v5, all adapter code imports from the published package:
 
@@ -1317,5 +1328,5 @@ The localStorage key changes from `v4` to `v5`. Active sessions will not carry o
 - `WalletProvider` / plugin / context setup — unchanged (just different config)
 - `WalletAccount` type — unchanged (additive optional `metadata` field)
 - `signTransactions()`, `transactionSigner()` — unchanged
-- `signData()`, `withPrivateKey()` — unchanged
+- `signData()`, `withPrivateKey()` — unchanged call signatures (the data signing types are renamed with a `Std` prefix — see §4.9)
 - Network configuration — unchanged

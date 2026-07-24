@@ -3,7 +3,6 @@ import {
   BaseWallet,
   SignDataError,
   SignTxnsError,
-  StdSignData,
   byteArrayToBase64,
   flattenTxnGroup,
   isSignedTxn,
@@ -20,7 +19,7 @@ import {
   SignDataError as ISignDataError,
   type SignTxnsError as ISignTxnsError,
   type WalletTransaction
-} from 'lute-connect/dist/types'
+} from 'lute-connect'
 
 export interface LuteConnectOptions {
   siteName?: string
@@ -221,16 +220,17 @@ export class LuteAdapter extends BaseWallet<LuteConnectOptions> {
   public canSignData = true
 
   public signData = async (
-    data: StdSignData,
+    data: string,
     metadata: StdSignMetadata
   ): Promise<StdSignDataResponse> => {
     try {
       this.logger.debug('Signing data...', { data, metadata })
 
+      const stdSignData = await this.createStdSignData(data)
       const client = this.client || (await this.initializeClient())
 
       // Sign data
-      const signDataResult = await client.signData(data, metadata)
+      const signDataResult = await client.signData(stdSignData, metadata)
 
       this.logger.debug('Data signed successfully', signDataResult)
       return signDataResult
