@@ -5,7 +5,6 @@ import type algosdk from 'algosdk'
 import type {
   AdapterConstructorParams,
   AdapterStoreAccessor,
-  StdSignData,
   StdSignDataResponse,
   StdSignMetadata,
   WalletAccount,
@@ -87,7 +86,7 @@ export abstract class BaseWallet<TOptions = Record<string, unknown>> {
   public canSignData = false
 
   public signData = async (
-    _data: StdSignData,
+    _data: string,
     _metadata: StdSignMetadata
   ): Promise<StdSignDataResponse> => {
     this.logger.error('Method not supported: signData')

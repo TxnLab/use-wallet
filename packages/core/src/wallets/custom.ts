@@ -3,7 +3,6 @@ import { BaseWallet } from './base'
 import { compareAccounts } from '../utils'
 import type {
   AdapterConstructorParams,
-  StdSignData,
   StdSignDataResponse,
   StdSignMetadata,
   WalletAccount,
@@ -24,7 +23,7 @@ export type CustomProvider = {
     txnGroup: algosdk.Transaction[],
     indexesToSign: number[]
   ): Promise<Uint8Array[]>
-  signData?(data: StdSignData, metadata: StdSignMetadata): Promise<StdSignDataResponse>
+  signData?(data: string, metadata: StdSignMetadata): Promise<StdSignDataResponse>
 }
 
 export interface CustomWalletOptions {
@@ -172,7 +171,7 @@ export class CustomWallet extends BaseWallet<CustomWalletOptions> {
   // ---------- Sign Data ---------------------------------------------- //
 
   public signData = async (
-    data: StdSignData,
+    data: string,
     metadata: StdSignMetadata
   ): Promise<StdSignDataResponse> => {
     if (!this.provider.signData) {

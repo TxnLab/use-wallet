@@ -3,7 +3,6 @@ import {
   BaseWallet,
   WalletManager,
   type Wallet,
-  type StdSignData,
   type StdSignMetadata,
   type StdSignDataResponse
 } from '@txnlab/use-wallet'
@@ -110,7 +109,7 @@ export function useWallet() {
     return activeBaseWallet.value.transactionSigner(txnGroup, indexesToSign)
   }
 
-  const signData = (data: StdSignData, metadata: StdSignMetadata): Promise<StdSignDataResponse> => {
+  const signData = (data: string, metadata: StdSignMetadata): Promise<StdSignDataResponse> => {
     if (!activeBaseWallet.value) {
       throw new Error('No active wallet')
     }

@@ -5,7 +5,6 @@ import type {
   AlgodConfig,
   BaseWallet,
   NetworkId,
-  StdSignData,
   StdSignDataResponse,
   StdSignMetadata,
   WalletAccount,
@@ -232,7 +231,7 @@ export const useWallet = () => {
     return wallet.transactionSigner(txnGroup, indexesToSign)
   }
 
-  const signData = (data: StdSignData, metadata: StdSignMetadata): Promise<StdSignDataResponse> => {
+  const signData = (data: string, metadata: StdSignMetadata): Promise<StdSignDataResponse> => {
     const wallet = activeBaseWallet()
     if (!wallet) {
       throw new Error('No active wallet')
