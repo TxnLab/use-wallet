@@ -8,8 +8,7 @@ import {
   type WalletAdapterConfig,
   type AdapterConstructorParams,
   ScopeType,
-  type ManagerStatus,
-  StdSignData
+  type ManagerStatus
 } from '@txnlab/use-wallet'
 import algosdk from 'algosdk'
 import { getContext, setContext } from 'svelte'
@@ -487,9 +486,9 @@ describe('useWallet', () => {
   it('throws error when signing data without active wallet', () => {
     const wallet = useWallet()
 
-    expect(() =>
-      wallet.signData({} as StdSignData, { scope: ScopeType.AUTH, encoding: 'utf8' })
-    ).toThrow('No active wallet')
+    expect(() => wallet.signData('test-data', { scope: ScopeType.AUTH, encoding: 'utf8' })).toThrow(
+      'No active wallet'
+    )
   })
 
   it('signs data with active wallet', async () => {
@@ -503,20 +502,10 @@ describe('useWallet', () => {
 
     const data = 'test-data'
     const metadata = { scope: ScopeType.AUTH, encoding: 'utf8' as const }
-    const testAuthData = new Uint8Array(32).fill(1)
-    const testSigner = new Uint8Array([1, 2, 3])
-    const testDomain = 'test.domain'
 
-    const stdSignData = {
-      data,
-      signer: testSigner,
-      domain: testDomain,
-      authenticatorData: testAuthData
-    }
+    await wallet.signData(data, metadata)
 
-    await wallet.signData(stdSignData, metadata)
-
-    expect(mocks.signData).toHaveBeenCalledWith(stdSignData, metadata)
+    expect(mocks.signData).toHaveBeenCalledWith(data, metadata)
   })
 })
 

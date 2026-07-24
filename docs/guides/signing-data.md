@@ -23,8 +23,7 @@ import {
   SignDataError,
   useNetwork,
   useWallet,
-  type Siwa,
-  type StdSignData
+  type Siwa
 } from '@txnlab/use-wallet-react'
 import { Address } from 'algosdk'
 import { canonify } from 'canonify'
@@ -42,13 +41,10 @@ function Authenticate() {
     if (!activeAddress) return
 
     try {
-      const domain = location.host
-      const acctInfo = await algodClient.accountInformation(activeAddress).do()
-
       // Create SIWA request
       const siwaRequest: Siwa = {
-        domain,
-        chain_id: activeNetworkConfig.caipChainId || 'algorand',
+        domain: location.host,
+        chain_id: activeNetworkConfig.caipChainId || 'algorand:localnet',
         account_address: activeAddress,
         type: 'ed25519',
         uri: location.origin,
@@ -59,24 +55,16 @@ function Authenticate() {
       if (!dataString) throw Error('Invalid JSON')
       const data = btoa(dataString)
 
-      // Build the StdSignData object
-      const enc = new TextEncoder()
-      const authenticatorData = await sha256(enc.encode(domain))
-      const signer = acctInfo.authAddr?.publicKey ?? Address.fromString(activeAddress).publicKey
-      const stdSignData: StdSignData = {
-        data,
-        signer,
-        domain,
-        authenticatorData
-      }
-
       // Sign data with authentication scope
       const metadata = { scope: ScopeType.AUTH, encoding: 'base64' }
-      const resp = await signData(stdSignData, metadata)
+      const resp = await signData(data, metadata)
 
       // Verify signature
+      const acctInfo = await algodClient.accountInformation(activeAddress).do()
+      const signer = acctInfo.authAddr?.publicKey ?? Address.fromString(activeAddress).publicKey
+      const enc = new TextEncoder()
       const clientDataJsonHash = await sha256(enc.encode(dataString))
-      const authenticatorDataHash = await sha256(authenticatorData)
+      const authenticatorDataHash = await sha256(new Uint8Array(resp.authenticatorData))
       const toSign = new Uint8Array([...clientDataJsonHash, ...authenticatorDataHash])
       if (!(await ed.verifyAsync(resp.signature, toSign, signer))) {
         throw new SignDataError('Verification Failed', 4300)
@@ -104,8 +92,7 @@ function Authenticate() {
     SignDataError,
     useNetwork,
     useWallet,
-    type Siwa,
-    type StdSignData
+    type Siwa
   } from '@txnlab/use-wallet-vue'
   import { Address } from 'algosdk'
   import { canonify } from 'canonify'
@@ -122,13 +109,10 @@ function Authenticate() {
     if (!activeAddress.value) return
 
     try {
-      const domain = location.host
-      const acctInfo = await algodClient.value.accountInformation(activeAddress.value).do()
-
       // Create SIWA request
       const siwaRequest: Siwa = {
-        domain,
-        chain_id: activeNetworkConfig.value.caipChainId || 'algorand',
+        domain: location.host,
+        chain_id: activeNetworkConfig.value.caipChainId || 'algorand:localnet',
         account_address: activeAddress.value,
         type: 'ed25519',
         uri: location.origin,
@@ -139,25 +123,17 @@ function Authenticate() {
       if (!dataString) throw Error('Invalid JSON')
       const data = btoa(dataString)
 
-      // Build the StdSignData object
-      const enc = new TextEncoder()
-      const authenticatorData = await sha256(enc.encode(domain))
-      const signer =
-        acctInfo.authAddr?.publicKey ?? Address.fromString(activeAddress.value).publicKey
-      const stdSignData: StdSignData = {
-        data,
-        signer,
-        domain,
-        authenticatorData
-      }
-
       // Sign data with authentication scope
       const metadata = { scope: ScopeType.AUTH, encoding: 'base64' }
-      const resp = await signData(stdSignData, metadata)
+      const resp = await signData(data, metadata)
 
       // Verify signature
+      const acctInfo = await algodClient.value.accountInformation(activeAddress.value).do()
+      const signer =
+        acctInfo.authAddr?.publicKey ?? Address.fromString(activeAddress.value).publicKey
+      const enc = new TextEncoder()
       const clientDataJsonHash = await sha256(enc.encode(dataString))
-      const authenticatorDataHash = await sha256(authenticatorData)
+      const authenticatorDataHash = await sha256(new Uint8Array(resp.authenticatorData))
       const toSign = new Uint8Array([...clientDataJsonHash, ...authenticatorDataHash])
       if (!(await ed.verifyAsync(resp.signature, toSign, signer))) {
         throw new SignDataError('Verification Failed', 4300)
@@ -184,8 +160,7 @@ import {
   SignDataError,
   useNetwork,
   useWallet,
-  type Siwa,
-  type StdSignData
+  type Siwa
 } from '@txnlab/use-wallet-solid'
 import { Address } from 'algosdk'
 import { canonify } from 'canonify'
@@ -204,13 +179,10 @@ function Authenticate() {
     if (!address) return
 
     try {
-      const domain = location.host
-      const acctInfo = await algodClient().accountInformation(address).do()
-
       // Create SIWA request
       const siwaRequest: Siwa = {
-        domain,
-        chain_id: activeNetworkConfig().caipChainId || 'algorand',
+        domain: location.host,
+        chain_id: activeNetworkConfig().caipChainId || 'algorand:localnet',
         account_address: address,
         type: 'ed25519',
         uri: location.origin,
@@ -221,24 +193,16 @@ function Authenticate() {
       if (!dataString) throw Error('Invalid JSON')
       const data = btoa(dataString)
 
-      // Build the StdSignData object
-      const enc = new TextEncoder()
-      const authenticatorData = await sha256(enc.encode(domain))
-      const signer = acctInfo.authAddr?.publicKey ?? Address.fromString(address).publicKey
-      const stdSignData: StdSignData = {
-        data,
-        signer,
-        domain,
-        authenticatorData
-      }
-
       // Sign data with authentication scope
       const metadata = { scope: ScopeType.AUTH, encoding: 'base64' }
-      const resp = await signData(stdSignData, metadata)
+      const resp = await signData(data, metadata)
 
       // Verify signature
+      const acctInfo = await algodClient().accountInformation(address).do()
+      const signer = acctInfo.authAddr?.publicKey ?? Address.fromString(address).publicKey
+      const enc = new TextEncoder()
       const clientDataJsonHash = await sha256(enc.encode(dataString))
-      const authenticatorDataHash = await sha256(authenticatorData)
+      const authenticatorDataHash = await sha256(new Uint8Array(resp.authenticatorData))
       const toSign = new Uint8Array([...clientDataJsonHash, ...authenticatorDataHash])
       if (!(await ed.verifyAsync(resp.signature, toSign, signer))) {
         throw new SignDataError('Verification Failed', 4300)
@@ -266,8 +230,7 @@ function Authenticate() {
     SignDataError,
     useNetwork,
     useWallet,
-    type Siwa,
-    type StdSignData
+    type Siwa
   } from '@txnlab/use-wallet-svelte'
   import { Address } from 'algosdk'
   import { canonify } from 'canonify'
@@ -286,13 +249,10 @@ function Authenticate() {
     if (!address || !client) return
 
     try {
-      const domain = location.host
-      const acctInfo = await client.accountInformation(address).do()
-
       // Create SIWA request
       const siwaRequest: Siwa = {
-        domain,
-        chain_id: activeNetworkConfig.current.caipChainId || 'algorand',
+        domain: location.host,
+        chain_id: activeNetworkConfig.current.caipChainId || 'algorand:localnet',
         account_address: address,
         type: 'ed25519',
         uri: location.origin,
@@ -303,24 +263,16 @@ function Authenticate() {
       if (!dataString) throw Error('Invalid JSON')
       const data = btoa(dataString)
 
-      // Build the StdSignData object
-      const enc = new TextEncoder()
-      const authenticatorData = await sha256(enc.encode(domain))
-      const signer = acctInfo.authAddr?.publicKey ?? Address.fromString(address).publicKey
-      const stdSignData: StdSignData = {
-        data,
-        signer,
-        domain,
-        authenticatorData
-      }
-
       // Sign data with authentication scope
       const metadata = { scope: ScopeType.AUTH, encoding: 'base64' }
-      const resp = await signData(stdSignData, metadata)
+      const resp = await signData(data, metadata)
 
       // Verify signature
+      const acctInfo = await client.accountInformation(address).do()
+      const signer = acctInfo.authAddr?.publicKey ?? Address.fromString(address).publicKey
+      const enc = new TextEncoder()
       const clientDataJsonHash = await sha256(enc.encode(dataString))
-      const authenticatorDataHash = await sha256(authenticatorData)
+      const authenticatorDataHash = await sha256(new Uint8Array(resp.authenticatorData))
       const toSign = new Uint8Array([...clientDataJsonHash, ...authenticatorDataHash])
       if (!(await ed.verifyAsync(resp.signature, toSign, signer))) {
         throw new SignDataError('Verification Failed', 4300)
@@ -343,7 +295,7 @@ function Authenticate() {
 1. **Create SIWA Request**: The code creates a Sign-In with Algorand (SIWA) request object containing:
    * Required Properties
      * `domain` - The current host
-     * `chain_id` - The [CAIP-2](https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-2.md) chain identifier for the active network, read from `activeNetworkConfig.caipChainId` (e.g. `algorand:wGHE2Pwdvd7S12BL5FaOP20EGYesN73k` for MainNet), falling back to `'algorand'` when a custom network has no CAIP chain ID
+     * `chain_id` - The [CAIP-2](https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-2.md) chain identifier for the active network, read from `activeNetworkConfig.caipChainId` (e.g. `algorand:wGHE2Pwdvd7S12BL5FaOP20EGYesN73k` for MainNet), falling back to `'algorand:localnet'` when a custom network has no CAIP chain ID
      * `account_address` - The user's wallet address
      * `type` - The signature type (ed25519)
      * `uri` - The origin URL
@@ -357,20 +309,21 @@ function Authenticate() {
      * `request-id` - A unique identifier for the request
      * `resources` - An array of URIs the user is requesting access to
    * The SIWA request format follows the [CAIP-122 specification](https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-122.md) for chain-agnostic sign-in.
-2. **Build the StdSignData object**: The canonified request is base64-encoded and packaged into a `StdSignData` object, which is the first argument passed to `signData`:
-   * `data` - The base64-encoded SIWA request
-   * `signer` - The public key that will sign the data. Account information is fetched from the algod client so that rekeyed accounts sign with their auth address (`acctInfo.authAddr?.publicKey`), falling back to the active address's public key
-   * `domain` - The current host
-   * `authenticatorData` - The SHA-256 hash of the domain
-   * `requestId` - An optional unique identifier for the request
-   * `hdPath` - An optional HD derivation path
-3. **Sign Data**: The `StdSignData` object is signed using the `signData` method, passing metadata as the second argument:
+2. **Sign Data**: The canonified request is base64-encoded and passed to `signData` as a string, with metadata as the second argument:
    * `scope` - Set to `ScopeType.AUTH` for authentication
    * `encoding` - Set to `'base64'` for the data format
-4. **Verify Signature**: The signature is verified by:
-   * Computing SHA-256 hashes of the client data and authenticator data
+   * The wallet adapter packages the data into an ARC-60 `StdSignData` object internally: it resolves the signer public key via the algod client (so rekeyed accounts sign with their auth address), sets `domain` to the current host, and derives `authenticatorData` from the SHA-256 hash of the domain.
+3. **Verify Signature**: The signature is verified by:
+   * Resolving the signer public key the same way the adapter does — from the account's auth address if the account has been rekeyed (`acctInfo.authAddr?.publicKey`), otherwise from the active address
+   * Computing SHA-256 hashes of the client data and the `authenticatorData` returned in the response
    * Combining the hashes into a single buffer
    * Using the signer's public key to verify the signature
+
+{% hint style="info" %}
+**Adapter Authors**
+
+Wallet adapters that support ARC-60 signing can call the protected `createStdSignData(data)` helper on `BaseWallet`. It builds the `StdSignData` object for the active account — resolving the signer public key via algod (respecting rekeyed accounts) and hashing the current domain into `authenticatorData` — so an adapter's `signData` implementation only needs to forward the result to the wallet.
+{% endhint %}
 
 {% hint style="info" %}
 **Signature Verification**

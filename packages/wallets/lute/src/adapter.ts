@@ -1,9 +1,8 @@
-import algosdk, { Address } from 'algosdk'
+import algosdk from 'algosdk'
 import {
   BaseWallet,
   SignDataError,
   SignTxnsError,
-  StdSignData,
   byteArrayToBase64,
   flattenTxnGroup,
   isSignedTxn,
@@ -73,11 +72,6 @@ export class LuteAdapter extends BaseWallet<LuteConnectOptions> {
       intDecoding: algosdk.IntDecoding.MIXED
     })
     return `${genesis.network}-${genesis.id}`
-  }
-
-  private async sha256(data: BufferSource) {
-    const buf = await crypto.subtle.digest('SHA-256', data)
-    return new Uint8Array(buf)
   }
 
   public connect = async (): Promise<WalletAccount[]> => {
@@ -232,22 +226,7 @@ export class LuteAdapter extends BaseWallet<LuteConnectOptions> {
     try {
       this.logger.debug('Signing data...', { data, metadata })
 
-      // construct StdSignData
-      const domain = location.host
-      const enc = new TextEncoder()
-      const authenticatorData = await this.sha256(enc.encode(domain))
-      if (!this.activeAddress) throw Error('')
-      const algodClient = this.getAlgodClient()
-      const acctInfo = await algodClient.accountInformation(this.activeAddress).do()
-      const signer =
-        acctInfo.authAddr?.publicKey ?? Address.fromString(this.activeAddress).publicKey
-      const stdSignData: StdSignData = {
-        data,
-        signer,
-        domain,
-        authenticatorData
-      }
-
+      const stdSignData = await this.createStdSignData(data)
       const client = this.client || (await this.initializeClient())
 
       // Sign data
