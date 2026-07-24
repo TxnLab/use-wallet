@@ -5,7 +5,6 @@ import {
   flattenTxnGroup,
   isSignedTxn,
   isTransactionArray,
-  StdSignData,
   StdSignDataResponse,
   StdSignMetadata,
   type AdapterConstructorParams,
