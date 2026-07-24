@@ -1,3 +1,18 @@
+# [5.0.0-rc.2](https://github.com/TxnLab/use-wallet/compare/v5.0.0-rc.1...v5.0.0-rc.2) (2026-07-24)
+
+
+### Features
+
+* signData builds StdSignData from a data string internally ([#439](https://github.com/TxnLab/use-wallet/issues/439)) ([3349e94](https://github.com/TxnLab/use-wallet/commit/3349e94f46836cf32ff640ad4fedba01da5af85e))
+
+
+### BREAKING CHANGES
+
+* signData now takes a plain `data` string and builds the
+ARC-60 StdSignData internally (rekey-aware signer, domain, authenticatorData).
+The SignData / SignDataResponse / SignMetadata types are renamed to
+StdSignData / StdSignDataResponse / StdSignMetadata.
+
 # [5.0.0-rc.1](https://github.com/TxnLab/use-wallet/compare/v4.6.0...v5.0.0-rc.1) (2026-03-08)
 
 
