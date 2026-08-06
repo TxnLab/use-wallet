@@ -12,7 +12,9 @@ export { BaseWallet } from './wallets/base'
 export type {
   AdapterConstructorParams,
   AdapterStoreAccessor,
-  WalletAdapterConfig
+  WalletAdapterConfig,
+  WalletCapabilities,
+  WalletFactoryOptions
 } from './wallets/types'
 
 // Shared types

@@ -5,6 +5,12 @@ import type { WalletAdapterConfig } from '@txnlab/use-wallet'
 
 export const WALLET_ID = 'walletconnect' as const
 
+/**
+ * Note: unlike other adapter factories, `walletConnect` does not accept
+ * the shared `metadata` factory option. WalletConnect's `metadata` option
+ * is the dApp metadata sent to the relay (name, description, url, icons).
+ * To customize the wallet's display name and icon, pass a custom `skin`.
+ */
 export function walletConnect(options: WalletConnectOptions): WalletAdapterConfig {
   const skin = options.skin ? resolveSkin(options.skin) : null
   const id = skin ? `walletconnect:${skin.id}` : WALLET_ID

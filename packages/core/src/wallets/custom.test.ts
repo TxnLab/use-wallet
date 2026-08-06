@@ -1,5 +1,5 @@
 import algosdk from 'algosdk'
-import { CustomWallet } from 'src/wallets/custom'
+import { custom, CustomWallet } from 'src/wallets/custom'
 import { createTestHarness } from 'src/testing'
 import type { AdapterStoreAccessor, WalletState } from 'src/wallets/types'
 import type { Store } from '@tanstack/store'
@@ -322,5 +322,33 @@ describe('CustomWallet', () => {
         'Method not supported: transactionSigner'
       )
     })
+  })
+})
+
+describe('custom factory', () => {
+  it('returns config with default metadata', () => {
+    const provider = new MockProvider()
+    const config = custom({ provider })
+
+    expect(config.id).toBe('custom')
+    expect(config.metadata).toEqual(CustomWallet.defaultMetadata)
+    expect(config.options).toEqual({ provider })
+  })
+
+  it('merges metadata overrides with default metadata', () => {
+    const provider = new MockProvider()
+    const config = custom({ provider, metadata: { name: 'My Wallet' } })
+
+    expect(config.metadata).toEqual({
+      ...CustomWallet.defaultMetadata,
+      name: 'My Wallet'
+    })
+  })
+
+  it('does not pass metadata through to adapter options', () => {
+    const provider = new MockProvider()
+    const config = custom({ provider, metadata: { name: 'My Wallet' } })
+
+    expect(config.options).toEqual({ provider })
   })
 })

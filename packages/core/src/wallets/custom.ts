@@ -7,6 +7,7 @@ import type {
   StdSignMetadata,
   WalletAccount,
   WalletAdapterConfig,
+  WalletFactoryOptions,
   WalletMetadata,
   WalletState
 } from './types'
@@ -189,11 +190,12 @@ export class CustomWallet extends BaseWallet<CustomWalletOptions> {
 
 // ---------- Factory Function ----------------------------------------- //
 
-export function custom(options: CustomWalletOptions): WalletAdapterConfig {
+export function custom(options: CustomWalletOptions & WalletFactoryOptions): WalletAdapterConfig {
+  const { metadata, ...adapterOptions } = options
   return {
     id: CUSTOM_WALLET_ID,
-    metadata: CustomWallet.defaultMetadata,
+    metadata: { ...CustomWallet.defaultMetadata, ...metadata },
     Adapter: CustomWallet as unknown as WalletAdapterConfig['Adapter'],
-    options: options as unknown as Record<string, unknown>
+    options: adapterOptions as unknown as Record<string, unknown>
   }
 }

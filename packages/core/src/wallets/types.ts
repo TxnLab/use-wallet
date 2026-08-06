@@ -101,6 +101,16 @@ export interface WalletAdapterConfig {
   capabilities?: WalletCapabilities
 }
 
+/**
+ * Common options accepted by all wallet adapter factory functions.
+ * Adapter packages intersect this with their own options type:
+ * `function myWallet(options?: MyWalletOptions & WalletFactoryOptions)`
+ */
+export interface WalletFactoryOptions {
+  /** Override the wallet's default display metadata (name, icon) */
+  metadata?: Partial<WalletMetadata>
+}
+
 // ---------- Wallet Interface (public-facing) ----------------------- //
 
 /**
