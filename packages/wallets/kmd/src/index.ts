@@ -13,7 +13,8 @@ export function kmd(options?: KmdOptions & WalletFactoryOptions): WalletAdapterC
     options:
       Object.keys(adapterOptions).length > 0
         ? (adapterOptions as unknown as Record<string, unknown>)
-        : undefined
+        : undefined,
+    capabilities: { supportedNetworks: ['localnet'] }
   }
 }
 
