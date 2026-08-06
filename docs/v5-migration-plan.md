@@ -531,7 +531,7 @@ These are a transitional convenience for the monorepo phase. When wallet teams f
   },
   "devDependencies": {
     "@txnlab/use-wallet": "workspace:*",
-    "algosdk": "3.5.2",
+    "algosdk": "3.6.0",
     "tsup": "8.5.1",
     "typescript": "5.9.3"
   },

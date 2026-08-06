@@ -141,8 +141,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/wallets/web3auth
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       canonify:
         specifier: ^2.1.1
         version: 2.1.1
@@ -220,8 +220,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/wallets/web3auth
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       canonify:
         specifier: ^2.1.1
         version: 2.1.1
@@ -290,8 +290,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/wallets/web3auth
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       canonify:
         specifier: ^2.1.1
         version: 2.1.1
@@ -393,8 +393,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/wallets/web3auth
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       canonify:
         specifier: ^2.1.1
         version: 2.1.1
@@ -469,8 +469,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/wallets/web3auth
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       canonify:
         specifier: ^2.1.1
         version: 2.1.1
@@ -551,8 +551,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/wallets/web3auth
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       canonify:
         specifier: ^2.1.1
         version: 2.1.1
@@ -618,8 +618,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/wallets/web3auth
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       canonify:
         specifier: ^2.1.1
         version: 2.1.1
@@ -668,8 +668,8 @@ importers:
         specifier: 20.11.30
         version: 20.11.30
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       tsdown:
         specifier: 0.21.0
         version: 0.21.0(publint@0.3.18)(typescript@5.9.3)(vue-tsc@3.2.5(typescript@5.9.3))
@@ -690,8 +690,8 @@ importers:
         specifier: 19.2.14
         version: 19.2.14
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       jsdom:
         specifier: 26.1.0
         version: 26.1.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
@@ -721,8 +721,8 @@ importers:
         specifier: 0.8.10
         version: 0.8.10(solid-js@1.9.11)
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       solid-js:
         specifier: 1.9.11
         version: 1.9.11
@@ -746,8 +746,8 @@ importers:
         specifier: 5.3.1
         version: 5.3.1(svelte@5.49.1)(vite@7.3.1(@types/node@24.12.0)(jiti@2.6.1)(lightningcss@1.31.1)(terser@5.46.0)(yaml@2.8.2))(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.12.0)(jiti@2.6.1)(jsdom@26.1.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))(lightningcss@1.31.1)(terser@5.46.0)(yaml@2.8.2))
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       svelte:
         specifier: 5.49.1
         version: 5.49.1
@@ -768,8 +768,8 @@ importers:
         version: link:../../core
     devDependencies:
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       tsdown:
         specifier: 0.21.0
         version: 0.21.0(publint@0.3.18)(typescript@5.9.3)(vue-tsc@3.2.5(typescript@5.9.3))
@@ -784,14 +784,14 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: 1.2.1
-        version: 1.2.1(algosdk@3.5.2)(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+        version: 1.2.1(algosdk@3.6.0)(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     devDependencies:
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../../core
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       tsdown:
         specifier: 0.21.0
         version: 0.21.0(publint@0.3.18)(typescript@5.9.3)(vue-tsc@3.2.5(typescript@5.9.3))
@@ -809,8 +809,8 @@ importers:
         specifier: workspace:*
         version: link:../../core
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       tsdown:
         specifier: 0.21.0
         version: 0.21.0(publint@0.3.18)(typescript@5.9.3)(vue-tsc@3.2.5(typescript@5.9.3))
@@ -824,8 +824,8 @@ importers:
         specifier: workspace:*
         version: link:../../core
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       tsdown:
         specifier: 0.21.0
         version: 0.21.0(publint@0.3.18)(typescript@5.9.3)(vue-tsc@3.2.5(typescript@5.9.3))
@@ -843,8 +843,8 @@ importers:
         specifier: workspace:*
         version: link:../../core
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       tsdown:
         specifier: 0.21.0
         version: 0.21.0(publint@0.3.18)(typescript@5.9.3)(vue-tsc@3.2.5(typescript@5.9.3))
@@ -858,8 +858,8 @@ importers:
         specifier: workspace:*
         version: link:../../core
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       tsdown:
         specifier: 0.21.0
         version: 0.21.0(publint@0.3.18)(typescript@5.9.3)(vue-tsc@3.2.5(typescript@5.9.3))
@@ -877,8 +877,8 @@ importers:
         specifier: workspace:*
         version: link:../../core
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       tsdown:
         specifier: 0.21.0
         version: 0.21.0(publint@0.3.18)(typescript@5.9.3)(vue-tsc@3.2.5(typescript@5.9.3))
@@ -899,8 +899,8 @@ importers:
         specifier: workspace:*
         version: link:../../core
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       tsdown:
         specifier: 0.21.0
         version: 0.21.0(publint@0.3.18)(typescript@5.9.3)(vue-tsc@3.2.5(typescript@5.9.3))
@@ -914,8 +914,8 @@ importers:
         specifier: workspace:*
         version: link:../../core
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       tsdown:
         specifier: 0.21.0
         version: 0.21.0(publint@0.3.18)(typescript@5.9.3)(vue-tsc@3.2.5(typescript@5.9.3))
@@ -927,14 +927,14 @@ importers:
     dependencies:
       '@perawallet/connect':
         specifier: 1.6.0
-        version: 1.6.0(algosdk@3.5.2)
+        version: 1.6.0(algosdk@3.6.0)
     devDependencies:
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../../core
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       tsdown:
         specifier: 0.21.0
         version: 0.21.0(publint@0.3.18)(typescript@5.9.3)(vue-tsc@3.2.5(typescript@5.9.3))
@@ -948,8 +948,8 @@ importers:
         specifier: workspace:*
         version: link:../../core
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       tsdown:
         specifier: 0.21.0
         version: 0.21.0(publint@0.3.18)(typescript@5.9.3)(vue-tsc@3.2.5(typescript@5.9.3))
@@ -973,8 +973,8 @@ importers:
         specifier: workspace:*
         version: link:../../core
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       tsdown:
         specifier: 0.21.0
         version: 0.21.0(publint@0.3.18)(typescript@5.9.3)(vue-tsc@3.2.5(typescript@5.9.3))
@@ -998,8 +998,8 @@ importers:
         specifier: workspace:*
         version: link:../../core
       algosdk:
-        specifier: 3.5.2
-        version: 3.5.2
+        specifier: 3.6.0
+        version: 3.6.0
       tsdown:
         specifier: 0.21.0
         version: 0.21.0(publint@0.3.18)(typescript@5.9.3)(vue-tsc@3.2.5(typescript@5.9.3))
@@ -4310,8 +4310,8 @@ packages:
     resolution: {integrity: sha512-08k7pBQnkaUB5p+jL7f1TRaUIlTSDE0cesFu1mD7llLao+1cAhtvvZmGE3OnisTd0xOn118QMw74SRqddqaYvw==}
     engines: {node: '>= 14'}
 
-  algosdk@3.5.2:
-    resolution: {integrity: sha512-frhGtZl1JvfrLRKmMvUm880wj4OiWsWo2FhbreNWh7pdFsKuWPj60fV682wt/CYefLI70iwHavPOwGBkTVt0VA==}
+  algosdk@3.6.0:
+    resolution: {integrity: sha512-pdM0neCgR3DasvpSPfgQKc5/hlhkSYmXjcUChePLGegA0kqA0AoLmcfMDyeREcsvHcu7rrv3Wa+RZnGa5kINwQ==}
     engines: {node: '>=18.0.0'}
 
   alien-signals@3.1.2:
@@ -9468,12 +9468,12 @@ snapshots:
       '@babel/helper-string-parser': 8.0.0-rc.2
       '@babel/helper-validator-identifier': 8.0.0-rc.2
 
-  '@blockshake/defly-connect@1.2.1(algosdk@3.5.2)(bufferutil@4.1.0)(utf-8-validate@5.0.10)':
+  '@blockshake/defly-connect@1.2.1(algosdk@3.6.0)(bufferutil@4.1.0)(utf-8-validate@5.0.10)':
     dependencies:
       '@likecoin/qr-code-styling': 1.6.6
       '@walletconnect/client': 1.8.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       '@walletconnect/types': 1.8.0
-      algosdk: 3.5.2
+      algosdk: 3.6.0
       bowser: 2.11.0
       buffer: 6.0.3
       lottie-web: 5.13.0
@@ -10951,11 +10951,11 @@ snapshots:
 
   '@paulmillr/qr@0.2.1': {}
 
-  '@perawallet/connect@1.6.0(algosdk@3.5.2)':
+  '@perawallet/connect@1.6.0(algosdk@3.6.0)':
     dependencies:
       '@evanhahn/lottie-web-light': 5.8.1
       '@perawallet/walletconnect': 1.0.0
-      algosdk: 3.5.2
+      algosdk: 3.6.0
       bowser: 2.11.0
       buffer: 6.0.3
       qr-code-styling: 1.6.0-rc.1
@@ -13317,7 +13317,7 @@ snapshots:
 
   algorand-msgpack@1.1.0: {}
 
-  algosdk@3.5.2:
+  algosdk@3.6.0:
     dependencies:
       algorand-msgpack: 1.1.0
       hi-base32: 0.5.1

@@ -8,12 +8,16 @@
   "description": "Solid.js library for integrating Algorand wallets into decentralized applications",
   "author": "Doug Richar <drichar@gmail.com>",
   "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/TxnLab/use-wallet.git",
     "directory": "packages/frameworks/solid"
   },
   "type": "module",
+  "sideEffects": false,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -52,12 +56,13 @@
   },
   "devDependencies": {
     "@solidjs/testing-library": "0.8.10",
-    "algosdk": "3.5.2",
+    "algosdk": "3.6.0",
     "solid-js": "1.9.11",
     "tsdown": "0.21.0",
     "typescript": "5.9.3"
   },
   "peerDependencies": {
-    "algosdk": "^3.0.0"
+    "algosdk": "^3.0.0",
+    "solid-js": "^1.9.0"
   }
 }

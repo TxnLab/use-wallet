@@ -23,7 +23,7 @@
     "@txnlab/use-wallet-w3wallet": "workspace:*",
     "@txnlab/use-wallet-walletconnect": "workspace:*",
     "@txnlab/use-wallet-web3auth": "workspace:*",
-    "algosdk": "3.5.2",
+    "algosdk": "3.6.0",
     "canonify": "^2.1.1"
   },
   "devDependencies": {
