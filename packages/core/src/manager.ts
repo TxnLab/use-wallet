@@ -123,6 +123,14 @@ export class WalletManager {
       }
     })
 
+    // Subscribe to emit lifecycle events on state changes
+    let previousState = initialState
+    this.store.subscribe(() => {
+      const currentState = this.store.state
+      this.emitLifecycleEvents(previousState, currentState)
+      previousState = currentState
+    })
+
     // Subscribe to persist state on updates
     this.store.subscribe(() => this.savePersistedState())
 
@@ -156,6 +164,33 @@ export class WalletManager {
     ...args: WalletManagerEvents[K] extends void ? [] : [payload: WalletManagerEvents[K]]
   ): void {
     this.events.emit(event, ...args)
+  }
+
+  private emitLifecycleEvents(prev: State, next: State): void {
+    if (next.wallets !== prev.wallets) {
+      for (const [walletId, walletState] of Object.entries(next.wallets)) {
+        if (!walletState) continue
+        const prevWalletState = prev.wallets[walletId as WalletKey]
+        if (!prevWalletState) {
+          this.events.emit('walletConnected', { walletId, accounts: walletState.accounts })
+        } else {
+          const address = walletState.activeAccount?.address
+          if (address && address !== prevWalletState.activeAccount?.address) {
+            this.events.emit('activeAccountChanged', { walletId, address })
+          }
+        }
+      }
+
+      for (const walletId of Object.keys(prev.wallets)) {
+        if (!next.wallets[walletId as WalletKey]) {
+          this.events.emit('walletDisconnected', { walletId })
+        }
+      }
+    }
+
+    if (next.activeWallet !== prev.activeWallet) {
+      this.events.emit('activeWalletChanged', { walletId: next.activeWallet })
+    }
   }
 
   // ---------- Logging ----------------------------------------------- //
@@ -370,6 +405,10 @@ export class WalletManager {
             await wallet.disconnect()
           } catch (error) {
             this.logger.error(`Error disconnecting ${walletKey}:`, error)
+            this.events.emit('error', {
+              walletId: walletKey,
+              error: error instanceof Error ? error : new Error(String(error))
+            })
             removeWallet(this.store, { walletId: walletKey })
           }
         }
@@ -390,6 +429,11 @@ export class WalletManager {
     try {
       const promises = this.wallets.map((wallet) => wallet?.resumeSession())
       await Promise.all(promises)
+    } catch (error) {
+      this.events.emit('error', {
+        error: error instanceof Error ? error : new Error(String(error))
+      })
+      throw error
     } finally {
       this.store.setState((state) => ({
         ...state,

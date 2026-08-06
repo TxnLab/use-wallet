@@ -6,7 +6,9 @@ import {
   PersistedState,
   State,
   DEFAULT_STATE,
+  addWallet,
   removeWallet,
+  setActiveAccount,
   setActiveWallet
 } from 'src/store'
 import { WalletManager } from 'src/manager'
@@ -574,6 +576,122 @@ describe('WalletManager', () => {
       unsubscribe()
       await manager.setActiveNetwork('testnet')
       expect(handler).toHaveBeenCalledTimes(1) // Not called again
+    })
+
+    it('emits walletConnected when a wallet is added', () => {
+      const manager = new WalletManager({
+        wallets: [defly()]
+      })
+
+      const handler = vi.fn()
+      manager.on('walletConnected', handler)
+
+      const account = { name: 'Defly 1', address: 'ADDRESS_1' }
+      addWallet(manager.store, {
+        walletId: 'defly',
+        wallet: { accounts: [account], activeAccount: account }
+      })
+
+      expect(handler).toHaveBeenCalledTimes(1)
+      expect(handler).toHaveBeenCalledWith({ walletId: 'defly', accounts: [account] })
+    })
+
+    it('emits walletDisconnected when a wallet is removed', () => {
+      const manager = new WalletManager({
+        wallets: [defly()]
+      })
+
+      const account = { name: 'Defly 1', address: 'ADDRESS_1' }
+      addWallet(manager.store, {
+        walletId: 'defly',
+        wallet: { accounts: [account], activeAccount: account }
+      })
+
+      const handler = vi.fn()
+      manager.on('walletDisconnected', handler)
+
+      removeWallet(manager.store, { walletId: 'defly' })
+
+      expect(handler).toHaveBeenCalledTimes(1)
+      expect(handler).toHaveBeenCalledWith({ walletId: 'defly' })
+    })
+
+    it('emits activeWalletChanged when the active wallet changes', () => {
+      const manager = new WalletManager({
+        wallets: [defly(), kibisis()]
+      })
+
+      const handler = vi.fn()
+      manager.on('activeWalletChanged', handler)
+
+      const account = { name: 'Defly 1', address: 'ADDRESS_1' }
+      addWallet(manager.store, {
+        walletId: 'defly',
+        wallet: { accounts: [account], activeAccount: account }
+      })
+
+      expect(handler).toHaveBeenCalledWith({ walletId: 'defly' })
+
+      setActiveWallet(manager.store, { walletId: null })
+
+      expect(handler).toHaveBeenCalledWith({ walletId: null })
+      expect(handler).toHaveBeenCalledTimes(2)
+    })
+
+    it('emits activeAccountChanged when the active account changes', () => {
+      const manager = new WalletManager({
+        wallets: [defly()]
+      })
+
+      const account1 = { name: 'Defly 1', address: 'ADDRESS_1' }
+      const account2 = { name: 'Defly 2', address: 'ADDRESS_2' }
+      addWallet(manager.store, {
+        walletId: 'defly',
+        wallet: { accounts: [account1, account2], activeAccount: account1 }
+      })
+
+      const handler = vi.fn()
+      manager.on('activeAccountChanged', handler)
+
+      setActiveAccount(manager.store, { walletId: 'defly', address: 'ADDRESS_2' })
+
+      expect(handler).toHaveBeenCalledTimes(1)
+      expect(handler).toHaveBeenCalledWith({ walletId: 'defly', address: 'ADDRESS_2' })
+    })
+
+    it('does not emit activeAccountChanged when a wallet first connects', () => {
+      const manager = new WalletManager({
+        wallets: [defly()]
+      })
+
+      const handler = vi.fn()
+      manager.on('activeAccountChanged', handler)
+
+      const account = { name: 'Defly 1', address: 'ADDRESS_1' }
+      addWallet(manager.store, {
+        walletId: 'defly',
+        wallet: { accounts: [account], activeAccount: account }
+      })
+
+      expect(handler).not.toHaveBeenCalled()
+    })
+
+    it('emits error when resumeSessions fails', async () => {
+      const manager = new WalletManager({
+        wallets: [defly()]
+      })
+
+      const error = new Error('Resume failed')
+      const wallet = manager.wallets[0]
+      ;(wallet.resumeSession as Mock).mockRejectedValueOnce(error)
+
+      const handler = vi.fn()
+      manager.on('error', handler)
+
+      await expect(manager.resumeSessions()).rejects.toThrow('Resume failed')
+
+      expect(handler).toHaveBeenCalledTimes(1)
+      expect(handler).toHaveBeenCalledWith({ error })
     })
   })
 
