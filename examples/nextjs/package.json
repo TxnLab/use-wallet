@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@blockshake/defly-connect": "^1.2.1",
-    "@noble/ed25519": "3.0.0",
+    "@noble/ed25519": "3.1.0",
     "@perawallet/connect": "^1.4.1",
     "@txnlab/use-wallet-react": "workspace:*",
     "@walletconnect/modal": "^2.7.0",
@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@types/node": "20.11.30",
-    "@types/react": "18.3.27",
+    "@types/react": "18.3.31",
     "@types/react-dom": "18.3.7",
     "eslint": "8.57.1",
     "eslint-config-next": "14.2.35",
