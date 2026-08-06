@@ -27,7 +27,7 @@ type EventUnsubscribe = () => void
 /**
  * Lightweight typed event emitter for WalletManager.
  * Events are fire-and-forget (observation only). Async interception
- * (middleware) is planned for v5.1+ — see docs/v5-future-features.md.
+ * (middleware) is planned for v5.1+ — see notes/v5-future-features.md.
  */
 export class EventEmitter<TEvents extends Record<string, any>> {
   private listeners = new Map<keyof TEvents, Set<EventHandler<any>>>()
