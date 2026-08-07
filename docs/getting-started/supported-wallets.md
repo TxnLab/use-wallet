@@ -395,8 +395,10 @@ See the [Custom Provider](../guides/custom-provider.md) guide for implementation
 
 ### Third-Party Adapters
 
-Because v5 wallet adapters are standalone packages, wallet providers can publish and maintain their own adapters — they work with use-wallet without requiring changes to this repository. Known third-party adapters:
+Because v5 wallet adapters are standalone packages, wallet providers can publish and maintain their own adapters — they work with use-wallet without requiring changes to this repository. Adapters that meet the [listing criteria](../resources/third-party-adapters.md) are listed here alongside the first-party wallets.
 
-* [`@algovoi/use-wallet-algovoi`](https://www.npmjs.com/package/@algovoi/use-wallet-algovoi) — AlgoVoi wallet (maintained by the AlgoVoi team)
+_No third-party adapters are currently listed. To submit yours, see [Third-Party Adapters](../resources/third-party-adapters.md)._
 
-To build your own adapter package, see the [Custom Provider](../guides/custom-provider.md) guide, or use the [Lute adapter](https://github.com/TxnLab/use-wallet/tree/main/packages/wallets/lute) as a reference implementation.
+{% hint style="info" %}
+Third-party adapters are developed and maintained by their respective teams. TxnLab reviews adapters against the [listing criteria](../resources/third-party-adapters.md#listing-criteria) at the time of listing, but does not audit subsequent releases — a listing is not an endorsement or a guarantee of security or functionality. Always evaluate any adapter, including reviewing its source code, before using it in your application.
+{% endhint %}

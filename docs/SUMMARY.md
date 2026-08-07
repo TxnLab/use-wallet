@@ -36,3 +36,4 @@
 
 * [Example Projects](resources/example-projects.md)
 * [AlgoKit Templates](resources/algokit-templates.md)
+* [Third-Party Adapters](resources/third-party-adapters.md)

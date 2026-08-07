@@ -185,6 +185,10 @@ If the commit reverts a previous commit, it should begin with `revert: `, follow
 
 See the [GitBook documentation](https://txnlab.gitbook.io/use-wallet/) for configuration and usage details, including guides for supported frameworks. For documentation issues and feature requests, please [open an issue](https://github.com/txnlab/use-wallet/issues/new/choose).
 
+## Third-Party Wallet Adapters
+
+Wallet providers can publish and maintain their own adapter packages. To build one and get it listed in the docs, see [Third-Party Adapters](docs/resources/third-party-adapters.md).
+
 ## Contact
 
 If you have any questions, please join our [Discord server](https://discord.gg/7XcuMTfeZP). Discussion related to `@txnlab/use-wallet` takes place in the `#use-wallet` channel.
