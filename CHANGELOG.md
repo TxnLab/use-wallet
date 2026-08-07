@@ -1,3 +1,30 @@
+# [5.0.0-rc.4](https://github.com/TxnLab/use-wallet/compare/v5.0.0-rc.3...v5.0.0-rc.4) (2026-08-07)
+
+
+* feat(*)!: remove Defly Web and Magic wallet adapters ([e497193](https://github.com/TxnLab/use-wallet/commit/e4971931926873eabaca48fca5596f3460d2f300))
+
+
+### Bug Fixes
+
+* harden package manifests for v5 stable ([636d61c](https://github.com/TxnLab/use-wallet/commit/636d61c64c2f9187c60ed7241c0f61fc3f08f3d9))
+* **kmd:** only offer KMD wallet on LocalNet ([6c9ca41](https://github.com/TxnLab/use-wallet/commit/6c9ca4110bee212d1e0e8c1f1ef04a41173681ef))
+* **pera:** normalize signData errors and align packaging ([#441](https://github.com/TxnLab/use-wallet/issues/441) follow-up) ([c373ddc](https://github.com/TxnLab/use-wallet/commit/c373ddcda31d8c5790fdb23d640afc76a5c976dc))
+
+
+### Features
+
+* **core:** emit wallet lifecycle and error events ([8f50217](https://github.com/TxnLab/use-wallet/commit/8f50217cbb5f977ba196bc2e15f9819d1a4c1bea))
+* support metadata override in adapter factory functions ([08b1071](https://github.com/TxnLab/use-wallet/commit/08b1071fac4961c72f1fe41bff5c4d893dbed724))
+
+
+### BREAKING CHANGES
+
+* The @txnlab/use-wallet-defly-web and
+@txnlab/use-wallet-magic adapter packages have been removed. Magic no
+longer supports Algorand; apps using Magic for email-based login can
+migrate to @txnlab/use-wallet-web3auth. The mobile Defly adapter
+(@txnlab/use-wallet-defly) is unaffected.
+
 # [5.0.0-rc.3](https://github.com/TxnLab/use-wallet/compare/v5.0.0-rc.2...v5.0.0-rc.3) (2026-08-07)
 
 

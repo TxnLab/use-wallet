@@ -1,6 +1,6 @@
 {
   "name": "@txnlab/use-wallet-w3wallet",
-  "version": "5.0.0-rc.3",
+  "version": "5.0.0-rc.4",
   "publishConfig": {
     "access": "public",
     "provenance": true
