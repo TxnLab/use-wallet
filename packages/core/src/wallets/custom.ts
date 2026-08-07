@@ -170,6 +170,10 @@ export class CustomWallet extends BaseWallet<CustomWalletOptions> {
 
   // ---------- Sign Data ---------------------------------------------- //
 
+  /*
+   * The developer must own the ARC-60 object construction.
+   * See BaseWallet.createStdSignData for a helper function.
+   */
   public signData = async (
     data: string,
     metadata: StdSignMetadata
