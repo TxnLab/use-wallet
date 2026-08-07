@@ -12,12 +12,10 @@
   "dependencies": {
     "@noble/ed25519": "^3.1.0",
     "@txnlab/use-wallet-defly": "workspace:*",
-    "@txnlab/use-wallet-defly-web": "workspace:*",
     "@txnlab/use-wallet-exodus": "workspace:*",
     "@txnlab/use-wallet-kibisis": "workspace:*",
     "@txnlab/use-wallet-kmd": "workspace:*",
     "@txnlab/use-wallet-lute": "workspace:*",
-    "@txnlab/use-wallet-magic": "workspace:*",
     "@txnlab/use-wallet-mnemonic": "workspace:*",
     "@txnlab/use-wallet-pera": "workspace:*",
     "@txnlab/use-wallet-react": "workspace:*",

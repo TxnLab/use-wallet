@@ -7,12 +7,10 @@ import {
   type Siwa
 } from '@txnlab/use-wallet'
 import { defly } from '@txnlab/use-wallet-defly'
-import { deflyWeb } from '@txnlab/use-wallet-defly-web'
 import { exodus } from '@txnlab/use-wallet-exodus'
 import { kibisis } from '@txnlab/use-wallet-kibisis'
 import { kmd } from '@txnlab/use-wallet-kmd'
 import { lute } from '@txnlab/use-wallet-lute'
-import { magic } from '@txnlab/use-wallet-magic'
 import { mnemonic } from '@txnlab/use-wallet-mnemonic'
 import { pera } from '@txnlab/use-wallet-pera'
 import { w3wallet } from '@txnlab/use-wallet-w3wallet'
@@ -23,13 +21,11 @@ import { canonify } from 'canonify'
 import './style.css'
 
 const WC_PROJECT_ID = 'fcfde0713d43baa0d23be0773c80a72b'
-const MAGIC_ID = 'magic'
 
 const wallets = [
   pera(),
   lute(),
   defly(),
-  deflyWeb(),
   exodus(),
   walletConnect({ projectId: WC_PROJECT_ID }),
   walletConnect({ projectId: WC_PROJECT_ID, skin: 'biatec' }),
@@ -37,7 +33,6 @@ const wallets = [
   w3wallet(),
   kmd(),
   mnemonic(),
-  magic({ apiKey: 'pk_live_D17FD8D89621B5F3' }),
   ...(import.meta.env.VITE_WEB3AUTH_CLIENT_ID
     ? [web3auth({ clientId: import.meta.env.VITE_WEB3AUTH_CLIENT_ID })]
     : [])
@@ -49,7 +44,6 @@ const manager = new WalletManager({
 })
 
 let connectingId: string | null = null
-let magicEmail = ''
 let txnStatus: 'idle' | 'signing' | 'confirming' | 'confirmed' | 'error' = 'idle'
 let authStatus: 'idle' | 'signing' | 'verified' | 'error' = 'idle'
 let txId: string | null = null
@@ -102,20 +96,13 @@ function renderWalletList() {
         }
         buttons += `<button data-disconnect="${wallet.walletKey}" class="rounded-lg border border-red-200 bg-red-50 px-2.5 py-1 text-xs font-medium text-red-500 hover:bg-red-100 transition-colors">Disconnect</button>`
       } else {
-        const isDisabled =
-          connectingId === wallet.id ||
-          (wallet.id === MAGIC_ID && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(magicEmail))
+        const isDisabled = connectingId === wallet.id
         buttons += `<button data-connect="${wallet.walletKey}" ${isDisabled ? 'disabled' : ''} class="rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-800 disabled:opacity-50 transition-colors">${connectingId === wallet.id ? 'Connecting...' : 'Connect'}</button>`
       }
 
       let addressHtml = ''
       if (isConnected && activeAccount) {
         addressHtml = `<div class="text-xs text-gray-400 truncate font-mono">${activeAccount.address.slice(0, 8)}...${activeAccount.address.slice(-4)}</div>`
-      }
-
-      let magicInput = ''
-      if (wallet.id === MAGIC_ID && !isConnected) {
-        magicInput = `<input type="email" data-magic-email placeholder="Email address" value="${escapeHtml(magicEmail)}" class="mt-2 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm text-gray-700 placeholder:text-gray-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400" />`
       }
 
       return `
@@ -128,7 +115,6 @@ function renderWalletList() {
             </div>
             <div class="flex items-center gap-1.5 shrink-0">${buttons}</div>
           </div>
-          ${magicInput}
         </div>`
     })
     .join('')
@@ -307,11 +293,7 @@ function attachEventListeners() {
       try {
         connectingId = wallet.id
         render()
-        if (wallet.id === MAGIC_ID) {
-          await wallet.connect({ email: magicEmail })
-        } else {
-          await wallet.connect()
-        }
+        await wallet.connect()
       } catch (error) {
         console.error(`Failed to connect ${wallet.metadata.name}:`, error)
       } finally {
@@ -336,15 +318,6 @@ function attachEventListeners() {
       await wallet?.disconnect()
     })
   })
-
-  // Magic email
-  const emailInput = document.querySelector<HTMLInputElement>('[data-magic-email]')
-  if (emailInput) {
-    emailInput.addEventListener('input', () => {
-      magicEmail = emailInput.value
-      render()
-    })
-  }
 
   // Account switcher
   const accountSelect = document.querySelector<HTMLSelectElement>('[data-account-switch]')

@@ -146,7 +146,6 @@ npm uninstall @perawallet/connect @blockshake/defly-connect lute-connect
 |---------|--------|
 | `@txnlab/use-wallet-pera` | Pera Wallet |
 | `@txnlab/use-wallet-defly` | Defly Wallet |
-| `@txnlab/use-wallet-defly-web` | Defly Web Wallet |
 | `@txnlab/use-wallet-exodus` | Exodus |
 | `@txnlab/use-wallet-walletconnect` | WalletConnect (+ skins: Biatec, Voi) |
 | `@txnlab/use-wallet-kibisis` | Kibisis |
@@ -154,7 +153,6 @@ npm uninstall @perawallet/connect @blockshake/defly-connect lute-connect
 | `@txnlab/use-wallet-w3wallet` | W3 Wallet |
 | `@txnlab/use-wallet-kmd` | KMD (development) |
 | `@txnlab/use-wallet-mnemonic` | Mnemonic (testing) |
-| `@txnlab/use-wallet-magic` | Magic Auth |
 | `@txnlab/use-wallet-web3auth` | Web3Auth |
 
 {% hint style="info" %}
@@ -350,6 +348,14 @@ If your webpack config references `webpackFallback` from `@txnlab/use-wallet`, r
 #### `WalletId.BIATEC`
 
 Removed. Use `walletConnect({ skin: 'biatec', projectId: '...' })` from `@txnlab/use-wallet-walletconnect`.
+
+#### `WalletId.MAGIC` (Magic Auth)
+
+Removed. Magic dropped support for Algorand (along with all non-EVM chains except Cosmos and Solana) in July 2026, so the integration no longer functions. If your app relied on Magic for email-based login, consider [Web3Auth](../getting-started/supported-wallets.md#web3auth), which supports email and social login flows.
+
+#### `WalletId.DEFLY_WEB` (Defly Web Wallet)
+
+Removed. The Defly Web Wallet browser extension remained in an unfinished beta that was never published to the Chrome Web Store, and there are no plans for a stable release. The mobile [Defly Wallet](../getting-started/supported-wallets.md#defly-wallet) adapter is unaffected.
 
 #### CJS Build Output
 

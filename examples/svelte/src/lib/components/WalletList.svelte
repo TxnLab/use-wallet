@@ -1,31 +1,19 @@
 <script lang="ts">
   import { useWallet, type Wallet } from '@txnlab/use-wallet-svelte'
 
-  const MAGIC_ID = 'magic'
-
   const { availableWallets } = useWallet()
 
   let connecting = $state<string | null>(null)
-  let magicEmail = $state('')
 
   const handleConnect = async (wallet: Wallet) => {
     try {
       connecting = wallet.id
-      if (wallet.id === MAGIC_ID) {
-        await wallet.connect({ email: magicEmail })
-      } else {
-        await wallet.connect()
-      }
+      await wallet.connect()
     } catch (error) {
       console.error(`Failed to connect ${wallet.metadata.name}:`, error)
     } finally {
       connecting = null
     }
-  }
-
-  const isMagicConnectDisabled = (wallet: Wallet) => {
-    if (wallet.id !== MAGIC_ID) return false
-    return !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(magicEmail)
   }
 </script>
 
@@ -73,7 +61,7 @@
           {:else}
             <button
               onclick={() => handleConnect(wallet)}
-              disabled={connecting === wallet.id || isMagicConnectDisabled(wallet)}
+              disabled={connecting === wallet.id}
               class="rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-800 disabled:opacity-50 transition-colors"
             >
               {connecting === wallet.id ? 'Connecting...' : 'Connect'}
@@ -81,14 +69,6 @@
           {/if}
         </div>
       </div>
-      {#if wallet.id === MAGIC_ID && !wallet.isConnected()}
-        <input
-          type="email"
-          bind:value={magicEmail}
-          placeholder="Email address"
-          class="mt-2 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm text-gray-700 placeholder:text-gray-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
-        />
-      {/if}
     </div>
   {/each}
 </div>

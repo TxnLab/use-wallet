@@ -1,31 +1,19 @@
 import { useWallet, type Wallet } from '@txnlab/use-wallet-react'
 import { useState } from 'react'
 
-const MAGIC_ID = 'magic'
-
 export function WalletList() {
   const { availableWallets } = useWallet()
   const [connecting, setConnecting] = useState<string | null>(null)
-  const [magicEmail, setMagicEmail] = useState('')
 
   const handleConnect = async (wallet: Wallet) => {
     try {
       setConnecting(wallet.id)
-      if (wallet.id === MAGIC_ID) {
-        await wallet.connect({ email: magicEmail })
-      } else {
-        await wallet.connect()
-      }
+      await wallet.connect()
     } catch (error) {
       console.error(`Failed to connect ${wallet.metadata.name}:`, error)
     } finally {
       setConnecting(null)
     }
-  }
-
-  const isMagicConnectDisabled = (wallet: Wallet) => {
-    if (wallet.id !== MAGIC_ID) return false
-    return !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(magicEmail)
   }
 
   return (
@@ -36,19 +24,8 @@ export function WalletList() {
           key={wallet.walletKey}
           wallet={wallet}
           isConnecting={connecting === wallet.id}
-          connectDisabled={isMagicConnectDisabled(wallet)}
           onConnect={() => handleConnect(wallet)}
-        >
-          {wallet.id === MAGIC_ID && !wallet.isConnected && (
-            <input
-              type="email"
-              value={magicEmail}
-              onChange={(e) => setMagicEmail(e.target.value)}
-              placeholder="Email address"
-              className="mt-2 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm text-gray-700 placeholder:text-gray-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
-            />
-          )}
-        </WalletRow>
+        />
       ))}
     </div>
   )
@@ -57,15 +34,11 @@ export function WalletList() {
 function WalletRow({
   wallet,
   isConnecting,
-  connectDisabled,
-  onConnect,
-  children
+  onConnect
 }: {
   wallet: Wallet
   isConnecting: boolean
-  connectDisabled: boolean
   onConnect: () => void
-  children?: React.ReactNode
 }) {
   return (
     <div
@@ -111,7 +84,7 @@ function WalletRow({
           ) : (
             <button
               onClick={onConnect}
-              disabled={isConnecting || connectDisabled}
+              disabled={isConnecting}
               className="rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-800 disabled:opacity-50 transition-colors"
             >
               {isConnecting ? 'Connecting...' : 'Connect'}
@@ -119,7 +92,6 @@ function WalletRow({
           )}
         </div>
       </div>
-      {children}
     </div>
   )
 }

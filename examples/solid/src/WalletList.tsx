@@ -1,31 +1,19 @@
 import { useWallet, type Wallet } from '@txnlab/use-wallet-solid'
-import { createSignal, For, Show, type JSX } from 'solid-js'
-
-const MAGIC_ID = 'magic'
+import { createSignal, For, Show } from 'solid-js'
 
 export function WalletList() {
   const { availableWallets } = useWallet()
   const [connecting, setConnecting] = createSignal<string | null>(null)
-  const [magicEmail, setMagicEmail] = createSignal('')
 
   const handleConnect = async (wallet: Wallet) => {
     try {
       setConnecting(wallet.id)
-      if (wallet.id === MAGIC_ID) {
-        await wallet.connect({ email: magicEmail() })
-      } else {
-        await wallet.connect()
-      }
+      await wallet.connect()
     } catch (error) {
       console.error(`Failed to connect ${wallet.metadata.name}:`, error)
     } finally {
       setConnecting(null)
     }
-  }
-
-  const isMagicConnectDisabled = (wallet: Wallet) => {
-    if (wallet.id !== MAGIC_ID) return false
-    return !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(magicEmail())
   }
 
   return (
@@ -36,19 +24,8 @@ export function WalletList() {
           <WalletRow
             wallet={wallet}
             isConnecting={connecting() === wallet.id}
-            connectDisabled={isMagicConnectDisabled(wallet)}
             onConnect={() => handleConnect(wallet)}
-          >
-            <Show when={wallet.id === MAGIC_ID && !wallet.isConnected}>
-              <input
-                type="email"
-                value={magicEmail()}
-                onInput={(e) => setMagicEmail(e.currentTarget.value)}
-                placeholder="Email address"
-                class="mt-2 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm text-gray-700 placeholder:text-gray-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
-              />
-            </Show>
-          </WalletRow>
+          />
         )}
       </For>
     </div>
@@ -58,9 +35,7 @@ export function WalletList() {
 function WalletRow(props: {
   wallet: Wallet
   isConnecting: boolean
-  connectDisabled: boolean
   onConnect: () => void
-  children?: JSX.Element
 }) {
   return (
     <div
@@ -91,7 +66,7 @@ function WalletRow(props: {
             fallback={
               <button
                 onClick={props.onConnect}
-                disabled={props.isConnecting || props.connectDisabled}
+                disabled={props.isConnecting}
                 class="rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-800 disabled:opacity-50 transition-colors"
               >
                 {props.isConnecting ? 'Connecting...' : 'Connect'}
@@ -115,7 +90,6 @@ function WalletRow(props: {
           </Show>
         </div>
       </div>
-      {props.children}
     </div>
   )
 }

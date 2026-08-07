@@ -58,23 +58,6 @@ defly({
 * [Defly Website](https://defly.app)
 * [Defly Connect Documentation](https://github.com/blockshake-io/defly-connect)
 
-#### Defly Wallet (Web)
-
-{% hint style="warning" %}
-The Defly Web Wallet is currently in beta.
-{% endhint %}
-
-Browser extension wallet by Defly, optimized for web interactions.
-
-```typescript
-import { deflyWeb } from '@txnlab/use-wallet-defly-web'
-
-// Basic usage (no options required)
-deflyWeb()
-```
-
-* [Defly Website](https://defly.app)
-
 #### WalletConnect
 
 Universal wallet connection protocol that enables secure communication between mobile wallets and desktop dApps. Supports any wallet that implements the WalletConnect v2 protocol. Project IDs must be obtained from Reown Cloud.
@@ -228,22 +211,6 @@ exodus({
 
 * [Exodus Website](https://www.exodus.com)
 * [Exodus Algorand Provider API](https://docs.exodus.com/web3-providers/algorand-provider-arc-api/)
-
-#### Magic Auth
-
-Email-based authentication provider with built-in wallet functionality.
-
-```typescript
-import { magic } from '@txnlab/use-wallet-magic'
-
-// Configuration required
-magic({
-  apiKey: string // Required: Magic Auth API key
-})
-```
-
-* [Magic Website](https://magic.link)
-* [Magic Algorand Documentation](https://magic.link/docs/blockchains/other-chains/other/algorand)
 
 #### Web3Auth
 

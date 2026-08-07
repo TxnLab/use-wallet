@@ -29,8 +29,6 @@
       "rangeStrategy": "bump",
       "matchPackageNames": [
         "/@agoralabs-sh/avm-web-provider/",
-        "/@magic-ext/algorand/",
-        "/magic-sdk/",
         "/lute-connect/",
         "/walletconnect/",
         "/@perawallet/connect/",

@@ -2,30 +2,18 @@
 import { ref } from 'vue'
 import { useWallet, type Wallet } from '@txnlab/use-wallet-vue'
 
-const MAGIC_ID = 'magic'
-
 const { availableWallets } = useWallet()
 const connecting = ref<string | null>(null)
-const magicEmail = ref('')
 
 const handleConnect = async (wallet: Wallet) => {
   try {
     connecting.value = wallet.id
-    if (wallet.id === MAGIC_ID) {
-      await wallet.connect({ email: magicEmail.value })
-    } else {
-      await wallet.connect()
-    }
+    await wallet.connect()
   } catch (error) {
     console.error(`Failed to connect ${wallet.metadata.name}:`, error)
   } finally {
     connecting.value = null
   }
-}
-
-const isMagicConnectDisabled = (wallet: Wallet) => {
-  if (wallet.id !== MAGIC_ID) return false
-  return !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(magicEmail.value)
 }
 </script>
 
@@ -78,20 +66,13 @@ const isMagicConnectDisabled = (wallet: Wallet) => {
           <button
             v-else
             @click="handleConnect(wallet)"
-            :disabled="connecting === wallet.id || isMagicConnectDisabled(wallet)"
+            :disabled="connecting === wallet.id"
             class="rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-800 disabled:opacity-50 transition-colors"
           >
             {{ connecting === wallet.id ? 'Connecting...' : 'Connect' }}
           </button>
         </div>
       </div>
-      <input
-        v-if="wallet.id === MAGIC_ID && !wallet.isConnected"
-        type="email"
-        v-model="magicEmail"
-        placeholder="Email address"
-        class="mt-2 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm text-gray-700 placeholder:text-gray-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
-      />
     </div>
   </div>
 </template>

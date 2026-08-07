@@ -50,7 +50,7 @@ pnpm example:ts           # Vanilla TypeScript example
 
 ### Package Structure (pnpm monorepo)
 
-All 17 publishable packages use lockstep versioning — every package shares the same version number.
+All 15 publishable packages use lockstep versioning — every package shares the same version number.
 
 **Core** (`packages/core`):
 
@@ -58,7 +58,7 @@ All 17 publishable packages use lockstep versioning — every package shares the
 
 **Wallet Adapters** (`packages/wallets/<name>`):
 
-- `@txnlab/use-wallet-pera`, `-defly`, `-defly-web`, `-exodus`, `-walletconnect`, `-kibisis`, `-lute`, `-w3wallet`, `-kmd`, `-mnemonic`, `-magic`, `-web3auth`
+- `@txnlab/use-wallet-pera`, `-defly`, `-exodus`, `-walletconnect`, `-kibisis`, `-lute`, `-w3wallet`, `-kmd`, `-mnemonic`, `-web3auth`
 - Each is a separate npm package that bundles its wallet SDK as a regular dependency
 - Depends on `@txnlab/use-wallet` via `workspace:*`
 

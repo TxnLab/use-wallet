@@ -57,7 +57,7 @@ import { lute } from '@txnlab/use-wallet-lute'
 import { w3wallet } from '@txnlab/use-wallet-w3wallet'
 import { defly } from '@txnlab/use-wallet-defly'
 import { walletConnect } from '@txnlab/use-wallet-walletconnect'
-import { magic } from '@txnlab/use-wallet-magic'
+import { web3auth } from '@txnlab/use-wallet-web3auth'
 
 const manager = new WalletManager({
   wallets: [
@@ -73,7 +73,7 @@ const manager = new WalletManager({
 
     // Wallets that require options
     walletConnect({ projectId: '<REOWN_PROJECT_ID>' }),
-    magic({ apiKey: '<MAGIC_API_KEY>' }),
+    web3auth({ clientId: '<WEB3AUTH_CLIENT_ID>' }),
 
     // WalletConnect with skin (branded wallet appearance)
     walletConnect({ projectId: '<REOWN_PROJECT_ID>', skin: 'biatec' }),

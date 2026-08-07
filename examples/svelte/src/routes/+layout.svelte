@@ -1,12 +1,10 @@
 <script lang="ts">
   import { useWalletContext, WalletManager } from '@txnlab/use-wallet-svelte'
   import { defly } from '@txnlab/use-wallet-defly'
-  import { deflyWeb } from '@txnlab/use-wallet-defly-web'
   import { exodus } from '@txnlab/use-wallet-exodus'
   import { kibisis } from '@txnlab/use-wallet-kibisis'
   import { kmd } from '@txnlab/use-wallet-kmd'
   import { lute } from '@txnlab/use-wallet-lute'
-  import { magic } from '@txnlab/use-wallet-magic'
   import { mnemonic } from '@txnlab/use-wallet-mnemonic'
   import { pera } from '@txnlab/use-wallet-pera'
   import { w3wallet } from '@txnlab/use-wallet-w3wallet'
@@ -20,7 +18,6 @@
     pera(),
     lute(),
     defly(),
-    deflyWeb(),
     exodus(),
     walletConnect({ projectId: WC_PROJECT_ID }),
     walletConnect({ projectId: WC_PROJECT_ID, skin: 'biatec' }),
@@ -28,7 +25,6 @@
     w3wallet(),
     kmd(),
     mnemonic(),
-    magic({ apiKey: 'pk_live_D17FD8D89621B5F3' }),
     ...(import.meta.env.VITE_WEB3AUTH_CLIENT_ID
       ? [web3auth({ clientId: import.meta.env.VITE_WEB3AUTH_CLIENT_ID })]
       : [])
