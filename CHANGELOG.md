@@ -1,3 +1,10 @@
+# [5.0.0-rc.3](https://github.com/TxnLab/use-wallet/compare/v5.0.0-rc.2...v5.0.0-rc.3) (2026-08-07)
+
+
+### Features
+
+* add signData to Pera adapter ([#441](https://github.com/TxnLab/use-wallet/issues/441)) ([a61cbeb](https://github.com/TxnLab/use-wallet/commit/a61cbeb2c1e4c190ce13fb430dac6f3a6f734db2))
+
 # [5.0.0-rc.2](https://github.com/TxnLab/use-wallet/compare/v5.0.0-rc.1...v5.0.0-rc.2) (2026-07-24)
 
 
