@@ -1,7 +1,7 @@
 # @txnlab/use-wallet-react
 
-[![GitHub package.json version](https://img.shields.io/github/package-json/v/TxnLab/use-wallet?filename=packages%2Fuse-wallet-react%2Fpackage.json&label=version)](https://www.npmjs.com/package/@txnlab/use-wallet?activeTab=versions)
-[![GitHub License](https://img.shields.io/github/license/TxnLab/use-wallet)](https://github.com/TxnLab/use-wallet/blob/main/LICENSE.md)
+[![npm version](https://img.shields.io/npm/v/@txnlab/use-wallet-react)](https://www.npmjs.com/package/@txnlab/use-wallet-react)
+[![License](https://img.shields.io/github/license/TxnLab/use-wallet)](https://github.com/TxnLab/use-wallet/blob/main/LICENSE)
 
 React adapter for [@txnlab/use-wallet](https://github.com/TxnLab/use-wallet)
 
