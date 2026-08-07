@@ -42,6 +42,10 @@ npm install @txnlab/use-wallet-pera @txnlab/use-wallet-defly @txnlab/use-wallet-
 # @perawallet/connect is a dependency of @txnlab/use-wallet-pera — no manual install needed
 ```
 
+{% hint style="info" %}
+Framework packages depend on `@txnlab/use-wallet` (core) directly, so it is installed automatically with them. The wallet adapter packages declare core as a peer dependency, which the explicit `@txnlab/use-wallet` install below satisfies in package managers that don't auto-install peers.
+{% endhint %}
+
 1. Update your use-wallet packages:
 
 {% tabs %}
@@ -229,6 +233,10 @@ walletConnect({ skin: 'biatec', projectId: '...' })
 `WalletId.BIATEC` has been removed entirely. Use `walletConnect({ skin: 'biatec', ... })` instead.
 {% endhint %}
 
+{% hint style="info" %}
+For skinned WalletConnect instances, `wallet.id` has changed: in v4 the id was `'walletconnect'` and only `walletKey` carried the composite value (`'walletconnect:biatec'`). In v5, `wallet.id` and `wallet.walletKey` are both the composite `'walletconnect:biatec'`. Update any code that matches on `wallet.id === 'walletconnect'` for skinned instances.
+{% endhint %}
+
 #### Custom Wallet Metadata
 
 To override a wallet's display name or icon, pass a `metadata` option in the factory function's options object — just as in v4:
@@ -241,6 +249,10 @@ pera({
   }
 })
 ```
+
+{% hint style="info" %}
+Exception: the `walletConnect` factory's `metadata` option is WalletConnect's own dApp metadata (name, description, url, icons) sent to the relay — not display metadata. To customize a WalletConnect instance's display name and icon, pass a custom `skin`: `walletConnect({ projectId, skin: { id: 'mywallet', name: 'My Wallet', icon: '...' } })`.
+{% endhint %}
 
 ### `resetNetwork` Renamed to `persistNetwork`
 
@@ -339,13 +351,11 @@ If your webpack config references `webpackFallback` from `@txnlab/use-wallet`, r
 
 Removed. Use `walletConnect({ skin: 'biatec', projectId: '...' })` from `@txnlab/use-wallet-walletconnect`.
 
-#### `WalletId.LIQUID`
-
-Removed. Liquid Auth had unresolved peer dependency issues and is no longer supported.
-
 #### CJS Build Output
 
 v5 is ESM-only. If your project uses CommonJS (`require()`), you will need to update your build configuration to support ESM imports.
+
+All packages now declare `engines.node >= 22`. Node.js 22+ is required for SSR and tooling environments (browsers are unaffected).
 
 ### New Features
 
@@ -363,6 +373,8 @@ const available = manager.availableWallets
 
 For example, the Mnemonic wallet excludes MainNet for security. When the active network is `'mainnet'`, it won't appear in `availableWallets`.
 
+Related behavior change: when the active network changes, any **connected** wallet that doesn't support the new network is automatically disconnected.
+
 {% hint style="info" %}
 `availableWallets` is also available in all framework adapter hooks (`useWallet`). Use it when rendering wallet lists to respect network capabilities.
 {% endhint %}
@@ -378,7 +390,8 @@ const unsubscribe = manager.on('walletConnected', ({ walletId, accounts }) => {
 
 // Available events:
 // ready, walletConnected, walletDisconnected, activeWalletChanged,
-// activeAccountChanged, networkChanged, beforeSign, afterSign, error
+// activeAccountChanged, networkChanged, error
+// (beforeSign/afterSign signing interception is planned for v5.1+)
 
 // Unsubscribe when done
 unsubscribe()

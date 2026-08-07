@@ -1,6 +1,20 @@
+---
+layout:
+  title:
+    visible: true
+  description:
+    visible: false
+  tableOfContents:
+    visible: true
+  outline:
+    visible: true
+  pagination:
+    visible: true
+---
+
 # Using Private Keys Safely
 
-## The `withPrivateKey` Callback Pattern
+### The `withPrivateKey` Callback Pattern
 
 The `withPrivateKey` method provides scoped access to a wallet's raw private key through a callback. The key material is guaranteed to be zeroed from memory when the callback completes, whether it succeeds or throws.
 
@@ -17,7 +31,7 @@ Only wallets that manage raw key material support `withPrivateKey`. Currently th
 All other wallets (Pera, Defly, Lute, WalletConnect, etc.) use external signing and will throw `"Method not supported: withPrivateKey"`. Always check `canUsePrivateKey` before calling.
 {% endhint %}
 
-### Basic Usage
+#### Basic Usage
 
 {% tabs %}
 {% tab title="React" %}
@@ -114,7 +128,7 @@ function KeyOperation() {
 {% endtab %}
 {% endtabs %}
 
-### How It Works
+#### How It Works
 
 The `withPrivateKey` method follows a "loan" pattern:
 
@@ -126,7 +140,7 @@ The `withPrivateKey` method follows a "loan" pattern:
 
 The key is a standard 64-byte Algorand secret key (32-byte ed25519 seed concatenated with 32-byte public key), compatible with `algosdk` operations.
 
-### Security Guarantees
+#### Security Guarantees
 
 The library provides several layers of defense:
 
@@ -142,9 +156,9 @@ The library provides several layers of defense:
 JavaScript does not offer guaranteed immediate memory clearing due to garbage collection. The `zeroMemory()` function provides defense-in-depth by overwriting the buffer contents immediately, but copies of the data could theoretically persist in GC-managed memory until collected. This is an inherent limitation of the JavaScript runtime, not a flaw in the implementation.
 {% endhint %}
 
-## Best Practices
+### Best Practices
 
-### 1. Keep callbacks short and focused
+#### 1. Keep callbacks short and focused
 
 Do the minimum amount of work needed with the key. The longer the callback runs, the longer the key material lives in memory.
 
@@ -176,7 +190,7 @@ const signature = await withPrivateKey(async (secretKey) => {
 await submitSignatureToServer(signature)
 ```
 
-### 2. Never copy the key out of the callback
+#### 2. Never copy the key out of the callback
 
 The entire point of the callback pattern is scoped access. Copying the key defeats the automatic cleanup.
 
@@ -191,7 +205,7 @@ await withPrivateKey(async (secretKey) => {
 
 If you need key material for a deferred operation, restructure your code so the operation happens inside the callback.
 
-### 3. Check `canUsePrivateKey` before calling
+#### 3. Check `canUsePrivateKey` before calling
 
 Not all wallets support private key access. Always guard the call:
 
@@ -202,7 +216,7 @@ if (!activeWallet?.canUsePrivateKey) {
 }
 ```
 
-### 4. Handle errors gracefully
+#### 4. Handle errors gracefully
 
 The callback's errors propagate through `withPrivateKey`. The key is still zeroed on error, but you should handle the exception:
 
@@ -217,7 +231,7 @@ try {
 }
 ```
 
-### 5. Never log or serialize the key
+#### 5. Never log or serialize the key
 
 Avoid any operation that converts the key to a persistent or inspectable form:
 
@@ -231,11 +245,11 @@ await withPrivateKey(async (secretKey) => {
 })
 ```
 
-## Desktop App Considerations
+### Desktop App Considerations
 
 If you are building a desktop app with Electron, Tauri, or a similar framework, be aware that desktop environments introduce additional security concerns around process isolation, memory dumps, DevTools access, and IPC boundaries. These topics are beyond the scope of this guide -- consult the [Electron Security](https://www.electronjs.org/docs/latest/tutorial/security) or [Tauri Security](https://tauri.app/security/) documentation for framework-specific guidance.
 
-## Example: Signing a Custom Challenge
+### Example: Signing a Custom Challenge
 
 A common use case is signing an authentication challenge from a backend server:
 

@@ -271,6 +271,8 @@ web3auth({
 })
 ```
 
+Web3Auth-derived accounts support scoped private key access via `withPrivateKey` — see [Using Private Keys Safely](../guides/using-private-keys-safely.md).
+
 **Custom Authentication**
 
 Web3Auth also supports custom authentication flows using Single Factor Auth (SFA), allowing integration with existing authentication systems such as Firebase, Auth0, or custom JWT providers. This approach requires an additional dependency:
@@ -354,7 +356,7 @@ mnemonic({
 **Warning:** The Mnemonic Wallet provider is for testing only and will not work on MainNet. Never use with real assets.
 {% endhint %}
 
-See the [Testing with Mnemonic Wallet](../guides/testing-with-mnemonic-wallet.md) guide for details about end-to-end (E2E) testing.
+See the [Testing with Mnemonic Wallet](../guides/testing-with-mnemonic-wallet.md) guide for details about end-to-end (E2E) testing. The Mnemonic wallet also supports scoped private key access via `withPrivateKey` — see [Using Private Keys Safely](../guides/using-private-keys-safely.md).
 
 #### W3 Wallet
 
@@ -383,9 +385,18 @@ custom({
     disconnect?: () => Promise<void>,
     resumeSession?: () => Promise<WalletAccount[] | void>,
     signTransactions?: <T>(txnGroup: T | T[], indexesToSign?: number[]) => Promise<(Uint8Array | null)[]>,
-    transactionSigner?: (txnGroup: Transaction[], indexesToSign: number[]) => Promise<Uint8Array[]>
+    transactionSigner?: (txnGroup: Transaction[], indexesToSign: number[]) => Promise<Uint8Array[]>,
+    signData?: (data: string, metadata: StdSignMetadata) => Promise<StdSignDataResponse>
   }
 })
 ```
 
 See the [Custom Provider](../guides/custom-provider.md) guide for implementation details.
+
+### Third-Party Adapters
+
+Because v5 wallet adapters are standalone packages, wallet providers can publish and maintain their own adapters — they work with use-wallet without requiring changes to this repository. Known third-party adapters:
+
+* [`@algovoi/use-wallet-algovoi`](https://www.npmjs.com/package/@algovoi/use-wallet-algovoi) — AlgoVoi wallet (maintained by the AlgoVoi team)
+
+To build your own adapter package, see the [Custom Provider](../guides/custom-provider.md) guide, or use the [Lute adapter](https://github.com/TxnLab/use-wallet/tree/main/packages/wallets/lute) as a reference implementation.

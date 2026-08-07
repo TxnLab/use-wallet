@@ -128,8 +128,12 @@ interface WalletMethods {
     indexesToSign?: number[]
   ): Promise<(Uint8Array | null)[]>
   transactionSigner: algosdk.TransactionSigner
+  signData(data: string, metadata: StdSignMetadata): Promise<StdSignDataResponse>
+  withPrivateKey<T>(callback: (secretKey: Uint8Array) => Promise<T>): Promise<T>
 }
 ```
+
+`signData` is only supported by wallets whose `canSignData` property is `true` (see [Sign Data](../guides/signing-data.md)). `withPrivateKey` is only supported by wallets whose `canUsePrivateKey` property is `true` (see [Using Private Keys Safely](../guides/using-private-keys-safely.md)); both throw for unsupported wallets.
 
 ### Framework-Specific Usage
 
@@ -209,7 +213,7 @@ function App() {
 {% endtab %}
 {% endtabs %}
 
-See the [framework-specific guides](broken-reference) for detailed setup instructions.
+See the framework-specific guides ([React](../framework/react.md), [Vue](../framework/vue.md), [SolidJS](../framework/solidjs.md), [Svelte](../framework/svelte.md)) for detailed setup instructions.
 
 #### State Access
 
@@ -601,5 +605,5 @@ All framework adapters are written in TypeScript and provide full type definitio
 ### See Also
 
 * [WalletManager](walletmanager.md) - Core functionality documentation
-* [Framework Adapters](broken-reference) - Detailed setup guides
+* [React](../framework/react.md), [Vue](../framework/vue.md), [SolidJS](../framework/solidjs.md), [Svelte](../framework/svelte.md) - Detailed setup guides
 * [Example Projects](../resources/example-projects.md) - Complete examples in each framework

@@ -23,6 +23,8 @@ One straightforward approach is to implement a wallet menu with two distinct sta
 1. **Disconnected State**: Shows a list of available wallets to choose from
 2. **Connected State**: Shows details and controls for a single active wallet
 
+The examples below render the list from `availableWallets`, which is automatically filtered to wallets that support the active network. Use `wallets` instead if you want to show every configured wallet regardless of network compatibility.
+
 While use-wallet supports connecting multiple wallets simultaneously, focusing on a single active wallet can:
 
 * Simplify the user experience
@@ -43,7 +45,7 @@ import { useWallet, type Wallet } from '@txnlab/use-wallet-react'
 import { useState } from 'react'
 
 const WalletMenu = () => {
-  const { wallets, activeWallet } = useWallet()
+  const { availableWallets, activeWallet } = useWallet()
   
   // If we have an active wallet, show the connected view
   if (activeWallet) {
@@ -51,7 +53,7 @@ const WalletMenu = () => {
   }
   
   // Otherwise, show the wallet selection list
-  return <WalletList wallets={wallets} />
+  return <WalletList wallets={availableWallets} />
 }
 
 const WalletList = ({ wallets }: { wallets: Wallet[] }) => {
@@ -153,7 +155,7 @@ const ConnectedWallet = ({ wallet }: { wallet: Wallet }) => {
   import { useWallet, type Wallet } from '@txnlab/use-wallet-vue'
   import { ref } from 'vue'
 
-  const { wallets, activeWallet } = useWallet()
+  const { availableWallets, activeWallet } = useWallet()
   const connecting = ref(false)
 
   const handleConnect = async (wallet: Wallet) => {
@@ -216,7 +218,7 @@ const ConnectedWallet = ({ wallet }: { wallet: Wallet }) => {
       <h3>Connect Wallet</h3>
       <div class="wallet-options">
         <button
-          v-for="wallet in wallets"
+          v-for="wallet in availableWallets"
           :key="wallet.id"
           @click="() => handleConnect(wallet)"
           :disabled="connecting"
@@ -243,7 +245,7 @@ import { useWallet, type Wallet } from '@txnlab/use-wallet-solid'
 import { createSignal, For, Show } from 'solid-js'
 
 const WalletMenu = () => {
-  const { wallets, activeWallet, activeAccount } = useWallet()
+  const { availableWallets, activeWallet, activeAccount } = useWallet()
   const [connecting, setConnecting] = createSignal(false)
 
   const handleConnect = async (wallet: Wallet) => {
@@ -270,7 +272,7 @@ const WalletMenu = () => {
           <div class="wallet-list">
             <h3>Connect Wallet</h3>
             <div class="wallet-options">
-              <For each={wallets}>
+              <For each={availableWallets}>
                 {(wallet) => (
                   <button
                     onClick={() => handleConnect(wallet)}
@@ -341,7 +343,7 @@ const WalletMenu = () => {
 <script lang="ts">
   import { useWallet, type Wallet } from '@txnlab/use-wallet-svelte'
 
-  const { wallets, activeWallet } = useWallet()
+  const { availableWallets, activeWallet } = useWallet()
   const connecting = $state(false)
 
   const handleConnect = async (wallet: Wallet) => {
@@ -404,7 +406,7 @@ const WalletMenu = () => {
     <div class="wallet-list">
       <h3>Connect Wallet</h3>
       <div class="wallet-options">
-        {#each wallets as wallet}
+        {#each availableWallets as wallet}
           <button
             onclick={() => handleConnect(wallet)}
             disabled={connecting}

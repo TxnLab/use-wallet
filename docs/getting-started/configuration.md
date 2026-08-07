@@ -91,9 +91,10 @@ By default, use-wallet comes with configurations for:
 * MainNet
 * TestNet
 * BetaNet
+* FNet
 * LocalNet (for development)
 
-For all public Algorand networks (MainNet, TestNet, BetaNet), the default configurations use [Nodely's free public API](https://nodely.io/docs/free/start/), so you don't need to configure network settings to get started.
+For all public Algorand networks (MainNet, TestNet, BetaNet, FNet), the default configurations use [Nodely's free public API](https://nodely.io/docs/free/start/), so you don't need to configure network settings to get started.
 
 {% hint style="info" %}
 [Nodely](https://nodely.io/) provides their public API free of charge with [certain usage requirements](https://nodely.io/docs/free/policy/). For production applications with significant traffic, consider either:

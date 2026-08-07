@@ -17,7 +17,8 @@ layout:
 ### Requirements
 
 * `algosdk` v3
-* ESM-capable environment (Node 18+, modern bundlers like Vite, Next.js, or Webpack 5+)
+* ESM-capable environment (modern bundlers like Vite, Next.js, or Webpack 5+)
+* Node.js 22 or later (for SSR, tooling, and development — the packages are ESM-only and do not ship a CommonJS build)
 
 ### Install Package
 

@@ -67,10 +67,12 @@ const manager = new WalletManager({
 
   // Configure networks
   networks: {
-    algod: {
-      baseServer: 'https://testnet-api.4160.nodely.dev',
-      port: '443',
-      token: ''
+    testnet: {
+      algod: {
+        baseServer: 'https://testnet-api.4160.nodely.dev',
+        port: '443',
+        token: ''
+      }
     }
   },
   defaultNetwork: 'testnet',
@@ -278,25 +280,34 @@ interface State {
   algodClient: algosdk.Algodv2
   managerStatus: ManagerStatus
   networkConfig: Record<string, NetworkConfig>
+  customNetworkConfigs: Record<string, Partial<NetworkConfig>>
 }
 ```
 
-#### on / off
+#### on
 
 ```typescript
-on<K extends keyof WalletManagerEvents>(event: K, handler: WalletManagerEvents[K]): () => void
-off<K extends keyof WalletManagerEvents>(event: K, handler: WalletManagerEvents[K]): void
+on<K extends keyof WalletManagerEvents>(
+  event: K,
+  handler: (payload: WalletManagerEvents[K]) => void
+): () => void
 ```
 
-Subscribe to or unsubscribe from specific wallet events. The `on` method returns an unsubscribe function.
+Subscribe to specific wallet events. Returns an unsubscribe function.
 
-Available events:
-- `walletConnected` — Emitted when a wallet connects
-- `walletDisconnected` — Emitted when a wallet disconnects
-- `activeWalletChanged` — Emitted when the active wallet changes
-- `activeAccountChanged` — Emitted when the active account changes
-- `beforeSign` — Emitted before a transaction signing request
-- `afterSign` — Emitted after a transaction signing request
+Available events and their payloads:
+
+| Event | Payload | Emitted when |
+| --- | --- | --- |
+| `ready` | — | All wallet sessions have been resumed after initialization |
+| `walletConnected` | `{ walletId, accounts }` | A wallet connects |
+| `walletDisconnected` | `{ walletId }` | A wallet disconnects |
+| `activeWalletChanged` | `{ walletId }` | The active wallet changes (`null` when unset) |
+| `activeAccountChanged` | `{ walletId, address }` | The active account within a wallet changes |
+| `networkChanged` | `{ networkId }` | The active network changes |
+| `error` | `{ walletId?, error }` | Session resumption fails, or disconnecting an incompatible wallet on network switch fails |
+
+Events are fire-and-forget notifications for observing state changes — they cannot intercept or cancel operations. Signing interception events (`beforeSign`/`afterSign`) are planned for a future release.
 
 #### Example
 
@@ -310,8 +321,8 @@ const unsubscribe = manager.subscribe((state) => {
 unsubscribe()
 
 // Event emitter
-const off = manager.on('walletConnected', (wallet) => {
-  console.log('Wallet connected:', wallet.id)
+const off = manager.on('walletConnected', ({ walletId, accounts }) => {
+  console.log('Wallet connected:', walletId, accounts)
 })
 
 // Later
@@ -320,7 +331,7 @@ off()
 
 ### Framework Integration
 
-The WalletManager can be used directly with the `subscribe` method to implement custom reactivity, or through one of the official [framework adapters](broken-reference) that provide hooks/composables for common frameworks:
+The WalletManager can be used directly with the `subscribe` method to implement custom reactivity, or through one of the official framework adapters that provide hooks/composables for common frameworks:
 
 ```tsx
 // React

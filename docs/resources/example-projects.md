@@ -196,7 +196,7 @@ pnpm example:nuxt    # Run Nuxt example
 
 ### Next Steps
 
-* Read the [framework-specific integration](broken-reference) guides for detailed setup instructions
+* Read the framework-specific integration guides ([React](../framework/react.md), [Vue](../framework/vue.md), [SolidJS](../framework/solidjs.md), [Svelte](../framework/svelte.md)) for detailed setup instructions
 * Explore the [Connect Wallet Menu](../guides/connect-wallet-menu.md) guide to understand core wallet integration concepts and best practices
 * Learn about advanced features in the [Runtime Node Configuration](../guides/runtime-node-configuration.md) guide
 * Set up testing with the [Testing with Mnemonic Wallet](../guides/testing-with-mnemonic-wallet.md) guide

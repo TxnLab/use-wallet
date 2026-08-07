@@ -222,8 +222,9 @@ const genesisId = () => activeNetworkConfig().genesisId
 When switching networks, several things happen automatically:
 
 1. The `algodClient` is updated to point to the new network
-2. Active wallet sessions are maintained (if the wallet supports the new network)
-3. The active network is saved to local storage
+2. Connected wallets that don't support the new network (per their declared capabilities) are automatically disconnected; other wallet sessions are maintained
+3. A `networkChanged` event is emitted
+4. If `persistNetwork` is enabled, the active network is saved to local storage and restored on the next page load
 
 ### Wallet Compatibility
 
@@ -232,6 +233,7 @@ Not all wallets support all networks. For example:
 * Exodus only works on MainNet
 * Defly and Pera only support MainNet and TestNet
 * The Mnemonic wallet only works on test networks
+* KMD only works on LocalNet
 * Custom networks may not be supported by all wallets
 
 Wallets can declare which networks they support using `WalletCapabilities`. The `availableWallets` property (available on `WalletManager` and all framework hooks) returns only wallets compatible with the active network. Consider using `availableWallets` instead of `wallets` when rendering wallet selection lists.
@@ -243,6 +245,7 @@ use-wallet supports any AVM-compatible network and comes with default configurat
 * MainNet
 * TestNet
 * BetaNet
+* FNet
 * LocalNet (for development)
 
 For details about configuring networks, including how to customize default networks and add custom networks, see the [Configuration](../getting-started/configuration.md#network-configuration) guide.

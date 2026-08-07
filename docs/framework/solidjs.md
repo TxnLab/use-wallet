@@ -55,7 +55,8 @@ import { useWallet } from '@txnlab/use-wallet-solid'
 
 function WalletInfo() {
   const { 
-    wallets,             // List of available wallets
+    wallets,             // All configured wallets
+    availableWallets,    // Wallets available on the active network
     activeWallet,        // Currently active wallet (signal)
     activeAccount,       // Active account in active wallet (signal)
     activeAddress,       // Address of active account (signal)
@@ -136,5 +137,5 @@ For a complete list of all available properties and methods, see the [useNetwork
 * Check out the [Connect Wallet Menu](../guides/connect-wallet-menu.md) guide for creating a simple wallet connection interface
 * Learn about transaction signing patterns in the [Signing Transactions](../guides/signing-transactions.md) guide
 * Explore network features in the [Switching Networks](../guides/switching-networks.md) and [Runtime Node Configuration](../guides/runtime-node-configuration.md) guides
-* Read the [API Reference](broken-reference) for detailed documentation of the library's main exports
+* Read the [API Reference](../api-reference/usewallet.md) for detailed documentation of the library's main exports
 * Browse [Example Projects](../resources/example-projects.md) for a working implementation in Vite (Solid)
