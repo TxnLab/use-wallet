@@ -24,7 +24,7 @@ const manager = new WalletManager({
 })
 ```
 
-Supports MainNet and TestNet. Options: `bridge`, `shouldShowSignTxnToast`, `chainId`, `compactMode`.
+Supports MainNet and TestNet. Also supports ARC-60 data signing (`signData`). Options: `bridge`, `shouldShowSignTxnToast`, `chainId`, `compactMode`.
 
 The factory also accepts an optional `metadata` option to override the wallet's display name and icon.
 

@@ -5,10 +5,11 @@ import {
   flattenTxnGroup,
   isSignedTxn,
   isTransactionArray,
-  StdSignDataResponse,
-  StdSignMetadata,
+  SignDataError,
   type AdapterConstructorParams,
   type SignerTransaction,
+  type StdSignDataResponse,
+  type StdSignMetadata,
   type WalletAccount,
   type WalletMetadata,
   type WalletState
@@ -25,6 +26,12 @@ export interface PeraOptions {
 import { icon } from './icon'
 
 const ICON = `data:image/svg+xml;base64,${btoa(icon)}`
+
+// PeraWalletConnectError is not exported from @perawallet/connect,
+// so detect it structurally via its `data.type` discriminator
+function isPeraWalletError(error: unknown): error is Error & { data: { type: string } } {
+  return error instanceof Error && typeof (error as any).data?.type === 'string'
+}
 
 export class PeraAdapter extends BaseWallet<PeraOptions> {
   private client: PeraWalletConnect | null = null
@@ -308,8 +315,15 @@ export class PeraAdapter extends BaseWallet<PeraOptions> {
 
       this.logger.debug('Data signed successfully', signDataResult)
       return signDataResult
-    } catch (error: any) {
-      this.logger.error('Error signing data:', error.message)
+    } catch (error) {
+      if (isPeraWalletError(error)) {
+        // Map Pera error types to ARC-60 error codes: user cancellation
+        // is 4001, all other signing failures are 4300 (invalid input)
+        const code = error.data.type.includes('CANCELLED') ? 4001 : 4300
+        this.logger.error('Error signing data:', error.message, `(${error.data.type})`)
+        throw new SignDataError(error.message, code, error.data)
+      }
+      this.logger.error('Unknown error signing data:', error)
       throw error
     }
   }

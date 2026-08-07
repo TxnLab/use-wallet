@@ -1,7 +1,7 @@
 import algosdk from 'algosdk'
 import { PeraAdapter } from './adapter'
 import { createTestHarness, type WalletState } from '@txnlab/use-wallet/testing'
-import type { AdapterStoreAccessor } from '@txnlab/use-wallet/adapter'
+import { ScopeType, type AdapterStoreAccessor } from '@txnlab/use-wallet/adapter'
 import type { State, Store } from '@txnlab/use-wallet/testing'
 
 vi.mock('@txnlab/use-wallet/adapter', async (importOriginal) => {
@@ -17,6 +17,7 @@ const mockPeraWallet = {
   reconnectSession: vi.fn(),
   disconnect: vi.fn(),
   signTransaction: vi.fn(),
+  signArc60Data: vi.fn(),
   connector: {
     on: vi.fn(),
     off: vi.fn()
@@ -29,13 +30,16 @@ vi.mock('@perawallet/connect', () => ({
 
 const WALLET_ID = 'pera'
 
-function createWallet(store: AdapterStoreAccessor): PeraAdapter {
+function createWallet(
+  store: AdapterStoreAccessor,
+  getAlgodClient: () => any = () => ({}) as any
+): PeraAdapter {
   const wallet = new PeraAdapter({
     id: WALLET_ID,
     metadata: PeraAdapter.defaultMetadata,
     store,
     subscribe: vi.fn(),
-    getAlgodClient: () => ({}) as any
+    getAlgodClient
   })
 
   // @ts-expect-error - Mocking the private client property
@@ -479,6 +483,128 @@ describe('PeraAdapter', () => {
 
         expect(signTransactionsSpy).toHaveBeenCalledWith(txnGroup, indexesToSign)
       })
+    })
+  })
+
+  describe('signData', () => {
+    // Connected account
+    const connectedAcct1 = '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q'
+    const testDomain = 'test.domain'
+
+    const sha256 = async (data: BufferSource): Promise<Uint8Array> => {
+      const buf = await crypto.subtle.digest('SHA-256', data)
+      return new Uint8Array(buf)
+    }
+
+    const mockAlgodClient = {
+      accountInformation: vi.fn()
+    }
+
+    beforeEach(async () => {
+      vi.stubGlobal('location', { host: testDomain })
+
+      mockAlgodClient.accountInformation.mockReturnValue({
+        do: vi.fn().mockResolvedValue({})
+      })
+
+      wallet = createWallet(accessor, () => mockAlgodClient)
+
+      mockPeraWallet.connect.mockResolvedValueOnce([connectedAcct1])
+      await wallet.connect()
+    })
+
+    afterEach(() => {
+      vi.unstubAllGlobals()
+    })
+
+    it('should have canSignData set to true', () => {
+      expect(wallet.canSignData).toBe(true)
+    })
+
+    it('should construct StdSignData and call Pera client signArc60Data with correct parameters', async () => {
+      const testData = 'test-data'
+      const testMetadata = { scope: ScopeType.AUTH, encoding: 'base64' }
+
+      const expectedStdSignData = {
+        data: testData,
+        signer: algosdk.Address.fromString(connectedAcct1).publicKey,
+        domain: testDomain,
+        authenticatorData: await sha256(new TextEncoder().encode(testDomain))
+      }
+
+      const mockResponse = {
+        ...expectedStdSignData,
+        signature: new Uint8Array([7, 8, 9])
+      }
+
+      mockPeraWallet.signArc60Data.mockResolvedValue(mockResponse)
+
+      const result = await wallet.signData(testData, testMetadata)
+
+      expect(mockAlgodClient.accountInformation).toHaveBeenCalledWith(connectedAcct1)
+      expect(mockPeraWallet.signArc60Data).toHaveBeenCalledWith(expectedStdSignData, testMetadata)
+      expect(result).toEqual(mockResponse)
+    })
+
+    it('should sign with the auth address public key for rekeyed accounts', async () => {
+      const authAddr = new algosdk.Address(new Uint8Array(32).fill(7))
+      mockAlgodClient.accountInformation.mockReturnValue({
+        do: vi.fn().mockResolvedValue({ authAddr })
+      })
+
+      mockPeraWallet.signArc60Data.mockResolvedValue({
+        data: 'test-data',
+        signer: authAddr.publicKey,
+        domain: testDomain,
+        authenticatorData: await sha256(new TextEncoder().encode(testDomain)),
+        signature: new Uint8Array([7, 8, 9])
+      })
+
+      await wallet.signData('test-data', { scope: ScopeType.AUTH, encoding: 'base64' })
+
+      expect(mockPeraWallet.signArc60Data).toHaveBeenCalledWith(
+        expect.objectContaining({ signer: authAddr.publicKey }),
+        { scope: ScopeType.AUTH, encoding: 'base64' }
+      )
+    })
+
+    it('should normalize user cancellation to SignDataError with code 4001', async () => {
+      const peraError = Object.assign(new Error('Sign data cancelled'), {
+        data: { type: 'SIGN_DATA_CANCELLED' }
+      })
+      mockPeraWallet.signArc60Data.mockRejectedValueOnce(peraError)
+
+      await expect(
+        wallet.signData('test-data', { scope: ScopeType.AUTH, encoding: 'base64' })
+      ).rejects.toMatchObject({
+        name: 'SignDataError',
+        message: 'Sign data cancelled',
+        code: 4001
+      })
+    })
+
+    it('should normalize other Pera signing errors to SignDataError with code 4300', async () => {
+      const peraError = Object.assign(new Error('Domain mismatch'), {
+        data: { type: 'SIGN_DATA_DOMAIN_MISMATCH' }
+      })
+      mockPeraWallet.signArc60Data.mockRejectedValueOnce(peraError)
+
+      await expect(
+        wallet.signData('test-data', { scope: ScopeType.AUTH, encoding: 'base64' })
+      ).rejects.toMatchObject({
+        name: 'SignDataError',
+        message: 'Domain mismatch',
+        code: 4300
+      })
+    })
+
+    it('should re-throw unrecognized errors unchanged', async () => {
+      const unknownError = new Error('Network failure')
+      mockPeraWallet.signArc60Data.mockRejectedValueOnce(unknownError)
+
+      await expect(
+        wallet.signData('test-data', { scope: ScopeType.AUTH, encoding: 'base64' })
+      ).rejects.toBe(unknownError)
     })
   })
 })

@@ -31,7 +31,7 @@
   ],
   "peerDependencies": {
     "@txnlab/use-wallet": "^5.0.0",
-    "algosdk": "^3.0.0"
+    "algosdk": "^3.5.2"
   },
   "dependencies": {
     "@perawallet/connect": "1.6.0"

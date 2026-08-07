@@ -1,13 +1,13 @@
 # Signing Data
 
-## ARC-60 Authentication with Lute Wallet
+## ARC-60 Authentication
 
-The `useWallet` hook/composable/primitive provides a `signData` method for implementing ARC-60 authentication with the [Lute](../getting-started/supported-wallets.md#lute-wallet) wallet provider. This guide demonstrates how to implement Sign-In with Algorand (SIWA) using Lute wallet.
+The `useWallet` hook/composable/primitive provides a `signData` method for implementing ARC-60 authentication with supported wallet providers. This guide demonstrates how to implement Sign-In with Algorand (SIWA).
 
 {% hint style="info" %}
 **Wallet Compatibility**
 
-Currently, only the Lute wallet provider supports ARC-60 data signing. Attempting to call `signData` with any other wallet provider will throw an error. You should check the wallet's capabilities before attempting to sign data.
+Currently, the [Lute](../getting-started/supported-wallets.md#lute-wallet) and [Pera](../getting-started/supported-wallets.md#pera-wallet) wallet providers support ARC-60 data signing. Attempting to call `signData` with any other wallet provider will throw an error. You should check the wallet's `canSignData` capability before attempting to sign data.
 {% endhint %}
 
 ### Implementation
