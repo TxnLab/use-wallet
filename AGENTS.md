@@ -59,7 +59,7 @@ All 17 publishable packages use lockstep versioning — every package shares the
 **Wallet Adapters** (`packages/wallets/<name>`):
 
 - `@txnlab/use-wallet-pera`, `-defly`, `-defly-web`, `-exodus`, `-walletconnect`, `-kibisis`, `-lute`, `-w3wallet`, `-kmd`, `-mnemonic`, `-magic`, `-web3auth`
-- Each is a separate npm package with the wallet SDK as a peer dependency
+- Each is a separate npm package that bundles its wallet SDK as a regular dependency
 - Depends on `@txnlab/use-wallet` via `workspace:*`
 
 **Framework Adapters** (`packages/frameworks/<name>`):
@@ -82,7 +82,7 @@ All 17 publishable packages use lockstep versioning — every package shares the
 - `WalletManager` (`src/manager.ts`): Orchestrates wallet initialization, network configuration, and state persistence. Entry point for configuring the library.
 - `BaseWallet` (`src/wallets/base.ts`): Abstract base class all wallet implementations extend. Defines the wallet interface: `connect()`, `disconnect()`, `resumeSession()`, `signTransactions()`.
 
-**Wallet Implementations** (`src/wallets/`): Each wallet provider has its own implementation extending `BaseWallet`. Wallet SDKs are peer dependencies, allowing users to install only what they need.
+**Wallet Implementations** (`packages/wallets/*`): Each wallet provider has its own adapter package extending `BaseWallet`, with its wallet SDK bundled as a dependency. Users install only the adapter packages they need.
 
 **v5 API**: Wallets are configured using factory functions (e.g., `pera()`, `defly()`) instead of the v4 `WalletId` enum. Wallet capabilities include `supportedNetworks`/`excludedNetworks` for filtering via `availableWallets`.
 
