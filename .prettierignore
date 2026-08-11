@@ -13,7 +13,13 @@ docs/**
 **/.svelte-kit
 **/build
 
+# Generated Next.js files
+**/next-env.d.ts
+
 # Project files
 CLAUDE.md
 .claude/**
 CHANGELOG.md
+
+# Untracked local scratch files
+*.local.md
