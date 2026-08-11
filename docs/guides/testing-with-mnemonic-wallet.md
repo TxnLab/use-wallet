@@ -37,22 +37,22 @@ The Mnemonic wallet is strictly for testing and development. For security reason
 Add the Mnemonic provider to your WalletManager configuration:
 
 ```typescript
-import { WalletManager, WalletId } from '@txnlab/use-wallet'
+import { WalletManager } from '@txnlab/use-wallet'
+import { pera } from '@txnlab/use-wallet-pera'
+import { defly } from '@txnlab/use-wallet-defly'
+import { mnemonic } from '@txnlab/use-wallet-mnemonic'
 
 const manager = new WalletManager({
   wallets: [
     // Production wallets...
-    WalletId.PERA,
-    WalletId.DEFLY,
-    
+    pera(),
+    defly(),
+
     // Test wallet
-    {
-      id: WalletId.MNEMONIC,
-      options: {
-        // Optional: persist mnemonic to localStorage
-        persistToStorage: false
-      }
-    }
+    mnemonic({
+      // Optional: persist mnemonic to localStorage
+      persistToStorage: false
+    }),
   ],
   defaultNetwork: 'testnet'
 })
@@ -69,12 +69,7 @@ By default, the Mnemonic provider does not persist sessions to localStorage. Thi
 To match the behavior of production wallets in tests, enable persistence:
 
 ```typescript
-{
-  id: WalletId.MNEMONIC,
-  options: {
-    persistToStorage: true
-  }
-}
+mnemonic({ persistToStorage: true })
 ```
 
 {% hint style="warning" %}
@@ -112,24 +107,11 @@ test('wallet connection flow', async ({ page }) => {
     'sugar bronze century excuse animal jacket what rail biology symbol want craft annual soul increase question army win execute slim girl chief exhaust abstract wink'
   ))
   
-  // Verify Mnemonic wallet is available
-  await expect(page.getByRole('heading', { name: 'Mnemonic' })).toBeVisible()
-  
-  // Connect to wallet
-  await page
-    .locator('.wallet-group', {
-      has: page.locator('h4', { hasText: 'Mnemonic' })
-    })
-    .getByRole('button', { name: 'Connect' })
-    .click()
-    
+  // Connect to Mnemonic wallet
+  await page.locator('[data-connect="mnemonic"]').click()
+
   // Verify connection succeeded
-  await expect(page.getByRole('heading', { name: 'Mnemonic [active]' })).toBeVisible()
-  
-  // Verify correct account is connected
-  await expect(page.getByRole('combobox')).toHaveValue(
-    '3F3FPW6ZQQYD6JDC7FKKQHNGVVUIBIZOUI5WPSJEHBRABZDRN6LOTBMFEY'
-  )
+  await expect(page.locator('[data-disconnect="mnemonic"]')).toBeVisible()
 })
 ```
 
@@ -184,4 +166,4 @@ When using the Mnemonic provider for testing:
   * Running tests against LocalNet (sandbox) or a private network
   * Including wallet tests in your automated test suite
 
-For complete testing examples, including mocking strategies and common test scenarios, see the [E2E test examples](https://github.com/TxnLab/use-wallet/tree/main/examples/e2e-tests) in the repository.
+For complete testing examples, including mocking strategies and common test scenarios, see the [E2E test examples](https://github.com/TxnLab/use-wallet/tree/v5/examples/e2e-tests) in the repository.

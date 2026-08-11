@@ -1,0 +1,50 @@
+{
+  "name": "@txnlab/use-wallet-kmd",
+  "version": "5.0.0-rc.4",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "description": "KMD wallet adapter for @txnlab/use-wallet",
+  "author": "Doug Richar <drichar@gmail.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TxnLab/use-wallet.git",
+    "directory": "packages/wallets/kmd"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "peerDependencies": {
+    "@txnlab/use-wallet": "^5.0.0",
+    "algosdk": "^3.0.0"
+  },
+  "devDependencies": {
+    "@txnlab/use-wallet": "workspace:*",
+    "algosdk": "3.6.0",
+    "tsdown": "0.21.0",
+    "typescript": "5.9.3"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "start": "tsdown --watch",
+    "test": "vitest run",
+    "test:watch": "vitest --watch",
+    "lint": "eslint \"src/**/*.{js,ts}\"",
+    "typecheck": "tsc --noEmit"
+  }
+}

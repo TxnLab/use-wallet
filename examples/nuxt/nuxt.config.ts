@@ -1,26 +1,12 @@
+import tailwindcss from '@tailwindcss/vite'
+import { nodePolyfills } from 'vite-plugin-node-polyfills'
+
 export default defineNuxtConfig({
-  devtools: { enabled: true },
-
-  // Disable SSR - wallet connections are client-side only
+  compatibilityDate: '2025-03-06',
   ssr: false,
-
-  typescript: {
-    strict: true
-  },
-
+  css: ['~/assets/css/main.css'],
   vite: {
-    define: {
-      // Required for some Web3Auth dependencies
-      global: 'globalThis'
-    },
-    build: {
-      target: 'es2020',
-      chunkSizeWarningLimit: 700
-    },
-    optimizeDeps: {
-      include: ['buffer', 'process']
-    }
-  },
-
-  compatibilityDate: '2025-05-02'
+    // @ts-expect-error Vite version mismatch between plugins and Nuxt's bundled Vite
+    plugins: [tailwindcss(), nodePolyfills()]
+  }
 })

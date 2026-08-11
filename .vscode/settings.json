@@ -5,17 +5,6 @@
   "editor.formatOnSave": true,
   "git.closeDiffOnOperation": true,
   "javascript.validate.enable": true,
-  "eslint.workingDirectories": [
-    "./packages/use-wallet",
-    "./packages/use-wallet-react",
-    "./packages/use-wallet-solid",
-    "./packages/use-wallet-vue",
-    "./examples/nextjs",
-    "./examples/nuxt",
-    "./examples/react-ts",
-    "./examples/solid-ts",
-    "./examples/vanilla-ts",
-    "./examples/vue-ts"
-  ],
-  "typescript.tsdk": "./packages/use-wallet/node_modules/typescript/lib"
+  "eslint.useFlatConfig": true,
+  "typescript.tsdk": "./packages/core/node_modules/typescript/lib"
 }

@@ -1,0 +1,59 @@
+{
+  "name": "@txnlab/use-wallet-vue",
+  "version": "5.0.0-rc.4",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "description": "Vue library for integrating Algorand wallets into decentralized applications",
+  "author": "Doug Richar <drichar@gmail.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TxnLab/use-wallet.git",
+    "directory": "packages/frameworks/vue"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsdown",
+    "start": "tsdown --watch",
+    "test": "vitest run",
+    "test:watch": "vitest --watch",
+    "lint": "eslint \"src/**/*.{js,ts}\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "algorand",
+    "wallet",
+    "vue"
+  ],
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@tanstack/vue-store": "0.9.1",
+    "@txnlab/use-wallet": "workspace:*"
+  },
+  "devDependencies": {
+    "algosdk": "3.6.0",
+    "tsdown": "0.21.0",
+    "typescript": "5.9.3",
+    "vue": "3.5.27"
+  },
+  "peerDependencies": {
+    "algosdk": "^3.0.0",
+    "vue": "^3.0.0"
+  }
+}

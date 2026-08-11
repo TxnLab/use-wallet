@@ -10,7 +10,7 @@
   "configMigration": true,
   "timezone": "America/New_York",
   "assignees": ["drichar"],
-  "baseBranchPatterns": ["main"],
+  "baseBranchPatterns": ["main", "v5"],
   "ignorePaths": ["**/node_modules/**"],
   "minimumReleaseAge": "3 days",
   "lockFileMaintenance": {
@@ -29,15 +29,18 @@
       "rangeStrategy": "bump",
       "matchPackageNames": [
         "/@agoralabs-sh/avm-web-provider/",
-        "/@magic-ext/algorand/",
-        "/magic-sdk/",
         "/lute-connect/",
-        "/walletconnect/"
+        "/walletconnect/",
+        "/@perawallet/connect/",
+        "/@blockshake/defly-connect/",
+        "/@web3auth/",
+        "/@w3hq/keychain-adapter/"
       ]
     },
     {
-      "matchPackageNames": ["@blockshake/defly-connect", "@perawallet/connect"],
-      "enabled": false
+      "groupName": "Wallet adapter packages",
+      "matchFileNames": ["packages/wallets/*/package.json"],
+      "matchUpdateTypes": ["patch", "minor"]
     },
     {
       "groupName": "pnpm",

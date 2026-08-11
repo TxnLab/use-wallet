@@ -31,19 +31,19 @@ const manager = new WalletManager({
 })
 ```
 
-You can also control whether the manager should reset to the default network on page load using the `resetNetwork` option:
+You can also control whether the manager should persist the active network across page loads using the `persistNetwork` option:
 
 ```typescript
 const manager = new WalletManager({
   defaultNetwork: NetworkId.TESTNET,
   options: {
-    // Always start on TestNet, even if the user was previously on a different network
-    resetNetwork: true
+    // Restore the last active network from localStorage on page load
+    persistNetwork: true
   }
 })
 ```
 
-When `resetNetwork` is `false` (the default), use-wallet will attempt to restore the last active network from local storage.
+When `persistNetwork` is `false` (the default), use-wallet will always reset to `defaultNetwork` on page load. Set `persistNetwork: true` for apps with runtime network switching that should remember the user's last network.
 
 ### Runtime Network Switching
 
@@ -222,8 +222,9 @@ const genesisId = () => activeNetworkConfig().genesisId
 When switching networks, several things happen automatically:
 
 1. The `algodClient` is updated to point to the new network
-2. Active wallet sessions are maintained (if the wallet supports the new network)
-3. The active network is saved to local storage
+2. Connected wallets that don't support the new network (per their declared capabilities) are automatically disconnected; other wallet sessions are maintained
+3. A `networkChanged` event is emitted
+4. If `persistNetwork` is enabled, the active network is saved to local storage and restored on the next page load
 
 ### Wallet Compatibility
 
@@ -232,9 +233,10 @@ Not all wallets support all networks. For example:
 * Exodus only works on MainNet
 * Defly and Pera only support MainNet and TestNet
 * The Mnemonic wallet only works on test networks
+* KMD only works on LocalNet
 * Custom networks may not be supported by all wallets
 
-Please refer to each wallet's documentation to determine which networks they support.
+Wallets can declare which networks they support using `WalletCapabilities`. The `availableWallets` property (available on `WalletManager` and all framework hooks) returns only wallets compatible with the active network. Consider using `availableWallets` instead of `wallets` when rendering wallet selection lists.
 
 ### Default Networks
 
@@ -243,6 +245,7 @@ use-wallet supports any AVM-compatible network and comes with default configurat
 * MainNet
 * TestNet
 * BetaNet
+* FNet
 * LocalNet (for development)
 
 For details about configuring networks, including how to customize default networks and add custom networks, see the [Configuration](../getting-started/configuration.md#network-configuration) guide.

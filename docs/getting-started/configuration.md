@@ -22,7 +22,7 @@ The `WalletManager` constructor accepts a configuration object with the followin
 
 ```typescript
 interface WalletManagerConfig {
-  wallets?: SupportedWallet[]      // Array of wallets to enable
+  wallets?: WalletAdapterConfig[]    // Array of wallets to enable
   networks?: Record<string, NetworkConfig>  // Custom network configurations
   defaultNetwork?: string          // Network to use by default
   options?: WalletManagerOptions   // Additional options
@@ -32,81 +32,52 @@ interface WalletManagerConfig {
 Here's a basic example:
 
 ```typescript
-import { WalletManager, WalletId, NetworkId } from '@txnlab/use-wallet'
+import { WalletManager } from '@txnlab/use-wallet'
+import { pera } from '@txnlab/use-wallet-pera'
+import { defly } from '@txnlab/use-wallet-defly'
 
 const manager = new WalletManager({
-  wallets: [WalletId.PERA, WalletId.DEFLY],
-  defaultNetwork: NetworkId.MAINNET // or just 'mainnet'
+  wallets: [pera(), defly()],
+  defaultNetwork: 'mainnet'
 })
 ```
 
 ### Configuring Wallets
 
-The `wallets` array determines which wallets will be available in your application. For each wallet, you can provide either:
-
-* Just the wallet identifier (for wallets with no required options)
-* A configuration object specifying required options and optional customizations
-
-Some wallets require specific options to be provided. TypeScript will show errors if these required options are omitted or if you try to use just the identifier.
+The `wallets` array determines which wallets will be available in your application. Each wallet adapter is imported from its own package and called as a factory function. Options can be passed directly to the factory function, with full TypeScript autocomplete.
 
 Here's an example showing common wallet configurations, including popular production wallets and those that require specific options:
 
 ```typescript
-import {
-  WalletManager,
-  WalletId
-} from '@txnlab/use-wallet'
+import { WalletManager } from '@txnlab/use-wallet'
+import { pera } from '@txnlab/use-wallet-pera'
+import { exodus } from '@txnlab/use-wallet-exodus'
+import { kibisis } from '@txnlab/use-wallet-kibisis'
+import { lute } from '@txnlab/use-wallet-lute'
+import { w3wallet } from '@txnlab/use-wallet-w3wallet'
+import { defly } from '@txnlab/use-wallet-defly'
+import { walletConnect } from '@txnlab/use-wallet-walletconnect'
+import { web3auth } from '@txnlab/use-wallet-web3auth'
 
 const manager = new WalletManager({
   wallets: [
-    // Wallets that can be used without configuration
-    WalletId.PERA,
-    WalletId.EXODUS,
-    WalletId.KIBISIS,
-    WalletId.LUTE,
-    WalletId.W3_WALLET,
-    
-    // Example of a wallet with optional customizations
-    {
-      id: WalletId.DEFLY,
-      options: {
-        shouldShowSignTxnToast: false
-      },
-      metadata: {
-        name: 'Custom Defly Name',
-        icon: '/path/to/custom-icon.svg'
-      }
-    },
-    
-    // Wallets that require specific options
-    {
-      id: WalletId.WALLETCONNECT,
-      options: {
-        projectId: '<REOWN_PROJECT_ID>'  // Required
-      }
-    },
-    {
-      id: WalletId.MAGIC,
-      options: {
-        apiKey: '<MAGIC_API_KEY>'  // Required
-      }
-    },
+    // Wallets with no required options
+    pera(),
+    exodus(),
+    kibisis(),
+    lute(),
+    w3wallet(),
 
-    // WalletConnect with skin (for branded wallet appearance)
-    {
-      id: WalletId.WALLETCONNECT,
-      options: {
-        projectId: '<REOWN_PROJECT_ID>', // Required
-        skin: 'biatec'  // Built-in skin for Biatec Wallet
-      }
-    },
-    {
-      id: WalletId.WALLETCONNECT,
-      options: {
-        projectId: '<REOWN_PROJECT_ID>', // Required
-        skin: 'voiwallet'  // Built-in skin for Voi Wallet
-      }
-    }
+    // Wallet with optional configuration
+    defly({ shouldShowSignTxnToast: false }),
+
+    // Wallets that require options
+    walletConnect({ projectId: '<REOWN_PROJECT_ID>' }),
+    web3auth({ clientId: '<WEB3AUTH_CLIENT_ID>' }),
+
+    // WalletConnect with skin (branded wallet appearance)
+    walletConnect({ projectId: '<REOWN_PROJECT_ID>', skin: 'biatec' }),
+    walletConnect({ projectId: '<REOWN_PROJECT_ID>', skin: 'voiwallet' }),
   ]
 })
 ```
@@ -120,9 +91,10 @@ By default, use-wallet comes with configurations for:
 * MainNet
 * TestNet
 * BetaNet
+* FNet
 * LocalNet (for development)
 
-For all public Algorand networks (MainNet, TestNet, BetaNet), the default configurations use [Nodely's free public API](https://nodely.io/docs/free/start/), so you don't need to configure network settings to get started.
+For all public Algorand networks (MainNet, TestNet, BetaNet, FNet), the default configurations use [Nodely's free public API](https://nodely.io/docs/free/start/), so you don't need to configure network settings to get started.
 
 {% hint style="info" %}
 [Nodely](https://nodely.io/) provides their public API free of charge with [certain usage requirements](https://nodely.io/docs/free/policy/). For production applications with significant traffic, consider either:
@@ -165,10 +137,9 @@ This approach is particularly useful when the network configuration comes from e
 For applications that support multiple networks with custom configurations, the `NetworkConfigBuilder` class provides a convenient, fluent interface:
 
 ```typescript
-import { 
+import {
   WalletManager,
-  NetworkConfigBuilder,
-  NetworkId
+  NetworkConfigBuilder
 } from '@txnlab/use-wallet'
 
 // Customize Algorand networks
@@ -192,7 +163,7 @@ const networks = new NetworkConfigBuilder()
 const manager = new WalletManager({
   wallets: [...],
   networks,
-  defaultNetwork: NetworkId.TESTNET // or just 'testnet'
+  defaultNetwork: 'testnet'
 })
 ```
 
@@ -201,7 +172,7 @@ const manager = new WalletManager({
 To add configurations for other AVM-compatible networks, use the `addNetwork` method:
 
 ```typescript
-import { 
+import {
   WalletManager,
   NetworkConfigBuilder
 } from '@txnlab/use-wallet'
@@ -255,7 +226,7 @@ interface NetworkConfig {
     port?: string | number
     headers?: Record<string, string>
   }
-  
+
   // Optional: Network identifiers (only needed for custom networks)
   genesisHash?: string    // Network genesis hash
   genesisId?: string      // Network genesis ID
@@ -288,7 +259,7 @@ The remaining Algod client settings include:
 * `headers`: Optional additional HTTP headers to include with requests.
 
 {% hint style="info" %}
-**Note:** Starting with v4.0.0, use-wallet supports user-customizable node settings at runtime. If your application implements the necessary UI components, users can override the configured Algod settings to connect to a different node.
+**Note:** use-wallet supports user-customizable node settings at runtime. If your application implements the necessary UI components, users can override the configured Algod settings to connect to a different node.
 
 See the [Runtime Node Configuration](../guides/runtime-node-configuration.md) guide for details.
 {% endhint %}
@@ -330,20 +301,20 @@ However, providing them in your configuration can save network requests and ensu
 The optional `options` object allows you to configure the WalletManager's behavior:
 
 ```typescript
-import { 
+import {
   WalletManager,
-  LogLevel 
+  LogLevel
 } from '@txnlab/use-wallet'
 
 const manager = new WalletManager({
   // ...
   options: {
-    // Reset to default network on page load
-    resetNetwork: true,
-    
+    // Use persisted network from localStorage on page load
+    persistNetwork: true,
+
     // Enable debug logging
     debug: true,
-    
+
     // Or set a specific log level
     logLevel: LogLevel.INFO
   }
@@ -355,13 +326,13 @@ const manager = new WalletManager({
 Here's a complete configuration example combining all the elements:
 
 ```typescript
-import { 
+import {
   WalletManager,
-  WalletId,
   NetworkConfigBuilder,
-  NetworkId,
   LogLevel
 } from '@txnlab/use-wallet'
+import { defly } from '@txnlab/use-wallet-defly'
+import { pera } from '@txnlab/use-wallet-pera'
 
 // Configure networks
 const networks = new NetworkConfigBuilder()
@@ -385,24 +356,19 @@ const networks = new NetworkConfigBuilder()
 const manager = new WalletManager({
   // Configure wallets
   wallets: [
-    WalletId.DEFLY,
-    {
-      id: WalletId.PERA,
-      options: {
-        shouldShowSignTxnToast: false
-      }
-    }
+    defly(),
+    pera({ shouldShowSignTxnToast: false }),
   ],
-  
+
   // Use custom network configurations
   networks,
-  defaultNetwork: NetworkId.TESTNET,
-  
+  defaultNetwork: 'testnet',
+
   // Set manager options
   options: {
     debug: true,
     logLevel: LogLevel.INFO,
-    resetNetwork: false
+    persistNetwork: false
   }
 })
 ```

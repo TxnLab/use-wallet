@@ -8,16 +8,18 @@ Use-wallet is a comprehensive wallet management solution for Algorand/AVM dApps.
 
 The library is framework-agnostic and can be used in any modern front-end stack, with official adapters for [React](framework/react.md), [Vue](framework/vue.md), and [SolidJS](framework/solidjs.md), and [Svelte](framework/svelte.md).
 
-Version 4.x introduces several major improvements:
+Version 5.x introduces several major improvements:
 
-* **Algorand SDK v3** - Full support for [Algorand JavaScript SDK](https://github.com/algorand/js-algorand-sdk) v3
-* **Runtime Node Configuration** - Let users connect to their private Algorand nodes ([guide](guides/runtime-node-configuration.md))
-* **Custom Networks** - Add support for custom network configurations
+* **Modular Wallet Adapters** — Install only the wallets you need as separate packages
+* **Factory Function Configuration** — Type-safe wallet setup with per-adapter autocomplete
+* **Tree-Shakeable** — Unused wallet code is eliminated from bundles
+* **Wallet Capabilities** — Network-aware wallet filtering with `availableWallets`
+* **ESM-Only** — Modern ES module output for all packages
 
-See the [Migration Guide](guides/migrating-from-v3.x.md) for help upgrading from v3.x.
+See the [Migration Guide](guides/migrating-from-v4.x.md) for help upgrading from v4.x.
 
 {% hint style="info" %}
-**Looking for v3 docs?** You can find the use-wallet v3.x documentation [here](https://txnlab.gitbook.io/use-wallet/v3).
+**Looking for v4 docs?** You can find the use-wallet v4.x documentation [here](https://txnlab.gitbook.io/use-wallet/v4).
 {% endhint %}
 
 ### Links

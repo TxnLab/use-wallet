@@ -18,20 +18,17 @@ The React adapter (`@txnlab/use-wallet-react`) provides a set of hooks and compo
 
 ### Setup
 
-After installing the package and any required wallet dependencies (see [Installation](../getting-started/installation.md)) and [configuring your WalletManager](../getting-started/configuration.md), wrap your application with the `WalletProvider`:
+After installing the package and any required wallet adapters (see [Installation](../getting-started/installation.md)) and [configuring your WalletManager](../getting-started/configuration.md), wrap your application with the `WalletProvider`:
 
 ```tsx
-import {
-  WalletProvider,
-  WalletManager,
-  NetworkId,
-} from '@txnlab/use-wallet-react'
+import { WalletProvider, WalletManager } from '@txnlab/use-wallet-react'
+import { pera } from '@txnlab/use-wallet-pera'
+import { defly } from '@txnlab/use-wallet-defly'
 
 // Create manager instance (see Configuration guide)
 const manager = new WalletManager({
-  wallets: [...],
-  networks: {...},
-  defaultNetwork: NetworkId.TESTNET // or just 'testnet'
+  wallets: [pera(), defly()],
+  defaultNetwork: 'testnet'
 })
 
 function App() {
@@ -47,7 +44,7 @@ The provider makes the wallet functionality available throughout your applicatio
 
 ### Using the Hooks
 
-The React adapter provides two hooks for accessing wallet functionality. In v4.0.0, network-related features were moved from `useWallet` into a new `useNetwork` hook to provide better separation of concerns:
+The React adapter provides two hooks for accessing wallet functionality:
 
 #### useWallet
 
@@ -58,7 +55,8 @@ import { useWallet } from '@txnlab/use-wallet-react'
 
 function WalletInfo() {
   const { 
-    wallets,             // List of available wallets
+    wallets,             // All configured wallets
+    availableWallets,    // Wallets available on the active network
     activeWallet,        // Currently active wallet
     activeAddress,       // Address of active account
     isReady,             // Whether all wallet providers have finished initialization
@@ -125,9 +123,9 @@ function NetworkSelector() {
 }
 ```
 
-Active network management (previously part of `useWallet`) enables users to switch between different networks.
+Active network management enables users to switch between different networks.
 
-Runtime node configuration, introduced in v4.0.0, enables users to override the application's default node settings and connect to any Algorand node. See the [Runtime Node Configuration](../guides/runtime-node-configuration.md) guide for details about implementing this feature.
+Runtime node configuration enables users to override the application's default node settings and connect to any Algorand node. See the [Runtime Node Configuration](../guides/runtime-node-configuration.md) guide for details about implementing this feature.
 
 For a complete list of all available properties and methods, see the [useNetwork API Reference](../api-reference/usenetwork.md).
 
@@ -136,5 +134,5 @@ For a complete list of all available properties and methods, see the [useNetwork
 * Check out the [Connect Wallet Menu](../guides/connect-wallet-menu.md) guide for creating a simple wallet connection interface
 * Learn about transaction signing patterns in the [Signing Transactions](../guides/signing-transactions.md) guide
 * Explore network features in the [Switching Networks](../guides/switching-networks.md) and [Runtime Node Configuration](../guides/runtime-node-configuration.md) guides
-* Read the [API Reference](broken-reference) for detailed documentation of the library's main exports
+* Read the [API Reference](../api-reference/usewallet.md) for detailed documentation of the library's main exports
 * Browse [Example Projects](../resources/example-projects.md) for working implementations in Vite (React) and Next.js

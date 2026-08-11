@@ -1,0 +1,60 @@
+{
+  "name": "@txnlab/use-wallet-svelte",
+  "version": "5.0.0-rc.4",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "description": "Svelte library for integrating Algorand wallets into decentralized applications",
+  "author": "Andrew Funk <acfunk@gmail.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TxnLab/use-wallet.git",
+    "directory": "packages/frameworks/svelte"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsdown",
+    "start": "tsdown --watch",
+    "test": "vitest run",
+    "test:watch": "vitest --watch",
+    "lint": "eslint \"src/**/*.{js,ts}\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "algorand",
+    "wallet",
+    "svelte"
+  ],
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@tanstack/svelte-store": "0.10.1",
+    "@txnlab/use-wallet": "workspace:*"
+  },
+  "devDependencies": {
+    "@testing-library/svelte": "5.3.1",
+    "algosdk": "3.6.0",
+    "svelte": "5.49.1",
+    "tsdown": "0.21.0",
+    "typescript": "5.9.3"
+  },
+  "peerDependencies": {
+    "algosdk": "^3.0.0",
+    "svelte": "^5.0.0"
+  }
+}

@@ -19,6 +19,10 @@ The `useWallet` hook/composable/primitive provides two methods for signing Algor
 * `signTransactions` - For directly signing transactions
 * `transactionSigner` - For use with transaction composers that accept an `algosdk.TransactionSigner`
 
+{% hint style="warning" %}
+**Important:** Some wallet providers require transaction signature requests to be initiated by direct user interaction (such as a button click). For web wallets this is enforced by the browser as a security measure. It is generally good practice to ensure each signature request is triggered by a user action like clicking a button.
+{% endhint %}
+
 ### signTransactions
 
 The [`signTransactions`](../api-reference/usewallet.md) method accepts either:

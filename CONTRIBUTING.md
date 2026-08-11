@@ -46,7 +46,7 @@ If you want to contribute to `@txnlab/use-wallet`, please follow these steps to 
   pnpm install
   ```
 
-  - We use pnpm v9 as our package manager. If you are not familiar with pnpm, please refer to the [pnpm documentation](https://pnpm.io/cli/install).
+  - We use pnpm v10 as our package manager (see the `packageManager` field in `package.json`). If you are not familiar with pnpm, please refer to the [pnpm documentation](https://pnpm.io/cli/install).
 
   - We use [nvm](https://github.com/nvm-sh/nvm) to manage node versions. Please make sure to use the version mentioned in the `.nvmrc` file.
 
@@ -87,7 +87,8 @@ If you want to contribute to `@txnlab/use-wallet`, please follow these steps to 
   pnpm example:react
   pnpm example:solid
   pnpm example:vue
-  pnpm example:nextjs
+  pnpm example:svelte
+  pnpm example:next
   pnpm example:nuxt
   ```
 
@@ -163,7 +164,7 @@ If the commit reverts a previous commit, it should begin with `revert: `, follow
   ```
 
   ```bash
-  pnpm prettier
+  pnpm format:check
   ```
 
   ```bash
@@ -183,6 +184,10 @@ If the commit reverts a previous commit, it should begin with `revert: `, follow
 ## Documentation
 
 See the [GitBook documentation](https://txnlab.gitbook.io/use-wallet/) for configuration and usage details, including guides for supported frameworks. For documentation issues and feature requests, please [open an issue](https://github.com/txnlab/use-wallet/issues/new/choose).
+
+## Third-Party Wallet Adapters
+
+Wallet providers can publish and maintain their own adapter packages. To build one and get it listed in the docs, see [Third-Party Adapters](docs/resources/third-party-adapters.md).
 
 ## Contact
 

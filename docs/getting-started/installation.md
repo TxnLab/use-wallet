@@ -17,7 +17,8 @@ layout:
 ### Requirements
 
 * `algosdk` v3
-* Environment with support for dynamic imports (e.g., modern build tools like Vite, Next.js, or Webpack 5+)
+* ESM-capable environment (modern bundlers like Vite, Next.js, or Webpack 5+)
+* Node.js 22 or later (for SSR, tooling, and development — the packages are ESM-only and do not ship a CommonJS build)
 
 ### Install Package
 
@@ -163,276 +164,34 @@ bun add @txnlab/use-wallet
 {% endtab %}
 {% endtabs %}
 
-### Install Dependencies
+### Install Wallet Adapters
 
-Some [supported wallet providers](supported-wallets.md) require additional packages to be installed. You only need to install the packages for wallets that you plan to support in your application.
+Each wallet is provided as a separate adapter package. Install only the adapters for the wallets you want to support:
 
-#### Pera Wallet
-
-{% tabs %}
-{% tab title="npm" %}
 ```bash
-npm install @perawallet/connect
+# Install the adapters for the wallets you want to support
+npm install @txnlab/use-wallet-pera @txnlab/use-wallet-defly
 ```
-{% endtab %}
 
-{% tab title="yarn" %}
-```bash
-yarn add @perawallet/connect
-```
-{% endtab %}
+#### Available Adapter Packages
 
-{% tab title="pnpm" %}
-```bash
-pnpm add @perawallet/connect
-```
-{% endtab %}
+| Adapter Package | Wallet |
+|----------------|--------|
+| `@txnlab/use-wallet-pera` | Pera Wallet |
+| `@txnlab/use-wallet-defly` | Defly Wallet |
+| `@txnlab/use-wallet-exodus` | Exodus |
+| `@txnlab/use-wallet-walletconnect` | WalletConnect (+ skins: Biatec, Voi) |
+| `@txnlab/use-wallet-kibisis` | Kibisis |
+| `@txnlab/use-wallet-lute` | Lute Wallet |
+| `@txnlab/use-wallet-w3wallet` | W3 Wallet |
+| `@txnlab/use-wallet-kmd` | KMD (development) |
+| `@txnlab/use-wallet-mnemonic` | Mnemonic (testing) |
+| `@txnlab/use-wallet-web3auth` | Web3Auth |
 
-{% tab title="bun" %}
-```bash
-bun add @perawallet/connect
-```
-{% endtab %}
-{% endtabs %}
-
-#### Defly Wallet
-
-{% tabs %}
-{% tab title="npm" %}
-```bash
-npm install @blockshake/defly-connect
-```
-{% endtab %}
-
-{% tab title="yarn" %}
-```bash
-yarn add @blockshake/defly-connect
-```
-{% endtab %}
-
-{% tab title="pnpm" %}
-```bash
-pnpm add @blockshake/defly-connect
-```
-{% endtab %}
-
-{% tab title="bun" %}
-```bash
-bun add @blockshake/defly-connect
-```
-{% endtab %}
-{% endtabs %}
-
-#### Defly Wallet (Web)
-
-{% hint style="warning" %}
-The Defly Web Wallet is currently in beta.
+{% hint style="info" %}
+The Custom wallet adapter is built into `@txnlab/use-wallet` — no separate package needed.
 {% endhint %}
 
-{% tabs %}
-{% tab title="npm" %}
-```bash
-npm install @agoralabs-sh/avm-web-provider
-```
-{% endtab %}
-
-{% tab title="yarn" %}
-```bash
-yarn add @agoralabs-sh/avm-web-provider
-```
-{% endtab %}
-
-{% tab title="pnpm" %}
-```bash
-pnpm add @agoralabs-sh/avm-web-provider
-```
-{% endtab %}
-
-{% tab title="bun" %}
-```bash
-bun add @agoralabs-sh/avm-web-provider
-```
-{% endtab %}
-{% endtabs %}
-
-#### WalletConnect
-
-{% tabs %}
-{% tab title="npm" %}
-```bash
-npm install @walletconnect/sign-client @walletconnect/modal
-```
-{% endtab %}
-
-{% tab title="yarn" %}
-```bash
-yarn add @walletconnect/sign-client @walletconnect/modal
-```
-{% endtab %}
-
-{% tab title="pnpm" %}
-```bash
-pnpm add @walletconnect/sign-client @walletconnect/modal
-```
-{% endtab %}
-
-{% tab title="bun" %}
-```bash
-bun add @walletconnect/sign-client @walletconnect/modal
-```
-{% endtab %}
-{% endtabs %}
-
-#### Lute Wallet
-
-{% tabs %}
-{% tab title="npm" %}
-```bash
-npm install lute-connect
-```
-{% endtab %}
-
-{% tab title="yarn" %}
-```bash
-yarn add lute-connect
-```
-{% endtab %}
-
-{% tab title="pnpm" %}
-```bash
-pnpm add lute-connect
-```
-{% endtab %}
-
-{% tab title="bun" %}
-```bash
-bun add lute-connect
-```
-{% endtab %}
-{% endtabs %}
-
-#### Kibisis
-
-{% tabs %}
-{% tab title="npm" %}
-```bash
-npm install @agoralabs-sh/avm-web-provider
-```
-{% endtab %}
-
-{% tab title="yarn" %}
-```bash
-yarn add @agoralabs-sh/avm-web-provider
-```
-{% endtab %}
-
-{% tab title="pnpm" %}
-```bash
-pnpm add @agoralabs-sh/avm-web-provider
-```
-{% endtab %}
-
-{% tab title="bun" %}
-```bash
-bun add @agoralabs-sh/avm-web-provider
-```
-{% endtab %}
-{% endtabs %}
-
-#### Magic Auth
-
-{% tabs %}
-{% tab title="npm" %}
-```bash
-npm install magic-sdk @magic-ext/algorand
-```
-{% endtab %}
-
-{% tab title="yarn" %}
-```bash
-yarn add magic-sdk @magic-ext/algorand
-```
-{% endtab %}
-
-{% tab title="pnpm" %}
-```bash
-pnpm add magic-sdk @magic-ext/algorand
-```
-{% endtab %}
-
-{% tab title="bun" %}
-```bash
-bun add magic-sdk @magic-ext/algorand
-```
-{% endtab %}
-{% endtabs %}
-
-#### Web3Auth
-
-{% tabs %}
-{% tab title="npm" %}
-```bash
-npm install @web3auth/modal @web3auth/base @web3auth/base-provider
-```
-{% endtab %}
-
-{% tab title="yarn" %}
-```bash
-yarn add @web3auth/modal @web3auth/base @web3auth/base-provider
-```
-{% endtab %}
-
-{% tab title="pnpm" %}
-```bash
-pnpm add @web3auth/modal @web3auth/base @web3auth/base-provider
-```
-{% endtab %}
-
-{% tab title="bun" %}
-```bash
-bun add @web3auth/modal @web3auth/base @web3auth/base-provider
-```
-{% endtab %}
-{% endtabs %}
-
-### Webpack Configuration
-
-When using this library in a project that uses Webpack as its build tool, you may encounter "module not found" errors for optional dependencies of wallets you choose not to support. To resolve this, you can use the `webpackFallback` export.
-
-Here's how to configure Webpack to handle these optional dependencies:
-
-```javascript
-// webpack.config.js
-import { webpackFallback } from '@txnlab/use-wallet' // exported by all packages
-
-export default {
-  // ... other webpack configuration
-  resolve: {
-    fallback: {
-      ...webpackFallback
-    }
-  }
-}
-```
-
-For Next.js specifically, add this to your `next.config.js`:
-
-```javascript
-import { webpackFallback } from '@txnlab/use-wallet-react'
-
-const nextConfig = {
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        ...webpackFallback
-      }
-    }
-    return config
-  }
-}
-
-export default nextConfig
-```
-
-This configuration allows your application to build and run without these packages installed, enabling you to include only the wallet packages you need. The `webpackFallback` object is maintained within the `@txnlab/use-wallet` library and will be automatically updated when new optional dependencies are added.
+{% hint style="info" %}
+Wallet SDK dependencies (e.g., `@perawallet/connect`) are bundled with each adapter package — you don't need to install them separately.
+{% endhint %}

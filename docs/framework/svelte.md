@@ -18,20 +18,17 @@ The Svelte adapter (`@txnlab/use-wallet-svelte`) provides primitives for integra
 
 ### Setup
 
-After installing the package and any required wallet dependencies (see [Installation](../getting-started/installation.md)) and [configuring your WalletManager](../getting-started/configuration.md), call `useWalletContext` in your base `+layout.svelte`:
+After installing the package and any required wallet adapters (see [Installation](../getting-started/installation.md)) and [configuring your WalletManager](../getting-started/configuration.md), call `useWalletContext` in your base `+layout.svelte`:
 
 ```ts
-import {
-  useWalletContext,
-  WalletManager,
-  NetworkId
-} from '@txnlab/use-wallet-svelte'
+import { useWalletContext, WalletManager } from '@txnlab/use-wallet-svelte'
+import { pera } from '@txnlab/use-wallet-pera'
+import { defly } from '@txnlab/use-wallet-defly'
 
 // Create manager instance (see Configuration guide)
 const manager = new WalletManager({
-  wallets: [...],
-  networks: {...},
-  defaultNetwork: NetworkId.TESTNET
+  wallets: [pera(), defly()],
+  defaultNetwork: 'testnet'
 })
 
 useWalletContext(manager)
@@ -41,7 +38,7 @@ This makes the wallet functionality available throughout your application via Sv
 
 ### Using the Primitives
 
-The Svelte adapter provides two primitives for accessing wallet functionality. In v4.0.0, network-related features were moved from `useWallet` into a new `useNetwork` primitive to provide better separation of concerns:
+The Svelte adapter provides two primitives for accessing wallet functionality:
 
 #### useWallet
 
@@ -51,7 +48,8 @@ The `useWallet` primitive provides access to wallet management features. Here's 
 <script lang="ts">
   import { useWallet } from '@txnlab/use-wallet-svelte'
   const { 
-    wallets,             // List of available wallets
+    wallets,             // All configured wallets
+    availableWallets,    // Wallets available on the active network
     activeWallet,        // Currently active wallet (function)
     activeAccount,       // Active account in active wallet
     activeAddress,       // Address of active account
@@ -143,5 +141,5 @@ This pattern integrates with [TanStack Store](https://tanstack.com/store) for cr
 * Check out the [Connect Wallet Menu](../guides/connect-wallet-menu.md) guide for creating a simple wallet connection interface
 * Learn about transaction signing patterns in the [Signing Transactions](../guides/signing-transactions.md) guide
 * Explore network features in the [Switching Networks](../guides/switching-networks.md) and [Runtime Node Configuration](../guides/runtime-node-configuration.md) guides
-* Read the [API Reference](broken-reference) for detailed documentation of the library's main exports
+* Read the [API Reference](../api-reference/usewallet.md) for detailed documentation of the library's main exports
 * Browse [Example Projects](../resources/example-projects.md) for a working implementation in Vite (Svelte)

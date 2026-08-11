@@ -14,28 +14,25 @@ layout:
 
 # Supported Wallets
 
-Use-wallet supports several popular Algorand wallets. This guide covers the available wallet providers and their configuration options. For complete configuration examples and additional setup details, see the [Installation](installation.md#install-dependencies) and [Configuration](configuration.md#configuring-wallets) guides.
+Use-wallet supports several popular Algorand wallets. This guide covers the available wallet providers and their configuration options. For complete configuration examples and additional setup details, see the [Installation](installation.md#install-wallet-adapters) and [Configuration](configuration.md#configuring-wallets) guides.
 
 ### Production Wallets
 
 #### Pera Wallet
 
-Mobile-first wallet with robust dApp integration features. [Installation instructions](installation.md#pera-wallet).
+Mobile-first wallet with robust dApp integration features.
 
 ```typescript
-import { WalletId } from '@txnlab/use-wallet'
+import { pera } from '@txnlab/use-wallet-pera'
 
 // Basic usage (no options required)
-WalletId.PERA
+pera()
 
 // With optional configuration
-{
-  id: WalletId.PERA,
-  options: {
-    shouldShowSignTxnToast?: boolean
-    chainId?: number // Defaults to active network
-  }
-}
+pera({
+  shouldShowSignTxnToast?: boolean,
+  chainId?: number // Defaults to active network
+})
 ```
 
 * [Pera Website](https://perawallet.app)
@@ -43,66 +40,43 @@ WalletId.PERA
 
 #### Defly Wallet
 
-Mobile wallet with advanced DeFi features. [Installation instructions](installation.md#defly-wallet).
+Mobile wallet with advanced DeFi features.
 
 ```typescript
-import { WalletId } from '@txnlab/use-wallet'
+import { defly } from '@txnlab/use-wallet-defly'
 
 // Basic usage (no options required)
-WalletId.DEFLY
+defly()
 
 // With optional configuration
-{
-  id: WalletId.DEFLY,
-  options: {
-    shouldShowSignTxnToast?: boolean
-    chainId?: number // Defaults to active network
-  }
-}
+defly({
+  shouldShowSignTxnToast?: boolean,
+  chainId?: number // Defaults to active network
+})
 ```
 
 * [Defly Website](https://defly.app)
 * [Defly Connect Documentation](https://github.com/blockshake-io/defly-connect)
 
-#### Defly Wallet (Web)
-
-{% hint style="warning" %}
-The Defly Web Wallet is currently in beta.
-{% endhint %}
-
-Browser extension wallet by Defly, optimized for web interactions. [Installation instructions](installation.md#defly-wallet-web).
-
-```typescript
-import { WalletId } from '@txnlab/use-wallet'
-
-// Basic usage (no options required)
-WalletId.DEFLY_WEB
-```
-
-* [Defly Website](https://defly.app)
-
 #### WalletConnect
 
-Universal wallet connection protocol that enables secure communication between mobile wallets and desktop dApps. Supports any wallet that implements the WalletConnect v2 protocol. Project IDs must be obtained from Reown Cloud. [Installation instructions](installation.md#walletconnect).
+Universal wallet connection protocol that enables secure communication between mobile wallets and desktop dApps. Supports any wallet that implements the WalletConnect v2 protocol. Project IDs must be obtained from Reown Cloud.
 
 ```typescript
-import { WalletId } from '@txnlab/use-wallet'
+import { walletConnect } from '@txnlab/use-wallet-walletconnect'
 
 // Configuration required
-{
-  id: WalletId.WALLETCONNECT,
-  options: {
-    projectId: string      // Required: Project ID from cloud.reown.com
-    relayUrl?: string      // Optional: Custom relay server
-    metadata?: {           // Optional: dApp metadata
-      name?: string
-      description?: string
-      url?: string
-      icons?: string[]
-    }
-    skin?: string | WalletConnectSkin  // Optional: Skin for branded wallet appearance
-  }
-}
+walletConnect({
+  projectId: string,      // Required: Project ID from cloud.reown.com
+  relayUrl?: string,      // Optional: Custom relay server
+  metadata?: {            // Optional: dApp metadata
+    name?: string,
+    description?: string,
+    url?: string,
+    icons?: string[]
+  },
+  skin?: string | WalletConnectSkin  // Optional: Skin for branded wallet appearance
+})
 ```
 
 ##### WalletConnect Skins
@@ -116,64 +90,59 @@ Built-in skins:
 **Using a built-in skin:**
 
 ```typescript
+import { walletConnect } from '@txnlab/use-wallet-walletconnect'
+
 // Use the built-in 'biatec' skin
-{
-  id: WalletId.WALLETCONNECT,
-  options: {
-    skin: 'biatec',
-    projectId: '<YOUR_PROJECT_ID>',
-  }
-}
+walletConnect({
+  skin: 'biatec',
+  projectId: '<YOUR_PROJECT_ID>',
+})
 
 // Use the built-in 'voiwallet' skin
-{
-  id: WalletId.WALLETCONNECT,
-  options: {
-    skin: 'voiwallet',
-    projectId: '<YOUR_PROJECT_ID>',
-  }
-}
+walletConnect({
+  skin: 'voiwallet',
+  projectId: '<YOUR_PROJECT_ID>',
+})
 ```
 
 **Using a custom skin at runtime:**
 
 ```typescript
+import { walletConnect } from '@txnlab/use-wallet-walletconnect'
+
 // Define a custom skin
-{
-  id: WalletId.WALLETCONNECT,
-  options: {
-    skin: {
-      id: 'mywallet',
-      name: 'My Wallet',
-      icon: 'data:image/svg+xml;base64,...'
-    },
-    projectId: '<YOUR_PROJECT_ID>',
-  }
-}
+walletConnect({
+  skin: {
+    id: 'mywallet',
+    name: 'My Wallet',
+    icon: 'data:image/svg+xml;base64,...'
+  },
+  projectId: '<YOUR_PROJECT_ID>',
+})
 ```
 
 **Multiple WalletConnect instances:**
 
 ```typescript
+import { WalletManager } from '@txnlab/use-wallet'
+import { walletConnect } from '@txnlab/use-wallet-walletconnect'
+
 const manager = new WalletManager({
   wallets: [
     // Generic WalletConnect (no skin)
-    { id: WalletId.WALLETCONNECT, options: { projectId: '...' } },
+    walletConnect({ projectId: '...' }),
 
     // Biatec-branded WalletConnect
-    { id: WalletId.WALLETCONNECT, options: { skin: 'biatec', projectId: '...' } },
+    walletConnect({ projectId: '...', skin: 'biatec' }),
 
     // Voi Wallet-branded WalletConnect
-    { id: WalletId.WALLETCONNECT, options: { skin: 'voiwallet', projectId: '...' } },
+    walletConnect({ projectId: '...', skin: 'voiwallet' }),
 
     // Custom wallet skin
-    {
-      id: WalletId.WALLETCONNECT,
-      options: {
-        skin: { id: 'customwallet', name: 'Custom Wallet', icon: '...' },
-        projectId: '...'
-      }
-    }
+    walletConnect({
+      projectId: '...',
+      skin: { id: 'customwallet', name: 'Custom Wallet', icon: '...' },
+    }),
   ]
 })
 
@@ -192,21 +161,18 @@ Each skinned WalletConnect instance maintains isolated session storage, allowing
 
 #### Lute Wallet
 
-Web and browser extension wallet with Ledger hardware support. [Installation instructions](installation.md#lute-wallet).
+Web and browser extension wallet with Ledger hardware support.
 
 ```typescript
-import { WalletId } from '@txnlab/use-wallet'
+import { lute } from '@txnlab/use-wallet-lute'
 
 // Basic usage (no options required)
-WalletId.LUTE
+lute()
 
 // With optional configuration
-{
-  id: WalletId.LUTE,
-  options: {
-    siteName?: string // Defaults to document title
-  }
-}
+lute({
+  siteName?: string // Defaults to document title
+})
 ```
 
 * [Lute Website](https://lute.app)
@@ -214,13 +180,13 @@ WalletId.LUTE
 
 #### Kibisis
 
-Browser extension wallet for AVM-compatible chains (Algorand and Voi). [Installation instructions](installation.md#kibisis).
+Browser extension wallet for AVM-compatible chains (Algorand and Voi).
 
 ```typescript
-import { WalletId } from '@txnlab/use-wallet'
+import { kibisis } from '@txnlab/use-wallet-kibisis'
 
 // Basic usage (no options required)
-WalletId.KIBISIS
+kibisis()
 ```
 
 * [Kibisis Website](https://kibis.is)
@@ -231,74 +197,48 @@ WalletId.KIBISIS
 Multi-currency wallet with desktop, mobile, and browser extension support.
 
 ```typescript
-import { WalletId } from '@txnlab/use-wallet'
+import { exodus } from '@txnlab/use-wallet-exodus'
 
 // Basic usage (no options required)
-WalletId.EXODUS
+exodus()
 
 // With optional configuration
-{
-  id: WalletId.EXODUS,
-  options: {
-    genesisID?: string    // Network identifier
-    genesisHash?: string  // Network hash
-  }
-}
+exodus({
+  genesisID?: string,    // Network identifier
+  genesisHash?: string   // Network hash
+})
 ```
 
 * [Exodus Website](https://www.exodus.com)
 * [Exodus Algorand Provider API](https://docs.exodus.com/web3-providers/algorand-provider-arc-api/)
 
-#### Magic Auth
-
-Email-based authentication provider with built-in wallet functionality. [Installation instructions](installation.md#magic-auth).
-
-```typescript
-import { WalletId } from '@txnlab/use-wallet'
-
-// Configuration required
-{
-  id: WalletId.MAGIC,
-  options: {
-    apiKey: string // Required: Magic Auth API key
-  }
-}
-```
-
-* [Magic Website](https://magic.link)
-* [Magic Algorand Documentation](https://magic.link/docs/blockchains/other-chains/other/algorand)
-
 #### Web3Auth
 
-Social login authentication provider supporting Google, Facebook, Twitter, Discord, and other OAuth providers. Web3Auth enables users to sign in with familiar social accounts and derive an Algorand wallet from their authentication credentials. [Installation instructions](installation.md#web3auth).
+Social login authentication provider supporting Google, Facebook, Twitter, Discord, and other OAuth providers. Web3Auth enables users to sign in with familiar social accounts and derive an Algorand wallet from their authentication credentials.
 
 ```typescript
-import { WalletId } from '@txnlab/use-wallet'
+import { web3auth } from '@txnlab/use-wallet-web3auth'
 
 // Basic usage with modal (shows social login options)
-{
-  id: WalletId.WEB3AUTH,
-  options: {
-    clientId: string // Required: from dashboard.web3auth.io
-  }
-}
+web3auth({
+  clientId: string // Required: from dashboard.web3auth.io
+})
 
 // With optional configuration
-{
-  id: WalletId.WEB3AUTH,
-  options: {
-    clientId: string               // Required: from dashboard.web3auth.io
-    web3AuthNetwork?: string       // Optional: 'sapphire_mainnet' (default) or 'sapphire_devnet'
-    loginProvider?: string         // Optional: skip modal and use specific provider (e.g., 'google', 'facebook')
-    uiConfig?: {                   // Optional: customize modal appearance
-      appName?: string
-      logoLight?: string
-      logoDark?: string
-      mode?: 'light' | 'dark' | 'auto'
-    }
+web3auth({
+  clientId: string,               // Required: from dashboard.web3auth.io
+  web3AuthNetwork?: string,       // Optional: 'sapphire_mainnet' (default) or 'sapphire_devnet'
+  loginProvider?: string,         // Optional: skip modal and use specific provider (e.g., 'google', 'facebook')
+  uiConfig?: {                    // Optional: customize modal appearance
+    appName?: string,
+    logoLight?: string,
+    logoDark?: string,
+    mode?: 'light' | 'dark' | 'auto'
   }
-}
+})
 ```
+
+Web3Auth-derived accounts support scoped private key access via `withPrivateKey` — see [Using Private Keys Safely](../guides/using-private-keys-safely.md).
 
 **Custom Authentication**
 
@@ -320,87 +260,23 @@ For implementation details, refer to the [Web3Auth Custom Authentication documen
 * [Web3Auth Dashboard](https://dashboard.web3auth.io)
 * [Web3Auth Documentation](https://web3auth.io/docs)
 
-#### Biatec
-
-{% hint style="warning" %}
-**Deprecation Notice:** `WalletId.BIATEC` is deprecated and will be removed in v5. Use WalletConnect with the `'biatec'` skin instead:
-
-```typescript
-{
-  id: WalletId.WALLETCONNECT,
-  options: {
-    skin: 'biatec',
-    projectId: '<REOWN_PROJECT_ID>',
-  }
-}
-```
-{% endhint %}
-
-Open-source mobile wallet with community focus and WalletConnect support. [Installation instructions](installation.md#walletconnect).
-
-```typescript
-import { WalletId } from '@txnlab/use-wallet'
-
-// Deprecated - use WalletConnect with skin: 'biatec' instead
-WalletId.BIATEC
-```
-
-* [Biatec Website](https://wallet.biatec.io)
-* [Biatec GitHub Repository](https://github.com/scholtz/wallet)
-
 #### Voi Wallet
 
-Secure, user-friendly mobile wallet built with React Native for the Voi Network, with Algorand compatibility. Features WalletConnect support for dApp connectivity, airgapped signing for offline transaction signing, and ARC-90 Advanced QR Code Support. [Installation instructions](installation.md#walletconnect).
+Secure, user-friendly mobile wallet built with React Native for the Voi Network, with Algorand compatibility. Features WalletConnect support for dApp connectivity, airgapped signing for offline transaction signing, and ARC-90 Advanced QR Code Support.
 
 ```typescript
-import { WalletId } from '@txnlab/use-wallet'
+import { walletConnect } from '@txnlab/use-wallet-walletconnect'
 
 // Use WalletConnect with the 'voiwallet' skin
-{
-  id: WalletId.WALLETCONNECT,
-  options: {
-    skin: 'voiwallet',
-    projectId: '<REOWN_PROJECT_ID>',
-  }
-}
+walletConnect({
+  skin: 'voiwallet',
+  projectId: '<REOWN_PROJECT_ID>',
+})
 ```
 
 * [Voi Wallet Website](https://getvera.app)
 * [Download for Android](https://play.google.com/store/apps/details?id=com.voinetwork.wallet)
 * [Download for iOS](https://apps.apple.com/us/app/voi-wallet/id6752960399)
-
-#### Liquid Auth (experimental)
-
- {% hint style="warning" %}
- Due to an unresolved issue with its peer dependencies, as of use-wallet v4.3.1 the Liquid Auth provider is not supported. Support will be restored when the issue is resolved.
- {% endhint %}
-
- Liquid Auth is a self-hosted authentication service that provides a simple way to associate Passkeys to spending KeyPairs commonly found in cryptocurrencies, in accordance with the FIDO2 WebAuthn specification. In addition to authentication, Liquid Auth provides a Peer to Peer signaling service.
- 
- Not only can you authenticate users, you can also establish secure, WebRTC-based connections between a mobile wallet and a desktop dApp. Liquid Auth serves as an alternative to protocols where access is controlled or limited by centralized entities.
-
- The Liquid Auth wallet provider defaults to `window.origin` as the origin, assuming the Liquid Auth backend is hosted on the same domain. Alternatively, you can specify a custom endpoint.
-
-```typescript
-import { WalletId } from '@txnlab/use-wallet'
-
-{
-  id: WalletId.LIQUID,
-  options: {
-    origin?: string,
-    RTC_config_username: string,
-    RTC_config_credential: string
-  }
-}
-``` 
-
- The example use cases are configured to use the Algorand Foundation-hosted endpoint at `https://debug.liquidauth.com`, with `liquid-auth` as the username and `sqmcP4MiTKMT4TGEDSk9jgHY` as the credential. This endpoint is suitable for testing but should NOT be used in production environments.
-
- {% hint style="info" %}
- The Liquid Auth provider is currently experimental and subject to change in future releases. It requires users to have an Android v14+ device or an iOS 17+ device, and for developers to set up a [specific backend](https://liquidauth.com/server/introduction/). For more info, please refer to the [documentation](https://liquidauth.com/guides/getting-started/).
- {% endhint %}
-
-[Liquid Auth documentation](https://liquidauth.com/guides/getting-started/)
 
 ### Development Wallets
 
@@ -409,19 +285,19 @@ import { WalletId } from '@txnlab/use-wallet'
 Development wallet provider for use with Algorand's [`goal`](https://developer.algorand.org/docs/get-details/algokit/features/goal/) CLI tool and [AlgoKit](https://algorand.co/algokit).
 
 ```typescript
-import { WalletId } from '@txnlab/use-wallet'
+import { kmd } from '@txnlab/use-wallet-kmd'
 
-// Configuration required
-{
-  id: WalletId.KMD,
-  options: {
-    wallet?: string           // Optional: KMD wallet name
-    token?: string            // Optional: KMD API token
-    baseServer?: string       // Optional: KMD server URL
-    port?: string | number    // Optional: KMD server port
-    promptForPassword?: () => Promise<string>  // Optional: Custom password prompt
-  }
-}
+// Basic usage (no options required)
+kmd()
+
+// With optional configuration
+kmd({
+  wallet?: string,           // Optional: KMD wallet name
+  token?: string,            // Optional: KMD API token
+  baseServer?: string,       // Optional: KMD server URL
+  port?: string | number,    // Optional: KMD server port
+  promptForPassword?: () => Promise<string>  // Optional: Custom password prompt
+})
 ```
 
 * [KMD Documentation](https://algorand.github.io/js-algorand-sdk/classes/Kmd.html)
@@ -431,33 +307,33 @@ import { WalletId } from '@txnlab/use-wallet'
 Simple wallet provider for testing environments.
 
 ```typescript
-import { WalletId } from '@txnlab/use-wallet'
+import { mnemonic } from '@txnlab/use-wallet-mnemonic'
 
-// Configuration required
-{
-  id: WalletId.MNEMONIC,
-  options: {
-    persistToStorage?: boolean          // Optional: Save mnemonic in localStorage
-    promptForMnemonic?: () => Promise<string> // Optional: Custom mnemonic prompt
-  }
-}
+// Basic usage (no options required)
+mnemonic()
+
+// With optional configuration
+mnemonic({
+  persistToStorage?: boolean,          // Optional: Save mnemonic in localStorage
+  promptForMnemonic?: () => Promise<string> // Optional: Custom mnemonic prompt
+})
 ```
 
 {% hint style="danger" %}
 **Warning:** The Mnemonic Wallet provider is for testing only and will not work on MainNet. Never use with real assets.
 {% endhint %}
 
-See the [Testing with Mnemonic Wallet](../guides/testing-with-mnemonic-wallet.md) guide for details about end-to-end (E2E) testing.
+See the [Testing with Mnemonic Wallet](../guides/testing-with-mnemonic-wallet.md) guide for details about end-to-end (E2E) testing. The Mnemonic wallet also supports scoped private key access via `withPrivateKey` — see [Using Private Keys Safely](../guides/using-private-keys-safely.md).
 
 #### W3 Wallet
 
 Multi-currency wallet with desktop, mobile, and browser extension support.
 
 ```typescript
-import { WalletId } from '@txnlab/use-wallet'
+import { w3wallet } from '@txnlab/use-wallet-w3wallet'
 
 // Basic usage (no options required)
-WalletId.W3_WALLET
+w3wallet()
 ```
 
 * [W3 Wallet Website](https://w3wallet.app)
@@ -467,21 +343,42 @@ WalletId.W3_WALLET
 For integrating unsupported wallets or implementing specialized wallet interactions.
 
 ```typescript
-import { WalletId } from '@txnlab/use-wallet'
+import { custom } from '@txnlab/use-wallet'
 
 // Configuration required
-{
-  id: WalletId.CUSTOM,
-  options: {
-    provider: {
-      connect: (args?: Record<string, any>) => Promise<WalletAccount[]>
-      disconnect?: () => Promise<void>
-      resumeSession?: () => Promise<WalletAccount[] | void>
-      signTransactions?: <T>(txnGroup: T | T[], indexesToSign?: number[]) => Promise<(Uint8Array | null)[]>
-      transactionSigner?: (txnGroup: Transaction[], indexesToSign: number[]) => Promise<Uint8Array[]>
-    }
+custom({
+  provider: {
+    connect: (args?: Record<string, any>) => Promise<WalletAccount[]>,
+    disconnect?: () => Promise<void>,
+    resumeSession?: () => Promise<WalletAccount[] | void>,
+    signTransactions?: <T>(txnGroup: T | T[], indexesToSign?: number[]) => Promise<(Uint8Array | null)[]>,
+    transactionSigner?: (txnGroup: Transaction[], indexesToSign: number[]) => Promise<Uint8Array[]>,
+    signData?: (data: string, metadata: StdSignMetadata) => Promise<StdSignDataResponse>
   }
-}
+})
 ```
 
 See the [Custom Provider](../guides/custom-provider.md) guide for implementation details.
+
+### Third-Party Adapters
+
+Because v5 wallet adapters are standalone packages, wallet providers can publish and maintain their own adapters — they work with use-wallet without requiring changes to this repository. Adapters that meet the [listing criteria](../resources/third-party-adapters.md) are listed here alongside the first-party wallets.
+
+#### AlgoVoi Wallet
+
+ARC-0027 browser wallet for the Algorand and Voi networks, maintained by the AlgoVoi team ([source](https://github.com/chopmob-cloud/use-wallet-algovoi)).
+
+```typescript
+import { algovoi } from '@algovoi/use-wallet-algovoi'
+
+// Basic usage (no options required)
+algovoi()
+```
+
+* [npm package](https://www.npmjs.com/package/@algovoi/use-wallet-algovoi)
+
+_To submit your own adapter for listing, see [Third-Party Adapters](../resources/third-party-adapters.md)._
+
+{% hint style="info" %}
+Third-party adapters are developed and maintained by their respective teams. TxnLab reviews adapters against the [listing criteria](../resources/third-party-adapters.md#listing-criteria) at the time of listing, but does not audit subsequent releases — a listing is not an endorsement or a guarantee of security or functionality. Always evaluate any adapter, including reviewing its source code, before using it in your application.
+{% endhint %}

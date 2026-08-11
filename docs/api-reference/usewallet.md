@@ -113,6 +113,7 @@ interface WalletState {
   activeWalletAccounts: WalletAccount[] | null
   activeWalletAddresses: string[] | null
   algodClient: algosdk.Algodv2
+  availableWallets: Wallet[]
   isReady: boolean
   wallets: Wallet[]
 }
@@ -127,8 +128,12 @@ interface WalletMethods {
     indexesToSign?: number[]
   ): Promise<(Uint8Array | null)[]>
   transactionSigner: algosdk.TransactionSigner
+  signData(data: string, metadata: StdSignMetadata): Promise<StdSignDataResponse>
+  withPrivateKey<T>(callback: (secretKey: Uint8Array) => Promise<T>): Promise<T>
 }
 ```
+
+`signData` is only supported by wallets whose `canSignData` property is `true` (see [Sign Data](../guides/signing-data.md)). `withPrivateKey` is only supported by wallets whose `canUsePrivateKey` property is `true` (see [Using Private Keys Safely](../guides/using-private-keys-safely.md)); both throw for unsupported wallets.
 
 ### Framework-Specific Usage
 
@@ -208,7 +213,7 @@ function App() {
 {% endtab %}
 {% endtabs %}
 
-See the [framework-specific guides](broken-reference) for detailed setup instructions.
+See the framework-specific guides ([React](../framework/react.md), [Vue](../framework/vue.md), [SolidJS](../framework/solidjs.md), [Svelte](../framework/svelte.md)) for detailed setup instructions.
 
 #### State Access
 
@@ -298,7 +303,7 @@ Here's a complete example showing wallet connection, transaction signing, and er
 {% tabs %}
 {% tab title="React" %}
 ```tsx
-import { useNetwork, useWallet, WalletId } from '@txnlab/use-wallet-react'
+import { useNetwork, useWallet } from '@txnlab/use-wallet-react'
 
 function WalletComponent() {
   const {
@@ -310,7 +315,7 @@ function WalletComponent() {
   const { activeNetwork } = useNetwork()
 
   const handleConnect = async () => {
-    const pera = wallets.find((w) => w.id === WalletId.PERA)
+    const pera = wallets.find((w) => w.id === 'pera')
     if (!pera) return
 
     try {
@@ -321,7 +326,7 @@ function WalletComponent() {
   }
 
   const handleDisconnect = async () => {
-    const pera = wallets.find((w) => w.id === WalletId.PERA)
+    const pera = wallets.find((w) => w.id === 'pera')
     if (!pera) return
 
     try {
@@ -361,7 +366,7 @@ function WalletComponent() {
 {% tab title="Vue" %}
 ```typescript
 <script setup lang="ts">
-  import { useNetwork, useWallet, WalletId } from '@txnlab/use-wallet-vue'
+  import { useNetwork, useWallet } from '@txnlab/use-wallet-vue'
 
   const {
     activeAccount,
@@ -372,7 +377,7 @@ function WalletComponent() {
   const { activeNetwork } = useNetwork()
 
   const handleConnect = async () => {
-    const pera = wallets.value.find((w) => w.id === WalletId.PERA)
+    const pera = wallets.value.find((w) => w.id === 'pera')
     if (!pera) return
 
     try {
@@ -383,7 +388,7 @@ function WalletComponent() {
   }
 
   const handleDisconnect = async () => {
-    const pera = wallets.value.find((w) => w.id === WalletId.PERA)
+    const pera = wallets.value.find((w) => w.id === 'pera')
     if (!pera) return
 
     try {
@@ -423,7 +428,7 @@ function WalletComponent() {
 
 {% tab title="Solid" %}
 ```tsx
-import { useNetwork, useWallet, WalletId } from '@txnlab/use-wallet-solid'
+import { useNetwork, useWallet } from '@txnlab/use-wallet-solid'
 import { Show } from 'solid-js'
 
 function WalletComponent() {
@@ -436,7 +441,7 @@ function WalletComponent() {
   const { activeNetwork } = useNetwork()
 
   const handleConnect = async () => {
-    const pera = wallets().find((w) => w.id === WalletId.PERA)
+    const pera = wallets().find((w) => w.id === 'pera')
     if (!pera) return
 
     try {
@@ -447,7 +452,7 @@ function WalletComponent() {
   }
 
   const handleDisconnect = async () => {
-    const pera = wallets().find((w) => w.id === WalletId.PERA)
+    const pera = wallets().find((w) => w.id === 'pera')
     if (!pera) return
 
     try {
@@ -485,7 +490,7 @@ function WalletComponent() {
 {% tab title="Svelte" %}
 ```typescript
 <script lang="ts">
-  import { useNetwork, useWallet, WalletId } from '@txnlab/use-wallet-svelte'
+  import { useNetwork, useWallet } from '@txnlab/use-wallet-svelte'
 
   const {
     activeAccount,
@@ -496,7 +501,7 @@ function WalletComponent() {
   const { activeNetwork } = useNetwork()
 
   const handleConnect = async () => {
-    const pera = wallets.value.find((w) => w.id === WalletId.PERA)
+    const pera = wallets.value.find((w) => w.id === 'pera')
     if (!pera) return
 
     try {
@@ -507,7 +512,7 @@ function WalletComponent() {
   }
 
   const handleDisconnect = async () => {
-    const pera = wallets.value.find((w) => w.id === WalletId.PERA)
+    const pera = wallets.value.find((w) => w.id === 'pera')
     if (!pera) return
 
     try {
@@ -600,5 +605,5 @@ All framework adapters are written in TypeScript and provide full type definitio
 ### See Also
 
 * [WalletManager](walletmanager.md) - Core functionality documentation
-* [Framework Adapters](broken-reference) - Detailed setup guides
+* [React](../framework/react.md), [Vue](../framework/vue.md), [SolidJS](../framework/solidjs.md), [Svelte](../framework/svelte.md) - Detailed setup guides
 * [Example Projects](../resources/example-projects.md) - Complete examples in each framework

@@ -1,9 +1,7 @@
 import { defineConfig } from 'vite'
+import tailwindcss from '@tailwindcss/vite'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 export default defineConfig({
-  plugins: [nodePolyfills()],
-  build: {
-    chunkSizeWarningLimit: 600
-  }
+  plugins: [tailwindcss(), nodePolyfills()]
 })

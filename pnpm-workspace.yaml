@@ -1,6 +1,6 @@
 packages:
   - examples/*
-  - packages/*
+  - packages/**
 
 onlyBuiltDependencies:
   - '@parcel/watcher'
@@ -8,6 +8,8 @@ onlyBuiltDependencies:
   - canvas
   - cbor-extract
   - esbuild
+  - sharp
+  - tiny-secp256k1
   - unrs-resolver
   - utf-8-validate
   - vue-demi

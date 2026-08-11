@@ -1,0 +1,53 @@
+name: Release
+on:
+  push:
+    branches: [main, v5]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  id-token: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate release token
+        id: generate_token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.RELEASE_BOT_APP_ID }}
+          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          token: ${{ steps.generate_token.outputs.token }}
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: npm install -g npm@latest
+      - run: npm audit signatures
+
+      - run: pnpm run build:packages
+      - run: pnpm run lint
+      - run: pnpm run typecheck
+      - run: pnpm run test
+      - run: pnpm run publint
+
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
+          GIT_AUTHOR_NAME: TxnLab Release Bot[bot]
+          GIT_AUTHOR_EMAIL: txnlab-release-bot[bot]@users.noreply.github.com
+          GIT_COMMITTER_NAME: TxnLab Release Bot[bot]
+          GIT_COMMITTER_EMAIL: txnlab-release-bot[bot]@users.noreply.github.com
+        run: npx semantic-release

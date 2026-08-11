@@ -26,7 +26,7 @@ To create a custom provider, you'll need to:
 Here's a minimal example:
 
 ```typescript
-import { CustomProvider, WalletAccount } from '@txnlab/use-wallet'
+import { CustomProvider, WalletAccount, custom } from '@txnlab/use-wallet'
 
 class MyWalletProvider implements CustomProvider {
   async connect(): Promise<WalletAccount[]> {
@@ -48,17 +48,14 @@ class MyWalletProvider implements CustomProvider {
 }
 
 // Add to WalletManager configuration
+import { WalletManager, custom } from '@txnlab/use-wallet'
+
 const manager = new WalletManager({
-  wallets: [{
-    id: WalletId.CUSTOM,
-    options: {
-      provider: new MyWalletProvider()
-    },
-    metadata: {
-      name: 'My Wallet',
-      icon: '/path/to/icon.svg'
-    }
-  }],
+  wallets: [
+    custom({
+      provider: new MyWalletProvider(),
+    }),
+  ],
   defaultNetwork: 'testnet'
 })
 ```

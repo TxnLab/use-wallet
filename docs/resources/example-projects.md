@@ -20,9 +20,7 @@ All examples are built with Vite or their respective meta-frameworks and include
 
 * Complete wallet integration with all supported providers
 * Transaction signing demonstration
-* End-to-end tests with Playwright
 * TypeScript configuration
-* Runtime node configuration UI (Vite examples only)
 
 ### Framework Examples
 
@@ -30,7 +28,7 @@ All examples are built with Vite or their respective meta-frameworks and include
 
 ```bash
 git clone https://github.com/TxnLab/use-wallet
-cd use-wallet/examples/react-ts
+cd use-wallet/examples/react
 pnpm install
 pnpm dev
 ```
@@ -40,13 +38,12 @@ The React example demonstrates:
 * React-specific hooks and patterns
 * Component composition with TypeScript
 * Integration with React's state management
-* Advanced features like runtime node configuration
 
 #### **Vite (Vue)**
 
 ```bash
 git clone https://github.com/TxnLab/use-wallet
-cd use-wallet/examples/vue-ts
+cd use-wallet/examples/vue
 pnpm install
 pnpm dev
 ```
@@ -56,13 +53,12 @@ The Vue example showcases:
 * Vue composables and plugins
 * Integration with Vue's reactivity system
 * TypeScript support in Vue components
-* Advanced features like runtime node configuration
 
 #### **Vite (SolidJS)**
 
 ```bash
 git clone https://github.com/TxnLab/use-wallet
-cd use-wallet/examples/solid-ts
+cd use-wallet/examples/solid
 pnpm install
 pnpm dev
 ```
@@ -72,23 +68,6 @@ The Solid example illustrates:
 * Solid.js primitives and patterns
 * Fine-grained reactivity integration
 * TypeScript configuration for Solid
-* Advanced features like runtime node configuration
-
-#### **Vite (Svelte)**
-
-```bash
-git clone https://github.com/TxnLab/use-wallet
-cd use-wallet/examples/svelte-ts
-pnpm install
-pnpm dev
-```
-
-The Svelte example showcases:
-
-* Svelte primitives and patterns
-* Integration with Svelte's reactivity system
-* TypeScript support in Svelte components
-* Advanced features like runtime node configuration
 
 #### **Vite (Vanilla TypeScript)**
 
@@ -112,7 +91,7 @@ The Vanilla TypeScript example demonstrates:
 
 ```bash
 git clone https://github.com/TxnLab/use-wallet
-cd use-wallet/examples/nextjs
+cd use-wallet/examples/next
 pnpm install
 pnpm dev
 ```
@@ -140,6 +119,22 @@ The Nuxt example showcases:
 * Auto-imports configuration
 * TypeScript configuration for Nuxt
 
+#### **SvelteKit**
+
+```bash
+git clone https://github.com/TxnLab/use-wallet
+cd use-wallet/examples/svelte
+pnpm install
+pnpm dev
+```
+
+The SvelteKit example showcases:
+
+* Svelte 5 primitives and patterns
+* Integration with Svelte's reactivity system
+* SvelteKit adapter-static configuration
+* TypeScript support in Svelte components
+
 ### Key Features
 
 #### Wallet Integration
@@ -153,17 +148,11 @@ All examples include a complete wallet connection interface demonstrating:
 
 #### Runtime Node Configuration
 
-The Vite examples include a UI for configuring Algorand node settings at runtime:
-
-* Custom node URL/port/headers
-* Network switching
-* Configuration persistence
-
-For more information about this feature, see the [Runtime Node Configuration](../guides/runtime-node-configuration.md) guide.
+See the [Runtime Node Configuration](../guides/runtime-node-configuration.md) guide for information about configuring Algorand node settings at runtime.
 
 #### Testing
 
-All examples include end-to-end tests using Playwright, demonstrating:
+End-to-end tests using Playwright are available in the shared `examples/e2e-tests/` directory, demonstrating:
 
 * Mocked Algorand node responses
 * Wallet connection testing
@@ -199,14 +188,15 @@ pnpm build
 pnpm example:react   # Run React example
 pnpm example:vue     # Run Vue example
 pnpm example:solid   # Run Solid example
+pnpm example:svelte  # Run Svelte example
 pnpm example:ts      # Run Vanilla TypeScript example
-pnpm example:nextjs  # Run Next.js example
+pnpm example:next    # Run Next.js example
 pnpm example:nuxt    # Run Nuxt example
 ```
 
 ### Next Steps
 
-* Read the [framework-specific integration](broken-reference) guides for detailed setup instructions
+* Read the framework-specific integration guides ([React](../framework/react.md), [Vue](../framework/vue.md), [SolidJS](../framework/solidjs.md), [Svelte](../framework/svelte.md)) for detailed setup instructions
 * Explore the [Connect Wallet Menu](../guides/connect-wallet-menu.md) guide to understand core wallet integration concepts and best practices
 * Learn about advanced features in the [Runtime Node Configuration](../guides/runtime-node-configuration.md) guide
 * Set up testing with the [Testing with Mnemonic Wallet](../guides/testing-with-mnemonic-wallet.md) guide
