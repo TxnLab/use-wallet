@@ -1,8 +1,12 @@
-import type algosdk from 'algosdk'
 import type { WalletAccount } from 'src/wallets/types'
 
 // ---------- Event Types -------------------------------------------- //
 
+/**
+ * Events emitted by WalletManager. Signing interception events
+ * (beforeSign/afterSign) are planned for v5.1+ — see
+ * notes/v5-future-features.md.
+ */
 export type WalletManagerEvents = {
   ready: void
   walletConnected: { walletId: string; accounts: WalletAccount[] }
@@ -10,12 +14,6 @@ export type WalletManagerEvents = {
   activeWalletChanged: { walletId: string | null }
   activeAccountChanged: { walletId: string; address: string }
   networkChanged: { networkId: string }
-  beforeSign: {
-    walletId: string
-    txnGroup: algosdk.Transaction[] | Uint8Array[]
-    indexesToSign?: number[]
-  }
-  afterSign: { walletId: string; success: boolean; error?: Error }
   error: { walletId?: string; error: Error }
 }
 
