@@ -307,7 +307,13 @@ const id: string = 'pera' // valid
 
 #### `WalletKey`
 
-`WalletKey` was a union type of `WalletId | \`${WalletId.WALLETCONNECT}:${string}\``. In v5, it is simply `string`.
+In v4, `WalletKey` was a union type:
+
+```typescript
+type WalletKey = WalletId | `${WalletId.WALLETCONNECT}:${string}`
+```
+
+In v5, it is simply `string`.
 
 #### Data Signing Types
 
