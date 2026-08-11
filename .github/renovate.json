@@ -10,7 +10,7 @@
   "configMigration": true,
   "timezone": "America/New_York",
   "assignees": ["drichar"],
-  "baseBranchPatterns": ["main", "v5"],
+  "baseBranchPatterns": ["main"],
   "ignorePaths": ["**/node_modules/**"],
   "minimumReleaseAge": "3 days",
   "lockFileMaintenance": {
