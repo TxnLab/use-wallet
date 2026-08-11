@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@noble/ed25519": "^3.1.0",
+    "@noble/ed25519": "3.1.0",
     "@txnlab/use-wallet": "workspace:*",
     "@txnlab/use-wallet-defly": "workspace:*",
     "@txnlab/use-wallet-exodus": "workspace:*",
@@ -22,13 +22,13 @@
     "@txnlab/use-wallet-walletconnect": "workspace:*",
     "@txnlab/use-wallet-web3auth": "workspace:*",
     "algosdk": "3.6.0",
-    "canonify": "^2.1.1"
+    "canonify": "2.1.1"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.1.0",
-    "tailwindcss": "^4.1.0",
-    "typescript": "~5.9.3",
-    "vite": "^7.3.1",
-    "vite-plugin-node-polyfills": "^0.25.0"
+    "@tailwindcss/vite": "4.2.1",
+    "tailwindcss": "4.2.1",
+    "typescript": "5.9.3",
+    "vite": "7.3.1",
+    "vite-plugin-node-polyfills": "0.25.0"
   }
 }
