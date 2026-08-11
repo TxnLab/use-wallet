@@ -1,6 +1,6 @@
 export default {
   tagFormat: 'v${version}',
-  branches: ['main', { name: 'v5', prerelease: 'rc', channel: 'next' }],
+  branches: ['main'],
   plugins: [
     '@semantic-release/commit-analyzer',
     [
