@@ -32,11 +32,7 @@ export function WalletList() {
   )
 }
 
-function WalletRow(props: {
-  wallet: Wallet
-  isConnecting: boolean
-  onConnect: () => void
-}) {
+function WalletRow(props: { wallet: Wallet; isConnecting: boolean; onConnect: () => void }) {
   return (
     <div
       class={`rounded-xl border p-3 transition-colors ${

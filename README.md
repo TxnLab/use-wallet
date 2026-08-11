@@ -44,13 +44,13 @@ function App() {
 
 ## Packages
 
-| Package | Description |
-| --- | --- |
-| [`@txnlab/use-wallet`](https://www.npmjs.com/package/@txnlab/use-wallet) | Core library (framework-agnostic) |
-| [`@txnlab/use-wallet-react`](https://www.npmjs.com/package/@txnlab/use-wallet-react) | React adapter |
-| [`@txnlab/use-wallet-vue`](https://www.npmjs.com/package/@txnlab/use-wallet-vue) | Vue adapter |
-| [`@txnlab/use-wallet-solid`](https://www.npmjs.com/package/@txnlab/use-wallet-solid) | SolidJS adapter |
-| [`@txnlab/use-wallet-svelte`](https://www.npmjs.com/package/@txnlab/use-wallet-svelte) | Svelte adapter |
+| Package                                                                                | Description                       |
+| -------------------------------------------------------------------------------------- | --------------------------------- |
+| [`@txnlab/use-wallet`](https://www.npmjs.com/package/@txnlab/use-wallet)               | Core library (framework-agnostic) |
+| [`@txnlab/use-wallet-react`](https://www.npmjs.com/package/@txnlab/use-wallet-react)   | React adapter                     |
+| [`@txnlab/use-wallet-vue`](https://www.npmjs.com/package/@txnlab/use-wallet-vue)       | Vue adapter                       |
+| [`@txnlab/use-wallet-solid`](https://www.npmjs.com/package/@txnlab/use-wallet-solid)   | SolidJS adapter                   |
+| [`@txnlab/use-wallet-svelte`](https://www.npmjs.com/package/@txnlab/use-wallet-svelte) | Svelte adapter                    |
 
 Wallet adapters: [Pera](https://www.npmjs.com/package/@txnlab/use-wallet-pera) · [Defly](https://www.npmjs.com/package/@txnlab/use-wallet-defly) · [Exodus](https://www.npmjs.com/package/@txnlab/use-wallet-exodus) · [Kibisis](https://www.npmjs.com/package/@txnlab/use-wallet-kibisis) · [KMD](https://www.npmjs.com/package/@txnlab/use-wallet-kmd) · [Lute](https://www.npmjs.com/package/@txnlab/use-wallet-lute) · [Mnemonic](https://www.npmjs.com/package/@txnlab/use-wallet-mnemonic) · [W3 Wallet](https://www.npmjs.com/package/@txnlab/use-wallet-w3wallet) · [WalletConnect](https://www.npmjs.com/package/@txnlab/use-wallet-walletconnect) · [Web3Auth](https://www.npmjs.com/package/@txnlab/use-wallet-web3auth)
 
