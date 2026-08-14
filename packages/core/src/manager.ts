@@ -28,31 +28,33 @@ import type { BaseWallet } from 'src/wallets/base'
 import type {
   AdapterConstructorParams,
   AdapterStoreAccessor,
+  InferWalletAccounts,
   WalletAccount,
   WalletAdapterConfig,
   WalletCapabilities,
   WalletKey
 } from 'src/wallets/types'
 
-export interface WalletManagerOptions {
+export interface WalletManagerOptions<TAccount extends WalletAccount = WalletAccount> {
   persistNetwork?: boolean
   debug?: boolean
   logLevel?: LogLevel
+  store?: Store<State<TAccount>>
 }
 
-export interface WalletManagerConfig {
-  wallets?: WalletAdapterConfig[]
+export interface WalletManagerConfig<TAccount extends WalletAccount = WalletAccount> {
+  wallets?: readonly WalletAdapterConfig<any>[]
   networks?: Record<string, NetworkConfig>
   defaultNetwork?: string
-  options?: WalletManagerOptions
+  options?: WalletManagerOptions<TAccount>
 }
 
-export class WalletManager {
-  public _clients: Map<WalletKey, BaseWallet> = new Map()
+export class WalletManager<TAccount extends WalletAccount = WalletAccount> {
+  public _clients: Map<WalletKey, BaseWallet<any>> = new Map()
   private _capabilities: Map<WalletKey, WalletCapabilities> = new Map()
   private baseNetworkConfig: Record<string, NetworkConfig>
-  public store: Store<State>
-  public subscribe: (callback: (state: State) => void) => () => void
+  public store: Store<State<TAccount>>
+  public subscribe: (callback: (state: State<TAccount>) => void) => () => void
   public options: { persistNetwork: boolean }
 
   private logger: ReturnType<typeof logger.createScopedLogger>
@@ -63,7 +65,7 @@ export class WalletManager {
     networks,
     defaultNetwork = 'testnet',
     options = {}
-  }: WalletManagerConfig = {}) {
+  }: WalletManagerConfig<TAccount> = {}) {
     // Initialize scoped logger
     this.logger = this.initializeLogger(options)
 
@@ -100,7 +102,7 @@ export class WalletManager {
     const algodClient = this.createAlgodClient(networkConfig[activeNetwork].algod)
 
     // Create initial state
-    const initialState: State = {
+    const initialState: State<TAccount> = {
       ...DEFAULT_STATE,
       ...persistedState,
       networkConfig,
@@ -108,8 +110,22 @@ export class WalletManager {
       algodClient
     }
 
-    // Create store
-    this.store = new Store<State>(initialState)
+    // Create store, or adopt an injected instance and hydrate it.
+    const injectedStore = options.store
+    const preExistingWalletKeys = injectedStore ? Object.keys(injectedStore.state.wallets) : []
+    if (injectedStore) {
+      this.store = injectedStore
+      injectedStore.setState((state) => ({
+        ...initialState,
+        wallets: {
+          ...initialState.wallets,
+          ...state.wallets
+        },
+        activeWallet: state.activeWallet ?? initialState.activeWallet
+      }))
+    } else {
+      this.store = new Store<State<TAccount>>(initialState)
+    }
 
     // Track active network for change detection
     let previousNetwork = activeNetwork
@@ -138,7 +154,7 @@ export class WalletManager {
     this.savePersistedState()
 
     // Subscribe to store updates
-    this.subscribe = (callback: (state: State) => void): (() => void) => {
+    this.subscribe = (callback: (state: State<TAccount>) => void): (() => void) => {
       const subscription = this.store.subscribe(() => {
         callback(this.store.state)
       })
@@ -147,7 +163,27 @@ export class WalletManager {
     }
 
     // Initialize wallets
-    this.initializeWallets(wallets)
+    const hydratedWalletKeys = Object.keys(initialState.wallets).filter(
+      (key) => !preExistingWalletKeys.includes(key)
+    ) as WalletKey[]
+    this.initializeWallets(wallets, hydratedWalletKeys)
+  }
+
+  // Creates a WalletManager whose account type parameter is inferred as the
+  // union of the account types declared by the given adapter configs, e.g.
+  // WalletManager<PQAccount>. Direct construction (new WalletManager<T>(...))
+  // cannot perform this inference: TypeScript fixes the class type parameter
+  // from the first array element instead of uniting the candidates. The static
+  // factory captures the configs as a tuple type and derives the union from it.
+  static create<TConfigs extends readonly WalletAdapterConfig<any>[] = WalletAdapterConfig[]>(
+    config?: Omit<WalletManagerConfig, 'wallets' | 'options'> & {
+      wallets?: TConfigs
+      options?: WalletManagerOptions<NoInfer<InferWalletAccounts<TConfigs>>>
+    }
+  ): WalletManager<InferWalletAccounts<TConfigs>> {
+    return new WalletManager<InferWalletAccounts<TConfigs>>(
+      config as WalletManagerConfig<InferWalletAccounts<TConfigs>>
+    )
   }
 
   // ---------- Events ------------------------------------------------- //
@@ -166,7 +202,7 @@ export class WalletManager {
     this.events.emit(event, ...args)
   }
 
-  private emitLifecycleEvents(prev: State, next: State): void {
+  private emitLifecycleEvents(prev: State<TAccount>, next: State<TAccount>): void {
     if (next.wallets !== prev.wallets) {
       for (const [walletId, walletState] of Object.entries(next.wallets)) {
         if (!walletState) continue
@@ -196,14 +232,14 @@ export class WalletManager {
   // ---------- Logging ----------------------------------------------- //
 
   private initializeLogger(
-    options: WalletManagerOptions
+    options: WalletManagerOptions<TAccount>
   ): ReturnType<typeof logger.createScopedLogger> {
     const logLevel = this.determineLogLevel(options)
     Logger.setLevel(logLevel)
     return logger.createScopedLogger('WalletManager')
   }
 
-  private determineLogLevel(options: WalletManagerOptions): LogLevel {
+  private determineLogLevel(options: WalletManagerOptions<TAccount>): LogLevel {
     if (options?.debug) {
       return LogLevel.DEBUG
     }
@@ -223,14 +259,14 @@ export class WalletManager {
     }))
   }
 
-  private loadPersistedState(): PersistedState | null {
+  private loadPersistedState(): PersistedState<TAccount> | null {
     try {
       const serializedState = StorageAdapter.getItem(LOCAL_STORAGE_KEY)
       if (serializedState === null) {
         return null
       }
       const parsedState = JSON.parse(serializedState)
-      if (!isValidPersistedState(parsedState)) {
+      if (!isValidPersistedState<TAccount>(parsedState)) {
         this.logger.warn('Parsed state:', parsedState)
         throw new Error('Persisted state is invalid')
       }
@@ -244,7 +280,7 @@ export class WalletManager {
   private savePersistedState(): void {
     try {
       const { wallets, activeWallet, activeNetwork, networkConfig } = this.store.state
-      const persistedState: PersistedState = {
+      const persistedState: PersistedState<TAccount> = {
         wallets,
         activeWallet,
         activeNetwork,
@@ -284,17 +320,21 @@ export class WalletManager {
 
   // ---------- Scoped Store Access ----------------------------------- //
 
-  private createStoreAccessor(walletKey: string): AdapterStoreAccessor {
+  private createStoreAccessor<T extends WalletAccount>(walletKey: string): AdapterStoreAccessor<T> {
+    // The adapter's account type `T` is independent of the manager's
+    // `TAccount`: the shared store holds all wallets, so mutations are
+    // funneled through a store view scoped to the adapter's own type.
+    const store = this.store as unknown as Store<State<T>>
     return {
-      getWalletState: () => this.store.state.wallets[walletKey],
+      getWalletState: () => store.state.wallets[walletKey],
       getActiveWallet: () => this.store.state.activeWallet,
       getActiveNetwork: () => this.store.state.activeNetwork,
       getState: () => this.store.state,
-      addWallet: (wallet) => addWallet(this.store, { walletId: walletKey, wallet }),
-      removeWallet: () => removeWallet(this.store, { walletId: walletKey }),
-      setAccounts: (accounts) => setAccounts(this.store, { walletId: walletKey, accounts }),
-      setActiveAccount: (address) => setActiveAccount(this.store, { walletId: walletKey, address }),
-      setActive: () => setActiveWallet(this.store, { walletId: walletKey })
+      addWallet: (wallet) => addWallet(store, { walletId: walletKey, wallet }),
+      removeWallet: () => removeWallet(store, { walletId: walletKey }),
+      setAccounts: (accounts) => setAccounts(store, { walletId: walletKey, accounts }),
+      setActiveAccount: (address) => setActiveAccount(store, { walletId: walletKey, address }),
+      setActive: () => setActiveWallet(store, { walletId: walletKey })
     }
   }
 
@@ -310,7 +350,10 @@ export class WalletManager {
 
   // ---------- Wallets ----------------------------------------------- //
 
-  private initializeWallets(walletConfigs: WalletAdapterConfig[]) {
+  private initializeWallets(
+    walletConfigs: readonly WalletAdapterConfig<any>[],
+    hydratedWalletKeys: WalletKey[]
+  ) {
     this.logger.info('Initializing wallets...')
 
     for (const config of walletConfigs) {
@@ -323,7 +366,7 @@ export class WalletManager {
 
       const storeAccessor = this.createStoreAccessor(walletKey)
 
-      const params: AdapterConstructorParams = {
+      const params: AdapterConstructorParams<any> = {
         id: config.id,
         metadata: config.metadata,
         store: storeAccessor,
@@ -346,25 +389,26 @@ export class WalletManager {
       this.logger.info(`Initialized ${walletKey}`)
     }
 
-    const state = this.store.state
-
-    // Check if connected wallets are still valid
-    const connectedWallets = Object.keys(state.wallets) as WalletKey[]
-    for (const walletKey of connectedWallets) {
-      if (!this._clients.has(walletKey)) {
+    // Check if connected wallets are still valid. Only wallet entries the
+    // manager hydrated itself are candidates for cleanup; entries under
+    // keys owned by external writers are honored.
+    for (const walletKey of hydratedWalletKeys) {
+      if (this.store.state.wallets[walletKey] && !this._clients.has(walletKey)) {
         this.logger.warn(`Connected wallet not found: ${walletKey}`)
         removeWallet(this.store, { walletId: walletKey })
       }
     }
 
-    // Check if active wallet is still valid
-    if (state.activeWallet && !this._clients.has(state.activeWallet)) {
-      this.logger.warn(`Active wallet not found: ${state.activeWallet}`)
+    // Check if active wallet is still valid. An active wallet backed by an
+    // externally owned entry (no adapter, but a live wallet entry) is kept.
+    const { activeWallet, wallets } = this.store.state
+    if (activeWallet && !this._clients.has(activeWallet) && !wallets[activeWallet]) {
+      this.logger.warn(`Active wallet not found: ${activeWallet}`)
       setActiveWallet(this.store, { walletId: null })
     }
   }
 
-  public get wallets(): BaseWallet[] {
+  public get wallets(): BaseWallet<any>[] {
     return [...this._clients.values()]
   }
 
@@ -416,12 +460,12 @@ export class WalletManager {
     }
   }
 
-  public get availableWallets(): BaseWallet[] {
+  public get availableWallets(): BaseWallet<any>[] {
     const activeNetwork = this.store.state.activeNetwork
     return this.wallets.filter((w) => this.isWalletAvailable(w.walletKey, activeNetwork))
   }
 
-  public getWallet(walletKey: WalletKey): BaseWallet | undefined {
+  public getWallet(walletKey: WalletKey): BaseWallet<any> | undefined {
     return this._clients.get(walletKey)
   }
 
@@ -602,7 +646,7 @@ export class WalletManager {
 
   // ---------- Active Wallet ----------------------------------------- //
 
-  public get activeWallet(): BaseWallet | null {
+  public get activeWallet(): BaseWallet<any> | null {
     const state = this.store.state
     const activeWallet = this.wallets.find((wallet) => wallet.walletKey === state.activeWallet)
     if (!activeWallet) {
@@ -642,7 +686,7 @@ export class WalletManager {
 
   // ---------- Sign Transactions ------------------------------------- //
 
-  public get signTransactions(): BaseWallet['signTransactions'] {
+  public get signTransactions(): BaseWallet<any>['signTransactions'] {
     if (!this.activeWallet) {
       this.logger.error('No active wallet found!')
       throw new Error('No active wallet found!')

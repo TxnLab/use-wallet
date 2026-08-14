@@ -14,6 +14,7 @@ import algosdk from 'algosdk'
 import { getContext, setContext } from 'svelte'
 import type { Mock } from 'vitest'
 import { useWalletContext, useWalletManager, useNetwork, useWallet } from './index'
+import type { ResolvedWalletAccount, ResolvedWalletManager } from './index'
 
 // Mock Svelte's context functions
 vi.mock('svelte', async (importOriginal) => {
@@ -553,5 +554,69 @@ describe('useWallet - availableWallets', () => {
 
     expect(wallet.availableWallets.current).toHaveLength(2)
     expect(wallet.wallets).toHaveLength(2)
+  })
+})
+
+describe('Register - account type resolution', () => {
+  // Type-level equality assertion: `Eq<A, B>` resolves to the literal type
+  // `true` only when A and B are identical, so `const x: Eq<A, B> = true`
+  // fails to compile if the inference ever regresses.
+  type Eq<A, B> = (<G>() => G extends A ? 1 : 2) extends <G>() => G extends B ? 1 : 2 ? true : false
+
+  interface QuantumAccount extends WalletAccount {
+    kind: 'quantum'
+    handleQuantumOperation: () => string
+  }
+
+  interface ClassicAccount extends WalletAccount {
+    kind: 'classic'
+    legacyId: number
+  }
+
+  it('defaults to the base WalletAccount without a Register declaration', () => {
+    ;(getContext as Mock).mockReturnValue(mockWalletManager)
+
+    const { activeAccount, wallets } = useWallet()
+
+    const activeAccountType: Eq<typeof activeAccount.current, WalletAccount | null | undefined> =
+      true
+    const accountsType: Eq<
+      (typeof wallets)[number]['accounts']['current'],
+      WalletAccount[] | undefined
+    > = true
+
+    expect(activeAccountType && accountsType).toBe(true)
+    expect(activeAccount.current).toBeUndefined()
+    expect(wallets).toHaveLength(2)
+  })
+
+  it('resolves the account union from a registered manager type', () => {
+    // Classic construction with an explicitly declared union;
+    // `WalletManager.create({ wallets: [...] })` infers the same shape
+    // from the adapter configs (covered by the core test suite)
+    const manager = new WalletManager<QuantumAccount | ClassicAccount>({
+      wallets: [mockAdapterA()]
+    })
+
+    // The resolution chain the public hook uses: a `Register` declaration
+    // carrying `typeof manager` resolves to the manager type and its
+    // account union (apps write `declare module '@txnlab/use-wallet-svelte'
+    // { interface Register { manager: typeof manager } }`)
+    const resolvedManager: Eq<
+      ResolvedWalletManager<{ manager: typeof manager }>,
+      WalletManager<QuantumAccount | ClassicAccount>
+    > = true
+    const resolvedAccount: Eq<
+      ResolvedWalletAccount<{ manager: typeof manager }>,
+      QuantumAccount | ClassicAccount
+    > = true
+
+    // Without a registration, resolution falls back to the base types
+    const unregisteredManager: Eq<ResolvedWalletManager, WalletManager> = true
+    const unregisteredAccount: Eq<ResolvedWalletAccount, WalletAccount> = true
+
+    expect(manager).toBeInstanceOf(WalletManager)
+    expect(resolvedManager && resolvedAccount).toBe(true)
+    expect(unregisteredManager && unregisteredAccount).toBe(true)
   })
 })
