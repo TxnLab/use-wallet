@@ -48,7 +48,7 @@
   },
   "devDependencies": {
     "@types/react": "19.2.14",
-    "algosdk": "3.6.0",
+    "algosdk": "3.7.0",
     "jsdom": "26.1.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
