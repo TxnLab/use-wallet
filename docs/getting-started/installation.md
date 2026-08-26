@@ -182,7 +182,7 @@ npm install @txnlab/use-wallet-pera @txnlab/use-wallet-defly
 | `@txnlab/use-wallet-exodus` | Exodus |
 | `@txnlab/use-wallet-walletconnect` | WalletConnect (+ skins: Biatec, Voi) |
 | `@txnlab/use-wallet-kibisis` | Kibisis |
-| `@txnlab/use-wallet-lute` | Lute Wallet |
+| `@galaxypay/use-wallet-lute` | Lute Wallet |
 | `@txnlab/use-wallet-w3wallet` | W3 Wallet |
 | `@txnlab/use-wallet-kmd` | KMD (development) |
 | `@txnlab/use-wallet-mnemonic` | Mnemonic (testing) |
