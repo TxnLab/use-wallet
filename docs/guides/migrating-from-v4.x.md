@@ -38,7 +38,7 @@ In v5, wallet SDKs are bundled inside their adapter packages. You install the fr
 ```bash
 # v5 pattern
 npm install @txnlab/use-wallet-react algosdk
-npm install @txnlab/use-wallet-pera @txnlab/use-wallet-defly @txnlab/use-wallet-lute  # adapter packages
+npm install @txnlab/use-wallet-pera @txnlab/use-wallet-defly @galaxypay/use-wallet-lute  # adapter packages
 # @perawallet/connect is a dependency of @txnlab/use-wallet-pera — no manual install needed
 ```
 
@@ -111,25 +111,25 @@ bun add @txnlab/use-wallet-svelte@^5.0.0
 {% tabs %}
 {% tab title="npm" %}
 ```bash
-npm install @txnlab/use-wallet-pera @txnlab/use-wallet-defly @txnlab/use-wallet-lute
+npm install @txnlab/use-wallet-pera @txnlab/use-wallet-defly @galaxypay/use-wallet-lute
 ```
 {% endtab %}
 
 {% tab title="yarn" %}
 ```bash
-yarn add @txnlab/use-wallet-pera @txnlab/use-wallet-defly @txnlab/use-wallet-lute
+yarn add @txnlab/use-wallet-pera @txnlab/use-wallet-defly @galaxypay/use-wallet-lute
 ```
 {% endtab %}
 
 {% tab title="pnpm" %}
 ```bash
-pnpm add @txnlab/use-wallet-pera @txnlab/use-wallet-defly @txnlab/use-wallet-lute
+pnpm add @txnlab/use-wallet-pera @txnlab/use-wallet-defly @galaxypay/use-wallet-lute
 ```
 {% endtab %}
 
 {% tab title="bun" %}
 ```bash
-bun add @txnlab/use-wallet-pera @txnlab/use-wallet-defly @txnlab/use-wallet-lute
+bun add @txnlab/use-wallet-pera @txnlab/use-wallet-defly @galaxypay/use-wallet-lute
 ```
 {% endtab %}
 {% endtabs %}
@@ -149,7 +149,7 @@ npm uninstall @perawallet/connect @blockshake/defly-connect lute-connect
 | `@txnlab/use-wallet-exodus` | Exodus |
 | `@txnlab/use-wallet-walletconnect` | WalletConnect (+ skins: Biatec, Voi) |
 | `@txnlab/use-wallet-kibisis` | Kibisis |
-| `@txnlab/use-wallet-lute` | Lute Wallet |
+| `@galaxypay/use-wallet-lute` | Lute Wallet |
 | `@txnlab/use-wallet-w3wallet` | W3 Wallet |
 | `@txnlab/use-wallet-kmd` | KMD (development) |
 | `@txnlab/use-wallet-mnemonic` | Mnemonic (testing) |
@@ -187,10 +187,10 @@ const manager = new WalletManager({
 #### After (v5)
 
 ```typescript
+import { lute } from '@galaxypay/use-wallet-lute'
 import { WalletManager } from '@txnlab/use-wallet'
 import { pera } from '@txnlab/use-wallet-pera'
 import { defly } from '@txnlab/use-wallet-defly'
-import { lute } from '@txnlab/use-wallet-lute'
 import { walletConnect } from '@txnlab/use-wallet-walletconnect'
 
 const manager = new WalletManager({
