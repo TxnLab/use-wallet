@@ -11,18 +11,9 @@ If you have found an issue with `@txnlab/use-wallet`, please follow these steps:
 - Describe the exact steps which reproduce the problem in as much detail as possible.
 - To help triage and fix the issue quickly, please provide a minimal reproducible example.
 
-To create a shareable code example, you can use CodeSandbox (https://codesandbox.io/s/new) or Stackblitz (https://stackblitz.com/).
+The [`examples/`](./examples) directory contains a working app for each framework adapter — vanilla TypeScript, React, Vue, Solid, Svelte, Next.js, and Nuxt. Copying the one that matches your setup is usually the quickest way to build a reproduction.
 
-Feel free to fork any of our examples to reproduce your issue:
-
-| Package                    | Framework         | Examples                                                                                                                              |
-| -------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `@txnlab/use-wallet`       | Vite (Vanilla TS) | [CodeSandbox](https://codesandbox.io/p/devbox/vite-vanilla-ts-mxmghx) / [StackBlitz](https://stackblitz.com/edit/vitejs-vite-cfpybn)  |
-| `@txnlab/use-wallet-react` | Vite (React)      | [CodeSandbox](https://codesandbox.io/p/devbox/vite-react-k55gr5) / [StackBlitz](https://stackblitz.com/edit/vitejs-vite-tbsvrz)       |
-| `@txnlab/use-wallet-solid` | Vite (Solid)      | [CodeSandbox](https://codesandbox.io/p/devbox/vite-solid-w2gtz2) / [StackBlitz](https://stackblitz.com/edit/solidjs-templates-mnxg4m) |
-| `@txnlab/use-wallet-vue`   | Vite (Vue)        | [CodeSandbox](https://codesandbox.io/p/devbox/vite-vue-cznvls) / [StackBlitz](https://stackblitz.com/edit/vitejs-vite-mpwnm1)         |
-
-A public GitHub repository also works. 👌
+Share it as a public GitHub repository, or in a sandbox such as [CodeSandbox](https://codesandbox.io/s/new) or [StackBlitz](https://stackblitz.com/). 👌
 
 Please ensure that the reproduction is as minimal as possible. For more information on how to create a minimal reproducible example, please refer to [this guide](https://stackoverflow.com/help/minimal-reproducible-example).
 
