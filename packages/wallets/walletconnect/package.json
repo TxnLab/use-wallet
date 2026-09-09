@@ -35,13 +35,13 @@
   },
   "dependencies": {
     "@walletconnect/modal": "2.7.0",
-    "@walletconnect/sign-client": "2.23.4",
-    "@walletconnect/types": "2.23.4"
+    "@walletconnect/sign-client": "2.24.0",
+    "@walletconnect/types": "2.24.0"
   },
   "devDependencies": {
     "@txnlab/use-wallet": "workspace:*",
-    "algosdk": "3.6.0",
-    "tsdown": "0.21.0",
+    "algosdk": "3.7.0",
+    "tsdown": "0.23.0",
     "typescript": "5.9.3"
   },
   "scripts": {

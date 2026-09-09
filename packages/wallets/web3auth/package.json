@@ -35,13 +35,13 @@
   },
   "dependencies": {
     "@web3auth/base-provider": "9.7.0",
-    "@web3auth/modal": "10.15.0",
+    "@web3auth/modal": "10.16.0",
     "@web3auth/single-factor-auth": "9.5.0"
   },
   "devDependencies": {
     "@txnlab/use-wallet": "workspace:*",
-    "algosdk": "3.6.0",
-    "tsdown": "0.21.0",
+    "algosdk": "3.7.0",
+    "tsdown": "0.23.0",
     "typescript": "5.9.3"
   },
   "scripts": {
