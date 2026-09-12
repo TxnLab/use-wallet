@@ -23,7 +23,7 @@
     "@txnlab/use-wallet-web3auth": "workspace:*",
     "algosdk": "3.6.0",
     "canonify": "^2.1.1",
-    "solid-js": "^1.9.10"
+    "solid-js": "^1.9.11"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.0",
@@ -31,7 +31,7 @@
     "tailwindcss": "^4.1.0",
     "typescript": "~5.9.3",
     "vite": "^7.3.1",
-    "vite-plugin-node-polyfills": "^0.25.0",
+    "vite-plugin-node-polyfills": "^0.28.0",
     "vite-plugin-solid": "^2.11.10"
   }
 }

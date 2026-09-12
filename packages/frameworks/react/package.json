@@ -43,16 +43,16 @@
     "dist"
   ],
   "dependencies": {
-    "@tanstack/react-store": "0.9.1",
+    "@tanstack/react-store": "0.11.1",
     "@txnlab/use-wallet": "workspace:*"
   },
   "devDependencies": {
-    "@types/react": "19.2.14",
+    "@types/react": "19.3.0",
     "algosdk": "3.6.0",
     "jsdom": "26.1.0",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "tsdown": "0.21.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "tsdown": "0.23.0",
     "typescript": "5.9.3"
   },
   "peerDependencies": {
