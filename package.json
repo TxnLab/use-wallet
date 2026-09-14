@@ -44,7 +44,7 @@
     "@semantic-release/release-notes-generator": "^14.1.0",
     "@sveltejs/kit": "2.50.1",
     "@sveltejs/vite-plugin-svelte": "6.2.4",
-    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "16.3.2",
     "@types/node": "20.11.30",
     "@vitejs/plugin-react": "4.7.0",
