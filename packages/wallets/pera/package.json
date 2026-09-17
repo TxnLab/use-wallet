@@ -34,12 +34,12 @@
     "algosdk": "^3.5.2"
   },
   "dependencies": {
-    "@perawallet/connect": "1.6.0"
+    "@perawallet/connect": "1.6.1"
   },
   "devDependencies": {
     "@txnlab/use-wallet": "workspace:*",
-    "algosdk": "3.6.0",
-    "tsdown": "0.21.0",
+    "algosdk": "3.7.0",
+    "tsdown": "0.23.0",
     "typescript": "5.9.3"
   },
   "scripts": {
