@@ -43,14 +43,14 @@
     "dist"
   ],
   "dependencies": {
-    "@tanstack/svelte-store": "0.10.1",
+    "@tanstack/svelte-store": "0.12.1",
     "@txnlab/use-wallet": "workspace:*"
   },
   "devDependencies": {
-    "@testing-library/svelte": "5.3.1",
+    "@testing-library/svelte": "5.4.2",
     "algosdk": "3.6.0",
-    "svelte": "5.49.1",
-    "tsdown": "0.21.0",
+    "svelte": "5.57.0",
+    "tsdown": "0.23.0",
     "typescript": "5.9.3"
   },
   "peerDependencies": {

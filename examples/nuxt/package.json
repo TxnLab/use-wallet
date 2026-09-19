@@ -25,12 +25,12 @@
     "algosdk": "3.6.0",
     "canonify": "^2.1.1",
     "nuxt": "^3.21.0",
-    "vue": "^3.5.25"
+    "vue": "^3.5.27"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.0",
     "tailwindcss": "^4.1.0",
     "typescript": "^5.9.3",
-    "vite-plugin-node-polyfills": "^0.25.0"
+    "vite-plugin-node-polyfills": "^0.28.0"
   }
 }
