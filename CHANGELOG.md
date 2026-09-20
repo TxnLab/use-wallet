@@ -1,3 +1,10 @@
+## [5.0.1](https://github.com/TxnLab/use-wallet/compare/v5.0.0...v5.0.1) (2026-09-20)
+
+
+### Bug Fixes
+
+* **deps:** update wallet adapter packages ([#450](https://github.com/TxnLab/use-wallet/issues/450)) ([49af752](https://github.com/TxnLab/use-wallet/commit/49af7521cae91adaacd5ae3f24f3cbc202d86bea))
+
 # [5.0.0](https://github.com/TxnLab/use-wallet/compare/v4.6.0...v5.0.0) (2026-08-11)
 
 
