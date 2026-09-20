@@ -49,11 +49,11 @@ The `wallets` array determines which wallets will be available in your applicati
 Here's an example showing common wallet configurations, including popular production wallets and those that require specific options:
 
 ```typescript
+import { lute } from '@galaxypay/use-wallet-lute'
 import { WalletManager } from '@txnlab/use-wallet'
 import { pera } from '@txnlab/use-wallet-pera'
 import { exodus } from '@txnlab/use-wallet-exodus'
 import { kibisis } from '@txnlab/use-wallet-kibisis'
-import { lute } from '@txnlab/use-wallet-lute'
 import { w3wallet } from '@txnlab/use-wallet-w3wallet'
 import { defly } from '@txnlab/use-wallet-defly'
 import { walletConnect } from '@txnlab/use-wallet-walletconnect'

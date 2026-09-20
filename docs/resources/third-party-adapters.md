@@ -31,7 +31,7 @@ An adapter package:
 * Exports a factory function returning a `WalletAdapterConfig`, plus a `WALLET_ID` constant
 * Optionally declares `WalletCapabilities` (supported networks) and accepts the shared `metadata` factory option
 
-The [Lute adapter](https://github.com/TxnLab/use-wallet/tree/main/packages/wallets/lute) is the reference implementation, and the [Custom Provider](../guides/custom-provider.md) guide covers the underlying wallet interface.
+The [Lute adapter](https://github.com/GalaxyPay/use-wallet-lute) is the reference implementation, and the [Custom Provider](../guides/custom-provider.md) guide covers the underlying wallet interface.
 
 ### Listing Criteria
 

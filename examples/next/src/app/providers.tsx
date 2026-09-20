@@ -1,11 +1,11 @@
 'use client'
 
+import { lute } from '@galaxypay/use-wallet-lute'
 import { WalletManager, WalletProvider } from '@txnlab/use-wallet-react'
 import { defly } from '@txnlab/use-wallet-defly'
 import { exodus } from '@txnlab/use-wallet-exodus'
 import { kibisis } from '@txnlab/use-wallet-kibisis'
 import { kmd } from '@txnlab/use-wallet-kmd'
-import { lute } from '@txnlab/use-wallet-lute'
 import { mnemonic } from '@txnlab/use-wallet-mnemonic'
 import { pera } from '@txnlab/use-wallet-pera'
 import { w3wallet } from '@txnlab/use-wallet-w3wallet'
