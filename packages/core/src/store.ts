@@ -6,12 +6,14 @@ import type { Store } from '@tanstack/store'
 
 export type { WalletState }
 
-export type WalletStateMap = Partial<Record<WalletKey, WalletState>>
+export type WalletStateMap<T extends WalletAccount = WalletAccount> = Partial<
+  Record<WalletKey, WalletState<T>>
+>
 
 export type ManagerStatus = 'initializing' | 'ready'
 
-export interface State {
-  wallets: WalletStateMap
+export interface State<T extends WalletAccount = WalletAccount> {
+  wallets: WalletStateMap<T>
   activeWallet: WalletKey | null
   activeNetwork: string
   algodClient: algosdk.Algodv2
@@ -20,7 +22,7 @@ export interface State {
   customNetworkConfigs: Record<string, Partial<NetworkConfig>>
 }
 
-export const DEFAULT_STATE: State = {
+export const DEFAULT_STATE = {
   wallets: {},
   activeWallet: null,
   activeNetwork: 'testnet',
@@ -28,17 +30,20 @@ export const DEFAULT_STATE: State = {
   managerStatus: 'initializing',
   networkConfig: DEFAULT_NETWORK_CONFIG,
   customNetworkConfigs: {}
-}
+} satisfies State
 
-export type PersistedState = Omit<State, 'algodClient' | 'managerStatus' | 'networkConfig'>
+export type PersistedState<T extends WalletAccount = WalletAccount> = Omit<
+  State<T>,
+  'algodClient' | 'managerStatus' | 'networkConfig'
+>
 
 export const LOCAL_STORAGE_KEY = '@txnlab/use-wallet:v5'
 
 // State mutations
 
-export function addWallet(
-  store: Store<State>,
-  { walletId, wallet }: { walletId: WalletKey; wallet: WalletState }
+export function addWallet<T extends WalletAccount>(
+  store: Store<State<T>>,
+  { walletId, wallet }: { walletId: WalletKey; wallet: WalletState<T> }
 ) {
   store.setState((state) => {
     const updatedWallets = {
@@ -57,7 +62,10 @@ export function addWallet(
   })
 }
 
-export function removeWallet(store: Store<State>, { walletId }: { walletId: WalletKey }) {
+export function removeWallet<T extends WalletAccount>(
+  store: Store<State<T>>,
+  { walletId }: { walletId: WalletKey }
+) {
   store.setState((state) => {
     const updatedWallets = { ...state.wallets }
     delete updatedWallets[walletId]
@@ -70,15 +78,18 @@ export function removeWallet(store: Store<State>, { walletId }: { walletId: Wall
   })
 }
 
-export function setActiveWallet(store: Store<State>, { walletId }: { walletId: WalletKey | null }) {
+export function setActiveWallet<T extends WalletAccount>(
+  store: Store<State<T>>,
+  { walletId }: { walletId: WalletKey | null }
+) {
   store.setState((state) => ({
     ...state,
     activeWallet: walletId
   }))
 }
 
-export function setActiveAccount(
-  store: Store<State>,
+export function setActiveAccount<T extends WalletAccount>(
+  store: Store<State<T>>,
   { walletId, address }: { walletId: WalletKey; address: string }
 ) {
   store.setState((state) => {
@@ -112,9 +123,9 @@ export function setActiveAccount(
   })
 }
 
-export function setAccounts(
-  store: Store<State>,
-  { walletId, accounts }: { walletId: WalletKey; accounts: WalletAccount[] }
+export function setAccounts<T extends WalletAccount>(
+  store: Store<State<T>>,
+  { walletId, accounts }: { walletId: WalletKey; accounts: T[] }
 ) {
   store.setState((state) => {
     const wallet = state.wallets[walletId]
@@ -151,8 +162,8 @@ export function setAccounts(
   })
 }
 
-export function setActiveNetwork(
-  store: Store<State>,
+export function setActiveNetwork<T extends WalletAccount>(
+  store: Store<State<T>>,
   { networkId, algodClient }: { networkId: NetworkId | string; algodClient: algosdk.Algodv2 }
 ) {
   store.setState((state) => ({
@@ -164,7 +175,9 @@ export function setActiveNetwork(
 
 // Type guards
 
-export function isValidWalletAccount(account: any): account is WalletAccount {
+export function isValidWalletAccount<T extends WalletAccount = WalletAccount>(
+  account: any
+): account is T {
   return (
     typeof account === 'object' &&
     account !== null &&
@@ -173,17 +186,21 @@ export function isValidWalletAccount(account: any): account is WalletAccount {
   )
 }
 
-export function isValidWalletState(wallet: any): wallet is WalletState {
+export function isValidWalletState<T extends WalletAccount = WalletAccount>(
+  wallet: any
+): wallet is WalletState<T> {
   return (
     typeof wallet === 'object' &&
     wallet !== null &&
     Array.isArray(wallet.accounts) &&
-    wallet.accounts.every(isValidWalletAccount) &&
+    wallet.accounts.every((account: any) => isValidWalletAccount(account)) &&
     (wallet.activeAccount === null || isValidWalletAccount(wallet.activeAccount))
   )
 }
 
-export function isValidPersistedState(state: unknown): state is PersistedState {
+export function isValidPersistedState<T extends WalletAccount = WalletAccount>(
+  state: unknown
+): state is PersistedState<T> {
   return (
     typeof state === 'object' &&
     state !== null &&

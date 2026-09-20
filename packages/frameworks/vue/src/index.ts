@@ -1,4 +1,5 @@
 export * from '@txnlab/use-wallet'
 export { WalletManagerPlugin } from './walletManagerPlugin'
 export { useWallet } from './useWallet'
+export type { Register, ResolvedWalletManager, ResolvedWalletAccount } from './useWallet'
 export { useNetwork } from './useNetwork'

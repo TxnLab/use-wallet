@@ -15,28 +15,28 @@ import type {
 
 export * from '@txnlab/use-wallet'
 
-export interface Wallet {
+export interface Wallet<T extends WalletAccount = WalletAccount> {
   id: string
   walletKey: WalletKey
   metadata: WalletMetadata
-  readonly accounts: WalletAccount[]
-  readonly activeAccount: WalletAccount | null
+  readonly accounts: T[]
+  readonly activeAccount: T | null
   readonly isConnected: boolean
   readonly isActive: boolean
   canSignData: boolean
   canUsePrivateKey: boolean
-  connect: (args?: Record<string, any>) => Promise<WalletAccount[]>
+  connect: (args?: Record<string, any>) => Promise<T[]>
   disconnect: () => Promise<void>
   setActive: () => void
   setActiveAccount: (address: string) => void
 }
 
 interface WalletProviderProps {
-  manager: WalletManager
+  manager: WalletManager<any>
   children: JSX.Element
 }
 
-const WalletContext = createContext<() => WalletManager>()
+const WalletContext = createContext<() => WalletManager<any>>()
 
 export const WalletProvider = (props: WalletProviderProps): JSX.Element => {
   const store = () => props.manager
@@ -52,12 +52,37 @@ export const WalletProvider = (props: WalletProviderProps): JSX.Element => {
   return <WalletContext.Provider value={store}>{props.children}</WalletContext.Provider>
 }
 
-export const useWalletManager = (): WalletManager => {
+// Wagmi-style type registration: an app declares its manager type once,
+// next to where the manager is created:
+//
+//   const manager = WalletManager.create({ wallets: [pqWallet(), classicWallet()] })
+//   // or, with classic construction, declare the union explicitly:
+//   // const manager = new WalletManager<PQAccount | ClassicAccount>({ wallets: [...] })
+//
+//   declare module '@txnlab/use-wallet-solid' {
+//     interface Register { manager: typeof manager }
+//   }
+//
+// Every bare `useWallet()` then infers the manager's account union; apps
+// that don't register keep the base `WalletAccount` default.
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface Register {}
+
+export type ResolvedWalletManager<TRegister = Register> = TRegister extends {
+  manager: infer TManager extends WalletManager<any>
+}
+  ? TManager
+  : WalletManager
+
+export type ResolvedWalletAccount<TRegister = Register> =
+  ResolvedWalletManager<TRegister> extends WalletManager<infer TAccount> ? TAccount : WalletAccount
+
+export const useWalletManager = (): ResolvedWalletManager => {
   const manager = useContext(WalletContext)
   if (!manager) {
     throw new Error('useWalletManager must be used within a WalletProvider')
   }
-  return manager()
+  return manager() as ResolvedWalletManager
 }
 
 export const useNetwork = () => {
@@ -138,8 +163,12 @@ export const useNetwork = () => {
   }
 }
 
-export const useWallet = () => {
-  const manager = createMemo(() => useWalletManager())
+// Internal implementation; the public hook binds `T` to the account type
+// resolved from the app's `Register` declaration
+const useWalletCore = <T extends WalletAccount = WalletAccount>() => {
+  // The context erases the manager's generic; view it at the resolved
+  // account type `T` so the store-derived state flows as `T`
+  const manager = createMemo(() => useWalletManager() as WalletManager<T>)
 
   const managerStatus = useStore(manager().store, (state) => state.managerStatus)
   const isReady = createMemo(() => managerStatus() === 'ready')
@@ -148,7 +177,7 @@ export const useWallet = () => {
   const walletStateMap = useStore(manager().store, (state) => state.wallets)
   const activeWalletId = useStore(manager().store, (state) => state.activeWallet)
 
-  const transformToWallet = (wallet: BaseWallet): Wallet => {
+  const transformToWallet = (wallet: BaseWallet<any, any>): Wallet<T> => {
     return {
       id: wallet.id,
       walletKey: wallet.walletKey,
@@ -263,3 +292,5 @@ export const useWallet = () => {
     transactionSigner
   }
 }
+
+export const useWallet = () => useWalletCore<ResolvedWalletAccount>()
