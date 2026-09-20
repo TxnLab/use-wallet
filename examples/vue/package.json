@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@galaxypay/use-wallet-lute": "1.0.0",
-    "@noble/ed25519": "3.1.0",
+    "@noble/ed25519": "3.2.0",
     "@txnlab/use-wallet": "workspace:*",
     "@txnlab/use-wallet-defly": "workspace:*",
     "@txnlab/use-wallet-exodus": "workspace:*",
@@ -24,17 +24,17 @@
     "@txnlab/use-wallet-web3auth": "workspace:*",
     "algosdk": "3.6.0",
     "canonify": "2.1.1",
-    "vue": "3.5.27"
+    "vue": "3.5.43"
   },
   "devDependencies": {
     "@tailwindcss/vite": "4.3.3",
     "@types/node": "^24.10.1",
-    "@vitejs/plugin-vue": "6.0.3",
-    "@vue/tsconfig": "0.8.1",
+    "@vitejs/plugin-vue": "6.0.9",
+    "@vue/tsconfig": "0.9.1",
     "tailwindcss": "4.3.3",
     "typescript": "5.9.3",
     "vite": "7.3.6",
-    "vite-plugin-node-polyfills": "0.25.0",
-    "vue-tsc": "3.3.9"
+    "vite-plugin-node-polyfills": "0.28.0",
+    "vue-tsc": "3.3.11"
   }
 }
