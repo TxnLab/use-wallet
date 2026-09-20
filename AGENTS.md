@@ -50,7 +50,7 @@ pnpm example:ts           # Vanilla TypeScript example
 
 ### Package Structure (pnpm monorepo)
 
-All 15 publishable packages use lockstep versioning — every package shares the same version number.
+All 14 publishable packages use lockstep versioning — every package shares the same version number.
 
 **Core** (`packages/core`):
 
@@ -126,7 +126,7 @@ This project uses **semantic-release** for automated versioning and publishing. 
 
 1. Push to `main` or `v5` triggers `.github/workflows/release.yml`
 2. semantic-release determines the next version from commit history and git tags
-3. `scripts/update-versions.mjs` updates all 17 package versions (lockstep)
+3. `scripts/update-versions.mjs` updates every workspace package version (lockstep)
 4. `scripts/publish-packages.mjs` publishes in dependency order: core → wallets → frameworks
 5. `@semantic-release/git` commits the updated package.json files and CHANGELOG.md
 6. Publishing uses OIDC trusted publishing (no npm token needed)

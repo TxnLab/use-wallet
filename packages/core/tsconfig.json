@@ -5,7 +5,7 @@
     "strict": true,
     "esModuleInterop": true,
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "allowSyntheticDefaultImports": true,
     "exactOptionalPropertyTypes": true,
