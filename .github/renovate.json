@@ -29,7 +29,6 @@
       "rangeStrategy": "bump",
       "matchPackageNames": [
         "/@agoralabs-sh/avm-web-provider/",
-        "/lute-connect/",
         "/walletconnect/",
         "/@perawallet/connect/",
         "/@blockshake/defly-connect/",
@@ -41,6 +40,10 @@
       "groupName": "Wallet adapter packages",
       "matchFileNames": ["packages/wallets/*/package.json"],
       "matchUpdateTypes": ["patch", "minor"]
+    },
+    {
+      "groupName": "algosdk",
+      "matchPackageNames": ["algosdk"]
     },
     {
       "groupName": "pnpm",
