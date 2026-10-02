@@ -3,8 +3,11 @@ import { ref } from 'vue'
 import type algosdk from 'algosdk'
 
 export const WalletManagerPlugin = {
-  install(app: any, options: WalletManagerConfig) {
-    const manager = new WalletManager(options)
+  // Accepts either a config (the manager is constructed internally) or an
+  // existing instance, e.g. one created with `WalletManager.create()` whose
+  // type can back the app's `Register` declaration
+  install(app: any, options: WalletManagerConfig | WalletManager<any>) {
+    const manager = options instanceof WalletManager ? options : new WalletManager(options)
     const algodClient = ref(manager.algodClient)
 
     const setAlgodClient = (client: algosdk.Algodv2) => {

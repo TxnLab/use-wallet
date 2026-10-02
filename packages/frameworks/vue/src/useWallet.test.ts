@@ -9,6 +9,7 @@ import { mount } from '@vue/test-utils'
 import algosdk from 'algosdk'
 import { inject, nextTick, ref, type InjectionKey } from 'vue'
 import { useWallet } from './useWallet'
+import type { ResolvedWalletAccount, ResolvedWalletManager } from './useWallet'
 import type { Mock } from 'vitest'
 
 // Mock Vue's inject function
@@ -373,5 +374,63 @@ describe('useWallet - availableWallets', () => {
 
     expect(availableWallets.value).toHaveLength(2)
     expect(wallets.value).toHaveLength(2)
+  })
+})
+
+describe('Register - account type resolution', () => {
+  // Type-level equality assertion: `Eq<A, B>` resolves to the literal type
+  // `true` only when A and B are identical, so `const x: Eq<A, B> = true`
+  // fails to compile if the inference ever regresses.
+  type Eq<A, B> = (<G>() => G extends A ? 1 : 2) extends <G>() => G extends B ? 1 : 2 ? true : false
+
+  interface QuantumAccount extends WalletAccount {
+    kind: 'quantum'
+    handleQuantumOperation: () => string
+  }
+
+  interface ClassicAccount extends WalletAccount {
+    kind: 'classic'
+    legacyId: number
+  }
+
+  it('defaults to the base WalletAccount without a Register declaration', () => {
+    const { activeAccount, wallets } = useWallet()
+
+    const activeAccountType: Eq<typeof activeAccount.value, WalletAccount | null> = true
+    const accountsType: Eq<(typeof wallets.value)[number]['accounts'], WalletAccount[]> = true
+
+    expect(activeAccountType && accountsType).toBe(true)
+    expect(activeAccount.value).toBeNull()
+    expect(wallets.value).toHaveLength(2)
+  })
+
+  it('resolves the account union from a registered manager type', () => {
+    // Classic construction with an explicitly declared union;
+    // `WalletManager.create({ wallets: [...] })` infers the same shape
+    // from the adapter configs (covered by the core test suite)
+    const manager = new WalletManager<QuantumAccount | ClassicAccount>({
+      wallets: [mockAdapterA()]
+    })
+
+    // The resolution chain the public composable uses: a `Register`
+    // declaration carrying `typeof manager` resolves to the manager type and
+    // its account union (apps write `declare module '@txnlab/use-wallet-vue'
+    // { interface Register { manager: typeof manager } }`)
+    const resolvedManager: Eq<
+      ResolvedWalletManager<{ manager: typeof manager }>,
+      WalletManager<QuantumAccount | ClassicAccount>
+    > = true
+    const resolvedAccount: Eq<
+      ResolvedWalletAccount<{ manager: typeof manager }>,
+      QuantumAccount | ClassicAccount
+    > = true
+
+    // Without a registration, resolution falls back to the base types
+    const unregisteredManager: Eq<ResolvedWalletManager, WalletManager> = true
+    const unregisteredAccount: Eq<ResolvedWalletAccount, WalletAccount> = true
+
+    expect(manager).toBeInstanceOf(WalletManager)
+    expect(resolvedManager && resolvedAccount).toBe(true)
+    expect(unregisteredManager && unregisteredAccount).toBe(true)
   })
 })

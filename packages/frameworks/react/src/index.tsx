@@ -6,6 +6,7 @@ import {
   StdSignDataResponse,
   StdSignMetadata,
   type Wallet,
+  type WalletAccount,
   WalletManager
 } from '@txnlab/use-wallet'
 import algosdk from 'algosdk'
@@ -13,20 +14,23 @@ import * as React from 'react'
 
 export * from '@txnlab/use-wallet'
 
-interface IWalletContext {
-  manager: WalletManager
+interface IWalletContext<TAccount extends WalletAccount = WalletAccount> {
+  manager: WalletManager<TAccount>
   algodClient: algosdk.Algodv2
   setAlgodClient: React.Dispatch<React.SetStateAction<algosdk.Algodv2>>
 }
 
-const WalletContext = React.createContext<IWalletContext | undefined>(undefined)
+const WalletContext = React.createContext<IWalletContext<any> | undefined>(undefined)
 
-interface WalletProviderProps {
-  manager: WalletManager
+interface WalletProviderProps<TAccount extends WalletAccount = WalletAccount> {
+  manager: WalletManager<TAccount>
   children: React.ReactNode
 }
 
-export const WalletProvider = ({ manager, children }: WalletProviderProps): React.JSX.Element => {
+export const WalletProvider = <TAccount extends WalletAccount = WalletAccount>({
+  manager,
+  children
+}: WalletProviderProps<TAccount>): React.JSX.Element => {
   const [algodClient, setAlgodClient] = React.useState(manager.algodClient)
 
   React.useEffect(() => {
@@ -120,8 +124,37 @@ export const useNetwork = () => {
   }
 }
 
-export const useWallet = () => {
-  const context = React.useContext(WalletContext)
+// Wagmi-style type registration: an app declares its manager type once,
+// next to where the manager is created:
+//
+//   const manager = WalletManager.create({ wallets: [pqWallet(), classicWallet()] })
+//   // or, with classic construction, declare the union explicitly:
+//   // const manager = new WalletManager<PQAccount | ClassicAccount>({ wallets: [...] })
+//
+//   declare module '@txnlab/use-wallet-react' {
+//     interface Register { manager: typeof manager }
+//   }
+//
+// Every bare `useWallet()` then infers the manager's account union; apps
+// that don't register keep the base `WalletAccount` default.
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface Register {}
+
+export type ResolvedWalletManager<TRegister = Register> = TRegister extends {
+  manager: infer TManager extends WalletManager<any>
+}
+  ? TManager
+  : WalletManager
+
+export type ResolvedWalletAccount<TRegister = Register> =
+  ResolvedWalletManager<TRegister> extends WalletManager<infer TAccount> ? TAccount : WalletAccount
+
+// Internal implementation; the public hook binds `T` to the account type
+// resolved from the app's `Register` declaration
+const useWalletCore = <T extends WalletAccount = WalletAccount>() => {
+  // The module-level context erases the provider's generic; view it at the
+  // resolved account type `T` so the store-derived state flows as `T`
+  const context = React.useContext(WalletContext) as IWalletContext<T> | undefined
 
   if (!context) {
     throw new Error('useWallet must be used within the WalletProvider')
@@ -137,7 +170,7 @@ export const useWallet = () => {
   const activeNetwork = useStore(manager.store, (state) => state.activeNetwork)
 
   const transformToWallet = React.useCallback(
-    (wallet: BaseWallet): Wallet => {
+    (wallet: BaseWallet<any, any>): Wallet<T> => {
       const walletState = walletStateMap[wallet.walletKey]
       return {
         id: wallet.id,
@@ -227,3 +260,5 @@ export const useWallet = () => {
     transactionSigner
   }
 }
+
+export const useWallet = () => useWalletCore<ResolvedWalletAccount>()
