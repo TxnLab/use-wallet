@@ -17,4 +17,11 @@ export {
   withSecureKeySync
 } from './secure-key'
 export type { WalletManagerEvents } from './events'
+export {
+  encodeEmptySignature,
+  decodeEmptySignature,
+  getSignatureType,
+  type EmptySignatureFields,
+  type SignatureType
+} from './empty-signature'
 export * from './wallets'

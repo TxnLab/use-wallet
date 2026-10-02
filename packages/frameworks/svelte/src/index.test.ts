@@ -57,6 +57,7 @@ const mocks = vi.hoisted(() => {
     resumeSession: vi.fn(() => Promise.resolve()),
     signTransactions: vi.fn(() => Promise.resolve([] as Uint8Array[])),
     transactionSigner: vi.fn(() => Promise.resolve([] as Uint8Array[])),
+    emptyTransactionSigner: vi.fn(() => Promise.resolve([] as Uint8Array[])),
     signData: vi.fn(() =>
       Promise.resolve({
         signature: new Uint8Array(),
@@ -77,6 +78,7 @@ class MockWalletA extends BaseWallet {
   resumeSession = mocks.resumeSession
   signTransactions = mocks.signTransactions
   transactionSigner = mocks.transactionSigner
+  emptyTransactionSigner = mocks.emptyTransactionSigner
   signData = mocks.signData
 
   static defaultMetadata = { name: 'Wallet A', icon: 'icon-a' }
@@ -94,6 +96,7 @@ class MockWalletB extends BaseWallet {
   resumeSession = mocks.resumeSession
   signTransactions = mocks.signTransactions
   transactionSigner = mocks.transactionSigner
+  emptyTransactionSigner = mocks.emptyTransactionSigner
   signData = mocks.signData
 
   static defaultMetadata = { name: 'Wallet B', icon: 'icon-b' }
@@ -481,6 +484,28 @@ describe('useWallet', () => {
     await wallet.transactionSigner(txns, indexes)
 
     expect(mocks.transactionSigner).toHaveBeenCalledWith(txns, indexes)
+  })
+
+  it('throws error when using empty transaction signer without active wallet', () => {
+    const wallet = useWallet()
+
+    expect(() => wallet.emptyTransactionSigner([], [])).toThrow('No active wallet')
+  })
+
+  it('uses empty transaction signer with active wallet', async () => {
+    const wallet = useWallet()
+
+    mockWalletManager.store.setState((state) => ({
+      ...state,
+      activeWallet: 'wallet-a'
+    }))
+
+    const txns = [] as algosdk.Transaction[]
+    const indexes = [0]
+
+    await wallet.emptyTransactionSigner(txns, indexes)
+
+    expect(mocks.emptyTransactionSigner).toHaveBeenCalledWith(txns, indexes)
   })
 
   it('throws error when signing data without active wallet', () => {

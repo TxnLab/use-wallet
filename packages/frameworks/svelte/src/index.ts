@@ -199,6 +199,17 @@ export const useWallet = () => {
     return wallet.transactionSigner(txnGroup, indexesToSign)
   }
 
+  const emptyTransactionSigner = (
+    txnGroup: algosdk.Transaction[],
+    indexesToSign: number[]
+  ): Promise<Uint8Array[]> => {
+    const wallet = manager.wallets.find((w) => w.walletKey === activeWalletId.current)
+    if (!wallet) {
+      throw new Error('No active wallet')
+    }
+    return wallet.emptyTransactionSigner(txnGroup, indexesToSign)
+  }
+
   const signData = (data: string, metadata: StdSignMetadata): Promise<StdSignDataResponse> => {
     const wallet = manager.wallets.find((w) => w.walletKey === activeWalletId.current)
     if (!wallet) {
@@ -228,6 +239,7 @@ export const useWallet = () => {
     signData,
     withPrivateKey,
     signTransactions,
-    transactionSigner
+    transactionSigner,
+    emptyTransactionSigner
   }
 }

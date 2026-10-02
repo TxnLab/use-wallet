@@ -302,7 +302,10 @@ export class WalletConnectAdapter extends BaseWallet<WalletConnectOptions> {
     return modal
   }
 
-  private onSessionConnected(session: SessionTypes.Struct): WalletAccount[] {
+  private onSessionConnected(
+    session: SessionTypes.Struct,
+    { approved = false }: { approved?: boolean } = {}
+  ): WalletAccount[] {
     const caipAccounts = session.namespaces.algorand!.accounts
 
     if (!caipAccounts.length) {
@@ -315,12 +318,27 @@ export class WalletConnectAdapter extends BaseWallet<WalletConnectOptions> {
     // Filter duplicate accounts (same address, different chain)
     const accounts = [...new Set(caipAccounts.map((account) => account.split(':').pop()!))]
 
-    const walletAccounts = accounts.map((address: string, idx: number) => ({
-      name: `${this.metadata.name} Account ${idx + 1}`,
-      address
-    }))
-
     const walletState = this.store.getWalletState()
+
+    // A session's scopedProperties are only sent when it's approved. When restoring
+    // or updating a session, keep the empty signatures already in the store, which
+    // the manager clears if an account is rekeyed.
+    const emptySignatures: Record<string, string | undefined> =
+      approved || !walletState
+        ? this.getEmptySignatures(session)
+        : Object.fromEntries(walletState.accounts.map((a) => [a.address, a.emptySignature]))
+
+    const walletAccounts = accounts.map((address: string, idx: number) => {
+      const account: WalletAccount = {
+        name: `${this.metadata.name} Account ${idx + 1}`,
+        address
+      }
+      const emptySignature = emptySignatures[address]
+      if (emptySignature !== undefined) {
+        account.emptySignature = emptySignature
+      }
+      return account
+    })
 
     if (!walletState) {
       const newWalletState: WalletState = {
@@ -332,7 +350,13 @@ export class WalletConnectAdapter extends BaseWallet<WalletConnectOptions> {
 
       this.logger.info('Connected', newWalletState)
     } else {
-      const match = compareAccounts(walletAccounts, walletState.accounts)
+      const match =
+        compareAccounts(walletAccounts, walletState.accounts) &&
+        walletAccounts.every(
+          (account) =>
+            walletState.accounts.find((a) => a.address === account.address)?.emptySignature ===
+            account.emptySignature
+        )
 
       if (!match) {
         this.logger.warn('Session accounts mismatch, updating accounts', {
@@ -345,6 +369,28 @@ export class WalletConnectAdapter extends BaseWallet<WalletConnectOptions> {
 
     this.session = session
     return walletAccounts
+  }
+
+  /**
+   * Reads the empty signatures the wallet advertised for the active network,
+   * from `scopedProperties[<CAIP-2 chain ID>].emptySignatures`: a map of each
+   * address to its base64 empty signature.
+   */
+  private getEmptySignatures(session: SessionTypes.Struct): Record<string, string> {
+    const isRecord = (value: unknown): value is Record<string, unknown> =>
+      typeof value === 'object' && value !== null && !Array.isArray(value)
+
+    const scoped = session.scopedProperties?.[this.activeChainId]
+    const emptySignatures = isRecord(scoped) ? scoped.emptySignatures : undefined
+    if (!isRecord(emptySignatures)) {
+      return {}
+    }
+
+    return Object.fromEntries(
+      Object.entries(emptySignatures).filter(
+        (entry): entry is [string, string] => typeof entry[1] === 'string'
+      )
+    )
   }
 
   public get activeChainId(): string {
@@ -380,7 +426,7 @@ export class WalletConnectAdapter extends BaseWallet<WalletConnectOptions> {
       await modal.openModal({ uri })
 
       const session = await approval()
-      const walletAccounts = this.onSessionConnected(session)
+      const walletAccounts = this.onSessionConnected(session, { approved: true })
 
       this.logger.info('Connected successfully')
       return walletAccounts

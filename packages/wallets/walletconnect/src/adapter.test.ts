@@ -325,6 +325,136 @@ describe('WalletConnectAdapter', () => {
     })
   })
 
+  describe('empty signatures', () => {
+    // The adapter passes empty signatures through; the manager validates them
+    const otherSignature = 'opaque-empty-signature'
+
+    function withEmptySignatures(
+      session: SessionTypes.Struct,
+      scopedProperties: Record<string, unknown>
+    ): SessionTypes.Struct {
+      return { ...session, scopedProperties }
+    }
+
+    function mockResumedSession(session: SessionTypes.Struct) {
+      mockSignClient.session.get.mockImplementationOnce(() => session)
+      mockSignClient.session.keys = ['mockSessionKey']
+      mockSignClient.session.length = 1
+    }
+
+    it('reads empty signatures for the active chain from scopedProperties on connect', async () => {
+      const caipChainId = wallet.activeChainId
+      const session = withEmptySignatures(
+        createMockSession([account1.address, account2.address], caipChainId),
+        {
+          'algorand:other-chain': {
+            emptySignatures: {
+              [account1.address]: otherSignature,
+              [account2.address]: otherSignature
+            }
+          },
+          [caipChainId]: { emptySignatures: { [account1.address]: 'gA==' } }
+        }
+      )
+      mockSignClient.connect.mockResolvedValueOnce({
+        uri: 'mock-uri',
+        approval: vi.fn().mockResolvedValue(session)
+      })
+
+      const accounts = await wallet.connect()
+
+      expect(accounts).toEqual([{ ...account1, emptySignature: 'gA==' }, account2])
+      expect(store.state.wallets[WALLET_ID]?.accounts).toEqual(accounts)
+    })
+
+    it('reads empty signatures from a session update when the wallet is no longer in the store', async () => {
+      const caipChainId = wallet.activeChainId
+      mockSignClient.connect.mockResolvedValueOnce({
+        uri: 'mock-uri',
+        approval: vi.fn().mockResolvedValue(createMockSession([account1.address], caipChainId))
+      })
+      await wallet.connect()
+      accessor.removeWallet()
+
+      const session = withEmptySignatures(createMockSession([account1.address], caipChainId), {
+        [caipChainId]: { emptySignatures: { [account1.address]: otherSignature } }
+      })
+      mockSignClient.session.get.mockImplementationOnce(() => session)
+      const onSessionUpdate = mockSignClient.on.mock.calls.find(
+        ([event]) => event === 'session_update'
+      )![1]
+
+      onSessionUpdate({ topic: session.topic, params: { namespaces: session.namespaces } })
+
+      expect(store.state.wallets[WALLET_ID]?.accounts).toEqual([
+        { ...account1, emptySignature: otherSignature }
+      ])
+    })
+
+    it('ignores malformed scopedProperties', async () => {
+      const caipChainId = wallet.activeChainId
+      const session = withEmptySignatures(createMockSession([account1.address], caipChainId), {
+        [caipChainId]: { emptySignatures: { [account1.address]: 123 } }
+      })
+      mockSignClient.connect.mockResolvedValueOnce({
+        uri: 'mock-uri',
+        approval: vi.fn().mockResolvedValue(session)
+      })
+
+      expect(await wallet.connect()).toEqual([account1])
+    })
+
+    it("keeps the store's empty signatures when resuming a session", async () => {
+      // The manager cleared account1's empty signature after a rekey
+      const walletState: WalletState = {
+        accounts: [account1, { ...account2, emptySignature: 'gA==', authAddr: null }],
+        activeAccount: account1
+      }
+      const harness = createTestHarness(WALLET_ID, { wallets: { [WALLET_ID]: walletState } })
+      store = harness.store
+      wallet = createWallet(harness.accessor)
+
+      const caipChainId = wallet.activeChainId
+      mockResumedSession(
+        withEmptySignatures(createMockSession([account1.address, account2.address], caipChainId), {
+          [caipChainId]: {
+            emptySignatures: { [account1.address]: otherSignature, [account2.address]: 'gA==' }
+          }
+        })
+      )
+
+      await wallet.resumeSession()
+
+      expect(store.state.wallets[WALLET_ID]).toEqual(walletState)
+    })
+
+    it('replaces empty signatures when the wallet connects again', async () => {
+      const walletState: WalletState = {
+        accounts: [{ ...account1, emptySignature: 'gA==', authAddr: null }],
+        activeAccount: { ...account1, emptySignature: 'gA==', authAddr: null }
+      }
+      const harness = createTestHarness(WALLET_ID, { wallets: { [WALLET_ID]: walletState } })
+      store = harness.store
+      wallet = createWallet(harness.accessor)
+
+      const caipChainId = wallet.activeChainId
+      mockSignClient.connect.mockResolvedValueOnce({
+        uri: 'mock-uri',
+        approval: vi.fn().mockResolvedValue(
+          withEmptySignatures(createMockSession([account1.address], caipChainId), {
+            [caipChainId]: { emptySignatures: { [account1.address]: otherSignature } }
+          })
+        )
+      })
+
+      await wallet.connect()
+
+      expect(store.state.wallets[WALLET_ID]?.accounts).toEqual([
+        { ...account1, emptySignature: otherSignature }
+      ])
+    })
+  })
+
   describe('signing transactions', () => {
     const connectedAcct1 = '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q'
     const connectedAcct2 = 'GD64YIY3TWGDMCNPP553DZPPR6LDUSFQOIJVFDPPXWEG3FVOJCCDBBHU5A'

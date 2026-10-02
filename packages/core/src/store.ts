@@ -36,17 +36,44 @@ export const LOCAL_STORAGE_KEY = '@txnlab/use-wallet:v5'
 
 // State mutations
 
+/**
+ * Copies an account from an adapter, carrying over the auth address recorded
+ * for its empty signature as long as the empty signature hasn't changed. A new
+ * or changed empty signature has to be checked again.
+ */
+function withRecordedAuthAddr(
+  account: WalletAccount,
+  previousAccounts: WalletAccount[] | undefined
+): WalletAccount {
+  const { authAddr: _authAddr, ...copy } = account
+  const previous = previousAccounts?.find((a) => a.address === account.address)
+  if (
+    copy.emptySignature !== undefined &&
+    previous?.emptySignature === copy.emptySignature &&
+    previous.authAddr !== undefined
+  ) {
+    return { ...copy, authAddr: previous.authAddr }
+  }
+  return copy
+}
+
 export function addWallet(
   store: Store<State>,
   { walletId, wallet }: { walletId: WalletKey; wallet: WalletState }
 ) {
   store.setState((state) => {
+    const previousAccounts = state.wallets[walletId]?.accounts
+    const accounts = wallet.accounts.map((account) =>
+      withRecordedAuthAddr(account, previousAccounts)
+    )
+    const activeAccount = wallet.activeAccount
+      ? (accounts.find((a) => a.address === wallet.activeAccount!.address) ??
+        withRecordedAuthAddr(wallet.activeAccount, previousAccounts))
+      : null
+
     const updatedWallets = {
       ...state.wallets,
-      [walletId]: {
-        accounts: wallet.accounts.map((account) => ({ ...account })),
-        activeAccount: wallet.activeAccount ? { ...wallet.activeAccount } : null
-      }
+      [walletId]: { accounts, activeAccount }
     }
 
     return {
@@ -123,15 +150,12 @@ export function setAccounts(
       return state
     }
 
-    const newAccounts = accounts.map((account) => ({ ...account }))
+    const newAccounts = accounts.map((account) => withRecordedAuthAddr(account, wallet.accounts))
 
-    const isActiveAccountConnected = newAccounts.some(
-      (account) => account.address === wallet.activeAccount?.address
-    )
-
-    const newActiveAccount = isActiveAccountConnected
-      ? { ...wallet.activeAccount! }
-      : newAccounts[0] || null
+    const newActiveAccount =
+      newAccounts.find((account) => account.address === wallet.activeAccount?.address) ??
+      newAccounts[0] ??
+      null
 
     const updatedWallet = {
       ...wallet,
@@ -147,6 +171,65 @@ export function setAccounts(
     return {
       ...state,
       wallets: updatedWallets
+    }
+  })
+}
+
+export type EmptySignatureCheck = {
+  address: string
+  /** The empty signature that was checked */
+  emptySignature: string
+  /** The auth address to record, or `undefined` to clear the empty signature */
+  authAddr: string | null | undefined
+}
+
+/**
+ * Records the results of checking accounts' empty signatures against algod.
+ * A result is ignored if the account's empty signature changed while it was
+ * being checked.
+ */
+export function recordEmptySignatureChecks(
+  store: Store<State>,
+  { walletId, checks }: { walletId: WalletKey; checks: EmptySignatureCheck[] }
+) {
+  store.setState((state) => {
+    const wallet = state.wallets[walletId]
+    if (!wallet) {
+      return state
+    }
+
+    let changed = false
+    const applyCheck = (account: WalletAccount): WalletAccount => {
+      const check = checks.find(
+        (c) => c.address === account.address && c.emptySignature === account.emptySignature
+      )
+      if (!check) {
+        return account
+      }
+      changed = true
+      if (check.authAddr === undefined) {
+        const { emptySignature: _emptySignature, authAddr: _authAddr, ...rest } = account
+        return rest
+      }
+      return { ...account, authAddr: check.authAddr }
+    }
+
+    const accounts = wallet.accounts.map(applyCheck)
+    const activeAccount = wallet.activeAccount
+      ? (accounts.find((a) => a.address === wallet.activeAccount!.address) ??
+        applyCheck(wallet.activeAccount))
+      : null
+
+    if (!changed) {
+      return state
+    }
+
+    return {
+      ...state,
+      wallets: {
+        ...state.wallets,
+        [walletId]: { ...wallet, accounts, activeAccount }
+      }
     }
   })
 }
@@ -169,7 +252,11 @@ export function isValidWalletAccount(account: any): account is WalletAccount {
     typeof account === 'object' &&
     account !== null &&
     typeof account.name === 'string' &&
-    typeof account.address === 'string'
+    typeof account.address === 'string' &&
+    (account.emptySignature === undefined || typeof account.emptySignature === 'string') &&
+    (account.authAddr === undefined ||
+      account.authAddr === null ||
+      typeof account.authAddr === 'string')
   )
 }
 
