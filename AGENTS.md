@@ -100,7 +100,7 @@ Each adapter provides:
 
 ## Releases and Commit Conventions
 
-This project uses **semantic-release** for automated versioning and publishing. Commits to `main` and `v5` trigger the release workflow.
+This project uses **semantic-release** for automated versioning and publishing. Commits to `main` and `next` trigger the release workflow.
 
 ### Commit types that trigger a release
 
@@ -117,14 +117,14 @@ This project uses **semantic-release** for automated versioning and publishing. 
 
 ### Important
 
-- **Direct commits** to `main` or `v5` with a release-triggering type (`feat`, `fix`, `perf`, `refactor`) will automatically publish new versions to npm.
-- **Pull requests** into `main` or `v5` are squash-merged (enforced by GitHub ruleset). The squash commit message determines whether a release is triggered.
+- **Direct commits** to `main` or `next` with a release-triggering type (`feat`, `fix`, `perf`, `refactor`) will automatically publish new versions to npm.
+- **Pull requests** into `main` or `next` are squash-merged (enforced by GitHub ruleset). The squash commit message determines whether a release is triggered.
 - Use `chore`, `docs`, `test`, `ci`, or `build` prefixes for commits that should not trigger a release.
-- The `v5` branch publishes pre-release versions (e.g., `5.0.0-rc.N`) to the `next` npm tag. The `main` branch publishes stable versions to `latest`.
+- The `next` branch publishes pre-release versions (e.g., `5.1.0-next.N`) to the `next` npm tag. The `main` branch publishes stable versions to `latest`.
 
 ### Release pipeline
 
-1. Push to `main` or `v5` triggers `.github/workflows/release.yml`
+1. Push to `main` or `next` triggers `.github/workflows/release.yml`
 2. semantic-release determines the next version from commit history and git tags
 3. `scripts/update-versions.mjs` updates every workspace package version (lockstep)
 4. `scripts/publish-packages.mjs` publishes in dependency order: core → wallets → frameworks
