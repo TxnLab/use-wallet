@@ -209,6 +209,47 @@ export abstract class BaseWallet<TOptions = Record<string, unknown>> {
   }
 
   /**
+   * Sets connected accounts' empty signatures from a wallet's response: a map of
+   * each address to its base64 empty signature. Accounts missing from the map
+   * become unknown, and addresses that aren't connected are ignored. A response
+   * that isn't such a map is ignored.
+   */
+  protected applyEmptySignatures(emptySignatures: unknown): void {
+    if (
+      typeof emptySignatures !== 'object' ||
+      emptySignatures === null ||
+      Array.isArray(emptySignatures)
+    ) {
+      this.logger.warn('Ignoring invalid empty signatures response')
+      return
+    }
+
+    const walletState = this.store.getWalletState()
+    if (!walletState) {
+      return
+    }
+
+    const response = emptySignatures as Record<string, unknown>
+    let changed = false
+
+    const accounts = walletState.accounts.map((account) => {
+      const value = response[account.address]
+      const emptySignature = typeof value === 'string' ? value : undefined
+      if (emptySignature === account.emptySignature) {
+        return account
+      }
+
+      changed = true
+      const { emptySignature: _emptySignature, authAddr: _authAddr, ...rest } = account
+      return emptySignature === undefined ? rest : { ...rest, emptySignature }
+    })
+
+    if (changed) {
+      this.store.setAccounts(accounts)
+    }
+  }
+
+  /**
    * Returns a connected account's decoded empty signature, or `undefined` if
    * the account type is unknown or its empty signature can't be decoded.
    */

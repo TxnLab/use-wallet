@@ -1,5 +1,6 @@
 import algosdk from 'algosdk'
 import { encodeEmptySignature } from 'src/empty-signature'
+import { recordEmptySignatureChecks } from 'src/store'
 import { createMockAlgodClient, createTestHarness } from 'src/testing'
 import { BaseWallet } from 'src/wallets/base'
 import { SignDataError } from 'src/wallets/types'
@@ -29,6 +30,10 @@ class TestWallet extends BaseWallet {
   public createStdSignDataForTest(data: string) {
     return this.createStdSignData(data)
   }
+
+  public applyEmptySignaturesForTest(emptySignatures: unknown) {
+    this.applyEmptySignatures(emptySignatures)
+  }
 }
 
 const suggestedParams = {
@@ -56,8 +61,8 @@ function makeFalconAccount() {
   })
 }
 
-function createWallet(accounts: WalletAccount[]) {
-  const { accessor } = createTestHarness('test')
+function createWalletWithStore(accounts: WalletAccount[]) {
+  const { accessor, store } = createTestHarness('test')
   const wallet = new TestWallet({
     id: 'test',
     metadata: { name: 'Test', icon: '' },
@@ -66,7 +71,11 @@ function createWallet(accounts: WalletAccount[]) {
     getAlgodClient: createMockAlgodClient
   })
   accessor.addWallet({ accounts, activeAccount: accounts[0] })
-  return wallet
+  return { wallet, store }
+}
+
+function createWallet(accounts: WalletAccount[]) {
+  return createWalletWithStore(accounts).wallet
 }
 
 describe('emptyTransactionSigner', () => {
@@ -139,5 +148,68 @@ describe('createStdSignData', () => {
       code: 4200,
       message: 'signData is not supported for post-quantum accounts'
     })
+  })
+})
+
+describe('applyEmptySignatures', () => {
+  const a1 = { name: 'Account 1', address: 'ADDRESS1' }
+  const a2 = { name: 'Account 2', address: 'ADDRESS2' }
+
+  it("sets connected accounts' empty signatures and ignores unconnected addresses", () => {
+    const { wallet, store } = createWalletWithStore([a1, a2])
+
+    wallet.applyEmptySignaturesForTest({ ADDRESS1: 'gA==', ADDRESS2: 'sig2', OTHER: 'sig3' })
+
+    expect(store.state.wallets['test']?.accounts).toEqual([
+      { ...a1, emptySignature: 'gA==' },
+      { ...a2, emptySignature: 'sig2' }
+    ])
+    expect(store.state.wallets['test']?.activeAccount).toEqual({ ...a1, emptySignature: 'gA==' })
+  })
+
+  it('clears the empty signature of accounts missing from the response', () => {
+    const { wallet, store } = createWalletWithStore([
+      { ...a1, emptySignature: 'gA==' },
+      { ...a2, emptySignature: 'sig2' }
+    ])
+
+    wallet.applyEmptySignaturesForTest({ ADDRESS1: 'gA==', ADDRESS2: 123 })
+
+    expect(store.state.wallets['test']?.accounts).toEqual([{ ...a1, emptySignature: 'gA==' }, a2])
+  })
+
+  it('keeps the recorded auth address of an unchanged empty signature', () => {
+    const { wallet, store } = createWalletWithStore([{ ...a1, emptySignature: 'gA==' }, a2])
+    recordEmptySignatureChecks(store, {
+      walletId: 'test',
+      checks: [{ address: 'ADDRESS1', emptySignature: 'gA==', authAddr: null }]
+    })
+
+    wallet.applyEmptySignaturesForTest({ ADDRESS1: 'gA==', ADDRESS2: 'sig2' })
+
+    expect(store.state.wallets['test']?.accounts).toEqual([
+      { ...a1, emptySignature: 'gA==', authAddr: null },
+      { ...a2, emptySignature: 'sig2' }
+    ])
+  })
+
+  it('ignores a response that is not a map', () => {
+    const { wallet, store } = createWalletWithStore([{ ...a1, emptySignature: 'gA==' }])
+    const before = store.state
+
+    for (const response of [null, 'gA==', ['gA=='], undefined]) {
+      wallet.applyEmptySignaturesForTest(response)
+    }
+
+    expect(store.state).toBe(before)
+  })
+
+  it('does nothing when nothing changed', () => {
+    const { wallet, store } = createWalletWithStore([{ ...a1, emptySignature: 'gA==' }])
+    const before = store.state
+
+    wallet.applyEmptySignaturesForTest({ ADDRESS1: 'gA==' })
+
+    expect(store.state).toBe(before)
   })
 })

@@ -63,6 +63,17 @@ import { icon } from './icon'
 
 const ICON = `data:image/svg+xml;base64,${btoa(icon)}`
 
+const EMPTY_SIGNATURES_METHOD = 'algo_getEmptySignatures'
+const EMPTY_SIGNATURES_TIMEOUT = 30_000
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`Timed out after ${ms}ms`)), ms)
+  })
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer))
+}
+
 export class WalletConnectAdapter extends BaseWallet<WalletConnectOptions> {
   private client: SignClient | null = null
   private clientOptions: SignClientOptions
@@ -320,12 +331,12 @@ export class WalletConnectAdapter extends BaseWallet<WalletConnectOptions> {
 
     const walletState = this.store.getWalletState()
 
-    // A session's scopedProperties are only sent when it's approved. When restoring
-    // or updating a session, keep the empty signatures already in the store, which
-    // the manager clears if an account is rekeyed.
+    // A new session gets its empty signatures from the wallet, via
+    // algo_getEmptySignatures. When restoring or updating a session, keep the ones
+    // already in the store, which the manager clears if an account is rekeyed.
     const emptySignatures: Record<string, string | undefined> =
       approved || !walletState
-        ? this.getEmptySignatures(session)
+        ? {}
         : Object.fromEntries(walletState.accounts.map((a) => [a.address, a.emptySignature]))
 
     const walletAccounts = accounts.map((address: string, idx: number) => {
@@ -372,25 +383,37 @@ export class WalletConnectAdapter extends BaseWallet<WalletConnectOptions> {
   }
 
   /**
-   * Reads the empty signatures the wallet advertised for the active network,
-   * from `scopedProperties[<CAIP-2 chain ID>].emptySignatures`: a map of each
-   * address to its base64 empty signature.
+   * Asks the wallet for its accounts' empty signatures with
+   * `algo_getEmptySignatures`, if it approved that method for the session. The
+   * response is applied when it arrives. If the wallet doesn't answer in time,
+   * the accounts' types stay unknown.
    */
-  private getEmptySignatures(session: SessionTypes.Struct): Record<string, string> {
-    const isRecord = (value: unknown): value is Record<string, unknown> =>
-      typeof value === 'object' && value !== null && !Array.isArray(value)
-
-    const scoped = session.scopedProperties?.[this.activeChainId]
-    const emptySignatures = isRecord(scoped) ? scoped.emptySignatures : undefined
-    if (!isRecord(emptySignatures)) {
-      return {}
+  private async requestEmptySignatures(session: SessionTypes.Struct): Promise<void> {
+    if (!this.client || !session.namespaces.algorand?.methods.includes(EMPTY_SIGNATURES_METHOD)) {
+      return
     }
 
-    return Object.fromEntries(
-      Object.entries(emptySignatures).filter(
-        (entry): entry is [string, string] => typeof entry[1] === 'string'
+    const chainId = this.activeChainId
+
+    try {
+      const emptySignatures = await withTimeout(
+        this.client.request<unknown>({
+          chainId,
+          topic: session.topic,
+          request: formatJsonRpcRequest(EMPTY_SIGNATURES_METHOD, { chainId })
+        }),
+        EMPTY_SIGNATURES_TIMEOUT
       )
-    )
+
+      // Discard the response if the session or network changed while waiting
+      if (this.session?.topic !== session.topic || this.activeChainId !== chainId) {
+        return
+      }
+
+      this.applyEmptySignatures(emptySignatures)
+    } catch (error: any) {
+      this.logger.warn(`Could not get empty signatures: ${error.message}`)
+    }
   }
 
   public get activeChainId(): string {
@@ -416,7 +439,16 @@ export class WalletConnectAdapter extends BaseWallet<WalletConnectOptions> {
         }
       }
 
-      const { uri, approval } = await client.connect({ requiredNamespaces })
+      // Optional, so wallets that don't support it can still approve the session
+      const optionalNamespaces = {
+        algorand: {
+          chains: [this.activeChainId],
+          methods: [EMPTY_SIGNATURES_METHOD],
+          events: []
+        }
+      }
+
+      const { uri, approval } = await client.connect({ requiredNamespaces, optionalNamespaces })
 
       if (!uri) {
         this.logger.error('No URI found')
@@ -427,6 +459,9 @@ export class WalletConnectAdapter extends BaseWallet<WalletConnectOptions> {
 
       const session = await approval()
       const walletAccounts = this.onSessionConnected(session, { approved: true })
+
+      // Don't hold up the connection waiting for the wallet
+      void this.requestEmptySignatures(session)
 
       this.logger.info('Connected successfully')
       return walletAccounts
