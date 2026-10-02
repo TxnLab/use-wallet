@@ -30,7 +30,7 @@
     "dist"
   ],
   "peerDependencies": {
-    "@txnlab/use-wallet": "^5.0.0",
+    "@txnlab/use-wallet": "workspace:^",
     "algosdk": "^3.0.0"
   },
   "devDependencies": {
