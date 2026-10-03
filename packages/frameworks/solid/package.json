@@ -51,7 +51,7 @@
     "dist"
   ],
   "dependencies": {
-    "@tanstack/solid-store": "0.11.1",
+    "@tanstack/solid-store": "0.11.2",
     "@txnlab/use-wallet": "workspace:*"
   },
   "devDependencies": {
