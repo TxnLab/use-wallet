@@ -1,3 +1,10 @@
+# [5.1.0-next.1](https://github.com/TxnLab/use-wallet/compare/v5.0.1...v5.1.0-next.1) (2026-10-03)
+
+
+### Features
+
+* support post-quantum accounts with empty signatures ([#465](https://github.com/TxnLab/use-wallet/issues/465)) ([f43d35d](https://github.com/TxnLab/use-wallet/commit/f43d35d1cf2425afcaaa6b26eba781e28721a26a))
+
 ## [5.0.1](https://github.com/TxnLab/use-wallet/compare/v5.0.0...v5.0.1) (2026-09-20)
 
 
