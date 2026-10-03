@@ -325,6 +325,257 @@ describe('WalletConnectAdapter', () => {
     })
   })
 
+  describe('empty signatures', () => {
+    const METHOD = 'algo_getEmptySignatures'
+    // The adapter passes empty signatures through; the manager validates them
+    const otherSignature = 'opaque-empty-signature'
+
+    afterEach(() => {
+      mockSignClient.request.mockReset()
+      vi.useRealTimers()
+    })
+
+    /** A session in which the wallet approved algo_getEmptySignatures */
+    function withEmptySignaturesMethod(
+      session: SessionTypes.Struct,
+      topic = session.topic
+    ): SessionTypes.Struct {
+      const algorand = session.namespaces.algorand!
+      return {
+        ...session,
+        topic,
+        namespaces: { algorand: { ...algorand, methods: [...algorand.methods, METHOD] } }
+      }
+    }
+
+    function mockApproval(session: SessionTypes.Struct) {
+      mockSignClient.connect.mockResolvedValueOnce({
+        uri: 'mock-uri',
+        approval: vi.fn().mockResolvedValue(session)
+      })
+    }
+
+    /** Stubs the wallet's next response, which stays pending until resolved */
+    function deferResponse() {
+      let resolve!: (value: unknown) => void
+      mockSignClient.request.mockReturnValueOnce(new Promise((res) => (resolve = res)))
+      return { resolve: (value: unknown) => resolve(value) }
+    }
+
+    const flush = () => new Promise((resolve) => setTimeout(resolve, 0))
+
+    it('requests algo_getEmptySignatures as an optional method', async () => {
+      const caipChainId = wallet.activeChainId
+      mockApproval(createMockSession([account1.address], caipChainId))
+
+      await wallet.connect()
+
+      expect(mockSignClient.connect).toHaveBeenCalledWith({
+        requiredNamespaces: {
+          algorand: { chains: [caipChainId], methods: ['algo_signTxn'], events: [] }
+        },
+        optionalNamespaces: {
+          algorand: { chains: [caipChainId], methods: [METHOD], events: [] }
+        }
+      })
+    })
+
+    it('applies the empty signatures the wallet returns after connecting', async () => {
+      const caipChainId = wallet.activeChainId
+      mockApproval(
+        withEmptySignaturesMethod(
+          createMockSession([account1.address, account2.address], caipChainId)
+        )
+      )
+      mockSignClient.request.mockResolvedValueOnce({
+        [account1.address]: 'gA==',
+        [account2.address]: otherSignature
+      })
+
+      await wallet.connect()
+
+      await vi.waitFor(() =>
+        expect(store.state.wallets[WALLET_ID]?.accounts).toEqual([
+          { ...account1, emptySignature: 'gA==' },
+          { ...account2, emptySignature: otherSignature }
+        ])
+      )
+      expect(mockSignClient.request).toHaveBeenCalledWith({
+        chainId: caipChainId,
+        topic: 'mock-topic',
+        request: expect.objectContaining({ method: METHOD, params: { chainId: caipChainId } })
+      })
+    })
+
+    it("doesn't wait for the wallet's response to connect", async () => {
+      mockApproval(
+        withEmptySignaturesMethod(createMockSession([account1.address], wallet.activeChainId))
+      )
+      deferResponse()
+
+      const accounts = await wallet.connect()
+
+      expect(accounts).toEqual([account1])
+      expect(mockSignClient.request).toHaveBeenCalledTimes(1)
+    })
+
+    it("doesn't request empty signatures if the wallet didn't approve the method", async () => {
+      mockApproval(createMockSession([account1.address], wallet.activeChainId))
+
+      await wallet.connect()
+      await flush()
+
+      expect(mockSignClient.request).not.toHaveBeenCalled()
+      expect(store.state.wallets[WALLET_ID]?.accounts).toEqual([account1])
+    })
+
+    it('ignores an error from the wallet', async () => {
+      mockApproval(
+        withEmptySignaturesMethod(createMockSession([account1.address], wallet.activeChainId))
+      )
+      mockSignClient.request.mockRejectedValueOnce(new Error('Method not supported'))
+
+      await wallet.connect()
+      await flush()
+
+      expect(store.state.wallets[WALLET_ID]?.accounts).toEqual([account1])
+    })
+
+    it('ignores a response that arrives after the timeout', async () => {
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+      mockApproval(
+        withEmptySignaturesMethod(createMockSession([account1.address], wallet.activeChainId))
+      )
+      const response = deferResponse()
+
+      await wallet.connect()
+      await vi.advanceTimersByTimeAsync(30_000)
+      response.resolve({ [account1.address]: 'gA==' })
+      await vi.advanceTimersByTimeAsync(0)
+
+      expect(store.state.wallets[WALLET_ID]?.accounts).toEqual([account1])
+    })
+
+    it('discards a response that arrives after the network changed', async () => {
+      mockApproval(
+        withEmptySignaturesMethod(createMockSession([account1.address], wallet.activeChainId))
+      )
+      const response = deferResponse()
+
+      await wallet.connect()
+      store.setState((state) => ({ ...state, activeNetwork: 'mainnet' }))
+      response.resolve({ [account1.address]: 'gA==' })
+      await flush()
+
+      expect(store.state.wallets[WALLET_ID]?.accounts).toEqual([account1])
+    })
+
+    it('discards a response for a session that was replaced', async () => {
+      const caipChainId = wallet.activeChainId
+      mockApproval(withEmptySignaturesMethod(createMockSession([account1.address], caipChainId)))
+      const firstResponse = deferResponse()
+      await wallet.connect()
+
+      mockApproval(
+        withEmptySignaturesMethod(createMockSession([account1.address], caipChainId), 'new-topic')
+      )
+      const secondResponse = deferResponse()
+      await wallet.connect()
+
+      firstResponse.resolve({ [account1.address]: otherSignature })
+      await flush()
+      expect(store.state.wallets[WALLET_ID]?.accounts).toEqual([account1])
+
+      secondResponse.resolve({ [account1.address]: 'gA==' })
+      await vi.waitFor(() =>
+        expect(store.state.wallets[WALLET_ID]?.accounts).toEqual([
+          { ...account1, emptySignature: 'gA==' }
+        ])
+      )
+    })
+
+    it("keeps the store's empty signatures when resuming a session, without requesting them", async () => {
+      // The manager cleared account1's empty signature after a rekey
+      const walletState: WalletState = {
+        accounts: [account1, { ...account2, emptySignature: 'gA==', authAddr: null }],
+        activeAccount: account1
+      }
+      const harness = createTestHarness(WALLET_ID, { wallets: { [WALLET_ID]: walletState } })
+      store = harness.store
+      wallet = createWallet(harness.accessor)
+
+      mockSignClient.session.get.mockImplementationOnce(() =>
+        withEmptySignaturesMethod(
+          createMockSession([account1.address, account2.address], wallet.activeChainId)
+        )
+      )
+      mockSignClient.session.keys = ['mockSessionKey']
+      mockSignClient.session.length = 1
+
+      await wallet.resumeSession()
+      await flush()
+
+      expect(store.state.wallets[WALLET_ID]).toEqual(walletState)
+      expect(mockSignClient.request).not.toHaveBeenCalled()
+    })
+
+    it("drops the previous session's empty signatures when the new session has none", async () => {
+      const walletState: WalletState = {
+        accounts: [{ ...account1, emptySignature: 'gA==', authAddr: null }],
+        activeAccount: { ...account1, emptySignature: 'gA==', authAddr: null }
+      }
+      const harness = createTestHarness(WALLET_ID, { wallets: { [WALLET_ID]: walletState } })
+      store = harness.store
+      wallet = createWallet(harness.accessor)
+
+      mockApproval(createMockSession([account1.address], wallet.activeChainId))
+
+      await wallet.connect()
+
+      expect(store.state.wallets[WALLET_ID]?.accounts).toEqual([account1])
+    })
+
+    it('replaces empty signatures when the wallet connects again', async () => {
+      const walletState: WalletState = {
+        accounts: [{ ...account1, emptySignature: 'gA==', authAddr: null }],
+        activeAccount: { ...account1, emptySignature: 'gA==', authAddr: null }
+      }
+      const harness = createTestHarness(WALLET_ID, { wallets: { [WALLET_ID]: walletState } })
+      store = harness.store
+      wallet = createWallet(harness.accessor)
+
+      mockApproval(
+        withEmptySignaturesMethod(createMockSession([account1.address], wallet.activeChainId))
+      )
+      mockSignClient.request.mockResolvedValueOnce({ [account1.address]: otherSignature })
+
+      await wallet.connect()
+
+      await vi.waitFor(() =>
+        expect(store.state.wallets[WALLET_ID]?.accounts).toEqual([
+          { ...account1, emptySignature: otherSignature }
+        ])
+      )
+    })
+
+    it('handles a session update when the wallet is no longer in the store', async () => {
+      const caipChainId = wallet.activeChainId
+      mockApproval(createMockSession([account1.address], caipChainId))
+      await wallet.connect()
+      accessor.removeWallet()
+
+      const session = createMockSession([account1.address], caipChainId)
+      mockSignClient.session.get.mockImplementationOnce(() => session)
+      const onSessionUpdate = mockSignClient.on.mock.calls.find(
+        ([event]) => event === 'session_update'
+      )![1]
+
+      onSessionUpdate({ topic: session.topic, params: { namespaces: session.namespaces } })
+
+      expect(store.state.wallets[WALLET_ID]?.accounts).toEqual([account1])
+    })
+  })
+
   describe('signing transactions', () => {
     const connectedAcct1 = '7ZUECA7HFLZTXENRV24SHLU4AVPUTMTTDUFUBNBD64C73F3UHRTHAIOF6Q'
     const connectedAcct2 = 'GD64YIY3TWGDMCNPP553DZPPR6LDUSFQOIJVFDPPXWEG3FVOJCCDBBHU5A'

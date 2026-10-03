@@ -13,9 +13,14 @@ import {
 } from 'src/store'
 import { WalletManager } from 'src/manager'
 import { StorageAdapter } from 'src/storage'
+import { encodeEmptySignature } from 'src/empty-signature'
 import { BaseWallet } from 'src/wallets/base'
-import type { AdapterConstructorParams, WalletAdapterConfig } from 'src/wallets/types'
-import type { Mock } from 'vitest'
+import type {
+  AdapterConstructorParams,
+  WalletAccount,
+  WalletAdapterConfig
+} from 'src/wallets/types'
+import type { Mock, MockInstance } from 'vitest'
 
 vi.mock('src/logger', () => {
   const mockLogger = {
@@ -1001,5 +1006,329 @@ describe('WalletManager', () => {
         expect(manager.activeNetwork).toBe('mainnet')
       })
     })
+  })
+})
+
+describe('WalletManager empty signatures', () => {
+  const ed25519 = 'gA=='
+  let persistedState: PersistedState | null
+  let accountInformation: MockInstance<algosdk.Algodv2['accountInformation']>
+
+  beforeEach(() => {
+    persistedState = null
+    vi.mocked(StorageAdapter.getItem).mockImplementation((key: string) =>
+      key === LOCAL_STORAGE_KEY && persistedState ? JSON.stringify(persistedState) : null
+    )
+    // Every algod client the manager creates, so no test reaches the network
+    accountInformation = vi.spyOn(algosdk.Algodv2.prototype, 'accountInformation')
+    mockAuthAddr(null)
+  })
+
+  afterEach(() => {
+    accountInformation.mockRestore()
+  })
+
+  /** Stubs algod's account information with the given auth address (or a failure) */
+  function mockAuthAddr(authAddr: string | null | Error) {
+    accountInformation.mockReturnValue({
+      do: () =>
+        authAddr instanceof Error
+          ? Promise.reject(authAddr)
+          : Promise.resolve({
+              authAddr: authAddr ? algosdk.Address.fromString(authAddr) : undefined
+            })
+    } as unknown as ReturnType<algosdk.Algodv2['accountInformation']>)
+    return accountInformation
+  }
+
+  /** Stubs algod's next account information call with one that stays pending until resolved */
+  function deferAuthAddr() {
+    let resolve!: (authAddr: string | null) => void
+    const pending = new Promise<{ authAddr?: algosdk.Address | undefined }>((res) => {
+      resolve = (authAddr) =>
+        res({ authAddr: authAddr ? algosdk.Address.fromString(authAddr) : undefined })
+    })
+    accountInformation.mockReturnValueOnce({
+      do: () => pending
+    } as unknown as ReturnType<algosdk.Algodv2['accountInformation']>)
+    return { resolve }
+  }
+
+  const tick = () => new Promise((resolve) => setTimeout(resolve, 0))
+
+  function connect(manager: WalletManager, account: { address: string; emptySignature?: string }) {
+    const walletAccount = { name: 'Defly Account 1', ...account }
+    addWallet(manager.store, {
+      walletId: 'defly',
+      wallet: { accounts: [walletAccount], activeAccount: walletAccount }
+    })
+  }
+
+  function persistConnected(account: Omit<WalletAccount, 'name'>) {
+    const walletAccount = { name: 'Defly Account 1', ...account }
+    persistedState = {
+      wallets: { defly: { accounts: [walletAccount], activeAccount: walletAccount } },
+      activeWallet: 'defly',
+      activeNetwork: 'testnet',
+      customNetworkConfigs: {}
+    }
+  }
+
+  const getAccount = (manager: WalletManager) => manager.store.state.wallets['defly']?.accounts[0]
+
+  async function makeFalconSig() {
+    const falcon = algosdk.addressWithSignersFromRawFalcon1024Signer({
+      falcon1024PublicKey: crypto.getRandomValues(new Uint8Array(1793)),
+      falcon1024Signer: async () => new Uint8Array(0)
+    })
+    const txn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+      sender: falcon.address,
+      receiver: falcon.address,
+      amount: 0,
+      suggestedParams: {
+        fee: 1000,
+        minFee: 1000,
+        firstValid: 1,
+        lastValid: 1000,
+        genesisHash: new Uint8Array(32),
+        flatFee: true
+      }
+    })
+    const [stxn] = await falcon.emptyTxnSigner([txn], [0])
+    const { pqsig } = algosdk.decodeSignedTransaction(stxn)
+    return {
+      address: falcon.address.toString(),
+      emptySignature: encodeEmptySignature({ pqsig: pqsig! }),
+      pqsig: pqsig!
+    }
+  }
+
+  it('records the auth address when an account with an empty signature connects', async () => {
+    const manager = new WalletManager({ wallets: [defly()] })
+    const address = algosdk.generateAccount().addr.toString()
+    mockAuthAddr(null)
+
+    connect(manager, { address, emptySignature: ed25519 })
+
+    await vi.waitFor(() => expect(getAccount(manager)?.authAddr).toBeNull())
+    expect(getAccount(manager)?.emptySignature).toBe(ed25519)
+    expect(accountInformation).toHaveBeenCalledWith(address)
+  })
+
+  it('records the auth address of a rekeyed account', async () => {
+    const manager = new WalletManager({ wallets: [defly()] })
+    const authAddr = algosdk.generateAccount().addr.toString()
+    mockAuthAddr(authAddr)
+
+    connect(manager, {
+      address: algosdk.generateAccount().addr.toString(),
+      emptySignature: ed25519
+    })
+
+    await vi.waitFor(() => expect(getAccount(manager)?.authAddr).toBe(authAddr))
+  })
+
+  it('does not check accounts without an empty signature', async () => {
+    const manager = new WalletManager({ wallets: [defly()] })
+    mockAuthAddr(null)
+
+    connect(manager, { address: algosdk.generateAccount().addr.toString() })
+    await manager.resumeSessions()
+
+    expect(accountInformation).not.toHaveBeenCalled()
+  })
+
+  it('clears an empty signature on resume if the account was rekeyed since it was checked', async () => {
+    persistConnected({
+      address: algosdk.generateAccount().addr.toString(),
+      emptySignature: ed25519,
+      authAddr: null
+    })
+    const manager = new WalletManager({ wallets: [defly()] })
+    mockAuthAddr(algosdk.generateAccount().addr.toString())
+
+    await manager.resumeSessions()
+
+    await vi.waitFor(() => expect(getAccount(manager)).not.toHaveProperty('emptySignature'))
+    expect(getAccount(manager)).not.toHaveProperty('authAddr')
+    expect(manager.store.state.wallets['defly']?.activeAccount).toEqual(getAccount(manager))
+  })
+
+  it('keeps an empty signature on resume if the auth address is unchanged', async () => {
+    const authAddr = algosdk.generateAccount().addr.toString()
+    persistConnected({
+      address: algosdk.generateAccount().addr.toString(),
+      emptySignature: ed25519,
+      authAddr
+    })
+    const manager = new WalletManager({ wallets: [defly()] })
+    mockAuthAddr(authAddr)
+
+    await manager.resumeSessions()
+
+    await vi.waitFor(() => expect(accountInformation).toHaveBeenCalled())
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(getAccount(manager)).toMatchObject({ emptySignature: ed25519, authAddr })
+  })
+
+  it('accepts a pqsig that authorizes the account', async () => {
+    const manager = new WalletManager({ wallets: [defly()] })
+    const falcon = await makeFalconSig()
+    mockAuthAddr(null)
+
+    connect(manager, falcon)
+
+    await vi.waitFor(() => expect(getAccount(manager)?.authAddr).toBeNull())
+    expect(getAccount(manager)?.emptySignature).toBe(falcon.emptySignature)
+  })
+
+  it('accepts a pqsig for an account rekeyed to the PQ key', async () => {
+    const manager = new WalletManager({ wallets: [defly()] })
+    const falcon = await makeFalconSig()
+    mockAuthAddr(falcon.address)
+
+    connect(manager, {
+      address: algosdk.generateAccount().addr.toString(),
+      emptySignature: falcon.emptySignature
+    })
+
+    await vi.waitFor(() => expect(getAccount(manager)?.authAddr).toBe(falcon.address))
+  })
+
+  it("clears a pqsig that doesn't authorize the account", async () => {
+    const manager = new WalletManager({ wallets: [defly()] })
+    const falcon = await makeFalconSig()
+    mockAuthAddr(null)
+
+    connect(manager, {
+      address: algosdk.generateAccount().addr.toString(),
+      emptySignature: falcon.emptySignature
+    })
+
+    await vi.waitFor(() => expect(getAccount(manager)).not.toHaveProperty('emptySignature'))
+  })
+
+  it('clears the pqsig of an account rekeyed away from its PQ key', async () => {
+    const manager = new WalletManager({ wallets: [defly()] })
+    const falcon = await makeFalconSig()
+    mockAuthAddr(algosdk.generateAccount().addr.toString())
+
+    connect(manager, { address: falcon.address, emptySignature: falcon.emptySignature })
+
+    await vi.waitFor(() => expect(getAccount(manager)).not.toHaveProperty('emptySignature'))
+  })
+
+  it('clears a pqsig with a non-canonical salt', async () => {
+    const manager = new WalletManager({ wallets: [defly()] })
+    const falcon = await makeFalconSig()
+    mockAuthAddr(null)
+
+    connect(manager, {
+      address: falcon.address,
+      emptySignature: encodeEmptySignature({
+        pqsig: { ...falcon.pqsig, slt: falcon.pqsig.slt + 1 }
+      })
+    })
+
+    await vi.waitFor(() => expect(getAccount(manager)).not.toHaveProperty('emptySignature'))
+  })
+
+  it('clears an invalid empty signature without querying algod', async () => {
+    const manager = new WalletManager({ wallets: [defly()] })
+    mockAuthAddr(null)
+
+    connect(manager, { address: algosdk.generateAccount().addr.toString(), emptySignature: 'AQ==' })
+
+    await vi.waitFor(() => expect(getAccount(manager)).not.toHaveProperty('emptySignature'))
+    expect(accountInformation).not.toHaveBeenCalled()
+  })
+
+  it('leaves an empty signature unchecked if algod is unreachable, and retries on resume', async () => {
+    const manager = new WalletManager({ wallets: [defly()] })
+    mockAuthAddr(new Error('Network error'))
+
+    connect(manager, {
+      address: algosdk.generateAccount().addr.toString(),
+      emptySignature: ed25519
+    })
+    await vi.waitFor(() => expect(accountInformation).toHaveBeenCalledTimes(1))
+    await tick()
+
+    // Unrelated state changes don't retry a failed check
+    manager.store.setState((state) => ({ ...state }))
+    await tick()
+    expect(accountInformation).toHaveBeenCalledTimes(1)
+    expect(getAccount(manager)).toMatchObject({ emptySignature: ed25519 })
+    expect(getAccount(manager)).not.toHaveProperty('authAddr')
+
+    mockAuthAddr(null)
+    await manager.resumeSessions()
+    await vi.waitFor(() => expect(getAccount(manager)?.authAddr).toBeNull())
+    expect(accountInformation).toHaveBeenCalledTimes(2)
+  })
+
+  it("doesn't start a second check while one is pending", async () => {
+    const manager = new WalletManager({ wallets: [defly()] })
+    const check = deferAuthAddr()
+
+    connect(manager, {
+      address: algosdk.generateAccount().addr.toString(),
+      emptySignature: ed25519
+    })
+    manager.store.setState((state) => ({ ...state }))
+    manager.store.setState((state) => ({ ...state }))
+    await tick()
+    expect(accountInformation).toHaveBeenCalledTimes(1)
+
+    check.resolve(null)
+    await vi.waitFor(() => expect(getAccount(manager)?.authAddr).toBeNull())
+  })
+
+  it('discards the result of a check that was running when the network changed', async () => {
+    const manager = new WalletManager({ wallets: [defly()] })
+    const address = algosdk.generateAccount().addr.toString()
+    const testnetCheck = deferAuthAddr()
+
+    connect(manager, { address, emptySignature: ed25519 })
+    await vi.waitFor(() => expect(accountInformation).toHaveBeenCalledTimes(1))
+
+    // MainNet is checked even though the TestNet check hasn't finished
+    await manager.setActiveNetwork('mainnet')
+    await vi.waitFor(() => expect(getAccount(manager)?.authAddr).toBeNull())
+    expect(accountInformation).toHaveBeenCalledTimes(2)
+    expect(accountInformation).toHaveBeenLastCalledWith(address)
+
+    // The account is rekeyed on TestNet, which mustn't affect MainNet
+    testnetCheck.resolve(algosdk.generateAccount().addr.toString())
+    await tick()
+    expect(getAccount(manager)).toMatchObject({ emptySignature: ed25519, authAddr: null })
+  })
+
+  it('re-checks empty signatures when the network changes', async () => {
+    persistConnected({
+      address: algosdk.generateAccount().addr.toString(),
+      emptySignature: ed25519,
+      authAddr: null
+    })
+    const manager = new WalletManager({ wallets: [defly()] })
+    await manager.resumeSessions()
+    await vi.waitFor(() => expect(accountInformation).toHaveBeenCalledTimes(1))
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(getAccount(manager)).toMatchObject({ emptySignature: ed25519 })
+
+    // The account is rekeyed on the other network
+    mockAuthAddr(algosdk.generateAccount().addr.toString())
+    await manager.setActiveNetwork('mainnet')
+
+    await vi.waitFor(() => expect(getAccount(manager)).not.toHaveProperty('emptySignature'))
+  })
+
+  it('exposes the active wallet emptyTransactionSigner', () => {
+    const manager = new WalletManager({ wallets: [defly()] })
+    expect(() => manager.emptyTransactionSigner).toThrow('No active wallet found!')
+
+    connect(manager, { address: algosdk.generateAccount().addr.toString() })
+
+    expect(manager.emptyTransactionSigner).toBe(manager.getWallet('defly')!.emptyTransactionSigner)
   })
 })

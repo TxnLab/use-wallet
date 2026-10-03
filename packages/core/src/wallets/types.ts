@@ -28,6 +28,19 @@ export type WalletAccount = {
   name: string
   address: string
   metadata?: Record<string, unknown>
+  /**
+   * The account's empty signature, as advertised by its wallet: base64 of the
+   * canonical msgpack encoding of a `SignedTransaction` with `txn` removed.
+   * Undefined when the wallet hasn't advertised one, i.e. the account type is unknown.
+   * @see decodeEmptySignature
+   */
+  emptySignature?: string
+  /**
+   * The account's auth address when `emptySignature` was last checked against
+   * algod, or `null` if the account wasn't rekeyed. Set by the manager; adapters
+   * should leave it unset.
+   */
+  authAddr?: string | null
 }
 
 // ---------- Wallet Capabilities ----------------------------------- //

@@ -12,7 +12,8 @@ import {
   setActiveWallet,
   isValidPersistedState,
   isValidWalletAccount,
-  isValidWalletState
+  isValidWalletState,
+  recordEmptySignatureChecks
 } from 'src/store'
 
 // Mock the logger
@@ -223,6 +224,156 @@ describe('Mutations', () => {
       setAccounts(store, { walletId: 'defly', accounts: [account2, account3] })
       expect(store.state.wallets['defly']?.activeAccount).toEqual(account2)
     })
+
+    it('should update the active account to its new account data', () => {
+      const account1 = { name: 'Defly Wallet 1', address: 'address1' }
+      addWallet(store, {
+        walletId: 'defly',
+        wallet: { accounts: [account1], activeAccount: account1 }
+      })
+
+      const updated = { ...account1, emptySignature: 'gA==' }
+      setAccounts(store, { walletId: 'defly', accounts: [updated] })
+
+      expect(store.state.wallets['defly']?.activeAccount).toEqual(updated)
+    })
+  })
+
+  describe('empty signature auth addresses', () => {
+    const walletId = 'defly'
+    const checked = { name: 'Defly Wallet 1', address: 'address1', emptySignature: 'gA==' }
+
+    beforeEach(() => {
+      addWallet(store, { walletId, wallet: { accounts: [checked], activeAccount: checked } })
+      recordEmptySignatureChecks(store, {
+        walletId,
+        checks: [{ address: 'address1', emptySignature: 'gA==', authAddr: null }]
+      })
+    })
+
+    it('keeps the recorded auth address while the empty signature is unchanged', () => {
+      setAccounts(store, { walletId, accounts: [{ ...checked, name: 'Renamed' }] })
+
+      const wallet = store.state.wallets[walletId]!
+      expect(wallet.accounts[0]).toEqual({ ...checked, name: 'Renamed', authAddr: null })
+      expect(wallet.activeAccount).toEqual(wallet.accounts[0])
+    })
+
+    it('keeps the recorded auth address when the wallet connects again', () => {
+      addWallet(store, {
+        walletId,
+        wallet: { accounts: [checked], activeAccount: { ...checked, authAddr: 'adapter-value' } }
+      })
+
+      const wallet = store.state.wallets[walletId]!
+      expect(wallet.accounts[0].authAddr).toBeNull()
+      expect(wallet.activeAccount).toEqual(wallet.accounts[0])
+    })
+
+    it('ignores an auth address an adapter sets on an active account outside its accounts', () => {
+      const other = { name: 'Other', address: 'address2', emptySignature: 'gA==', authAddr: 'x' }
+
+      addWallet(store, { walletId, wallet: { accounts: [checked], activeAccount: other } })
+
+      expect(store.state.wallets[walletId]?.activeAccount).toEqual({
+        name: 'Other',
+        address: 'address2',
+        emptySignature: 'gA=='
+      })
+    })
+
+    it('drops the recorded auth address when the empty signature changes', () => {
+      setAccounts(store, { walletId, accounts: [{ ...checked, emptySignature: 'other' }] })
+
+      expect(store.state.wallets[walletId]?.accounts[0]).not.toHaveProperty('authAddr')
+    })
+
+    it('ignores an auth address set by an adapter', () => {
+      setAccounts(store, {
+        walletId,
+        accounts: [{ ...checked, emptySignature: 'other', authAddr: 'adapter-value' }]
+      })
+
+      expect(store.state.wallets[walletId]?.accounts[0]).not.toHaveProperty('authAddr')
+    })
+  })
+
+  describe('recordEmptySignatureChecks', () => {
+    const walletId = 'defly'
+    const account1 = { name: 'Defly Wallet 1', address: 'address1', emptySignature: 'sig1' }
+    const account2 = { name: 'Defly Wallet 2', address: 'address2', emptySignature: 'sig2' }
+
+    beforeEach(() => {
+      addWallet(store, {
+        walletId,
+        wallet: { accounts: [account1, account2], activeAccount: account1 }
+      })
+    })
+
+    it('records auth addresses on accounts and the active account', () => {
+      recordEmptySignatureChecks(store, {
+        walletId,
+        checks: [
+          { address: 'address1', emptySignature: 'sig1', authAddr: 'AUTH' },
+          { address: 'address2', emptySignature: 'sig2', authAddr: null }
+        ]
+      })
+
+      const wallet = store.state.wallets[walletId]!
+      expect(wallet.accounts).toEqual([
+        { ...account1, authAddr: 'AUTH' },
+        { ...account2, authAddr: null }
+      ])
+      expect(wallet.activeAccount).toEqual({ ...account1, authAddr: 'AUTH' })
+    })
+
+    it('clears the empty signature when the auth address is undefined', () => {
+      recordEmptySignatureChecks(store, {
+        walletId,
+        checks: [{ address: 'address1', emptySignature: 'sig1', authAddr: undefined }]
+      })
+
+      const wallet = store.state.wallets[walletId]!
+      expect(wallet.accounts[0]).toEqual({ name: 'Defly Wallet 1', address: 'address1' })
+      expect(wallet.activeAccount).toEqual({ name: 'Defly Wallet 1', address: 'address1' })
+    })
+
+    it('records a check for an active account that is not in the accounts list', () => {
+      const other = { name: 'Other', address: 'address3', emptySignature: 'sig3' }
+      store.setState((state) => ({
+        ...state,
+        wallets: { [walletId]: { accounts: [account1], activeAccount: other } }
+      }))
+
+      recordEmptySignatureChecks(store, {
+        walletId,
+        checks: [{ address: 'address3', emptySignature: 'sig3', authAddr: 'AUTH' }]
+      })
+
+      expect(store.state.wallets[walletId]?.activeAccount).toEqual({ ...other, authAddr: 'AUTH' })
+    })
+
+    it('ignores a check for an empty signature that has since changed', () => {
+      const before = store.state
+
+      recordEmptySignatureChecks(store, {
+        walletId,
+        checks: [{ address: 'address1', emptySignature: 'stale', authAddr: undefined }]
+      })
+
+      expect(store.state).toBe(before)
+    })
+
+    it('does nothing if walletId is not in wallets map', () => {
+      const before = store.state
+
+      recordEmptySignatureChecks(store, {
+        walletId: 'pera',
+        checks: [{ address: 'address1', emptySignature: 'sig1', authAddr: null }]
+      })
+
+      expect(store.state).toBe(before)
+    })
   })
 
   describe('setActiveNetwork', () => {
@@ -240,6 +391,14 @@ describe('Type Guards', () => {
   describe('isValidWalletAccount', () => {
     it('returns true for a valid WalletAccount', () => {
       expect(isValidWalletAccount({ name: 'Defly Wallet 1', address: 'address' })).toBe(true)
+      expect(
+        isValidWalletAccount({
+          name: 'Defly Wallet 1',
+          address: 'address',
+          emptySignature: 'gA==',
+          authAddr: null
+        })
+      ).toBe(true)
     })
 
     it('returns false for an invalid WalletAccount', () => {
@@ -247,6 +406,10 @@ describe('Type Guards', () => {
       expect(isValidWalletAccount(null)).toBe(false)
       expect(isValidWalletAccount({ name: 'Defly Wallet 1', address: 123 })).toBe(false)
       expect(isValidWalletAccount({ address: 'address' })).toBe(false)
+      expect(isValidWalletAccount({ name: 'Defly', address: 'address', emptySignature: {} })).toBe(
+        false
+      )
+      expect(isValidWalletAccount({ name: 'Defly', address: 'address', authAddr: 1 })).toBe(false)
     })
   })
 

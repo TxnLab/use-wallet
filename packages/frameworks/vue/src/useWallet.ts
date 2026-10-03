@@ -109,6 +109,16 @@ export function useWallet() {
     return activeBaseWallet.value.transactionSigner(txnGroup, indexesToSign)
   }
 
+  const emptyTransactionSigner = (
+    txnGroup: algosdk.Transaction[],
+    indexesToSign: number[]
+  ): Promise<Uint8Array[]> => {
+    if (!activeBaseWallet.value) {
+      throw new Error('No active wallet')
+    }
+    return activeBaseWallet.value.emptyTransactionSigner(txnGroup, indexesToSign)
+  }
+
   const signData = (data: string, metadata: StdSignMetadata): Promise<StdSignDataResponse> => {
     if (!activeBaseWallet.value) {
       throw new Error('No active wallet')
@@ -141,6 +151,7 @@ export function useWallet() {
     signData,
     withPrivateKey,
     signTransactions,
-    transactionSigner
+    transactionSigner,
+    emptyTransactionSigner
   }
 }

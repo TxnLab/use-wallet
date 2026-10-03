@@ -62,6 +62,6 @@
     "typescript": "5.9.3"
   },
   "peerDependencies": {
-    "algosdk": "^3.0.0"
+    "algosdk": "^3.7.0"
   }
 }

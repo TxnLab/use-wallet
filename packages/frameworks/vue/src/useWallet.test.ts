@@ -28,7 +28,8 @@ const mocks = vi.hoisted(() => {
     setActiveAccount: vi.fn(),
     resumeSession: vi.fn(() => Promise.resolve()),
     signTransactions: vi.fn(() => Promise.resolve([] as Uint8Array[])),
-    transactionSigner: vi.fn(() => Promise.resolve([] as Uint8Array[]))
+    transactionSigner: vi.fn(() => Promise.resolve([] as Uint8Array[])),
+    emptyTransactionSigner: vi.fn(() => Promise.resolve([] as Uint8Array[]))
   }
 })
 
@@ -40,6 +41,7 @@ class MockWalletA extends BaseWallet {
   resumeSession = mocks.resumeSession
   signTransactions = mocks.signTransactions
   transactionSigner = mocks.transactionSigner
+  emptyTransactionSigner = mocks.emptyTransactionSigner
 
   static defaultMetadata = { name: 'Wallet A', icon: 'icon-a' }
 
@@ -56,6 +58,7 @@ class MockWalletB extends BaseWallet {
   resumeSession = mocks.resumeSession
   signTransactions = mocks.signTransactions
   transactionSigner = mocks.transactionSigner
+  emptyTransactionSigner = mocks.emptyTransactionSigner
 
   static defaultMetadata = { name: 'Wallet B', icon: 'icon-b' }
 
@@ -149,8 +152,8 @@ describe('useWallet', () => {
     expect(mocks.setActiveAccount).toHaveBeenCalledWith('address')
   })
 
-  it('calls signTransactions and transactionSigner correctly', async () => {
-    const { signTransactions, transactionSigner } = useWallet()
+  it('calls signTransactions, transactionSigner and emptyTransactionSigner correctly', async () => {
+    const { signTransactions, transactionSigner, emptyTransactionSigner } = useWallet()
 
     mockWalletManager.store.setState((state) => ({
       ...state,
@@ -165,9 +168,11 @@ describe('useWallet', () => {
 
     await signTransactions([], [])
     await transactionSigner([], [])
+    await emptyTransactionSigner([], [])
 
     expect(mocks.signTransactions).toHaveBeenCalledWith([], [])
     expect(mocks.transactionSigner).toHaveBeenCalledWith([], [])
+    expect(mocks.emptyTransactionSigner).toHaveBeenCalledWith([], [])
   })
 
   it('updates wallets when store state changes', () => {

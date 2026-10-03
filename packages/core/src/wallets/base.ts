@@ -1,3 +1,4 @@
+import { decodeEmptySignature, type EmptySignatureFields } from 'src/empty-signature'
 import { logger } from 'src/logger'
 import { NetworkConfig } from 'src/network'
 import type { State } from 'src/store'
@@ -85,6 +86,33 @@ export abstract class BaseWallet<TOptions = Record<string, unknown>> {
     return signedTxns
   }
 
+  /**
+   * A `TransactionSigner` that returns placeholder-signed transactions without
+   * prompting the wallet, for simulating with `allowEmptySignatures` (plus
+   * `fixSigners` for rekeyed accounts). Each transaction carries its sender's
+   * empty signature, or no signature if the sender's type is unknown, which
+   * simulates as a single ed25519 key. The results can't be submitted.
+   */
+  public emptyTransactionSigner = async (
+    txnGroup: algosdk.Transaction[],
+    indexesToSign: number[]
+  ): Promise<Uint8Array[]> => {
+    const fieldsBySender = new Map<string, EmptySignatureFields>()
+
+    return indexesToSign.map((index) => {
+      const txn = txnGroup[index]
+      const sender = txn.sender.toString()
+
+      let fields = fieldsBySender.get(sender)
+      if (!fields) {
+        fields = this.getEmptySignatureFields(sender) ?? {}
+        fieldsBySender.set(sender, fields)
+      }
+
+      return algosdk.encodeMsgpack(new algosdk.SignedTransaction({ ...fields, txn }))
+    })
+  }
+
   public canSignData = false
 
   public signData = async (
@@ -161,6 +189,13 @@ export abstract class BaseWallet<TOptions = Record<string, unknown>> {
       throw new SignDataError('No active account', 4100)
     }
 
+    // ARC-60's `signer` is an ed25519 public key, so post-quantum accounts can't
+    // sign data until the ARC supports other key types
+    if (this.getEmptySignatureFields(activeAddress)?.pqsig) {
+      this.logger.error('signData is not supported for post-quantum accounts')
+      throw new SignDataError('signData is not supported for post-quantum accounts', 4200)
+    }
+
     const domain = location.host
     const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(domain))
     const authenticatorData = new Uint8Array(digest)
@@ -171,6 +206,65 @@ export abstract class BaseWallet<TOptions = Record<string, unknown>> {
       acctInfo.authAddr?.publicKey ?? algosdk.Address.fromString(activeAddress).publicKey
 
     return { data, signer, domain, authenticatorData }
+  }
+
+  /**
+   * Sets connected accounts' empty signatures from a wallet's response: a map of
+   * each address to its base64 empty signature. Accounts missing from the map
+   * become unknown, and addresses that aren't connected are ignored. A response
+   * that isn't such a map is ignored.
+   */
+  protected applyEmptySignatures(emptySignatures: unknown): void {
+    if (
+      typeof emptySignatures !== 'object' ||
+      emptySignatures === null ||
+      Array.isArray(emptySignatures)
+    ) {
+      this.logger.warn('Ignoring invalid empty signatures response')
+      return
+    }
+
+    const walletState = this.store.getWalletState()
+    if (!walletState) {
+      return
+    }
+
+    const response = emptySignatures as Record<string, unknown>
+    let changed = false
+
+    const accounts = walletState.accounts.map((account) => {
+      const value = response[account.address]
+      const emptySignature = typeof value === 'string' ? value : undefined
+      if (emptySignature === account.emptySignature) {
+        return account
+      }
+
+      changed = true
+      const { emptySignature: _emptySignature, authAddr: _authAddr, ...rest } = account
+      return emptySignature === undefined ? rest : { ...rest, emptySignature }
+    })
+
+    if (changed) {
+      this.store.setAccounts(accounts)
+    }
+  }
+
+  /**
+   * Returns a connected account's decoded empty signature, or `undefined` if
+   * the account type is unknown or its empty signature can't be decoded.
+   */
+  protected getEmptySignatureFields(address: string): EmptySignatureFields | undefined {
+    const emptySignature = this.accounts.find((a) => a.address === address)?.emptySignature
+    if (emptySignature === undefined) {
+      return undefined
+    }
+
+    try {
+      return decodeEmptySignature(emptySignature)
+    } catch (error: any) {
+      this.logger.warn(`Ignoring invalid empty signature for ${address}: ${error.message}`)
+      return undefined
+    }
   }
 
   protected onDisconnect = (): void => {

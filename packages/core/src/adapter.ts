@@ -55,6 +55,15 @@ export {
   formatJsonRpcRequest
 } from './utils'
 
+// Empty signatures
+export {
+  encodeEmptySignature,
+  decodeEmptySignature,
+  getSignatureType,
+  type EmptySignatureFields,
+  type SignatureType
+} from './empty-signature'
+
 // Secure key utilities
 export {
   SecureKeyContainer,

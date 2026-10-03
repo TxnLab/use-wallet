@@ -1,5 +1,6 @@
 import { Store } from '@tanstack/store'
 import algosdk from 'algosdk'
+import { decodeEmptySignature, type EmptySignatureFields } from 'src/empty-signature'
 import { EventEmitter, type WalletManagerEvents } from 'src/events'
 import { Logger, LogLevel, logger } from 'src/logger'
 import {
@@ -15,6 +16,7 @@ import {
   isValidPersistedState,
   LOCAL_STORAGE_KEY,
   addWallet,
+  recordEmptySignatureChecks,
   removeWallet,
   setAccounts,
   setActiveAccount,
@@ -57,6 +59,9 @@ export class WalletManager {
 
   private logger: ReturnType<typeof logger.createScopedLogger>
   private events = new EventEmitter<WalletManagerEvents>()
+
+  private pendingEmptySignatureChecks = new Set<string>()
+  private failedEmptySignatureChecks = new Set<string>()
 
   constructor({
     wallets = [],
@@ -136,6 +141,11 @@ export class WalletManager {
 
     // Save persisted state immediately
     this.savePersistedState()
+
+    // Check empty signatures against algod as accounts connect
+    this.store.subscribe(() => {
+      void this.checkEmptySignatures({ recheck: false })
+    })
 
     // Subscribe to store updates
     this.subscribe = (callback: (state: State) => void): (() => void) => {
@@ -435,12 +445,123 @@ export class WalletManager {
       })
       throw error
     } finally {
+      // Catch accounts rekeyed since they connected. This doesn't hold up
+      // `ready`, so an unreachable algod can't delay the app.
+      void this.checkEmptySignatures({ recheck: true })
+
       this.store.setState((state) => ({
         ...state,
         managerStatus: 'ready'
       }))
       this.events.emit('ready')
     }
+  }
+
+  // ---------- Empty Signatures -------------------------------------- //
+
+  /**
+   * Checks connected accounts' empty signatures against algod on the active network.
+   *
+   * A new empty signature is accepted, and the account's current auth address is
+   * recorded with it. An empty signature whose recorded auth address no longer
+   * matches (the account was rekeyed) is cleared, so the account type is unknown
+   * until the wallet reconnects. A `pqsig` must also authorize the account's
+   * current auth address. If algod can't be reached, the empty signature is left
+   * as is.
+   *
+   * @param recheck - Also re-check empty signatures that were already checked
+   */
+  private async checkEmptySignatures({ recheck }: { recheck: boolean }): Promise<void> {
+    if (recheck) {
+      this.failedEmptySignatureChecks.clear()
+    }
+
+    const checks: Promise<void>[] = []
+
+    for (const [walletKey, walletState] of Object.entries(this.store.state.wallets)) {
+      if (!walletState) continue
+      for (const account of walletState.accounts) {
+        if (account.emptySignature === undefined) continue
+        if (!recheck && account.authAddr !== undefined) continue
+
+        const key = `${this.activeNetwork}:${walletKey}:${account.address}:${account.emptySignature}`
+        if (this.pendingEmptySignatureChecks.has(key)) continue
+        if (!recheck && this.failedEmptySignatureChecks.has(key)) continue
+
+        this.pendingEmptySignatureChecks.add(key)
+        checks.push(
+          this.checkEmptySignature(walletKey, account, key).finally(() =>
+            this.pendingEmptySignatureChecks.delete(key)
+          )
+        )
+      }
+    }
+
+    await Promise.all(checks)
+  }
+
+  private async checkEmptySignature(
+    walletKey: WalletKey,
+    account: WalletAccount,
+    key: string
+  ): Promise<void> {
+    const { address, authAddr: recordedAuthAddr } = account
+    const emptySignature = account.emptySignature!
+    const networkId = this.activeNetwork
+
+    const record = (authAddr: string | null | undefined) => {
+      // Discard the result if the network changed while checking
+      if (this.activeNetwork !== networkId) return
+      recordEmptySignatureChecks(this.store, {
+        walletId: walletKey,
+        checks: [{ address, emptySignature, authAddr }]
+      })
+    }
+
+    let fields: EmptySignatureFields
+    try {
+      fields = decodeEmptySignature(emptySignature)
+    } catch (error: any) {
+      this.logger.warn(`Clearing invalid empty signature for ${address}: ${error.message}`)
+      record(undefined)
+      return
+    }
+
+    let authAddr: string | null
+    try {
+      const accountInfo = await this.algodClient.accountInformation(address).do()
+      authAddr = accountInfo.authAddr?.toString() ?? null
+    } catch (error: any) {
+      this.logger.warn(`Could not check empty signature for ${address}: ${error.message}`)
+      this.failedEmptySignatureChecks.add(key)
+      return
+    }
+
+    if (recordedAuthAddr !== undefined && recordedAuthAddr !== authAddr) {
+      this.logger.warn(
+        `Account ${address} was rekeyed, so its type is unknown until the wallet reconnects`
+      )
+      record(undefined)
+      return
+    }
+
+    if (fields.pqsig) {
+      let pqAddress: string | undefined
+      try {
+        pqAddress = algosdk.addressFromPQSig(fields.pqsig).toString()
+      } catch {
+        // A malformed pqsig authorizes nothing
+      }
+      if (pqAddress !== (authAddr ?? address)) {
+        this.logger.warn(
+          `Clearing empty signature for ${address}: its pqsig doesn't authorize the account`
+        )
+        record(undefined)
+        return
+      }
+    }
+
+    record(authAddr)
   }
 
   public async disconnect(): Promise<void> {
@@ -510,6 +631,9 @@ export class WalletManager {
 
     const algodClient = this.createAlgodClient(this.networkConfig[networkId].algod)
     setActiveNetwork(this.store, { networkId, algodClient })
+
+    // An account's auth address is per network
+    void this.checkEmptySignatures({ recheck: true })
 
     this.events.emit('networkChanged', { networkId })
     this.logger.info(`Active network set to ${networkId}`)
@@ -656,5 +780,13 @@ export class WalletManager {
       throw new Error('No active wallet found!')
     }
     return this.activeWallet.transactionSigner
+  }
+
+  public get emptyTransactionSigner(): algosdk.TransactionSigner {
+    if (!this.activeWallet) {
+      this.logger.error('No active wallet found!')
+      throw new Error('No active wallet found!')
+    }
+    return this.activeWallet.emptyTransactionSigner
   }
 }
