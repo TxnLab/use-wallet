@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@web3auth/base-provider": "9.7.0",
-    "@web3auth/modal": "10.16.0",
+    "@web3auth/modal": "11.4.2",
     "@web3auth/single-factor-auth": "9.5.0"
   },
   "devDependencies": {
