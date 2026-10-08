@@ -37,8 +37,8 @@ The Mnemonic wallet is strictly for testing and development. For security reason
 Add the Mnemonic provider to your WalletManager configuration:
 
 ```typescript
+import { pera } from '@perawallet/use-wallet-pera'
 import { WalletManager } from '@txnlab/use-wallet'
-import { pera } from '@txnlab/use-wallet-pera'
 import { defly } from '@txnlab/use-wallet-defly'
 import { mnemonic } from '@txnlab/use-wallet-mnemonic'
 

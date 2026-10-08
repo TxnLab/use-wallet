@@ -32,8 +32,8 @@ interface WalletManagerConfig {
 Here's a basic example:
 
 ```typescript
+import { pera } from '@perawallet/use-wallet-pera'
 import { WalletManager } from '@txnlab/use-wallet'
-import { pera } from '@txnlab/use-wallet-pera'
 import { defly } from '@txnlab/use-wallet-defly'
 
 const manager = new WalletManager({
@@ -50,8 +50,8 @@ Here's an example showing common wallet configurations, including popular produc
 
 ```typescript
 import { lute } from '@galaxypay/use-wallet-lute'
+import { pera } from '@perawallet/use-wallet-pera'
 import { WalletManager } from '@txnlab/use-wallet'
-import { pera } from '@txnlab/use-wallet-pera'
 import { exodus } from '@txnlab/use-wallet-exodus'
 import { kibisis } from '@txnlab/use-wallet-kibisis'
 import { w3wallet } from '@txnlab/use-wallet-w3wallet'
@@ -326,13 +326,13 @@ const manager = new WalletManager({
 Here's a complete configuration example combining all the elements:
 
 ```typescript
+import { pera } from '@perawallet/use-wallet-pera'
 import {
   WalletManager,
   NetworkConfigBuilder,
   LogLevel
 } from '@txnlab/use-wallet'
 import { defly } from '@txnlab/use-wallet-defly'
-import { pera } from '@txnlab/use-wallet-pera'
 
 // Configure networks
 const networks = new NetworkConfigBuilder()

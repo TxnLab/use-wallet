@@ -21,8 +21,8 @@ The React adapter (`@txnlab/use-wallet-react`) provides a set of hooks and compo
 After installing the package and any required wallet adapters (see [Installation](../getting-started/installation.md)) and [configuring your WalletManager](../getting-started/configuration.md), wrap your application with the `WalletProvider`:
 
 ```tsx
+import { pera } from '@perawallet/use-wallet-pera'
 import { WalletProvider, WalletManager } from '@txnlab/use-wallet-react'
-import { pera } from '@txnlab/use-wallet-pera'
 import { defly } from '@txnlab/use-wallet-defly'
 
 // Create manager instance (see Configuration guide)

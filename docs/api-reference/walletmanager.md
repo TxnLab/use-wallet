@@ -51,11 +51,11 @@ interface WalletManagerOptions {
 #### Example
 
 ```typescript
+import { pera } from '@perawallet/use-wallet-pera'
 import {
   WalletManager,
   LogLevel
 } from '@txnlab/use-wallet'
-import { pera } from '@txnlab/use-wallet-pera'
 import { walletConnect } from '@txnlab/use-wallet-walletconnect'
 
 const manager = new WalletManager({
