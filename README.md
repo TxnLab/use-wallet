@@ -20,12 +20,12 @@ A framework-agnostic Algorand wallet integration library with reactive adapters 
 Install the framework adapter (or the core package for vanilla JS/TS) plus the wallet adapters you want to support:
 
 ```bash
-npm install @txnlab/use-wallet-react @txnlab/use-wallet-pera @txnlab/use-wallet-defly algosdk
+npm install @txnlab/use-wallet-react @perawallet/use-wallet-pera @txnlab/use-wallet-defly algosdk
 ```
 
 ```tsx
+import { pera } from '@perawallet/use-wallet-pera'
 import { WalletManager, WalletProvider, useWallet } from '@txnlab/use-wallet-react'
-import { pera } from '@txnlab/use-wallet-pera'
 import { defly } from '@txnlab/use-wallet-defly'
 
 const manager = new WalletManager({
@@ -52,7 +52,7 @@ function App() {
 | [`@txnlab/use-wallet-solid`](https://www.npmjs.com/package/@txnlab/use-wallet-solid)   | SolidJS adapter                   |
 | [`@txnlab/use-wallet-svelte`](https://www.npmjs.com/package/@txnlab/use-wallet-svelte) | Svelte adapter                    |
 
-Wallet adapters: [Pera](https://www.npmjs.com/package/@txnlab/use-wallet-pera) · [Defly](https://www.npmjs.com/package/@txnlab/use-wallet-defly) · [Exodus](https://www.npmjs.com/package/@txnlab/use-wallet-exodus) · [Kibisis](https://www.npmjs.com/package/@txnlab/use-wallet-kibisis) · [KMD](https://www.npmjs.com/package/@txnlab/use-wallet-kmd) · [Lute](https://www.npmjs.com/package/@galaxypay/use-wallet-lute) · [Mnemonic](https://www.npmjs.com/package/@txnlab/use-wallet-mnemonic) · [W3 Wallet](https://www.npmjs.com/package/@txnlab/use-wallet-w3wallet) · [WalletConnect](https://www.npmjs.com/package/@txnlab/use-wallet-walletconnect) · [Web3Auth](https://www.npmjs.com/package/@txnlab/use-wallet-web3auth)
+Wallet adapters: [Pera](https://www.npmjs.com/package/@perawallet/use-wallet-pera) · [Defly](https://www.npmjs.com/package/@txnlab/use-wallet-defly) · [Exodus](https://www.npmjs.com/package/@txnlab/use-wallet-exodus) · [Kibisis](https://www.npmjs.com/package/@txnlab/use-wallet-kibisis) · [KMD](https://www.npmjs.com/package/@txnlab/use-wallet-kmd) · [Lute](https://www.npmjs.com/package/@galaxypay/use-wallet-lute) · [Mnemonic](https://www.npmjs.com/package/@txnlab/use-wallet-mnemonic) · [W3 Wallet](https://www.npmjs.com/package/@txnlab/use-wallet-w3wallet) · [WalletConnect](https://www.npmjs.com/package/@txnlab/use-wallet-walletconnect) · [Web3Auth](https://www.npmjs.com/package/@txnlab/use-wallet-web3auth)
 
 A `custom` provider (built into core) supports integrating any other wallet, and third-party adapter packages work without changes to this repository — see the [supported wallets](https://txnlab.gitbook.io/use-wallet/getting-started/supported-wallets) docs.
 

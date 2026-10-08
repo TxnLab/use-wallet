@@ -23,8 +23,8 @@ After installing the package and any required wallet adapters (see [Installation
 ```typescript
 // main.ts
 import { createApp } from 'vue'
+import { pera } from '@perawallet/use-wallet-pera'
 import { WalletManagerPlugin } from '@txnlab/use-wallet-vue'
-import { pera } from '@txnlab/use-wallet-pera'
 import { defly } from '@txnlab/use-wallet-defly'
 import App from './App.vue'
 

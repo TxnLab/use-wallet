@@ -58,7 +58,7 @@ All 14 publishable packages use lockstep versioning — every package shares the
 
 **Wallet Adapters** (`packages/wallets/<name>`):
 
-- `@txnlab/use-wallet-pera`, `-defly`, `-exodus`, `-walletconnect`, `-kibisis`, `-lute`, `-w3wallet`, `-kmd`, `-mnemonic`, `-web3auth`
+- `@txnlab/use-wallet-defly`, `-exodus`, `-walletconnect`, `-kibisis`, `-w3wallet`, `-kmd`, `-mnemonic`, `-web3auth`
 - Each is a separate npm package that bundles its wallet SDK as a regular dependency
 - Depends on `@txnlab/use-wallet` via `workspace:*`
 

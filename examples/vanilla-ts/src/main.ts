@@ -1,5 +1,6 @@
 import { lute } from '@galaxypay/use-wallet-lute'
 import * as ed from '@noble/ed25519'
+import { pera } from '@perawallet/use-wallet-pera'
 import {
   ScopeType,
   SignDataError,
@@ -12,7 +13,6 @@ import { exodus } from '@txnlab/use-wallet-exodus'
 import { kibisis } from '@txnlab/use-wallet-kibisis'
 import { kmd } from '@txnlab/use-wallet-kmd'
 import { mnemonic } from '@txnlab/use-wallet-mnemonic'
-import { pera } from '@txnlab/use-wallet-pera'
 import { w3wallet } from '@txnlab/use-wallet-w3wallet'
 import { walletConnect } from '@txnlab/use-wallet-walletconnect'
 import { web3auth } from '@txnlab/use-wallet-web3auth'
