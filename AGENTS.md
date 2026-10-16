@@ -50,7 +50,7 @@ pnpm example:ts           # Vanilla TypeScript example
 
 ### Package Structure (pnpm monorepo)
 
-All 14 publishable packages use lockstep versioning — every package shares the same version number.
+All 13 publishable packages use lockstep versioning — every package shares the same version number.
 
 **Core** (`packages/core`):
 

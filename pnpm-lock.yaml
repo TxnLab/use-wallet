@@ -105,7 +105,7 @@ importers:
         specifier: 3.2.0
         version: 3.2.0
       '@perawallet/use-wallet-pera':
-        specifier: ^1.0.0
+        specifier: 1.0.0
         version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.8.0)
       '@txnlab/use-wallet':
         specifier: workspace:*
@@ -181,7 +181,7 @@ importers:
         specifier: 3.2.0
         version: 3.2.0
       '@perawallet/use-wallet-pera':
-        specifier: ^1.0.0
+        specifier: 1.0.0
         version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.8.0)
       '@txnlab/use-wallet':
         specifier: workspace:*
@@ -248,7 +248,7 @@ importers:
         specifier: 3.2.0
         version: 3.2.0
       '@perawallet/use-wallet-pera':
-        specifier: ^1.0.0
+        specifier: 1.0.0
         version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.8.0)
       '@txnlab/use-wallet':
         specifier: workspace:*
@@ -348,7 +348,7 @@ importers:
         specifier: 3.2.0
         version: 3.2.0
       '@perawallet/use-wallet-pera':
-        specifier: ^1.0.0
+        specifier: 1.0.0
         version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.8.0)
       '@txnlab/use-wallet':
         specifier: workspace:*
@@ -421,7 +421,7 @@ importers:
         specifier: 3.2.0
         version: 3.2.0
       '@perawallet/use-wallet-pera':
-        specifier: ^1.0.0
+        specifier: 1.0.0
         version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.8.0)
       '@txnlab/use-wallet':
         specifier: workspace:*
@@ -500,7 +500,7 @@ importers:
         specifier: 3.2.0
         version: 3.2.0
       '@perawallet/use-wallet-pera':
-        specifier: ^1.0.0
+        specifier: 1.0.0
         version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.8.0)
       '@txnlab/use-wallet':
         specifier: workspace:*
@@ -561,7 +561,7 @@ importers:
         specifier: 3.2.0
         version: 3.2.0
       '@perawallet/use-wallet-pera':
-        specifier: ^1.0.0
+        specifier: 1.0.0
         version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.8.0)
       '@txnlab/use-wallet':
         specifier: workspace:*
