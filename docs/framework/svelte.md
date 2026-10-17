@@ -21,8 +21,8 @@ The Svelte adapter (`@txnlab/use-wallet-svelte`) provides primitives for integra
 After installing the package and any required wallet adapters (see [Installation](../getting-started/installation.md)) and [configuring your WalletManager](../getting-started/configuration.md), call `useWalletContext` in your base `+layout.svelte`:
 
 ```ts
+import { pera } from '@perawallet/use-wallet-pera'
 import { useWalletContext, WalletManager } from '@txnlab/use-wallet-svelte'
-import { pera } from '@txnlab/use-wallet-pera'
 import { defly } from '@txnlab/use-wallet-defly'
 
 // Create manager instance (see Configuration guide)
