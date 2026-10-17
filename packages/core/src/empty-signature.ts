@@ -1,5 +1,6 @@
 import algosdk from 'algosdk'
 import { base64ToByteArray, byteArrayToBase64 } from 'src/utils'
+import type { SignDataScheme } from 'src/wallets/types'
 
 /**
  * The signature fields of a `SignedTransaction`, i.e. everything but `txn`.
@@ -87,25 +88,61 @@ export function decodeEmptySignature(emptySignature: string): EmptySignatureFiel
   ) as EmptySignatureFields
 }
 
+function tryDecodeEmptySignature(
+  emptySignature: string | undefined
+): EmptySignatureFields | undefined {
+  if (emptySignature === undefined) {
+    return undefined
+  }
+
+  try {
+    return decodeEmptySignature(emptySignature)
+  } catch {
+    return undefined
+  }
+}
+
 /**
  * Returns the kind of signature an account's empty signature represents, or
  * `undefined` if the account type is unknown or the empty signature can't be
  * decoded.
  */
 export function getSignatureType(emptySignature: string | undefined): SignatureType | undefined {
-  if (emptySignature === undefined) {
-    return undefined
-  }
-
-  let fields: EmptySignatureFields
-  try {
-    fields = decodeEmptySignature(emptySignature)
-  } catch {
-    return undefined
-  }
+  const fields = tryDecodeEmptySignature(emptySignature)
+  if (!fields) return undefined
 
   if (fields.pqsig) return 'pqsig'
   if (fields.lsig) return 'lsig'
   if (fields.msig) return 'msig'
   return 'sig'
+}
+
+/**
+ * Returns the ARC-60 scheme for a post-quantum signature's scheme, or
+ * `undefined` if ARC-60 doesn't name it.
+ */
+export function getPQSignDataScheme(
+  pqsig: NonNullable<EmptySignatureFields['pqsig']>
+): SignDataScheme | undefined {
+  if (byteArrayToBase64(pqsig.sch) === byteArrayToBase64(algosdk.FALCON_1024_SCHEME)) {
+    return 'falcon-1024-det'
+  }
+  return undefined
+}
+
+/**
+ * Returns the ARC-60 `signData` scheme an account signs with, from its empty
+ * signature: `ed25519` for a single ed25519 key, `falcon-1024-det` for a
+ * Falcon-1024 key. Use it to set a SIWA payload's `type`.
+ *
+ * Returns `undefined` for accounts that can't sign data (multisig, logic sig),
+ * an unknown post-quantum scheme, or an unknown or invalid empty signature.
+ */
+export function getSignDataScheme(emptySignature: string | undefined): SignDataScheme | undefined {
+  const fields = tryDecodeEmptySignature(emptySignature)
+  if (!fields) return undefined
+
+  if (fields.pqsig) return getPQSignDataScheme(fields.pqsig)
+  if (fields.lsig || fields.msig) return undefined
+  return 'ed25519'
 }

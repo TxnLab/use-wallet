@@ -1,4 +1,8 @@
-import { decodeEmptySignature, type EmptySignatureFields } from 'src/empty-signature'
+import {
+  decodeEmptySignature,
+  getPQSignDataScheme,
+  type EmptySignatureFields
+} from 'src/empty-signature'
 import { logger } from 'src/logger'
 import { NetworkConfig } from 'src/network'
 import type { State } from 'src/store'
@@ -181,6 +185,10 @@ export abstract class BaseWallet<TOptions = Record<string, unknown>> {
    * The signer public key is resolved via algod so that rekeyed accounts
    * sign with their auth address, and the authenticator data is the
    * SHA-256 hash of the current domain.
+   *
+   * For a post-quantum account, the signer is the public key from its empty
+   * signature and `scheme` is set (see `getSignDataScheme`). For ed25519,
+   * `scheme` is omitted, which ARC-60 defines as ed25519.
    */
   protected createStdSignData = async (data: string): Promise<StdSignData> => {
     const activeAddress = this.activeAddress
@@ -189,11 +197,12 @@ export abstract class BaseWallet<TOptions = Record<string, unknown>> {
       throw new SignDataError('No active account', 4100)
     }
 
-    // ARC-60's `signer` is an ed25519 public key, so post-quantum accounts can't
-    // sign data until the ARC supports other key types
-    if (this.getEmptySignatureFields(activeAddress)?.pqsig) {
-      this.logger.error('signData is not supported for post-quantum accounts')
-      throw new SignDataError('signData is not supported for post-quantum accounts', 4200)
+    const pqsig = this.getEmptySignatureFields(activeAddress)?.pqsig
+    const scheme = pqsig ? getPQSignDataScheme(pqsig) : 'ed25519'
+    if (!scheme) {
+      const message = 'signData does not support this post-quantum signature scheme'
+      this.logger.error(message)
+      throw new SignDataError(message, 4601)
     }
 
     const domain = location.host
@@ -202,10 +211,27 @@ export abstract class BaseWallet<TOptions = Record<string, unknown>> {
 
     const algodClient = this.getAlgodClient()
     const acctInfo = await algodClient.accountInformation(activeAddress).do()
-    const signer =
-      acctInfo.authAddr?.publicKey ?? algosdk.Address.fromString(activeAddress).publicKey
+    const authAddr = acctInfo.authAddr ?? algosdk.Address.fromString(activeAddress)
 
-    return { data, signer, domain, authenticatorData }
+    // Omit `scheme` for ed25519 so wallets that predate it keep working
+    if (!pqsig) {
+      return { data, signer: authAddr.publicKey, domain, authenticatorData }
+    }
+
+    // The account may have been rekeyed since its wallet advertised this key
+    let pqAddress: string | undefined
+    try {
+      pqAddress = algosdk.addressFromPQSig(pqsig).toString()
+    } catch {
+      // A malformed pqsig authorizes nothing
+    }
+    if (pqAddress !== authAddr.toString()) {
+      const message = `Account ${activeAddress} is not authorized by its post-quantum key; reconnect the wallet`
+      this.logger.error(message)
+      throw new SignDataError(message, 4603)
+    }
+
+    return { data, signer: pqsig.pk, domain, authenticatorData, scheme }
   }
 
   /**

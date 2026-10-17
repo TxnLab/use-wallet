@@ -30,7 +30,8 @@ export type {
   StdSignDataResponse,
   StdSignMetadata,
   JsonRpcRequest,
-  Siwa
+  Siwa,
+  SignDataScheme
 } from './wallets/types'
 
 export { ScopeType, SignTxnsError, SignDataError } from './wallets/types'
@@ -60,6 +61,7 @@ export {
   encodeEmptySignature,
   decodeEmptySignature,
   getSignatureType,
+  getSignDataScheme,
   type EmptySignatureFields,
   type SignatureType
 } from './empty-signature'
