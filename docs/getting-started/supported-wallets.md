@@ -22,8 +22,10 @@ Use-wallet supports several popular Algorand wallets. This guide covers the avai
 
 Mobile-first wallet with robust dApp integration features.
 
+Maintained by Pera ([source](https://github.com/perawallet/use-wallet-pera)).
+
 ```typescript
-import { pera } from '@txnlab/use-wallet-pera'
+import { pera } from '@perawallet/use-wallet-pera'
 
 // Basic usage (no options required)
 pera()
@@ -31,9 +33,11 @@ pera()
 // With optional configuration
 pera({
   shouldShowSignTxnToast?: boolean,
-  chainId?: number // Defaults to active network
+  chainId?: number // Defaults to 4160 (any network)
 })
 ```
+
+`pera()` passes every `PeraWalletConnect` option through. See the [adapter's README](https://github.com/perawallet/use-wallet-pera#usage) for the full list.
 
 * [Pera Website](https://perawallet.app)
 * [Pera Connect Documentation](https://github.com/perawallet/connect)

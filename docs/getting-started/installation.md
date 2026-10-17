@@ -170,14 +170,14 @@ Each wallet is provided as a separate adapter package. Install only the adapters
 
 ```bash
 # Install the adapters for the wallets you want to support
-npm install @txnlab/use-wallet-pera @txnlab/use-wallet-defly
+npm install @perawallet/use-wallet-pera @txnlab/use-wallet-defly
 ```
 
 #### Available Adapter Packages
 
 | Adapter Package | Wallet |
 |----------------|--------|
-| `@txnlab/use-wallet-pera` | Pera Wallet |
+| `@perawallet/use-wallet-pera` | Pera Wallet |
 | `@txnlab/use-wallet-defly` | Defly Wallet |
 | `@txnlab/use-wallet-exodus` | Exodus |
 | `@txnlab/use-wallet-walletconnect` | WalletConnect (+ skins: Biatec, Voi) |

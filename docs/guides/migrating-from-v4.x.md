@@ -38,8 +38,8 @@ In v5, wallet SDKs are bundled inside their adapter packages. You install the fr
 ```bash
 # v5 pattern
 npm install @txnlab/use-wallet-react algosdk
-npm install @txnlab/use-wallet-pera @txnlab/use-wallet-defly @galaxypay/use-wallet-lute  # adapter packages
-# @perawallet/connect is a dependency of @txnlab/use-wallet-pera — no manual install needed
+npm install @perawallet/use-wallet-pera @txnlab/use-wallet-defly @galaxypay/use-wallet-lute  # adapter packages
+# @perawallet/connect is a dependency of @perawallet/use-wallet-pera — no manual install needed
 ```
 
 {% hint style="info" %}
@@ -111,25 +111,25 @@ bun add @txnlab/use-wallet-svelte@^5.0.0
 {% tabs %}
 {% tab title="npm" %}
 ```bash
-npm install @txnlab/use-wallet-pera @txnlab/use-wallet-defly @galaxypay/use-wallet-lute
+npm install @perawallet/use-wallet-pera @txnlab/use-wallet-defly @galaxypay/use-wallet-lute
 ```
 {% endtab %}
 
 {% tab title="yarn" %}
 ```bash
-yarn add @txnlab/use-wallet-pera @txnlab/use-wallet-defly @galaxypay/use-wallet-lute
+yarn add @perawallet/use-wallet-pera @txnlab/use-wallet-defly @galaxypay/use-wallet-lute
 ```
 {% endtab %}
 
 {% tab title="pnpm" %}
 ```bash
-pnpm add @txnlab/use-wallet-pera @txnlab/use-wallet-defly @galaxypay/use-wallet-lute
+pnpm add @perawallet/use-wallet-pera @txnlab/use-wallet-defly @galaxypay/use-wallet-lute
 ```
 {% endtab %}
 
 {% tab title="bun" %}
 ```bash
-bun add @txnlab/use-wallet-pera @txnlab/use-wallet-defly @galaxypay/use-wallet-lute
+bun add @perawallet/use-wallet-pera @txnlab/use-wallet-defly @galaxypay/use-wallet-lute
 ```
 {% endtab %}
 {% endtabs %}
@@ -144,7 +144,7 @@ npm uninstall @perawallet/connect @blockshake/defly-connect lute-connect
 
 | Package | Wallet |
 |---------|--------|
-| `@txnlab/use-wallet-pera` | Pera Wallet |
+| `@perawallet/use-wallet-pera` | Pera Wallet |
 | `@txnlab/use-wallet-defly` | Defly Wallet |
 | `@txnlab/use-wallet-exodus` | Exodus |
 | `@txnlab/use-wallet-walletconnect` | WalletConnect (+ skins: Biatec, Voi) |
@@ -188,8 +188,8 @@ const manager = new WalletManager({
 
 ```typescript
 import { lute } from '@galaxypay/use-wallet-lute'
+import { pera } from '@perawallet/use-wallet-pera'
 import { WalletManager } from '@txnlab/use-wallet'
-import { pera } from '@txnlab/use-wallet-pera'
 import { defly } from '@txnlab/use-wallet-defly'
 import { walletConnect } from '@txnlab/use-wallet-walletconnect'
 
@@ -294,7 +294,7 @@ import { WalletId } from '@txnlab/use-wallet'
 const id = WalletId.PERA // enum value
 
 // v5 — if you need a wallet ID string
-import { WALLET_ID } from '@txnlab/use-wallet-pera'
+import { WALLET_ID } from '@perawallet/use-wallet-pera'
 // WALLET_ID === 'pera'
 ```
 
@@ -429,8 +429,8 @@ Framework-specific setup (providers, plugins, context) remains the same:
 {% tabs %}
 {% tab title="React" %}
 ```tsx
+import { pera } from '@perawallet/use-wallet-pera'
 import { WalletManager, WalletProvider } from '@txnlab/use-wallet-react'
-import { pera } from '@txnlab/use-wallet-pera'
 import { defly } from '@txnlab/use-wallet-defly'
 
 const manager = new WalletManager({
@@ -451,8 +451,8 @@ function App() {
 {% tab title="Vue" %}
 ```typescript
 import { createApp } from 'vue'
+import { pera } from '@perawallet/use-wallet-pera'
 import { WalletManagerPlugin } from '@txnlab/use-wallet-vue'
-import { pera } from '@txnlab/use-wallet-pera'
 import { defly } from '@txnlab/use-wallet-defly'
 import App from './App.vue'
 
@@ -469,9 +469,9 @@ app.mount('#app')
 
 {% tab title="Solid" %}
 ```tsx
+import { pera } from '@perawallet/use-wallet-pera'
 import { WalletProvider } from '@txnlab/use-wallet-solid'
 import { WalletManager } from '@txnlab/use-wallet'
-import { pera } from '@txnlab/use-wallet-pera'
 import { defly } from '@txnlab/use-wallet-defly'
 
 const manager = new WalletManager({
@@ -491,8 +491,8 @@ function App() {
 
 {% tab title="Svelte" %}
 ```typescript
+import { pera } from '@perawallet/use-wallet-pera'
 import { WalletManager } from '@txnlab/use-wallet'
-import { pera } from '@txnlab/use-wallet-pera'
 import { defly } from '@txnlab/use-wallet-defly'
 
 const manager = new WalletManager({
