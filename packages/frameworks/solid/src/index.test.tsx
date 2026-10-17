@@ -10,6 +10,7 @@ import {
 } from '@txnlab/use-wallet'
 import { For } from 'solid-js'
 import { WalletProvider, useWallet, useWalletManager, useNetwork } from './index'
+import type { ResolvedWalletAccount, ResolvedWalletManager } from './index'
 
 const mocks = vi.hoisted(() => {
   return {
@@ -715,5 +716,78 @@ describe('useWallet - availableWallets', () => {
     await waitFor(() => {
       expect(screen.getByTestId('available-count')).toHaveTextContent('2')
     })
+  })
+})
+
+describe('Register - account type resolution', () => {
+  // Type-level equality assertion: `Eq<A, B>` resolves to the literal type
+  // `true` only when A and B are identical, so `const x: Eq<A, B> = true`
+  // fails to compile if the inference ever regresses.
+  type Eq<A, B> = (<G>() => G extends A ? 1 : 2) extends <G>() => G extends B ? 1 : 2 ? true : false
+
+  interface QuantumAccount extends WalletAccount {
+    kind: 'quantum'
+    handleQuantumOperation: () => string
+  }
+
+  interface ClassicAccount extends WalletAccount {
+    kind: 'classic'
+    legacyId: number
+  }
+
+  it('defaults to the base WalletAccount without a Register declaration', () => {
+    const manager = new WalletManager({
+      wallets: [mockAdapterA()]
+    })
+
+    let checks = false
+    const TestComponent = () => {
+      const { activeAccount, wallets } = useWallet()
+
+      const activeAccountType: Eq<ReturnType<typeof activeAccount>, WalletAccount | null> = true
+      const accountsType: Eq<ReturnType<typeof wallets>[number]['accounts'], WalletAccount[]> = true
+      checks = activeAccountType && accountsType && activeAccount() === null
+
+      return <div data-testid="wallet-count">{wallets().length}</div>
+    }
+
+    render(() => (
+      <WalletProvider manager={manager}>
+        <TestComponent />
+      </WalletProvider>
+    ))
+
+    expect(checks).toBe(true)
+    expect(screen.getByTestId('wallet-count')).toHaveTextContent('1')
+  })
+
+  it('resolves the account union from a registered manager type', () => {
+    // Classic construction with an explicitly declared union;
+    // `WalletManager.create({ wallets: [...] })` infers the same shape
+    // from the adapter configs (covered by the core test suite)
+    const manager = new WalletManager<QuantumAccount | ClassicAccount>({
+      wallets: [mockAdapterA()]
+    })
+
+    // The resolution chain the public hook uses: a `Register` declaration
+    // carrying `typeof manager` resolves to the manager type and its
+    // account union (apps write `declare module '@txnlab/use-wallet-solid'
+    // { interface Register { manager: typeof manager } }`)
+    const resolvedManager: Eq<
+      ResolvedWalletManager<{ manager: typeof manager }>,
+      WalletManager<QuantumAccount | ClassicAccount>
+    > = true
+    const resolvedAccount: Eq<
+      ResolvedWalletAccount<{ manager: typeof manager }>,
+      QuantumAccount | ClassicAccount
+    > = true
+
+    // Without a registration, resolution falls back to the base types
+    const unregisteredManager: Eq<ResolvedWalletManager, WalletManager> = true
+    const unregisteredAccount: Eq<ResolvedWalletAccount, WalletAccount> = true
+
+    expect(manager).toBeInstanceOf(WalletManager)
+    expect(resolvedManager && resolvedAccount).toBe(true)
+    expect(unregisteredManager && unregisteredAccount).toBe(true)
   })
 })
