@@ -5,6 +5,7 @@ import { createMockAlgodClient, createTestHarness } from 'src/testing'
 import { BaseWallet } from 'src/wallets/base'
 import { SignDataError } from 'src/wallets/types'
 import type { AdapterConstructorParams, WalletAccount } from 'src/wallets/types'
+import type { MockInstance } from 'vitest'
 
 vi.mock('src/logger', () => ({
   logger: {
@@ -54,11 +55,14 @@ function makeTxn(sender: string | algosdk.Address) {
   })
 }
 
-function makeFalconAccount() {
-  return algosdk.addressWithSignersFromRawFalcon1024Signer({
-    falcon1024PublicKey: crypto.getRandomValues(new Uint8Array(1793)),
-    falcon1024Signer: async () => new Uint8Array(0)
-  })
+function makeFalconAccount(sendingAddress?: algosdk.Address) {
+  return algosdk.addressWithSignersFromRawFalcon1024Signer(
+    {
+      falcon1024PublicKey: crypto.getRandomValues(new Uint8Array(1793)),
+      falcon1024Signer: async () => new Uint8Array(0)
+    },
+    sendingAddress
+  )
 }
 
 function createWalletWithStore(accounts: WalletAccount[]) {
@@ -129,25 +133,178 @@ describe('emptyTransactionSigner', () => {
 })
 
 describe('createStdSignData', () => {
-  it('throws for a post-quantum account', async () => {
-    const falcon = makeFalconAccount()
-    const [stxn] = await falcon.emptyTxnSigner([makeTxn(falcon.address)], [0])
-    const { pqsig } = algosdk.decodeSignedTransaction(stxn)
+  const domain = 'arc60.example'
+  let accountInformation: MockInstance<algosdk.Algodv2['accountInformation']>
+
+  beforeEach(() => {
+    vi.stubGlobal('location', { host: domain })
+    accountInformation = vi.spyOn(algosdk.Algodv2.prototype, 'accountInformation')
+    mockAuthAddr(null)
+  })
+
+  afterEach(() => {
+    accountInformation.mockRestore()
+    vi.unstubAllGlobals()
+  })
+
+  /** Stubs algod's account information with the given auth address */
+  function mockAuthAddr(authAddr: algosdk.Address | null) {
+    accountInformation.mockReturnValue({
+      do: () => Promise.resolve({ authAddr: authAddr ?? undefined })
+    } as unknown as ReturnType<algosdk.Algodv2['accountInformation']>)
+  }
+
+  /** An account's pqsig and empty signature, taken from algosdk's own empty signer */
+  async function getEmptySignature(account: algosdk.AddressWithEmptyTransactionSigner) {
+    const [stxn] = await account.emptyTxnSigner([makeTxn(account.address)], [0])
+    const { pqsig, sgnr } = algosdk.decodeSignedTransaction(stxn)
+    return {
+      pqsig: pqsig!,
+      emptySignature: encodeEmptySignature({ pqsig: pqsig!, ...(sgnr && { sgnr }) })
+    }
+  }
+
+  async function sha256(text: string) {
+    return new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)))
+  }
+
+  it.each([
+    ['an ed25519', 'gA=='],
+    ['an unknown', undefined]
+  ])("signs with %s account's key and omits scheme", async (_, emptySignature) => {
+    const address = algosdk.generateAccount().addr
+    const wallet = createWallet([
+      { name: 'A', address: address.toString(), ...(emptySignature && { emptySignature }) }
+    ])
+
+    const result = await wallet.createStdSignDataForTest('data')
+
+    expect(result).toEqual({
+      data: 'data',
+      signer: address.publicKey,
+      domain,
+      authenticatorData: await sha256(domain)
+    })
+    expect(result).not.toHaveProperty('scheme')
+    expect(accountInformation).toHaveBeenCalledWith(address.toString())
+  })
+
+  it("signs with a rekeyed ed25519 account's auth key and omits scheme", async () => {
+    const address = algosdk.generateAccount().addr
+    const authAddr = algosdk.generateAccount().addr
+    mockAuthAddr(authAddr)
     const wallet = createWallet([
       {
-        name: 'PQ',
-        address: falcon.address.toString(),
-        emptySignature: encodeEmptySignature({ pqsig: pqsig! })
+        name: 'A',
+        address: address.toString(),
+        emptySignature: encodeEmptySignature({ sgnr: authAddr })
       }
+    ])
+
+    const result = await wallet.createStdSignDataForTest('data')
+
+    expect(result.signer).toEqual(authAddr.publicKey)
+    expect(result).not.toHaveProperty('scheme')
+  })
+
+  // Unchanged from before ARC-60 had schemes: only pqsig accounts get one
+  it.each([
+    [
+      'multisig',
+      { msig: { v: 1, thr: 1, subsig: [{ pk: algosdk.generateAccount().addr.publicKey }] } }
+    ],
+    ['logic sig', { lsig: new algosdk.LogicSig(new Uint8Array([0x06, 0x81, 0x01])) }]
+  ])("signs with a %s account's address key and omits scheme", async (_, fields) => {
+    const address = algosdk.generateAccount().addr
+    const wallet = createWallet([
+      { name: 'A', address: address.toString(), emptySignature: encodeEmptySignature(fields) }
+    ])
+
+    const result = await wallet.createStdSignDataForTest('data')
+
+    expect(result.signer).toEqual(address.publicKey)
+    expect(result).not.toHaveProperty('scheme')
+  })
+
+  it('signs with the Falcon public key and falcon-1024-det scheme', async () => {
+    const falcon = makeFalconAccount()
+    const { pqsig, emptySignature } = await getEmptySignature(falcon)
+    const wallet = createWallet([
+      { name: 'PQ', address: falcon.address.toString(), emptySignature }
+    ])
+
+    const result = await wallet.createStdSignDataForTest('data')
+
+    expect(result).toEqual({
+      data: 'data',
+      signer: pqsig.pk,
+      domain,
+      authenticatorData: await sha256(domain),
+      scheme: 'falcon-1024-det'
+    })
+    expect(result.signer).toHaveLength(1793)
+  })
+
+  it('signs with the Falcon key of an account rekeyed to it', async () => {
+    const address = algosdk.generateAccount().addr
+    const falcon = makeFalconAccount(address)
+    const { pqsig, emptySignature } = await getEmptySignature(falcon)
+    mockAuthAddr(algosdk.addressFromPQSig(pqsig))
+    const wallet = createWallet([{ name: 'PQ', address: address.toString(), emptySignature }])
+
+    const result = await wallet.createStdSignDataForTest('data')
+
+    expect(result.signer).toEqual(pqsig.pk)
+    expect(result.scheme).toBe('falcon-1024-det')
+  })
+
+  it('throws 4603 when the account was rekeyed away from its Falcon key', async () => {
+    const falcon = makeFalconAccount()
+    const { emptySignature } = await getEmptySignature(falcon)
+    mockAuthAddr(algosdk.generateAccount().addr)
+    const wallet = createWallet([
+      { name: 'PQ', address: falcon.address.toString(), emptySignature }
     ])
 
     const result = wallet.createStdSignDataForTest('data')
 
     await expect(result).rejects.toThrow(SignDataError)
     await expect(result).rejects.toMatchObject({
-      code: 4200,
-      message: 'signData is not supported for post-quantum accounts'
+      code: 4603,
+      message: `Account ${falcon.address} is not authorized by its post-quantum key; reconnect the wallet`
     })
+  })
+
+  it('throws 4603 for a pqsig with a non-canonical salt', async () => {
+    const falcon = makeFalconAccount()
+    const { pqsig } = await getEmptySignature(falcon)
+    const emptySignature = encodeEmptySignature({ pqsig: { ...pqsig, slt: pqsig.slt + 1 } })
+    const wallet = createWallet([
+      { name: 'PQ', address: falcon.address.toString(), emptySignature }
+    ])
+
+    await expect(wallet.createStdSignDataForTest('data')).rejects.toMatchObject({ code: 4603 })
+  })
+
+  it('throws 4601 for a post-quantum scheme ARC-60 does not name, without querying algod', async () => {
+    const falcon512 = algosdk.addressWithSignersFromRawPQSigner({
+      pqScheme: new TextEncoder().encode('f5'),
+      pqPublicKey: crypto.getRandomValues(new Uint8Array(897)),
+      pqSigner: async () => new Uint8Array(0)
+    })
+    const { emptySignature } = await getEmptySignature(falcon512)
+    const wallet = createWallet([
+      { name: 'PQ', address: falcon512.address.toString(), emptySignature }
+    ])
+
+    const result = wallet.createStdSignDataForTest('data')
+
+    await expect(result).rejects.toThrow(SignDataError)
+    await expect(result).rejects.toMatchObject({
+      code: 4601,
+      message: 'signData does not support this post-quantum signature scheme'
+    })
+    expect(accountInformation).not.toHaveBeenCalled()
   })
 })
 

@@ -21,6 +21,7 @@ export {
   encodeEmptySignature,
   decodeEmptySignature,
   getSignatureType,
+  getSignDataScheme,
   type EmptySignatureFields,
   type SignatureType
 } from './empty-signature'

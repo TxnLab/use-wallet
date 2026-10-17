@@ -261,6 +261,12 @@ export class SignTxnsError extends Error {
 
 // ---------- signData Types ----------------------------------------- //
 
+/**
+ * An ARC-60 signing scheme that use-wallet can resolve for an account.
+ * @see getSignDataScheme
+ */
+export type SignDataScheme = 'ed25519' | 'falcon-1024-det'
+
 export interface Siwa {
   domain: string
   account_address: string
@@ -274,7 +280,8 @@ export interface Siwa {
   'request-id'?: string
   chain_id: string
   resources?: string[]
-  type: 'ed25519'
+  /** Must match the `scheme` the account signs with; see `getSignDataScheme` */
+  type: SignDataScheme
 }
 
 export class SignDataError extends Error {
@@ -296,6 +303,8 @@ export interface StdSignData {
   authenticatorData: Uint8Array
   requestId?: string
   hdPath?: string
+  /** ARC-60 signing scheme; omitted means `ed25519` */
+  scheme?: string
 }
 
 export interface StdSignDataResponse extends StdSignData {
