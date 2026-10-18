@@ -1,3 +1,10 @@
+# [5.1.0-next.2](https://github.com/TxnLab/use-wallet/compare/v5.1.0-next.1...v5.1.0-next.2) (2026-10-18)
+
+
+### Features
+
+* support Falcon signData with ARC-60 schemes ([#473](https://github.com/TxnLab/use-wallet/issues/473)) ([9154ed0](https://github.com/TxnLab/use-wallet/commit/9154ed094fe48507d5c073883596fc12523c335a)), closes [algorandfoundation/ARCs#494](https://github.com/algorandfoundation/ARCs/issues/494)
+
 # [5.1.0-next.1](https://github.com/TxnLab/use-wallet/compare/v5.0.1...v5.1.0-next.1) (2026-10-03)
 
 
