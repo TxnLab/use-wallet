@@ -60,7 +60,7 @@ All 13 publishable packages use lockstep versioning — every package shares the
 
 - `@txnlab/use-wallet-defly`, `-exodus`, `-walletconnect`, `-kibisis`, `-w3wallet`, `-kmd`, `-mnemonic`, `-web3auth`
 - Each is a separate npm package that bundles its wallet SDK as a regular dependency
-- Depends on `@txnlab/use-wallet` via `workspace:*`
+- Peer-depends on `@txnlab/use-wallet` via `workspace:^` (with `workspace:*` as a devDependency for local linking)
 
 **Framework Adapters** (`packages/frameworks/<name>`):
 
@@ -122,6 +122,14 @@ This project uses **semantic-release** for automated versioning and publishing. 
 - Use `chore`, `docs`, `test`, `ci`, or `build` prefixes for commits that should not trigger a release.
 - The `next` branch publishes pre-release versions (e.g., `5.1.0-next.N`) to the `next` npm tag. The `main` branch publishes stable versions to `latest`.
 
+### Prerelease flow (`next` branch)
+
+- Feature work for the next minor version targets `next`. Each release-type squash merge publishes a new `X.Y.Z-next.N` prerelease of every package.
+- Dependency updates (Renovate) target `main` as `chore(deps)` and reach `next` when `main` is synced into it.
+- **Syncing `main` into `next`** uses a merge commit, not a squash PR (squashing would drop `main`'s ancestry and cause conflicts at promotion). Branch from `origin/next`, `git merge --no-ff origin/main`, run the checks, then push the branch to `next` (requires a ruleset bypass).
+- **Promoting `next` to `main`** also uses a merge commit: temporarily allow merge commits in the "Release branches" ruleset, merge the `next` → `main` PR, then disallow them again. semantic-release publishes the stable version to `latest`. Afterwards, fast-forward `next` to `main` (the ruleset blocks deleting `next`).
+- `chore` commits are hidden from the generated changelog, so add notable `chore` changes (e.g., adapters moving to other maintainers) to the release notes by hand.
+
 ### Release pipeline
 
 1. Push to `main` or `next` triggers `.github/workflows/release.yml`
@@ -133,7 +141,12 @@ This project uses **semantic-release** for automated versioning and publishing. 
 
 ### Workspace references
 
-Internal dependencies use `workspace:*` in package.json files. This is resolved to concrete versions automatically by `pnpm publish` at publish time. Do not manually replace `workspace:*` with version strings — this breaks local development linking.
+Internal dependencies use `workspace:` references in package.json files, which `pnpm publish` resolves at publish time:
+
+- `workspace:*` publishes as the exact version (framework adapters' `dependencies`, all `devDependencies`).
+- `workspace:^` publishes as a caret range, e.g. `^5.1.0` (wallet adapters' `peerDependencies`, so an app's single copy of core satisfies every adapter).
+
+Do not manually replace `workspace:` references with version strings — this breaks local development linking.
 
 ## ESLint Configuration
 
