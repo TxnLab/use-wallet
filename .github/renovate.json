@@ -30,7 +30,6 @@
       "matchPackageNames": [
         "/@agoralabs-sh/avm-web-provider/",
         "/walletconnect/",
-        "/@perawallet/connect/",
         "/@blockshake/defly-connect/",
         "/@web3auth/",
         "/@w3hq/keychain-adapter/"

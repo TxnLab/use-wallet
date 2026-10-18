@@ -193,5 +193,5 @@ The Custom wallet adapter is built into `@txnlab/use-wallet` — no separate pac
 {% endhint %}
 
 {% hint style="info" %}
-Wallet SDK dependencies (e.g., `@perawallet/connect`) are bundled with each adapter package — you don't need to install them separately.
+Wallet SDK dependencies (e.g., `@blockshake/defly-connect`) are bundled with each adapter package — you don't need to install them separately.
 {% endhint %}
