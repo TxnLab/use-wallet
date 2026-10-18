@@ -8,24 +8,31 @@ The `useWallet` hook/composable/primitive provides a `signData` method for imple
 **Wallet Compatibility**
 
 Currently, the [Lute](../getting-started/supported-wallets.md#lute-wallet) and [Pera](../getting-started/supported-wallets.md#pera-wallet) wallet providers support ARC-60 data signing. Attempting to call `signData` with any other wallet provider will throw an error. You should check the wallet's `canSignData` capability before attempting to sign data.
+
+Post-quantum (Falcon-1024) accounts can sign data with wallets that support ARC-60's `scheme` field, such as Lute.
 {% endhint %}
 
 ### Implementation
 
-Here's how to implement ARC-60 authentication:
+Here's how to implement ARC-60 authentication. The examples verify ed25519 signatures with [`@noble/ed25519`](https://www.npmjs.com/package/@noble/ed25519) and Falcon signatures with [`falcon-1024`](https://www.npmjs.com/package/falcon-1024):
+
+```bash
+npm install @noble/ed25519 falcon-1024 canonify
+```
 
 {% tabs %}
 {% tab title="React" %}
 ```tsx
 import * as ed from '@noble/ed25519'
 import {
+  getSignDataScheme,
   ScopeType,
   SignDataError,
   useNetwork,
   useWallet,
   type Siwa
 } from '@txnlab/use-wallet-react'
-import { Address } from 'algosdk'
+import { Address, addressFromPQKey, FALCON_1024_SCHEME } from 'algosdk'
 import { canonify } from 'canonify'
 
 async function sha256(data: BufferSource) {
@@ -33,8 +40,26 @@ async function sha256(data: BufferSource) {
   return new Uint8Array(buf)
 }
 
+// A Falcon key must authorize the account: its address (or the account's auth
+// address, if rekeyed) is derived from the key
+async function verifyFalcon(
+  publicKey: Uint8Array,
+  signature: Uint8Array,
+  message: Uint8Array,
+  authAddr: Address
+) {
+  if (!addressFromPQKey(FALCON_1024_SCHEME, publicKey).address.equals(authAddr)) return false
+  const { verifyCompressed } = await import('falcon-1024')
+  try {
+    return verifyCompressed(publicKey, signature, message)
+  } catch {
+    // verifyCompressed throws for an invalid signature
+    return false
+  }
+}
+
 function Authenticate() {
-  const { activeAddress, algodClient, signData } = useWallet()
+  const { activeAccount, activeAddress, algodClient, signData } = useWallet()
   const { activeNetworkConfig } = useNetwork()
 
   const handleAuth = async () => {
@@ -46,7 +71,7 @@ function Authenticate() {
         domain: location.host,
         chain_id: activeNetworkConfig.caipChainId || 'algorand:localnet',
         account_address: activeAddress,
-        type: 'ed25519',
+        type: getSignDataScheme(activeAccount?.emptySignature) ?? 'ed25519',
         uri: location.origin,
         version: '1',
         'issued-at': new Date().toISOString()
@@ -61,12 +86,16 @@ function Authenticate() {
 
       // Verify signature
       const acctInfo = await algodClient.accountInformation(activeAddress).do()
-      const signer = acctInfo.authAddr?.publicKey ?? Address.fromString(activeAddress).publicKey
+      const authAddr = acctInfo.authAddr ?? Address.fromString(activeAddress)
       const enc = new TextEncoder()
       const clientDataJsonHash = await sha256(enc.encode(dataString))
       const authenticatorDataHash = await sha256(new Uint8Array(resp.authenticatorData))
       const toSign = new Uint8Array([...clientDataJsonHash, ...authenticatorDataHash])
-      if (!(await ed.verifyAsync(resp.signature, toSign, signer))) {
+      const verified =
+        siwaRequest.type === 'falcon-1024-det'
+          ? await verifyFalcon(resp.signer, resp.signature, toSign, authAddr)
+          : await ed.verifyAsync(resp.signature, toSign, authAddr.publicKey)
+      if (!verified) {
         throw new SignDataError('Verification Failed', 4300)
       }
 
@@ -88,21 +117,40 @@ function Authenticate() {
 <script setup lang="ts">
   import * as ed from '@noble/ed25519'
   import {
+    getSignDataScheme,
     ScopeType,
     SignDataError,
     useNetwork,
     useWallet,
     type Siwa
   } from '@txnlab/use-wallet-vue'
-  import { Address } from 'algosdk'
+  import { Address, addressFromPQKey, FALCON_1024_SCHEME } from 'algosdk'
   import { canonify } from 'canonify'
 
-  const { activeAddress, algodClient, signData } = useWallet()
+  const { activeAccount, activeAddress, algodClient, signData } = useWallet()
   const { activeNetworkConfig } = useNetwork()
 
   async function sha256(data: BufferSource) {
     const buf = await crypto.subtle.digest('SHA-256', data)
     return new Uint8Array(buf)
+  }
+
+  // A Falcon key must authorize the account: its address (or the account's auth
+  // address, if rekeyed) is derived from the key
+  async function verifyFalcon(
+    publicKey: Uint8Array,
+    signature: Uint8Array,
+    message: Uint8Array,
+    authAddr: Address
+  ) {
+    if (!addressFromPQKey(FALCON_1024_SCHEME, publicKey).address.equals(authAddr)) return false
+    const { verifyCompressed } = await import('falcon-1024')
+    try {
+      return verifyCompressed(publicKey, signature, message)
+    } catch {
+      // verifyCompressed throws for an invalid signature
+      return false
+    }
   }
 
   const handleAuth = async () => {
@@ -114,7 +162,7 @@ function Authenticate() {
         domain: location.host,
         chain_id: activeNetworkConfig.value.caipChainId || 'algorand:localnet',
         account_address: activeAddress.value,
-        type: 'ed25519',
+        type: getSignDataScheme(activeAccount.value?.emptySignature) ?? 'ed25519',
         uri: location.origin,
         version: '1',
         'issued-at': new Date().toISOString()
@@ -129,13 +177,16 @@ function Authenticate() {
 
       // Verify signature
       const acctInfo = await algodClient.value.accountInformation(activeAddress.value).do()
-      const signer =
-        acctInfo.authAddr?.publicKey ?? Address.fromString(activeAddress.value).publicKey
+      const authAddr = acctInfo.authAddr ?? Address.fromString(activeAddress.value)
       const enc = new TextEncoder()
       const clientDataJsonHash = await sha256(enc.encode(dataString))
       const authenticatorDataHash = await sha256(new Uint8Array(resp.authenticatorData))
       const toSign = new Uint8Array([...clientDataJsonHash, ...authenticatorDataHash])
-      if (!(await ed.verifyAsync(resp.signature, toSign, signer))) {
+      const verified =
+        siwaRequest.type === 'falcon-1024-det'
+          ? await verifyFalcon(resp.signer, resp.signature, toSign, authAddr)
+          : await ed.verifyAsync(resp.signature, toSign, authAddr.publicKey)
+      if (!verified) {
         throw new SignDataError('Verification Failed', 4300)
       }
 
@@ -156,13 +207,14 @@ function Authenticate() {
 ```tsx
 import * as ed from '@noble/ed25519'
 import {
+  getSignDataScheme,
   ScopeType,
   SignDataError,
   useNetwork,
   useWallet,
   type Siwa
 } from '@txnlab/use-wallet-solid'
-import { Address } from 'algosdk'
+import { Address, addressFromPQKey, FALCON_1024_SCHEME } from 'algosdk'
 import { canonify } from 'canonify'
 
 async function sha256(data: BufferSource) {
@@ -170,8 +222,26 @@ async function sha256(data: BufferSource) {
   return new Uint8Array(buf)
 }
 
+// A Falcon key must authorize the account: its address (or the account's auth
+// address, if rekeyed) is derived from the key
+async function verifyFalcon(
+  publicKey: Uint8Array,
+  signature: Uint8Array,
+  message: Uint8Array,
+  authAddr: Address
+) {
+  if (!addressFromPQKey(FALCON_1024_SCHEME, publicKey).address.equals(authAddr)) return false
+  const { verifyCompressed } = await import('falcon-1024')
+  try {
+    return verifyCompressed(publicKey, signature, message)
+  } catch {
+    // verifyCompressed throws for an invalid signature
+    return false
+  }
+}
+
 function Authenticate() {
-  const { activeAddress, algodClient, signData } = useWallet()
+  const { activeAccount, activeAddress, algodClient, signData } = useWallet()
   const { activeNetworkConfig } = useNetwork()
 
   const handleAuth = async () => {
@@ -184,7 +254,7 @@ function Authenticate() {
         domain: location.host,
         chain_id: activeNetworkConfig().caipChainId || 'algorand:localnet',
         account_address: address,
-        type: 'ed25519',
+        type: getSignDataScheme(activeAccount()?.emptySignature) ?? 'ed25519',
         uri: location.origin,
         version: '1',
         'issued-at': new Date().toISOString()
@@ -199,12 +269,16 @@ function Authenticate() {
 
       // Verify signature
       const acctInfo = await algodClient().accountInformation(address).do()
-      const signer = acctInfo.authAddr?.publicKey ?? Address.fromString(address).publicKey
+      const authAddr = acctInfo.authAddr ?? Address.fromString(address)
       const enc = new TextEncoder()
       const clientDataJsonHash = await sha256(enc.encode(dataString))
       const authenticatorDataHash = await sha256(new Uint8Array(resp.authenticatorData))
       const toSign = new Uint8Array([...clientDataJsonHash, ...authenticatorDataHash])
-      if (!(await ed.verifyAsync(resp.signature, toSign, signer))) {
+      const verified =
+        siwaRequest.type === 'falcon-1024-det'
+          ? await verifyFalcon(resp.signer, resp.signature, toSign, authAddr)
+          : await ed.verifyAsync(resp.signature, toSign, authAddr.publicKey)
+      if (!verified) {
         throw new SignDataError('Verification Failed', 4300)
       }
 
@@ -226,21 +300,40 @@ function Authenticate() {
 <script lang="ts">
   import * as ed from '@noble/ed25519'
   import {
+    getSignDataScheme,
     ScopeType,
     SignDataError,
     useNetwork,
     useWallet,
     type Siwa
   } from '@txnlab/use-wallet-svelte'
-  import { Address } from 'algosdk'
+  import { Address, addressFromPQKey, FALCON_1024_SCHEME } from 'algosdk'
   import { canonify } from 'canonify'
 
-  const { activeAddress, algodClient, signData } = useWallet()
+  const { activeAccount, activeAddress, algodClient, signData } = useWallet()
   const { activeNetworkConfig } = useNetwork()
 
   async function sha256(data: BufferSource) {
     const buf = await crypto.subtle.digest('SHA-256', data)
     return new Uint8Array(buf)
+  }
+
+  // A Falcon key must authorize the account: its address (or the account's auth
+  // address, if rekeyed) is derived from the key
+  async function verifyFalcon(
+    publicKey: Uint8Array,
+    signature: Uint8Array,
+    message: Uint8Array,
+    authAddr: Address
+  ) {
+    if (!addressFromPQKey(FALCON_1024_SCHEME, publicKey).address.equals(authAddr)) return false
+    const { verifyCompressed } = await import('falcon-1024')
+    try {
+      return verifyCompressed(publicKey, signature, message)
+    } catch {
+      // verifyCompressed throws for an invalid signature
+      return false
+    }
   }
 
   const handleAuth = async () => {
@@ -254,7 +347,7 @@ function Authenticate() {
         domain: location.host,
         chain_id: activeNetworkConfig.current.caipChainId || 'algorand:localnet',
         account_address: address,
-        type: 'ed25519',
+        type: getSignDataScheme(activeAccount.current?.emptySignature) ?? 'ed25519',
         uri: location.origin,
         version: '1',
         'issued-at': new Date().toISOString()
@@ -269,12 +362,16 @@ function Authenticate() {
 
       // Verify signature
       const acctInfo = await client.accountInformation(address).do()
-      const signer = acctInfo.authAddr?.publicKey ?? Address.fromString(address).publicKey
+      const authAddr = acctInfo.authAddr ?? Address.fromString(address)
       const enc = new TextEncoder()
       const clientDataJsonHash = await sha256(enc.encode(dataString))
       const authenticatorDataHash = await sha256(new Uint8Array(resp.authenticatorData))
       const toSign = new Uint8Array([...clientDataJsonHash, ...authenticatorDataHash])
-      if (!(await ed.verifyAsync(resp.signature, toSign, signer))) {
+      const verified =
+        siwaRequest.type === 'falcon-1024-det'
+          ? await verifyFalcon(resp.signer, resp.signature, toSign, authAddr)
+          : await ed.verifyAsync(resp.signature, toSign, authAddr.publicKey)
+      if (!verified) {
         throw new SignDataError('Verification Failed', 4300)
       }
 
@@ -297,7 +394,7 @@ function Authenticate() {
      * `domain` - The current host
      * `chain_id` - The [CAIP-2](https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-2.md) chain identifier for the active network, read from `activeNetworkConfig.caipChainId` (e.g. `algorand:wGHE2Pwdvd7S12BL5FaOP20EGYesN73k` for MainNet), falling back to `'algorand:localnet'` when a custom network has no CAIP chain ID
      * `account_address` - The user's wallet address
-     * `type` - The signature type (ed25519)
+     * `type` - The signing scheme of the account's key: `'ed25519'` or `'falcon-1024-det'`. `getSignDataScheme(activeAccount.emptySignature)` returns it from the empty signature the wallet advertised for the account when it connected, and the examples fall back to `'ed25519'` for wallets that don't advertise one. Wallets reject a request whose `type` doesn't match the scheme they sign with.
      * `uri` - The origin URL
      * `version` - The SIWA version
    * Optional Properties
@@ -313,22 +410,25 @@ function Authenticate() {
    * `scope` - Set to `ScopeType.AUTH` for authentication
    * `encoding` - Set to `'base64'` for the data format
    * The wallet adapter packages the data into an ARC-60 `StdSignData` object internally: it resolves the signer public key via the algod client (so rekeyed accounts sign with their auth address), sets `domain` to the current host, and derives `authenticatorData` from the SHA-256 hash of the domain.
+   * For a Falcon account, the signer is the account's Falcon public key and `scheme` is set to `'falcon-1024-det'`. Before calling the wallet, the adapter checks that the key authorizes the account on the active network, and throws a `SignDataError` (code 4603) if the account has been rekeyed away from it.
 3. **Verify Signature**: The signature is verified by:
-   * Resolving the signer public key the same way the adapter does — from the account's auth address if the account has been rekeyed (`acctInfo.authAddr?.publicKey`), otherwise from the active address
-   * Computing SHA-256 hashes of the client data and the `authenticatorData` returned in the response
-   * Combining the hashes into a single buffer
-   * Using the signer's public key to verify the signature
+   * Resolving the account's auth address the same way the adapter does: `acctInfo.authAddr` if the account has been rekeyed, otherwise the active address
+   * Computing SHA-256 hashes of the client data and the `authenticatorData` returned in the response, and combining them into a single buffer. Both schemes sign the same bytes.
+   * For ed25519, verifying the signature with the auth address's public key
+   * For Falcon, checking that the returned `signer` key derives the auth address (`addressFromPQKey(FALCON_1024_SCHEME, resp.signer)`), then verifying the signature with that key. Without the address check, a valid signature only proves possession of *some* Falcon key, not of one that controls the account.
 
 {% hint style="info" %}
 **Adapter Authors**
 
-Wallet adapters that support ARC-60 signing can call the protected `createStdSignData(data)` helper on `BaseWallet`. It builds the `StdSignData` object for the active account — resolving the signer public key via algod (respecting rekeyed accounts) and hashing the current domain into `authenticatorData` — so an adapter's `signData` implementation only needs to forward the result to the wallet.
+Wallet adapters that support ARC-60 signing can call the protected `createStdSignData(data)` helper on `BaseWallet`. It builds the `StdSignData` object for the active account — resolving the signer public key via algod (respecting rekeyed accounts), using the Falcon public key and `scheme` for post-quantum accounts, and hashing the current domain into `authenticatorData` — so an adapter's `signData` implementation only needs to forward the result to the wallet.
 {% endhint %}
 
 {% hint style="info" %}
 **Signature Verification**
 
 While this example demonstrates signature verification in the front-end for simplicity, in a production environment, it's generally better to perform signature verification on the backend. This approach provides better security and allows for proper session management and authentication state persistence.
+
+A backend runs the same steps: look up the account's auth address on the network named by the request's `chain_id`, check that the signer key resolves to it (for Falcon), and verify the signature. `falcon-1024` runs in Node.js as well as the browser. The examples load it with a dynamic `import()`, so its WebAssembly is only downloaded when a Falcon signature is verified.
 {% endhint %}
 
 ### Error Handling
@@ -339,6 +439,8 @@ The implementation includes error handling for:
 * Unsupported wallet provider
 * Failed signature verification
 * General signing errors
+
+For post-quantum accounts, `signData` also throws a `SignDataError` with code 4601 if the account's signature scheme isn't supported, or 4603 if its Falcon key no longer authorizes the account (for example, after a rekey). Reconnecting the wallet refreshes the account's empty signature.
 
 ### Best Practices
 

@@ -2,13 +2,14 @@
 
 import * as ed from '@noble/ed25519'
 import {
+  getSignDataScheme,
   ScopeType,
   SignDataError,
   useNetwork,
   useWallet,
   type Siwa
 } from '@txnlab/use-wallet-react'
-import { Address } from 'algosdk'
+import { Address, addressFromPQKey, FALCON_1024_SCHEME } from 'algosdk'
 import { canonify } from 'canonify'
 import { useState } from 'react'
 
@@ -19,8 +20,26 @@ async function sha256(data: BufferSource) {
   return new Uint8Array(buf)
 }
 
+// A Falcon key must authorize the account: its address (or the account's auth
+// address, if rekeyed) is derived from the key
+async function verifyFalcon(
+  publicKey: Uint8Array,
+  signature: Uint8Array,
+  message: Uint8Array,
+  authAddr: Address
+) {
+  if (!addressFromPQKey(FALCON_1024_SCHEME, publicKey).address.equals(authAddr)) return false
+  const { verifyCompressed } = await import('falcon-1024')
+  try {
+    return verifyCompressed(publicKey, signature, message)
+  } catch {
+    // verifyCompressed throws for an invalid signature
+    return false
+  }
+}
+
 export function Authenticate() {
-  const { activeAddress, algodClient, signData } = useWallet()
+  const { activeAccount, activeAddress, algodClient, signData } = useWallet()
   const { activeNetworkConfig } = useNetwork()
   const [status, setStatus] = useState<AuthStatus>('idle')
   const [error, setError] = useState<string | null>(null)
@@ -36,7 +55,7 @@ export function Authenticate() {
         domain: location.host,
         chain_id: activeNetworkConfig.caipChainId || 'algorand:localnet',
         account_address: activeAddress,
-        type: 'ed25519',
+        type: getSignDataScheme(activeAccount?.emptySignature) ?? 'ed25519',
         uri: location.origin,
         version: '1',
         'issued-at': new Date().toISOString()
@@ -50,12 +69,16 @@ export function Authenticate() {
 
       // verify signature
       const acctInfo = await algodClient.accountInformation(activeAddress).do()
-      const signer = acctInfo.authAddr?.publicKey ?? Address.fromString(activeAddress).publicKey
+      const authAddr = acctInfo.authAddr ?? Address.fromString(activeAddress)
       const enc = new TextEncoder()
       const clientDataJsonHash = await sha256(enc.encode(dataString))
       const authenticatorDataHash = await sha256(new Uint8Array(resp.authenticatorData))
       const toSign = new Uint8Array([...clientDataJsonHash, ...authenticatorDataHash])
-      if (!(await ed.verifyAsync(resp.signature, toSign, signer))) {
+      const verified =
+        siwaRequest.type === 'falcon-1024-det'
+          ? await verifyFalcon(resp.signer, resp.signature, toSign, authAddr)
+          : await ed.verifyAsync(resp.signature, toSign, authAddr.publicKey)
+      if (!verified) {
         throw new SignDataError('Verification Failed', 4300)
       }
       setStatus('verified')
