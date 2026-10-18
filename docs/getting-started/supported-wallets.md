@@ -167,6 +167,8 @@ Each skinned WalletConnect instance maintains isolated session storage, allowing
 
 Web and browser extension wallet with Ledger hardware support.
 
+Maintained by GalaxyPay ([source](https://github.com/GalaxyPay/use-wallet-lute)).
+
 ```typescript
 import { lute } from '@galaxypay/use-wallet-lute'
 
