@@ -124,10 +124,17 @@ This project uses **semantic-release** for automated versioning and publishing. 
 
 ### Prerelease flow (`next` branch)
 
+`next` exists only during a prerelease cycle: it's created from `main` when the cycle starts and deleted when it's promoted. Creating, deleting and pushing to `next` all require a ruleset bypass.
+
+- **Starting a cycle:** create `next` from the current `main` with `git fetch origin && git push origin refs/remotes/origin/main:refs/heads/next`. If a local `next` is left over from a previous cycle, delete it (`git branch -D next`) and check out the new one.
 - Feature work for the next minor version targets `next`. Each release-type squash merge publishes a new `X.Y.Z-next.N` prerelease of every package.
 - Dependency updates (Renovate) target `main` as `chore(deps)` and reach `next` when `main` is synced into it.
-- **Syncing `main` into `next`** uses a merge commit, not a squash PR (squashing would drop `main`'s ancestry and cause conflicts at promotion). Branch from `origin/next`, `git merge --no-ff origin/main`, run the checks, then push the branch to `next` (requires a ruleset bypass).
-- **Promoting `next` to `main`** also uses a merge commit: temporarily allow merge commits in the "Release branches" ruleset, merge the `next` → `main` PR, then disallow them again. semantic-release publishes the stable version to `latest`. Afterwards, fast-forward `next` to `main` (the ruleset blocks deleting `next`).
+- **Syncing `main` into `next`** uses a merge commit, not a squash PR (squashing would drop `main`'s ancestry and cause conflicts at promotion). Branch from `origin/next`, `git merge --no-ff origin/main`, run the checks, then push the branch to `next`. Sync before promoting.
+- **Promoting `next` to `main`** is a fast-forward, not a merge:
+  1. Open a PR from `next` into `main` as a record of the release, and let CI pass.
+  2. Run `git push origin refs/remotes/origin/next:refs/heads/main`, which moves `main` to `next`'s exact commits. git rejects it if `main` has commits `next` lacks; sync first.
+  3. semantic-release publishes the stable version to `latest`. GitHub marks the PR merged and auto-deletes `next`, which ends the cycle.
+  4. Locally, run `git fetch --prune` and `git branch -D next`.
 - `chore` commits are hidden from the generated changelog, so add notable `chore` changes (e.g., adapters moving to other maintainers) to the release notes by hand.
 
 ### Release pipeline
