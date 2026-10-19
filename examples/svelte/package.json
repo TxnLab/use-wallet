@@ -25,7 +25,8 @@
     "@txnlab/use-wallet-walletconnect": "workspace:*",
     "@txnlab/use-wallet-web3auth": "workspace:*",
     "algosdk": "3.8.0",
-    "canonify": "2.1.1"
+    "canonify": "2.1.1",
+    "falcon-1024": "0.2.0"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "3.0.10",

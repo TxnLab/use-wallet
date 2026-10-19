@@ -1,13 +1,20 @@
 <script setup lang="ts">
 import * as ed from '@noble/ed25519'
-import { ScopeType, SignDataError, useNetwork, useWallet, type Siwa } from '@txnlab/use-wallet-vue'
-import { Address } from 'algosdk'
+import {
+  getSignDataScheme,
+  ScopeType,
+  SignDataError,
+  useNetwork,
+  useWallet,
+  type Siwa
+} from '@txnlab/use-wallet-vue'
+import { Address, addressFromPQKey, FALCON_1024_SCHEME } from 'algosdk'
 import { canonify } from 'canonify'
 import { ref } from 'vue'
 
 type AuthStatus = 'idle' | 'signing' | 'verified' | 'error'
 
-const { activeAddress, algodClient, signData } = useWallet()
+const { activeAccount, activeAddress, algodClient, signData } = useWallet()
 const { activeNetworkConfig } = useNetwork()
 const status = ref<AuthStatus>('idle')
 const error = ref<string | null>(null)
@@ -15,6 +22,24 @@ const error = ref<string | null>(null)
 async function sha256(data: BufferSource) {
   const buf = await crypto.subtle.digest('SHA-256', data)
   return new Uint8Array(buf)
+}
+
+// A Falcon key must authorize the account: its address (or the account's auth
+// address, if rekeyed) is derived from the key
+async function verifyFalcon(
+  publicKey: Uint8Array,
+  signature: Uint8Array,
+  message: Uint8Array,
+  authAddr: Address
+) {
+  if (!addressFromPQKey(FALCON_1024_SCHEME, publicKey).address.equals(authAddr)) return false
+  const { verifyCompressed } = await import('falcon-1024')
+  try {
+    return verifyCompressed(publicKey, signature, message)
+  } catch {
+    // verifyCompressed throws for an invalid signature
+    return false
+  }
 }
 
 const handleAuth = async () => {
@@ -27,7 +52,7 @@ const handleAuth = async () => {
       domain: location.host,
       chain_id: activeNetworkConfig.value.caipChainId || 'algorand:localnet',
       account_address: activeAddress.value,
-      type: 'ed25519',
+      type: getSignDataScheme(activeAccount.value?.emptySignature) ?? 'ed25519',
       uri: location.origin,
       version: '1',
       'issued-at': new Date().toISOString()
@@ -41,12 +66,16 @@ const handleAuth = async () => {
 
     // verify signature
     const acctInfo = await algodClient.value.accountInformation(activeAddress.value).do()
-    const signer = acctInfo.authAddr?.publicKey ?? Address.fromString(activeAddress.value).publicKey
+    const authAddr = acctInfo.authAddr ?? Address.fromString(activeAddress.value)
     const enc = new TextEncoder()
     const clientDataJsonHash = await sha256(enc.encode(dataString))
     const authenticatorDataHash = await sha256(new Uint8Array(resp.authenticatorData))
     const toSign = new Uint8Array([...clientDataJsonHash, ...authenticatorDataHash])
-    if (!(await ed.verifyAsync(resp.signature, toSign, signer))) {
+    const verified =
+      siwaRequest.type === 'falcon-1024-det'
+        ? await verifyFalcon(resp.signer, resp.signature, toSign, authAddr)
+        : await ed.verifyAsync(resp.signature, toSign, authAddr.publicKey)
+    if (!verified) {
       throw new SignDataError('Verification Failed', 4300)
     }
     status.value = 'verified'
