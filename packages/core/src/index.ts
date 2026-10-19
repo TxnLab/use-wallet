@@ -7,7 +7,19 @@ export {
   type AlgodConfig,
   type NetworkConfig
 } from './network'
-export { DEFAULT_STATE, type State, type WalletState, type ManagerStatus } from './store'
+export {
+  DEFAULT_STATE,
+  addWallet,
+  removeWallet,
+  setAccounts,
+  setActiveAccount,
+  setActiveWallet,
+  type State,
+  type WalletState,
+  type WalletStateMap,
+  type PersistedState,
+  type ManagerStatus
+} from './store'
 export { StorageAdapter } from './storage'
 export {
   SecureKeyContainer,
