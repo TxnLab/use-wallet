@@ -303,6 +303,20 @@ describe('MnemonicAdapter', () => {
         expect(result).toEqual(expected)
       })
 
+      it('should skip encoded transactions already signed by a logic sig', async () => {
+        // #pragma version 1; int 1
+        const lsig = new algosdk.LogicSigAccount(new Uint8Array([1, 32, 1, 1, 34]))
+        const [gtxn1, gtxn2] = algosdk.assignGroupID([txn1, txn2])
+        const encodedGroup = [
+          algosdk.signLogicSigTransactionObject(gtxn1, lsig).blob,
+          gtxn2.toByte()
+        ]
+
+        const result = await wallet.signTransactions(encodedGroup)
+
+        expect(result).toEqual([gtxn2.signTxn(sk)])
+      })
+
       it('should determine which transactions to sign based on indexesToSign', async () => {
         const [gtxn1, gtxn2, gtxn3, gtxn4] = algosdk.assignGroupID([txn1, txn2, txn3, txn4])
         const indexesToSign = [0, 1, 3]

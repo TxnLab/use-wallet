@@ -43,12 +43,20 @@ export function byteArrayToString(array: Uint8Array): string {
   return result
 }
 
+const isMap = (value: unknown): boolean =>
+  !!value && typeof value === 'object' && !(value instanceof Uint8Array) && !Array.isArray(value)
+
 export function isSignedTxn(txnObj: any): boolean {
   if (!txnObj || typeof txnObj !== 'object') return false
-  if (!('sig' in txnObj && 'txn' in txnObj)) return false
+  if (!('txn' in txnObj)) return false
 
-  // Verify sig is a Uint8Array
-  if (!(txnObj.sig instanceof Uint8Array)) return false
+  // Verify it carries a signature: ed25519 (sig), multisig, logic sig or post-quantum
+  const hasSignature =
+    txnObj.sig instanceof Uint8Array ||
+    isMap(txnObj.msig) ||
+    isMap(txnObj.lsig) ||
+    isMap(txnObj.pqsig)
+  if (!hasSignature) return false
 
   // Verify txn is an object
   const txn = txnObj.txn
