@@ -63,6 +63,16 @@ export const pendingTxn2 = Buffer.from(
   'base64'
 )
 
+// POST /v2/transactions/simulate?format=msgpack with allow-empty-signatures and fix-signers
+// content-type: application/msgpack
+// Encoded with algosdk in the shape of a TestNet response, for the same transaction with an empty
+// ed25519 signature (group-usage 1000000, one min fee). A live simulate of this unfunded account
+// reports the same group-usage, plus an overspend failure.
+export const simulateTxn = Buffer.from(
+  'hK5ldmFsLW92ZXJyaWRlc4K2YWxsb3ctZW1wdHktc2lnbmF0dXJlc8OrZml4LXNpZ25lcnPDqmxhc3Qtcm91bmTOAqYdGap0eG4tZ3JvdXBzkYOvZ3JvdXAtZmVlcy1wYWlkzQPoq2dyb3VwLXVzYWdlzgAPQkCrdHhuLXJlc3VsdHORgqlmZWVzLXBhaWTNA+iqdHhuLXJlc3VsdIGjdHhugaN0eG6Io2ZlZc0D6KJmds4Cph0Zo2dlbqx0ZXN0bmV0LXYxLjCiZ2jEIEhjtRiks8hOyBDyLU8QgcsPcfBZp6wg3sYvf3DlCToiomx2zgKmIQGjcmN2xCDZdlfb2YQwPyRi+VSoHaataICjLqI7Z8kkOGIA5HFvlqNzbmTEINl2V9vZhDA/JGL5VKgdpq1ogKMuojtnySQ4YgDkcW+WpHR5cGWjcGF5p3ZlcnNpb24C',
+  'base64'
+)
+
 // GET /v2/status/wait-for-block-after/44440861
 export const waitForBlock = JSON.stringify({
   catchpoint: '',
@@ -107,6 +117,14 @@ export async function fakeTxnResponses(page: Page) {
       await route.fulfill()
     } else {
       await route.fulfill({ body: sendTxn, contentType: 'application/json' })
+    }
+  })
+
+  await page.route('*/**/v2/transactions/simulate*', async (route, request) => {
+    if (request.method() === 'OPTIONS') {
+      await route.fulfill()
+    } else {
+      await route.fulfill({ body: simulateTxn, contentType: 'application/msgpack' })
     }
   })
 

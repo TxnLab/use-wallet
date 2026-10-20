@@ -344,6 +344,35 @@ function attachEventListeners() {
   }
 }
 
+// Post-quantum (Falcon) accounts pay more than the suggested fee, so simulate with empty
+// signatures to find the fee the network requires
+async function estimateFee(
+  client: algosdk.Algodv2,
+  txn: algosdk.Transaction,
+  emptySigner: algosdk.TransactionSigner,
+  minFee: bigint
+) {
+  const atc = new algosdk.AtomicTransactionComposer()
+  atc.addTransaction({ txn, signer: emptySigner })
+  const { simulateResponse } = await atc.simulate(
+    client,
+    new algosdk.modelsv2.SimulateRequest({
+      txnGroups: [],
+      allowEmptySignatures: true,
+      fixSigners: true
+    })
+  )
+
+  // groupUsage is in millionths of the min fee
+  const { groupUsage } = simulateResponse.txnGroups[0]
+  if (groupUsage === undefined) return txn.fee
+  const fee = BigInt(Math.ceil((groupUsage * Number(minFee)) / 1_000_000))
+
+  // Keep the suggested fee if higher. Its per-byte part (only under congestion) assumes an
+  // ed25519 signature; a Falcon signature adds about 3 KB
+  return fee > txn.fee ? fee : txn.fee
+}
+
 async function handleSendTransaction() {
   const state = getState()
   if (!state.activeWallet) return
@@ -368,6 +397,12 @@ async function handleSendTransaction() {
       amount: 0,
       suggestedParams
     })
+    txn.fee = await estimateFee(
+      state.algodClient,
+      txn,
+      wallet.emptyTransactionSigner,
+      suggestedParams.minFee
+    )
 
     const atc = new algosdk.AtomicTransactionComposer()
     atc.addTransaction({

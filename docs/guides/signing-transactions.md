@@ -715,3 +715,63 @@ For more information, see:
 * [AlgorandClient documentation](https://github.com/algorandfoundation/algokit-utils-ts/blob/main/docs/capabilities/algorand-client.md)
 * [Application Client Usage documentation](https://github.com/algorandfoundation/algokit-client-generator-ts/blob/main/docs/usage.md)
 * [TransactionComposer documentation](https://github.com/algorandfoundation/algokit-utils-ts/blob/main/docs/capabilities/transaction-composer.md)
+
+### Estimating Fees
+
+Post-quantum (Falcon-1024) accounts pay more per transaction: each transaction authorized by a Falcon key costs an extra 2× the minimum fee, so a 0 ALGO payment from a Falcon account needs 3,000 µALGO when the minimum fee is 1,000. The suggested params from `getTransactionParams()` don't know who will sign, so a transaction built with the suggested fee is rejected when a Falcon account signs it.
+
+To find the fee a transaction needs, simulate it before signing. `useWallet` also returns an `emptyTransactionSigner`, a `TransactionSigner` that doesn't prompt the wallet: it returns each transaction with its sender's empty signature (the one the wallet advertised for the account when it connected), and the results can't be submitted. Simulating with `allowEmptySignatures` (and `fixSigners`, for rekeyed accounts) reports the group's `groupUsage`, its fee requirement in millionths of the minimum fee, including inner transactions. It's reported even if the simulation fails for another reason, such as an unfunded account.
+
+```typescript
+import algosdk from 'algosdk'
+
+async function estimateFee(
+  client: algosdk.Algodv2,
+  txn: algosdk.Transaction,
+  emptySigner: algosdk.TransactionSigner,
+  minFee: bigint
+) {
+  const atc = new algosdk.AtomicTransactionComposer()
+  atc.addTransaction({ txn, signer: emptySigner })
+  const { simulateResponse } = await atc.simulate(
+    client,
+    new algosdk.modelsv2.SimulateRequest({
+      txnGroups: [],
+      allowEmptySignatures: true,
+      fixSigners: true
+    })
+  )
+
+  const { groupUsage } = simulateResponse.txnGroups[0]
+  if (groupUsage === undefined) return txn.fee
+  const fee = BigInt(Math.ceil((groupUsage * Number(minFee)) / 1_000_000))
+
+  // Keep the suggested fee if higher (see per-byte fees below)
+  return fee > txn.fee ? fee : txn.fee
+}
+```
+
+Set the fee on the transaction, then sign it as usual:
+
+```typescript
+const { activeAddress, algodClient, signTransactions, emptyTransactionSigner } = useWallet()
+
+const suggestedParams = await algodClient.getTransactionParams().do()
+const txn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+  sender: activeAddress,
+  receiver: activeAddress,
+  amount: 0,
+  suggestedParams
+})
+txn.fee = await estimateFee(algodClient, txn, emptyTransactionSigner, suggestedParams.minFee)
+
+const signedTxns = await signTransactions([txn])
+```
+
+In Vue, Solid and Svelte, pass `algodClient.value`, `algodClient()` or `algodClient.current`. Without a framework adapter, `WalletManager` and each wallet have an `emptyTransactionSigner` too. The [example projects](../resources/example-projects.md) estimate the fee this way before sending.
+
+{% hint style="info" %}
+* **Groups:** `groupUsage` covers the whole group, and fees pool across a group, so one transaction can pay the total. A group ID depends on the fees, so build the group again after simulating rather than changing fees on transactions that already have one.
+* **Unknown account types:** If a wallet doesn't advertise an account's empty signature, `emptyTransactionSigner` leaves the signature off and the simulation counts the sender as an ed25519 account.
+* **Per-byte fees:** Under congestion, algod suggests a fee per byte, which algosdk sizes for an ed25519 signature. A Falcon public key and signature add about 3 KB that it doesn't count.
+{% endhint %}
