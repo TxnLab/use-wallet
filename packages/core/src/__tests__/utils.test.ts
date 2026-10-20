@@ -75,6 +75,70 @@ describe('isSignedTxn', () => {
   it('should return false if the object is not a signed transaction', () => {
     expect(isSignedTxn(decodedRawTxn)).toBe(false)
   })
+
+  describe('signature types', () => {
+    const account = algosdk.generateAccount()
+    const suggestedParams = {
+      fee: 0,
+      minFee: 1000,
+      firstValid: 51,
+      lastValid: 61,
+      genesisHash: new Uint8Array(32),
+      flatFee: true
+    }
+    const txn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+      sender: account.addr,
+      receiver: account.addr,
+      amount: 0,
+      suggestedParams
+    })
+    const decode = (signed: Uint8Array) => algosdk.msgpackRawDecode(signed)
+
+    it('recognizes an ed25519 signature', () => {
+      expect(isSignedTxn(decode(txn.signTxn(account.sk)))).toBe(true)
+    })
+
+    it('recognizes a multisig signature', () => {
+      const msig = { version: 1, threshold: 1, addrs: [account.addr] }
+      const multisigTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+        sender: algosdk.multisigAddress(msig),
+        receiver: account.addr,
+        amount: 0,
+        suggestedParams
+      })
+      const { blob } = algosdk.signMultisigTransaction(multisigTxn, msig, account.sk)
+      expect(isSignedTxn(decode(blob))).toBe(true)
+    })
+
+    it('recognizes a logic signature', () => {
+      // #pragma version 1; int 1
+      const lsig = new algosdk.LogicSigAccount(new Uint8Array([1, 32, 1, 1, 34]))
+      const { blob } = algosdk.signLogicSigTransactionObject(txn, lsig)
+      expect(isSignedTxn(decode(blob))).toBe(true)
+    })
+
+    it('recognizes a post-quantum signature', () => {
+      const signed = algosdk.encodeMsgpack(
+        new algosdk.SignedTransaction({
+          txn,
+          pqsig: {
+            sch: algosdk.FALCON_1024_SCHEME,
+            slt: 0,
+            pk: new Uint8Array(1793).fill(1),
+            sig: new Uint8Array(1230).fill(2)
+          }
+        })
+      )
+      expect(isSignedTxn(decode(signed))).toBe(true)
+    })
+
+    it('rejects a transaction with no signature, or a malformed one', () => {
+      const unsigned = decode(algosdk.encodeMsgpack(new algosdk.SignedTransaction({ txn })))
+      expect(isSignedTxn(unsigned)).toBe(false)
+      expect(isSignedTxn({ ...(unsigned as object), msig: 'not a map' })).toBe(false)
+      expect(isSignedTxn({ ...(unsigned as object), sig: 'not bytes' })).toBe(false)
+    })
+  })
 })
 
 describe('isTransaction', () => {
