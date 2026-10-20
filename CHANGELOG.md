@@ -1,3 +1,10 @@
+## [5.1.1](https://github.com/TxnLab/use-wallet/compare/v5.1.0...v5.1.1) (2026-10-20)
+
+
+### Bug Fixes
+
+* **core:** recognize multisig, logic sig and post-quantum signatures in isSignedTxn ([#480](https://github.com/TxnLab/use-wallet/issues/480)) ([1dc5473](https://github.com/TxnLab/use-wallet/commit/1dc54734142ddc948144f2354ee5e7547091e071))
+
 # [5.1.0](https://github.com/TxnLab/use-wallet/compare/v5.0.1...v5.1.0) (2026-10-19)
 
 
