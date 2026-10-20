@@ -128,12 +128,13 @@ interface WalletMethods {
     indexesToSign?: number[]
   ): Promise<(Uint8Array | null)[]>
   transactionSigner: algosdk.TransactionSigner
+  emptyTransactionSigner: algosdk.TransactionSigner
   signData(data: string, metadata: StdSignMetadata): Promise<StdSignDataResponse>
   withPrivateKey<T>(callback: (secretKey: Uint8Array) => Promise<T>): Promise<T>
 }
 ```
 
-`signData` is only supported by wallets whose `canSignData` property is `true` (see [Sign Data](../guides/signing-data.md)). `withPrivateKey` is only supported by wallets whose `canUsePrivateKey` property is `true` (see [Using Private Keys Safely](../guides/using-private-keys-safely.md)); both throw for unsupported wallets.
+`emptyTransactionSigner` returns transactions with placeholder signatures, without prompting the wallet, for simulating with `allowEmptySignatures` (see [Estimating Fees](../guides/signing-transactions.md#estimating-fees)); they can't be submitted. `signData` is only supported by wallets whose `canSignData` property is `true` (see [Sign Data](../guides/signing-data.md)). `withPrivateKey` is only supported by wallets whose `canUsePrivateKey` property is `true` (see [Using Private Keys Safely](../guides/using-private-keys-safely.md)); both throw for unsupported wallets.
 
 ### Framework-Specific Usage
 
