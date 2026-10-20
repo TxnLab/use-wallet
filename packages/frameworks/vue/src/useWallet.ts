@@ -1,23 +1,20 @@
 import { useStore } from '@tanstack/vue-store'
 import {
   BaseWallet,
-  WalletManager,
   type Wallet,
   type StdSignMetadata,
   type StdSignDataResponse
 } from '@txnlab/use-wallet'
 import algosdk from 'algosdk'
 import { computed, inject, ref } from 'vue'
+import { useWalletManager } from './useWalletManager'
 
 export type SetAlgodClient = (client: algosdk.Algodv2) => void
 
 export function useWallet() {
-  const manager = inject<WalletManager>('walletManager')
+  const manager = useWalletManager()
   const algodClient = inject<ReturnType<typeof ref<algosdk.Algodv2>>>('algodClient')
 
-  if (!manager) {
-    throw new Error('WalletManager plugin is not properly installed')
-  }
   if (!algodClient) {
     throw new Error('Algod client not properly installed')
   }

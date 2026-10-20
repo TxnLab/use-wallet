@@ -49,6 +49,16 @@ export const WalletProvider = ({ manager, children }: WalletProviderProps): Reac
   )
 }
 
+export const useWalletManager = (): WalletManager => {
+  const context = React.useContext(WalletContext)
+
+  if (!context) {
+    throw new Error('useWalletManager must be used within the WalletProvider')
+  }
+
+  return context.manager
+}
+
 export const useNetwork = () => {
   const context = React.useContext(WalletContext)
 

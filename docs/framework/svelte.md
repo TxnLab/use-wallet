@@ -38,7 +38,7 @@ This makes the wallet functionality available throughout your application via Sv
 
 ### Using the Primitives
 
-The Svelte adapter provides two primitives for accessing wallet functionality:
+The Svelte adapter provides three primitives for accessing wallet functionality:
 
 #### useWallet
 
@@ -116,6 +116,28 @@ Active network management enables users to switch between different networks.
 Runtime node configuration, enables users to override the application's default node settings and connect to any Algorand node. See the [Runtime Node Configuration](../guides/runtime-node-configuration.md) guide for details about implementing this feature.
 
 For a complete list of all available properties and methods, see the [useNetwork API Reference](../api-reference/usenetwork.md).
+
+#### useWalletManager
+
+The `useWalletManager` primitive returns the `WalletManager` instance. Use it to reach a method or property that only one wallet adapter has: get the adapter instance with `manager.getWallet(walletKey)` and cast it to the adapter's type (shown here with a hypothetical `MyWalletAdapter`).
+
+```typescript
+<script lang="ts">
+  import { useWalletManager } from '@txnlab/use-wallet-svelte'
+  import type { MyWalletAdapter } from 'my-wallet-adapter'
+
+  const manager = useWalletManager()
+
+  const handleClick = async () => {
+    const wallet = manager.getWallet('my-wallet') as MyWalletAdapter | undefined
+    await wallet?.customMethod()
+  }
+</script>
+
+<button onclick={handleClick}>Run</button>
+```
+
+See the [useWalletManager API Reference](../api-reference/usewalletmanager.md) for details.
 
 ### Working with Reactive Values
 

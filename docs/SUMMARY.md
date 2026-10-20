@@ -31,6 +31,7 @@
 * [WalletManager](api-reference/walletmanager.md)
 * [useWallet](api-reference/usewallet.md)
 * [useNetwork](api-reference/usenetwork.md)
+* [useWalletManager](api-reference/usewalletmanager.md)
 
 ## Resources
 

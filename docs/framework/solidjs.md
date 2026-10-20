@@ -44,7 +44,7 @@ The provider makes the wallet functionality available throughout your applicatio
 
 ### Using the Primitives
 
-The Solid adapter provides two primitives for accessing wallet functionality:
+The Solid adapter provides three primitives for accessing wallet functionality:
 
 #### useWallet
 
@@ -131,6 +131,28 @@ Active network management enables users to switch between different networks.
 Runtime node configuration enables users to override the application's default node settings and connect to any Algorand node. See the [Runtime Node Configuration](../guides/runtime-node-configuration.md) guide for details about implementing this feature.
 
 For a complete list of all available properties and methods, see the [useNetwork API Reference](../api-reference/usenetwork.md).
+
+#### useWalletManager
+
+The `useWalletManager` primitive returns the `WalletManager` instance. Use it to reach a method or property that only one wallet adapter has: get the adapter instance with `manager.getWallet(walletKey)` and cast it to the adapter's type (shown here with a hypothetical `MyWalletAdapter`).
+
+```tsx
+import { useWalletManager } from '@txnlab/use-wallet-solid'
+import type { MyWalletAdapter } from 'my-wallet-adapter'
+
+function CustomAction() {
+  const manager = useWalletManager()
+
+  const handleClick = async () => {
+    const wallet = manager.getWallet('my-wallet') as MyWalletAdapter | undefined
+    await wallet?.customMethod()
+  }
+
+  return <button onClick={handleClick}>Run</button>
+}
+```
+
+See the [useWalletManager API Reference](../api-reference/usewalletmanager.md) for details.
 
 ### Next Steps
 
