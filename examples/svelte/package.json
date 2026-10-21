@@ -20,6 +20,7 @@
     "@txnlab/use-wallet-kibisis": "workspace:*",
     "@txnlab/use-wallet-kmd": "workspace:*",
     "@txnlab/use-wallet-mnemonic": "workspace:*",
+    "@txnlab/use-wallet-passkey": "workspace:*",
     "@txnlab/use-wallet-svelte": "workspace:*",
     "@txnlab/use-wallet-w3wallet": "workspace:*",
     "@txnlab/use-wallet-walletconnect": "workspace:*",

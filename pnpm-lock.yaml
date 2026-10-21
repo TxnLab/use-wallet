@@ -125,6 +125,9 @@ importers:
       '@txnlab/use-wallet-mnemonic':
         specifier: workspace:*
         version: link:../../packages/wallets/mnemonic
+      '@txnlab/use-wallet-passkey':
+        specifier: workspace:*
+        version: link:../../packages/wallets/passkey
       '@txnlab/use-wallet-react':
         specifier: workspace:*
         version: link:../../packages/frameworks/react
@@ -204,6 +207,9 @@ importers:
       '@txnlab/use-wallet-mnemonic':
         specifier: workspace:*
         version: link:../../packages/wallets/mnemonic
+      '@txnlab/use-wallet-passkey':
+        specifier: workspace:*
+        version: link:../../packages/wallets/passkey
       '@txnlab/use-wallet-vue':
         specifier: workspace:*
         version: link:../../packages/frameworks/vue
@@ -274,6 +280,9 @@ importers:
       '@txnlab/use-wallet-mnemonic':
         specifier: workspace:*
         version: link:../../packages/wallets/mnemonic
+      '@txnlab/use-wallet-passkey':
+        specifier: workspace:*
+        version: link:../../packages/wallets/passkey
       '@txnlab/use-wallet-react':
         specifier: workspace:*
         version: link:../../packages/frameworks/react
@@ -377,6 +386,9 @@ importers:
       '@txnlab/use-wallet-mnemonic':
         specifier: workspace:*
         version: link:../../packages/wallets/mnemonic
+      '@txnlab/use-wallet-passkey':
+        specifier: workspace:*
+        version: link:../../packages/wallets/passkey
       '@txnlab/use-wallet-solid':
         specifier: workspace:*
         version: link:../../packages/frameworks/solid
@@ -453,6 +465,9 @@ importers:
       '@txnlab/use-wallet-mnemonic':
         specifier: workspace:*
         version: link:../../packages/wallets/mnemonic
+      '@txnlab/use-wallet-passkey':
+        specifier: workspace:*
+        version: link:../../packages/wallets/passkey
       '@txnlab/use-wallet-svelte':
         specifier: workspace:*
         version: link:../../packages/frameworks/svelte
@@ -535,6 +550,9 @@ importers:
       '@txnlab/use-wallet-mnemonic':
         specifier: workspace:*
         version: link:../../packages/wallets/mnemonic
+      '@txnlab/use-wallet-passkey':
+        specifier: workspace:*
+        version: link:../../packages/wallets/passkey
       '@txnlab/use-wallet-w3wallet':
         specifier: workspace:*
         version: link:../../packages/wallets/w3wallet
@@ -599,6 +617,9 @@ importers:
       '@txnlab/use-wallet-mnemonic':
         specifier: workspace:*
         version: link:../../packages/wallets/mnemonic
+      '@txnlab/use-wallet-passkey':
+        specifier: workspace:*
+        version: link:../../packages/wallets/passkey
       '@txnlab/use-wallet-vue':
         specifier: workspace:*
         version: link:../../packages/frameworks/vue
@@ -853,6 +874,31 @@ importers:
       algosdk:
         specifier: 3.8.0
         version: 3.8.0
+      tsdown:
+        specifier: 0.23.1
+        version: 0.23.1(@volar/typescript@2.4.28)(@vue/language-core@3.3.13)(publint@0.3.25)(typescript@5.9.3)(vue-tsc@3.3.13(typescript@5.9.3))
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+
+  packages/wallets/passkey:
+    dependencies:
+      '@noble/hashes':
+        specifier: 1.8.0
+        version: 1.8.0
+      canonify:
+        specifier: 2.1.1
+        version: 2.1.1
+    devDependencies:
+      '@txnlab/use-wallet':
+        specifier: workspace:*
+        version: link:../../core
+      algosdk:
+        specifier: 3.8.0
+        version: 3.8.0
+      falcon-1024:
+        specifier: 0.2.0
+        version: 0.2.0
       tsdown:
         specifier: 0.23.1
         version: 0.23.1(@volar/typescript@2.4.28)(@vue/language-core@3.3.13)(publint@0.3.25)(typescript@5.9.3)(vue-tsc@3.3.13(typescript@5.9.3))

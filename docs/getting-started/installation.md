@@ -187,6 +187,7 @@ npm install @perawallet/use-wallet-pera @txnlab/use-wallet-defly
 | `@txnlab/use-wallet-kmd` | KMD (development) |
 | `@txnlab/use-wallet-mnemonic` | Mnemonic (testing) |
 | `@txnlab/use-wallet-web3auth` | Web3Auth |
+| `@txnlab/use-wallet-passkey` | Passkey (Falcon-1024) |
 
 {% hint style="info" %}
 The Custom wallet adapter is built into `@txnlab/use-wallet` — no separate package needed.

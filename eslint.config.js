@@ -30,6 +30,8 @@ export default tseslint.config(
     ignores: [
       '**/node_modules/',
       '**/dist/',
+      '**/dist-worker/',
+      '**/*.generated.ts',
       '**/.env',
       '**/examples/',
       '**/.nuxt/',

@@ -30,23 +30,25 @@ The manager itself isn't reactive. Use [useWallet](usewallet.md) and [useNetwork
 
 ### Framework-Specific Usage
 
-Call `useWalletManager` where the framework allows context access (a component body, `setup`, or a Svelte component's `<script>`), then use the manager anywhere, including event handlers. The examples below call a hypothetical `customMethod()` on a `MyWalletAdapter`.
+Call `useWalletManager` where the framework allows context access (a component body, `setup`, or a Svelte component's `<script>`), then use the manager anywhere, including event handlers. The examples below call the Passkey adapter's `exportRecoveryPhrase()`.
 
 {% tabs %}
 {% tab title="React" %}
 ```tsx
 import { useWalletManager } from '@txnlab/use-wallet-react'
-import type { MyWalletAdapter } from 'my-wallet-adapter'
+import type { PasskeyAdapter } from '@txnlab/use-wallet-passkey'
 
-function CustomAction() {
+function ExportRecoveryPhrase() {
   const manager = useWalletManager()
 
   const handleClick = async () => {
-    const wallet = manager.getWallet('my-wallet') as MyWalletAdapter | undefined
-    await wallet?.customMethod()
+    const wallet = manager.getWallet('passkey') as PasskeyAdapter | undefined
+    if (!wallet) return
+    // Show the phrase with a warning to import it as a Falcon account
+    const { phrase } = await wallet.exportRecoveryPhrase()
   }
 
-  return <button onClick={handleClick}>Run</button>
+  return <button onClick={handleClick}>Export recovery phrase</button>
 }
 ```
 {% endtab %}
@@ -55,18 +57,20 @@ function CustomAction() {
 ```typescript
 <script setup lang="ts">
   import { useWalletManager } from '@txnlab/use-wallet-vue'
-  import type { MyWalletAdapter } from 'my-wallet-adapter'
+  import type { PasskeyAdapter } from '@txnlab/use-wallet-passkey'
 
   const manager = useWalletManager()
 
   const handleClick = async () => {
-    const wallet = manager.getWallet('my-wallet') as MyWalletAdapter | undefined
-    await wallet?.customMethod()
+    const wallet = manager.getWallet('passkey') as PasskeyAdapter | undefined
+    if (!wallet) return
+    // Show the phrase with a warning to import it as a Falcon account
+    const { phrase } = await wallet.exportRecoveryPhrase()
   }
 </script>
 
 <template>
-  <button @click="handleClick">Run</button>
+  <button @click="handleClick">Export recovery phrase</button>
 </template>
 ```
 {% endtab %}
@@ -74,17 +78,19 @@ function CustomAction() {
 {% tab title="Solid" %}
 ```tsx
 import { useWalletManager } from '@txnlab/use-wallet-solid'
-import type { MyWalletAdapter } from 'my-wallet-adapter'
+import type { PasskeyAdapter } from '@txnlab/use-wallet-passkey'
 
-function CustomAction() {
+function ExportRecoveryPhrase() {
   const manager = useWalletManager()
 
   const handleClick = async () => {
-    const wallet = manager.getWallet('my-wallet') as MyWalletAdapter | undefined
-    await wallet?.customMethod()
+    const wallet = manager.getWallet('passkey') as PasskeyAdapter | undefined
+    if (!wallet) return
+    // Show the phrase with a warning to import it as a Falcon account
+    const { phrase } = await wallet.exportRecoveryPhrase()
   }
 
-  return <button onClick={handleClick}>Run</button>
+  return <button onClick={handleClick}>Export recovery phrase</button>
 }
 ```
 {% endtab %}
@@ -93,17 +99,19 @@ function CustomAction() {
 ```typescript
 <script lang="ts">
   import { useWalletManager } from '@txnlab/use-wallet-svelte'
-  import type { MyWalletAdapter } from 'my-wallet-adapter'
+  import type { PasskeyAdapter } from '@txnlab/use-wallet-passkey'
 
   const manager = useWalletManager()
 
   const handleClick = async () => {
-    const wallet = manager.getWallet('my-wallet') as MyWalletAdapter | undefined
-    await wallet?.customMethod()
+    const wallet = manager.getWallet('passkey') as PasskeyAdapter | undefined
+    if (!wallet) return
+    // Show the phrase with a warning to import it as a Falcon account
+    const { phrase } = await wallet.exportRecoveryPhrase()
   }
 </script>
 
-<button onclick={handleClick}>Run</button>
+<button onclick={handleClick}>Export recovery phrase</button>
 ```
 {% endtab %}
 {% endtabs %}

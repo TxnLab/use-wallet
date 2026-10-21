@@ -14,6 +14,7 @@ import { exodus } from '@txnlab/use-wallet-exodus'
 import { kibisis } from '@txnlab/use-wallet-kibisis'
 import { kmd } from '@txnlab/use-wallet-kmd'
 import { mnemonic } from '@txnlab/use-wallet-mnemonic'
+import { passkey } from '@txnlab/use-wallet-passkey'
 import { w3wallet } from '@txnlab/use-wallet-w3wallet'
 import { walletConnect } from '@txnlab/use-wallet-walletconnect'
 import { web3auth } from '@txnlab/use-wallet-web3auth'
@@ -34,6 +35,7 @@ const wallets = [
   w3wallet(),
   kmd(),
   mnemonic(),
+  passkey({ session: true }),
   ...(import.meta.env.VITE_WEB3AUTH_CLIENT_ID
     ? [web3auth({ clientId: import.meta.env.VITE_WEB3AUTH_CLIENT_ID })]
     : [])
@@ -98,6 +100,10 @@ function renderWalletList() {
         buttons += `<button data-disconnect="${wallet.walletKey}" class="rounded-lg border border-red-200 bg-red-50 px-2.5 py-1 text-xs font-medium text-red-500 hover:bg-red-100 transition-colors">Disconnect</button>`
       } else {
         const isDisabled = connectingId === wallet.id
+        // The passkey wallet signs in with an existing passkey or creates one
+        if (wallet.id === 'passkey') {
+          buttons += `<button data-create="${wallet.walletKey}" ${isDisabled ? 'disabled' : ''} class="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors">Create passkey</button>`
+        }
         buttons += `<button data-connect="${wallet.walletKey}" ${isDisabled ? 'disabled' : ''} class="rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-800 disabled:opacity-50 transition-colors">${connectingId === wallet.id ? 'Connecting...' : 'Connect'}</button>`
       }
 
@@ -286,15 +292,16 @@ function attachEventListeners() {
     })
   })
 
-  // Connect
-  document.querySelectorAll<HTMLButtonElement>('[data-connect]').forEach((btn) => {
+  // Connect, or create a passkey
+  document.querySelectorAll<HTMLButtonElement>('[data-connect], [data-create]').forEach((btn) => {
     btn.addEventListener('click', async () => {
-      const wallet = getWalletByKey(btn.dataset.connect!)
+      const create = btn.dataset.create !== undefined
+      const wallet = getWalletByKey((create ? btn.dataset.create : btn.dataset.connect)!)
       if (!wallet) return
       try {
         connectingId = wallet.id
         render()
-        await wallet.connect()
+        await wallet.connect(create ? { create: true } : undefined)
       } catch (error) {
         console.error(`Failed to connect ${wallet.metadata.name}:`, error)
       } finally {

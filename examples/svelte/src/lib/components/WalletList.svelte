@@ -5,10 +5,10 @@
 
   let connecting = $state<string | null>(null)
 
-  const handleConnect = async (wallet: Wallet) => {
+  const handleConnect = async (wallet: Wallet, args?: { create?: boolean }) => {
     try {
       connecting = wallet.id
-      await wallet.connect()
+      await wallet.connect(args)
     } catch (error) {
       console.error(`Failed to connect ${wallet.metadata.name}:`, error)
     } finally {
@@ -59,6 +59,16 @@
               Disconnect
             </button>
           {:else}
+            <!-- The passkey wallet signs in with an existing passkey or creates one -->
+            {#if wallet.id === 'passkey'}
+              <button
+                onclick={() => handleConnect(wallet, { create: true })}
+                disabled={connecting === wallet.id}
+                class="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+              >
+                Create passkey
+              </button>
+            {/if}
             <button
               onclick={() => handleConnect(wallet)}
               disabled={connecting === wallet.id}

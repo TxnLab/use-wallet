@@ -8,6 +8,7 @@ import { exodus } from '@txnlab/use-wallet-exodus'
 import { kibisis } from '@txnlab/use-wallet-kibisis'
 import { kmd } from '@txnlab/use-wallet-kmd'
 import { mnemonic } from '@txnlab/use-wallet-mnemonic'
+import { passkey } from '@txnlab/use-wallet-passkey'
 import { w3wallet } from '@txnlab/use-wallet-w3wallet'
 import { walletConnect } from '@txnlab/use-wallet-walletconnect'
 import { web3auth } from '@txnlab/use-wallet-web3auth'
@@ -25,6 +26,7 @@ const wallets = [
   w3wallet(),
   kmd(),
   mnemonic(),
+  passkey({ session: true }),
   ...(process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID
     ? [web3auth({ clientId: process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID })]
     : [])

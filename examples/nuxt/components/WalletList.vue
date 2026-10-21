@@ -5,10 +5,10 @@ import { useWallet, type Wallet } from '@txnlab/use-wallet-vue'
 const { availableWallets } = useWallet()
 const connecting = ref<string | null>(null)
 
-const handleConnect = async (wallet: Wallet) => {
+const handleConnect = async (wallet: Wallet, args?: { create?: boolean }) => {
   try {
     connecting.value = wallet.id
-    await wallet.connect()
+    await wallet.connect(args)
   } catch (error) {
     console.error(`Failed to connect ${wallet.metadata.name}:`, error)
   } finally {
@@ -63,14 +63,24 @@ const handleConnect = async (wallet: Wallet) => {
               Disconnect
             </button>
           </template>
-          <button
-            v-else
-            @click="handleConnect(wallet)"
-            :disabled="connecting === wallet.id"
-            class="rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-800 disabled:opacity-50 transition-colors"
-          >
-            {{ connecting === wallet.id ? 'Connecting...' : 'Connect' }}
-          </button>
+          <template v-else>
+            <!-- The passkey wallet signs in with an existing passkey or creates one -->
+            <button
+              v-if="wallet.id === 'passkey'"
+              @click="handleConnect(wallet, { create: true })"
+              :disabled="connecting === wallet.id"
+              class="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            >
+              Create passkey
+            </button>
+            <button
+              @click="handleConnect(wallet)"
+              :disabled="connecting === wallet.id"
+              class="rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-800 disabled:opacity-50 transition-colors"
+            >
+              {{ connecting === wallet.id ? 'Connecting...' : 'Connect' }}
+            </button>
+          </template>
         </div>
       </div>
     </div>

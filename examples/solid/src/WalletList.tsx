@@ -5,10 +5,10 @@ export function WalletList() {
   const { availableWallets } = useWallet()
   const [connecting, setConnecting] = createSignal<string | null>(null)
 
-  const handleConnect = async (wallet: Wallet) => {
+  const handleConnect = async (wallet: Wallet, args?: { create?: boolean }) => {
     try {
       setConnecting(wallet.id)
-      await wallet.connect()
+      await wallet.connect(args)
     } catch (error) {
       console.error(`Failed to connect ${wallet.metadata.name}:`, error)
     } finally {
@@ -25,6 +25,10 @@ export function WalletList() {
             wallet={wallet}
             isConnecting={connecting() === wallet.id}
             onConnect={() => handleConnect(wallet)}
+            // The passkey wallet signs in with an existing passkey or creates one
+            onCreate={
+              wallet.id === 'passkey' ? () => handleConnect(wallet, { create: true }) : undefined
+            }
           />
         )}
       </For>
@@ -32,7 +36,12 @@ export function WalletList() {
   )
 }
 
-function WalletRow(props: { wallet: Wallet; isConnecting: boolean; onConnect: () => void }) {
+function WalletRow(props: {
+  wallet: Wallet
+  isConnecting: boolean
+  onConnect: () => void
+  onCreate?: () => void
+}) {
   return (
     <div
       class={`rounded-xl border p-3 transition-colors ${
@@ -60,13 +69,24 @@ function WalletRow(props: { wallet: Wallet; isConnecting: boolean; onConnect: ()
           <Show
             when={props.wallet.isConnected}
             fallback={
-              <button
-                onClick={props.onConnect}
-                disabled={props.isConnecting}
-                class="rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-800 disabled:opacity-50 transition-colors"
-              >
-                {props.isConnecting ? 'Connecting...' : 'Connect'}
-              </button>
+              <>
+                <Show when={props.onCreate}>
+                  <button
+                    onClick={() => props.onCreate?.()}
+                    disabled={props.isConnecting}
+                    class="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                  >
+                    Create passkey
+                  </button>
+                </Show>
+                <button
+                  onClick={props.onConnect}
+                  disabled={props.isConnecting}
+                  class="rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-800 disabled:opacity-50 transition-colors"
+                >
+                  {props.isConnecting ? 'Connecting...' : 'Connect'}
+                </button>
+              </>
             }
           >
             <Show when={!props.wallet.isActive}>
