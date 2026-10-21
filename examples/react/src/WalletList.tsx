@@ -5,10 +5,10 @@ export function WalletList() {
   const { availableWallets } = useWallet()
   const [connecting, setConnecting] = useState<string | null>(null)
 
-  const handleConnect = async (wallet: Wallet) => {
+  const handleConnect = async (wallet: Wallet, args?: { create?: boolean }) => {
     try {
       setConnecting(wallet.id)
-      await wallet.connect()
+      await wallet.connect(args)
     } catch (error) {
       console.error(`Failed to connect ${wallet.metadata.name}:`, error)
     } finally {
@@ -25,6 +25,10 @@ export function WalletList() {
           wallet={wallet}
           isConnecting={connecting === wallet.id}
           onConnect={() => handleConnect(wallet)}
+          // The passkey wallet signs in with an existing passkey or creates one
+          onCreate={
+            wallet.id === 'passkey' ? () => handleConnect(wallet, { create: true }) : undefined
+          }
         />
       ))}
     </div>
@@ -34,11 +38,13 @@ export function WalletList() {
 function WalletRow({
   wallet,
   isConnecting,
-  onConnect
+  onConnect,
+  onCreate
 }: {
   wallet: Wallet
   isConnecting: boolean
   onConnect: () => void
+  onCreate?: () => void
 }) {
   return (
     <div
@@ -82,13 +88,24 @@ function WalletRow({
               </button>
             </>
           ) : (
-            <button
-              onClick={onConnect}
-              disabled={isConnecting}
-              className="rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-800 disabled:opacity-50 transition-colors"
-            >
-              {isConnecting ? 'Connecting...' : 'Connect'}
-            </button>
+            <>
+              {onCreate && (
+                <button
+                  onClick={onCreate}
+                  disabled={isConnecting}
+                  className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                >
+                  Create passkey
+                </button>
+              )}
+              <button
+                onClick={onConnect}
+                disabled={isConnecting}
+                className="rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-800 disabled:opacity-50 transition-colors"
+              >
+                {isConnecting ? 'Connecting...' : 'Connect'}
+              </button>
+            </>
           )}
         </div>
       </div>

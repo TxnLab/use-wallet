@@ -119,22 +119,24 @@ For a complete list of all available properties and methods, see the [useNetwork
 
 #### useWalletManager
 
-The `useWalletManager` primitive returns the `WalletManager` instance. Use it to reach a method or property that only one wallet adapter has: get the adapter instance with `manager.getWallet(walletKey)` and cast it to the adapter's type (shown here with a hypothetical `MyWalletAdapter`).
+The `useWalletManager` primitive returns the `WalletManager` instance. Use it to reach a method or property that only one wallet adapter has: get the adapter instance with `manager.getWallet(walletKey)` and cast it to the adapter's type (shown here with the Passkey adapter's `exportRecoveryPhrase()`).
 
 ```typescript
 <script lang="ts">
   import { useWalletManager } from '@txnlab/use-wallet-svelte'
-  import type { MyWalletAdapter } from 'my-wallet-adapter'
+  import type { PasskeyAdapter } from '@txnlab/use-wallet-passkey'
 
   const manager = useWalletManager()
 
   const handleClick = async () => {
-    const wallet = manager.getWallet('my-wallet') as MyWalletAdapter | undefined
-    await wallet?.customMethod()
+    const wallet = manager.getWallet('passkey') as PasskeyAdapter | undefined
+    if (!wallet) return
+    // Show the phrase with a warning to import it as a Falcon account
+    const { phrase } = await wallet.exportRecoveryPhrase()
   }
 </script>
 
-<button onclick={handleClick}>Run</button>
+<button onclick={handleClick}>Export recovery phrase</button>
 ```
 
 See the [useWalletManager API Reference](../api-reference/usewalletmanager.md) for details.

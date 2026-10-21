@@ -1,0 +1,56 @@
+{
+  "name": "@txnlab/use-wallet-passkey",
+  "version": "5.2.0-next.1",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "description": "Passkey (WebAuthn PRF) wallet adapter for @txnlab/use-wallet, with Falcon-1024 post-quantum accounts",
+  "author": "Doug Richar <drichar@gmail.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TxnLab/use-wallet.git",
+    "directory": "packages/wallets/passkey"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "peerDependencies": {
+    "@txnlab/use-wallet": "workspace:^",
+    "algosdk": "^3.7.0"
+  },
+  "dependencies": {
+    "@noble/hashes": "1.8.0",
+    "canonify": "2.1.1"
+  },
+  "devDependencies": {
+    "@txnlab/use-wallet": "workspace:*",
+    "algosdk": "3.8.0",
+    "falcon-1024": "0.2.0",
+    "tsdown": "0.23.1",
+    "typescript": "5.9.3"
+  },
+  "scripts": {
+    "build:worker": "tsdown -c tsdown.worker.config.ts && node scripts/embed-worker.mjs",
+    "build": "pnpm build:worker && tsdown",
+    "start": "pnpm build:worker && tsdown --watch",
+    "test": "pnpm build:worker && vitest run",
+    "test:watch": "pnpm build:worker && vitest --watch",
+    "lint": "eslint \"src/**/*.{js,ts}\"",
+    "typecheck": "pnpm build:worker && tsc --noEmit"
+  }
+}

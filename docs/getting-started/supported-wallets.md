@@ -266,6 +266,26 @@ For implementation details, refer to the [Web3Auth Custom Authentication documen
 * [Web3Auth Dashboard](https://dashboard.web3auth.io)
 * [Web3Auth Documentation](https://web3auth.io/docs)
 
+#### Passkey
+
+Derives a Falcon-1024 (post-quantum) account from the user's passkey, using the WebAuthn PRF extension. There's no extension, app or seed phrase to install: the passkey provider (iCloud Keychain, Google Password Manager, 1Password, Windows Hello or a FIDO2 security key) stores and syncs the credential. The account is bound to your domain.
+
+```typescript
+import { passkey } from '@txnlab/use-wallet-passkey'
+
+passkey({
+  rpId?: string,              // Optional: the domain the account is bound to (default: location.hostname)
+  rpName?: string,            // Optional: name shown in passkey prompts
+  context?: string,           // Optional: separates this app's account from others on the domain
+  session?: boolean | { idleTimeoutMs?: number }, // Optional: keep the key unlocked between signatures
+  confirm?: (request) => 'silent' | 'presence' | 'verify' // Optional: how to confirm signatures in a session
+})
+```
+
+Connect with `connect()` to sign in with an existing passkey, or `connect({ create: true })` to create one; show both choices. The adapter supports `signData` (ARC-60, scheme `falcon-1024-det`) and exports a recovery phrase with `exportRecoveryPhrase()`, which must be imported as a Falcon account. A page with a Content Security Policy must allow `worker-src blob:` and `'wasm-unsafe-eval'`.
+
+* [Passkey adapter README](https://github.com/TxnLab/use-wallet/tree/main/packages/wallets/passkey#readme)
+
 #### Voi Wallet
 
 Secure, user-friendly mobile wallet built with React Native for the Voi Network, with Algorand compatibility. Features WalletConnect support for dApp connectivity, airgapped signing for offline transaction signing, and ARC-90 Advanced QR Code Support.

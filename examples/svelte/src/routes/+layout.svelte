@@ -7,6 +7,7 @@
   import { kibisis } from '@txnlab/use-wallet-kibisis'
   import { kmd } from '@txnlab/use-wallet-kmd'
   import { mnemonic } from '@txnlab/use-wallet-mnemonic'
+  import { passkey } from '@txnlab/use-wallet-passkey'
   import { w3wallet } from '@txnlab/use-wallet-w3wallet'
   import { walletConnect } from '@txnlab/use-wallet-walletconnect'
   import { web3auth } from '@txnlab/use-wallet-web3auth'
@@ -25,6 +26,7 @@
     w3wallet(),
     kmd(),
     mnemonic(),
+    passkey({ session: true }),
     ...(import.meta.env.VITE_WEB3AUTH_CLIENT_ID
       ? [web3auth({ clientId: import.meta.env.VITE_WEB3AUTH_CLIENT_ID })]
       : [])
