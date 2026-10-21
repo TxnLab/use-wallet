@@ -191,7 +191,7 @@ describe('useWalletManager', () => {
     mockGetContext.mockReturnValue(null)
 
     expect(() => useWalletManager()).toThrow(
-      'useWalletManager must be used within a useWalletContext'
+      'useWalletManager must be used in the component that calls useWalletContext or one of its descendants'
     )
   })
 })
