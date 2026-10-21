@@ -1,3 +1,10 @@
+# [5.2.0-next.1](https://github.com/TxnLab/use-wallet/compare/v5.1.1...v5.2.0-next.1) (2026-10-21)
+
+
+### Features
+
+* **frameworks:** add useWalletManager to React and Vue ([#482](https://github.com/TxnLab/use-wallet/issues/482)) ([5806103](https://github.com/TxnLab/use-wallet/commit/5806103b778a29bdce6bee7c76fb2d01c7b1e8cb))
+
 ## [5.1.1](https://github.com/TxnLab/use-wallet/compare/v5.1.0...v5.1.1) (2026-10-20)
 
 
