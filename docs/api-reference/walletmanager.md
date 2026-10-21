@@ -201,6 +201,8 @@ getWallet(walletId: string): BaseWallet | undefined
 
 Get a specific wallet provider instance by ID or wallet key.
 
+In a framework adapter, get the manager with [useWalletManager](usewalletmanager.md) to call this.
+
 #### resumeSessions
 
 ```typescript

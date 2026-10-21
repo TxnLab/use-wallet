@@ -9,7 +9,7 @@ import {
 } from '@txnlab/use-wallet'
 import algosdk from 'algosdk'
 import * as React from 'react'
-import { WalletProvider, useWallet, useNetwork } from './index'
+import { WalletProvider, useWallet, useNetwork, useWalletManager } from './index'
 
 const mocks = vi.hoisted(() => {
   return {
@@ -116,6 +116,38 @@ describe('WalletProvider', () => {
     )
 
     expect(mockResumeSessions).toHaveBeenCalled()
+  })
+})
+
+describe('useWalletManager', () => {
+  it('returns the WalletManager passed to WalletProvider', () => {
+    const walletManager = new WalletManager({
+      wallets: [mockAdapterA()]
+    })
+
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <WalletProvider manager={walletManager}>{children}</WalletProvider>
+    )
+
+    const { result } = renderHook(() => useWalletManager(), { wrapper })
+
+    expect(result.current).toBe(walletManager)
+  })
+
+  it('throws an error when used outside of WalletProvider', () => {
+    const TestComponent = () => {
+      try {
+        useWalletManager()
+        return <div>No error thrown</div>
+      } catch (error: any) {
+        return <div>{error.message}</div>
+      }
+    }
+
+    render(<TestComponent />)
+    expect(
+      screen.getByText('useWalletManager must be used within the WalletProvider')
+    ).toBeInTheDocument()
   })
 })
 

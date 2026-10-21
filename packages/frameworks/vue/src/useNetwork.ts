@@ -1,17 +1,15 @@
 import { useStore } from '@tanstack/vue-store'
-import { WalletManager, type AlgodConfig } from '@txnlab/use-wallet'
+import type { AlgodConfig } from '@txnlab/use-wallet'
 import algosdk from 'algosdk'
 import { computed, inject, ref } from 'vue'
 import type { SetAlgodClient } from './useWallet'
+import { useWalletManager } from './useWalletManager'
 
 export function useNetwork() {
-  const manager = inject<WalletManager>('walletManager')
+  const manager = useWalletManager()
   const algodClient = inject<ReturnType<typeof ref<algosdk.Algodv2>>>('algodClient')
   const setAlgodClient = inject<SetAlgodClient>('setAlgodClient')
 
-  if (!manager) {
-    throw new Error('WalletManager plugin is not properly installed')
-  }
   if (!algodClient || !setAlgodClient) {
     throw new Error('Algod client or setter not properly installed')
   }
