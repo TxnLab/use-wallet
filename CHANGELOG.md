@@ -1,3 +1,10 @@
+# [5.2.0-next.2](https://github.com/TxnLab/use-wallet/compare/v5.2.0-next.1...v5.2.0-next.2) (2026-10-21)
+
+
+### Features
+
+* **passkey:** add a passkey wallet adapter with Falcon-1024 accounts ([#483](https://github.com/TxnLab/use-wallet/issues/483)) ([0281a55](https://github.com/TxnLab/use-wallet/commit/0281a5529ec7ca725cf29b262a44c3b0efbdeadc))
+
 # [5.2.0-next.1](https://github.com/TxnLab/use-wallet/compare/v5.1.1...v5.2.0-next.1) (2026-10-21)
 
 
