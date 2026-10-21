@@ -26,7 +26,9 @@ export const useWalletContext = (manager: WalletManager) => {
 export const useWalletManager = (): WalletManager => {
   const manager: WalletManager = getContext('walletManager')
   if (!manager) {
-    throw new Error('useWalletManager must be used within a useWalletContext')
+    throw new Error(
+      'useWalletManager must be used in the component that calls useWalletContext or one of its descendants'
+    )
   }
   return manager
 }
