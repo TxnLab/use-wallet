@@ -1,3 +1,10 @@
+# [5.2.0-next.3](https://github.com/TxnLab/use-wallet/compare/v5.2.0-next.2...v5.2.0-next.3) (2026-10-21)
+
+
+### Bug Fixes
+
+* **svelte:** clarify the useWalletManager error outside useWalletContext ([#484](https://github.com/TxnLab/use-wallet/issues/484)) ([56b9973](https://github.com/TxnLab/use-wallet/commit/56b9973fc2790e8ac7066e0bbc633dc2ccf46749))
+
 # [5.2.0-next.2](https://github.com/TxnLab/use-wallet/compare/v5.2.0-next.1...v5.2.0-next.2) (2026-10-21)
 
 
