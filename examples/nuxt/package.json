@@ -10,7 +10,7 @@
     "generate": "nuxt generate"
   },
   "dependencies": {
-    "@galaxypay/use-wallet-lute": "1.0.0",
+    "@galaxypay/use-wallet-lute": "1.1.0",
     "@noble/ed25519": "3.2.0",
     "@perawallet/use-wallet-pera": "1.0.0",
     "@txnlab/use-wallet": "workspace:*",
