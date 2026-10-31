@@ -49,8 +49,8 @@
   "devDependencies": {
     "@testing-library/svelte": "5.4.2",
     "algosdk": "3.8.0",
-    "svelte": "5.57.2",
-    "tsdown": "0.23.1",
+    "svelte": "5.57.3",
+    "tsdown": "0.23.3",
     "typescript": "5.9.3"
   },
   "peerDependencies": {

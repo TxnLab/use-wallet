@@ -58,7 +58,7 @@
     "@solidjs/testing-library": "0.8.10",
     "algosdk": "3.8.0",
     "solid-js": "1.9.17",
-    "tsdown": "0.23.1",
+    "tsdown": "0.23.3",
     "typescript": "5.9.3"
   },
   "peerDependencies": {
