@@ -8,7 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
-    "@galaxypay/use-wallet-lute": "1.0.0",
+    "@galaxypay/use-wallet-lute": "1.1.0",
     "@noble/ed25519": "3.2.0",
     "@perawallet/use-wallet-pera": "1.0.0",
     "@txnlab/use-wallet": "workspace:*",
@@ -24,7 +24,7 @@
     "algosdk": "3.8.0",
     "canonify": "2.1.1",
     "falcon-1024": "0.2.0",
-    "next": "16.4.1",
+    "next": "16.4.3",
     "react": "19.3.1",
     "react-dom": "19.3.1"
   },
