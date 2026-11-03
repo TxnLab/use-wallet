@@ -65,6 +65,14 @@ If you want to contribute to `@txnlab/use-wallet`, please follow these steps to 
   pnpm install
   ```
 
+- Build all packages. The examples import the packages from their `dist/` output, so they fail to resolve `@txnlab/use-wallet-*` imports until this has run.
+
+  ```bash
+  pnpm build:packages
+  ```
+
+  To have a running example pick up changes as you edit the packages' `src/` files, run `pnpm dev` from the root directory in a separate terminal.
+
 - If you want to run an example against your local changes, navigate to the project in the `examples/` directory and run the following command:
 
   ```bash
