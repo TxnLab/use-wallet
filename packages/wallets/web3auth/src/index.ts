@@ -10,8 +10,7 @@ export function web3auth(options: Web3AuthOptions & WalletFactoryOptions): Walle
     id: WALLET_ID,
     metadata: { ...Web3AuthAdapter.defaultMetadata, ...metadata },
     Adapter: Web3AuthAdapter as unknown as WalletAdapterConfig['Adapter'],
-    options: adapterOptions as unknown as Record<string, unknown>,
-    capabilities: { supportedNetworks: ['mainnet'] }
+    options: adapterOptions as unknown as Record<string, unknown>
   }
 }
 

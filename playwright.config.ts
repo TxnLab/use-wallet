@@ -22,7 +22,8 @@ export default defineConfig({
     }
   ],
   webServer: {
-    command: 'pnpm --filter vanilla-ts build && pnpm --filter vanilla-ts preview --port 4173',
+    command:
+      'pnpm --filter ./examples/vanilla-ts build && pnpm --filter ./examples/vanilla-ts preview --port 4173',
     port: 4173,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000
