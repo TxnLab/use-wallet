@@ -24,7 +24,7 @@ const manager = new WalletManager({
 })
 ```
 
-Social login authentication (Google, Facebook, X, Discord, and more) via [Web3Auth](https://web3auth.io). Requires a `clientId` from the [Web3Auth Dashboard](https://dashboard.web3auth.io). Supports scoped private key access via `withPrivateKey`. Supports MainNet only.
+Social login authentication (Google, Facebook, X, Discord, and more) via [Web3Auth](https://web3auth.io). Requires a `clientId` from the [Web3Auth Dashboard](https://dashboard.web3auth.io). Supports scoped private key access via `withPrivateKey`. Works on every Algorand network; `web3AuthNetwork` selects the Web3Auth environment (e.g. Sapphire Mainnet or Devnet), not the Algorand network.
 
 The factory also accepts an optional `metadata` option to override the wallet's display name and icon.
 
