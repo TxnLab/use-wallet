@@ -1,6 +1,6 @@
 {
   "name": "@txnlab/use-wallet-svelte",
-  "version": "5.1.2",
+  "version": "5.1.3",
   "publishConfig": {
     "access": "public",
     "provenance": true

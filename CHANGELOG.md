@@ -1,3 +1,10 @@
+## [5.1.3](https://github.com/TxnLab/use-wallet/compare/v5.1.2...v5.1.3) (2026-11-04)
+
+
+### Bug Fixes
+
+* **web3auth:** make Web3Auth available on every network ([#490](https://github.com/TxnLab/use-wallet/issues/490)) ([a7df956](https://github.com/TxnLab/use-wallet/commit/a7df956e51d8c29f9ad7e627b4e0c8c73d97c176))
+
 ## [5.1.2](https://github.com/TxnLab/use-wallet/compare/v5.1.1...v5.1.2) (2026-11-04)
 
 
