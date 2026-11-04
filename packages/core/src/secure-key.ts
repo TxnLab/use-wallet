@@ -185,7 +185,8 @@ export async function deriveAlgorandAccountFromEd25519(
   // This is the same library algosdk uses internally but this approach avoids the seed to 25-word mnemonic conversion
   // and then mnemonic to secret key.  Because strings in JS are immutable, this avoids a dangerous security issue of
   // not being able to securely erase the mnemonics.
-  const nacl = await import('tweetnacl')
+  // tweetnacl is CommonJS, so its namespace object only has `default`
+  const { default: nacl } = await import('tweetnacl')
   const algosdk = await import('algosdk')
 
   // Create a nacl keypair from the seed
