@@ -28,6 +28,19 @@ import {
 
 const LOCAL_STORAGE_WEB3AUTH_KEY = '@txnlab/use-wallet:v5:web3auth'
 
+/**
+ * Web3Auth network IDs, the same strings as Web3Auth's `WEB3AUTH_NETWORK`.
+ * Literals so the SFA path doesn't load `@web3auth/modal` just for the constant.
+ */
+const WEB3AUTH_NETWORKS: Record<string, string> = {
+  mainnet: 'mainnet',
+  testnet: 'testnet',
+  sapphire_mainnet: 'sapphire_mainnet',
+  sapphire_devnet: 'sapphire_devnet',
+  cyan: 'cyan',
+  aqua: 'aqua'
+}
+
 /** Metadata persisted to localStorage for Web3Auth session restoration */
 interface Web3AuthMetadata {
   /** Whether the session was established using Single Factor Auth (SFA) vs modal */
@@ -272,32 +285,20 @@ export class Web3AuthAdapter extends BaseWallet<Web3AuthOptions> {
 
     let Web3Auth: any
 
-    let WEB3AUTH_NETWORK: any
-
     try {
       // Dynamic import - @web3auth/modal is a dependency
       const modal = await import('@web3auth/modal')
       Web3Auth = modal.Web3Auth
-      WEB3AUTH_NETWORK = modal.WEB3AUTH_NETWORK
     } catch (error) {
       this.logger.error('Failed to load Web3Auth.', error)
       throw new Error('Web3Auth package not found. Please install @web3auth/modal')
-    }
-
-    const networkMap: Record<string, string> = {
-      mainnet: WEB3AUTH_NETWORK.MAINNET,
-      testnet: WEB3AUTH_NETWORK.TESTNET,
-      sapphire_mainnet: WEB3AUTH_NETWORK.SAPPHIRE_MAINNET,
-      sapphire_devnet: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
-      cyan: WEB3AUTH_NETWORK.CYAN,
-      aqua: WEB3AUTH_NETWORK.AQUA
     }
 
     // v10: Chain config and provider are handled internally for non-EVM chains.
     // Only clientId, web3AuthNetwork, and uiConfig are needed.
     const web3auth = new Web3Auth({
       clientId: this.options.clientId,
-      web3AuthNetwork: networkMap[this.options.web3AuthNetwork || 'sapphire_mainnet'] as any,
+      web3AuthNetwork: WEB3AUTH_NETWORKS[this.options.web3AuthNetwork || 'sapphire_mainnet'] as any,
       uiConfig: this.options.uiConfig
     })
 
@@ -317,17 +318,12 @@ export class Web3AuthAdapter extends BaseWallet<Web3AuthOptions> {
 
     let Web3Auth: any
 
-    let WEB3AUTH_NETWORK: any
-
     let CommonPrivateKeyProvider: any
 
     try {
       // Dynamic imports
       const sfa = await import('@web3auth/single-factor-auth')
       Web3Auth = sfa.Web3Auth
-      // Import WEB3AUTH_NETWORK from @web3auth/modal (v10 re-exports it)
-      const modal = await import('@web3auth/modal')
-      WEB3AUTH_NETWORK = modal.WEB3AUTH_NETWORK
       const baseProvider = await import('@web3auth/base-provider')
       CommonPrivateKeyProvider = baseProvider.CommonPrivateKeyProvider
     } catch {
@@ -351,15 +347,6 @@ export class Web3AuthAdapter extends BaseWallet<Web3AuthOptions> {
       tickerName: 'Algorand'
     }
 
-    const networkMap: Record<string, string> = {
-      mainnet: WEB3AUTH_NETWORK.MAINNET,
-      testnet: WEB3AUTH_NETWORK.TESTNET,
-      sapphire_mainnet: WEB3AUTH_NETWORK.SAPPHIRE_MAINNET,
-      sapphire_devnet: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
-      cyan: WEB3AUTH_NETWORK.CYAN,
-      aqua: WEB3AUTH_NETWORK.AQUA
-    }
-
     // SFA v9 still requires CommonPrivateKeyProvider for non-EVM chains
     const privateKeyProvider = new CommonPrivateKeyProvider({
       config: { chainConfig }
@@ -367,7 +354,7 @@ export class Web3AuthAdapter extends BaseWallet<Web3AuthOptions> {
 
     const web3authSFA = new Web3Auth({
       clientId: this.options.clientId,
-      web3AuthNetwork: networkMap[this.options.web3AuthNetwork || 'sapphire_mainnet'] as any,
+      web3AuthNetwork: WEB3AUTH_NETWORKS[this.options.web3AuthNetwork || 'sapphire_mainnet'] as any,
       privateKeyProvider
     })
 
