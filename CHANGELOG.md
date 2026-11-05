@@ -1,3 +1,11 @@
+# [5.2.0-next.4](https://github.com/TxnLab/use-wallet/compare/v5.2.0-next.3...v5.2.0-next.4) (2026-11-05)
+
+
+### Bug Fixes
+
+* **core:** load tweetnacl default export when deriving Web3Auth accounts ([#489](https://github.com/TxnLab/use-wallet/issues/489)) ([6ca910c](https://github.com/TxnLab/use-wallet/commit/6ca910c14dcccb7c10cca70e2f577e5482bf7509))
+* **web3auth:** make Web3Auth available on every network ([#490](https://github.com/TxnLab/use-wallet/issues/490)) ([a7df956](https://github.com/TxnLab/use-wallet/commit/a7df956e51d8c29f9ad7e627b4e0c8c73d97c176))
+
 # [5.2.0-next.3](https://github.com/TxnLab/use-wallet/compare/v5.2.0-next.2...v5.2.0-next.3) (2026-10-21)
 
 
