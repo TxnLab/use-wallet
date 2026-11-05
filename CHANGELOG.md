@@ -1,3 +1,10 @@
+## [5.1.4](https://github.com/TxnLab/use-wallet/compare/v5.1.3...v5.1.4) (2026-11-05)
+
+
+### Bug Fixes
+
+* **web3auth:** stop loading @web3auth/modal for Single Factor Auth ([#491](https://github.com/TxnLab/use-wallet/issues/491)) ([285dcee](https://github.com/TxnLab/use-wallet/commit/285dcee7368ad553686c9aa3836c3171cf29f6bf))
+
 ## [5.1.3](https://github.com/TxnLab/use-wallet/compare/v5.1.2...v5.1.3) (2026-11-04)
 
 
