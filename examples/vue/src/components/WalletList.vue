@@ -30,13 +30,13 @@ const handleConnect = async (wallet: Wallet, args?: { create?: boolean }) => {
           : 'border-gray-200 bg-white hover:border-gray-300'
       ]"
     >
-      <div class="flex items-center gap-3">
+      <div class="flex flex-wrap items-center gap-3">
         <img
           :src="wallet.metadata.icon"
           :alt="wallet.metadata.name"
           class="h-10 w-10 rounded-lg shrink-0"
         />
-        <div class="flex-1 min-w-0">
+        <div class="flex-1 min-w-24">
           <div class="text-sm font-medium text-gray-900">{{ wallet.metadata.name }}</div>
           <div
             v-if="wallet.isConnected && wallet.activeAccount"
@@ -47,7 +47,7 @@ const handleConnect = async (wallet: Wallet, args?: { create?: boolean }) => {
             }}
           </div>
         </div>
-        <div class="flex items-center gap-1.5 shrink-0">
+        <div class="ml-auto flex items-center gap-1.5 shrink-0">
           <template v-if="wallet.isConnected">
             <button
               v-if="!wallet.isActive"

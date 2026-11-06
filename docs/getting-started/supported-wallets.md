@@ -268,7 +268,11 @@ For implementation details, refer to the [Web3Auth Custom Authentication documen
 
 #### Passkey
 
-Derives a Falcon-1024 (post-quantum) account from the user's passkey, using the WebAuthn PRF extension. There's no extension, app or seed phrase to install: the passkey provider (iCloud Keychain, Google Password Manager, 1Password, Windows Hello or a FIDO2 security key) stores and syncs the credential. The account is bound to your domain.
+Derives an app-scoped Falcon-1024 (post-quantum) account from the user's passkey, using the WebAuthn PRF extension. There's no extension, app or seed phrase to install: the passkey provider (iCloud Keychain, Google Password Manager, 1Password, Windows Hello or a FIDO2 security key) stores and syncs the credential.
+
+{% hint style="warning" %}
+The account belongs to your site. The key is derived in your page, so any script running on your domain can take it with one passkey prompt that looks like a sign-in, and users have to trust your site the way they'd trust an app that holds their balance. Read the adapter's [security model](https://github.com/TxnLab/use-wallet/tree/main/packages/wallets/passkey#security-model) before you ship it, and give users a way to move to a wallet they control.
+{% endhint %}
 
 ```typescript
 import { passkey } from '@txnlab/use-wallet-passkey'
@@ -277,12 +281,12 @@ passkey({
   rpId?: string,              // Optional: the domain the account is bound to (default: location.hostname)
   rpName?: string,            // Optional: name shown in passkey prompts
   context?: string,           // Optional: separates this app's account from others on the domain
-  session?: boolean | { idleTimeoutMs?: number }, // Optional: keep the key unlocked between signatures
+  session?: boolean | { idleTimeoutMs?: number, maxAgeMs?: number, lockWhenHidden?: boolean }, // Optional: keep the key unlocked between signatures
   confirm?: (request) => 'silent' | 'presence' | 'verify' // Optional: how to confirm signatures in a session
 })
 ```
 
-Connect with `connect()` to sign in with an existing passkey, or `connect({ create: true })` to create one; show both choices. The adapter supports `signData` (ARC-60, scheme `falcon-1024-det`) and exports a recovery phrase with `exportRecoveryPhrase()`, which must be imported as a Falcon account. A page with a Content Security Policy must allow `worker-src blob:` and `'wasm-unsafe-eval'`.
+Connect with `connect()` to sign in with an existing passkey, or `connect({ create: true })` to create one; show both choices. The adapter supports `signData` (ARC-60, scheme `falcon-1024-det`) and exports a recovery phrase with `exportRecoveryPhrase()`, which must be imported as a Falcon account. In a session, `unlock()`, `lock()` and `isUnlocked` let you control when the key is held, for example to unlock on a tap before a flow that awaits a quote. A page with a Content Security Policy must allow `worker-src blob:` and `'wasm-unsafe-eval'`.
 
 * [Passkey adapter README](https://github.com/TxnLab/use-wallet/tree/main/packages/wallets/passkey#readme)
 

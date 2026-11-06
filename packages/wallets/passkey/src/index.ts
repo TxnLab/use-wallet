@@ -2,6 +2,7 @@ import { PasskeyAdapter } from './adapter'
 import type {
   PasskeyConfirmation,
   PasskeyConnectArgs,
+  PasskeyLockReason,
   PasskeyOptions,
   PasskeyRecoveryPhrase,
   PasskeySessionOptions,
@@ -28,12 +29,19 @@ export function passkey(options?: PasskeyOptions & WalletFactoryOptions): Wallet
 
 export { PasskeyAdapter }
 export { PasskeyError, type PasskeyErrorCode } from './errors'
-export { WorkerKeyStore, type PasskeyKeyStore, type WorkerKeyStoreOptions } from './key-store'
+export {
+  WorkerKeyStore,
+  type PasskeyKeyStore,
+  type WorkerKeyStoreLockReason,
+  type WorkerKeyStoreOptions
+} from './key-store'
+export type { PasskeyTimeoutReason } from './worker/protocol'
 export { PRF_LABEL_PREFIX, keygenSeedFromEntropy, prfInput } from './derivation'
 export { LOCAL_STORAGE_PASSKEY_KEY } from './record'
 export type {
   PasskeyConfirmation,
   PasskeyConnectArgs,
+  PasskeyLockReason,
   PasskeyOptions,
   PasskeyRecoveryPhrase,
   PasskeySessionOptions,

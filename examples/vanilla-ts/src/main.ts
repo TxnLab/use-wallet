@@ -35,7 +35,7 @@ const wallets = [
   w3wallet(),
   kmd(),
   mnemonic(),
-  passkey({ session: true }),
+  passkey({ rpName: 'use-wallet example', session: true }),
   ...(import.meta.env.VITE_WEB3AUTH_CLIENT_ID
     ? [web3auth({ clientId: import.meta.env.VITE_WEB3AUTH_CLIENT_ID })]
     : [])
@@ -114,13 +114,13 @@ function renderWalletList() {
 
       return `
         <div class="rounded-xl border p-3 transition-colors ${isActive ? 'border-blue-200 bg-blue-50' : 'border-gray-200 bg-white hover:border-gray-300'}">
-          <div class="flex items-center gap-3">
+          <div class="flex flex-wrap items-center gap-3">
             <img src="${wallet.metadata.icon}" alt="${escapeHtml(wallet.metadata.name)}" class="h-10 w-10 rounded-lg shrink-0" />
-            <div class="flex-1 min-w-0">
+            <div class="flex-1 min-w-24">
               <div class="text-sm font-medium text-gray-900">${escapeHtml(wallet.metadata.name)}</div>
               ${addressHtml}
             </div>
-            <div class="flex items-center gap-1.5 shrink-0">${buttons}</div>
+            <div class="ml-auto flex items-center gap-1.5 shrink-0">${buttons}</div>
           </div>
         </div>`
     })

@@ -25,7 +25,13 @@ vi.mock('./key-store', async () => {
     static instances: WorkerKeyStore[] = []
     private privateKey: Uint8Array | null = null
 
-    constructor(public options: { idleTimeoutMs?: number } = {}) {
+    constructor(
+      public options: {
+        idleTimeoutMs?: number
+        maxAgeMs?: number
+        onLock?: (reason: string) => void
+      } = {}
+    ) {
       WorkerKeyStore.instances.push(this)
     }
 
@@ -49,13 +55,22 @@ vi.mock('./key-store', async () => {
     lock() {
       this.privateKey = null
     }
+
+    /** Lock the way the worker's timeouts do */
+    expire(reason: 'idle' | 'max-age') {
+      this.privateKey = null
+      this.options.onLock?.(reason)
+    }
   }
 
   return { WorkerKeyStore }
 })
 
 const FakeKeyStore = WorkerKeyStore as unknown as {
-  instances: (PasskeyKeyStore & { options: { idleTimeoutMs?: number } })[]
+  instances: (PasskeyKeyStore & {
+    options: { idleTimeoutMs?: number; maxAgeMs?: number }
+    expire: (reason: 'idle' | 'max-age') => void
+  })[]
 }
 
 const WALLET_ID = 'passkey'
@@ -701,13 +716,18 @@ describe('PasskeyAdapter', () => {
   })
 
   describe('key store lifecycle', () => {
-    it('uses a 15-minute idle timeout for a session, and none without one', async () => {
+    it('uses a 15-minute idle timeout and a 1-hour maximum age for a session, and neither without one', async () => {
       await createWallet(accessor, { session: true }).connect()
       await createWallet(accessor).connect()
       await createWallet(accessor, { session: false }).connect()
 
       expect(FakeKeyStore.instances.map((store) => store.options.idleTimeoutMs)).toEqual([
         15 * 60 * 1000,
+        0,
+        0
+      ])
+      expect(FakeKeyStore.instances.map((store) => store.options.maxAgeMs)).toEqual([
+        60 * 60 * 1000,
         0,
         0
       ])
@@ -1048,6 +1068,373 @@ describe('PasskeyAdapter', () => {
     it('keeps a session with idleTimeoutMs 0 without an idle lock', async () => {
       await createWallet(accessor, { session: { idleTimeoutMs: 0 } }).connect()
       expect(FakeKeyStore.instances[0].options.idleTimeoutMs).toBe(0)
+      expect(FakeKeyStore.instances[0].options.maxAgeMs).toBe(60 * 60 * 1000)
+    })
+
+    it('passes the maximum age to the key store, and 0 for none', async () => {
+      await createWallet(accessor, { session: { maxAgeMs: 5 * 60 * 1000 } }).connect()
+      await createWallet(accessor, { session: { maxAgeMs: 0 } }).connect()
+      expect(FakeKeyStore.instances.map((store) => store.options.maxAgeMs)).toEqual([
+        5 * 60 * 1000,
+        0
+      ])
+      expect(FakeKeyStore.instances[0].options.idleTimeoutMs).toBe(15 * 60 * 1000)
+    })
+
+    describe('lockWhenHidden', () => {
+      let page: EventTarget & { visibilityState: DocumentVisibilityState }
+
+      const setVisibility = (state: DocumentVisibilityState) => {
+        page.visibilityState = state
+        page.dispatchEvent(new Event('visibilitychange'))
+      }
+
+      beforeEach(() => {
+        page = Object.assign(new EventTarget(), { visibilityState: 'visible' as const })
+        vi.stubGlobal('document', page)
+      })
+
+      it('locks the session when the page is hidden', async () => {
+        const wallet = createWallet(accessor, { session: { lockWhenHidden: true } })
+        await wallet.connect()
+        setVisibility('visible')
+        expect(FakeKeyStore.instances[0].unlocked).toBe(true)
+
+        setVisibility('hidden')
+        expect(FakeKeyStore.instances[0].unlocked).toBe(false)
+
+        setVisibility('visible')
+        getCalls = []
+        await wallet.signTransactions([makePayment(ADDRESS)])
+        expect(prfCalls()).toHaveLength(1)
+      })
+
+      it('finishes a request that hides the page, then locks', async () => {
+        const wallet = createWallet(accessor, { session: { lockWhenHidden: true } })
+        await wallet.connect()
+
+        // The presence prompt hides the page
+        credentials.get.mockImplementationOnce((options: CredentialRequestOptions) => {
+          setVisibility('hidden')
+          return fakeGet(options)
+        })
+        const txn = makePayment(ADDRESS)
+        const [signed] = await wallet.signTransactions([txn])
+
+        expectValidSignature(signed!, txn)
+        expect(FakeKeyStore.instances[0].unlocked).toBe(false)
+      })
+
+      it('keeps the session if the page is visible again when the request ends', async () => {
+        const wallet = createWallet(accessor, { session: { lockWhenHidden: true } })
+        await wallet.connect()
+
+        credentials.get.mockImplementationOnce((options: CredentialRequestOptions) => {
+          setVisibility('hidden')
+          setVisibility('visible')
+          return fakeGet(options)
+        })
+        await wallet.signData(siwaData(), { scope: ScopeType.AUTH, encoding: 'base64' })
+        expect(FakeKeyStore.instances[0].unlocked).toBe(true)
+      })
+
+      it('locks a session that connects while the page is hidden', async () => {
+        page.visibilityState = 'hidden'
+        await createWallet(accessor, { session: { lockWhenHidden: true } }).connect()
+        expect(FakeKeyStore.instances[0].unlocked).toBe(false)
+      })
+
+      it('applies to a custom key store', async () => {
+        const keyStore = new (WorkerKeyStore as unknown as new () => PasskeyKeyStore)()
+        const wallet = createWallet(accessor, {
+          keyStore: () => keyStore,
+          session: { lockWhenHidden: true }
+        })
+        await wallet.connect()
+        expect(keyStore.unlocked).toBe(true)
+
+        setVisibility('hidden')
+        expect(keyStore.unlocked).toBe(false)
+      })
+
+      it('reports hidden locks to onLock', async () => {
+        const onLock = vi.fn()
+        const wallet = createWallet(accessor, { session: { lockWhenHidden: true }, onLock })
+        await wallet.connect()
+        setVisibility('hidden')
+        expect(onLock.mock.calls).toEqual([['hidden']])
+
+        // A lock at the end of a request the page was hidden during
+        setVisibility('visible')
+        await wallet.unlock()
+        credentials.get.mockImplementationOnce((options: CredentialRequestOptions) => {
+          setVisibility('hidden')
+          return fakeGet(options)
+        })
+        await wallet.signTransactions([makePayment(ADDRESS)])
+        expect(onLock.mock.calls).toEqual([['hidden'], ['hidden']])
+      })
+
+      it('follows a setting passed as a function', async () => {
+        let setting = false
+        const wallet = createWallet(accessor, { session: { lockWhenHidden: () => setting } })
+        await wallet.connect()
+
+        setVisibility('hidden')
+        expect(wallet.isUnlocked).toBe(true)
+
+        setVisibility('visible')
+        setting = true
+        setVisibility('hidden')
+        expect(wallet.isUnlocked).toBe(false)
+      })
+
+      it('fails closed when the setting function throws', async () => {
+        const wallet = createWallet(accessor, {
+          session: {
+            lockWhenHidden: () => {
+              throw new Error('app bug')
+            }
+          }
+        })
+        await wallet.connect()
+        setVisibility('hidden')
+        expect(wallet.isUnlocked).toBe(false)
+      })
+
+      it('is off by default', async () => {
+        await createWallet(accessor, { session: true }).connect()
+        await createWallet(accessor, { session: { lockWhenHidden: false } }).connect()
+
+        setVisibility('hidden')
+        expect(FakeKeyStore.instances.map((store) => store.unlocked)).toEqual([true, true])
+      })
+    })
+  })
+
+  describe('unlock and lock', () => {
+    it('unlocks a resumed session with one scoped PRF ceremony, so signing needs none', async () => {
+      await createWallet(accessor, { session: true, confirm: () => 'silent' }).connect()
+      const reloaded = createWallet(accessor, { session: true, confirm: () => 'silent' })
+      await reloaded.resumeSession()
+      getCalls = []
+      expect(reloaded.isUnlocked).toBe(false)
+
+      await reloaded.unlock()
+      expect(reloaded.isUnlocked).toBe(true)
+      expect(prfCalls()).toHaveLength(1)
+      expect(
+        new Uint8Array(prfCalls()[0].publicKey!.allowCredentials![0].id as Uint8Array)
+      ).toEqual(CREDENTIAL_ID)
+
+      await reloaded.unlock()
+      const txn = makePayment(ADDRESS)
+      const [signed] = await reloaded.signTransactions([txn])
+      expectValidSignature(signed!, txn)
+      expect(getCalls).toHaveLength(1)
+    })
+
+    it('does nothing without a session', async () => {
+      const wallet = createWallet(accessor)
+      await wallet.connect()
+      getCalls = []
+
+      await wallet.unlock()
+      expect(getCalls).toHaveLength(0)
+      expect(wallet.isUnlocked).toBe(false)
+    })
+
+    it('requires a connected account', async () => {
+      await expect(createWallet(accessor, { session: true }).unlock()).rejects.toMatchObject({
+        code: 'not-connected'
+      })
+    })
+
+    it('fails closed and stays locked on a key mismatch', async () => {
+      const wallet = createWallet(accessor, { session: true })
+      await wallet.connect()
+      wallet.lock()
+      authenticator.prfOutput = (input) => sha256(sha256(input))
+
+      await expect(wallet.unlock()).rejects.toMatchObject({ code: 'key-mismatch' })
+      expect(wallet.isUnlocked).toBe(false)
+    })
+
+    it('surfaces a cancelled prompt', async () => {
+      const wallet = createWallet(accessor, { session: true })
+      await wallet.connect()
+      wallet.lock()
+      authenticator.failWith = new DOMException('no', 'NotAllowedError')
+
+      await expect(wallet.unlock()).rejects.toMatchObject({ code: 'cancelled' })
+      expect(wallet.isUnlocked).toBe(false)
+    })
+
+    it('locks without disconnecting, and the next signature unlocks again', async () => {
+      const wallet = createWallet(accessor, { session: true })
+      await wallet.connect()
+      expect(wallet.isUnlocked).toBe(true)
+
+      wallet.lock()
+      expect(wallet.isUnlocked).toBe(false)
+      expect(wallet.isConnected).toBe(true)
+
+      getCalls = []
+      await wallet.signTransactions([makePayment(ADDRESS)])
+      expect(prfCalls()).toHaveLength(1)
+      expect(bareCalls()).toHaveLength(0)
+    })
+
+    describe('onLock and onUnlock', () => {
+      it('reports lock() once, and nothing while already locked', async () => {
+        const onLock = vi.fn()
+        const wallet = createWallet(accessor, { session: true, onLock })
+        await wallet.connect()
+
+        wallet.lock()
+        wallet.lock()
+        expect(onLock.mock.calls).toEqual([['lock']])
+      })
+
+      it.each(['idle', 'max-age'] as const)('reports the key store %s timeout', async (reason) => {
+        const onLock = vi.fn()
+        const wallet = createWallet(accessor, { session: true, onLock })
+        await wallet.connect()
+
+        FakeKeyStore.instances[0].expire(reason)
+        expect(onLock).toHaveBeenCalledWith(reason)
+        expect(wallet.isUnlocked).toBe(false)
+      })
+
+      it('reports a disconnect', async () => {
+        const onLock = vi.fn()
+        const wallet = createWallet(accessor, { session: true, onLock })
+        await wallet.connect()
+
+        await wallet.disconnect()
+        expect(onLock.mock.calls).toEqual([['disconnect']])
+      })
+
+      it('reports again after a reload and an unlock', async () => {
+        await createWallet(accessor, { session: true }).connect()
+        const onLock = vi.fn()
+        const reloaded = createWallet(accessor, { session: true, onLock })
+        await reloaded.resumeSession()
+
+        reloaded.lock()
+        expect(onLock).not.toHaveBeenCalled()
+
+        await reloaded.unlock()
+        reloaded.lock()
+        expect(onLock.mock.calls).toEqual([['lock']])
+      })
+
+      it('reports a failed reconnect that dropped the session', async () => {
+        const onLock = vi.fn()
+        const wallet = createWallet(accessor, { session: true, onLock })
+        await wallet.connect()
+        authenticator.failWith = new DOMException('no', 'NotAllowedError')
+
+        await expect(wallet.connect()).rejects.toMatchObject({ code: 'cancelled' })
+        expect(onLock.mock.calls).toEqual([['connect']])
+      })
+
+      it('reports a key store that dropped the key during a request', async () => {
+        const onLock = vi.fn()
+        const keyStore = new (WorkerKeyStore as unknown as new () => PasskeyKeyStore)()
+        const wallet = createWallet(accessor, {
+          keyStore: () => keyStore,
+          confirm: () => 'silent',
+          onLock
+        })
+        await wallet.connect()
+        vi.spyOn(keyStore, 'sign').mockImplementationOnce(async () => {
+          keyStore.lock()
+          throw new Error('worker crashed')
+        })
+
+        await expect(wallet.signTransactions([makePayment(ADDRESS)])).rejects.toThrow()
+        expect(onLock.mock.calls).toEqual([['key-store']])
+      })
+
+      it('is never called without a session', async () => {
+        const onLock = vi.fn()
+        const onUnlock = vi.fn()
+        const wallet = createWallet(accessor, { onLock, onUnlock })
+        await wallet.connect()
+        await wallet.signTransactions([makePayment(ADDRESS)])
+        await wallet.unlock()
+        wallet.lock()
+        await wallet.disconnect()
+        expect(onLock).not.toHaveBeenCalled()
+        expect(onUnlock).not.toHaveBeenCalled()
+      })
+
+      it('reports unlocks from connect, unlock and a signature, once each', async () => {
+        const onUnlock = vi.fn()
+        const options = { session: true, confirm: () => 'silent' as const, onUnlock }
+        const wallet = createWallet(accessor, options)
+        await wallet.connect()
+        expect(onUnlock).toHaveBeenCalledTimes(1)
+
+        // Already unlocked: a signature and another unlock change nothing
+        await wallet.signTransactions([makePayment(ADDRESS)])
+        await wallet.unlock()
+        expect(onUnlock).toHaveBeenCalledTimes(1)
+
+        wallet.lock()
+        await wallet.unlock()
+        expect(onUnlock).toHaveBeenCalledTimes(2)
+
+        // After a reload, the first signature's PRF ceremony unlocks
+        const reloaded = createWallet(accessor, options)
+        await reloaded.resumeSession()
+        await reloaded.signTransactions([makePayment(ADDRESS)])
+        expect(onUnlock).toHaveBeenCalledTimes(3)
+      })
+
+      it('reports nothing for a failed unlock', async () => {
+        const onLock = vi.fn()
+        const onUnlock = vi.fn()
+        const wallet = createWallet(accessor, { session: true, onLock, onUnlock })
+        await wallet.connect()
+        wallet.lock()
+        authenticator.failWith = new DOMException('no', 'NotAllowedError')
+
+        await expect(wallet.unlock()).rejects.toMatchObject({ code: 'cancelled' })
+        expect(onUnlock).toHaveBeenCalledTimes(1)
+        expect(onLock).toHaveBeenCalledTimes(1)
+      })
+
+      it('keeps working when onLock or onUnlock throws', async () => {
+        const wallet = createWallet(accessor, {
+          session: true,
+          onLock: () => {
+            throw new Error('app bug')
+          },
+          onUnlock: () => {
+            throw new Error('app bug')
+          }
+        })
+        await expect(wallet.connect()).resolves.toHaveLength(1)
+
+        expect(() => wallet.lock()).not.toThrow()
+        expect(wallet.isUnlocked).toBe(false)
+      })
+    })
+
+    it('reads the confirm policy on every request', async () => {
+      let preference: PasskeyConfirmation = 'silent'
+      const wallet = createWallet(accessor, { session: true, confirm: () => preference })
+      await wallet.connect()
+      getCalls = []
+
+      await wallet.signTransactions([makePayment(ADDRESS)])
+      expect(getCalls).toHaveLength(0)
+
+      preference = 'verify'
+      await wallet.signTransactions([makePayment(ADDRESS)])
+      expect(bareCalls().map((call) => call.publicKey!.userVerification)).toEqual(['required'])
     })
   })
 
@@ -1059,6 +1446,7 @@ describe('PasskeyAdapter', () => {
 
       expect(createCalls[0].publicKey!.rp.id).toBe('example.com')
       expect(createCalls[0].publicKey!.user.name).toBe('Example dApp account')
+      expect(wallet.activeAccount!.name).toBe('Passkey · example.com')
 
       const resumed = createWallet(accessor, options)
       await resumed.resumeSession()
@@ -1152,7 +1540,7 @@ describe('PasskeyAdapter', () => {
       const wallet = createWallet(accessor)
       expect(wallet.canSignData).toBe(true)
       const [account] = await wallet.connect({ create: true, userName: 'alice' })
-      expect(account.name).toBe('Passkey Account')
+      expect(account.name).toBe('Passkey · dapp.example')
       expect(createCalls[0].publicKey!.user.displayName).toBe('alice')
     })
 

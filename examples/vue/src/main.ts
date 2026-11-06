@@ -27,7 +27,7 @@ const wallets = [
   w3wallet(),
   kmd(),
   mnemonic(),
-  passkey({ session: true }),
+  passkey({ rpName: 'use-wallet example', session: true }),
   ...(import.meta.env.VITE_WEB3AUTH_CLIENT_ID
     ? [web3auth({ clientId: import.meta.env.VITE_WEB3AUTH_CLIENT_ID })]
     : [])

@@ -6,11 +6,13 @@
  * provider (iCloud Keychain, Google Password Manager, 1Password, Windows
  * Hello, a security key) syncs and protects the credential.
  *
- * SECURITY CONSIDERATIONS:
- * - The account is bound to the relying party ID (by default the page's
- *   hostname). Whoever controls that domain can run a PRF ceremony and recover
- *   the key with one tap, and the account is stranded if the domain is lost,
- *   so offer `exportRecoveryPhrase`.
+ * SECURITY MODEL: the account is app-scoped.
+ * - It is bound to the relying party ID (by default the page's hostname). Any
+ *   script running there can derive the key with one verified passkey prompt
+ *   that looks like a sign-in: the dApp itself, an XSS bug, a compromised
+ *   dependency, or whoever takes over the domain. Other sites can't derive it.
+ * - The account is stranded if the domain is lost, so offer
+ *   `exportRecoveryPhrase` and a way to move to a wallet. See the README.
  * - Only public data is persisted: the credential ID, public key, address
  *   salt and address. Never the PRF output, the entropy or the private key.
  * - The private key lives in a dedicated worker, never on the main thread.
@@ -38,13 +40,14 @@ import {
 import { assertValidContext, prfInput } from './derivation'
 import { PasskeyError } from './errors'
 import { icon } from './icon'
-import { WorkerKeyStore, type PasskeyKeyStore } from './key-store'
+import { WorkerKeyStore, type PasskeyKeyStore, type WorkerKeyStoreLockReason } from './key-store'
 import { loadRecord, removeRecord, saveRecord, type PasskeyRecord } from './record'
 import { assertUser, createPasskey, evaluatePrf, type PrfResult } from './webauthn'
 
 const ICON = `data:image/svg+xml;base64,${btoa(icon)}`
 
 const DEFAULT_IDLE_TIMEOUT_MS = 15 * 60 * 1000
+const DEFAULT_MAX_AGE_MS = 60 * 60 * 1000
 
 /**
  * How to confirm a signing request while a session is unlocked:
@@ -61,9 +64,30 @@ export type PasskeyConfirmation = 'silent' | 'presence' | 'verify'
 export type PasskeySigningRequest =
   { type: 'transactions'; transactions: algosdk.Transaction[] } | { type: 'data'; siwa: Siwa }
 
+/**
+ * Why an unlocked session locked:
+ * - `idle`, `max-age`: the built-in key store's timeouts
+ * - `hidden`: the page was hidden, with `lockWhenHidden`
+ * - `lock`: the app called `lock()`
+ * - `disconnect`: the wallet disconnected
+ * - `connect`: a new `connect` replaced or dropped the session
+ * - `key-store`: the key store dropped the key itself, e.g. its worker failed
+ */
+export type PasskeyLockReason =
+  WorkerKeyStoreLockReason | 'hidden' | 'lock' | 'disconnect' | 'connect'
+
 export interface PasskeySessionOptions {
   /** Lock the session after this long without a signature; 0 never locks it. Default: 15 minutes */
   idleTimeoutMs?: number
+  /** Lock the session this long after it unlocks, however active it is; 0 sets no limit. Default: 1 hour */
+  maxAgeMs?: number
+  /**
+   * Lock the session when the page is hidden, e.g. the user switches tabs or
+   * apps. A signing request in progress finishes first. Also applies to a
+   * custom `keyStore`. Pass a function to follow a setting the user can
+   * change; it's read each time the page is hidden. Default: `false`
+   */
+  lockWhenHidden?: boolean | (() => boolean)
 }
 
 export interface PasskeyOptions {
@@ -87,8 +111,8 @@ export interface PasskeyOptions {
    * Keep the key unlocked between signatures, so only the first signature
    * (or `connect`) runs a PRF ceremony with full user verification; later ones
    * are confirmed per `confirm`. The key is held in a dedicated worker until
-   * the idle timeout, `disconnect` or a page reload. Default: `false`, a PRF
-   * ceremony for every request.
+   * the idle timeout, the maximum age, `disconnect` or a page reload. Default:
+   * `false`, a PRF ceremony for every request.
    */
   session?: boolean | PasskeySessionOptions
   /**
@@ -97,6 +121,17 @@ export interface PasskeyOptions {
    * across an await, so this must not be async. Default: `() => 'presence'`.
    */
   confirm?: (request: PasskeySigningRequest) => PasskeyConfirmation
+  /**
+   * Called when an unlocked session locks, so the app can show it (e.g. an
+   * "Unlock" button) without polling `isUnlocked`. Not called without a
+   * session, where the key is only held during a request.
+   */
+  onLock?: (reason: PasskeyLockReason) => void
+  /**
+   * Called when a locked session unlocks: on `connect`, `unlock`, or a
+   * signature that ran the PRF ceremony. Not called without a session.
+   */
+  onUnlock?: () => void
   /**
    * Replaces the built-in worker key store, e.g. to keep a session across page
    * reloads. The adapter treats a custom key store as a session: it never
@@ -140,10 +175,17 @@ async function sha256(data: Uint8Array): Promise<Uint8Array> {
 
 export class PasskeyAdapter extends BaseWallet<PasskeyOptions> {
   private keyStore: PasskeyKeyStore | null = null
+  /** Signing requests in progress; hiding the page doesn't lock in the middle of one */
+  private activeRequests = 0
+  /** Whether the session was unlocked when `onLock`/`onUnlock` last checked */
+  private reportedUnlocked = false
 
   constructor(params: AdapterConstructorParams<PasskeyOptions>) {
     super(params)
     assertValidContext(this.context)
+    if (this.isSession && this.sessionOptions.lockWhenHidden && typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', this.onVisibilityChange)
+    }
   }
 
   static defaultMetadata: WalletMetadata = {
@@ -170,17 +212,37 @@ export class PasskeyAdapter extends BaseWallet<PasskeyOptions> {
     return !!this.options.session || !!this.options.keyStore
   }
 
+  private get sessionOptions(): PasskeySessionOptions {
+    const { session } = this.options
+    return typeof session === 'object' ? session : {}
+  }
+
+  private get lockWhenHidden(): boolean {
+    const { lockWhenHidden } = this.sessionOptions
+    if (!this.isSession) return false
+    if (typeof lockWhenHidden !== 'function') return !!lockWhenHidden
+    try {
+      return lockWhenHidden()
+    } catch (error: any) {
+      // Fail closed
+      this.logger.error('Error in lockWhenHidden:', error.message)
+      return true
+    }
+  }
+
   private createKeyStore(): PasskeyKeyStore {
     if (this.options.keyStore) return this.options.keyStore()
 
-    const { session } = this.options
-    const idleTimeoutMs = session
-      ? ((typeof session === 'object' ? session.idleTimeoutMs : undefined) ??
-        DEFAULT_IDLE_TIMEOUT_MS)
-      : 0
+    const session = !!this.options.session
+    const { idleTimeoutMs = DEFAULT_IDLE_TIMEOUT_MS, maxAgeMs = DEFAULT_MAX_AGE_MS } =
+      this.sessionOptions
     return new WorkerKeyStore({
-      idleTimeoutMs,
-      onIdleLock: () => this.logger.info('Session locked after inactivity')
+      idleTimeoutMs: session ? idleTimeoutMs : 0,
+      maxAgeMs: session ? maxAgeMs : 0,
+      onLock: (reason) => {
+        this.logger.info(`Session locked (${reason})`)
+        this.reportSession(reason)
+      }
     })
   }
 
@@ -191,7 +253,49 @@ export class PasskeyAdapter extends BaseWallet<PasskeyOptions> {
 
   /** Drop the key after a request, unless a session keeps it */
   private release(): void {
-    if (!this.isSession) this.keyStore?.lock()
+    if (!this.isSession || this.isHidden()) this.keyStore?.lock()
+  }
+
+  /** True when the page is hidden and the session should lock for it */
+  private isHidden(): boolean {
+    return (
+      typeof document !== 'undefined' &&
+      document.visibilityState === 'hidden' &&
+      this.lockWhenHidden
+    )
+  }
+
+  private onVisibilityChange = (): void => {
+    // A passkey prompt can hide the page; a request in progress locks when it ends
+    if (this.activeRequests === 0 && this.isHidden()) {
+      this.keyStore?.lock()
+      this.reportSession('hidden')
+    }
+  }
+
+  /** Finish a request: drop the key unless the session keeps it, and report the session state */
+  private finishRequest(): void {
+    this.activeRequests--
+    this.release()
+    // Any other lock during the request was reported where it happened
+    this.reportSession(this.isHidden() ? 'hidden' : 'key-store')
+  }
+
+  /**
+   * Call `onLock` or `onUnlock` once when the session changes state, with
+   * `reason` for a lock. Checks the key store itself, so a change is reported
+   * however it happened.
+   */
+  private reportSession(reason: PasskeyLockReason): void {
+    const unlocked = this.isSession && this.isUnlocked
+    if (unlocked === this.reportedUnlocked) return
+    this.reportedUnlocked = unlocked
+    try {
+      if (unlocked) this.options.onUnlock?.()
+      else this.options.onLock?.(reason)
+    } catch (error: any) {
+      this.logger.error(`Error in ${unlocked ? 'onUnlock' : 'onLock'}:`, error.message)
+    }
   }
 
   // ---------- Connection -------------------------------------------- //
@@ -240,7 +344,8 @@ export class PasskeyAdapter extends BaseWallet<PasskeyOptions> {
       saveRecord(record)
 
       const walletAccount: WalletAccount = {
-        name: `${this.metadata.name} Account`,
+        // Name the domain the account belongs to
+        name: `${this.metadata.name} · ${rpId}`,
         address: record.address,
         emptySignature: emptySignatureFor(record)
       }
@@ -249,12 +354,14 @@ export class PasskeyAdapter extends BaseWallet<PasskeyOptions> {
         activeAccount: walletAccount
       }
       this.store.addWallet(walletState)
+      this.reportSession(this.isHidden() ? 'hidden' : 'connect')
 
       this.logger.info('Connected successfully', walletState)
       return [walletAccount]
     } catch (error: any) {
       result?.prf.fill(0)
       this.keyStore?.lock()
+      this.reportSession('connect')
       this.logger.error('Error connecting:', error.message)
       throw error
     }
@@ -263,6 +370,7 @@ export class PasskeyAdapter extends BaseWallet<PasskeyOptions> {
   public disconnect = async (): Promise<void> => {
     this.logger.info('Disconnecting...')
     this.keyStore?.lock()
+    this.reportSession('disconnect')
     this.keyStore = null
     removeRecord()
     this.onDisconnect()
@@ -304,7 +412,69 @@ export class PasskeyAdapter extends BaseWallet<PasskeyOptions> {
     return record
   }
 
+  // ---------- Session ----------------------------------------------- //
+
+  /** True when the key is unlocked, so the next signature needs no PRF ceremony */
+  public get isUnlocked(): boolean {
+    return this.keyStore?.unlocked ?? false
+  }
+
+  /**
+   * Unlocks the session ahead of the next signature with one PRF ceremony
+   * (full user verification), e.g. from an "Unlock" button after a page
+   * reload, so signing needs no ceremony. Call it directly from the click
+   * handler: iOS drops the tap across an await. Does nothing if the session is
+   * already unlocked, or without `session`, where every request runs its own
+   * ceremony.
+   */
+  public unlock = async (): Promise<void> => {
+    const record = this.requireRecord()
+    if (!this.isSession || this.isUnlocked) return
+
+    this.logger.info('Unlocking...')
+    this.activeRequests++
+    try {
+      await this.unlockKey(record)
+      this.logger.info('Unlocked')
+    } catch (error: any) {
+      this.logger.error('Error unlocking:', error.message)
+      throw error
+    } finally {
+      this.finishRequest()
+    }
+  }
+
+  /**
+   * Drops the key. The account stays connected; the next signature (or
+   * `unlock`) runs a PRF ceremony.
+   */
+  public lock = (): void => {
+    this.keyStore?.lock()
+    this.reportSession('lock')
+  }
+
   // ---------- Authorization ----------------------------------------- //
+
+  /**
+   * Unlock the key with a PRF ceremony for the connected credential, and check
+   * it derives the connected account. Starts its prompt before any await.
+   */
+  private async unlockKey(record: PasskeyRecord): Promise<void> {
+    const keyStore = this.getKeyStore()
+    const { prf } = await evaluatePrf({
+      rpId: record.rpId,
+      prfInput: prfInput(record.context),
+      credentialId: record.credentialId
+    })
+    const publicKey = await keyStore.unlock(prf)
+    if (!bytesEqual(publicKey, record.publicKey)) {
+      keyStore.lock()
+      throw new PasskeyError(
+        'key-mismatch',
+        'This passkey derived a different key than the connected account. Disconnect and connect again.'
+      )
+    }
+  }
 
   /**
    * Make sure the key is unlocked and the user approved this request. When the
@@ -313,23 +483,7 @@ export class PasskeyAdapter extends BaseWallet<PasskeyOptions> {
    */
   private async authorize(request: PasskeySigningRequest, record: PasskeyRecord): Promise<void> {
     const keyStore = this.getKeyStore()
-
-    if (!keyStore.unlocked) {
-      const { prf } = await evaluatePrf({
-        rpId: record.rpId,
-        prfInput: prfInput(record.context),
-        credentialId: record.credentialId
-      })
-      const publicKey = await keyStore.unlock(prf)
-      if (!bytesEqual(publicKey, record.publicKey)) {
-        keyStore.lock()
-        throw new PasskeyError(
-          'key-mismatch',
-          'This passkey derived a different key than the connected account. Disconnect and connect again.'
-        )
-      }
-      return
-    }
+    if (!keyStore.unlocked) return this.unlockKey(record)
 
     const confirmation = this.options.confirm?.(request) ?? 'presence'
     if (confirmation === 'silent') return
@@ -396,6 +550,7 @@ export class PasskeyAdapter extends BaseWallet<PasskeyOptions> {
         )
     if (txnsToSign.length === 0) return []
 
+    this.activeRequests++
     try {
       this.logger.debug('Signing transactions...', { txnsToSign })
       await this.authorize({ type: 'transactions', transactions: txnsToSign }, record)
@@ -415,7 +570,7 @@ export class PasskeyAdapter extends BaseWallet<PasskeyOptions> {
       this.logger.error('Error signing transactions:', error.message)
       throw error
     } finally {
-      this.release()
+      this.finishRequest()
     }
   }
 
@@ -463,6 +618,7 @@ export class PasskeyAdapter extends BaseWallet<PasskeyOptions> {
       throw new SignDataError('Invalid Signer', 4603)
     }
 
+    this.activeRequests++
     try {
       await this.authorize({ type: 'data', siwa }, record)
 
@@ -481,7 +637,7 @@ export class PasskeyAdapter extends BaseWallet<PasskeyOptions> {
       this.logger.error('Error signing data:', error.message)
       throw error
     } finally {
-      this.release()
+      this.finishRequest()
     }
   }
 

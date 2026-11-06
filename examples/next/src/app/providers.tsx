@@ -26,7 +26,7 @@ const wallets = [
   w3wallet(),
   kmd(),
   mnemonic(),
-  passkey({ session: true }),
+  passkey({ rpName: 'use-wallet example', session: true }),
   ...(process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID
     ? [web3auth({ clientId: process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID })]
     : [])

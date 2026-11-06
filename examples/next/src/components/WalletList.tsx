@@ -60,13 +60,13 @@ function WalletRow({
         isActive ? 'border-blue-200 bg-blue-50' : 'border-gray-200 bg-white hover:border-gray-300'
       }`}
     >
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <img
           src={wallet.metadata.icon}
           alt={wallet.metadata.name}
           className="h-10 w-10 rounded-lg shrink-0"
         />
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-24">
           <div className="text-sm font-medium text-gray-900">{wallet.metadata.name}</div>
           {isConnected && wallet.activeAccount && (
             <div className="text-xs text-gray-400 truncate font-mono">
@@ -75,7 +75,7 @@ function WalletRow({
             </div>
           )}
         </div>
-        <div className="flex items-center gap-1.5 shrink-0">
+        <div className="ml-auto flex items-center gap-1.5 shrink-0">
           {isConnected ? (
             <>
               {!isActive && (
