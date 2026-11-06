@@ -17,6 +17,7 @@ declare const self: DedicatedWorkerGlobalScope
 let privateKey: Uint8Array | null = null
 let idleTimeoutMs = 0
 let idleTimer: ReturnType<typeof setTimeout> | undefined
+let maxAgeTimer: ReturnType<typeof setTimeout> | undefined
 
 function post(message: WorkerResponse): void {
   self.postMessage(message)
@@ -26,18 +27,21 @@ function wipe(): void {
   privateKey?.fill(0)
   privateKey = null
   clearTimeout(idleTimer)
+  clearTimeout(maxAgeTimer)
+}
+
+function expire(reason: 'idle' | 'max-age'): void {
+  wipe()
+  post({ type: 'locked', reason })
 }
 
 function touch(): void {
   if (!idleTimeoutMs) return
   clearTimeout(idleTimer)
-  idleTimer = setTimeout(() => {
-    wipe()
-    post({ type: 'locked', reason: 'idle' })
-  }, idleTimeoutMs)
+  idleTimer = setTimeout(() => expire('idle'), idleTimeoutMs)
 }
 
-function unlock(entropyBuffer: ArrayBuffer, timeoutMs = 0): Uint8Array {
+function unlock(entropyBuffer: ArrayBuffer, timeoutMs = 0, maxAgeMs = 0): Uint8Array {
   const entropy = new Uint8Array(entropyBuffer)
   const keygenSeed = keygenSeedFromEntropy(entropy)
   entropy.fill(0)
@@ -48,6 +52,8 @@ function unlock(entropyBuffer: ArrayBuffer, timeoutMs = 0): Uint8Array {
     privateKey = keys.privateKey
     idleTimeoutMs = timeoutMs
     touch()
+    // Unlike the idle timer, signing never extends this one
+    if (maxAgeMs) maxAgeTimer = setTimeout(() => expire('max-age'), maxAgeMs)
     return keys.publicKey
   } finally {
     keygenSeed.fill(0)
@@ -66,7 +72,7 @@ self.onmessage = (event: MessageEvent<WorkerRequest>) => {
     let value: unknown
     switch (request.op) {
       case 'unlock':
-        value = unlock(request.entropy, request.idleTimeoutMs)
+        value = unlock(request.entropy, request.idleTimeoutMs, request.maxAgeMs)
         break
       case 'sign':
         value = sign(request.bytes)

@@ -50,13 +50,13 @@ function WalletRow(props: {
           : 'border-gray-200 bg-white hover:border-gray-300'
       }`}
     >
-      <div class="flex items-center gap-3">
+      <div class="flex flex-wrap items-center gap-3">
         <img
           src={props.wallet.metadata.icon}
           alt={props.wallet.metadata.name}
           class="h-10 w-10 rounded-lg shrink-0"
         />
-        <div class="flex-1 min-w-0">
+        <div class="flex-1 min-w-24">
           <div class="text-sm font-medium text-gray-900">{props.wallet.metadata.name}</div>
           <Show when={props.wallet.isConnected && props.wallet.activeAccount}>
             <div class="text-xs text-gray-400 truncate font-mono">
@@ -65,7 +65,7 @@ function WalletRow(props: {
             </div>
           </Show>
         </div>
-        <div class="flex items-center gap-1.5 shrink-0">
+        <div class="ml-auto flex items-center gap-1.5 shrink-0">
           <Show
             when={props.wallet.isConnected}
             fallback={

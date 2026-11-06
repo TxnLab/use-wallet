@@ -1,5 +1,11 @@
 import { PasskeyError } from './errors'
-import type { WorkerRequest, WorkerResponse } from './worker/protocol'
+import type { PasskeyTimeoutReason, WorkerRequest, WorkerResponse } from './worker/protocol'
+
+/**
+ * Why the built-in key store locked itself: a timeout, or `'key-store'` when
+ * its worker failed
+ */
+export type WorkerKeyStoreLockReason = PasskeyTimeoutReason | 'key-store'
 
 /**
  * Holds the Falcon-1024 private key between a passkey's PRF ceremony and the
@@ -25,8 +31,10 @@ export interface PasskeyKeyStore {
 export interface WorkerKeyStoreOptions {
   /** Clear the key after this long without a signature. 0 keeps it until `lock`. */
   idleTimeoutMs?: number
-  /** Called when the idle timeout clears the key */
-  onIdleLock?: () => void
+  /** Clear the key this long after `unlock`, however often it signs. 0 sets no limit. */
+  maxAgeMs?: number
+  /** Called when the key store locks itself, not on `lock` */
+  onLock?: (reason: WorkerKeyStoreLockReason) => void
   /** How long to wait for the worker to load. Default: 10000 */
   startTimeoutMs?: number
 }
@@ -64,7 +72,12 @@ export class WorkerKeyStore implements PasskeyKeyStore {
     try {
       this.worker = await this.start()
       const publicKey = await this.call<Uint8Array>(
-        { op: 'unlock', entropy: buffer, idleTimeoutMs: this.options.idleTimeoutMs },
+        {
+          op: 'unlock',
+          entropy: buffer,
+          idleTimeoutMs: this.options.idleTimeoutMs,
+          maxAgeMs: this.options.maxAgeMs
+        },
         [buffer]
       )
       this.isUnlocked = true
@@ -133,7 +146,9 @@ export class WorkerKeyStore implements PasskeyKeyStore {
         worker.onmessage = (event: MessageEvent<WorkerResponse>) => this.handle(event.data)
         worker.onerror = (event) => {
           event.preventDefault()
+          const wasUnlocked = this.isUnlocked
           this.lock()
+          if (wasUnlocked) this.options.onLock?.('key-store')
         }
         resolve(worker)
       }
@@ -177,7 +192,7 @@ export class WorkerKeyStore implements PasskeyKeyStore {
   private handle(message: WorkerResponse): void {
     if (message.type === 'locked') {
       this.lock()
-      this.options.onIdleLock?.()
+      this.options.onLock?.(message.reason)
       return
     }
     if (message.type !== 'result') return

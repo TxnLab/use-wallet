@@ -6,13 +6,14 @@ import { exodus } from '@txnlab/use-wallet-exodus'
 import { kibisis } from '@txnlab/use-wallet-kibisis'
 import { kmd } from '@txnlab/use-wallet-kmd'
 import { mnemonic } from '@txnlab/use-wallet-mnemonic'
-import { passkey } from '@txnlab/use-wallet-passkey'
+import { passkey, type PasskeyAdapter } from '@txnlab/use-wallet-passkey'
 import { w3wallet } from '@txnlab/use-wallet-w3wallet'
 import { walletConnect } from '@txnlab/use-wallet-walletconnect'
 import { web3auth } from '@txnlab/use-wallet-web3auth'
 import { WalletList } from './WalletList.tsx'
 import { ActiveWallet } from './ActiveWallet.tsx'
 import { NetworkSwitch } from './NetworkSwitch.tsx'
+import { getPasskeySettings, passkeyLocked, passkeyUnlocked } from './passkeySession.ts'
 
 const WC_PROJECT_ID = 'fcfde0713d43baa0d23be0773c80a72b'
 
@@ -27,7 +28,23 @@ const wallets = [
   w3wallet(),
   kmd(),
   mnemonic(),
-  passkey({ session: true }),
+  // Session behavior follows the user's settings (see PasskeySession.tsx). The
+  // built-in timeouts are off, so auto-lock is the app's own timer.
+  passkey({
+    // Passkeys are saved as "use-wallet example account"
+    rpName: 'use-wallet example',
+    session: {
+      idleTimeoutMs: 0,
+      maxAgeMs: 0,
+      lockWhenHidden: () => getPasskeySettings().lockWhenHidden
+    },
+    confirm: () => getPasskeySettings().confirmation,
+    onUnlock: () =>
+      passkeyUnlocked(() =>
+        (walletManager.getWallet('passkey') as PasskeyAdapter | undefined)?.lock()
+      ),
+    onLock: passkeyLocked
+  }),
   ...(import.meta.env.VITE_WEB3AUTH_CLIENT_ID
     ? [web3auth({ clientId: import.meta.env.VITE_WEB3AUTH_CLIENT_ID })]
     : [])
