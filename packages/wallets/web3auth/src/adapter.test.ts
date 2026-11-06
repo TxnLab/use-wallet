@@ -3,6 +3,8 @@ import { Web3AuthAdapter } from './adapter'
 import { createTestHarness, type WalletState } from '@txnlab/use-wallet/testing'
 import type { AdapterStoreAccessor } from '@txnlab/use-wallet/adapter'
 import type { State, Store } from '@txnlab/use-wallet/testing'
+import { Web3Auth as ModalWeb3Auth } from '@web3auth/modal'
+import { Web3Auth as SFAWeb3Auth } from '@web3auth/single-factor-auth'
 
 vi.mock('@txnlab/use-wallet/adapter', async (importOriginal) => {
   const original = await importOriginal<typeof import('@txnlab/use-wallet/adapter')>()
@@ -41,15 +43,7 @@ const mockWeb3AuthSFA = {
 }
 
 vi.mock('@web3auth/modal', () => ({
-  Web3Auth: vi.fn(() => mockWeb3Auth),
-  WEB3AUTH_NETWORK: {
-    MAINNET: 'mainnet',
-    TESTNET: 'testnet',
-    SAPPHIRE_MAINNET: 'sapphire_mainnet',
-    SAPPHIRE_DEVNET: 'sapphire_devnet',
-    CYAN: 'cyan',
-    AQUA: 'aqua'
-  }
+  Web3Auth: vi.fn(() => mockWeb3Auth)
 }))
 
 vi.mock('@web3auth/single-factor-auth', () => ({
@@ -260,6 +254,42 @@ describe('Web3AuthAdapter', () => {
       })
 
       await walletWithVerifier.disconnect()
+    })
+
+    it.each([
+      [undefined, 'sapphire_mainnet'],
+      ['sapphire_devnet', 'sapphire_devnet'],
+      ['testnet', 'testnet']
+    ])('should pass web3AuthNetwork %s to the modal SDK as %s', async (option, expected) => {
+      const networkWallet = createWallet(accessor, { web3AuthNetwork: option })
+
+      await networkWallet.connect()
+
+      expect(ModalWeb3Auth).toHaveBeenCalledWith(
+        expect.objectContaining({ web3AuthNetwork: expected })
+      )
+
+      await networkWallet.disconnect()
+    })
+
+    it.each([
+      [undefined, 'sapphire_mainnet'],
+      ['sapphire_devnet', 'sapphire_devnet'],
+      ['testnet', 'testnet']
+    ])('should pass web3AuthNetwork %s to the SFA SDK as %s', async (option, expected) => {
+      const networkWallet = createWallet(accessor, { web3AuthNetwork: option })
+
+      await networkWallet.connect({
+        idToken: 'mock-token',
+        verifierId: 'user@example.com',
+        verifier: 'my-firebase-verifier'
+      })
+
+      expect(SFAWeb3Auth).toHaveBeenCalledWith(
+        expect.objectContaining({ web3AuthNetwork: expected })
+      )
+
+      await networkWallet.disconnect()
     })
   })
 
