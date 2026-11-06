@@ -1,3 +1,15 @@
+# [5.2.0-next.5](https://github.com/TxnLab/use-wallet/compare/v5.2.0-next.4...v5.2.0-next.5) (2026-11-06)
+
+
+### Bug Fixes
+
+* **web3auth:** stop loading @web3auth/modal for Single Factor Auth ([#491](https://github.com/TxnLab/use-wallet/issues/491)) ([285dcee](https://github.com/TxnLab/use-wallet/commit/285dcee7368ad553686c9aa3836c3171cf29f6bf))
+
+
+### Features
+
+* **passkey:** add session controls and lock events, document the security model ([#492](https://github.com/TxnLab/use-wallet/issues/492)) ([27089d0](https://github.com/TxnLab/use-wallet/commit/27089d0549421eb92f1208417dbc1e7636d7a1b2))
+
 # [5.2.0-next.4](https://github.com/TxnLab/use-wallet/compare/v5.2.0-next.3...v5.2.0-next.4) (2026-11-05)
 
 
