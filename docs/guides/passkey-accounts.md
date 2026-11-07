@@ -1,0 +1,355 @@
+---
+layout:
+  title:
+    visible: true
+  description:
+    visible: false
+  tableOfContents:
+    visible: true
+  outline:
+    visible: true
+  pagination:
+    visible: true
+---
+
+# Passkey Accounts
+
+The Passkey adapter (`@txnlab/use-wallet-passkey`) gives users an Algorand account from a passkey, with no extension, app or seed phrase to set up. The user's passkey provider (iCloud Keychain, Google Password Manager, 1Password, Windows Hello or a FIDO2 security key) stores and syncs the passkey, and approves each sensitive step with a biometric, PIN or system password.
+
+The account is a **Falcon-1024 (post-quantum)** account. Its key is derived from the passkey's WebAuthn PRF output, so the same passkey gives the same account on every device it syncs to.
+
+{% hint style="warning" %}
+**The account belongs to your site.** The key is derived inside your page, so any script running on your domain can reach it with one passkey prompt that looks like a sign-in. Users have to trust your site the way they'd trust an app that holds a balance for them. Read the [security model](#security-model) before you ship it.
+{% endhint %}
+
+### How It Works
+
+* **Creating an account** saves a new passkey for your domain, then asks it for a PRF output for a label set by the adapter and your `context`. That 32-byte output is the account's secret: it seeds the Falcon key, and its 25-word encoding is the account's recovery phrase.
+* **Signing in** asks an existing passkey for the same output. The same passkey on the same domain always derives the same account.
+* **Every prompt that derives the key requires full user verification**, because the PRF output depends on it.
+* **The private key lives in a dedicated worker**, never on the page's main thread, and is dropped when the session locks. Only public data is stored: the credential ID, the public key and the address.
+
+### Security Model
+
+The key is derived inside your page, so your site is part of the account's trust boundary.
+
+* **Your site can take the key.** The passkey only works on its domain (the relying party ID), and any script running there can derive the account's key with one verified passkey prompt. That includes your own code, an XSS bug, a compromised dependency or third-party script, a takeover of your hosting, deploy or DNS accounts, a re-registered domain, and every subdomain when `rpId` is a parent domain.
+* **The library can't protect users from the site.** It runs in your page, so nothing in it can stop the site itself from taking the key.
+* **Other sites can't reach it.** Browsers bind a passkey to its domain, so another site can't derive this account, and this account gives no access to the user's other wallets.
+* **An unlocked session signs without a new key prompt.** Page scripts can request signatures through the adapter: silently if `confirm` returns `'silent'`, otherwise behind a passkey prompt. Getting the key itself always takes a fully verified prompt.
+* **Post-quantum is bounded by the passkey's custody.** The PRF itself is symmetric, but synced passkeys are protected by each provider's classical encryption, and the CTAP2 channel uses P-256. Hardware security keys that don't sync close more of that gap.
+
+Tell users plainly whose account it is, for example: _"This account is created by and for example.com. Keep only what you need here, and move larger amounts to a wallet you control."_ For the same reason, the adapter names the account after its domain (`Passkey · example.com`).
+
+#### Best Practices
+
+* Present it as a starting account: keep balances small, and offer both [moving to a wallet](#moving-to-a-wallet) and the [recovery phrase](#recovery-phrase).
+* Set a strict [Content Security Policy](#content-security-policy) and load as few third-party scripts as you can.
+* Keep `rpId` narrow: the default hostname, unless you need to share the account across subdomains.
+* Protect the domain and the accounts behind it: registrar lock, auto-renew, and two-factor authentication on your registrar, DNS, hosting and deploy accounts.
+* Choose `confirm` and the session timeouts deliberately, or [let users choose](#user-preferences). With `'silent'`, any script on your page can sign while the session is unlocked, so it's exactly as safe as your page. Asking for `'presence'` or `'verify'` above an amount you pick is a middle ground.
+* Show what's being signed in your own UI before you call `signTransactions`. The passkey prompt can only show your site's name.
+
+### Installation
+
+```bash
+npm install @txnlab/use-wallet-passkey
+```
+
+Install it next to `@txnlab/use-wallet` or your framework adapter, at the same version.
+
+### Configuration
+
+```typescript
+import { WalletManager } from '@txnlab/use-wallet'
+import { passkey } from '@txnlab/use-wallet-passkey'
+
+const manager = new WalletManager({
+  wallets: [passkey({ rpName: 'My dApp', session: true })]
+})
+```
+
+| Option     | Default             | Description                                                                                                                              |
+| ---------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `rpId`     | `location.hostname` | The domain the passkey, and so the account, is bound to. Set a parent domain (`example.com`) to share one account across its subdomains. |
+| `rpName`   | the RP ID           | The name shown in passkey prompts                                                                                                        |
+| `context`  | `''`                | Separates this app's account from others on the same domain. No `:`; changing it changes the account.                                    |
+| `userName` | `<rpName> account`  | The name new passkeys are saved under in the user's password manager                                                                     |
+| `session`  | `false`             | Keep the key unlocked between signatures. `true` or `{ idleTimeoutMs, maxAgeMs, lockWhenHidden }`. See [Sessions](#sessions).            |
+| `confirm`  | `() => 'presence'`  | How to confirm each signature while a session is unlocked                                                                                |
+| `onLock`   | none                | Called with a reason when an unlocked session locks                                                                                      |
+| `onUnlock` | none                | Called when a locked session unlocks                                                                                                     |
+| `keyStore` | built-in worker     | Replace where the key is held (`PasskeyKeyStore`)                                                                                        |
+
+The factory also accepts the usual `metadata` option to override the wallet's display name and icon.
+
+{% hint style="info" %}
+**The account depends on `rpId` and `context`.** Changing either one gives every user a different, empty account, so pick them once.
+{% endhint %}
+
+### Connecting
+
+Show two buttons: **Create passkey** and **Sign in**. A missing passkey and a cancelled prompt raise the same browser error, so the adapter can't choose for the user.
+
+Call `connect`, `unlock`, `signTransactions` and `signData` directly from the click handler, before awaiting anything else. Safari and every iOS browser drop the user's tap across an `await`, and the passkey prompt needs it.
+
+Adapter-specific methods such as `unlock()` aren't on the `useWallet` wallet objects, so get the adapter from [`useWalletManager`](../api-reference/usewalletmanager.md):
+
+{% tabs %}
+{% tab title="React" %}
+```tsx
+import { useWalletManager } from '@txnlab/use-wallet-react'
+import type { PasskeyAdapter } from '@txnlab/use-wallet-passkey'
+
+function PasskeyButtons() {
+  const manager = useWalletManager()
+  const passkey = () => manager.getWallet('passkey') as PasskeyAdapter | undefined
+
+  return (
+    <>
+      <button onClick={() => passkey()?.connect({ create: true })}>Create passkey</button>
+      <button onClick={() => passkey()?.connect()}>Sign in</button>
+      <button onClick={() => passkey()?.unlock()}>Unlock</button>
+    </>
+  )
+}
+```
+{% endtab %}
+
+{% tab title="Vue" %}
+```typescript
+<script setup lang="ts">
+  import { useWalletManager } from '@txnlab/use-wallet-vue'
+  import type { PasskeyAdapter } from '@txnlab/use-wallet-passkey'
+
+  const manager = useWalletManager()
+  const passkey = () => manager.getWallet('passkey') as PasskeyAdapter | undefined
+</script>
+
+<template>
+  <button @click="passkey()?.connect({ create: true })">Create passkey</button>
+  <button @click="passkey()?.connect()">Sign in</button>
+  <button @click="passkey()?.unlock()">Unlock</button>
+</template>
+```
+{% endtab %}
+
+{% tab title="Solid" %}
+```tsx
+import { useWalletManager } from '@txnlab/use-wallet-solid'
+import type { PasskeyAdapter } from '@txnlab/use-wallet-passkey'
+
+function PasskeyButtons() {
+  const manager = useWalletManager()
+  const passkey = () => manager.getWallet('passkey') as PasskeyAdapter | undefined
+
+  return (
+    <>
+      <button onClick={() => passkey()?.connect({ create: true })}>Create passkey</button>
+      <button onClick={() => passkey()?.connect()}>Sign in</button>
+      <button onClick={() => passkey()?.unlock()}>Unlock</button>
+    </>
+  )
+}
+```
+{% endtab %}
+
+{% tab title="Svelte" %}
+```typescript
+<script lang="ts">
+  import { useWalletManager } from '@txnlab/use-wallet-svelte'
+  import type { PasskeyAdapter } from '@txnlab/use-wallet-passkey'
+
+  const manager = useWalletManager()
+  const passkey = () => manager.getWallet('passkey') as PasskeyAdapter | undefined
+</script>
+
+<button onclick={() => passkey()?.connect({ create: true })}>Create passkey</button>
+<button onclick={() => passkey()?.connect()}>Sign in</button>
+<button onclick={() => passkey()?.unlock()}>Unlock</button>
+```
+{% endtab %}
+{% endtabs %}
+
+To save new passkeys under a name the user chooses, pass it when creating: `connect({ create: true, userName: 'Alice (trading)' })`. Each passkey is a separate account, and the passkey picker shows only these names, so a recognizable name helps users with more than one.
+
+### Sessions
+
+Without `session`, every signing request runs a fully verified passkey prompt that derives the key, signs and drops it.
+
+With `session`, only the first request after connecting or reloading does. The key then stays in a dedicated worker until the session locks, and `confirm` decides how each later request is approved:
+
+* `'silent'`: no prompt
+* `'presence'`: a passkey prompt with `userVerification: 'preferred'`, which some providers satisfy with a tap
+* `'verify'`: a passkey prompt with full user verification
+
+A session locks on `disconnect`, on a page reload, and when any of these options says so:
+
+* `idleTimeoutMs`: after this long without a signature. Default: 15 minutes.
+* `maxAgeMs`: this long after it unlocked, however active it is. Default: 1 hour.
+* `lockWhenHidden`: when the page is hidden, e.g. the user switches tabs or apps. A signing request in progress finishes first. Default: `false`, because on phones, leaving the browser to copy an address means one more verified prompt.
+
+`0` turns off either timeout.
+
+```typescript
+passkey({
+  session: { idleTimeoutMs: 10 * 60 * 1000, maxAgeMs: 30 * 60 * 1000, lockWhenHidden: true },
+  confirm: (request) =>
+    request.type === 'transactions' && request.transactions.some((txn) => txn.type === 'pay')
+      ? 'verify'
+      : 'presence'
+})
+```
+
+`confirm` must be synchronous: awaiting before the prompt would lose the user's tap on iOS.
+
+#### Unlocking and Locking
+
+After a page reload, the first signature runs the verified prompt that derives the key. On iOS, that prompt only appears if `signTransactions` is called straight from the user's tap. If your flow awaits something first, such as fetching a quote or building a group, unlock the session on an earlier tap instead:
+
+```typescript
+wallet.isUnlocked // false after a reload or a lock
+await wallet.unlock() // call from a click handler: one verified prompt
+wallet.lock() // drops the key; the account stays connected
+```
+
+A session can also lock on its own, and a signature can unlock it. Pass `onLock` and `onUnlock` to keep your UI in step, e.g. to show an "Unlock" button:
+
+```typescript
+passkey({
+  session: true,
+  onLock: (reason) => setUnlocked(false),
+  onUnlock: () => setUnlocked(true)
+})
+```
+
+`onUnlock` is called once each time a locked session unlocks: on `connect`, `unlock()`, or a signature that derived the key. `onLock` is called once each time it locks, with a reason:
+
+| Reason       | Cause                                                       |
+| ------------ | ----------------------------------------------------------- |
+| `idle`       | `idleTimeoutMs` passed without a signature                  |
+| `max-age`    | `maxAgeMs` passed since the session unlocked                |
+| `hidden`     | the page was hidden, with `lockWhenHidden`                  |
+| `lock`       | your code called `lock()`                                   |
+| `disconnect` | the wallet disconnected                                     |
+| `connect`    | a new `connect` replaced or dropped the session             |
+| `key-store`  | the key store dropped the key itself, e.g. its worker failed |
+
+Without `session`, neither callback is called and `unlock()` does nothing.
+
+#### User Preferences
+
+`confirm` runs on every request, so it can follow a setting the user changes at any time. `lockWhenHidden` can be a function for the same reason. For auto-lock settings, turn off the built-in timeouts and call `lock()` on your own schedule, starting from `onUnlock`:
+
+```typescript
+let autoLock: ReturnType<typeof setTimeout> | undefined
+
+passkey({
+  session: { idleTimeoutMs: 0, maxAgeMs: 0, lockWhenHidden: () => settings.lockWhenHidden },
+  confirm: () => settings.confirmation, // 'silent' | 'presence' | 'verify'
+  onUnlock: () => {
+    if (settings.autoLockMs) autoLock = setTimeout(() => wallet.lock(), settings.autoLockMs)
+  },
+  onLock: () => clearTimeout(autoLock)
+})
+```
+
+These settings decide how often honest requests prompt the user. They don't protect against a compromised page: a script that takes over your page can change them too.
+
+The [React example](https://github.com/TxnLab/use-wallet/tree/main/examples/react) has a complete session panel: lock status, Unlock and Lock buttons, and settings for confirmation, auto-lock and locking when the tab is hidden.
+
+### Signing
+
+Passkey accounts sign through the usual [`signTransactions`](signing-transactions.md) and [`signData`](signing-data.md) methods, with a few differences that come from Falcon-1024:
+
+* Each signed transaction carries a ~3.2 KB `pqsig` and pays an extra 2× the minimum fee. Get fees by simulating with `emptyTransactionSigner` and `allowEmptySignatures`.
+* `signData` supports ARC-60 authentication with scheme `falcon-1024-det`.
+* No multisig participation, and no raw-bytes or program-data signing.
+
+### Recovery Phrase
+
+The account is bound to your domain, so it's stranded if the domain is lost. Let users export its 25-word recovery phrase. Each export runs a fresh, fully verified passkey prompt:
+
+```typescript
+const { phrase } = await wallet.exportRecoveryPhrase()
+```
+
+{% hint style="warning" %}
+**Tell users to import the phrase as a Falcon / quantum account:** in Lute, Add account → "Falcon25 account" → Import; in Pera, the quantum import; or `algokey pq import --scheme falcon-1024`. The same 25 words in a regular import restore a different, empty account.
+{% endhint %}
+
+### Moving to a Wallet
+
+Give users a way to move to a wallet they control, such as Pera or Lute. After that, a compromise of your site can't reach their funds. There are two ways:
+
+* **Close the account:** send the whole balance to the wallet with `closeRemainderTo`. An account that still holds assets or app opt-ins can't close, so send or opt out of those first, or rekey instead.
+* **Rekey it:** keep the address, and give its signing authority to the wallet's account with `rekeyTo`. The passkey can no longer sign for it, so disconnect the passkey account afterwards: until then, signing still runs a passkey prompt, and the network rejects the result. To use the address, the user needs a wallet that supports both Falcon accounts and rekeyed accounts. Rekeying to a regular (ed25519) account gives up post-quantum protection, and its transactions pay the regular fee again.
+
+The adapter only signs for the passkey account's own address, so don't rekey other accounts _to_ a passkey account: it can't sign for them.
+
+```typescript
+import algosdk from 'algosdk'
+
+const wallet = manager.getWallet('passkey')!
+const sender = wallet.activeAddress!
+const params = await manager.algodClient.getTransactionParams().do()
+// A Falcon signature pays 3× the minimum fee; under congestion, simulate for the fee
+const suggestedParams = { ...params, flatFee: true, fee: params.minFee * 3n }
+
+// Close: send the whole balance to the wallet
+const close = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+  sender,
+  receiver: walletAddress,
+  amount: 0,
+  closeRemainderTo: walletAddress,
+  suggestedParams
+})
+
+// Or rekey: keep the address, and let the wallet sign for it
+const rekey = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+  sender,
+  receiver: sender,
+  amount: 0,
+  rekeyTo: walletAddress,
+  suggestedParams
+})
+
+// Sign from the user's tap, after building the transaction: on iOS, an await
+// before the passkey prompt loses the tap (or unlock() first)
+const [signed] = await wallet.signTransactions([close]) // or [rekey]
+await manager.algodClient.sendRawTransaction(signed!).do()
+```
+
+### Content Security Policy
+
+The key runs in a module worker started from a `blob:` URL, using WebAssembly. If your page sets a CSP, allow both:
+
+```
+script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:
+```
+
+Without them, signing fails with a `PasskeyError` whose `code` is `key-store-failed`.
+
+### Error Handling
+
+Failures throw a `PasskeyError` with a `code`:
+
+| Code               | Meaning                                                                                                   |
+| ------------------ | --------------------------------------------------------------------------------------------------------- |
+| `cancelled`        | The user cancelled, the request timed out, or no passkey matched (on iOS, also an in-app browser)         |
+| `unsupported`      | This browser can't run passkey prompts: no WebAuthn, or an Android in-app browser                         |
+| `prf-unsupported`  | The passkey provider lacks the PRF extension (Ledger Stax and Dashlane on Android are known cases)        |
+| `invalid-rp-id`    | `rpId` isn't valid for the page's origin                                                                  |
+| `key-mismatch`     | The passkey derived a different key than the connected account                                            |
+| `not-connected`    | No passkey account is connected                                                                           |
+| `key-store-failed` | The key worker failed to start or was locked, e.g. because the CSP blocks it                              |
+| `failed`           | Any other failure                                                                                         |
+
+`signData` validation failures throw a `SignDataError` with an ARC-60 code. See [Signing Data](signing-data.md#error-handling).
+
+### See Also
+
+* [Passkey adapter README](https://github.com/TxnLab/use-wallet/tree/main/packages/wallets/passkey#readme)
+* [Supported Wallets](../getting-started/supported-wallets.md#passkey)
+* [useWalletManager](../api-reference/usewalletmanager.md) - Reach adapter-specific methods
+* [Signing Data](signing-data.md) - ARC-60 authentication, including Falcon verification
