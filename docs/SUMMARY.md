@@ -19,6 +19,7 @@
 * [Connect Wallet Menu](guides/connect-wallet-menu.md)
 * [Signing Transactions](guides/signing-transactions.md)
 * [Signing Data](guides/signing-data.md)
+* [Passkey Accounts](guides/passkey-accounts.md)
 * [Switching Networks](guides/switching-networks.md)
 * [Runtime Node Configuration](guides/runtime-node-configuration.md)
 * [Testing with Mnemonic Wallet](guides/testing-with-mnemonic-wallet.md)
