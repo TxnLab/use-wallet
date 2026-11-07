@@ -165,10 +165,12 @@ Tell users to **import the phrase as a Falcon / quantum account**: in Lute, Add 
 
 ### Moving to a wallet
 
-Give users a way to move to a wallet they control, such as Pera, Defly or Lute. After that, a compromise of your site can't reach their funds. There are two ways:
+Give users a way to move to a wallet they control, such as Pera or Lute. After that, a compromise of your site can't reach their funds. There are two ways:
 
 - **Close the account:** send the whole balance to the wallet with `closeRemainderTo`. An account that still holds assets or app opt-ins can't close, so send or opt out of those first, or rekey instead.
-- **Rekey it:** keep the address, and give its signing authority to the wallet's account with `rekeyTo`. The passkey can no longer sign for it, so disconnect the passkey account afterwards. The user needs a wallet that supports rekeyed accounts to use the address. Rekeying to a regular (ed25519) account gives up post-quantum protection.
+- **Rekey it:** keep the address, and give its signing authority to the wallet's account with `rekeyTo`. The passkey can no longer sign for it, so disconnect the passkey account afterwards: until then, signing still runs a passkey prompt, and the network rejects the result. To use the address, the user needs a wallet that supports both Falcon accounts and rekeyed accounts. Rekeying to a regular (ed25519) account gives up post-quantum protection, and its transactions pay the regular fee again.
+
+The adapter only signs for the passkey account's own address, so don't rekey other accounts _to_ a passkey account: it can't sign for them.
 
 ```typescript
 import algosdk from 'algosdk'
@@ -197,6 +199,8 @@ const rekey = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
   suggestedParams
 })
 
+// Sign from the user's tap, after building the transaction: on iOS, an await
+// before the passkey prompt loses the tap (or unlock() first; see above)
 const [signed] = await wallet.signTransactions([close]) // or [rekey]
 await manager.algodClient.sendRawTransaction(signed!).do()
 ```
