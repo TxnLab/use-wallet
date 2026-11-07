@@ -1,3 +1,17 @@
+# [5.2.0](https://github.com/TxnLab/use-wallet/compare/v5.1.4...v5.2.0) (2026-11-07)
+
+
+### Bug Fixes
+
+* **svelte:** clarify the useWalletManager error outside useWalletContext ([#484](https://github.com/TxnLab/use-wallet/issues/484)) ([56b9973](https://github.com/TxnLab/use-wallet/commit/56b9973fc2790e8ac7066e0bbc633dc2ccf46749))
+
+
+### Features
+
+* **frameworks:** add useWalletManager to React and Vue ([#482](https://github.com/TxnLab/use-wallet/issues/482)) ([5806103](https://github.com/TxnLab/use-wallet/commit/5806103b778a29bdce6bee7c76fb2d01c7b1e8cb))
+* **passkey:** add a passkey wallet adapter with Falcon-1024 accounts ([#483](https://github.com/TxnLab/use-wallet/issues/483)) ([0281a55](https://github.com/TxnLab/use-wallet/commit/0281a5529ec7ca725cf29b262a44c3b0efbdeadc))
+* **passkey:** add session controls and lock events, document the security model ([#492](https://github.com/TxnLab/use-wallet/issues/492)) ([27089d0](https://github.com/TxnLab/use-wallet/commit/27089d0549421eb92f1208417dbc1e7636d7a1b2))
+
 # [5.2.0-next.5](https://github.com/TxnLab/use-wallet/compare/v5.2.0-next.4...v5.2.0-next.5) (2026-11-06)
 
 
