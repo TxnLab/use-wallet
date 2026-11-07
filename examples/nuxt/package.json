@@ -10,7 +10,7 @@
     "generate": "nuxt generate"
   },
   "dependencies": {
-    "@galaxypay/use-wallet-lute": "1.0.0",
+    "@galaxypay/use-wallet-lute": "1.1.0",
     "@noble/ed25519": "3.2.0",
     "@perawallet/use-wallet-pera": "1.0.0",
     "@txnlab/use-wallet": "workspace:*",
@@ -31,8 +31,8 @@
     "vue": "3.5.44"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "4.3.3",
-    "tailwindcss": "4.3.3",
+    "@tailwindcss/vite": "4.3.4",
+    "tailwindcss": "4.3.4",
     "typescript": "5.9.3",
     "vite-plugin-node-polyfills": "0.28.0"
   }
