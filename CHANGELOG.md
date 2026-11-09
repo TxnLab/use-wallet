@@ -1,3 +1,10 @@
+# [5.3.0](https://github.com/TxnLab/use-wallet/compare/v5.2.0...v5.3.0) (2026-11-09)
+
+
+### Features
+
+* **passkey:** sign for accounts rekeyed to the passkey account ([#496](https://github.com/TxnLab/use-wallet/issues/496)) ([360d718](https://github.com/TxnLab/use-wallet/commit/360d7182468427d0b5eb8aae2e7e3675ed3a813f))
+
 # [5.2.0](https://github.com/TxnLab/use-wallet/compare/v5.1.4...v5.2.0) (2026-11-07)
 
 
