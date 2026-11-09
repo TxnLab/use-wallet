@@ -11,6 +11,8 @@ export type PasskeyErrorCode =
   | 'key-mismatch'
   /** No account is connected */
   | 'not-connected'
+  /** `addRekeyedAccount`: algod reports another auth address for the account */
+  | 'not-rekeyed'
   /** The key store failed, e.g. the session worker was blocked by a CSP */
   | 'key-store-failed'
   | 'failed'

@@ -10,11 +10,14 @@ import {
   type AdapterStoreAccessor,
   type Siwa
 } from '@txnlab/use-wallet/adapter'
+import { WalletManager } from '@txnlab/use-wallet'
 import { createTestHarness, type State, type Store } from '@txnlab/use-wallet/testing'
+import type { MockInstance } from 'vitest'
 import { PasskeyAdapter, type PasskeyConfirmation, type PasskeyOptions } from './adapter'
+import { passkey } from './index'
 import { prfInput } from './derivation'
 import { WorkerKeyStore, type PasskeyKeyStore } from './key-store'
-import { LOCAL_STORAGE_PASSKEY_KEY } from './record'
+import { LOCAL_STORAGE_PASSKEY_KEY, loadRecord } from './record'
 
 // Stand in for the worker key store with the same derivation, run in Node
 vi.mock('./key-store', async () => {
@@ -178,29 +181,46 @@ const mockLocalStorage = {
 
 /** The auth address algod reports for every account, if rekeyed */
 let algodAuthAddr: string | undefined
+/** Auth addresses algod reports for particular accounts, over `algodAuthAddr` */
+let algodAuthAddrs: Record<string, string | undefined>
+/** Fails every algod read */
+let algodError: Error | undefined
+/** Holds every algod read until it settles */
+let algodGate: Promise<void> | undefined
+
+const accountInformation = vi.fn((address: string) => {
+  const request = {
+    exclude: () => request,
+    do: async () => {
+      await algodGate
+      if (algodError) throw algodError
+      const authAddr = address in algodAuthAddrs ? algodAuthAddrs[address] : algodAuthAddr
+      return authAddr ? { authAddr: algosdk.Address.fromString(authAddr) } : {}
+    }
+  }
+  return request
+})
+
+/** Subscribes to the test's store, as the manager does */
+let subscribeToStore: (callback: (state: State) => void) => () => void
 
 function createWallet(accessor: AdapterStoreAccessor, options?: PasskeyOptions): PasskeyAdapter {
   return new PasskeyAdapter({
     id: WALLET_ID,
     metadata: PasskeyAdapter.defaultMetadata,
     store: accessor,
-    subscribe: vi.fn(),
-    getAlgodClient: () =>
-      ({
-        accountInformation: () => ({
-          do: async () =>
-            algodAuthAddr ? { authAddr: algosdk.Address.fromString(algodAuthAddr) } : {}
-        })
-      }) as unknown as algosdk.Algodv2,
+    subscribe: (callback) => subscribeToStore(callback),
+    getAlgodClient: () => ({ accountInformation }) as unknown as algosdk.Algodv2,
     options
   })
 }
 
-function makePayment(sender: string, note?: string): algosdk.Transaction {
+function makePayment(sender: string, note?: string, rekeyTo?: string): algosdk.Transaction {
   return algosdk.makePaymentTxnWithSuggestedParamsFromObject({
     sender,
     receiver: sender,
     amount: 0,
+    rekeyTo,
     note: note ? new TextEncoder().encode(note) : undefined,
     suggestedParams: {
       flatFee: true,
@@ -215,13 +235,35 @@ function makePayment(sender: string, note?: string): algosdk.Transaction {
 }
 
 const OTHER_ADDRESS = algosdk.generateAccount().addr.toString()
+// ed25519 accounts that can be rekeyed to the passkey account
+const LEGACY_ACCOUNT = algosdk.generateAccount()
+const LEGACY = LEGACY_ACCOUNT.addr.toString()
+const LEGACY_2 = algosdk.generateAccount().addr.toString()
+// Rekeyed accounts are recorded by the network's genesis hash
+const TESTNET = 'SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI='
+const MAINNET = 'wGHE2Pwdvd7S12BL5FaOP20EGYesN73ktiC1qzkkit8='
+const onTestnet = (...addresses: string[]) =>
+  addresses.map((address) => ({ address, network: TESTNET }))
+
+/** The same address with other padding bits in its last character, which algosdk accepts */
+function nonCanonical(address: string): string {
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
+  const last = alphabet.indexOf(address[57])
+  return address.slice(0, 57) + alphabet[(last & ~3) | ((last + 1) & 3)]
+}
 
 function expectValidSignature(signed: Uint8Array, txn: algosdk.Transaction) {
   const decoded = algosdk.decodeSignedTransaction(signed)
   expect(decoded.pqsig).toBeDefined()
   expect(algosdk.addressFromPQSig(decoded.pqsig!).toString()).toBe(ADDRESS)
   expect(verifyCompressed(decoded.pqsig!.pk, decoded.pqsig!.sig, txn.bytesToSign())).toBe(true)
+  expect(decoded.txn.txID()).toBe(txn.txID())
 }
+
+/** The signer a signed transaction names, if any */
+const sgnrOf = (signed: Uint8Array) => algosdk.decodeSignedTransaction(signed).sgnr?.toString()
+
+const storedRecord = () => JSON.parse(localStorageData[LOCAL_STORAGE_PASSKEY_KEY])
 
 function siwaData(overrides: Partial<Siwa> = {}): string {
   const siwa: Siwa = {
@@ -248,6 +290,9 @@ describe('PasskeyAdapter', () => {
     localStorageData = {}
     authenticator = { supportsPrf: true, prfOutput: defaultPrfOutput }
     algodAuthAddr = undefined
+    algodAuthAddrs = {}
+    algodError = undefined
+    algodGate = undefined
     getCalls = []
     createCalls = []
     FakeKeyStore.instances.length = 0
@@ -260,6 +305,10 @@ describe('PasskeyAdapter', () => {
     const harness = createTestHarness(WALLET_ID)
     store = harness.store
     accessor = harness.accessor
+    subscribeToStore = (callback) => {
+      const subscription = harness.store.subscribe(() => callback(harness.store.state))
+      return () => subscription.unsubscribe()
+    }
   })
 
   afterEach(() => {
@@ -474,6 +523,18 @@ describe('PasskeyAdapter', () => {
       const [signed] = await wallet.signTransactions([algosdk.encodeUnsignedTransaction(txn)])
 
       expectValidSignature(signed!, txn)
+    })
+
+    it('signs nothing, without a prompt, for an empty indexesToSign', async () => {
+      const wallet = createWallet(accessor)
+      await wallet.connect()
+      getCalls = []
+      const txns = [makePayment(ADDRESS, 'a'), makePayment(ADDRESS, 'b')]
+
+      expect(await wallet.signTransactions(txns, [])).toEqual([])
+      const encoded = txns.map((txn) => algosdk.encodeUnsignedTransaction(txn))
+      expect(await wallet.signTransactions(encoded, [])).toEqual([])
+      expect(getCalls).toHaveLength(0)
     })
 
     it('skips the ceremony when there is nothing to sign', async () => {
@@ -847,14 +908,68 @@ describe('PasskeyAdapter', () => {
       expect(wallet.isConnected).toBe(false)
     })
 
-    it('disconnects on resume when the store holds more than one account', async () => {
+    it('drops a store account the record does not list on resume, without disconnecting', async () => {
       await createWallet(accessor).connect()
       const [account] = store.state.wallets[WALLET_ID]!.accounts
       accessor.setAccounts([account, { name: 'Other', address: OTHER_ADDRESS }])
+      accessor.setActiveAccount(OTHER_ADDRESS)
+
+      const wallet = createWallet(accessor)
+      await wallet.resumeSession()
+      expect(wallet.isConnected).toBe(true)
+      expect(wallet.addresses).toEqual([ADDRESS])
+      expect(wallet.activeAddress).toBe(ADDRESS)
+      expect(localStorageData[LOCAL_STORAGE_PASSKEY_KEY]).toBeDefined()
+    })
+
+    it('disconnects on resume when the store lacks the passkey account', async () => {
+      await createWallet(accessor).connect()
+      accessor.setAccounts([{ name: 'Other', address: OTHER_ADDRESS }])
 
       const wallet = createWallet(accessor)
       await wallet.resumeSession()
       expect(wallet.isConnected).toBe(false)
+    })
+
+    it('ignores malformed rekeyed entries and keeps the record', async () => {
+      algodAuthAddrs[LEGACY] = ADDRESS
+      await connectThen((record) => {
+        record.rekeyedAccounts = [
+          1,
+          null,
+          { address: LEGACY },
+          { address: 'not an address', network: TESTNET },
+          { address: ADDRESS, network: TESTNET },
+          { address: nonCanonical(LEGACY), network: TESTNET },
+          { address: LEGACY, network: TESTNET },
+          { address: LEGACY_2, network: MAINNET }
+        ]
+      })
+
+      const wallet = createWallet(accessor)
+      await wallet.resumeSession()
+      expect(wallet.isConnected).toBe(true)
+      expect(wallet.addresses).toEqual([ADDRESS, LEGACY])
+    })
+
+    it.each([
+      ['no network', { address: LEGACY }],
+      ['a numeric network', { address: LEGACY, network: 5 }]
+    ])('drops a rekeyed entry with %s, keeping the record', async (_name, entry) => {
+      await connectThen((record) => (record.rekeyedAccounts = [entry]))
+
+      const record = loadRecord()
+      expect(record?.address).toBe(ADDRESS)
+      expect(record?.rekeyedAccounts).toEqual([])
+    })
+
+    it('ignores a rekeyed list that is not an array', async () => {
+      await connectThen((record) => (record.rekeyedAccounts = LEGACY))
+
+      const wallet = createWallet(accessor)
+      await wallet.resumeSession()
+      expect(wallet.isConnected).toBe(true)
+      expect(wallet.addresses).toEqual([ADDRESS])
     })
 
     it('refuses to sign with a record from another RP ID', async () => {
@@ -1610,6 +1725,928 @@ describe('PasskeyAdapter', () => {
     it('counts context length in UTF-16 code units', () => {
       expect(() => createWallet(accessor, { context: '😀'.repeat(64) })).not.toThrow()
       expect(() => createWallet(accessor, { context: '😀'.repeat(65) })).toThrow()
+    })
+  })
+
+  describe('rekeyed accounts', () => {
+    /** Connects, then adds LEGACY, which algod reports as rekeyed to the passkey account */
+    async function connectWithRekeyed(options?: PasskeyOptions) {
+      algodAuthAddrs[LEGACY] = ADDRESS
+      const wallet = createWallet(accessor, options)
+      await wallet.connect()
+      await wallet.addRekeyedAccount(LEGACY)
+      return wallet
+    }
+
+    /** Lets background algod checks finish */
+    const settle = () => new Promise((resolve) => setTimeout(resolve, 0))
+
+    describe('addRekeyedAccount', () => {
+      it('adds and persists an account rekeyed to the passkey account, without a prompt', async () => {
+        algodAuthAddrs[LEGACY] = ADDRESS
+        algodAuthAddrs[LEGACY_2] = ADDRESS
+        const wallet = createWallet(accessor)
+        await wallet.connect()
+        getCalls = []
+
+        const account = await wallet.addRekeyedAccount(LEGACY)
+        await wallet.addRekeyedAccount(LEGACY_2)
+
+        expect(account).toMatchObject({ name: 'Passkey · rekeyed', address: LEGACY })
+        expect(wallet.addresses).toEqual([ADDRESS, LEGACY, LEGACY_2])
+        expect(wallet.activeAddress).toBe(ADDRESS)
+        expect(storedRecord().rekeyedAccounts).toEqual(onTestnet(LEGACY, LEGACY_2))
+        expect(accountInformation).toHaveBeenCalledWith(LEGACY)
+        expect(getCalls).toHaveLength(0)
+      })
+
+      it('persists only public data', async () => {
+        await connectWithRekeyed()
+
+        const record = storedRecord()
+        expect(Object.keys(record).sort()).toEqual(
+          [
+            'address',
+            'context',
+            'credentialId',
+            'publicKey',
+            'rekeyedAccounts',
+            'rpId',
+            'salt',
+            'version'
+          ].sort()
+        )
+        expect(record.rekeyedAccounts).toEqual(onTestnet(LEGACY))
+      })
+
+      it('sets a pqsig empty signature that names the passkey account as sgnr', async () => {
+        const wallet = await connectWithRekeyed()
+        const [own, rekeyed] = wallet.accounts
+
+        expect(getSignatureType(rekeyed.emptySignature)).toBe('pqsig')
+        const fields = decodeEmptySignature(rekeyed.emptySignature!)
+        expect(fields.sgnr?.toString()).toBe(ADDRESS)
+        expect(algosdk.addressFromPQSig(fields.pqsig!).toString()).toBe(ADDRESS)
+        expect(fields.pqsig).toEqual(decodeEmptySignature(own.emptySignature!).pqsig)
+        expect(decodeEmptySignature(own.emptySignature!).sgnr).toBeUndefined()
+
+        // Simulating with the empty signer names the passkey account as the authorizer
+        const txns = [makePayment(LEGACY), makePayment(ADDRESS)]
+        const [rekeyedStxn, ownStxn] = await wallet.emptyTransactionSigner(txns, [0, 1])
+        expect(sgnrOf(rekeyedStxn)).toBe(ADDRESS)
+        expect(algosdk.decodeSignedTransaction(rekeyedStxn).pqsig?.pk).toEqual(fields.pqsig!.pk)
+        expect(sgnrOf(ownStxn)).toBeUndefined()
+      })
+
+      it.each([
+        ['an account that is not rekeyed', undefined],
+        ['an account rekeyed to another address', OTHER_ADDRESS]
+      ])('refuses %s', async (_name, authAddr) => {
+        algodAuthAddrs[LEGACY] = authAddr
+        const wallet = createWallet(accessor)
+        await wallet.connect()
+
+        await expect(wallet.addRekeyedAccount(LEGACY)).rejects.toMatchObject({
+          name: 'PasskeyError',
+          code: 'not-rekeyed'
+        })
+        expect(wallet.addresses).toEqual([ADDRESS])
+        expect(storedRecord().rekeyedAccounts).toBeUndefined()
+      })
+
+      it('fails on an algod error, and adds nothing', async () => {
+        const wallet = createWallet(accessor)
+        await wallet.connect()
+        algodError = new Error('network down')
+
+        await expect(wallet.addRekeyedAccount(LEGACY)).rejects.toMatchObject({
+          code: 'failed',
+          cause: algodError
+        })
+        expect(wallet.addresses).toEqual([ADDRESS])
+        expect(storedRecord().rekeyedAccounts).toBeUndefined()
+      })
+
+      it('records an address in canonical form, and matches it in any form', async () => {
+        algodAuthAddrs[LEGACY] = ADDRESS
+        const wallet = createWallet(accessor)
+        await wallet.connect()
+
+        const account = await wallet.addRekeyedAccount(nonCanonical(LEGACY))
+        await wallet.addRekeyedAccount(LEGACY)
+
+        expect(account.address).toBe(LEGACY)
+        expect(wallet.addresses).toEqual([ADDRESS, LEGACY])
+        expect(storedRecord().rekeyedAccounts).toEqual(onTestnet(LEGACY))
+        expect(accountInformation).toHaveBeenCalledWith(LEGACY)
+        expect(accountInformation).not.toHaveBeenCalledWith(nonCanonical(LEGACY))
+
+        wallet.removeRekeyedAccount(nonCanonical(LEGACY))
+        expect(wallet.addresses).toEqual([ADDRESS])
+      })
+
+      it('restores an empty signature the manager cleared when the account is added again', async () => {
+        const wallet = await connectWithRekeyed()
+        const [own, rekeyed] = wallet.accounts
+        const { emptySignature: _cleared, ...withoutEmptySignature } = rekeyed
+        accessor.setAccounts([own, withoutEmptySignature])
+
+        const again = await wallet.addRekeyedAccount(LEGACY)
+
+        expect(again.emptySignature).toBe(rekeyed.emptySignature)
+        expect(wallet.accounts[1].emptySignature).toBe(rekeyed.emptySignature)
+      })
+
+      it('returns the same account when added again', async () => {
+        const wallet = await connectWithRekeyed()
+        wallet.setActiveAccount(LEGACY)
+
+        const again = await wallet.addRekeyedAccount(LEGACY)
+
+        expect(again.address).toBe(LEGACY)
+        expect(wallet.addresses).toEqual([ADDRESS, LEGACY])
+        expect(wallet.activeAddress).toBe(LEGACY)
+        expect(storedRecord().rekeyedAccounts).toEqual(onTestnet(LEGACY))
+      })
+
+      it('drops an account it added before when algod reports another auth address', async () => {
+        const wallet = await connectWithRekeyed()
+        algodAuthAddrs[LEGACY] = OTHER_ADDRESS
+
+        await expect(wallet.addRekeyedAccount(LEGACY)).rejects.toMatchObject({
+          code: 'not-rekeyed'
+        })
+        expect(wallet.addresses).toEqual([ADDRESS])
+        expect(storedRecord().rekeyedAccounts).toBeUndefined()
+      })
+
+      it('refuses the passkey account itself and invalid addresses, without asking algod', async () => {
+        const wallet = createWallet(accessor)
+        await wallet.connect()
+
+        await expect(wallet.addRekeyedAccount(ADDRESS)).rejects.toMatchObject({
+          code: 'not-rekeyed'
+        })
+        await expect(wallet.addRekeyedAccount(nonCanonical(ADDRESS))).rejects.toMatchObject({
+          code: 'not-rekeyed'
+        })
+        await expect(wallet.addRekeyedAccount('not an address')).rejects.toMatchObject({
+          code: 'failed'
+        })
+        expect(accountInformation).not.toHaveBeenCalled()
+        expect(wallet.addresses).toEqual([ADDRESS])
+      })
+
+      it('requires a connected account', async () => {
+        await expect(createWallet(accessor).addRekeyedAccount(LEGACY)).rejects.toMatchObject({
+          code: 'not-connected'
+        })
+      })
+
+      it('adds nothing when the wallet disconnects while algod answers', async () => {
+        algodAuthAddrs[LEGACY] = ADDRESS
+        const wallet = createWallet(accessor)
+        await wallet.connect()
+        let open!: () => void
+        algodGate = new Promise((resolve) => (open = resolve))
+
+        const adding = wallet.addRekeyedAccount(LEGACY)
+        await wallet.disconnect()
+        open()
+
+        await expect(adding).rejects.toMatchObject({ code: 'not-connected' })
+        expect(localStorageData[LOCAL_STORAGE_PASSKEY_KEY]).toBeUndefined()
+      })
+    })
+
+    it('reports the passkey address, whichever account is active', async () => {
+      const wallet = createWallet(accessor)
+      expect(wallet.passkeyAddress).toBeNull()
+
+      algodAuthAddrs[LEGACY] = ADDRESS
+      await wallet.connect()
+      await wallet.addRekeyedAccount(LEGACY)
+      wallet.setActiveAccount(LEGACY)
+
+      expect(wallet.activeAddress).toBe(LEGACY)
+      expect(wallet.passkeyAddress).toBe(ADDRESS)
+    })
+
+    describe('across reloads and sign-ins', () => {
+      it('keeps rekeyed accounts across a reload, without a ceremony', async () => {
+        await connectWithRekeyed()
+        getCalls = []
+        accountInformation.mockClear()
+
+        const reloaded = createWallet(accessor)
+        await reloaded.resumeSession()
+        await settle()
+
+        expect(reloaded.isConnected).toBe(true)
+        expect(reloaded.addresses).toEqual([ADDRESS, LEGACY])
+        expect(getCalls).toHaveLength(0)
+        expect(accountInformation).toHaveBeenCalledWith(LEGACY)
+
+        const txn = makePayment(LEGACY)
+        const [signed] = await reloaded.signTransactions([txn])
+        expectValidSignature(signed!, txn)
+        expect(sgnrOf(signed!)).toBe(ADDRESS)
+      })
+
+      it('drops an account algod reports rekeyed elsewhere on resume, keeping the others', async () => {
+        const wallet = await connectWithRekeyed()
+        algodAuthAddrs[LEGACY_2] = ADDRESS
+        await wallet.addRekeyedAccount(LEGACY_2)
+        algodAuthAddrs[LEGACY] = OTHER_ADDRESS
+
+        const reloaded = createWallet(accessor)
+        await reloaded.resumeSession()
+
+        await vi.waitFor(() => expect(reloaded.addresses).toEqual([ADDRESS, LEGACY_2]))
+        expect(storedRecord().rekeyedAccounts).toEqual(onTestnet(LEGACY_2))
+        expect(reloaded.isConnected).toBe(true)
+      })
+
+      it('activates the passkey account when resume drops the active rekeyed account', async () => {
+        const wallet = await connectWithRekeyed()
+        wallet.setActiveAccount(LEGACY)
+        algodAuthAddrs[LEGACY] = undefined
+
+        const reloaded = createWallet(accessor)
+        await reloaded.resumeSession()
+
+        await vi.waitFor(() => expect(reloaded.addresses).toEqual([ADDRESS]))
+        expect(reloaded.activeAddress).toBe(ADDRESS)
+      })
+
+      it('keeps rekeyed accounts when algod fails on resume', async () => {
+        await connectWithRekeyed()
+        algodError = new Error('network down')
+
+        const reloaded = createWallet(accessor)
+        await reloaded.resumeSession()
+        await settle()
+
+        expect(reloaded.addresses).toEqual([ADDRESS, LEGACY])
+        expect(storedRecord().rekeyedAccounts).toEqual(onTestnet(LEGACY))
+      })
+
+      it('resumes without waiting for algod', async () => {
+        await connectWithRekeyed()
+        algodGate = new Promise(() => {})
+
+        const reloaded = createWallet(accessor)
+        await reloaded.resumeSession()
+
+        expect(reloaded.isConnected).toBe(true)
+        expect(reloaded.addresses).toEqual([ADDRESS, LEGACY])
+      })
+
+      it('restores rekeyed accounts the store lacks on resume', async () => {
+        const wallet = await connectWithRekeyed()
+        accessor.setAccounts([wallet.accounts[0]])
+
+        const reloaded = createWallet(accessor)
+        await reloaded.resumeSession()
+
+        expect(reloaded.addresses).toEqual([ADDRESS, LEGACY])
+        expect(reloaded.accounts[1].name).toBe('Passkey · rekeyed')
+      })
+
+      it('drops and rewrites nothing when every rekeyed account checks out', async () => {
+        await connectWithRekeyed()
+        algodAuthAddrs[LEGACY_2] = ADDRESS
+        const record = storedRecord()
+        record.rekeyedAccounts = onTestnet(LEGACY, LEGACY_2)
+        localStorageData[LOCAL_STORAGE_PASSKEY_KEY] = JSON.stringify(record)
+
+        const reloaded = createWallet(accessor)
+        const { logger } = reloaded as unknown as { logger: { warn: () => void } }
+        const warn = vi.spyOn(logger, 'warn')
+        await reloaded.resumeSession()
+        const accountsAfterResume = store.state.wallets[WALLET_ID]?.accounts
+        mockLocalStorage.setItem.mockClear()
+        await settle()
+
+        expect(accountInformation).toHaveBeenCalledWith(LEGACY_2)
+        expect(warn).not.toHaveBeenCalled()
+        expect(mockLocalStorage.setItem).not.toHaveBeenCalled()
+        expect(store.state.wallets[WALLET_ID]?.accounts).toBe(accountsAfterResume)
+        expect(reloaded.addresses).toEqual([ADDRESS, LEGACY, LEGACY_2])
+      })
+
+      it('lists the rekeyed account the record has in place of one it lacks, on resume', async () => {
+        // Every rekeyed account has the same name and empty signature, so only the address differs
+        await connectWithRekeyed()
+        algodAuthAddrs[LEGACY_2] = ADDRESS
+        const record = storedRecord()
+        record.rekeyedAccounts = onTestnet(LEGACY_2)
+        localStorageData[LOCAL_STORAGE_PASSKEY_KEY] = JSON.stringify(record)
+
+        const reloaded = createWallet(accessor)
+        await reloaded.resumeSession()
+        expect(reloaded.addresses).toEqual([ADDRESS, LEGACY_2])
+      })
+
+      it('renames a rekeyed account the store holds under another name, on resume', async () => {
+        const wallet = await connectWithRekeyed()
+        const [own, rekeyed] = wallet.accounts
+        accessor.setAccounts([own, { ...rekeyed, name: 'Old name' }])
+
+        const reloaded = createWallet(accessor)
+        await reloaded.resumeSession()
+        expect(reloaded.accounts[1]).toMatchObject({ address: LEGACY, name: 'Passkey · rekeyed' })
+      })
+
+      it('leaves a store that no longer holds the passkey account alone when a check answers', async () => {
+        await connectWithRekeyed()
+        let openAlgod!: () => void
+        algodGate = new Promise((resolve) => (openAlgod = resolve))
+        await createWallet(accessor).resumeSession()
+
+        // Before the check of LEGACY answers, the store stops holding the passkey account
+        accessor.setAccounts([{ name: 'Other', address: OTHER_ADDRESS }])
+        algodAuthAddrs[LEGACY] = OTHER_ADDRESS
+        openAlgod()
+        await settle()
+
+        expect(storedRecord().rekeyedAccounts).toBeUndefined()
+        expect(store.state.wallets[WALLET_ID]?.accounts).toEqual([
+          { name: 'Other', address: OTHER_ADDRESS }
+        ])
+      })
+
+      it('rebuilds a rekeyed account whose empty signature was cleared, on resume', async () => {
+        const wallet = await connectWithRekeyed()
+        const [own, rekeyed] = wallet.accounts
+        const { emptySignature: _cleared, ...withoutEmptySignature } = rekeyed
+        accessor.setAccounts([own, withoutEmptySignature])
+
+        const reloaded = createWallet(accessor)
+        await reloaded.resumeSession()
+        expect(reloaded.accounts[1].emptySignature).toBe(rekeyed.emptySignature)
+      })
+
+      it('keeps and re-checks rekeyed accounts when the same passkey signs in again', async () => {
+        await connectWithRekeyed()
+        accountInformation.mockClear()
+
+        const accounts = await createWallet(accessor).connect()
+
+        expect(accounts.map((account) => account.address)).toEqual([ADDRESS, LEGACY])
+        expect(store.state.wallets[WALLET_ID]?.activeAccount?.address).toBe(ADDRESS)
+        await settle()
+        expect(accountInformation).toHaveBeenCalledWith(LEGACY)
+      })
+
+      it("leaves another passkey's rekeyed accounts alone when a check from before it signed in answers", async () => {
+        await connectWithRekeyed()
+        let openAlgod!: () => void
+        algodGate = new Promise((resolve) => (openAlgod = resolve))
+
+        // The first passkey's resume starts checking LEGACY, and algod holds the answer
+        await createWallet(accessor).resumeSession()
+
+        // Meanwhile another passkey signs in, with LEGACY rekeyed to it on the same network
+        authenticator.prfOutput = () => new Uint8Array(32).fill(7)
+        const second = createWallet(accessor)
+        const [{ address: secondAddress }] = await second.connect()
+        const record = storedRecord()
+        record.rekeyedAccounts = onTestnet(LEGACY)
+        localStorageData[LOCAL_STORAGE_PASSKEY_KEY] = JSON.stringify(record)
+        await second.resumeSession()
+        expect(second.addresses).toEqual([secondAddress, LEGACY])
+
+        // The first check answers that LEGACY isn't rekeyed to the first passkey
+        algodAuthAddrs[LEGACY] = secondAddress
+        openAlgod()
+        await settle()
+
+        expect(storedRecord().address).toBe(secondAddress)
+        expect(storedRecord().rekeyedAccounts).toEqual(onTestnet(LEGACY))
+        expect(second.addresses).toEqual([secondAddress, LEGACY])
+      })
+
+      it('keeps the active rekeyed account when the same passkey signs in again', async () => {
+        const wallet = await connectWithRekeyed()
+        wallet.setActiveAccount(LEGACY)
+
+        await createWallet(accessor).connect()
+
+        expect(store.state.wallets[WALLET_ID]?.activeAccount?.address).toBe(LEGACY)
+      })
+
+      it('activates the passkey account when it signs in with rekeyed accounts but no wallet state', async () => {
+        await connectWithRekeyed()
+        accessor.removeWallet()
+
+        const accounts = await createWallet(accessor).connect()
+
+        expect(accounts.map((account) => account.address)).toEqual([ADDRESS, LEGACY])
+        expect(store.state.wallets[WALLET_ID]?.activeAccount?.address).toBe(ADDRESS)
+      })
+
+      it('activates the passkey account when it connects after a disconnect', async () => {
+        const wallet = await connectWithRekeyed()
+        wallet.setActiveAccount(LEGACY)
+        await wallet.disconnect()
+
+        await createWallet(accessor).connect()
+
+        expect(store.state.wallets[WALLET_ID]?.activeAccount?.address).toBe(ADDRESS)
+      })
+
+      it('drops rekeyed accounts when another passkey signs in', async () => {
+        const wallet = await connectWithRekeyed()
+        wallet.setActiveAccount(LEGACY)
+        authenticator.prfOutput = () => new Uint8Array(32).fill(7)
+
+        const accounts = await createWallet(accessor).connect()
+
+        expect(accounts).toHaveLength(1)
+        expect(accounts[0].address).not.toBe(ADDRESS)
+        expect(storedRecord().rekeyedAccounts).toBeUndefined()
+        expect(store.state.wallets[WALLET_ID]?.activeAccount?.address).toBe(accounts[0].address)
+      })
+
+      it('reconciles a store another tab left behind on resume, without disconnecting', async () => {
+        // Tab A removes LEGACY, then tab B's store, which still lists it, is persisted
+        const tabA = await connectWithRekeyed()
+        const tabBAccounts = tabA.accounts
+        tabA.removeRekeyedAccount(LEGACY)
+        accessor.setAccounts(tabBAccounts)
+
+        const reloaded = createWallet(accessor)
+        await reloaded.resumeSession()
+
+        expect(reloaded.isConnected).toBe(true)
+        expect(reloaded.addresses).toEqual([ADDRESS])
+        expect(storedRecord().address).toBe(ADDRESS)
+      })
+
+      it('signs from the record, not a store another tab left behind', async () => {
+        const wallet = await connectWithRekeyed()
+        const staleAccounts = wallet.accounts
+        wallet.removeRekeyedAccount(LEGACY)
+        accessor.setAccounts(staleAccounts)
+
+        expect(await wallet.signTransactions([makePayment(LEGACY)])).toEqual([])
+        const txn = makePayment(ADDRESS)
+        const [signed] = await wallet.signTransactions([txn])
+        expectValidSignature(signed!, txn)
+      })
+    })
+
+    describe('networks', () => {
+      const switchTo = async (networkId: string) => {
+        store.setState((state) => ({ ...state, activeNetwork: networkId }))
+        await settle()
+      }
+
+      it("lists only the active network's rekeyed accounts, and keeps the others", async () => {
+        const wallet = await connectWithRekeyed()
+        wallet.setActiveAccount(LEGACY)
+        // Mainnet's algod doesn't know the rekey
+        algodAuthAddrs[LEGACY] = undefined
+        accountInformation.mockClear()
+
+        await switchTo('mainnet')
+        expect(wallet.addresses).toEqual([ADDRESS])
+        expect(wallet.activeAddress).toBe(ADDRESS)
+        expect(storedRecord().rekeyedAccounts).toEqual(onTestnet(LEGACY))
+        expect(accountInformation).not.toHaveBeenCalled()
+        expect(await wallet.signTransactions([makePayment(LEGACY)])).toEqual([])
+
+        algodAuthAddrs[LEGACY] = ADDRESS
+        await switchTo('testnet')
+        expect(wallet.addresses).toEqual([ADDRESS, LEGACY])
+        expect(getSignatureType(wallet.accounts[1].emptySignature)).toBe('pqsig')
+        expect(accountInformation).toHaveBeenCalledWith(LEGACY)
+      })
+
+      it("keeps another network's rekeyed accounts when a reload lands on a different one", async () => {
+        await connectWithRekeyed()
+        algodAuthAddrs[LEGACY] = undefined
+        await switchTo('mainnet')
+
+        const reloaded = createWallet(accessor)
+        await reloaded.resumeSession()
+        await settle()
+
+        expect(reloaded.addresses).toEqual([ADDRESS])
+        expect(storedRecord().rekeyedAccounts).toEqual(onTestnet(LEGACY))
+      })
+
+      it('records an account separately on each network', async () => {
+        const wallet = await connectWithRekeyed()
+        await switchTo('mainnet')
+        await wallet.addRekeyedAccount(LEGACY)
+
+        expect(storedRecord().rekeyedAccounts).toEqual([
+          { address: LEGACY, network: TESTNET },
+          { address: LEGACY, network: MAINNET }
+        ])
+
+        // Algod on mainnet reporting another auth address drops only mainnet's entry
+        algodAuthAddrs[LEGACY] = OTHER_ADDRESS
+        await expect(wallet.addRekeyedAccount(LEGACY)).rejects.toMatchObject({
+          code: 'not-rekeyed'
+        })
+        expect(storedRecord().rekeyedAccounts).toEqual(onTestnet(LEGACY))
+
+        // And removing it on mainnet leaves testnet's alone
+        algodAuthAddrs[LEGACY] = ADDRESS
+        await wallet.addRekeyedAccount(LEGACY)
+        wallet.removeRekeyedAccount(LEGACY)
+        expect(storedRecord().rekeyedAccounts).toEqual(onTestnet(LEGACY))
+      })
+
+      it('records an account for the network algod answered on, even if it switched meanwhile', async () => {
+        const wallet = await connectWithRekeyed()
+        algodAuthAddrs[LEGACY_2] = ADDRESS
+        let openAlgod!: () => void
+        algodGate = new Promise((resolve) => (openAlgod = resolve))
+
+        const adding = wallet.addRekeyedAccount(LEGACY_2)
+        await switchTo('mainnet')
+        openAlgod()
+        await adding
+        await settle()
+
+        expect(storedRecord().rekeyedAccounts).toEqual(onTestnet(LEGACY, LEGACY_2))
+        expect(wallet.addresses).toEqual([ADDRESS])
+      })
+
+      it('checks nothing again on a store change that keeps the network', async () => {
+        const wallet = await connectWithRekeyed()
+        await settle()
+        accountInformation.mockClear()
+
+        wallet.setActiveAccount(LEGACY)
+        accessor.setActive()
+        await settle()
+
+        expect(accountInformation).not.toHaveBeenCalled()
+        expect(wallet.addresses).toEqual([ADDRESS, LEGACY])
+      })
+
+      it('refuses signData for an account recorded on another network, before prompting', async () => {
+        const wallet = await connectWithRekeyed()
+        await switchTo('mainnet')
+        getCalls = []
+
+        await expect(
+          wallet.signData(siwaData({ account_address: LEGACY }), {
+            scope: ScopeType.AUTH,
+            encoding: 'base64'
+          })
+        ).rejects.toMatchObject({ code: 4603, message: 'Invalid Signer' })
+        expect(getCalls).toHaveLength(0)
+      })
+
+      it('keys a network without a genesis hash by its ID', async () => {
+        // The default LocalNet config has none
+        store.setState((state) => ({ ...state, activeNetwork: 'localnet' }))
+        await connectWithRekeyed()
+
+        expect(storedRecord().rekeyedAccounts).toEqual([{ address: LEGACY, network: 'localnet' }])
+      })
+
+      describe('with a WalletManager', () => {
+        let algodSpy: MockInstance
+
+        beforeEach(() => {
+          // The manager's own algod clients, and so the adapter's, answer from the mock
+          const fromMock = (address: string) => accountInformation(String(address))
+          algodSpy = vi
+            .spyOn(algosdk.Algodv2.prototype, 'accountInformation')
+            .mockImplementation(fromMock as unknown as algosdk.Algodv2['accountInformation'])
+        })
+
+        afterEach(() => algodSpy.mockRestore())
+
+        it("checks a rekeyed account's sgnr empty signature, and lists it again after a network round trip", async () => {
+          const manager = new WalletManager({ wallets: [passkey()] })
+          const wallet = manager.getWallet(WALLET_ID) as unknown as PasskeyAdapter
+          const accountOf = (address: string) =>
+            manager.store.state.wallets[WALLET_ID]?.accounts.find((a) => a.address === address)
+
+          await wallet.connect()
+          algodAuthAddrs[LEGACY] = ADDRESS
+          const added = await wallet.addRekeyedAccount(LEGACY)
+
+          // The manager accepts the empty signature and records the passkey account as the auth address
+          await vi.waitFor(() => expect(accountOf(LEGACY)?.authAddr).toBe(ADDRESS))
+          expect(accountOf(LEGACY)?.emptySignature).toBe(added.emptySignature)
+          expect(accountOf(ADDRESS)?.authAddr).toBeNull()
+
+          // On mainnet, which doesn't know the rekey, it isn't listed but stays recorded
+          algodAuthAddrs[LEGACY] = undefined
+          await manager.setActiveNetwork('mainnet')
+          await settle()
+          expect(wallet.addresses).toEqual([ADDRESS])
+          expect(storedRecord().rekeyedAccounts).toEqual(onTestnet(LEGACY))
+
+          // Back on testnet it's listed with its empty signature, and checked again
+          algodAuthAddrs[LEGACY] = ADDRESS
+          await manager.setActiveNetwork('testnet')
+          await vi.waitFor(() => expect(accountOf(LEGACY)?.authAddr).toBe(ADDRESS))
+          expect(accountOf(LEGACY)?.emptySignature).toBe(added.emptySignature)
+        })
+      })
+    })
+
+    describe('removeRekeyedAccount', () => {
+      it('removes it from the wallet and the record, and stops signing for it', async () => {
+        const wallet = await connectWithRekeyed()
+
+        wallet.removeRekeyedAccount(LEGACY)
+
+        expect(wallet.addresses).toEqual([ADDRESS])
+        expect(storedRecord().rekeyedAccounts).toBeUndefined()
+        expect(await wallet.signTransactions([makePayment(LEGACY)])).toEqual([])
+      })
+
+      it('activates the passkey account when it removes the active one', async () => {
+        const wallet = await connectWithRekeyed()
+        wallet.setActiveAccount(LEGACY)
+
+        wallet.removeRekeyedAccount(LEGACY)
+        expect(wallet.activeAddress).toBe(ADDRESS)
+      })
+
+      it('activates the passkey account, not the first one left, wherever the store lists it', async () => {
+        const wallet = await connectWithRekeyed()
+        algodAuthAddrs[LEGACY_2] = ADDRESS
+        await wallet.addRekeyedAccount(LEGACY_2)
+        accessor.setAccounts([...wallet.accounts].reverse())
+        wallet.setActiveAccount(LEGACY)
+
+        wallet.removeRekeyedAccount(LEGACY)
+        expect(wallet.addresses).toEqual([ADDRESS, LEGACY_2])
+        expect(wallet.activeAddress).toBe(ADDRESS)
+      })
+
+      it('ignores the passkey account itself and unknown addresses', async () => {
+        const wallet = await connectWithRekeyed()
+
+        wallet.removeRekeyedAccount(ADDRESS)
+        wallet.removeRekeyedAccount(OTHER_ADDRESS)
+
+        expect(wallet.addresses).toEqual([ADDRESS, LEGACY])
+        expect(storedRecord().rekeyedAccounts).toEqual(onTestnet(LEGACY))
+      })
+
+      it('requires a connected account', () => {
+        expect(() => createWallet(accessor).removeRekeyedAccount(LEGACY)).toThrow(
+          'No passkey account is connected.'
+        )
+      })
+    })
+
+    it('disconnect clears rekeyed accounts', async () => {
+      const wallet = await connectWithRekeyed()
+
+      await wallet.disconnect()
+      expect(wallet.isConnected).toBe(false)
+      expect(localStorageData[LOCAL_STORAGE_PASSKEY_KEY]).toBeUndefined()
+
+      const accounts = await wallet.connect()
+      expect(accounts.map((account) => account.address)).toEqual([ADDRESS])
+    })
+
+    describe('signTransactions', () => {
+      it('signs its own and its rekeyed accounts with one prompt, with sgnr only for the rekeyed', async () => {
+        const wallet = await connectWithRekeyed()
+        getCalls = []
+
+        const txns = [makePayment(ADDRESS), makePayment(LEGACY), makePayment(OTHER_ADDRESS)]
+        algosdk.assignGroupID(txns)
+        const signed = await wallet.signTransactions(txns)
+
+        expect(signed).toHaveLength(2)
+        expectValidSignature(signed[0]!, txns[0])
+        expectValidSignature(signed[1]!, txns[1])
+        expect(sgnrOf(signed[0]!)).toBeUndefined()
+        expect(sgnrOf(signed[1]!)).toBe(ADDRESS)
+        expect(prfCalls()).toHaveLength(1)
+      })
+
+      it('signs an encoded transaction from a rekeyed account with sgnr', async () => {
+        const wallet = await connectWithRekeyed()
+
+        const txn = makePayment(LEGACY)
+        const [signed] = await wallet.signTransactions([algosdk.encodeUnsignedTransaction(txn)])
+
+        expectValidSignature(signed!, txn)
+        expect(sgnrOf(signed!)).toBe(ADDRESS)
+      })
+
+      it('passes rekeyed transactions to confirm', async () => {
+        const confirm = vi.fn(() => 'silent' as const)
+        const wallet = await connectWithRekeyed({ session: true, confirm })
+
+        const txn = makePayment(LEGACY)
+        await wallet.signTransactions([txn, makePayment(OTHER_ADDRESS)])
+        expect(confirm).toHaveBeenLastCalledWith({ type: 'transactions', transactions: [txn] })
+      })
+
+      describe('a migration group', () => {
+        /** [LEGACY rekeys itself to `rekeyTo`, LEGACY's proof transaction] */
+        function migrationGroup(rekeyTo = ADDRESS) {
+          const txns = [makePayment(LEGACY, 'rekey', rekeyTo), makePayment(LEGACY, 'proof')]
+          return algosdk.assignGroupID(txns)
+        }
+
+        it('signs the proof transaction after the rekey to the passkey account, with sgnr', async () => {
+          const wallet = createWallet(accessor)
+          await wallet.connect()
+          const group = migrationGroup()
+
+          const signed = await wallet.signTransactions(group, [1])
+          expect(signed).toHaveLength(1)
+          expectValidSignature(signed[0]!, group[1])
+          expect(sgnrOf(signed[0]!)).toBe(ADDRESS)
+
+          // Without indexes, the rekey itself is left to the account's own key
+          const all = await wallet.signTransactions(group)
+          expect(all).toHaveLength(1)
+          expectValidSignature(all[0]!, group[1])
+        })
+
+        it('signs the proof transaction of an encoded group with the rekey already signed', async () => {
+          const wallet = createWallet(accessor)
+          await wallet.connect()
+          const group = migrationGroup()
+          const encoded = [
+            algosdk.signTransaction(group[0], LEGACY_ACCOUNT.sk).blob,
+            algosdk.encodeUnsignedTransaction(group[1])
+          ]
+
+          const signed = await wallet.signTransactions(encoded)
+          expect(signed).toHaveLength(1)
+          expectValidSignature(signed[0]!, group[1])
+          expect(sgnrOf(signed[0]!)).toBe(ADDRESS)
+        })
+
+        it('skips a transaction the group rekeys to the passkey account only after it', async () => {
+          const wallet = createWallet(accessor)
+          await wallet.connect()
+          getCalls = []
+          const group = migrationGroup().reverse()
+
+          expect(await wallet.signTransactions(group)).toEqual([])
+          const encoded = group.map((txn) => algosdk.encodeUnsignedTransaction(txn))
+          expect(await wallet.signTransactions(encoded)).toEqual([])
+          expect(getCalls).toHaveLength(0)
+        })
+
+        it('skips a transaction after a rekey to another address', async () => {
+          const wallet = createWallet(accessor)
+          await wallet.connect()
+          getCalls = []
+          const group = migrationGroup(OTHER_ADDRESS)
+
+          expect(await wallet.signTransactions(group)).toEqual([])
+          const encoded = group.map((txn) => algosdk.encodeUnsignedTransaction(txn))
+          expect(await wallet.signTransactions(encoded)).toEqual([])
+          expect(getCalls).toHaveLength(0)
+        })
+
+        it('skips a sender that is neither its own, rekeyed, nor rekeyed in the group', async () => {
+          const wallet = createWallet(accessor)
+          await wallet.connect()
+
+          expect(await wallet.signTransactions([makePayment(LEGACY)])).toEqual([])
+        })
+
+        it('ignores a rekey outside the transaction group', async () => {
+          const wallet = createWallet(accessor)
+          await wallet.connect()
+          getCalls = []
+
+          // Neither transaction in a group
+          const ungrouped = [makePayment(LEGACY, 'rekey', ADDRESS), makePayment(LEGACY, 'proof')]
+          expect(await wallet.signTransactions(ungrouped)).toEqual([])
+
+          // The rekey in one group and the transaction in another, nested or flat
+          const [rekey] = algosdk.assignGroupID([makePayment(LEGACY, 'rekey', ADDRESS)])
+          const [proof] = algosdk.assignGroupID([makePayment(LEGACY, 'proof')])
+          expect(await wallet.signTransactions([[rekey], [proof]])).toEqual([])
+          expect(await wallet.signTransactions([rekey, proof])).toEqual([])
+          const [encodedRekey, encodedProof] = [rekey, proof].map((txn) =>
+            algosdk.encodeUnsignedTransaction(txn)
+          )
+          expect(await wallet.signTransactions([[encodedRekey], [encodedProof]])).toEqual([])
+          expect(getCalls).toHaveLength(0)
+        })
+
+        it('treats an all-zero group as no group', async () => {
+          // A Transaction object can carry one; encoding drops it, so only the object path sees it
+          const wallet = createWallet(accessor)
+          await wallet.connect()
+          getCalls = []
+          const txns = [makePayment(LEGACY, 'rekey', ADDRESS), makePayment(LEGACY, 'proof')]
+          for (const txn of txns) txn.group = new Uint8Array(32)
+
+          expect(await wallet.signTransactions(txns)).toEqual([])
+          expect(getCalls).toHaveLength(0)
+        })
+
+        it('signs the proof transaction of its own group among nested groups', async () => {
+          const wallet = createWallet(accessor)
+          await wallet.connect()
+          const otherGroup = algosdk.assignGroupID([makePayment(LEGACY, 'other rekey', ADDRESS)])
+          const group = migrationGroup()
+
+          const signed = await wallet.signTransactions([otherGroup, group])
+          expect(signed).toHaveLength(1)
+          expectValidSignature(signed[0]!, group[1])
+          expect(sgnrOf(signed[0]!)).toBe(ADDRESS)
+        })
+      })
+
+      it('stops signing for an account once an earlier transaction rekeys it away', async () => {
+        const wallet = await connectWithRekeyed()
+
+        const group = algosdk.assignGroupID([
+          makePayment(LEGACY, 'move', OTHER_ADDRESS),
+          makePayment(LEGACY, 'after'),
+          makePayment(ADDRESS, 'own move', OTHER_ADDRESS),
+          makePayment(ADDRESS, 'own after')
+        ])
+        const signed = await wallet.signTransactions(group)
+
+        expect(signed).toHaveLength(2)
+        expectValidSignature(signed[0]!, group[0])
+        expect(sgnrOf(signed[0]!)).toBe(ADDRESS)
+        expectValidSignature(signed[1]!, group[2])
+        expect(sgnrOf(signed[1]!)).toBeUndefined()
+      })
+    })
+
+    describe('signData', () => {
+      const metadata = { scope: ScopeType.AUTH, encoding: 'base64' }
+
+      it("signs a SIWA request for a rekeyed account with the passkey's key", async () => {
+        const wallet = await connectWithRekeyed()
+        const { pqsig } = decodeEmptySignature(wallet.accounts[0].emptySignature!)
+        accountInformation.mockClear()
+        const data = siwaData({ account_address: LEGACY })
+
+        const response = await wallet.signData(data, metadata)
+
+        expect(wallet.activeAddress).toBe(ADDRESS)
+        expect(accountInformation).toHaveBeenCalledWith(LEGACY)
+        expect(response.scheme).toBe('falcon-1024-det')
+        expect(response.signer).toEqual(pqsig!.pk)
+        const message = new Uint8Array([
+          ...sha256(new TextEncoder().encode(atob(data))),
+          ...sha256(response.authenticatorData)
+        ])
+        expect(verifyCompressed(response.signer, response.signature, message)).toBe(true)
+      })
+
+      it.each([
+        ['the passkey account', ADDRESS],
+        ['a rekeyed account', LEGACY]
+      ])(
+        'signs for %s named with other padding bits, checking its canonical address',
+        async (_name, address) => {
+          const wallet = await connectWithRekeyed()
+          accountInformation.mockClear()
+
+          const response = await wallet.signData(
+            siwaData({ account_address: nonCanonical(address) }),
+            metadata
+          )
+
+          expect(response.scheme).toBe('falcon-1024-det')
+          expect(accountInformation).toHaveBeenCalledWith(address)
+          expect(accountInformation).not.toHaveBeenCalledWith(nonCanonical(address))
+        }
+      )
+
+      it('refuses an account that was not added, before prompting', async () => {
+        algodAuthAddrs[LEGACY] = ADDRESS
+        const wallet = createWallet(accessor)
+        await wallet.connect()
+        getCalls = []
+
+        await expect(
+          wallet.signData(siwaData({ account_address: LEGACY }), metadata)
+        ).rejects.toMatchObject({ code: 4603, message: 'Invalid Signer' })
+        expect(getCalls).toHaveLength(0)
+      })
+
+      it('refuses a rekeyed account algod reports rekeyed elsewhere', async () => {
+        const wallet = await connectWithRekeyed()
+        algodAuthAddrs[LEGACY] = OTHER_ADDRESS
+
+        await expect(
+          wallet.signData(siwaData({ account_address: LEGACY }), metadata)
+        ).rejects.toMatchObject({ code: 4603 })
+      })
     })
   })
 })

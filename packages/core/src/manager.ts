@@ -36,6 +36,10 @@ import type {
   WalletKey
 } from 'src/wallets/types'
 
+// How long to wait for algod to show a rekey a wallet already reports, before clearing its empty signature
+const REKEY_LAG_RETRY_MS = 2000
+const REKEY_LAG_RETRIES = 3
+
 export interface WalletManagerOptions {
   persistNetwork?: boolean
   debug?: boolean
@@ -62,6 +66,8 @@ export class WalletManager {
 
   private pendingEmptySignatureChecks = new Set<string>()
   private failedEmptySignatureChecks = new Set<string>()
+  private rekeyLagRetries = new Map<string, number>()
+  private rekeyLagTimers = new Set<string>()
 
   constructor({
     wallets = [],
@@ -471,7 +477,14 @@ export class WalletManager {
    *
    * @param recheck - Also re-check empty signatures that were already checked
    */
-  private async checkEmptySignatures({ recheck }: { recheck: boolean }): Promise<void> {
+  /** `retryKey`: check only that account, even if it was checked before (`retryAfterRekeyLag`) */
+  private async checkEmptySignatures({
+    recheck,
+    retryKey
+  }: {
+    recheck: boolean
+    retryKey?: string
+  }): Promise<void> {
     if (recheck) {
       this.failedEmptySignatureChecks.clear()
     }
@@ -482,9 +495,10 @@ export class WalletManager {
       if (!walletState) continue
       for (const account of walletState.accounts) {
         if (account.emptySignature === undefined) continue
-        if (!recheck && account.authAddr !== undefined) continue
 
         const key = `${this.activeNetwork}:${walletKey}:${account.address}:${account.emptySignature}`
+        if (retryKey !== undefined && key !== retryKey) continue
+        if (!recheck && retryKey === undefined && account.authAddr !== undefined) continue
         if (this.pendingEmptySignatureChecks.has(key)) continue
         if (!recheck && this.failedEmptySignatureChecks.has(key)) continue
 
@@ -512,6 +526,7 @@ export class WalletManager {
     const record = (authAddr: string | null | undefined) => {
       // Discard the result if the network changed while checking
       if (this.activeNetwork !== networkId) return
+      this.rekeyLagRetries.delete(key)
       recordEmptySignatureChecks(this.store, {
         walletId: walletKey,
         checks: [{ address, emptySignature, authAddr }]
@@ -537,6 +552,27 @@ export class WalletManager {
       return
     }
 
+    let pqAddress: string | undefined
+    if (fields.pqsig) {
+      try {
+        pqAddress = algosdk.addressFromPQSig(fields.pqsig).toString()
+      } catch {
+        // A malformed pqsig authorizes nothing
+      }
+    }
+
+    // The wallet names its post-quantum key as the account's signer, but this node shows no rekey: most
+    // likely one that just landed and this node hasn't seen yet, so ask again before clearing it
+    if (
+      authAddr === null &&
+      pqAddress !== undefined &&
+      pqAddress !== address &&
+      fields.sgnr?.toString() === pqAddress &&
+      this.retryAfterRekeyLag(key)
+    ) {
+      return
+    }
+
     if (recordedAuthAddr !== undefined && recordedAuthAddr !== authAddr) {
       this.logger.warn(
         `Account ${address} was rekeyed, so its type is unknown until the wallet reconnects`
@@ -546,12 +582,6 @@ export class WalletManager {
     }
 
     if (fields.pqsig) {
-      let pqAddress: string | undefined
-      try {
-        pqAddress = algosdk.addressFromPQSig(fields.pqsig).toString()
-      } catch {
-        // A malformed pqsig authorizes nothing
-      }
       if (pqAddress !== (authAddr ?? address)) {
         this.logger.warn(
           `Clearing empty signature for ${address}: its pqsig doesn't authorize the account`
@@ -562,6 +592,31 @@ export class WalletManager {
     }
 
     record(authAddr)
+  }
+
+  /**
+   * Checks an empty signature again in a moment, up to `REKEY_LAG_RETRIES` times; false once they're used
+   * up. It's a failed check meanwhile, so other state changes don't check it again.
+   */
+  private retryAfterRekeyLag(key: string): boolean {
+    this.failedEmptySignatureChecks.add(key)
+    // A check in between (a resume, say) waits for the retry already scheduled, without using up another
+    if (this.rekeyLagTimers.has(key)) return true
+    const tries = this.rekeyLagRetries.get(key) ?? 0
+    if (tries >= REKEY_LAG_RETRIES) {
+      this.failedEmptySignatureChecks.delete(key)
+      this.rekeyLagRetries.delete(key)
+      return false
+    }
+    this.rekeyLagRetries.set(key, tries + 1)
+    this.rekeyLagTimers.add(key)
+    this.logger.debug(`Checking ${key} again: algod shows no rekey to its post-quantum key yet`)
+    setTimeout(() => {
+      this.rekeyLagTimers.delete(key)
+      this.failedEmptySignatureChecks.delete(key)
+      void this.checkEmptySignatures({ recheck: false, retryKey: key })
+    }, REKEY_LAG_RETRY_MS)
+    return true
   }
 
   public async disconnect(): Promise<void> {
