@@ -396,7 +396,9 @@ A rekey belongs to one network, so each rekeyed account is recorded for the netw
 
 `removeRekeyedAccount(address)` stops listing and signing for it on the active network. If it was the active account, the passkey account becomes active. It doesn't change the account on chain: the account stays rekeyed to the passkey account, so the passkey's key still controls it until it's rekeyed elsewhere. `disconnect` drops them all.
 
-On each reload, sign-in with the same passkey, and network switch, the adapter checks the active network's rekeyed accounts with algod in the background: it drops one whose auth address has changed, and keeps them if algod can't be reached.
+On each reload, sign-in with the same passkey, and network switch, the adapter checks the active network's rekeyed accounts with algod in the background: it drops one whose auth address has changed, and keeps them if algod can't be reached. Signing in again with the same passkey while connected keeps the active account; after a disconnect, the passkey account is active.
+
+Right after a rekey, the node an app reads may not show it yet. The manager's check of empty signatures and `signData` both wait a few seconds for algod to show a rekey that an account's empty signature names (`sgnr`) before treating the account as not authorized by the passkey.
 
 #### Finding Rekeyed Accounts
 

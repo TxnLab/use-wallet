@@ -2127,8 +2127,38 @@ describe('PasskeyAdapter', () => {
         expect(second.addresses).toEqual([secondAddress, LEGACY])
       })
 
-      it('drops rekeyed accounts when another passkey signs in', async () => {
+      it('keeps the active rekeyed account when the same passkey signs in again', async () => {
+        const wallet = await connectWithRekeyed()
+        wallet.setActiveAccount(LEGACY)
+
+        await createWallet(accessor).connect()
+
+        expect(store.state.wallets[WALLET_ID]?.activeAccount?.address).toBe(LEGACY)
+      })
+
+      it('activates the passkey account when it signs in with rekeyed accounts but no wallet state', async () => {
         await connectWithRekeyed()
+        accessor.removeWallet()
+
+        const accounts = await createWallet(accessor).connect()
+
+        expect(accounts.map((account) => account.address)).toEqual([ADDRESS, LEGACY])
+        expect(store.state.wallets[WALLET_ID]?.activeAccount?.address).toBe(ADDRESS)
+      })
+
+      it('activates the passkey account when it connects after a disconnect', async () => {
+        const wallet = await connectWithRekeyed()
+        wallet.setActiveAccount(LEGACY)
+        await wallet.disconnect()
+
+        await createWallet(accessor).connect()
+
+        expect(store.state.wallets[WALLET_ID]?.activeAccount?.address).toBe(ADDRESS)
+      })
+
+      it('drops rekeyed accounts when another passkey signs in', async () => {
+        const wallet = await connectWithRekeyed()
+        wallet.setActiveAccount(LEGACY)
         authenticator.prfOutput = () => new Uint8Array(32).fill(7)
 
         const accounts = await createWallet(accessor).connect()
@@ -2136,6 +2166,7 @@ describe('PasskeyAdapter', () => {
         expect(accounts).toHaveLength(1)
         expect(accounts[0].address).not.toBe(ADDRESS)
         expect(storedRecord().rekeyedAccounts).toBeUndefined()
+        expect(store.state.wallets[WALLET_ID]?.activeAccount?.address).toBe(accounts[0].address)
       })
 
       it('reconciles a store another tab left behind on resume, without disconnecting', async () => {

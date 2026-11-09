@@ -1233,6 +1233,271 @@ describe('WalletManager empty signatures', () => {
     await vi.waitFor(() => expect(getAccount(manager)).not.toHaveProperty('emptySignature'))
   })
 
+  describe('a rekey to the PQ key that algod has not shown yet', () => {
+    beforeEach(() => {
+      vi.useFakeTimers()
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    // The empty signature of an account rekeyed to a Falcon key: its pqsig, naming the key as `sgnr`
+    async function makeRekeyedSig() {
+      const falcon = await makeFalconSig()
+      return {
+        falconAddress: falcon.address,
+        address: algosdk.generateAccount().addr.toString(),
+        emptySignature: encodeEmptySignature({
+          pqsig: falcon.pqsig,
+          sgnr: algosdk.Address.fromString(falcon.address)
+        })
+      }
+    }
+
+    const flush = () => vi.advanceTimersByTimeAsync(0)
+
+    it('keeps the empty signature and records the rekey once algod shows it', async () => {
+      const manager = new WalletManager({ wallets: [defly()] })
+      const { falconAddress, address, emptySignature } = await makeRekeyedSig()
+      mockAuthAddr(null)
+
+      connect(manager, { address, emptySignature })
+      await flush()
+      expect(accountInformation).toHaveBeenCalledTimes(1)
+      expect(getAccount(manager)).toMatchObject({ emptySignature })
+      expect(getAccount(manager)).not.toHaveProperty('authAddr')
+
+      // Unrelated state changes don't check it again meanwhile
+      manager.store.setState((state) => ({ ...state }))
+      await flush()
+      expect(accountInformation).toHaveBeenCalledTimes(1)
+
+      mockAuthAddr(falconAddress)
+      await vi.advanceTimersByTimeAsync(2000)
+      expect(accountInformation).toHaveBeenCalledTimes(2)
+      expect(getAccount(manager)).toMatchObject({ emptySignature, authAddr: falconAddress })
+    })
+
+    it('clears it if algod still shows no rekey after three more tries', async () => {
+      const manager = new WalletManager({ wallets: [defly()] })
+      const { address, emptySignature } = await makeRekeyedSig()
+      mockAuthAddr(null)
+
+      connect(manager, { address, emptySignature })
+      await flush()
+      await vi.advanceTimersByTimeAsync(2000)
+      await vi.advanceTimersByTimeAsync(2000)
+      expect(getAccount(manager)).toMatchObject({ emptySignature })
+      await vi.advanceTimersByTimeAsync(2000)
+
+      expect(accountInformation).toHaveBeenCalledTimes(4)
+      expect(getAccount(manager)).not.toHaveProperty('emptySignature')
+      await vi.advanceTimersByTimeAsync(10_000)
+      expect(accountInformation).toHaveBeenCalledTimes(4)
+
+      // A wallet that connects it again with the same empty signature gets it checked again
+      connect(manager, { address, emptySignature })
+      await flush()
+      expect(accountInformation).toHaveBeenCalledTimes(5)
+    })
+
+    it('clears at once a pqsig that names another key as its signer', async () => {
+      const manager = new WalletManager({ wallets: [defly()] })
+      const falcon = await makeFalconSig()
+      mockAuthAddr(null)
+
+      connect(manager, {
+        address: algosdk.generateAccount().addr.toString(),
+        emptySignature: encodeEmptySignature({
+          pqsig: falcon.pqsig,
+          sgnr: algosdk.generateAccount().addr
+        })
+      })
+      await flush()
+
+      expect(accountInformation).toHaveBeenCalledTimes(1)
+      expect(getAccount(manager)).not.toHaveProperty('emptySignature')
+    })
+
+    it('clears it at once when algod shows the account rekeyed to another address', async () => {
+      const manager = new WalletManager({ wallets: [defly()] })
+      const { address, emptySignature } = await makeRekeyedSig()
+      mockAuthAddr(algosdk.generateAccount().addr.toString())
+
+      connect(manager, { address, emptySignature })
+      await flush()
+
+      expect(accountInformation).toHaveBeenCalledTimes(1)
+      expect(getAccount(manager)).not.toHaveProperty('emptySignature')
+    })
+
+    it('clears at once a pqsig that names no signer', async () => {
+      const manager = new WalletManager({ wallets: [defly()] })
+      const falcon = await makeFalconSig()
+      mockAuthAddr(null)
+
+      connect(manager, {
+        address: algosdk.generateAccount().addr.toString(),
+        emptySignature: falcon.emptySignature
+      })
+      await flush()
+
+      expect(accountInformation).toHaveBeenCalledTimes(1)
+      expect(getAccount(manager)).not.toHaveProperty('emptySignature')
+    })
+
+    it("doesn't wait for a native PQ account whose empty signature names itself", async () => {
+      const manager = new WalletManager({ wallets: [defly()] })
+      const falcon = await makeFalconSig()
+      mockAuthAddr(null)
+
+      connect(manager, {
+        address: falcon.address,
+        emptySignature: encodeEmptySignature({
+          pqsig: falcon.pqsig,
+          sgnr: algosdk.Address.fromString(falcon.address)
+        })
+      })
+      await flush()
+
+      expect(getAccount(manager)?.authAddr).toBeNull()
+      expect(accountInformation).toHaveBeenCalledTimes(1)
+    })
+
+    it('gives an account that lags again its full retries', async () => {
+      const manager = new WalletManager({ wallets: [defly()] })
+      const { falconAddress, address, emptySignature } = await makeRekeyedSig()
+      mockAuthAddr(null)
+      connect(manager, { address, emptySignature })
+      await flush()
+      mockAuthAddr(falconAddress)
+      await vi.advanceTimersByTimeAsync(2000)
+      expect(getAccount(manager)).toMatchObject({ authAddr: falconAddress })
+
+      mockAuthAddr(null)
+      await manager.resumeSessions()
+      await flush()
+      await vi.advanceTimersByTimeAsync(4000)
+      expect(getAccount(manager)).toMatchObject({ emptySignature })
+      await vi.advanceTimersByTimeAsync(2000)
+      expect(getAccount(manager)).not.toHaveProperty('emptySignature')
+    })
+
+    it("doesn't shorten the wait when a resume checks in between", async () => {
+      const manager = new WalletManager({ wallets: [defly()] })
+      const { address, emptySignature } = await makeRekeyedSig()
+      mockAuthAddr(null)
+      connect(manager, { address, emptySignature })
+      await flush()
+
+      await vi.advanceTimersByTimeAsync(1000)
+      await manager.resumeSessions()
+      await flush()
+      expect(accountInformation).toHaveBeenCalledTimes(2)
+      // Other state changes still leave it to the retry
+      manager.store.setState((state) => ({ ...state }))
+      await flush()
+      expect(accountInformation).toHaveBeenCalledTimes(2)
+
+      await vi.advanceTimersByTimeAsync(4999)
+      expect(getAccount(manager)).toMatchObject({ emptySignature })
+      await vi.advanceTimersByTimeAsync(1)
+      expect(getAccount(manager)).not.toHaveProperty('emptySignature')
+    })
+
+    describe('beside another account', () => {
+      const b = {
+        name: 'B',
+        address: algosdk.generateAccount().addr.toString(),
+        emptySignature: ed25519
+      }
+
+      /** Answers algod per address: `a` for the lagging account, `b` for the other */
+      function mockPerAddress(
+        lagging: string,
+        a: () => string | null,
+        b: () => string | null | Error
+      ) {
+        accountInformation.mockImplementation(
+          (address: string | algosdk.Address) =>
+            ({
+              do: () => {
+                const authAddr = address.toString() === lagging ? a() : b()
+                return authAddr instanceof Error
+                  ? Promise.reject(authAddr)
+                  : Promise.resolve({
+                      authAddr: authAddr ? algosdk.Address.fromString(authAddr) : undefined
+                    })
+              }
+            }) as unknown as ReturnType<algosdk.Algodv2['accountInformation']>
+        )
+      }
+
+      const callsFor = (address: string) =>
+        accountInformation.mock.calls.filter(([called]) => called === address).length
+
+      /** Connects A, rekeyed to a Falcon key algod shows once `shown` is set, beside B */
+      async function connectBoth(manager: WalletManager, bAnswer: () => string | null | Error) {
+        const { falconAddress, address, emptySignature } = await makeRekeyedSig()
+        const lag = { shown: null as string | null }
+        mockPerAddress(address, () => lag.shown, bAnswer)
+        const a = { name: 'A', address, emptySignature }
+        addWallet(manager.store, {
+          walletId: 'defly',
+          wallet: { accounts: [a, b], activeAccount: a }
+        })
+        await flush()
+        return { falconAddress, address, show: () => (lag.shown = falconAddress) }
+      }
+
+      it('checks only the lagging account when it retries', async () => {
+        const manager = new WalletManager({ wallets: [defly()] })
+        const { address, show } = await connectBoth(manager, () => null)
+        expect(manager.store.state.wallets['defly']?.accounts[1]).toMatchObject({ authAddr: null })
+        expect(callsFor(b.address)).toBe(1)
+
+        show()
+        await vi.advanceTimersByTimeAsync(2000)
+
+        expect(callsFor(address)).toBe(2)
+        expect(callsFor(b.address)).toBe(1)
+      })
+
+      it("doesn't re-check an account algod couldn't be read for when it retries", async () => {
+        const manager = new WalletManager({ wallets: [defly()] })
+        const { falconAddress, show } = await connectBoth(manager, () => new Error('Network error'))
+        expect(manager.store.state.wallets['defly']?.accounts[1]).not.toHaveProperty('authAddr')
+        expect(callsFor(b.address)).toBe(1)
+
+        show()
+        await vi.advanceTimersByTimeAsync(2000)
+        await flush()
+
+        expect(manager.store.state.wallets['defly']?.accounts[0]).toMatchObject({
+          authAddr: falconAddress
+        })
+        expect(callsFor(b.address)).toBe(1)
+      })
+    })
+
+    it('checks a resumed account again when algod no longer shows its recorded rekey', async () => {
+      const { falconAddress, address, emptySignature } = await makeRekeyedSig()
+      persistConnected({ address, emptySignature, authAddr: falconAddress })
+      const manager = new WalletManager({ wallets: [defly()] })
+      mockAuthAddr(null)
+
+      await manager.resumeSessions()
+      await flush()
+      expect(getAccount(manager)).toMatchObject({ emptySignature, authAddr: falconAddress })
+
+      mockAuthAddr(falconAddress)
+      await vi.advanceTimersByTimeAsync(2000)
+      expect(accountInformation).toHaveBeenCalledTimes(2)
+      expect(getAccount(manager)).toMatchObject({ emptySignature, authAddr: falconAddress })
+    })
+  })
+
   it('clears an invalid empty signature without querying algod', async () => {
     const manager = new WalletManager({ wallets: [defly()] })
     mockAuthAddr(null)

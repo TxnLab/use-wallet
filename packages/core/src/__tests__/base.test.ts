@@ -258,6 +258,103 @@ describe('createStdSignData', () => {
     expect(result.scheme).toBe('falcon-1024-det')
   })
 
+  describe('a rekey to the Falcon key that algod has not shown yet', () => {
+    beforeEach(() => {
+      vi.useFakeTimers()
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    async function rekeyedWallet() {
+      const address = algosdk.generateAccount().addr
+      const falcon = makeFalconAccount(address)
+      const { pqsig, emptySignature } = await getEmptySignature(falcon)
+      const wallet = createWallet([{ name: 'PQ', address: address.toString(), emptySignature }])
+      return { wallet, pqsig, pqAddress: algosdk.addressFromPQSig(pqsig) }
+    }
+
+    it('asks algod again, and signs once it shows the rekey', async () => {
+      const { wallet, pqsig, pqAddress } = await rekeyedWallet()
+      mockAuthAddr(pqAddress)
+      // The first read comes after hashing the domain, which no fake timer drives, so it says when
+      // it's made (vi.waitFor would move the fake clock while it waits)
+      let firstRead!: () => void
+      const firstReadMade = new Promise<void>((resolve) => (firstRead = resolve))
+      accountInformation.mockReturnValueOnce({
+        do: () => {
+          firstRead()
+          return Promise.resolve({ authAddr: undefined })
+        }
+      } as unknown as ReturnType<algosdk.Algodv2['accountInformation']>)
+
+      const result = wallet.createStdSignDataForTest('data')
+      await firstReadMade
+      await vi.advanceTimersByTimeAsync(999)
+      expect(accountInformation).toHaveBeenCalledTimes(1)
+      await vi.advanceTimersByTimeAsync(1)
+
+      await expect(result).resolves.toMatchObject({ signer: pqsig.pk, scheme: 'falcon-1024-det' })
+      expect(accountInformation).toHaveBeenCalledTimes(2)
+    })
+
+    it("doesn't wait when algod shows the account rekeyed to another address", async () => {
+      const { wallet } = await rekeyedWallet()
+      mockAuthAddr(algosdk.generateAccount().addr)
+
+      await expect(wallet.createStdSignDataForTest('data')).rejects.toMatchObject({ code: 4603 })
+      expect(accountInformation).toHaveBeenCalledTimes(1)
+    })
+
+    it("doesn't wait for a native Falcon account whose empty signature names itself", async () => {
+      const falcon = makeFalconAccount()
+      const { pqsig } = await getEmptySignature(falcon)
+      const wallet = createWallet([
+        {
+          name: 'PQ',
+          address: falcon.address.toString(),
+          emptySignature: encodeEmptySignature({ pqsig, sgnr: falcon.address })
+        }
+      ])
+      mockAuthAddr(null)
+
+      await expect(wallet.createStdSignDataForTest('data')).resolves.toMatchObject({
+        scheme: 'falcon-1024-det'
+      })
+      expect(accountInformation).toHaveBeenCalledTimes(1)
+    })
+
+    it('throws 4603 if algod still shows no rekey after three more tries', async () => {
+      const { wallet } = await rekeyedWallet()
+      mockAuthAddr(null)
+
+      const result = wallet.createStdSignDataForTest('data')
+      const settled = expect(result).rejects.toMatchObject({ code: 4603 })
+      await vi.waitFor(() => expect(accountInformation).toHaveBeenCalledTimes(1))
+      await vi.advanceTimersByTimeAsync(3000)
+
+      await settled
+      expect(accountInformation).toHaveBeenCalledTimes(4)
+    })
+
+    it("doesn't wait for an account that names no signer", async () => {
+      const falcon = makeFalconAccount()
+      const { pqsig } = await getEmptySignature(falcon)
+      const wallet = createWallet([
+        {
+          name: 'PQ',
+          address: algosdk.generateAccount().addr.toString(),
+          emptySignature: encodeEmptySignature({ pqsig })
+        }
+      ])
+      mockAuthAddr(null)
+
+      await expect(wallet.createStdSignDataForTest('data')).rejects.toMatchObject({ code: 4603 })
+      expect(accountInformation).toHaveBeenCalledTimes(1)
+    })
+  })
+
   it('builds for a given connected account instead of the active one', async () => {
     const active = algosdk.generateAccount().addr
     const address = algosdk.generateAccount().addr
@@ -316,6 +413,8 @@ describe('createStdSignData', () => {
     ])
 
     await expect(wallet.createStdSignDataForTest('data')).rejects.toMatchObject({ code: 4603 })
+    // A malformed pqsig names no key to wait for
+    expect(accountInformation).toHaveBeenCalledTimes(1)
   })
 
   it('throws 4601 for a post-quantum scheme ARC-60 does not name, without querying algod', async () => {

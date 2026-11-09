@@ -376,7 +376,11 @@ export class PasskeyAdapter extends BaseWallet<PasskeyOptions> {
         walletAccount,
         ...this.rekeyedAddresses(record).map((rekeyed) => this.rekeyedAccount(record, rekeyed))
       ]
-      const walletState: WalletState = { accounts, activeAccount: walletAccount }
+      // Signing in again while connected keeps the account in use, if this passkey still holds it
+      const previousActive = this.store.getWalletState()?.activeAccount?.address
+      const activeAccount =
+        accounts.find((account) => account.address === previousActive) ?? walletAccount
+      const walletState: WalletState = { accounts, activeAccount }
       this.store.addWallet(walletState)
       this.reportSession(this.isHidden() ? 'hidden' : 'connect')
       void this.verifyRekeyedAccounts(record)

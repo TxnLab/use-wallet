@@ -18,6 +18,10 @@ import type {
   WalletMetadata
 } from 'src/wallets/types'
 
+// How long signData waits for algod to show a rekey the wallet already reports
+const SIGN_DATA_REKEY_RETRY_MS = 1000
+const SIGN_DATA_REKEY_RETRIES = 3
+
 export abstract class BaseWallet<TOptions = Record<string, unknown>> {
   public readonly id: string
   public readonly walletKey: string
@@ -205,7 +209,8 @@ export abstract class BaseWallet<TOptions = Record<string, unknown>> {
       throw new SignDataError(message, 4100)
     }
 
-    const pqsig = this.getEmptySignatureFields(accountAddress)?.pqsig
+    const fields = this.getEmptySignatureFields(accountAddress)
+    const pqsig = fields?.pqsig
     const scheme = pqsig ? getPQSignDataScheme(pqsig) : 'ed25519'
     if (!scheme) {
       const message = 'signData does not support this post-quantum signature scheme'
@@ -218,8 +223,11 @@ export abstract class BaseWallet<TOptions = Record<string, unknown>> {
     const authenticatorData = new Uint8Array(digest)
 
     const algodClient = this.getAlgodClient()
-    const acctInfo = await algodClient.accountInformation(accountAddress).do()
-    const authAddr = acctInfo.authAddr ?? algosdk.Address.fromString(accountAddress)
+    const readAuthAddr = async () => {
+      const acctInfo = await algodClient.accountInformation(accountAddress).do()
+      return acctInfo.authAddr ?? algosdk.Address.fromString(accountAddress)
+    }
+    let authAddr = await readAuthAddr()
 
     // Omit `scheme` for ed25519 so wallets that predate it keep working
     if (!pqsig) {
@@ -232,6 +240,20 @@ export abstract class BaseWallet<TOptions = Record<string, unknown>> {
       pqAddress = algosdk.addressFromPQSig(pqsig).toString()
     } catch {
       // A malformed pqsig authorizes nothing
+    }
+    // The wallet names this key as the account's signer, but algod shows no rekey: most likely one that
+    // just landed and this node hasn't seen yet, so ask again before refusing
+    const claimsRekey =
+      pqAddress !== undefined &&
+      pqAddress !== accountAddress &&
+      fields?.sgnr?.toString() === pqAddress
+    for (
+      let tries = 0;
+      claimsRekey && authAddr.toString() === accountAddress && tries < SIGN_DATA_REKEY_RETRIES;
+      tries++
+    ) {
+      await new Promise((resolve) => setTimeout(resolve, SIGN_DATA_REKEY_RETRY_MS))
+      authAddr = await readAuthAddr()
     }
     if (pqAddress !== authAddr.toString()) {
       const message = `Account ${accountAddress} is not authorized by its post-quantum key; reconnect the wallet`
