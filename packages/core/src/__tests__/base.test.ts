@@ -28,8 +28,8 @@ class TestWallet extends BaseWallet {
     super(params)
   }
 
-  public createStdSignDataForTest(data: string) {
-    return this.createStdSignData(data)
+  public createStdSignDataForTest(data: string, address?: string) {
+    return this.createStdSignData(data, address)
   }
 
   public applyEmptySignaturesForTest(emptySignatures: unknown) {
@@ -256,6 +256,38 @@ describe('createStdSignData', () => {
 
     expect(result.signer).toEqual(pqsig.pk)
     expect(result.scheme).toBe('falcon-1024-det')
+  })
+
+  it('builds for a given connected account instead of the active one', async () => {
+    const active = algosdk.generateAccount().addr
+    const address = algosdk.generateAccount().addr
+    const falcon = makeFalconAccount(address)
+    const { pqsig, emptySignature } = await getEmptySignature(falcon)
+    mockAuthAddr(algosdk.addressFromPQSig(pqsig))
+    const wallet = createWallet([
+      { name: 'Active', address: active.toString(), emptySignature: 'gA==' },
+      { name: 'PQ', address: address.toString(), emptySignature }
+    ])
+
+    const result = await wallet.createStdSignDataForTest('data', address.toString())
+
+    expect(result.signer).toEqual(pqsig.pk)
+    expect(result.scheme).toBe('falcon-1024-det')
+    expect(accountInformation).toHaveBeenCalledWith(address.toString())
+    expect(accountInformation).not.toHaveBeenCalledWith(active.toString())
+  })
+
+  it('throws 4100 for an address that is not a connected account, without querying algod', async () => {
+    const active = algosdk.generateAccount().addr.toString()
+    const other = algosdk.generateAccount().addr.toString()
+    const wallet = createWallet([{ name: 'Active', address: active, emptySignature: 'gA==' }])
+
+    await expect(wallet.createStdSignDataForTest('data', other)).rejects.toMatchObject({
+      name: 'SignDataError',
+      code: 4100,
+      message: `Account ${other} is not connected`
+    })
+    expect(accountInformation).not.toHaveBeenCalled()
   })
 
   it('throws 4603 when the account was rekeyed away from its Falcon key', async () => {

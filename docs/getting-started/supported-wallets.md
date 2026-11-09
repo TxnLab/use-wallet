@@ -286,7 +286,7 @@ passkey({
 })
 ```
 
-Connect with `connect()` to sign in with an existing passkey, or `connect({ create: true })` to create one; show both choices. The adapter supports `signData` (ARC-60, scheme `falcon-1024-det`) and exports a recovery phrase with `exportRecoveryPhrase()`, which must be imported as a Falcon account. In a session, `unlock()`, `lock()` and `isUnlocked` let you control when the key is held, for example to unlock on a tap before a flow that awaits a quote. A page with a Content Security Policy must allow `worker-src blob:` and `'wasm-unsafe-eval'`.
+Connect with `connect()` to sign in with an existing passkey, or `connect({ create: true })` to create one; show both choices. The adapter supports `signData` (ARC-60, scheme `falcon-1024-det`) and exports a recovery phrase with `exportRecoveryPhrase()`, which must be imported as a Falcon account. In a session, `unlock()`, `lock()` and `isUnlocked` let you control when the key is held, for example to unlock on a tap before a flow that awaits a quote. Accounts rekeyed to the passkey account join the wallet with `addRekeyedAccount()`, and the passkey signs for them. A page with a Content Security Policy must allow `worker-src blob:` and `'wasm-unsafe-eval'`.
 
 * [Passkey Accounts guide](../guides/passkey-accounts.md)
 * [Passkey adapter README](https://github.com/TxnLab/use-wallet/tree/main/packages/wallets/passkey#readme)

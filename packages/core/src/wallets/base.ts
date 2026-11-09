@@ -181,7 +181,10 @@ export abstract class BaseWallet<TOptions = Record<string, unknown>> {
   // ---------- Protected Methods ------------------------------------- //
 
   /**
-   * Constructs an ARC-60 `StdSignData` object for the given data payload.
+   * Constructs an ARC-60 `StdSignData` object for the given data payload,
+   * signed for `address`, which defaults to the active account. Pass it when
+   * the request names another of the wallet's connected accounts; any other
+   * address throws a `SignDataError` with code 4100.
    * The signer public key is resolved via algod so that rekeyed accounts
    * sign with their auth address, and the authenticator data is the
    * SHA-256 hash of the current domain.
@@ -190,14 +193,19 @@ export abstract class BaseWallet<TOptions = Record<string, unknown>> {
    * signature and `scheme` is set (see `getSignDataScheme`). For ed25519,
    * `scheme` is omitted, which ARC-60 defines as ed25519.
    */
-  protected createStdSignData = async (data: string): Promise<StdSignData> => {
-    const activeAddress = this.activeAddress
-    if (!activeAddress) {
+  protected createStdSignData = async (data: string, address?: string): Promise<StdSignData> => {
+    const accountAddress = address ?? this.activeAddress
+    if (!accountAddress) {
       this.logger.error('No active account')
       throw new SignDataError('No active account', 4100)
     }
+    if (address !== undefined && !this.addresses.includes(address)) {
+      const message = `Account ${address} is not connected`
+      this.logger.error(message)
+      throw new SignDataError(message, 4100)
+    }
 
-    const pqsig = this.getEmptySignatureFields(activeAddress)?.pqsig
+    const pqsig = this.getEmptySignatureFields(accountAddress)?.pqsig
     const scheme = pqsig ? getPQSignDataScheme(pqsig) : 'ed25519'
     if (!scheme) {
       const message = 'signData does not support this post-quantum signature scheme'
@@ -210,8 +218,8 @@ export abstract class BaseWallet<TOptions = Record<string, unknown>> {
     const authenticatorData = new Uint8Array(digest)
 
     const algodClient = this.getAlgodClient()
-    const acctInfo = await algodClient.accountInformation(activeAddress).do()
-    const authAddr = acctInfo.authAddr ?? algosdk.Address.fromString(activeAddress)
+    const acctInfo = await algodClient.accountInformation(accountAddress).do()
+    const authAddr = acctInfo.authAddr ?? algosdk.Address.fromString(accountAddress)
 
     // Omit `scheme` for ed25519 so wallets that predate it keep working
     if (!pqsig) {
@@ -226,7 +234,7 @@ export abstract class BaseWallet<TOptions = Record<string, unknown>> {
       // A malformed pqsig authorizes nothing
     }
     if (pqAddress !== authAddr.toString()) {
-      const message = `Account ${activeAddress} is not authorized by its post-quantum key; reconnect the wallet`
+      const message = `Account ${accountAddress} is not authorized by its post-quantum key; reconnect the wallet`
       this.logger.error(message)
       throw new SignDataError(message, 4603)
     }

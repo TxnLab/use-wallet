@@ -27,7 +27,7 @@ The account is a **Falcon-1024 (post-quantum)** account. Its key is derived from
 * **Creating an account** saves a new passkey for your domain, then asks it for a PRF output for a label set by the adapter and your `context`. That 32-byte output is the account's secret: it seeds the Falcon key, and its 25-word encoding is the account's recovery phrase.
 * **Signing in** asks an existing passkey for the same output. The same passkey on the same domain always derives the same account.
 * **Every prompt that derives the key requires full user verification**, because the PRF output depends on it.
-* **The private key lives in a dedicated worker**, never on the page's main thread, and is dropped when the session locks. Only public data is stored: the credential ID, the public key and the address.
+* **The private key lives in a dedicated worker**, never on the page's main thread, and is dropped when the session locks. Only public data is stored: the credential ID, the public key and the address, and the addresses and networks of [rekeyed accounts](#rekeyed-accounts).
 
 ### Security Model
 
@@ -262,8 +262,8 @@ The [React example](https://github.com/TxnLab/use-wallet/tree/main/examples/reac
 
 Passkey accounts sign through the usual [`signTransactions`](signing-transactions.md) and [`signData`](signing-data.md) methods, with a few differences that come from Falcon-1024:
 
-* Each signed transaction carries a ~3.2 KB `pqsig` and pays an extra 2× the minimum fee. Get fees by simulating with `emptyTransactionSigner` and `allowEmptySignatures`.
-* `signData` supports ARC-60 authentication with scheme `falcon-1024-det`.
+* Each signed transaction carries a ~3.2 KB `pqsig` and pays an extra 2× the minimum fee, including those of [rekeyed accounts](#rekeyed-accounts). Get fees by simulating with `emptyTransactionSigner` and `allowEmptySignatures`.
+* `signData` supports ARC-60 authentication with scheme `falcon-1024-det`, for the passkey account and its rekeyed accounts.
 * No multisig participation, and no raw-bytes or program-data signing.
 
 ### Recovery Phrase
@@ -278,6 +278,8 @@ const { phrase } = await wallet.exportRecoveryPhrase()
 **Tell users to import the phrase as a Falcon / quantum account:** in Lute, Add account → "Falcon25 account" → Import; in Pera, the quantum import; or `algokey pq import --scheme falcon-1024`. The same 25 words in a regular import restore a different, empty account.
 {% endhint %}
 
+The phrase restores the passkey's key, so it also controls every [account rekeyed to it](#rekeyed-accounts).
+
 ### Moving to a Wallet
 
 Give users a way to move to a wallet they control, such as Pera or Lute. After that, a compromise of your site can't reach their funds. There are two ways:
@@ -285,7 +287,9 @@ Give users a way to move to a wallet they control, such as Pera or Lute. After t
 * **Close the account:** send the whole balance to the wallet with `closeRemainderTo`. An account that still holds assets or app opt-ins can't close, so send or opt out of those first, or rekey instead.
 * **Rekey it:** keep the address, and give its signing authority to the wallet's account with `rekeyTo`. The passkey can no longer sign for it, so disconnect the passkey account afterwards: until then, signing still runs a passkey prompt, and the network rejects the result. To use the address, the user needs a wallet that supports both Falcon accounts and rekeyed accounts. Rekeying to a regular (ed25519) account gives up post-quantum protection, and its transactions pay the regular fee again.
 
-The adapter only signs for the passkey account's own address, so don't rekey other accounts _to_ a passkey account: it can't sign for them.
+{% hint style="warning" %}
+**Move the [rekeyed accounts](#rekeyed-accounts) first.** Rekeying or closing the passkey account doesn't move the accounts rekeyed to it: their auth address is still the passkey address, so the passkey's key, and so your site, still controls them. Rekey each one to the wallet's account first (the passkey signs that), then call `removeRekeyedAccount`.
+{% endhint %}
 
 ```typescript
 import algosdk from 'algosdk'
@@ -320,6 +324,102 @@ const [signed] = await wallet.signTransactions([close]) // or [rekey]
 await manager.algodClient.sendRawTransaction(signed!).do()
 ```
 
+### Rekeyed Accounts
+
+An existing account can move onto the passkey by rekeying to the passkey account. It keeps its address, history and holdings, and the passkey's key signs for it from then on, e.g. to move users off an ed25519 account your site manages for them.
+
+{% hint style="warning" %}
+**A rekeyed account joins the passkey account's [security model](#security-model).** Your site can reach it with the same key, and the [recovery phrase](#recovery-phrase) controls it too.
+{% endhint %}
+
+Each transaction the passkey signs for a rekeyed account pays 3× the minimum fee, like the passkey account's own.
+
+#### Rekeying an Account to the Passkey
+
+Rekey in an atomic group with a proof transaction, so the account can only move to a key the user holds:
+
+1. The account pays itself 0 with `rekeyTo` set to the passkey address, signed by the account's current key.
+2. The account pays itself 0 again, signed by the passkey. If the passkey doesn't sign it, the whole group fails and the account stays where it was.
+
+`signTransactions` signs the second one because the transaction before it rekeys its sender to the passkey account:
+
+```typescript
+import algosdk from 'algosdk'
+import { PasskeyError, type PasskeyAdapter } from '@txnlab/use-wallet-passkey'
+
+const passkey = (manager.getWallet('passkey') as PasskeyAdapter | undefined)!
+const current = manager.getWallet('web3auth')! // the account's current wallet
+const account = current.activeAddress!
+
+const params = await manager.algodClient.getTransactionParams().do()
+const pay = (fee: bigint, rekeyTo?: string) =>
+  algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+    sender: account,
+    receiver: account,
+    amount: 0,
+    rekeyTo,
+    suggestedParams: { ...params, flatFee: true, fee }
+  })
+const group = algosdk.assignGroupID([
+  pay(params.minFee, passkey.passkeyAddress!), // the rekey, signed by the account's key
+  pay(params.minFee * 3n) // the proof, signed by the passkey (a Falcon signature pays 3×)
+])
+
+// Sign from the user's tap, the passkey first: on iOS, an await before its prompt loses the tap
+const [proof] = await passkey.signTransactions(group, [1])
+const [rekey] = await current.signTransactions(group, [0])
+const { txid } = await manager.algodClient.sendRawTransaction([rekey!, proof!]).do()
+await algosdk.waitForConfirmation(manager.algodClient, txid, 4)
+
+// An algod node can lag a round behind the confirmation: retry briefly on `not-rekeyed`
+for (let attempt = 1; ; attempt++) {
+  try {
+    await passkey.addRekeyedAccount(account)
+    break
+  } catch (error) {
+    const lagging = error instanceof PasskeyError && error.code === 'not-rekeyed'
+    if (!lagging || attempt === 5) throw error
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+  }
+}
+```
+
+`passkeyAddress` is the passkey account's own address, whichever account is active.
+
+`signTransactions` signs a transaction when the passkey's key authorizes its sender at that point in its group: the passkey account, a rekeyed account added with `addRekeyedAccount`, or an account that an earlier transaction in the same group (the same group ID) rekeys to the passkey account. A rekey outside the transaction's group doesn't count. A transaction from any other account is skipped, and so is one whose sender an earlier transaction in its group rekeys elsewhere. Each transaction whose sender isn't the passkey account names the passkey address as its signer (`sgnr`).
+
+#### Adding and Removing Rekeyed Accounts
+
+`addRekeyedAccount(address)` reads the account from algod, and throws a `PasskeyError` with code `not-rekeyed` unless its auth address is the passkey address (or `failed` if algod can't be read). The account then joins the wallet's accounts as `Passkey · rekeyed` and stays across reloads. The active account doesn't change, so call `setActiveAccount` to switch to it. Adding an account again checks it again and returns it.
+
+A rekey belongs to one network, so each rekeyed account is recorded for the network it was added on (by genesis hash, or by network ID for a network without one, like LocalNet). The wallet lists the active network's rekeyed accounts, and lists another network's when the app switches to it. A check on one network never drops an account recorded on another.
+
+`removeRekeyedAccount(address)` stops listing and signing for it on the active network. If it was the active account, the passkey account becomes active. It doesn't change the account on chain: the account stays rekeyed to the passkey account, so the passkey's key still controls it until it's rekeyed elsewhere. `disconnect` drops them all.
+
+On each reload, sign-in with the same passkey, and network switch, the adapter checks the active network's rekeyed accounts with algod in the background: it drops one whose auth address has changed, and keeps them if algod can't be reached.
+
+#### Finding Rekeyed Accounts
+
+The adapter doesn't search for rekeyed accounts. When a user signs in on another device, or after site data is cleared, you can search an indexer for the accounts whose auth address is the passkey address.
+
+{% hint style="warning" %}
+**Anyone can rekey an account to the passkey address**, e.g. a spam account holding fake assets, and `addRekeyedAccount` accepts it. Add only accounts you know are the user's, such as one they just migrated or one your backend has on record for them, or show the others as unverified until the user confirms them.
+{% endhint %}
+
+```typescript
+const indexer = new algosdk.Indexer('', 'https://mainnet-idx.4160.nodely.dev', '')
+// One page holds up to 100 accounts; follow `nextToken` for more
+const { accounts } = await indexer.searchAccounts().authAddr(passkey.passkeyAddress!).do()
+for (const { address } of accounts) {
+  if (knownAccounts.has(address)) await passkey.addRekeyedAccount(address)
+}
+```
+
+#### Fees and Signing In
+
+* Get fees by simulating with `emptyTransactionSigner` and `allowEmptySignatures`: a rekeyed account's empty signature carries the passkey's key and names the passkey address as `sgnr`. The proof transaction's sender isn't one of the passkey's accounts until the rekey confirms, so give it the 3× fee yourself, as above.
+* `signData` accepts an ARC-60 request whose `account_address` is a rekeyed account, with `type: 'falcon-1024-det'`. The signer is the passkey's public key: verify it against the account's auth address, as [Signing Data](signing-data.md) describes.
+
 ### Content Security Policy
 
 The key runs in a module worker started from a `blob:` URL, using WebAssembly. If your page sets a CSP, allow both:
@@ -342,6 +442,7 @@ Failures throw a `PasskeyError` with a `code`:
 | `invalid-rp-id`    | `rpId` isn't valid for the page's origin                                                                  |
 | `key-mismatch`     | The passkey derived a different key than the connected account                                            |
 | `not-connected`    | No passkey account is connected                                                                           |
+| `not-rekeyed`      | `addRekeyedAccount`: algod doesn't report the account as rekeyed to the passkey account                   |
 | `key-store-failed` | The key worker failed to start or was locked, e.g. because the CSP blocks it                              |
 | `failed`           | Any other failure                                                                                         |
 
