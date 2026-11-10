@@ -425,10 +425,10 @@ for (const { address } of accounts) {
 
 ### App Secret
 
-Some apps need a key besides the Falcon account, e.g. an ed25519 account that signs raw bytes for a service. With `appSecret`, the passkey gives the app a 32-byte secret for it: the PRF's second output (`eval.second`, input `APP_SECRET_PREFIX + label`), asked for in the same ceremony that unlocks the key, so it adds no prompt.
+Some apps need keys besides the Falcon account, e.g. an ed25519 account that signs raw bytes for a service, or an HD wallet. With `appSecret`, the passkey gives the app a 32-byte secret for them: the PRF's second output (`eval.second`, input `APP_SECRET_PREFIX + label`), asked for in the same ceremony that unlocks the key, so it adds no prompt. It's key material, not a key of one kind: see [Deriving Keys from the Secret](#deriving-keys-from-the-secret).
 
 ```typescript
-passkey({ session: true, appSecret: { label: 'my-app/payer' } })
+passkey({ session: true, appSecret: { label: 'my-app/keys' } })
 
 // While the session is unlocked: confirmed per `confirm`, with { type: 'app-secret' }
 // While it's locked: one PRF ceremony, so call it from the click handler
@@ -443,6 +443,83 @@ const seed = await wallet.withAppSecret(async (secret) => hkdf(secret, 'my-app/p
 * `confirm` receives `{ type: 'app-secret' }` for it: an exhaustive `switch` over `PasskeySigningRequest` needs that case.
 * Without the option, ceremonies ask for `eval.first` alone, exactly as before. The account never changes, whatever the label.
 * A provider that leaves out the second output still signs in; `withAppSecret` then throws `app-secret-unavailable`. So does one that gives the first output for the second: that is the key's own entropy, which the adapter never hands out.
+
+#### Deriving Keys from the Secret
+
+Derive each key with HKDF, under an `info` string of its own, so one secret gives any number of unrelated keys:
+
+```typescript
+async function hkdf(secret: Uint8Array, info: string, length = 32): Promise<Uint8Array> {
+  const key = await crypto.subtle.importKey('raw', secret as BufferSource, 'HKDF', false, [
+    'deriveBits'
+  ])
+  const bits = await crypto.subtle.deriveBits(
+    { name: 'HKDF', hash: 'SHA-256', salt: new Uint8Array(), info: new TextEncoder().encode(info) },
+    key,
+    length * 8
+  )
+  return new Uint8Array(bits)
+}
+```
+
+Like the label, an `info` string is fixed once a key derived with it holds anything: changing it changes the key.
+
+**One ed25519 account**, e.g. one that signs raw bytes for a service:
+
+```typescript
+const account = await wallet.withAppSecret(async (secret) => {
+  const seed = await hkdf(secret, 'my-app/payer/v1')
+  try {
+    return algosdk.mnemonicToSecretKey(algosdk.mnemonicFromSeed(seed))
+  } finally {
+    seed.fill(0)
+  }
+})
+```
+
+`algosdk.mnemonicFromSeed(seed)` is the account's 25-word phrase, which any Algorand wallet imports as a regular account.
+
+**An HD wallet** (xHD, ARC-52): any number of ed25519 accounts from one root. 32 bytes are the entropy of a 24-word BIP-39 phrase, and the phrase gives the root key:
+
+```typescript
+import * as bip39 from 'bip39'
+import { KeyContext, XHDWalletAPI, fromSeed } from '@algorandfoundation/xhd-wallet-api'
+
+const phrase = await wallet.withAppSecret(async (secret) => {
+  const entropy = await hkdf(secret, 'my-app/hd-wallet/v1')
+  try {
+    return bip39.entropyToMnemonic(Buffer.from(entropy)) // 24 words
+  } finally {
+    entropy.fill(0)
+  }
+})
+
+// 96 bytes: zero it once you're done with it
+const rootKey = fromSeed(bip39.mnemonicToSeedSync(phrase))
+const xhd = new XHDWalletAPI()
+
+// Account 0, key 0: m/44'/283'/0'/0/0
+const publicKey = await xhd.keyGen(rootKey, KeyContext.Address, 0, 0)
+const address = new algosdk.Address(publicKey).toString()
+
+const signature = await xhd.signAlgoTransaction(
+  rootKey,
+  KeyContext.Address,
+  0,
+  0,
+  txn.bytesToSign()
+)
+const signedTxn = txn.attachSignature(address, signature)
+```
+
+It's a standard 24-word BIP-39 phrase, and the library's default derivation (Peikert's) is the one Pera's HD wallets use, so a wallet with xHD support restores the same accounts from the words. `bip39` and the xHD library use Node's `Buffer`, `crypto` and `util`, so a browser bundle needs polyfills for them.
+
+Before relying on derived keys:
+
+* **Offer the phrase as a backup.** Nothing recovers the app secret without the passkey, and the Falcon account's [recovery phrase](#recovery-phrase) doesn't cover keys derived from it. Show the 25 or 24 words as you would that phrase, and say which kind of import they need.
+* **They are ed25519 keys:** not post-quantum, and their transactions pay the regular fee.
+* **They are derived on the page.** The secret, and what you derive from it, are on the main thread, where any script on the page can reach them. For keys that hold more than small amounts, have `confirm` return `'verify'` for `{ type: 'app-secret' }`, derive when a key is needed rather than at sign-in, and zero the root key afterwards.
+* **One secret serves every account of the passkey.** Put the account's address in the `info` if each [rekeyed account](#rekeyed-accounts) needs keys of its own.
 
 ### Content Security Policy
 

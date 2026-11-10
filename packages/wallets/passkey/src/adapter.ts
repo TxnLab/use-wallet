@@ -178,6 +178,11 @@ export interface PasskeyOptions {
    * account's key, and one per passkey: the passkey's own account and its
    * rekeyed accounts share it, so derive per account if needed. The account
    * doesn't change. Without this option, no second output is asked for.
+   *
+   * It's key material, not a key of one kind: derive what the app needs from
+   * it with HKDF, each key under its own `info`, e.g. an ed25519 account or
+   * the 24-word phrase of an HD (xHD, ARC-52) wallet. The README's "Deriving
+   * keys from the secret" has both.
    */
   appSecret?: PasskeyAppSecretOptions
 }
