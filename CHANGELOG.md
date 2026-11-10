@@ -1,3 +1,10 @@
+# [5.4.0](https://github.com/TxnLab/use-wallet/compare/v5.3.0...v5.4.0) (2026-11-10)
+
+
+### Features
+
+* **passkey:** opt-in app secret from a second PRF output ([#499](https://github.com/TxnLab/use-wallet/issues/499)) ([c9d480e](https://github.com/TxnLab/use-wallet/commit/c9d480e9879975a0d5270975b0bc2e28cfa168e5))
+
 # [5.3.0](https://github.com/TxnLab/use-wallet/compare/v5.2.0...v5.3.0) (2026-11-09)
 
 
