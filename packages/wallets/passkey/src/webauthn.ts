@@ -118,7 +118,7 @@ export interface PrfResult {
   prf: Uint8Array
   /**
    * The 32-byte PRF output for `secondInput`, when it was asked for and the
-   * provider gave it. Zero it once it's used.
+   * provider gave it, and it isn't `prf` over again. Zero it once it's used.
    */
   second?: Uint8Array
 }
@@ -170,15 +170,19 @@ export function evaluatePrf({
           "This passkey's provider doesn't support the PRF extension. Use a passkey from a provider that does, such as iCloud Keychain, Google Password Manager, 1Password, Windows Hello or a FIDO2 security key."
         )
       }
+      // Copy both before wiping either: the results may share a buffer
       const prf = copy(first)
+      let second = secondInput && results?.second ? copy(results.second) : undefined
+      wipe(first)
+      if (results?.second) wipe(results.second)
       if (prf.length !== 32) {
         prf.fill(0)
+        second?.fill(0)
         throw new PasskeyError('prf-unsupported', `Unexpected PRF output length: ${prf.length}`)
       }
-      // A provider that leaves out the second output still signs in; only the app secret is missing
-      let second = secondInput && results?.second ? copy(results.second) : undefined
-      if (results?.second) wipe(results.second)
-      if (second && second.length !== 32) {
+      // A provider that leaves out the second output still signs in; only the app secret is missing.
+      // So is one that answers it with the first: that's the key's entropy, which no app may hold
+      if (second && (second.length !== 32 || bytesEqual(second, prf))) {
         second.fill(0)
         second = undefined
       }

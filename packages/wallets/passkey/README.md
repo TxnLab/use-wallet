@@ -314,11 +314,12 @@ const seed = await wallet.withAppSecret(async (secret) => hkdf(secret, 'my-app/p
 
 - It's the same on every device the passkey syncs to, and only on this RP ID, like the account.
 - It's independent of the account's key and its recovery phrase: neither reveals the other. Nothing recovers the secret without the passkey, so back up what depends on it some other way.
-- One passkey has one secret per label, shared by its own account and its rekeyed accounts. Derive per account (e.g. with the address in the HKDF info) if each needs its own.
+- The label is 1 to 128 characters of printable ASCII, with no `:`. Set it as a constant: changing it changes the secret.
+- One passkey has one secret per label, shared by its own account and its rekeyed accounts. Derive per account (e.g. with the address in the HKDF info) if each needs its own. `context` isn't part of it: adapters on the same RP ID that use the same label get the same secret.
 - Unlike the Falcon key, which stays in its worker, it's held on the main thread while the session is unlocked, so any script on the page can get it through `withAppSecret` then (subject to `confirm`). It's never persisted, and dropped (zeroed) whenever the adapter sees the key lock. A custom `keyStore` that locks itself can't tell the adapter, so the secret stays in memory until the next request or `lock()`, though it's never handed out while the key store is locked. After a reload, a custom key store that kept its key still needs one PRF ceremony for the secret. The bytes passed to the callback are a copy, zeroed once it settles.
 - `confirm` receives `{ type: 'app-secret' }` for it: an exhaustive `switch` over `PasskeySigningRequest` needs that case.
-- Without the option, ceremonies ask for `eval.first` alone, exactly as before. Changing the label changes the secret; the account never changes.
-- A provider that leaves out the second output still signs in; `withAppSecret` then throws `app-secret-unavailable`.
+- Without the option, ceremonies ask for `eval.first` alone, exactly as before. The account never changes, whatever the label.
+- A provider that leaves out the second output still signs in; `withAppSecret` then throws `app-secret-unavailable`. So does one that gives the first output for the second: that is the key's own entropy, which the adapter never hands out.
 
 ### Content Security Policy
 

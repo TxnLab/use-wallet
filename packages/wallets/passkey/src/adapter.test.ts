@@ -18,6 +18,7 @@ import { passkey } from './index'
 import { appSecretInput, prfInput } from './derivation'
 import { WorkerKeyStore, type PasskeyKeyStore } from './key-store'
 import { LOCAL_STORAGE_PASSKEY_KEY, loadRecord } from './record'
+import { evaluatePrf } from './webauthn'
 
 // Stand in for the worker key store with the same derivation, run in Node
 vi.mock('./key-store', async () => {
@@ -114,6 +115,8 @@ interface Authenticator {
   syncThrow?: Error
   /** Leave out the output for `eval.second`, as some providers might */
   noSecond?: boolean
+  /** Answer with this as the second output, asked for or not; it's given the first output's buffer */
+  secondResult?: (first: ArrayBuffer) => ArrayBuffer
   /** Runs while a prompt is open, before it answers */
   onGet?: () => void
 }
@@ -157,21 +160,18 @@ async function fakeGet(options: CredentialRequestOptions) {
   const prf = publicKey.extensions?.prf
   const input = prf?.eval?.first as Uint8Array | undefined
   const secondInput = prf?.eval?.second as Uint8Array | undefined
-  const extensions: AuthenticationExtensionsClientOutputs =
-    prf && input && authenticator.supportsPrf
-      ? {
-          prf: {
-            results: {
-              first: toBuffer(authenticator.prfOutput(new Uint8Array(input))),
-              ...(secondInput &&
-                !authenticator.noSecond && {
-                  second: toBuffer(authenticator.prfOutput(new Uint8Array(secondInput)))
-                })
-            }
-          }
-        }
-      : {}
-  return new FakePublicKeyCredential(toBuffer(rawId), extensions)
+  if (!prf || !input || !authenticator.supportsPrf) {
+    return new FakePublicKeyCredential(toBuffer(rawId), {})
+  }
+  const first = toBuffer(authenticator.prfOutput(new Uint8Array(input)))
+  const second = authenticator.secondResult
+    ? authenticator.secondResult(first)
+    : secondInput && !authenticator.noSecond
+      ? toBuffer(authenticator.prfOutput(new Uint8Array(secondInput)))
+      : undefined
+  return new FakePublicKeyCredential(toBuffer(rawId), {
+    prf: { results: { first, ...(second && { second }) } }
+  })
 }
 
 const prfCalls = () => getCalls.filter((call) => call.publicKey?.extensions?.prf)
@@ -2829,6 +2829,55 @@ describe('PasskeyAdapter', () => {
       expectValidSignature(signed!, txn)
     })
 
+    it("gives none when the provider answers with the key's own output", async () => {
+      // A provider that ignores the PRF input: the second output is the Falcon key's entropy
+      authenticator.prfOutput = () => unhex(PRF_VECTOR)
+      const wallet = createWallet(accessor, { session: true, confirm: () => 'silent', appSecret })
+      const [account] = await wallet.connect()
+      expect(account.address).toBe(ADDRESS)
+      getCalls = []
+
+      await expect(read(wallet)).rejects.toMatchObject({ code: 'app-secret-unavailable' })
+      expect(getCalls).toHaveLength(0)
+      const txn = makePayment(ADDRESS)
+      const [signed] = await wallet.signTransactions([txn])
+      expectValidSignature(signed!, txn)
+
+      // The same on the ceremony that unlocks a locked session
+      wallet.lock()
+      await expect(read(wallet)).rejects.toMatchObject({ code: 'app-secret-unavailable' })
+      expect(wallet.isUnlocked).toBe(true)
+    })
+
+    it('gives none, not zeros, when both outputs come in one buffer', async () => {
+      // Zeroing the first output's buffer would zero the second with it
+      authenticator.secondResult = (first) => first
+      const wallet = createWallet(accessor, { session: true, confirm: () => 'silent', appSecret })
+      const [account] = await wallet.connect()
+      expect(account.address).toBe(ADDRESS)
+
+      await expect(read(wallet)).rejects.toMatchObject({ code: 'app-secret-unavailable' })
+    })
+
+    it.each([31, 33])('gives none when the second output is %i bytes', async (length) => {
+      authenticator.secondResult = () => new Uint8Array(length).fill(7).buffer
+      const wallet = createWallet(accessor, { session: true, confirm: () => 'silent', appSecret })
+      const [account] = await wallet.connect()
+      expect(account.address).toBe(ADDRESS)
+
+      await expect(read(wallet)).rejects.toMatchObject({ code: 'app-secret-unavailable' })
+    })
+
+    it("keeps no second output it didn't ask for, and zeroes the credential's", async () => {
+      const unasked = new Uint8Array(32).fill(7).buffer
+      authenticator.secondResult = () => unasked
+
+      const result = await evaluatePrf({ rpId: DOMAIN, prfInput: prfInput('') })
+      expect(result.prf).toEqual(unhex(PRF_VECTOR))
+      expect(result.second).toBeUndefined()
+      expect(new Uint8Array(unasked)).toEqual(new Uint8Array(32))
+    })
+
     it('gives none after a key mismatch', async () => {
       const wallet = createWallet(accessor, { session: true, confirm: () => 'silent', appSecret })
       await wallet.connect()
@@ -2902,6 +2951,25 @@ describe('PasskeyAdapter', () => {
         expect(await read(wallet)).toEqual(EXPECTED())
         // The credential's own result, the copy passed to the callback, and the one held for the request
         expect(watch.count()).toBe(3)
+      })
+
+      it("zeroes the credential's own copy of the key's output too", async () => {
+        const wallet = createWallet(accessor, { session: true, confirm: () => 'silent', appSecret })
+        watch = watchZeroing(unhex(PRF_VECTOR))
+
+        await wallet.connect()
+        // The credential's own result, and the copy the key store derived the key from
+        expect(watch.count()).toBe(2)
+      })
+
+      it("zeroes every copy of an output that is the key's own", async () => {
+        authenticator.prfOutput = () => unhex(PRF_VECTOR)
+        const wallet = createWallet(accessor, { session: true, confirm: () => 'silent', appSecret })
+        watch = watchZeroing(unhex(PRF_VECTOR))
+
+        await wallet.connect()
+        // Both of the credential's results, the refused copy of the second, and the key store's
+        expect(watch.count()).toBe(4)
       })
 
       it("zeroes the old passkey's when another signs in", async () => {

@@ -46,13 +46,20 @@ export function prfInput(context: string): Uint8Array {
  */
 export const APP_SECRET_PREFIX = '@txnlab/use-wallet-passkey:app-secret:v1:'
 
-/** An app secret's label: 1 to 128 characters, no `:` (room for a `:<n>` suffix later) */
-const APP_SECRET_LABEL_PATTERN = /^[^:]{1,128}$/
+/**
+ * An app secret's label: 1 to 128 characters of printable ASCII (space to
+ * `~`), no `:` (room for a `:<n>` suffix later). ASCII alone, so a label has
+ * one encoding: other text can look the same and encode differently
+ * (composed and decomposed accents), or differ and encode the same (lone
+ * surrogates).
+ */
+const APP_SECRET_LABEL_PATTERN = /^[\x20-\x39\x3b-\x7e]{1,128}$/
 
 export function assertValidAppSecretLabel(label: string): void {
-  if (!APP_SECRET_LABEL_PATTERN.test(label)) {
+  // A string only: anything else would be tested, and used, as its text ("undefined")
+  if (typeof label !== 'string' || !APP_SECRET_LABEL_PATTERN.test(label)) {
     throw new Error(
-      'passkey: `appSecret.label` must be 1 to 128 characters and must not contain ":"'
+      'passkey: `appSecret.label` must be 1 to 128 characters of printable ASCII and must not contain ":"'
     )
   }
 }

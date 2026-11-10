@@ -89,7 +89,9 @@ export type PasskeySigningRequest =
 export interface PasskeyAppSecretOptions {
   /**
    * Names the secret: the PRF's second input is `APP_SECRET_PREFIX + label`.
-   * 1 to 128 characters, no `:`. Changing it changes the secret.
+   * 1 to 128 characters of printable ASCII, no `:`. Changing it changes the
+   * secret. `context` isn't part of it: adapters on one RP ID that use the
+   * same label get the same secret.
    */
   label: string
 }
@@ -1059,8 +1061,8 @@ export class PasskeyAdapter extends BaseWallet<PasskeyOptions> {
    *
    * Throws a `PasskeyError` with code `app-secret-unavailable` without the
    * `appSecret` option, or when the passkey's provider didn't give the second
-   * output (the account still works); `failed` when the session locked while
-   * the request waited, which a retry can fix.
+   * output or gave the key's own for it (the account still works); `failed`
+   * when the session locked while the request waited, which a retry can fix.
    */
   public withAppSecret = async <T>(
     callback: (secret: Uint8Array) => T | PromiseLike<T>

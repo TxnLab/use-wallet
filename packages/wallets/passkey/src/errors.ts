@@ -15,7 +15,7 @@ export type PasskeyErrorCode =
   | 'not-rekeyed'
   /**
    * `withAppSecret`: the adapter has no `appSecret` option, or the passkey's
-   * provider didn't give the second PRF output
+   * provider didn't give the second PRF output (or gave the first for it)
    */
   | 'app-secret-unavailable'
   /** The key store failed, e.g. the session worker was blocked by a CSP */
