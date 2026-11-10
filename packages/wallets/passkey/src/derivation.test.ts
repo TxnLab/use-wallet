@@ -1,7 +1,15 @@
 import algosdk from 'algosdk'
 import { generateKey } from 'falcon-1024'
 import { sha512_256 } from '@noble/hashes/sha2'
-import { PRF_LABEL_PREFIX, assertValidContext, keygenSeedFromEntropy, prfInput } from './derivation'
+import {
+  APP_SECRET_PREFIX,
+  PRF_LABEL_PREFIX,
+  appSecretInput,
+  assertValidAppSecretLabel,
+  assertValidContext,
+  keygenSeedFromEntropy,
+  prfInput
+} from './derivation'
 
 const hex = (bytes: Uint8Array) => Buffer.from(bytes).toString('hex')
 const unhex = (value: string) => new Uint8Array(Buffer.from(value, 'hex'))
@@ -29,6 +37,28 @@ describe('prfInput', () => {
     expect(() => prfInput('app:1')).toThrow('must not contain ":"')
     expect(() => assertValidContext('x'.repeat(129))).toThrow()
     expect(() => assertValidContext('x'.repeat(128))).not.toThrow()
+  })
+})
+
+describe('appSecretInput', () => {
+  // These bytes are the second PRF input, so they fix every app secret. Never change them.
+  it('pins the app secret label', () => {
+    expect(APP_SECRET_PREFIX).toBe('@txnlab/use-wallet-passkey:app-secret:v1:')
+    expect(hex(appSecretInput('my-app'))).toBe(
+      '4074786e6c61622f7573652d77616c6c65742d706173736b65793a6170702d7365637265743a76313a6d792d617070'
+    )
+  })
+
+  it("can't ask for an account's PRF input", () => {
+    expect(hex(appSecretInput('my-app'))).not.toBe(hex(prfInput('my-app')))
+    expect(APP_SECRET_PREFIX.startsWith(PRF_LABEL_PREFIX)).toBe(false)
+  })
+
+  it('takes 1 to 128 characters without ":"', () => {
+    expect(() => appSecretInput('')).toThrow('1 to 128 characters')
+    expect(() => appSecretInput('a:b')).toThrow('must not contain ":"')
+    expect(() => assertValidAppSecretLabel('x'.repeat(129))).toThrow()
+    expect(() => assertValidAppSecretLabel('x'.repeat(128))).not.toThrow()
   })
 })
 

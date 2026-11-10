@@ -20,6 +20,10 @@
  *   Without `session`, the worker is terminated after every request.
  * - Accounts rekeyed to the passkey account (`addRekeyedAccount`) are signed
  *   for by the same key, so they share its trust boundary.
+ * - With `appSecret`, the same ceremonies also give the app a 32-byte secret
+ *   of its own (the PRF's second output). It's on the main thread, handed to
+ *   the app's callback, held only while the session is unlocked, and never
+ *   persisted. It's independent of the account's key.
  */
 
 import algosdk from 'algosdk'
@@ -40,7 +44,12 @@ import {
   type WalletMetadata,
   type WalletState
 } from '@txnlab/use-wallet/adapter'
-import { assertValidContext, prfInput } from './derivation'
+import {
+  appSecretInput,
+  assertValidAppSecretLabel,
+  assertValidContext,
+  prfInput
+} from './derivation'
 import { PasskeyError } from './errors'
 import { icon } from './icon'
 import { WorkerKeyStore, type PasskeyKeyStore, type WorkerKeyStoreLockReason } from './key-store'
@@ -72,7 +81,18 @@ const DEFAULT_MAX_AGE_MS = 60 * 60 * 1000
 export type PasskeyConfirmation = 'silent' | 'presence' | 'verify'
 
 export type PasskeySigningRequest =
-  { type: 'transactions'; transactions: algosdk.Transaction[] } | { type: 'data'; siwa: Siwa }
+  | { type: 'transactions'; transactions: algosdk.Transaction[] }
+  | { type: 'data'; siwa: Siwa }
+  /** `withAppSecret` while the session is unlocked */
+  | { type: 'app-secret' }
+
+export interface PasskeyAppSecretOptions {
+  /**
+   * Names the secret: the PRF's second input is `APP_SECRET_PREFIX + label`.
+   * 1 to 128 characters, no `:`. Changing it changes the secret.
+   */
+  label: string
+}
 
 /**
  * Why an unlocked session locked:
@@ -148,6 +168,16 @@ export interface PasskeyOptions {
    * locks it after signing, only on `disconnect`. May be called more than once.
    */
   keyStore?: () => PasskeyKeyStore
+  /**
+   * Opt in to a 32-byte secret for the app, read with `withAppSecret`: the
+   * passkey's second PRF output, asked for in the same ceremony that unlocks
+   * the key (`connect`, `unlock`, a locked signature), so it adds no prompt.
+   * It's the same on every device the passkey syncs to, independent of the
+   * account's key, and one per passkey: the passkey's own account and its
+   * rekeyed accounts share it, so derive per account if needed. The account
+   * doesn't change. Without this option, no second output is asked for.
+   */
+  appSecret?: PasskeyAppSecretOptions
 }
 
 export interface PasskeyConnectArgs {
@@ -202,10 +232,18 @@ export class PasskeyAdapter extends BaseWallet<PasskeyOptions> {
   private reportedUnlocked = false
   /** The network the wallet's rekeyed accounts were last listed for */
   private listedNetwork: string
+  /**
+   * The app secret from the ceremony that unlocked the session; held only while it's unlocked. A
+   * `#` field, so code holding the wallet can't read it past `withAppSecret` (and `confirm`).
+   */
+  #secret: Uint8Array | null = null
+  /** The ceremony that unlocked the session asked for the app secret and the provider gave none */
+  #secretMissing = false
 
   constructor(params: AdapterConstructorParams<PasskeyOptions>) {
     super(params)
     assertValidContext(this.context)
+    if (this.options.appSecret) assertValidAppSecretLabel(this.options.appSecret.label)
     if (this.isSession && this.sessionOptions.lockWhenHidden && typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', this.onVisibilityChange)
     }
@@ -230,6 +268,30 @@ export class PasskeyAdapter extends BaseWallet<PasskeyOptions> {
 
   private get context(): string {
     return this.options.context ?? ''
+  }
+
+  /** The PRF's second input, or `undefined` without `appSecret` */
+  private get appSecretInput(): Uint8Array | undefined {
+    const { appSecret } = this.options
+    return appSecret ? appSecretInput(appSecret.label) : undefined
+  }
+
+  /** Keep a ceremony's app secret while the key it unlocked is held; zero it otherwise */
+  private holdAppSecret(second: Uint8Array | undefined): void {
+    this.dropAppSecret()
+    if (!this.isUnlocked) {
+      second?.fill(0)
+      return
+    }
+    if (second) this.#secret = second
+    // Asking again before the next unlock would only prompt for nothing
+    else this.#secretMissing = !!this.options.appSecret
+  }
+
+  private dropAppSecret(): void {
+    this.#secret?.fill(0)
+    this.#secret = null
+    this.#secretMissing = false
   }
 
   /** True when the key stays unlocked between requests */
@@ -279,6 +341,7 @@ export class PasskeyAdapter extends BaseWallet<PasskeyOptions> {
   /** Drop the key after a request, unless a session keeps it */
   private release(): void {
     if (!this.isSession || this.isHidden()) this.keyStore?.lock()
+    if (!this.isUnlocked) this.dropAppSecret()
   }
 
   /** True when the page is hidden and the session should lock for it */
@@ -313,6 +376,8 @@ export class PasskeyAdapter extends BaseWallet<PasskeyOptions> {
    */
   private reportSession(reason: PasskeyLockReason): void {
     const unlocked = this.isSession && this.isUnlocked
+    // The app secret goes with the key, however the key went
+    if (!unlocked) this.dropAppSecret()
     if (unlocked === this.reportedUnlocked) return
     this.reportedUnlocked = unlocked
     try {
@@ -334,6 +399,7 @@ export class PasskeyAdapter extends BaseWallet<PasskeyOptions> {
     const rpId = this.rpId
     const context = this.context
     const input = prfInput(context)
+    const secondInput = this.appSecretInput
     this.logger.info(args?.create ? 'Creating passkey...' : 'Connecting...')
 
     let result: PrfResult | undefined
@@ -346,15 +412,18 @@ export class PasskeyAdapter extends BaseWallet<PasskeyOptions> {
           userName: args.userName ?? this.options.userName ?? `${this.rpName} account`
         })
         // Scope to the new credential so the picker can't bind a sibling passkey
-        result = await evaluatePrf({ rpId, prfInput: input, credentialId })
+        result = await evaluatePrf({ rpId, prfInput: input, secondInput, credentialId })
       } else {
-        result = await evaluatePrf({ rpId, prfInput: input })
+        result = await evaluatePrf({ rpId, prfInput: input, secondInput })
       }
 
       this.keyStore?.lock()
+      this.dropAppSecret()
       const keyStore = this.getKeyStore()
       const publicKey = await keyStore.unlock(result.prf)
       this.release()
+      this.holdAppSecret(result.second)
+      result.second = undefined
 
       const { address, salt } = algosdk.addressFromPQKey(algosdk.FALCON_1024_SCHEME, publicKey)
       // Accounts rekeyed to this passkey account stay with it when it signs in again
@@ -389,7 +458,9 @@ export class PasskeyAdapter extends BaseWallet<PasskeyOptions> {
       return accounts
     } catch (error: any) {
       result?.prf.fill(0)
+      result?.second?.fill(0)
       this.keyStore?.lock()
+      this.dropAppSecret()
       this.reportSession('connect')
       this.logger.error('Error connecting:', error.message)
       throw error
@@ -739,19 +810,29 @@ export class PasskeyAdapter extends BaseWallet<PasskeyOptions> {
    */
   private async unlockKey(record: PasskeyRecord): Promise<void> {
     const keyStore = this.getKeyStore()
-    const { prf } = await evaluatePrf({
+    const { prf, second } = await evaluatePrf({
       rpId: record.rpId,
       prfInput: prfInput(record.context),
+      secondInput: this.appSecretInput,
       credentialId: record.credentialId
     })
-    const publicKey = await keyStore.unlock(prf)
+    let publicKey: Uint8Array
+    try {
+      publicKey = await keyStore.unlock(prf)
+    } catch (error) {
+      second?.fill(0)
+      throw error
+    }
     if (!bytesEqual(publicKey, record.publicKey)) {
+      second?.fill(0)
       keyStore.lock()
+      this.dropAppSecret()
       throw new PasskeyError(
         'key-mismatch',
         'This passkey derived a different key than the connected account. Disconnect and connect again.'
       )
     }
+    this.holdAppSecret(second)
   }
 
   /**
@@ -961,6 +1042,69 @@ export class PasskeyAdapter extends BaseWallet<PasskeyOptions> {
       this.logger.error('Error signing data:', error.message)
       throw error
     } finally {
+      this.finishRequest()
+    }
+  }
+
+  // ---------- App secret -------------------------------------------- //
+
+  /**
+   * Runs `callback` with the app secret (see `appSecret`): the 32-byte second
+   * PRF output for the connected passkey. While the session is unlocked it's
+   * confirmed per `confirm` (`{ type: 'app-secret' }`), like a signature;
+   * otherwise one PRF ceremony unlocks the session and gives it. Call it from
+   * the click handler when it may prompt: iOS drops the tap across an await.
+   * The bytes passed are a copy, zeroed once `callback` settles, so keep only
+   * what's derived from them.
+   *
+   * Throws a `PasskeyError` with code `app-secret-unavailable` without the
+   * `appSecret` option, or when the passkey's provider didn't give the second
+   * output (the account still works); `failed` when the session locked while
+   * the request waited, which a retry can fix.
+   */
+  public withAppSecret = async <T>(
+    callback: (secret: Uint8Array) => T | PromiseLike<T>
+  ): Promise<T> => {
+    const record = this.requireRecord()
+    if (!this.options.appSecret) {
+      throw new PasskeyError(
+        'app-secret-unavailable',
+        'The passkey wallet was configured without `appSecret`.'
+      )
+    }
+
+    const unavailable = () =>
+      new PasskeyError(
+        'app-secret-unavailable',
+        "This passkey's provider didn't return the second PRF output, so there's no app secret."
+      )
+    if (this.isUnlocked && this.#secretMissing) throw unavailable()
+
+    this.activeRequests++
+    let secret: Uint8Array | undefined
+    try {
+      // A key store that kept its key across a reload has no secret: run the ceremony for it
+      if (this.isUnlocked && this.#secret) {
+        await this.authorize({ type: 'app-secret' }, record)
+      } else {
+        await this.unlockKey(record)
+      }
+      if (!this.#secret) {
+        if (this.isUnlocked && this.#secretMissing) throw unavailable()
+        // The session locked (a timeout, `lock`, `disconnect`) while the prompt was open: not the provider's doing
+        throw new PasskeyError(
+          'failed',
+          'The passkey session locked before the app secret could be read. Try again.'
+        )
+      }
+      secret = new Uint8Array(this.#secret)
+      // Without a session the secret goes with the key once this request finishes
+      return await callback(secret)
+    } catch (error: any) {
+      this.logger.error('Error reading the app secret:', error.message)
+      throw error
+    } finally {
+      secret?.fill(0)
       this.finishRequest()
     }
   }

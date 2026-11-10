@@ -1,5 +1,6 @@
 import { PasskeyAdapter } from './adapter'
 import type {
+  PasskeyAppSecretOptions,
   PasskeyConfirmation,
   PasskeyConnectArgs,
   PasskeyLockReason,
@@ -8,7 +9,7 @@ import type {
   PasskeySessionOptions,
   PasskeySigningRequest
 } from './adapter'
-import { assertValidContext } from './derivation'
+import { assertValidAppSecretLabel, assertValidContext } from './derivation'
 import type { WalletAdapterConfig, WalletFactoryOptions } from '@txnlab/use-wallet'
 
 export const WALLET_ID = 'passkey' as const
@@ -16,6 +17,7 @@ export const WALLET_ID = 'passkey' as const
 export function passkey(options?: PasskeyOptions & WalletFactoryOptions): WalletAdapterConfig {
   const { metadata, ...adapterOptions } = options ?? {}
   assertValidContext(adapterOptions.context ?? '')
+  if (adapterOptions.appSecret) assertValidAppSecretLabel(adapterOptions.appSecret.label)
   return {
     id: WALLET_ID,
     metadata: { ...PasskeyAdapter.defaultMetadata, ...metadata },
@@ -36,9 +38,16 @@ export {
   type WorkerKeyStoreOptions
 } from './key-store'
 export type { PasskeyTimeoutReason } from './worker/protocol'
-export { PRF_LABEL_PREFIX, keygenSeedFromEntropy, prfInput } from './derivation'
+export {
+  APP_SECRET_PREFIX,
+  PRF_LABEL_PREFIX,
+  appSecretInput,
+  keygenSeedFromEntropy,
+  prfInput
+} from './derivation'
 export { LOCAL_STORAGE_PASSKEY_KEY } from './record'
 export type {
+  PasskeyAppSecretOptions,
   PasskeyConfirmation,
   PasskeyConnectArgs,
   PasskeyLockReason,

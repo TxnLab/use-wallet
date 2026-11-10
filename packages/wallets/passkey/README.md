@@ -61,17 +61,18 @@ Call `connect`, `signTransactions` and `signData` directly from the click handle
 
 ### Options
 
-| Option     | Default             |                                                                                                                                          |
-| ---------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `rpId`     | `location.hostname` | The domain the passkey, and so the account, is bound to. Set a parent domain (`example.com`) to share one account across its subdomains. |
-| `rpName`   | the RP ID           | The name shown in passkey prompts                                                                                                        |
-| `context`  | `''`                | Separates this app's account from others on the same domain. No `:`; changing it changes the account.                                    |
-| `userName` | `<rpName> account`  | The name new passkeys are saved under                                                                                                    |
-| `session`  | `false`             | Keep the key unlocked between signatures (see below). `true` or `{ idleTimeoutMs, maxAgeMs, lockWhenHidden }`.                           |
-| `confirm`  | `() => 'presence'`  | How to confirm each signature while a session is unlocked                                                                                |
-| `onLock`   | none                | Called with a reason when an unlocked session locks (see below)                                                                          |
-| `onUnlock` | none                | Called when a locked session unlocks (see below)                                                                                         |
-| `keyStore` | built-in worker     | Replace where the key is held (`PasskeyKeyStore`)                                                                                        |
+| Option      | Default             |                                                                                                                                          |
+| ----------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `rpId`      | `location.hostname` | The domain the passkey, and so the account, is bound to. Set a parent domain (`example.com`) to share one account across its subdomains. |
+| `rpName`    | the RP ID           | The name shown in passkey prompts                                                                                                        |
+| `context`   | `''`                | Separates this app's account from others on the same domain. No `:`; changing it changes the account.                                    |
+| `userName`  | `<rpName> account`  | The name new passkeys are saved under                                                                                                    |
+| `session`   | `false`             | Keep the key unlocked between signatures (see below). `true` or `{ idleTimeoutMs, maxAgeMs, lockWhenHidden }`.                           |
+| `confirm`   | `() => 'presence'`  | How to confirm each signature while a session is unlocked                                                                                |
+| `onLock`    | none                | Called with a reason when an unlocked session locks (see below)                                                                          |
+| `onUnlock`  | none                | Called when a locked session unlocks (see below)                                                                                         |
+| `keyStore`  | built-in worker     | Replace where the key is held (`PasskeyKeyStore`)                                                                                        |
+| `appSecret` | none                | `{ label }`: also give the app a 32-byte secret of its own (see [App secret](#app-secret))                                               |
 
 The factory also accepts an optional `metadata` option to override the wallet's display name and icon.
 
@@ -299,6 +300,26 @@ for (const { address } of accounts) {
 - Get fees by simulating with `emptyTransactionSigner` and `allowEmptySignatures`: a rekeyed account's empty signature carries the passkey's key and names the passkey address as `sgnr`. The proof transaction's sender isn't one of the passkey's accounts until the rekey confirms, so give it the 3× fee yourself, as above.
 - `signData` accepts an ARC-60 request whose `account_address` is a rekeyed account, with `type: 'falcon-1024-det'`. The signer is the passkey's public key: verify it against the account's auth address.
 
+### App secret
+
+With `appSecret`, the passkey also gives the app a 32-byte secret of its own: the PRF's second output (`eval.second`, input `APP_SECRET_PREFIX + label`), asked for in the same ceremony that unlocks the key, so it adds no prompt. Use it to derive keys the app needs besides the Falcon account, e.g. an ed25519 account that signs raw bytes.
+
+```typescript
+passkey({ session: true, appSecret: { label: 'my-app/payer' } })
+
+// While the session is unlocked: confirmed per `confirm` ({ type: 'app-secret' })
+// While it's locked: one PRF ceremony, so call it from the click handler
+const seed = await wallet.withAppSecret(async (secret) => hkdf(secret, 'my-app/payer/v1'))
+```
+
+- It's the same on every device the passkey syncs to, and only on this RP ID, like the account.
+- It's independent of the account's key and its recovery phrase: neither reveals the other. Nothing recovers the secret without the passkey, so back up what depends on it some other way.
+- One passkey has one secret per label, shared by its own account and its rekeyed accounts. Derive per account (e.g. with the address in the HKDF info) if each needs its own.
+- Unlike the Falcon key, which stays in its worker, it's held on the main thread while the session is unlocked, so any script on the page can get it through `withAppSecret` then (subject to `confirm`). It's never persisted, and dropped (zeroed) whenever the adapter sees the key lock. A custom `keyStore` that locks itself can't tell the adapter, so the secret stays in memory until the next request or `lock()`, though it's never handed out while the key store is locked. After a reload, a custom key store that kept its key still needs one PRF ceremony for the secret. The bytes passed to the callback are a copy, zeroed once it settles.
+- `confirm` receives `{ type: 'app-secret' }` for it: an exhaustive `switch` over `PasskeySigningRequest` needs that case.
+- Without the option, ceremonies ask for `eval.first` alone, exactly as before. Changing the label changes the secret; the account never changes.
+- A provider that leaves out the second output still signs in; `withAppSecret` then throws `app-secret-unavailable`.
+
 ### Content Security Policy
 
 The key runs in a module worker started from a `blob:` URL, using WebAssembly. If your page sets a CSP, allow both:
@@ -311,7 +332,7 @@ Without them, signing fails with a `PasskeyError` whose `code` is `key-store-fai
 
 ### Errors
 
-Failures throw a `PasskeyError` with a `code`: `cancelled`, `unsupported` (no WebAuthn, or an in-app browser), `prf-unsupported` (the provider lacks the PRF extension; Ledger Stax and Dashlane on Android are known cases), `invalid-rp-id`, `key-mismatch`, `not-connected`, `not-rekeyed` (`addRekeyedAccount`: the account isn't rekeyed to the passkey account), `key-store-failed` or `failed`. `signData` validation failures throw a `SignDataError` with an ARC-60 code.
+Failures throw a `PasskeyError` with a `code`: `cancelled`, `unsupported` (no WebAuthn, or an in-app browser), `prf-unsupported` (the provider lacks the PRF extension; Ledger Stax and Dashlane on Android are known cases), `invalid-rp-id`, `key-mismatch`, `not-connected`, `not-rekeyed` (`addRekeyedAccount`: the account isn't rekeyed to the passkey account), `app-secret-unavailable` (`withAppSecret`: no `appSecret` option, or the provider gave no second output), `key-store-failed` or `failed`. `signData` validation failures throw a `SignDataError` with an ARC-60 code.
 
 ## Falcon accounts
 
