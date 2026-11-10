@@ -1,7 +1,15 @@
 import algosdk from 'algosdk'
 import { generateKey } from 'falcon-1024'
 import { sha512_256 } from '@noble/hashes/sha2'
-import { PRF_LABEL_PREFIX, assertValidContext, keygenSeedFromEntropy, prfInput } from './derivation'
+import {
+  APP_SECRET_PREFIX,
+  PRF_LABEL_PREFIX,
+  appSecretInput,
+  assertValidAppSecretLabel,
+  assertValidContext,
+  keygenSeedFromEntropy,
+  prfInput
+} from './derivation'
 
 const hex = (bytes: Uint8Array) => Buffer.from(bytes).toString('hex')
 const unhex = (value: string) => new Uint8Array(Buffer.from(value, 'hex'))
@@ -29,6 +37,59 @@ describe('prfInput', () => {
     expect(() => prfInput('app:1')).toThrow('must not contain ":"')
     expect(() => assertValidContext('x'.repeat(129))).toThrow()
     expect(() => assertValidContext('x'.repeat(128))).not.toThrow()
+  })
+})
+
+describe('appSecretInput', () => {
+  // These bytes are the second PRF input, so they fix every app secret. Never change them.
+  it('pins the app secret label', () => {
+    expect(APP_SECRET_PREFIX).toBe('@txnlab/use-wallet-passkey:app-secret:v1:')
+    expect(hex(appSecretInput('my-app'))).toBe(
+      '4074786e6c61622f7573652d77616c6c65742d706173736b65793a6170702d7365637265743a76313a6d792d617070'
+    )
+  })
+
+  it("can't ask for an account's PRF input", () => {
+    expect(hex(appSecretInput('my-app'))).not.toBe(hex(prfInput('my-app')))
+    expect(APP_SECRET_PREFIX.startsWith(PRF_LABEL_PREFIX)).toBe(false)
+  })
+
+  it('takes 1 to 128 characters without ":"', () => {
+    expect(() => appSecretInput('')).toThrow('1 to 128 characters')
+    expect(() => appSecretInput('a:b')).toThrow('must not contain ":"')
+    expect(() => assertValidAppSecretLabel('x'.repeat(129))).toThrow()
+    expect(() => assertValidAppSecretLabel('x'.repeat(128))).not.toThrow()
+  })
+
+  // A label that isn't a string would be read as its text ("undefined"), and stay that way for good
+  it.each([undefined, null, 123, {}, ['my-app']])(
+    'rejects a label that is not a string: %j',
+    (label) => {
+      expect(() => assertValidAppSecretLabel(label as unknown as string)).toThrow('printable ASCII')
+      expect(() => appSecretInput(label as unknown as string)).toThrow('printable ASCII')
+    }
+  )
+
+  // Outside printable ASCII, labels that look alike (or differ) can encode to other (or the same) bytes
+  it.each([
+    ['an accented letter', 'café'],
+    ['a combining mark', 'café'],
+    ['a lone surrogate', 'app\ud800'],
+    ['a line break', 'my-app\n'],
+    ['a control character', 'my\u0000app'],
+    ['the character before a space', 'my\u001fapp'],
+    ['DEL', 'my\u007fapp']
+  ])('rejects %s', (_name, label) => {
+    expect(() => appSecretInput(label)).toThrow('printable ASCII')
+  })
+
+  it('takes every printable ASCII character but ":"', () => {
+    const printable = Array.from({ length: 0x7f - 0x20 }, (_, i) => String.fromCharCode(0x20 + i))
+      .filter((char) => char !== ':')
+      .join('')
+    expect(printable).toHaveLength(94)
+    expect(() => appSecretInput(printable)).not.toThrow()
+    expect(() => appSecretInput('hay.app/zerosignal-payer')).not.toThrow()
   })
 })
 

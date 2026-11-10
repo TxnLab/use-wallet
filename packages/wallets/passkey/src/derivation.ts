@@ -39,6 +39,37 @@ export function prfInput(context: string): Uint8Array {
   return new TextEncoder().encode(PRF_LABEL_PREFIX + context)
 }
 
+/**
+ * The prefix of the app secret's PRF input (`eval.second`), apart from the
+ * account's so no label can ask for the account's entropy. Frozen: changing it
+ * changes every app secret.
+ */
+export const APP_SECRET_PREFIX = '@txnlab/use-wallet-passkey:app-secret:v1:'
+
+/**
+ * An app secret's label: 1 to 128 characters of printable ASCII (space to
+ * `~`), no `:` (room for a `:<n>` suffix later). ASCII alone, so a label has
+ * one encoding: other text can look the same and encode differently
+ * (composed and decomposed accents), or differ and encode the same (lone
+ * surrogates).
+ */
+const APP_SECRET_LABEL_PATTERN = /^[\x20-\x39\x3b-\x7e]{1,128}$/
+
+export function assertValidAppSecretLabel(label: string): void {
+  // A string only: anything else would be tested, and used, as its text ("undefined")
+  if (typeof label !== 'string' || !APP_SECRET_LABEL_PATTERN.test(label)) {
+    throw new Error(
+      'passkey: `appSecret.label` must be 1 to 128 characters of printable ASCII and must not contain ":"'
+    )
+  }
+}
+
+/** The PRF input (`eval.second`) for an app secret label */
+export function appSecretInput(label: string): Uint8Array {
+  assertValidAppSecretLabel(label)
+  return new TextEncoder().encode(APP_SECRET_PREFIX + label)
+}
+
 // "PQK" || "f1"
 const PQK_PREFIX = new Uint8Array([0x50, 0x51, 0x4b, 0x66, 0x31])
 

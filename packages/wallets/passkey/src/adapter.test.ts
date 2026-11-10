@@ -15,9 +15,10 @@ import { createTestHarness, type State, type Store } from '@txnlab/use-wallet/te
 import type { MockInstance } from 'vitest'
 import { PasskeyAdapter, type PasskeyConfirmation, type PasskeyOptions } from './adapter'
 import { passkey } from './index'
-import { prfInput } from './derivation'
+import { appSecretInput, prfInput } from './derivation'
 import { WorkerKeyStore, type PasskeyKeyStore } from './key-store'
 import { LOCAL_STORAGE_PASSKEY_KEY, loadRecord } from './record'
+import { evaluatePrf } from './webauthn'
 
 // Stand in for the worker key store with the same derivation, run in Node
 vi.mock('./key-store', async () => {
@@ -112,6 +113,12 @@ interface Authenticator {
   returnNull?: boolean
   /** Throw from `get` synchronously, before returning a promise */
   syncThrow?: Error
+  /** Leave out the output for `eval.second`, as some providers might */
+  noSecond?: boolean
+  /** Answer with this as the second output, asked for or not; it's given the first output's buffer */
+  secondResult?: (first: ArrayBuffer) => ArrayBuffer
+  /** Runs while a prompt is open, before it answers */
+  onGet?: () => void
 }
 
 const sha256 = (bytes: Uint8Array) => new Uint8Array(createHash('sha256').update(bytes).digest())
@@ -143,6 +150,8 @@ const credentials = {
 
 async function fakeGet(options: CredentialRequestOptions) {
   getCalls.push(options)
+  await Promise.resolve()
+  authenticator.onGet?.()
   if (authenticator.failWith) throw authenticator.failWith
   if (authenticator.returnNull) return null
   const publicKey = options.publicKey!
@@ -150,11 +159,19 @@ async function fakeGet(options: CredentialRequestOptions) {
   const rawId = authenticator.rawId ?? (allowed ? new Uint8Array(allowed) : CREDENTIAL_ID)
   const prf = publicKey.extensions?.prf
   const input = prf?.eval?.first as Uint8Array | undefined
-  const extensions: AuthenticationExtensionsClientOutputs =
-    prf && input && authenticator.supportsPrf
-      ? { prf: { results: { first: toBuffer(authenticator.prfOutput(new Uint8Array(input))) } } }
-      : {}
-  return new FakePublicKeyCredential(toBuffer(rawId), extensions)
+  const secondInput = prf?.eval?.second as Uint8Array | undefined
+  if (!prf || !input || !authenticator.supportsPrf) {
+    return new FakePublicKeyCredential(toBuffer(rawId), {})
+  }
+  const first = toBuffer(authenticator.prfOutput(new Uint8Array(input)))
+  const second = authenticator.secondResult
+    ? authenticator.secondResult(first)
+    : secondInput && !authenticator.noSecond
+      ? toBuffer(authenticator.prfOutput(new Uint8Array(secondInput)))
+      : undefined
+  return new FakePublicKeyCredential(toBuffer(rawId), {
+    prf: { results: { first, ...(second && { second }) } }
+  })
 }
 
 const prfCalls = () => getCalls.filter((call) => call.publicKey?.extensions?.prf)
@@ -2647,6 +2664,331 @@ describe('PasskeyAdapter', () => {
           wallet.signData(siwaData({ account_address: LEGACY }), metadata)
         ).rejects.toMatchObject({ code: 4603 })
       })
+    })
+  })
+
+  describe('app secret', () => {
+    const LABEL = 'my-app/payer'
+    const appSecret = { label: LABEL }
+    // The fake authenticator's output for the label
+    const EXPECTED = () => sha256(appSecretInput(LABEL))
+    const read = (wallet: PasskeyAdapter) =>
+      wallet.withAppSecret(async (secret) => new Uint8Array(secret))
+    const secondInputOf = (call: CredentialRequestOptions) =>
+      call.publicKey?.extensions?.prf?.eval?.second as Uint8Array | undefined
+
+    it('asks for no second output without the option', async () => {
+      const wallet = createWallet(accessor, { session: true })
+      await wallet.connect()
+      wallet.lock()
+      await wallet.signTransactions([makePayment(ADDRESS)])
+
+      expect(prfCalls()).toHaveLength(2)
+      for (const call of prfCalls()) {
+        expect(Object.keys(call.publicKey!.extensions!.prf!.eval!)).toEqual(['first'])
+      }
+      await expect(read(wallet)).rejects.toMatchObject({ code: 'app-secret-unavailable' })
+    })
+
+    it('reads the second output from the connect ceremony, with no more prompts', async () => {
+      const wallet = createWallet(accessor, { session: true, confirm: () => 'silent', appSecret })
+      const [account] = await wallet.connect()
+
+      // The account is the same as without the option
+      expect(account.address).toBe(ADDRESS)
+      expect(new Uint8Array(secondInputOf(getCalls[0])!)).toEqual(appSecretInput(LABEL))
+      getCalls = []
+
+      expect(await read(wallet)).toEqual(EXPECTED())
+      expect(await read(wallet)).toEqual(EXPECTED())
+      expect(getCalls).toHaveLength(0)
+    })
+
+    it('asks for it when a passkey is created, in the scoped ceremony', async () => {
+      const wallet = createWallet(accessor, { session: true, confirm: () => 'silent', appSecret })
+      await wallet.connect({ create: true })
+      getCalls = []
+
+      expect(await read(wallet)).toEqual(EXPECTED())
+      expect(getCalls).toHaveLength(0)
+    })
+
+    it('zeroes the bytes it passed once the callback settles', async () => {
+      const wallet = createWallet(accessor, { session: true, confirm: () => 'silent', appSecret })
+      await wallet.connect()
+
+      let passed: Uint8Array | undefined
+      await wallet.withAppSecret(async (secret) => {
+        passed = secret
+        expect(secret).toEqual(EXPECTED())
+      })
+      expect(passed).toEqual(new Uint8Array(32))
+      // A rejected callback is zeroed too, and the secret held stays intact
+      await expect(
+        wallet.withAppSecret(async (secret) => {
+          passed = secret
+          throw new Error('boom')
+        })
+      ).rejects.toThrow('boom')
+      expect(passed).toEqual(new Uint8Array(32))
+      expect(await read(wallet)).toEqual(EXPECTED())
+    })
+
+    it('confirms per `confirm` while the session is unlocked', async () => {
+      const confirm = vi.fn((): PasskeyConfirmation => 'presence')
+      const wallet = createWallet(accessor, { session: true, confirm, appSecret })
+      await wallet.connect()
+      getCalls = []
+
+      expect(await read(wallet)).toEqual(EXPECTED())
+      expect(confirm).toHaveBeenCalledWith({ type: 'app-secret' })
+      expect(bareCalls()).toHaveLength(1)
+      expect(prfCalls()).toHaveLength(0)
+    })
+
+    it('goes with the key on lock, and the next read unlocks with one ceremony', async () => {
+      const wallet = createWallet(accessor, { session: true, confirm: () => 'silent', appSecret })
+      await wallet.connect()
+      wallet.lock()
+      getCalls = []
+
+      expect(await read(wallet)).toEqual(EXPECTED())
+      expect(prfCalls()).toHaveLength(1)
+      expect(new Uint8Array(secondInputOf(prfCalls()[0])!)).toEqual(appSecretInput(LABEL))
+      expect(wallet.isUnlocked).toBe(true)
+
+      // That ceremony unlocked the key too: signing asks nothing more
+      await wallet.signTransactions([makePayment(ADDRESS)])
+      expect(getCalls).toHaveLength(1)
+    })
+
+    it('goes when the key store locks itself', async () => {
+      const wallet = createWallet(accessor, { session: true, confirm: () => 'silent', appSecret })
+      await wallet.connect()
+      FakeKeyStore.instances[0].expire('idle')
+      getCalls = []
+
+      expect(await read(wallet)).toEqual(EXPECTED())
+      expect(prfCalls()).toHaveLength(1)
+    })
+
+    it('comes with the ceremony a locked signature runs', async () => {
+      const wallet = createWallet(accessor, { session: true, confirm: () => 'silent', appSecret })
+      await wallet.connect()
+      wallet.lock()
+      await wallet.signTransactions([makePayment(ADDRESS)])
+      getCalls = []
+
+      expect(await read(wallet)).toEqual(EXPECTED())
+      expect(getCalls).toHaveLength(0)
+    })
+
+    it('comes with unlock() after a reload', async () => {
+      const options = { session: true, confirm: () => 'silent' as const, appSecret }
+      await createWallet(accessor, options).connect()
+      const reloaded = createWallet(accessor, options)
+      await reloaded.resumeSession()
+      await reloaded.unlock()
+      getCalls = []
+
+      expect(await read(reloaded)).toEqual(EXPECTED())
+      expect(getCalls).toHaveLength(0)
+    })
+
+    it('runs a ceremony for each read without a session', async () => {
+      const wallet = createWallet(accessor, { appSecret })
+      await wallet.connect()
+      getCalls = []
+
+      expect(await read(wallet)).toEqual(EXPECTED())
+      expect(await read(wallet)).toEqual(EXPECTED())
+      expect(prfCalls()).toHaveLength(2)
+      expect(wallet.isUnlocked).toBe(false)
+    })
+
+    it('goes on disconnect', async () => {
+      const wallet = createWallet(accessor, { session: true, confirm: () => 'silent', appSecret })
+      await wallet.connect()
+      await wallet.disconnect()
+
+      await expect(read(wallet)).rejects.toMatchObject({ code: 'not-connected' })
+    })
+
+    it('connects without it when the provider leaves out the second output', async () => {
+      authenticator.noSecond = true
+      const wallet = createWallet(accessor, { session: true, confirm: () => 'silent', appSecret })
+      const [account] = await wallet.connect()
+      expect(account.address).toBe(ADDRESS)
+      getCalls = []
+
+      await expect(read(wallet)).rejects.toMatchObject({ code: 'app-secret-unavailable' })
+      // It doesn't prompt again for an output the unlocking ceremony didn't give
+      expect(getCalls).toHaveLength(0)
+      const txn = makePayment(ADDRESS)
+      const [signed] = await wallet.signTransactions([txn])
+      expectValidSignature(signed!, txn)
+    })
+
+    it("gives none when the provider answers with the key's own output", async () => {
+      // A provider that ignores the PRF input: the second output is the Falcon key's entropy
+      authenticator.prfOutput = () => unhex(PRF_VECTOR)
+      const wallet = createWallet(accessor, { session: true, confirm: () => 'silent', appSecret })
+      const [account] = await wallet.connect()
+      expect(account.address).toBe(ADDRESS)
+      getCalls = []
+
+      await expect(read(wallet)).rejects.toMatchObject({ code: 'app-secret-unavailable' })
+      expect(getCalls).toHaveLength(0)
+      const txn = makePayment(ADDRESS)
+      const [signed] = await wallet.signTransactions([txn])
+      expectValidSignature(signed!, txn)
+
+      // The same on the ceremony that unlocks a locked session
+      wallet.lock()
+      await expect(read(wallet)).rejects.toMatchObject({ code: 'app-secret-unavailable' })
+      expect(wallet.isUnlocked).toBe(true)
+    })
+
+    it('gives none, not zeros, when both outputs come in one buffer', async () => {
+      // Zeroing the first output's buffer would zero the second with it
+      authenticator.secondResult = (first) => first
+      const wallet = createWallet(accessor, { session: true, confirm: () => 'silent', appSecret })
+      const [account] = await wallet.connect()
+      expect(account.address).toBe(ADDRESS)
+
+      await expect(read(wallet)).rejects.toMatchObject({ code: 'app-secret-unavailable' })
+    })
+
+    it.each([31, 33])('gives none when the second output is %i bytes', async (length) => {
+      authenticator.secondResult = () => new Uint8Array(length).fill(7).buffer
+      const wallet = createWallet(accessor, { session: true, confirm: () => 'silent', appSecret })
+      const [account] = await wallet.connect()
+      expect(account.address).toBe(ADDRESS)
+
+      await expect(read(wallet)).rejects.toMatchObject({ code: 'app-secret-unavailable' })
+    })
+
+    it("keeps no second output it didn't ask for, and zeroes the credential's", async () => {
+      const unasked = new Uint8Array(32).fill(7).buffer
+      authenticator.secondResult = () => unasked
+
+      const result = await evaluatePrf({ rpId: DOMAIN, prfInput: prfInput('') })
+      expect(result.prf).toEqual(unhex(PRF_VECTOR))
+      expect(result.second).toBeUndefined()
+      expect(new Uint8Array(unasked)).toEqual(new Uint8Array(32))
+    })
+
+    it('gives none after a key mismatch', async () => {
+      const wallet = createWallet(accessor, { session: true, confirm: () => 'silent', appSecret })
+      await wallet.connect()
+      wallet.lock()
+      authenticator.prfOutput = (input) => sha256(sha256(input))
+
+      await expect(read(wallet)).rejects.toMatchObject({ code: 'key-mismatch' })
+      expect(wallet.isUnlocked).toBe(false)
+    })
+
+    it('requires a connected account', async () => {
+      await expect(read(createWallet(accessor, { appSecret }))).rejects.toMatchObject({
+        code: 'not-connected'
+      })
+    })
+
+    it('accepts a callback that returns at once', async () => {
+      const wallet = createWallet(accessor, { session: true, confirm: () => 'silent', appSecret })
+      await wallet.connect()
+      expect(await wallet.withAppSecret((secret) => secret.length)).toBe(32)
+    })
+
+    it('says the session locked, not that the provider lacks it, when it locks mid-prompt', async () => {
+      const wallet = createWallet(accessor, { session: true, confirm: () => 'presence', appSecret })
+      await wallet.connect()
+      authenticator.onGet = () => wallet.lock()
+
+      await expect(read(wallet)).rejects.toMatchObject({ code: 'failed' })
+      authenticator.onGet = undefined
+      // A retry unlocks again and reads it
+      expect(await read(wallet)).toEqual(EXPECTED())
+    })
+
+    describe('zeroing', () => {
+      /** Counts buffers holding `expected` as they're zeroed */
+      function watchZeroing(expected: Uint8Array) {
+        let zeroed = 0
+        const fill = Uint8Array.prototype.fill
+        const spy = vi.spyOn(Uint8Array.prototype, 'fill').mockImplementation(function (
+          this: Uint8Array,
+          ...args: Parameters<typeof fill>
+        ) {
+          if (args[0] === 0 && bytesEqual(this, expected)) zeroed++
+          return fill.apply(this, args)
+        })
+        return { count: () => zeroed, restore: () => spy.mockRestore() }
+      }
+
+      let watch: ReturnType<typeof watchZeroing> | undefined
+      afterEach(() => watch?.restore())
+
+      it.each([
+        ['lock()', (wallet: PasskeyAdapter) => wallet.lock()],
+        ['the key store timing out', () => FakeKeyStore.instances[0].expire('idle')],
+        ['disconnect', (wallet: PasskeyAdapter) => void wallet.disconnect()]
+      ])('zeroes the held secret on %s', async (_name, lockIt) => {
+        const wallet = createWallet(accessor, { session: true, confirm: () => 'silent', appSecret })
+        await wallet.connect()
+        watch = watchZeroing(EXPECTED())
+
+        lockIt(wallet)
+        await Promise.resolve()
+        expect(watch.count()).toBe(1)
+      })
+
+      it('zeroes it once a request without a session finishes', async () => {
+        const wallet = createWallet(accessor, { appSecret })
+        await wallet.connect()
+        watch = watchZeroing(EXPECTED())
+
+        expect(await read(wallet)).toEqual(EXPECTED())
+        // The credential's own result, the copy passed to the callback, and the one held for the request
+        expect(watch.count()).toBe(3)
+      })
+
+      it("zeroes the credential's own copy of the key's output too", async () => {
+        const wallet = createWallet(accessor, { session: true, confirm: () => 'silent', appSecret })
+        watch = watchZeroing(unhex(PRF_VECTOR))
+
+        await wallet.connect()
+        // The credential's own result, and the copy the key store derived the key from
+        expect(watch.count()).toBe(2)
+      })
+
+      it("zeroes every copy of an output that is the key's own", async () => {
+        authenticator.prfOutput = () => unhex(PRF_VECTOR)
+        const wallet = createWallet(accessor, { session: true, confirm: () => 'silent', appSecret })
+        watch = watchZeroing(unhex(PRF_VECTOR))
+
+        await wallet.connect()
+        // Both of the credential's results, the refused copy of the second, and the key store's
+        expect(watch.count()).toBe(4)
+      })
+
+      it("zeroes the old passkey's when another signs in", async () => {
+        const wallet = createWallet(accessor, { session: true, confirm: () => 'silent', appSecret })
+        await wallet.connect()
+        watch = watchZeroing(EXPECTED())
+        authenticator.prfOutput = (input) => sha256(sha256(input))
+
+        await wallet.connect()
+        expect(watch.count()).toBe(1)
+        expect(await read(wallet)).toEqual(sha256(sha256(appSecretInput(LABEL))))
+      })
+    })
+
+    it('rejects an invalid label', () => {
+      expect(() => createWallet(accessor, { appSecret: { label: 'a:b' } })).toThrow(
+        'must not contain ":"'
+      )
+      expect(() => passkey({ appSecret: { label: '' } })).toThrow('1 to 128 characters')
     })
   })
 })

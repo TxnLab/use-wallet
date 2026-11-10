@@ -38,6 +38,14 @@ function copy(buffer: ArrayBuffer | ArrayBufferView): Uint8Array<ArrayBuffer> {
     : new Uint8Array(new Uint8Array(buffer))
 }
 
+/** Zero a WebAuthn buffer once it's copied, so the credential's results don't keep a secret */
+function wipe(buffer: ArrayBuffer | ArrayBufferView): void {
+  const view = ArrayBuffer.isView(buffer)
+    ? new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength)
+    : new Uint8Array(buffer)
+  view.fill(0)
+}
+
 export interface CreatePasskeyParams {
   rpId: string
   rpName: string
@@ -95,6 +103,11 @@ export function createPasskey({
 export interface EvaluatePrfParams {
   rpId: string
   prfInput: Uint8Array
+  /**
+   * Also evaluate the PRF at this input (`eval.second`), in the same ceremony.
+   * Without it the request asks for `eval.first` alone.
+   */
+  secondInput?: Uint8Array
   /** Scope the ceremony to this credential. Omit to let the user pick a passkey. */
   credentialId?: Uint8Array
 }
@@ -103,12 +116,18 @@ export interface PrfResult {
   credentialId: Uint8Array
   /** The 32-byte PRF output. Zero it once it's used. */
   prf: Uint8Array
+  /**
+   * The 32-byte PRF output for `secondInput`, when it was asked for and the
+   * provider gave it, and it isn't `prf` over again. Zero it once it's used.
+   */
+  second?: Uint8Array
 }
 
 /** Run a PRF assertion with `userVerification: 'required'` */
 export function evaluatePrf({
   rpId,
   prfInput,
+  secondInput,
   credentialId
 }: EvaluatePrfParams): Promise<PrfResult> {
   let pending: Promise<Credential | null>
@@ -121,7 +140,13 @@ export function evaluatePrf({
         allowCredentials: credentialId
           ? [{ type: 'public-key', id: copy(credentialId) }]
           : undefined,
-        extensions: { prf: { eval: { first: copy(prfInput) } } }
+        extensions: {
+          prf: {
+            eval: secondInput
+              ? { first: copy(prfInput), second: copy(secondInput) }
+              : { first: copy(prfInput) }
+          }
+        }
       }
     })
   } catch (error) {
@@ -137,19 +162,31 @@ export function evaluatePrf({
       if (credentialId && !bytesEqual(rawId, credentialId)) {
         throw new PasskeyError('key-mismatch', 'A different passkey answered the request.')
       }
-      const first = credential.getClientExtensionResults().prf?.results?.first
+      const results = credential.getClientExtensionResults().prf?.results
+      const first = results?.first
       if (!first) {
         throw new PasskeyError(
           'prf-unsupported',
           "This passkey's provider doesn't support the PRF extension. Use a passkey from a provider that does, such as iCloud Keychain, Google Password Manager, 1Password, Windows Hello or a FIDO2 security key."
         )
       }
+      // Copy both before wiping either: the results may share a buffer
       const prf = copy(first)
+      let second = secondInput && results?.second ? copy(results.second) : undefined
+      wipe(first)
+      if (results?.second) wipe(results.second)
       if (prf.length !== 32) {
         prf.fill(0)
+        second?.fill(0)
         throw new PasskeyError('prf-unsupported', `Unexpected PRF output length: ${prf.length}`)
       }
-      return { credentialId: rawId, prf }
+      // A provider that leaves out the second output still signs in; only the app secret is missing.
+      // So is one that answers it with the first: that's the key's entropy, which no app may hold
+      if (second && (second.length !== 32 || bytesEqual(second, prf))) {
+        second.fill(0)
+        second = undefined
+      }
+      return { credentialId: rawId, prf, second }
     },
     (error) => {
       throw toPasskeyError(error)

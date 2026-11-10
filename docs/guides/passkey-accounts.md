@@ -80,6 +80,7 @@ const manager = new WalletManager({
 | `onLock`   | none                | Called with a reason when an unlocked session locks                                                                                      |
 | `onUnlock` | none                | Called when a locked session unlocks                                                                                                     |
 | `keyStore` | built-in worker     | Replace where the key is held (`PasskeyKeyStore`)                                                                                        |
+| `appSecret` | none               | `{ label }`: also give the app a 32-byte secret of its own. See [App Secret](#app-secret).                                              |
 
 The factory also accepts the usual `metadata` option to override the wallet's display name and icon.
 
@@ -422,6 +423,104 @@ for (const { address } of accounts) {
 * Get fees by simulating with `emptyTransactionSigner` and `allowEmptySignatures`: a rekeyed account's empty signature carries the passkey's key and names the passkey address as `sgnr`. The proof transaction's sender isn't one of the passkey's accounts until the rekey confirms, so give it the 3× fee yourself, as above.
 * `signData` accepts an ARC-60 request whose `account_address` is a rekeyed account, with `type: 'falcon-1024-det'`. The signer is the passkey's public key: verify it against the account's auth address, as [Signing Data](signing-data.md) describes.
 
+### App Secret
+
+Some apps need keys besides the Falcon account, e.g. an ed25519 account that signs raw bytes for a service, or an HD wallet. With `appSecret`, the passkey gives the app a 32-byte secret for them: the PRF's second output (`eval.second`, input `APP_SECRET_PREFIX + label`), asked for in the same ceremony that unlocks the key, so it adds no prompt. It's key material, not a key of one kind: see [Deriving Keys from the Secret](#deriving-keys-from-the-secret).
+
+```typescript
+passkey({ session: true, appSecret: { label: 'my-app/keys' } })
+
+// While the session is unlocked: confirmed per `confirm`, with { type: 'app-secret' }
+// While it's locked: one PRF ceremony, so call it from the click handler
+const seed = await wallet.withAppSecret(async (secret) => hkdf(secret, 'my-app/payer/v1'))
+```
+
+* It's the same on every device the passkey syncs to, and only on this RP ID, like the account.
+* It's independent of the account's key and recovery phrase: neither reveals the other. Nothing recovers it without the passkey, so back up whatever depends on it some other way.
+* The label is 1 to 128 characters of printable ASCII, with no `:`. Set it as a constant: changing it changes the secret.
+* One passkey has one secret per label, shared by its own account and its [rekeyed accounts](#rekeyed-accounts). Derive per account (e.g. with the address in the HKDF info) if each needs its own. `context` isn't part of it: adapters on the same RP ID that use the same label get the same secret.
+* Unlike the Falcon key, which stays in its worker, it's held on the main thread while the session is unlocked, so any script on the page can get it through `withAppSecret` then (subject to `confirm`). It's never persisted, and dropped (zeroed) whenever the adapter sees the key lock. A custom `keyStore` that locks itself can't tell the adapter, so the secret stays in memory until the next request or `lock()`, though it's never handed out while the key store is locked. After a reload, a custom key store that kept its key still needs one PRF ceremony for the secret. The bytes passed to the callback are a copy, zeroed once it settles.
+* `confirm` receives `{ type: 'app-secret' }` for it: an exhaustive `switch` over `PasskeySigningRequest` needs that case.
+* Without the option, ceremonies ask for `eval.first` alone, exactly as before. The account never changes, whatever the label.
+* A provider that leaves out the second output still signs in; `withAppSecret` then throws `app-secret-unavailable`. So does one that gives the first output for the second: that is the key's own entropy, which the adapter never hands out.
+
+#### Deriving Keys from the Secret
+
+Derive each key with HKDF, under an `info` string of its own, so one secret gives any number of unrelated keys:
+
+```typescript
+async function hkdf(secret: Uint8Array, info: string, length = 32): Promise<Uint8Array> {
+  const key = await crypto.subtle.importKey('raw', secret as BufferSource, 'HKDF', false, [
+    'deriveBits'
+  ])
+  const bits = await crypto.subtle.deriveBits(
+    { name: 'HKDF', hash: 'SHA-256', salt: new Uint8Array(), info: new TextEncoder().encode(info) },
+    key,
+    length * 8
+  )
+  return new Uint8Array(bits)
+}
+```
+
+Like the label, an `info` string is fixed once a key derived with it holds anything: changing it changes the key.
+
+**One ed25519 account**, e.g. one that signs raw bytes for a service:
+
+```typescript
+const account = await wallet.withAppSecret(async (secret) => {
+  const seed = await hkdf(secret, 'my-app/payer/v1')
+  try {
+    return algosdk.mnemonicToSecretKey(algosdk.mnemonicFromSeed(seed))
+  } finally {
+    seed.fill(0)
+  }
+})
+```
+
+`algosdk.mnemonicFromSeed(seed)` is the account's 25-word phrase, which any Algorand wallet imports as a regular account.
+
+**An HD wallet** (xHD, ARC-52): any number of ed25519 accounts from one root. 32 bytes are the entropy of a 24-word BIP-39 phrase, and the phrase gives the root key:
+
+```typescript
+import * as bip39 from 'bip39'
+import { KeyContext, XHDWalletAPI, fromSeed } from '@algorandfoundation/xhd-wallet-api'
+
+const phrase = await wallet.withAppSecret(async (secret) => {
+  const entropy = await hkdf(secret, 'my-app/hd-wallet/v1')
+  try {
+    return bip39.entropyToMnemonic(Buffer.from(entropy)) // 24 words
+  } finally {
+    entropy.fill(0)
+  }
+})
+
+// 96 bytes: zero it once you're done with it
+const rootKey = fromSeed(bip39.mnemonicToSeedSync(phrase))
+const xhd = new XHDWalletAPI()
+
+// Account 0, key 0: m/44'/283'/0'/0/0
+const publicKey = await xhd.keyGen(rootKey, KeyContext.Address, 0, 0)
+const address = new algosdk.Address(publicKey).toString()
+
+const signature = await xhd.signAlgoTransaction(
+  rootKey,
+  KeyContext.Address,
+  0,
+  0,
+  txn.bytesToSign()
+)
+const signedTxn = txn.attachSignature(address, signature)
+```
+
+It's a standard 24-word BIP-39 phrase, and the library's default derivation (Peikert's) is the one Pera's HD wallets use, so a wallet with xHD support restores the same accounts from the words. `bip39` and the xHD library use Node's `Buffer`, `crypto` and `util`, so a browser bundle needs polyfills for them.
+
+Before relying on derived keys:
+
+* **Offer the phrase as a backup.** Nothing recovers the app secret without the passkey, and the Falcon account's [recovery phrase](#recovery-phrase) doesn't cover keys derived from it. Show the 25 or 24 words as you would that phrase, and say which kind of import they need.
+* **They are ed25519 keys:** not post-quantum, and their transactions pay the regular fee.
+* **They are derived on the page.** The secret, and what you derive from it, are on the main thread, where any script on the page can reach them. For keys that hold more than small amounts, have `confirm` return `'verify'` for `{ type: 'app-secret' }`, derive when a key is needed rather than at sign-in, and zero the root key afterwards.
+* **One secret serves every account of the passkey.** Put the account's address in the `info` if each [rekeyed account](#rekeyed-accounts) needs keys of its own.
+
 ### Content Security Policy
 
 The key runs in a module worker started from a `blob:` URL, using WebAssembly. If your page sets a CSP, allow both:
@@ -445,6 +544,7 @@ Failures throw a `PasskeyError` with a `code`:
 | `key-mismatch`     | The passkey derived a different key than the connected account                                            |
 | `not-connected`    | No passkey account is connected                                                                           |
 | `not-rekeyed`      | `addRekeyedAccount`: algod doesn't report the account as rekeyed to the passkey account                   |
+| `app-secret-unavailable` | `withAppSecret`: no `appSecret` option, or the passkey provider gave no second output               |
 | `key-store-failed` | The key worker failed to start or was locked, e.g. because the CSP blocks it                              |
 | `failed`           | Any other failure                                                                                         |
 

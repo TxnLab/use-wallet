@@ -83,7 +83,8 @@ export class WorkerKeyStore implements PasskeyKeyStore {
       this.isUnlocked = true
       return publicKey
     } catch (error) {
-      new Uint8Array(buffer).fill(0)
+      // Once the worker has it, the buffer is detached (length 0) and a view of it would throw
+      if (buffer.byteLength > 0) new Uint8Array(buffer).fill(0)
       this.lock()
       throw error
     }
