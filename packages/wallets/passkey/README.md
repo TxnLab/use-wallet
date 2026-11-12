@@ -72,7 +72,7 @@ Call `connect`, `signTransactions` and `signData` directly from the click handle
 | `onLock`    | none                | Called with a reason when an unlocked session locks (see below)                                                                          |
 | `onUnlock`  | none                | Called when a locked session unlocks (see below)                                                                                         |
 | `keyStore`  | built-in worker     | Replace where the key is held (`PasskeyKeyStore`)                                                                                        |
-| `appSecret` | none                | `{ label }`: also give the app a 32-byte secret of its own (see [App secret](#app-secret))                                               |
+| `appSecret` | none                | `{ label }`: also give the app a 32-byte secret of its own, v5.4.0+ (see [App secret](#app-secret))                                      |
 
 The factory also accepts an optional `metadata` option to override the wallet's display name and icon.
 
@@ -151,7 +151,7 @@ These settings decide how often honest requests prompt the user. They don't prot
 
 ### Recovery phrase
 
-The account is bound to your domain, so it's stranded if the domain is lost. Let users export its recovery phrase:
+Users can export the account's 25-word recovery phrase with `exportRecoveryPhrase()`, and you should offer it: the account is bound to your domain, so it's stranded if the domain is lost. It returns `{ scheme: 'falcon-1024', phrase }`:
 
 ```typescript
 import type { PasskeyAdapter } from '@txnlab/use-wallet-passkey'
@@ -165,6 +165,8 @@ With a framework adapter, get the manager from `useWalletManager()`.
 Tell users to **import the phrase as a Falcon / quantum account**: in Lute, Add account → "Falcon25 account" → Import; in Pera, the quantum import; or `algokey pq import --scheme falcon-1024`. The same 25 words in a regular import restore a different, empty account.
 
 The phrase restores the passkey's key, so it also controls every [account rekeyed to it](#rekeyed-accounts).
+
+For a ready-made UI, the `passkeyPlugin` in [use-wallet-ui](https://github.com/TxnLab/use-wallet-ui) adds recovery phrase export, session lock status with Unlock and Lock, and a note on whose account it is. See the [React](https://github.com/TxnLab/use-wallet-ui/tree/main/examples/react-passkey) and [Vue](https://github.com/TxnLab/use-wallet-ui/tree/main/examples/vue-passkey) passkey examples.
 
 ### Moving to a wallet
 
@@ -211,6 +213,10 @@ await manager.algodClient.sendRawTransaction(signed!).do()
 ### Rekeyed accounts
 
 An existing account can move onto the passkey by rekeying to the passkey account. It keeps its address, history and holdings, and the passkey's key signs for it from then on, e.g. to move users off an ed25519 account your site manages for them.
+
+_Requires v5.3.0 or later. Earlier versions sign only for the passkey account's own address, so don't rekey accounts to a passkey account on them._
+
+The passkey signs only for the rekeyed accounts your app adds with [`addRekeyedAccount`](#adding-and-removing-rekeyed-accounts), plus the proof transaction in the [rekey group](#rekeying-an-account-to-the-passkey). The adapter doesn't [find them](#finding-rekeyed-accounts), and skips an account rekeyed to the passkey that your app hasn't added. The account's auth address must be the passkey address itself: the passkey can't sign as one key of a multisig.
 
 A rekeyed account joins the passkey account's [security model](#security-model): your site can reach it with the same key, and the [recovery phrase](#recovery-phrase) controls it too. Each transaction the passkey signs for it pays 3× the minimum fee, like the passkey account's own.
 
@@ -302,6 +308,8 @@ for (const { address } of accounts) {
 
 ### App secret
 
+_Requires v5.4.0 or later._
+
 With `appSecret`, the passkey also gives the app a 32-byte secret of its own: the PRF's second output (`eval.second`, input `APP_SECRET_PREFIX + label`), asked for in the same ceremony that unlocks the key, so it adds no prompt. It's key material, not a key of one kind: derive from it whatever the app needs besides the Falcon account, such as an ed25519 account that signs raw bytes or an HD wallet (see [Deriving keys from the secret](#deriving-keys-from-the-secret)).
 
 ```typescript
@@ -312,6 +320,8 @@ passkey({ session: true, appSecret: { label: 'my-app/keys' } })
 const seed = await wallet.withAppSecret(async (secret) => hkdf(secret, 'my-app/payer/v1'))
 ```
 
+`withAppSecret(callback)` calls `callback` with the secret and returns what `callback` returns. Keep only what you derive: the bytes are zeroed once `callback` settles.
+
 - It's the same on every device the passkey syncs to, and only on this RP ID, like the account.
 - It's independent of the account's key and its recovery phrase: neither reveals the other. Nothing recovers the secret without the passkey, so back up what depends on it some other way.
 - The label is 1 to 128 characters of printable ASCII, with no `:`. Set it as a constant: changing it changes the secret.
@@ -320,6 +330,7 @@ const seed = await wallet.withAppSecret(async (secret) => hkdf(secret, 'my-app/p
 - `confirm` receives `{ type: 'app-secret' }` for it: an exhaustive `switch` over `PasskeySigningRequest` needs that case.
 - Without the option, ceremonies ask for `eval.first` alone, exactly as before. The account never changes, whatever the label.
 - A provider that leaves out the second output still signs in; `withAppSecret` then throws `app-secret-unavailable`. So does one that gives the first output for the second: that is the key's own entropy, which the adapter never hands out.
+- If the session locks while a request waits, e.g. on a timeout or `lock()` while the prompt is open, `withAppSecret` throws `failed`, and a retry can succeed.
 
 #### Deriving keys from the secret
 

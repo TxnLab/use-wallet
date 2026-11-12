@@ -420,7 +420,7 @@ function Authenticate() {
 {% hint style="info" %}
 **Adapter Authors**
 
-Wallet adapters that support ARC-60 signing can call the protected `createStdSignData(data)` helper on `BaseWallet`. It builds the `StdSignData` object for the active account, or for the connected account passed as `createStdSignData(data, address)` — resolving the signer public key via algod (respecting rekeyed accounts), using the Falcon public key and `scheme` for post-quantum accounts, and hashing the current domain into `authenticatorData` — so an adapter's `signData` implementation only needs to forward the result to the wallet.
+Wallet adapters that support ARC-60 signing can call the protected `createStdSignData(data)` helper on `BaseWallet`. It builds the `StdSignData` object for the active account, or for the connected account passed as `createStdSignData(data, address)` (v5.3.0+; an address the wallet doesn't hold throws `SignDataError` 4100) — resolving the signer public key via algod (respecting rekeyed accounts), using the Falcon public key and `scheme` for post-quantum accounts, and hashing the current domain into `authenticatorData` — so an adapter's `signData` implementation only needs to forward the result to the wallet.
 {% endhint %}
 
 {% hint style="info" %}
