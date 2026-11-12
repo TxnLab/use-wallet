@@ -282,14 +282,16 @@ passkey({
   rpName?: string,            // Optional: name shown in passkey prompts
   context?: string,           // Optional: separates this app's account from others on the domain
   session?: boolean | { idleTimeoutMs?: number, maxAgeMs?: number, lockWhenHidden?: boolean }, // Optional: keep the key unlocked between signatures
-  confirm?: (request) => 'silent' | 'presence' | 'verify' // Optional: how to confirm signatures in a session
+  confirm?: (request) => 'silent' | 'presence' | 'verify', // Optional: how to confirm signatures in a session
+  appSecret?: { label: string } // Optional (v5.4.0+): also give the app a 32-byte secret, read with withAppSecret()
 })
 ```
 
-Connect with `connect()` to sign in with an existing passkey, or `connect({ create: true })` to create one; show both choices. The adapter supports `signData` (ARC-60, scheme `falcon-1024-det`) and exports a recovery phrase with `exportRecoveryPhrase()`, which must be imported as a Falcon account. In a session, `unlock()`, `lock()` and `isUnlocked` let you control when the key is held, for example to unlock on a tap before a flow that awaits a quote. Accounts rekeyed to the passkey account join the wallet with `addRekeyedAccount()`, and the passkey signs for them. A page with a Content Security Policy must allow `worker-src blob:` and `'wasm-unsafe-eval'`.
+Connect with `connect()` to sign in with an existing passkey, or `connect({ create: true })` to create one; show both choices. The adapter supports `signData` (ARC-60, scheme `falcon-1024-det`) and exports a recovery phrase with `exportRecoveryPhrase()`, which must be imported as a Falcon account. In a session, `unlock()`, `lock()` and `isUnlocked` let you control when the key is held, for example to unlock on a tap before a flow that awaits a quote. Accounts rekeyed to the passkey account join the wallet with `addRekeyedAccount()`, and the passkey signs for them (v5.3.0+). With `appSecret`, `withAppSecret()` gives the app a secret from the same passkey for keys of its own, such as an ed25519 account (v5.4.0+). A page with a Content Security Policy must allow `worker-src blob:` and `'wasm-unsafe-eval'`.
 
 * [Passkey Accounts guide](../guides/passkey-accounts.md)
 * [Passkey adapter README](https://github.com/TxnLab/use-wallet/tree/main/packages/wallets/passkey#readme)
+* [use-wallet-ui passkey examples](https://github.com/TxnLab/use-wallet-ui/tree/main/examples) (`react-passkey`, `vue-passkey`)
 
 #### Voi Wallet
 
