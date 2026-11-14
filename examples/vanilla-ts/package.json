@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@galaxypay/use-wallet-lute": "1.0.0",
+    "@galaxypay/use-wallet-lute": "1.1.0",
     "@noble/ed25519": "3.2.0",
     "@perawallet/use-wallet-pera": "1.0.0",
     "@txnlab/use-wallet": "workspace:*",
@@ -27,10 +27,10 @@
     "falcon-1024": "0.2.0"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "4.3.3",
-    "tailwindcss": "4.3.3",
+    "@tailwindcss/vite": "4.3.5",
+    "tailwindcss": "4.3.5",
     "typescript": "5.9.3",
-    "vite": "7.3.7",
+    "vite": "7.3.8",
     "vite-plugin-node-polyfills": "0.28.0"
   }
 }
