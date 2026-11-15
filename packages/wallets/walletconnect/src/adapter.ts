@@ -274,13 +274,23 @@ export class WalletConnectAdapter extends BaseWallet<WalletConnectOptions> {
   private async initializeClient(): Promise<SignClient> {
     this.logger.info('Initializing client...')
     const SignClient = (await import('@walletconnect/sign-client')).SignClient
-    const client = await SignClient.init(this.clientOptions)
+
+    // A storage prefix per wallet key gives each instance its own WalletConnect
+    // core, relay subscriptions and session store
+    const client = await SignClient.init({
+      ...this.clientOptions,
+      customStoragePrefix: this.walletKey
+    })
 
     client.on('session_event', (args) => {
       this.logger.info('EVENT: session_event', args)
     })
 
     client.on('session_update', ({ topic, params }) => {
+      if (topic !== this.session?.topic) {
+        this.logger.debug('Ignoring session_update for another session', { topic })
+        return
+      }
       this.logger.info('EVENT: session_update', { topic, params })
       const { namespaces } = params
       const session = client.session.get(topic)
@@ -288,9 +298,14 @@ export class WalletConnectAdapter extends BaseWallet<WalletConnectOptions> {
       this.onSessionConnected(updatedSession)
     })
 
-    client.on('session_delete', () => {
-      this.logger.info('EVENT: session_delete')
+    client.on('session_delete', ({ topic }) => {
+      if (topic !== this.session?.topic) {
+        this.logger.debug('Ignoring session_delete for another session', { topic })
+        return
+      }
+      this.logger.info('EVENT: session_delete', { topic })
       this.session = null
+      this.onDisconnect()
     })
 
     this.client = client
@@ -476,10 +491,14 @@ export class WalletConnectAdapter extends BaseWallet<WalletConnectOptions> {
   public disconnect = async (): Promise<void> => {
     this.logger.info('Disconnecting...')
     try {
+      // Drop the session first, so events that arrive while the client
+      // disconnects are ignored
+      const session = this.session
+      this.session = null
       this.onDisconnect()
-      if (this.client && this.session) {
+      if (this.client && session) {
         await this.client.disconnect({
-          topic: this.session.topic,
+          topic: session.topic,
           reason: {
             message: 'User disconnected.',
             code: 6000
@@ -507,11 +526,15 @@ export class WalletConnectAdapter extends BaseWallet<WalletConnectOptions> {
 
       const client = this.client || (await this.initializeClient())
 
-      if (client.session.length) {
-        const lastKeyIndex = client.session.keys.length - 1
-        const restoredSession = client.session.get(client.session.keys[lastKeyIndex])
-        this.onSessionConnected(restoredSession)
+      if (!client.session.length) {
+        this.logger.warn('No WalletConnect session found to resume, disconnecting')
+        this.onDisconnect()
+        return
       }
+
+      const lastKeyIndex = client.session.keys.length - 1
+      const restoredSession = client.session.get(client.session.keys[lastKeyIndex])
+      this.onSessionConnected(restoredSession)
       this.logger.info('Session resumed successfully')
     } catch (error: any) {
       this.logger.error('Error resuming session:', error.message)
