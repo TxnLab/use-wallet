@@ -6,7 +6,9 @@
     ":semanticCommitTypeAll(chore)",
     "schedule:weekly"
   ],
-  "dependencyDashboard": true,
+  "dependencyDashboard": {
+    "enabled": true
+  },
   "configMigration": true,
   "timezone": "America/New_York",
   "assignees": ["drichar"],
