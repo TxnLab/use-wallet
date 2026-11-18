@@ -5,6 +5,7 @@ import { byteArrayToBase64, base64ToByteArray } from '@txnlab/use-wallet/adapter
 import type { AdapterStoreAccessor, WalletTransaction } from '@txnlab/use-wallet/adapter'
 import type { State, Store } from '@txnlab/use-wallet/testing'
 import type { SessionTypes } from '@walletconnect/types'
+import { SignClient } from '@walletconnect/sign-client'
 
 vi.mock('@txnlab/use-wallet/adapter', async (importOriginal) => {
   const original = await importOriginal<typeof import('@txnlab/use-wallet/adapter')>()
@@ -49,6 +50,13 @@ vi.mock('@walletconnect/modal', () => {
 })
 
 const WALLET_ID = 'walletconnect'
+
+/** The handler the adapter registered on the sign client for an event */
+function getClientHandler(event: string): (args: any) => void {
+  const call = mockSignClient.on.mock.calls.find(([name]) => name === event)
+  if (!call) throw new Error(`No handler registered for ${event}`)
+  return call[1]
+}
 
 function createMockSession(accounts: string[], caipChainId: string): SessionTypes.Struct {
   return {
@@ -98,10 +106,11 @@ function createMockSession(accounts: string[], caipChainId: string): SessionType
 
 function createWallet(
   store: AdapterStoreAccessor,
-  options?: Record<string, unknown>
+  options?: Record<string, unknown>,
+  id: string = WALLET_ID
 ): WalletConnectAdapter {
   return new WalletConnectAdapter({
-    id: WALLET_ID,
+    id,
     metadata: WalletConnectAdapter.defaultMetadata,
     store,
     subscribe: vi.fn(),
@@ -126,6 +135,8 @@ describe('WalletConnectAdapter', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    mockSignClient.session.keys = ['']
+    mockSignClient.session.length = 0
 
     const harness = createTestHarness(WALLET_ID)
     store = harness.store
@@ -322,6 +333,189 @@ describe('WalletConnectAdapter', () => {
       }
 
       expect(store.state.wallets[WALLET_ID]).toEqual(newWalletState)
+    })
+
+    it('should remove the wallet from the store if the client has no session to restore', async () => {
+      const walletState: WalletState = {
+        accounts: [account1],
+        activeAccount: account1
+      }
+      const harness = createTestHarness(WALLET_ID, {
+        wallets: { [WALLET_ID]: walletState },
+        activeWallet: WALLET_ID
+      })
+      store = harness.store
+      wallet = createWallet(harness.accessor)
+
+      await wallet.resumeSession()
+
+      expect(SignClient.init).toHaveBeenCalledTimes(1)
+      expect(mockSignClient.session.get).not.toHaveBeenCalled()
+      expect(wallet.isConnected).toBe(false)
+      expect(store.state.wallets[WALLET_ID]).toBeUndefined()
+      expect(store.state.activeWallet).toBeNull()
+      await expect(wallet.signTransactions([])).rejects.toThrow('No session found!')
+    })
+  })
+
+  describe('client initialization', () => {
+    it("should use the wallet key as the client's storage prefix", async () => {
+      await wallet.resumeSession() // no-op without wallet state
+      expect(SignClient.init).not.toHaveBeenCalled()
+
+      mockSignClient.connect.mockResolvedValueOnce({
+        uri: 'mock-uri',
+        approval: vi
+          .fn()
+          .mockResolvedValue(createMockSession([account1.address], wallet.activeChainId))
+      })
+      await wallet.connect()
+
+      expect(SignClient.init).toHaveBeenCalledWith(
+        expect.objectContaining({ projectId: 'mockProjectId', customStoragePrefix: WALLET_ID })
+      )
+    })
+
+    it('should give a skinned instance its own storage prefix', async () => {
+      const skinnedKey = 'walletconnect:biatec'
+      const walletState: WalletState = { accounts: [account1], activeAccount: account1 }
+      const harness = createTestHarness(skinnedKey, { wallets: { [skinnedKey]: walletState } })
+      const skinned = createWallet(harness.accessor, undefined, skinnedKey)
+
+      mockSignClient.session.get.mockImplementationOnce(() =>
+        createMockSession([account1.address], skinned.activeChainId)
+      )
+      mockSignClient.session.keys = ['mockSessionKey']
+      mockSignClient.session.length = 1
+
+      await skinned.resumeSession()
+
+      expect(SignClient.init).toHaveBeenCalledTimes(1)
+      expect(SignClient.init).toHaveBeenCalledWith(
+        expect.objectContaining({ customStoragePrefix: skinnedKey })
+      )
+    })
+  })
+
+  describe('session events', () => {
+    const otherTopic = 'other-topic'
+
+    beforeEach(async () => {
+      mockSignClient.connect.mockResolvedValueOnce({
+        uri: 'mock-uri',
+        approval: vi
+          .fn()
+          .mockResolvedValue(
+            createMockSession([account1.address, account2.address], wallet.activeChainId)
+          )
+      })
+      await wallet.connect()
+    })
+
+    afterEach(() => {
+      mockSignClient.request.mockReset()
+    })
+
+    async function expectRequestTopic(topic: string) {
+      const txn = new algosdk.Transaction({
+        type: algosdk.TransactionType.pay,
+        sender: account1.address,
+        suggestedParams: {
+          fee: 0,
+          firstValid: 51,
+          lastValid: 61,
+          minFee: 1000,
+          genesisID: 'mainnet-v1.0'
+        },
+        paymentParams: { receiver: account2.address, amount: 1000 }
+      })
+      mockSignClient.request.mockResolvedValueOnce([byteArrayToBase64(txn.toByte())])
+      await wallet.signTransactions([txn])
+      expect(mockSignClient.request).toHaveBeenLastCalledWith(expect.objectContaining({ topic }))
+    }
+
+    it("should apply a session update for the wallet's own session", () => {
+      const updated = createMockSession([account2.address], wallet.activeChainId)
+      mockSignClient.session.get.mockImplementationOnce(() => updated)
+
+      getClientHandler('session_update')({
+        topic: updated.topic,
+        params: { namespaces: updated.namespaces }
+      })
+
+      expect(mockSignClient.session.get).toHaveBeenCalledWith(updated.topic)
+      expect(store.state.wallets[WALLET_ID]?.accounts).toEqual([
+        { name: 'WalletConnect Account 1', address: account2.address }
+      ])
+    })
+
+    it('should ignore a session update for another session', async () => {
+      const other = createMockSession([account2.address], wallet.activeChainId)
+
+      getClientHandler('session_update')({
+        topic: otherTopic,
+        params: { namespaces: other.namespaces }
+      })
+
+      expect(mockSignClient.session.get).not.toHaveBeenCalled()
+      expect(store.state.wallets[WALLET_ID]).toEqual({
+        accounts: [account1, account2],
+        activeAccount: account1
+      })
+      await expectRequestTopic('mock-topic')
+    })
+
+    it('should ignore a session delete for another session', async () => {
+      getClientHandler('session_delete')({ id: 1, topic: otherTopic })
+
+      expect(wallet.isConnected).toBe(true)
+      expect(store.state.wallets[WALLET_ID]).toEqual({
+        accounts: [account1, account2],
+        activeAccount: account1
+      })
+      await expectRequestTopic('mock-topic')
+    })
+
+    it("should remove the wallet from the store when the wallet's own session is deleted", async () => {
+      expect(store.state.activeWallet).toBe(WALLET_ID)
+
+      getClientHandler('session_delete')({ id: 1, topic: 'mock-topic' })
+
+      expect(wallet.isConnected).toBe(false)
+      expect(store.state.wallets[WALLET_ID]).toBeUndefined()
+      expect(store.state.activeWallet).toBeNull()
+      await expect(wallet.signTransactions([])).rejects.toThrow('No session found!')
+    })
+
+    it('should ignore a session update once the session has been deleted', () => {
+      const session = createMockSession([account2.address], wallet.activeChainId)
+      getClientHandler('session_delete')({ id: 1, topic: session.topic })
+
+      getClientHandler('session_update')({
+        topic: session.topic,
+        params: { namespaces: session.namespaces }
+      })
+
+      expect(mockSignClient.session.get).not.toHaveBeenCalled()
+      expect(store.state.wallets[WALLET_ID]).toBeUndefined()
+    })
+
+    it('should ignore a session update after the user disconnects', async () => {
+      const session = createMockSession([account2.address], wallet.activeChainId)
+      await wallet.disconnect()
+
+      expect(mockSignClient.disconnect).toHaveBeenCalledWith(
+        expect.objectContaining({ topic: session.topic })
+      )
+
+      getClientHandler('session_update')({
+        topic: session.topic,
+        params: { namespaces: session.namespaces }
+      })
+
+      expect(mockSignClient.session.get).not.toHaveBeenCalled()
+      expect(store.state.wallets[WALLET_ID]).toBeUndefined()
+      await expect(wallet.signTransactions([])).rejects.toThrow('No session found!')
     })
   })
 
