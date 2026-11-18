@@ -1,3 +1,10 @@
+## [5.4.1](https://github.com/TxnLab/use-wallet/compare/v5.4.0...v5.4.1) (2026-11-18)
+
+
+### Bug Fixes
+
+* **walletconnect:** isolate sessions per wallet instance ([#502](https://github.com/TxnLab/use-wallet/issues/502)) ([df7eae5](https://github.com/TxnLab/use-wallet/commit/df7eae5f2b4f7cfb6db9781ff44295584dfb99c9))
+
 # [5.4.0](https://github.com/TxnLab/use-wallet/compare/v5.3.0...v5.4.0) (2026-11-10)
 
 
