@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@noble/hashes": "1.8.0",
-    "canonify": "2.1.1"
+    "canonicalize": "5.1.0"
   },
   "devDependencies": {
     "@txnlab/use-wallet": "workspace:*",

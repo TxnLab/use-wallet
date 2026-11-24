@@ -27,7 +27,7 @@
  */
 
 import algosdk from 'algosdk'
-import { canonify } from 'canonify'
+import canonicalize from 'canonicalize'
 import {
   BaseWallet,
   ScopeType,
@@ -1008,14 +1008,17 @@ export class PasskeyAdapter extends BaseWallet<PasskeyOptions> {
     let bytes: Uint8Array
     let json: string
     let siwa: Siwa
+    let canonical: string | undefined
     try {
       bytes = algosdk.base64ToBytes(data)
       json = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(bytes)
       siwa = JSON.parse(json)
+      // Throws on strings JCS can't represent, such as an escaped lone surrogate
+      canonical = canonicalize(siwa)
     } catch {
       throw new SignDataError('Bad JSON', 4609)
     }
-    if (!siwa || typeof siwa !== 'object' || canonify(siwa) !== json) {
+    if (!siwa || typeof siwa !== 'object' || canonical !== json) {
       throw new SignDataError('Bad JSON', 4609)
     }
     if (siwa.domain !== location.host) {

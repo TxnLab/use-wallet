@@ -17,7 +17,7 @@ Post-quantum (Falcon-1024) accounts can sign data with wallets that support ARC-
 Here's how to implement ARC-60 authentication. The examples verify ed25519 signatures with [`@noble/ed25519`](https://www.npmjs.com/package/@noble/ed25519) and Falcon signatures with [`falcon-1024`](https://www.npmjs.com/package/falcon-1024):
 
 ```bash
-npm install @noble/ed25519 falcon-1024 canonify
+npm install @noble/ed25519 falcon-1024 canonicalize
 ```
 
 {% tabs %}
@@ -33,7 +33,7 @@ import {
   type Siwa
 } from '@txnlab/use-wallet-react'
 import { Address, addressFromPQKey, FALCON_1024_SCHEME } from 'algosdk'
-import { canonify } from 'canonify'
+import canonicalize from 'canonicalize'
 
 async function sha256(data: BufferSource) {
   const buf = await crypto.subtle.digest('SHA-256', data)
@@ -76,7 +76,7 @@ function Authenticate() {
         version: '1',
         'issued-at': new Date().toISOString()
       }
-      const dataString = canonify(siwaRequest)
+      const dataString = canonicalize(siwaRequest)
       if (!dataString) throw Error('Invalid JSON')
       const data = btoa(dataString)
 
@@ -125,7 +125,7 @@ function Authenticate() {
     type Siwa
   } from '@txnlab/use-wallet-vue'
   import { Address, addressFromPQKey, FALCON_1024_SCHEME } from 'algosdk'
-  import { canonify } from 'canonify'
+  import canonicalize from 'canonicalize'
 
   const { activeAccount, activeAddress, algodClient, signData } = useWallet()
   const { activeNetworkConfig } = useNetwork()
@@ -167,7 +167,7 @@ function Authenticate() {
         version: '1',
         'issued-at': new Date().toISOString()
       }
-      const dataString = canonify(siwaRequest)
+      const dataString = canonicalize(siwaRequest)
       if (!dataString) throw Error('Invalid JSON')
       const data = btoa(dataString)
 
@@ -215,7 +215,7 @@ import {
   type Siwa
 } from '@txnlab/use-wallet-solid'
 import { Address, addressFromPQKey, FALCON_1024_SCHEME } from 'algosdk'
-import { canonify } from 'canonify'
+import canonicalize from 'canonicalize'
 
 async function sha256(data: BufferSource) {
   const buf = await crypto.subtle.digest('SHA-256', data)
@@ -259,7 +259,7 @@ function Authenticate() {
         version: '1',
         'issued-at': new Date().toISOString()
       }
-      const dataString = canonify(siwaRequest)
+      const dataString = canonicalize(siwaRequest)
       if (!dataString) throw Error('Invalid JSON')
       const data = btoa(dataString)
 
@@ -308,7 +308,7 @@ function Authenticate() {
     type Siwa
   } from '@txnlab/use-wallet-svelte'
   import { Address, addressFromPQKey, FALCON_1024_SCHEME } from 'algosdk'
-  import { canonify } from 'canonify'
+  import canonicalize from 'canonicalize'
 
   const { activeAccount, activeAddress, algodClient, signData } = useWallet()
   const { activeNetworkConfig } = useNetwork()
@@ -352,7 +352,7 @@ function Authenticate() {
         version: '1',
         'issued-at': new Date().toISOString()
       }
-      const dataString = canonify(siwaRequest)
+      const dataString = canonicalize(siwaRequest)
       if (!dataString) throw Error('Invalid JSON')
       const data = btoa(dataString)
 

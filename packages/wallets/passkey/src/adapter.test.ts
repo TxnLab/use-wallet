@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
 import algosdk from 'algosdk'
-import { canonify } from 'canonify'
+import canonicalize from 'canonicalize'
 import { generateKey, verifyCompressed } from 'falcon-1024'
 import {
   ScopeType,
@@ -293,7 +293,7 @@ function siwaData(overrides: Partial<Siwa> = {}): string {
     'issued-at': '2026-10-20T00:00:00.000Z',
     ...overrides
   }
-  return btoa(canonify(siwa)!)
+  return btoa(canonicalize(siwa)!)
 }
 
 // ---------- Tests --------------------------------------------------- //
@@ -684,6 +684,12 @@ describe('PasskeyAdapter', () => {
       [
         'non-canonical JSON',
         () => btoa(JSON.stringify({ version: '1', domain: DOMAIN })),
+        metadata,
+        4609
+      ],
+      [
+        'an escaped lone surrogate',
+        () => btoa(atob(siwaData()).replace('"type":', '"statement":"\\ud800","type":')),
         metadata,
         4609
       ],

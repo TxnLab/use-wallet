@@ -8,7 +8,7 @@ import {
   type Siwa
 } from '@txnlab/use-wallet-solid'
 import { Address, addressFromPQKey, FALCON_1024_SCHEME } from 'algosdk'
-import { canonify } from 'canonify'
+import canonicalize from 'canonicalize'
 import { createSignal, Show } from 'solid-js'
 
 type AuthStatus = 'idle' | 'signing' | 'verified' | 'error'
@@ -60,7 +60,7 @@ export function Authenticate() {
         'issued-at': new Date().toISOString()
       }
 
-      const dataString = canonify(siwaRequest)
+      const dataString = canonicalize(siwaRequest)
       if (!dataString) throw Error('Invalid JSON')
       const data = btoa(dataString)
       const metadata = { scope: ScopeType.AUTH, encoding: 'base64' }
