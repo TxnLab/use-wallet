@@ -1,3 +1,5 @@
+## [5.4.2](https://github.com/TxnLab/use-wallet/compare/v5.4.1...v5.4.2) (2026-11-24)
+
 ## [5.4.1](https://github.com/TxnLab/use-wallet/compare/v5.4.0...v5.4.1) (2026-11-18)
 
 
