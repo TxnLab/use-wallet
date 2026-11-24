@@ -886,9 +886,9 @@ importers:
       '@noble/hashes':
         specifier: 1.8.0
         version: 1.8.0
-      canonify:
-        specifier: 2.1.1
-        version: 2.1.1
+      canonicalize:
+        specifier: 5.1.0
+        version: 5.1.0
     devDependencies:
       '@txnlab/use-wallet':
         specifier: workspace:*
@@ -4675,9 +4675,6 @@ packages:
     resolution: {integrity: sha512-bab9+WefZljqQ8jT0qRwVmTyzAUU63K97QIQD3agynIBrb6sa5M2eAy8Hv8K3p4V9+ONVYZKtGYl4Dg+/5Gumw==}
     engines: {node: '>=22'}
     hasBin: true
-
-  canonify@2.1.1:
-    resolution: {integrity: sha512-bDHlvXhY1fmi9P6cF8PVvs0G7+zOGKYww+5OLBM30+TotDif8tvKFCpdIqP0MJT5vDAgdgvm6CToLnH3RRIhAA==}
 
   chai@5.3.3:
     resolution: {integrity: sha512-4zNhdJD/iOjSH0A05ea+Ke6MU5mmpQcbQsSOkgdaUMJ9zTlDTD/GYlwohmIE2u0gaxHYiVHEn1Fw9mZ/ktJWgw==}
@@ -13791,8 +13788,6 @@ snapshots:
   caniuse-lite@1.0.30001816: {}
 
   canonicalize@5.1.0: {}
-
-  canonify@2.1.1: {}
 
   chai@5.3.3:
     dependencies:

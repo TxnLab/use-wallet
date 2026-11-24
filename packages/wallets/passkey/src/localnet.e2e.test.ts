@@ -8,7 +8,7 @@
  */
 import { createHash } from 'node:crypto'
 import algosdk from 'algosdk'
-import { canonify } from 'canonify'
+import canonicalize from 'canonicalize'
 import { generateKey, signCompressed, verifyCompressed } from 'falcon-1024'
 import { NetworkId, ScopeType, WalletManager, type Siwa } from '@txnlab/use-wallet'
 import { decodeEmptySignature } from '@txnlab/use-wallet/adapter'
@@ -214,7 +214,7 @@ describe.skipIf(!run)('LocalNet: moving an account to the passkey account', () =
       version: '1',
       'issued-at': new Date().toISOString()
     }
-    const data = btoa(canonify(siwa)!)
+    const data = btoa(canonicalize(siwa)!)
     const response = await wallet.signData(data, { scope: ScopeType.AUTH, encoding: 'base64' })
     expect(
       algosdk.encodeAddress(
