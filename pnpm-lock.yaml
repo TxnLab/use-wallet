@@ -143,9 +143,9 @@ importers:
       algosdk:
         specifier: 3.8.0
         version: 3.8.0
-      canonify:
-        specifier: 2.1.1
-        version: 2.1.1
+      canonicalize:
+        specifier: 5.1.0
+        version: 5.1.0
       falcon-1024:
         specifier: 0.2.0
         version: 0.2.0
@@ -225,9 +225,9 @@ importers:
       algosdk:
         specifier: 3.8.0
         version: 3.8.0
-      canonify:
-        specifier: 2.1.1
-        version: 2.1.1
+      canonicalize:
+        specifier: 5.1.0
+        version: 5.1.0
       falcon-1024:
         specifier: 0.2.0
         version: 0.2.0
@@ -298,9 +298,9 @@ importers:
       algosdk:
         specifier: 3.8.0
         version: 3.8.0
-      canonify:
-        specifier: 2.1.1
-        version: 2.1.1
+      canonicalize:
+        specifier: 5.1.0
+        version: 5.1.0
       falcon-1024:
         specifier: 0.2.0
         version: 0.2.0
@@ -404,9 +404,9 @@ importers:
       algosdk:
         specifier: 3.8.0
         version: 3.8.0
-      canonify:
-        specifier: 2.1.1
-        version: 2.1.1
+      canonicalize:
+        specifier: 5.1.0
+        version: 5.1.0
       falcon-1024:
         specifier: 0.2.0
         version: 0.2.0
@@ -483,9 +483,9 @@ importers:
       algosdk:
         specifier: 3.8.0
         version: 3.8.0
-      canonify:
-        specifier: 2.1.1
-        version: 2.1.1
+      canonicalize:
+        specifier: 5.1.0
+        version: 5.1.0
       falcon-1024:
         specifier: 0.2.0
         version: 0.2.0
@@ -565,9 +565,9 @@ importers:
       algosdk:
         specifier: 3.8.0
         version: 3.8.0
-      canonify:
-        specifier: 2.1.1
-        version: 2.1.1
+      canonicalize:
+        specifier: 5.1.0
+        version: 5.1.0
       falcon-1024:
         specifier: 0.2.0
         version: 0.2.0
@@ -635,9 +635,9 @@ importers:
       algosdk:
         specifier: 3.8.0
         version: 3.8.0
-      canonify:
-        specifier: 2.1.1
-        version: 2.1.1
+      canonicalize:
+        specifier: 5.1.0
+        version: 5.1.0
       falcon-1024:
         specifier: 0.2.0
         version: 0.2.0
@@ -4670,6 +4670,11 @@ packages:
 
   caniuse-lite@1.0.30001816:
     resolution: {integrity: sha512-+8Yx7BXCoqk6IF8yTicjfUR6D/ldJzdlsodlEOiOSPmhK844WIgk67/zIQaGAOxNkZyyvBlrRFnLvqKIoqbAFw==}
+
+  canonicalize@5.1.0:
+    resolution: {integrity: sha512-bab9+WefZljqQ8jT0qRwVmTyzAUU63K97QIQD3agynIBrb6sa5M2eAy8Hv8K3p4V9+ONVYZKtGYl4Dg+/5Gumw==}
+    engines: {node: '>=22'}
+    hasBin: true
 
   canonify@2.1.1:
     resolution: {integrity: sha512-bDHlvXhY1fmi9P6cF8PVvs0G7+zOGKYww+5OLBM30+TotDif8tvKFCpdIqP0MJT5vDAgdgvm6CToLnH3RRIhAA==}
@@ -13784,6 +13789,8 @@ snapshots:
       lodash.uniq: 4.5.0
 
   caniuse-lite@1.0.30001816: {}
+
+  canonicalize@5.1.0: {}
 
   canonify@2.1.1: {}
 

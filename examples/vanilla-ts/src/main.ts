@@ -19,7 +19,7 @@ import { w3wallet } from '@txnlab/use-wallet-w3wallet'
 import { walletConnect } from '@txnlab/use-wallet-walletconnect'
 import { web3auth } from '@txnlab/use-wallet-web3auth'
 import algosdk, { Address, addressFromPQKey, FALCON_1024_SCHEME } from 'algosdk'
-import { canonify } from 'canonify'
+import canonicalize from 'canonicalize'
 import './style.css'
 
 const WC_PROJECT_ID = 'fcfde0713d43baa0d23be0773c80a72b'
@@ -485,7 +485,7 @@ async function handleAuth() {
       'issued-at': new Date().toISOString()
     }
 
-    const dataString = canonify(siwaRequest)
+    const dataString = canonicalize(siwaRequest)
     if (!dataString) throw Error('Invalid JSON')
     const data = btoa(dataString)
     const metadata = { scope: ScopeType.AUTH, encoding: 'base64' }
