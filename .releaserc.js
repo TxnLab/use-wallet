@@ -13,7 +13,9 @@ export default {
     [
       '@semantic-release/release-notes-generator',
       {
-        preset: 'angular',
+        // presetConfig.types is a conventionalcommits option; the angular
+        // preset ignores it and drops refactor commits from the notes
+        preset: 'conventionalcommits',
         presetConfig: {
           types: [
             { type: 'feat', section: 'Features' },

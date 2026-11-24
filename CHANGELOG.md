@@ -1,5 +1,10 @@
 ## [5.4.2](https://github.com/TxnLab/use-wallet/compare/v5.4.1...v5.4.2) (2026-11-24)
 
+
+### Code Refactoring
+
+* **passkey:** replace canonify with canonicalize ([#503](https://github.com/TxnLab/use-wallet/issues/503)) ([cef10da](https://github.com/TxnLab/use-wallet/commit/cef10da0683da05200c466c4d8a943a74329fb6a))
+
 ## [5.4.1](https://github.com/TxnLab/use-wallet/compare/v5.4.0...v5.4.1) (2026-11-18)
 
 
