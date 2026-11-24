@@ -2,7 +2,14 @@ export default {
   tagFormat: 'v${version}',
   branches: ['main', { name: 'next', prerelease: true }],
   plugins: [
-    '@semantic-release/commit-analyzer',
+    [
+      '@semantic-release/commit-analyzer',
+      {
+        preset: 'angular',
+        // Commits that match no rule here fall back to the default rules
+        releaseRules: [{ type: 'refactor', release: 'patch' }]
+      }
+    ],
     [
       '@semantic-release/release-notes-generator',
       {
