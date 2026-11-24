@@ -10,7 +10,7 @@
     "generate": "nuxt generate"
   },
   "dependencies": {
-    "@galaxypay/use-wallet-lute": "1.0.0",
+    "@galaxypay/use-wallet-lute": "1.1.0",
     "@noble/ed25519": "3.2.0",
     "@perawallet/use-wallet-pera": "1.0.0",
     "@txnlab/use-wallet": "workspace:*",
@@ -24,15 +24,15 @@
     "@txnlab/use-wallet-w3wallet": "workspace:*",
     "@txnlab/use-wallet-walletconnect": "workspace:*",
     "@txnlab/use-wallet-web3auth": "workspace:*",
-    "algosdk": "3.8.0",
+    "algosdk": "3.9.0",
     "canonicalize": "5.1.0",
     "falcon-1024": "0.2.0",
     "nuxt": "3.21.11",
-    "vue": "3.5.44"
+    "vue": "3.5.46"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "4.3.3",
-    "tailwindcss": "4.3.3",
+    "@tailwindcss/vite": "4.3.5",
+    "tailwindcss": "4.3.5",
     "typescript": "5.9.3",
     "vite-plugin-node-polyfills": "0.28.0"
   }
