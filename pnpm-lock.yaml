@@ -100,13 +100,13 @@ importers:
     dependencies:
       '@galaxypay/use-wallet-lute':
         specifier: 1.0.0
-        version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.8.0)
+        version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.9.0)
       '@noble/ed25519':
         specifier: 3.2.0
         version: 3.2.0
       '@perawallet/use-wallet-pera':
         specifier: 1.0.0
-        version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.8.0)
+        version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.9.0)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../../packages/core
@@ -141,8 +141,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/wallets/web3auth
       algosdk:
-        specifier: 3.8.0
-        version: 3.8.0
+        specifier: 3.9.0
+        version: 3.9.0
       canonify:
         specifier: 2.1.1
         version: 2.1.1
@@ -182,13 +182,13 @@ importers:
     dependencies:
       '@galaxypay/use-wallet-lute':
         specifier: 1.0.0
-        version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.8.0)
+        version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.9.0)
       '@noble/ed25519':
         specifier: 3.2.0
         version: 3.2.0
       '@perawallet/use-wallet-pera':
         specifier: 1.0.0
-        version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.8.0)
+        version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.9.0)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../../packages/core
@@ -223,8 +223,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/wallets/web3auth
       algosdk:
-        specifier: 3.8.0
-        version: 3.8.0
+        specifier: 3.9.0
+        version: 3.9.0
       canonify:
         specifier: 2.1.1
         version: 2.1.1
@@ -255,13 +255,13 @@ importers:
     dependencies:
       '@galaxypay/use-wallet-lute':
         specifier: 1.0.0
-        version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.8.0)
+        version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.9.0)
       '@noble/ed25519':
         specifier: 3.2.0
         version: 3.2.0
       '@perawallet/use-wallet-pera':
         specifier: 1.0.0
-        version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.8.0)
+        version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.9.0)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../../packages/core
@@ -296,8 +296,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/wallets/web3auth
       algosdk:
-        specifier: 3.8.0
-        version: 3.8.0
+        specifier: 3.9.0
+        version: 3.9.0
       canonify:
         specifier: 2.1.1
         version: 2.1.1
@@ -361,13 +361,13 @@ importers:
     dependencies:
       '@galaxypay/use-wallet-lute':
         specifier: 1.0.0
-        version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.8.0)
+        version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.9.0)
       '@noble/ed25519':
         specifier: 3.2.0
         version: 3.2.0
       '@perawallet/use-wallet-pera':
         specifier: 1.0.0
-        version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.8.0)
+        version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.9.0)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../../packages/core
@@ -402,8 +402,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/wallets/web3auth
       algosdk:
-        specifier: 3.8.0
-        version: 3.8.0
+        specifier: 3.9.0
+        version: 3.9.0
       canonify:
         specifier: 2.1.1
         version: 2.1.1
@@ -440,13 +440,13 @@ importers:
     dependencies:
       '@galaxypay/use-wallet-lute':
         specifier: 1.0.0
-        version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.8.0)
+        version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.9.0)
       '@noble/ed25519':
         specifier: 3.2.0
         version: 3.2.0
       '@perawallet/use-wallet-pera':
         specifier: 1.0.0
-        version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.8.0)
+        version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.9.0)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../../packages/core
@@ -481,8 +481,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/wallets/web3auth
       algosdk:
-        specifier: 3.8.0
-        version: 3.8.0
+        specifier: 3.9.0
+        version: 3.9.0
       canonify:
         specifier: 2.1.1
         version: 2.1.1
@@ -525,13 +525,13 @@ importers:
     dependencies:
       '@galaxypay/use-wallet-lute':
         specifier: 1.0.0
-        version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.8.0)
+        version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.9.0)
       '@noble/ed25519':
         specifier: 3.2.0
         version: 3.2.0
       '@perawallet/use-wallet-pera':
         specifier: 1.0.0
-        version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.8.0)
+        version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.9.0)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../../packages/core
@@ -563,8 +563,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/wallets/web3auth
       algosdk:
-        specifier: 3.8.0
-        version: 3.8.0
+        specifier: 3.9.0
+        version: 3.9.0
       canonify:
         specifier: 2.1.1
         version: 2.1.1
@@ -592,13 +592,13 @@ importers:
     dependencies:
       '@galaxypay/use-wallet-lute':
         specifier: 1.0.0
-        version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.8.0)
+        version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.9.0)
       '@noble/ed25519':
         specifier: 3.2.0
         version: 3.2.0
       '@perawallet/use-wallet-pera':
         specifier: 1.0.0
-        version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.8.0)
+        version: 1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.9.0)
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../../packages/core
@@ -633,8 +633,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/wallets/web3auth
       algosdk:
-        specifier: 3.8.0
-        version: 3.8.0
+        specifier: 3.9.0
+        version: 3.9.0
       canonify:
         specifier: 2.1.1
         version: 2.1.1
@@ -686,8 +686,8 @@ importers:
         specifier: 20.11.30
         version: 20.11.30
       algosdk:
-        specifier: 3.8.0
-        version: 3.8.0
+        specifier: 3.9.0
+        version: 3.9.0
       tsdown:
         specifier: 0.23.1
         version: 0.23.1(@volar/typescript@2.4.28)(@vue/language-core@3.3.13)(publint@0.3.25)(typescript@5.9.3)(vue-tsc@3.3.13(typescript@5.9.3))
@@ -708,8 +708,8 @@ importers:
         specifier: 19.3.0
         version: 19.3.0
       algosdk:
-        specifier: 3.8.0
-        version: 3.8.0
+        specifier: 3.9.0
+        version: 3.9.0
       jsdom:
         specifier: 26.1.0
         version: 26.1.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
@@ -739,8 +739,8 @@ importers:
         specifier: 0.8.10
         version: 0.8.10(solid-js@1.9.17)
       algosdk:
-        specifier: 3.8.0
-        version: 3.8.0
+        specifier: 3.9.0
+        version: 3.9.0
       solid-js:
         specifier: 1.9.17
         version: 1.9.17
@@ -764,8 +764,8 @@ importers:
         specifier: 5.4.2
         version: 5.4.2(svelte@5.57.2(@typescript-eslint/types@8.71.2))(vite@7.3.7(@types/node@24.19.2)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.51.2)(yaml@2.9.1))(vitest@3.2.7(@types/debug@4.1.13)(@types/node@24.19.2)(jiti@2.7.0)(jsdom@26.1.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))(lightningcss@1.32.0)(terser@5.51.2)(yaml@2.9.1))
       algosdk:
-        specifier: 3.8.0
-        version: 3.8.0
+        specifier: 3.9.0
+        version: 3.9.0
       svelte:
         specifier: 5.57.2
         version: 5.57.2(@typescript-eslint/types@8.71.2)
@@ -786,8 +786,8 @@ importers:
         version: link:../../core
     devDependencies:
       algosdk:
-        specifier: 3.8.0
-        version: 3.8.0
+        specifier: 3.9.0
+        version: 3.9.0
       tsdown:
         specifier: 0.23.1
         version: 0.23.1(@volar/typescript@2.4.28)(@vue/language-core@3.3.13)(publint@0.3.25)(typescript@5.9.3)(vue-tsc@3.3.13(typescript@5.9.3))
@@ -802,14 +802,14 @@ importers:
     dependencies:
       '@blockshake/defly-connect':
         specifier: 1.2.1
-        version: 1.2.1(algosdk@3.8.0)(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+        version: 1.2.1(algosdk@3.9.0)(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     devDependencies:
       '@txnlab/use-wallet':
         specifier: workspace:*
         version: link:../../core
       algosdk:
-        specifier: 3.8.0
-        version: 3.8.0
+        specifier: 3.9.0
+        version: 3.9.0
       tsdown:
         specifier: 0.23.7
         version: 0.23.7(@volar/typescript@2.4.28)(@vue/language-core@3.3.13)(publint@0.3.25)(typescript@5.9.3)(vue-tsc@3.3.13(typescript@5.9.3))
@@ -823,8 +823,8 @@ importers:
         specifier: workspace:*
         version: link:../../core
       algosdk:
-        specifier: 3.8.0
-        version: 3.8.0
+        specifier: 3.9.0
+        version: 3.9.0
       tsdown:
         specifier: 0.23.7
         version: 0.23.7(@volar/typescript@2.4.28)(@vue/language-core@3.3.13)(publint@0.3.25)(typescript@5.9.3)(vue-tsc@3.3.13(typescript@5.9.3))
@@ -842,8 +842,8 @@ importers:
         specifier: workspace:*
         version: link:../../core
       algosdk:
-        specifier: 3.8.0
-        version: 3.8.0
+        specifier: 3.9.0
+        version: 3.9.0
       tsdown:
         specifier: 0.23.7
         version: 0.23.7(@volar/typescript@2.4.28)(@vue/language-core@3.3.13)(publint@0.3.25)(typescript@5.9.3)(vue-tsc@3.3.13(typescript@5.9.3))
@@ -857,8 +857,8 @@ importers:
         specifier: workspace:*
         version: link:../../core
       algosdk:
-        specifier: 3.8.0
-        version: 3.8.0
+        specifier: 3.9.0
+        version: 3.9.0
       tsdown:
         specifier: 0.23.7
         version: 0.23.7(@volar/typescript@2.4.28)(@vue/language-core@3.3.13)(publint@0.3.25)(typescript@5.9.3)(vue-tsc@3.3.13(typescript@5.9.3))
@@ -872,8 +872,8 @@ importers:
         specifier: workspace:*
         version: link:../../core
       algosdk:
-        specifier: 3.8.0
-        version: 3.8.0
+        specifier: 3.9.0
+        version: 3.9.0
       tsdown:
         specifier: 0.23.7
         version: 0.23.7(@volar/typescript@2.4.28)(@vue/language-core@3.3.13)(publint@0.3.25)(typescript@5.9.3)(vue-tsc@3.3.13(typescript@5.9.3))
@@ -894,8 +894,8 @@ importers:
         specifier: workspace:*
         version: link:../../core
       algosdk:
-        specifier: 3.8.0
-        version: 3.8.0
+        specifier: 3.9.0
+        version: 3.9.0
       falcon-1024:
         specifier: 0.2.0
         version: 0.2.0
@@ -912,8 +912,8 @@ importers:
         specifier: workspace:*
         version: link:../../core
       algosdk:
-        specifier: 3.8.0
-        version: 3.8.0
+        specifier: 3.9.0
+        version: 3.9.0
       tsdown:
         specifier: 0.23.7
         version: 0.23.7(@volar/typescript@2.4.28)(@vue/language-core@3.3.13)(publint@0.3.25)(typescript@5.9.3)(vue-tsc@3.3.13(typescript@5.9.3))
@@ -937,8 +937,8 @@ importers:
         specifier: workspace:*
         version: link:../../core
       algosdk:
-        specifier: 3.8.0
-        version: 3.8.0
+        specifier: 3.9.0
+        version: 3.9.0
       tsdown:
         specifier: 0.23.7
         version: 0.23.7(@volar/typescript@2.4.28)(@vue/language-core@3.3.13)(publint@0.3.25)(typescript@5.9.3)(vue-tsc@3.3.13(typescript@5.9.3))
@@ -962,8 +962,8 @@ importers:
         specifier: workspace:*
         version: link:../../core
       algosdk:
-        specifier: 3.8.0
-        version: 3.8.0
+        specifier: 3.9.0
+        version: 3.9.0
       tsdown:
         specifier: 0.23.7
         version: 0.23.7(@volar/typescript@2.4.28)(@vue/language-core@3.3.13)(publint@0.3.25)(typescript@5.9.3)(vue-tsc@3.3.13(typescript@5.9.3))
@@ -4444,9 +4444,9 @@ packages:
     resolution: {integrity: sha512-08k7pBQnkaUB5p+jL7f1TRaUIlTSDE0cesFu1mD7llLao+1cAhtvvZmGE3OnisTd0xOn118QMw74SRqddqaYvw==}
     engines: {node: '>= 14'}
 
-  algosdk@3.8.0:
-    resolution: {integrity: sha512-Q8MIQY/H21eTfc/zy/xce8kewlpK/t+Tt33StaamtHNycHLTLK004zsuMHN2Q++3MA4MdowOML1kFDox2hAqeg==}
-    engines: {node: '>=18.0.0'}
+  algosdk@3.9.0:
+    resolution: {integrity: sha512-v6DoM9UNWVmoKAhF9a/jQa6TnvCB5kf+lDlURdS3Qn1gLGxmEtkLmW5aUzBzgJXp18euvm8eS/0bNYFdB9bcVQ==}
+    engines: {node: '>=22.0'}
 
   alien-signals@3.2.1:
     resolution: {integrity: sha512-I8FjmltrfnDFoZedi5CG8DghVYNhzb/Ijluz7tCSJH0xpd0484Kowhbb1XDYOxfJpU1p5wnM2X54dA+IfGyD1g==}
@@ -4826,6 +4826,7 @@ packages:
 
   canonify@2.1.1:
     resolution: {integrity: sha512-bDHlvXhY1fmi9P6cF8PVvs0G7+zOGKYww+5OLBM30+TotDif8tvKFCpdIqP0MJT5vDAgdgvm6CToLnH3RRIhAA==}
+    deprecated: 'Deprecated: use canonicalize (https://www.npmjs.com/package/canonicalize) instead. canonify does not reject NaN, Infinity, lone surrogates or circular references as RFC 8785 requires.'
 
   chai@5.3.3:
     resolution: {integrity: sha512-4zNhdJD/iOjSH0A05ea+Ke6MU5mmpQcbQsSOkgdaUMJ9zTlDTD/GYlwohmIE2u0gaxHYiVHEn1Fw9mZ/ktJWgw==}
@@ -9423,18 +9424,22 @@ packages:
   yuku-ast@0.19.0:
     resolution: {integrity: sha512-PyCsiScaelhxBGzL8dyeJkLqvRZycoh78R31Vrt/WqYrm0hMFoKwIw/X7Dx5mBKLWAMlV9I9HEyBOHnj2gZVyw==}
     engines: {node: '>=14.18.0'}
+    deprecated: 'Yuku is now one package with one core. Use "yuku" instead: https://yuku.fyi/javascript/. Existing installs keep working but get no more fixes.'
 
   yuku-codegen@0.19.0:
     resolution: {integrity: sha512-uymAKHjDuaP4BEpkXC/BSLz4DUEF5oArZ5AuD3888nb2miChjWSgpPdojEJxm3pjpXkgUaCRJQyNAbnMN33wHg==}
     engines: {node: '>=14.18.0'}
+    deprecated: 'Yuku is now one package with one core. Use "yuku" instead: https://yuku.fyi/javascript/. Existing installs keep working but get no more fixes.'
 
   yuku-core@0.19.0:
     resolution: {integrity: sha512-kYK9e1XdfirNhkipzW0wmMcSWcVF/CWnuugodfVYRCUwvoBefweL9HzB96OiKEhsx78V5WbUxbJqlizMX869Qg==}
     engines: {node: '>=14.18.0'}
+    deprecated: 'Yuku is now one package with one core. Use "yuku" instead: https://yuku.fyi/javascript/. Existing installs keep working but get no more fixes.'
 
   yuku-parser@0.19.0:
     resolution: {integrity: sha512-XrBh9ZiQK5mJVRxZBAvD6LwRyAYrK3MFtH3+onyuxFL5hFD44EC3QOmIC1FjTj6H2MMwq46/NAI+NZxLZPZgxg==}
     engines: {node: '>=14.18.0'}
+    deprecated: 'Yuku is now one package with one core. Use "yuku" instead: https://yuku.fyi/javascript/. Existing installs keep working but get no more fixes.'
 
   yuku@0.28.1:
     resolution: {integrity: sha512-l899L8rSywcq9OLHf8JNQKpgyrBUL7UNJ7JqefoSVy0oYaFpdf3HoF72EVQFNWYr9HqMw0nGw1r1DefNujOnLQ==}
@@ -9680,12 +9685,12 @@ snapshots:
       '@babel/helper-string-parser': 7.29.7
       '@babel/helper-validator-identifier': 7.29.7
 
-  '@blockshake/defly-connect@1.2.1(algosdk@3.8.0)(bufferutil@4.1.0)(utf-8-validate@5.0.10)':
+  '@blockshake/defly-connect@1.2.1(algosdk@3.9.0)(bufferutil@4.1.0)(utf-8-validate@5.0.10)':
     dependencies:
       '@likecoin/qr-code-styling': 1.6.6
       '@walletconnect/client': 1.8.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       '@walletconnect/types': 1.8.0
-      algosdk: 3.8.0
+      algosdk: 3.9.0
       bowser: 2.11.0
       buffer: 6.0.3
       lottie-web: 5.13.0
@@ -10051,11 +10056,11 @@ snapshots:
 
   '@galaxypay/lute-connect@3.0.1': {}
 
-  '@galaxypay/use-wallet-lute@1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.8.0)':
+  '@galaxypay/use-wallet-lute@1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.9.0)':
     dependencies:
       '@galaxypay/lute-connect': 3.0.1
       '@txnlab/use-wallet': link:packages/core
-      algosdk: 3.8.0
+      algosdk: 3.9.0
 
   '@hcaptcha/react-hcaptcha@2.2.0': {}
 
@@ -11227,22 +11232,22 @@ snapshots:
 
   '@paulmillr/qr@0.2.1': {}
 
-  '@perawallet/connect@1.7.0(algosdk@3.8.0)':
+  '@perawallet/connect@1.7.0(algosdk@3.9.0)':
     dependencies:
       '@evanhahn/lottie-web-light': 5.8.1
       '@perawallet/walletconnect': 1.0.2
-      algosdk: 3.8.0
+      algosdk: 3.9.0
       bowser: 2.11.0
       buffer: 6.0.3
       qr-code-styling: 1.6.0-rc.1
       tslib: 2.8.1
       tweetnacl-ts: 1.0.3
 
-  '@perawallet/use-wallet-pera@1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.8.0)':
+  '@perawallet/use-wallet-pera@1.0.0(@txnlab/use-wallet@packages+core)(algosdk@3.9.0)':
     dependencies:
-      '@perawallet/connect': 1.7.0(algosdk@3.8.0)
+      '@perawallet/connect': 1.7.0(algosdk@3.9.0)
       '@txnlab/use-wallet': link:packages/core
-      algosdk: 3.8.0
+      algosdk: 3.9.0
 
   '@perawallet/walletconnect@1.0.2':
     dependencies:
@@ -13708,7 +13713,7 @@ snapshots:
 
   algorand-msgpack@1.1.0: {}
 
-  algosdk@3.8.0:
+  algosdk@3.9.0:
     dependencies:
       algorand-msgpack: 1.1.0
       hi-base32: 0.5.1
